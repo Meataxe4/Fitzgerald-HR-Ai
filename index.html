@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fitzgerald HR Assistant - Beta Test</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Document Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -90,7 +93,7 @@
                         <span class="text-xl">🏨</span>
                     </div>
                     <div>
-                        <h1 class="text-xl font-bold text-white">Fitzgerald HR Assistant</h1>
+                        <h1 class="text-xl font-bold text-white">Fitz - Your HR Assistant</h1>
                         <p class="text-xs text-slate-400">Beta Testing - <span id="userCode"></span></p>
                     </div>
                 </div>
@@ -121,7 +124,7 @@
                 <!-- Welcome Message -->
                 <div class="flex justify-start">
                     <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
-                        <p class="text-slate-100 leading-relaxed whitespace-pre-wrap">G'day! I'm your Fitzgerald HR Assistant, specialised in hospitality HR for Australian venues.
+                        <p class="text-slate-100 leading-relaxed whitespace-pre-wrap">G'day! I'm Fitz, your AI assistant from Fitzgerald HR, specialised in hospitality HR for Australian venues.
 
 I can help you with Fair Work compliance, award interpretation, employee relations, recruitment advice, and more.
 
@@ -229,6 +232,517 @@ What HR challenge can I help you with today?
     </div>
 
     <script>
+        // ========================================
+        // HR DOCUMENT TEMPLATES
+        // ========================================
+        const hrTemplates = {
+            employmentContract: (data) => `
+                <div class="header">
+                    <h1>EMPLOYMENT CONTRACT</h1>
+                    <p>Fitzgerald HR - Professional HR Solutions</p>
+                </div>
+                
+                <h2>Employment Details</h2>
+                <p><strong>Employee Name:</strong> ${data.employeeName || '[Employee Name]'}</p>
+                <p><strong>Position:</strong> ${data.position || '[Position Title]'}</p>
+                <p><strong>Start Date:</strong> ${data.startDate || '[Start Date]'}</p>
+                <p><strong>Employment Type:</strong> ${data.employmentType || '[Full-time/Part-time/Casual]'}</p>
+                <p><strong>Applicable Award:</strong> ${data.award || 'Hospitality Industry (General) Award'}</p>
+                
+                <h2>1. Position and Duties</h2>
+                <p>${data.duties || '[Insert comprehensive list of key duties, responsibilities, and reporting lines]'}</p>
+                
+                <h2>2. Remuneration and Benefits</h2>
+                <p><strong>Base Rate of Pay:</strong> ${data.baseRate || '[Rate]'} per ${data.payPeriod || 'hour'}</p>
+                <p>Payment will be made ${data.paymentFrequency || 'fortnightly'} via direct deposit.</p>
+                <p>In addition to the base rate, you will receive applicable penalty rates, loadings, and allowances as prescribed by the ${data.award || 'Hospitality Industry (General) Award'}.</p>
+                
+                <h2>3. Hours of Work</h2>
+                <p>${data.hoursOfWork || '[Specify ordinary hours, roster arrangements, and any requirements for availability]'}</p>
+                <p>Reasonable additional hours may be required from time to time, subject to the National Employment Standards.</p>
+                
+                <h2>4. Probationary Period</h2>
+                <p>The first ${data.probationPeriod || '3 months'} of your employment will be considered a probationary period. During this time, your suitability for the role will be assessed. Either party may terminate employment during probation with ${data.probationNotice || '1 week\'s'} notice.</p>
+                
+                <h2>5. Leave Entitlements</h2>
+                <p>You are entitled to leave in accordance with the National Employment Standards and the applicable Modern Award, including:</p>
+                <ul>
+                    <li>Annual leave (if applicable to employment type)</li>
+                    <li>Personal/carer's leave</li>
+                    <li>Compassionate and bereavement leave</li>
+                    <li>Long service leave (after qualifying period)</li>
+                    <li>Public holidays</li>
+                </ul>
+                
+                <h2>6. Termination of Employment</h2>
+                <p>Either party may terminate this employment by providing written notice as required by the National Employment Standards and the applicable Award.</p>
+                
+                <h2>7. Workplace Policies</h2>
+                <p>You are required to comply with all workplace policies and procedures, including but not limited to workplace health and safety, equal opportunity, and code of conduct policies.</p>
+                
+                <div class="warning">
+                    <strong>⚠️ IMPORTANT LEGAL NOTICE</strong>
+                    <p>This employment contract template has been generated by Fitz AI and is provided for guidance purposes only.</p>
+                    <p><strong>You MUST have this contract reviewed and customised by a Fitzgerald HR Senior Consultant or employment lawyer before use.</strong></p>
+                    <p>This ensures compliance with all applicable laws, awards, and your specific circumstances.</p>
+                    <p><strong>Contact:</strong> info@fitzgeraldhr.com.au | Fitzgerald HR</p>
+                </div>
+                
+                <div style="margin-top: 50px;">
+                    <p><strong>Employee Signature:</strong> _________________________ <strong>Date:</strong> __________</p>
+                    <p><strong>Employer Signature:</strong> _________________________ <strong>Date:</strong> __________</p>
+                </div>
+            `,
+            
+            warningLetter: (data) => `
+                <div class="header">
+                    <h1>WRITTEN WARNING</h1>
+                    <p>Fitzgerald HR - Professional HR Solutions</p>
+                </div>
+                
+                <p><strong>Date:</strong> ${data.date || new Date().toLocaleDateString('en-AU')}</p>
+                <p><strong>Employee Name:</strong> ${data.employeeName || '[Employee Name]'}</p>
+                <p><strong>Position:</strong> ${data.position || '[Position]'}</p>
+                <p><strong>Employee ID:</strong> ${data.employeeId || '[Employee ID]'}</p>
+                
+                <h2>Subject: ${data.subject || 'Formal Written Warning'}</h2>
+                
+                <p>This letter serves as a formal written warning regarding ${data.issue || '[describe the issue or concern]'}.</p>
+                
+                <h2>Details of Incident/Issue</h2>
+                <p><strong>Date(s) of Incident:</strong> ${data.incidentDate || '[Date(s)]'}</p>
+                <p><strong>Description:</strong></p>
+                <p>${data.description || '[Provide detailed, factual description of the incident, behaviour, or performance issue. Include specific examples, dates, times, and any witnesses if applicable]'}</p>
+                
+                <h2>Previous Discussions</h2>
+                <p>${data.previousDiscussions || '[If applicable, note any prior verbal warnings or discussions about this matter, including dates]'}</p>
+                
+                <h2>Expected Standards and Behaviour</h2>
+                <p>${data.expectations || '[Clearly outline the expected standards of conduct, performance, or behaviour moving forward. Reference relevant policies, position description, or award requirements]'}</p>
+                
+                <h2>Improvement Plan</h2>
+                <p>${data.improvementPlan || '[Outline specific, measurable steps the employee must take to address the issue. Include timeframes and any support or resources available]'}</p>
+                
+                <h2>Consequences of Further Issues</h2>
+                <p>Failure to meet these expectations and demonstrate sustained improvement may result in further disciplinary action, which may include:</p>
+                <ul>
+                    <li>A final written warning</li>
+                    <li>Termination of employment</li>
+                </ul>
+                
+                <h2>Support Available</h2>
+                <p>${data.support || '[Outline any support, training, coaching, or resources available to help the employee improve. This demonstrates procedural fairness]'}</p>
+                
+                <h2>Right to Respond</h2>
+                <p>You have the right to provide a written response to this warning within ${data.responseTimeframe || '7 days'}. Your response will be considered and placed on your employee file with this warning.</p>
+                
+                <p>This warning will remain on your employee file for ${data.warningDuration || '12 months'} from the date of this letter.</p>
+                
+                <div class="warning">
+                    <strong>⚠️ CRITICAL LEGAL RISK</strong>
+                    <p>Performance management and disciplinary processes involve significant legal risks if not handled correctly.</p>
+                    <p><strong>This template MUST be reviewed by a Fitzgerald HR Senior Consultant before being issued to any employee.</strong></p>
+                    <p>Incorrect process may result in unfair dismissal claims, general protections claims, or adverse action claims.</p>
+                    <p><strong>Contact immediately:</strong> info@fitzgeraldhr.com.au | Fitzgerald HR</p>
+                </div>
+                
+                <div style="margin-top: 40px;">
+                    <p><strong>I acknowledge receipt of this written warning:</strong></p>
+                    <p><strong>Employee Signature:</strong> _________________________ <strong>Date:</strong> __________</p>
+                    <p style="margin-top: 10px; font-size: 12px; color: #666;"><em>Signing this letter acknowledges receipt only and does not necessarily indicate agreement with its contents.</em></p>
+                    <br/>
+                    <p><strong>Manager/Supervisor Name:</strong> ${data.managerName || '[Manager Name]'}</p>
+                    <p><strong>Manager Signature:</strong> _________________________ <strong>Date:</strong> __________</p>
+                </div>
+            `,
+            
+            performanceReview: (data) => `
+                <div class="header">
+                    <h1>PERFORMANCE REVIEW</h1>
+                    <p>Fitzgerald HR - Professional HR Solutions</p>
+                </div>
+                
+                <h2>Employee Information</h2>
+                <p><strong>Employee Name:</strong> ${data.employeeName || '[Employee Name]'}</p>
+                <p><strong>Position:</strong> ${data.position || '[Position]'}</p>
+                <p><strong>Department/Location:</strong> ${data.department || '[Department]'}</p>
+                <p><strong>Review Period:</strong> ${data.reviewPeriod || '[Start Date] to [End Date]'}</p>
+                <p><strong>Review Date:</strong> ${data.reviewDate || new Date().toLocaleDateString('en-AU')}</p>
+                <p><strong>Reviewer:</strong> ${data.reviewer || '[Manager/Supervisor Name]'}</p>
+                
+                <h2>Performance Summary</h2>
+                <p>${data.summary || '[Provide an overall summary of the employee\'s performance during the review period. Consider achievements, challenges, growth, and overall contribution to the team and organisation]'}</p>
+                
+                <h2>Key Achievements and Successes</h2>
+                <p>${data.achievements || '[List and describe significant achievements, successful projects, goals met or exceeded, positive contributions to team/workplace culture, and any special recognition received during the review period]'}</p>
+                
+                <h2>Core Competencies Assessment</h2>
+                
+                <h3>1. Job Knowledge and Skills</h3>
+                <p>${data.jobKnowledge || '[Assess the employee\'s understanding of their role, technical skills, industry knowledge, and ability to perform required tasks]'}</p>
+                
+                <h3>2. Quality of Work</h3>
+                <p>${data.qualityOfWork || '[Evaluate accuracy, attention to detail, consistency, and standard of work produced]'}</p>
+                
+                <h3>3. Productivity and Time Management</h3>
+                <p>${data.productivity || '[Assess ability to meet deadlines, manage workload, prioritise tasks, and work efficiently]'}</p>
+                
+                <h3>4. Communication and Teamwork</h3>
+                <p>${data.communication || '[Evaluate interpersonal skills, collaboration with colleagues, customer service, and contribution to team dynamics]'}</p>
+                
+                <h3>5. Initiative and Problem Solving</h3>
+                <p>${data.initiative || '[Assess proactiveness, ability to identify and solve problems, willingness to take on new challenges]'}</p>
+                
+                <h3>6. Reliability and Attendance</h3>
+                <p>${data.reliability || '[Review punctuality, attendance record, dependability, and adherence to rostering requirements]'}</p>
+                
+                <h2>Areas of Strength</h2>
+                <p>${data.strengths || '[Identify specific areas where the employee excels. Be specific with examples]'}</p>
+                
+                <h2>Development Areas and Opportunities</h2>
+                <p>${data.developmentAreas || '[Identify areas where improvement is needed or where the employee can further develop their skills. Frame constructively and with specific examples]'}</p>
+                
+                <h2>Goals and Objectives for Next Review Period</h2>
+                <p>${data.goals || '[Set SMART goals (Specific, Measurable, Achievable, Relevant, Time-bound) for the upcoming review period. Align with both employee development and organisational objectives]'}</p>
+                
+                <h2>Training and Development Plan</h2>
+                <p>${data.trainingPlan || '[Outline specific training, development opportunities, mentoring, or resources that will be provided to support the employee\'s growth and achievement of goals]'}</p>
+                
+                <h2>Career Progression Discussion</h2>
+                <p>${data.careerDiscussion || '[If discussed, note any conversations about career aspirations, potential progression opportunities, or long-term development paths]'}</p>
+                
+                <h2>Overall Performance Rating</h2>
+                <p><strong>Rating: ${data.rating || '[Exceeds Expectations / Meets Expectations / Needs Improvement / Unsatisfactory]'}</strong></p>
+                
+                <h2>Employee Comments</h2>
+                <p>The employee has the opportunity to provide comments, feedback, or responses to this review:</p>
+                <p>_________________________________________________________________________________</p>
+                <p>_________________________________________________________________________________</p>
+                <p>_________________________________________________________________________________</p>
+                
+                <div style="margin-top: 40px;">
+                    <p><strong>Employee Signature:</strong> _________________________ <strong>Date:</strong> __________</p>
+                    <p style="font-size: 12px; color: #666; margin-top: 5px;"><em>Signature indicates that the review has been discussed with the employee, not necessarily agreement.</em></p>
+                    <br/>
+                    <p><strong>Reviewer Signature:</strong> _________________________ <strong>Date:</strong> __________</p>
+                </div>
+                
+                <div class="warning">
+                    <strong>⚠️ IMPORTANT NOTE</strong>
+                    <p>This performance review template has been generated by Fitz AI for guidance purposes.</p>
+                    <p>For best results and to ensure procedural fairness, consider having your performance review process and documentation reviewed by a Fitzgerald HR Senior Consultant.</p>
+                    <p><strong>Contact:</strong> info@fitzgeraldhr.com.au | Fitzgerald HR</p>
+                </div>
+            `
+        };
+
+        // ========================================
+        // DOCUMENT GENERATION FUNCTIONS
+        // ========================================
+        
+        function generateWordDocument(content, filename = 'document.doc', metadata = {}) {
+            const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; }
+        h1 { color: #E2A14A; border-bottom: 3px solid #E2A14A; padding-bottom: 10px; font-size: 24px; }
+        h2 { color: #1E3A5F; margin-top: 25px; font-size: 18px; }
+        h3 { color: #1E3A5F; margin-top: 20px; font-size: 16px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .footer { margin-top: 50px; border-top: 2px solid #ccc; padding-top: 20px; font-size: 11px; color: #666; }
+        .warning { background: #fff3cd; border-left: 4px solid #ff6b6b; padding: 20px; margin: 25px 0; }
+        strong { font-weight: bold; }
+        ul { margin-left: 20px; }
+        li { margin-bottom: 8px; }
+        p { margin-bottom: 12px; }
+    </style>
+</head>
+<body>
+    ${content}
+    
+    <div class="footer">
+        <p><strong>FITZGERALD HR</strong> - AI-Powered Hospitality HR Solutions</p>
+        <p>Email: info@fitzgeraldhr.com.au | Phone: [Your Phone]</p>
+        <p>This document was generated by Fitz, your AI HR Assistant, on ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}</p>
+        <p><strong>Document ID:</strong> ${metadata.documentId || 'N/A'} | <strong>Generated for:</strong> ${metadata.userName || 'Beta User'}</p>
+        <p><em>For personalised advice and document review, contact our Senior Consultants.</em></p>
+    </div>
+</body>
+</html>`;
+
+            const blob = new Blob(['\ufeff', htmlContent], {
+                type: 'application/msword'
+            });
+            
+            saveAs(blob, filename);
+            
+            // Track document generation
+            trackDocumentGeneration(filename, metadata);
+            
+            return true;
+        }
+        
+        function generateExcelSpreadsheet(data, filename = 'spreadsheet.xlsx', sheetName = 'HR Data') {
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(data);
+            
+            // Set column widths
+            const colWidths = [];
+            Object.keys(data[0] || {}).forEach(() => {
+                colWidths.push({ wch: 20 });
+            });
+            ws['!cols'] = colWidths;
+            
+            XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            XLSX.writeFile(wb, filename);
+            
+            // Track document generation
+            trackDocumentGeneration(filename, { type: 'excel', rows: data.length });
+            
+            return true;
+        }
+
+        // ========================================
+        // SMART DOCUMENT DETECTION & BUTTONS
+        // ========================================
+        
+        function detectDocumentType(content) {
+            const lowerContent = content.toLowerCase();
+            
+            const documentKeywords = {
+                'employmentContract': ['employment contract', 'hire', 'new employee', 'employment agreement', 'contract of employment'],
+                'warningLetter': ['warning', 'disciplinary', 'performance issue', 'misconduct', 'written warning'],
+                'performanceReview': ['performance review', 'performance appraisal', 'performance evaluation', 'annual review']
+            };
+            
+            for (const [docType, keywords] of Object.entries(documentKeywords)) {
+                if (keywords.some(keyword => lowerContent.includes(keyword))) {
+                    return docType;
+                }
+            }
+            
+            return null;
+        }
+        
+        function extractDataFromConversation(messages, documentType) {
+            // Parse conversation to extract relevant data
+            const conversationText = messages.map(m => m.content).join(' ').toLowerCase();
+            const data = {};
+            
+            // Extract employee name
+            const nameMatch = conversationText.match(/(?:employee name|name is|called)\s+(?:is\s+)?([A-Z][a-z]+\s+[A-Z][a-z]+)/i);
+            if (nameMatch) data.employeeName = nameMatch[1];
+            
+            // Extract position
+            const positionMatch = conversationText.match(/(?:position|role|job)\s+(?:is|as|of)?\s+([a-z\s]+?)(?:\s|,|\.|$)/i);
+            if (positionMatch) data.position = positionMatch[1].trim();
+            
+            // Extract date
+            const dateMatch = conversationText.match(/(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/);
+            if (dateMatch) data.startDate = dateMatch[1];
+            
+            // Extract rate
+            const rateMatch = conversationText.match(/\$?(\d+(?:\.\d{2})?)\s*(?:per hour|\/hr|hourly)/i);
+            if (rateMatch) data.baseRate = rateMatch[1];
+            
+            // Document-specific extraction
+            if (documentType === 'warningLetter') {
+                const issueMatch = conversationText.match(/(?:issue|problem|concern).*?(?:is|was|regarding)\s+([^.]+)/i);
+                if (issueMatch) data.issue = issueMatch[1];
+            }
+            
+            return data;
+        }
+        
+        function addDocumentDownloadButtons(messageDiv, documentType, conversationData) {
+            const buttonContainer = document.createElement('div');
+            buttonContainer.className = 'mt-4 p-4 bg-slate-700/50 rounded-lg border border-amber-500/30';
+            
+            const documentNames = {
+                'employmentContract': 'Employment Contract',
+                'warningLetter': 'Warning Letter',
+                'performanceReview': 'Performance Review'
+            };
+            
+            buttonContainer.innerHTML = `
+                <div class="flex items-center justify-between mb-3">
+                    <p class="text-amber-400 font-semibold flex items-center gap-2">
+                        <span>📄</span>
+                        <span>Generate ${documentNames[documentType]}</span>
+                    </p>
+                </div>
+                <p class="text-slate-300 text-sm mb-3">Based on our conversation, I can generate a customized template for you:</p>
+                <div class="flex gap-2 flex-wrap">
+                    <button onclick="downloadDocument('${documentType}', 'word')" 
+                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2 text-sm font-medium">
+                        <span>📝</span> Download Word Doc
+                    </button>
+                    <button onclick="downloadDocument('${documentType}', 'pdf')" 
+                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center gap-2 text-sm font-medium">
+                        <span>📄</span> Download PDF
+                    </button>
+                </div>
+                <p class="text-xs text-slate-400 mt-3 flex items-start gap-2">
+                    <span>⚠️</span>
+                    <span>This template must be reviewed by a Senior Consultant before use</span>
+                </p>
+            `;
+            
+            messageDiv.querySelector('.max-w-3xl').appendChild(buttonContainer);
+        }
+        
+        function downloadDocument(documentType, format) {
+            // Show disclaimer first
+            const confirmed = confirm(
+                "⚠️ IMPORTANT LEGAL DISCLAIMER\n\n" +
+                "This document is a TEMPLATE generated by Fitz AI for guidance purposes only.\n\n" +
+                "Before using this document:\n" +
+                "✓ You MUST have it reviewed by a Fitzgerald HR Senior Consultant\n" +
+                "✓ This ensures legal compliance and protects your business\n" +
+                "✓ Templates may need customization for your specific situation\n\n" +
+                "Failure to have documents professionally reviewed may expose you to legal risks.\n\n" +
+                "Contact: info@fitzgeraldhr.com.au\n\n" +
+                "Click OK to download template, or Cancel to return."
+            );
+            
+            if (!confirmed) return;
+            
+            // Extract data from conversation
+            const data = extractDataFromConversation(conversationHistory, documentType);
+            
+            // Add metadata
+            const metadata = {
+                documentId: generateDocumentId(),
+                userName: currentUser,
+                generatedAt: new Date().toISOString(),
+                documentType: documentType
+            };
+            
+            // Generate document content
+            const template = hrTemplates[documentType];
+            if (!template) {
+                alert('Template not found');
+                return;
+            }
+            
+            const content = template(data);
+            
+            // Generate filename
+            const timestamp = new Date().toISOString().slice(0,10);
+            const filename = `${documentType}_${timestamp}.${format === 'word' ? 'doc' : 'pdf'}`;
+            
+            // Download
+            if (format === 'word') {
+                generateWordDocument(content, filename, metadata);
+            } else {
+                generatePDFDocument(content, filename);
+            }
+            
+            // Show confirmation
+            alert(`✓ Document downloaded: ${filename}\n\n` +
+                  `Remember to have this reviewed by a Senior Consultant before use.\n` +
+                  `Contact: info@fitzgeraldhr.com.au`);
+        }
+        
+        function generatePDFDocument(content, filename = 'document.pdf') {
+            const printWindow = window.open('', '_blank');
+            
+            printWindow.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>${filename}</title>
+    <style>
+        @media print {
+            body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20mm; font-size: 11pt; }
+            h1 { color: #E2A14A; border-bottom: 3px solid #E2A14A; page-break-after: avoid; }
+            h2 { color: #1E3A5F; page-break-after: avoid; margin-top: 20px; }
+            .warning { background: #fff3cd; border-left: 4px solid #ff6b6b; padding: 15px; page-break-inside: avoid; }
+            .no-print { display: none; }
+            .header { text-align: center; margin-bottom: 20px; }
+        }
+        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; }
+        h1 { color: #E2A14A; border-bottom: 3px solid #E2A14A; }
+        h2 { color: #1E3A5F; margin-top: 20px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .warning { background: #fff3cd; border-left: 4px solid #ff6b6b; padding: 20px; margin: 25px 0; }
+        ul { margin-left: 20px; }
+        li { margin-bottom: 8px; }
+    </style>
+</head>
+<body>
+    ${content}
+    <div class="no-print" style="margin-top: 40px; text-align: center; padding: 20px; background: #f0f0f0; border-radius: 10px;">
+        <p style="margin-bottom: 15px; font-size: 16px; color: #333;">Use your browser's print function and select "Save as PDF"</p>
+        <button onclick="window.print()" style="padding: 12px 24px; font-size: 16px; background: #E2A14A; border: none; color: white; border-radius: 5px; cursor: pointer; margin-right: 10px;">Print / Save as PDF</button>
+        <button onclick="window.close()" style="padding: 12px 24px; font-size: 16px; background: #666; border: none; color: white; border-radius: 5px; cursor: pointer;">Close</button>
+    </div>
+</body>
+</html>`);
+            
+            printWindow.document.close();
+            return true;
+        }
+        
+        // ========================================
+        // ADVANCED FEATURES
+        // ========================================
+        
+        // 1. Document Metadata Tracking
+        function trackDocumentGeneration(filename, metadata) {
+            const documentLog = {
+                filename: filename,
+                user: currentUser,
+                timestamp: new Date().toISOString(),
+                ...metadata
+            };
+            
+            // Store in localStorage for tracking
+            const existingLogs = JSON.parse(localStorage.getItem('documentGenerationLogs') || '[]');
+            existingLogs.push(documentLog);
+            localStorage.setItem('documentGenerationLogs', JSON.stringify(existingLogs));
+            
+            // Also track as event
+            trackEvent('document_generated', documentLog);
+            
+            console.log('Document generated:', documentLog);
+        }
+        
+        function generateDocumentId() {
+            return 'DOC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+        }
+        
+        // 2. Multi-page document generation
+        function generateMultiPageDocument(sections, filename, metadata = {}) {
+            let fullContent = '';
+            
+            sections.forEach((section, index) => {
+                fullContent += section.content;
+                
+                // Add page break between sections (for PDF/Word)
+                if (index < sections.length - 1) {
+                    fullContent += '<div style="page-break-after: always;"></div>';
+                }
+            });
+            
+            generateWordDocument(fullContent, filename, metadata);
+        }
+        
+        // Example usage for complex documents:
+        // generateMultiPageDocument([
+        //     { content: hrTemplates.employmentContract(data), title: 'Employment Contract' },
+        //     { content: generatePolicySection(data), title: 'Workplace Policies' },
+        //     { content: generateBenefitsSection(data), title: 'Benefits Summary' }
+        // ], 'Complete_Employment_Package.doc');
+
+        // ========================================
+        // MAIN APPLICATION CODE
+        // ========================================
+        
         // Valid access codes (you can add more)
         const VALID_CODES = [
             'BETA-VENUE-001',
@@ -275,10 +789,13 @@ What HR challenge can I help you with today?
             addMessage('user', message);
             input.value = '';
             
+            // Show "Fitz is thinking..." indicator
+            const thinkingDiv = showThinkingIndicator();
+            
             // Disable send button
             const sendBtn = document.getElementById('sendButton');
             sendBtn.disabled = true;
-            sendBtn.innerHTML = '<span class="pulse">Thinking...</span>';
+            sendBtn.innerHTML = '<span class="pulse">●●●</span>';
             
             // Add to conversation history
             conversationHistory.push({ role: 'user', content: message });
@@ -286,6 +803,9 @@ What HR challenge can I help you with today?
             try {
                 // Call Claude API (you'll need to replace this with your actual API endpoint)
                 const response = await callClaudeAPI(message);
+                
+                // Remove thinking indicator
+                removeThinkingIndicator(thinkingDiv);
                 
                 // Add AI response to UI
                 addMessage('assistant', response);
@@ -298,6 +818,9 @@ What HR challenge can I help you with today?
                 });
                 
             } catch (error) {
+                // Remove thinking indicator
+                removeThinkingIndicator(thinkingDiv);
+                
                 addMessage('assistant', 'Sorry, I encountered an error. Please try again or contact support if the issue persists.');
                 console.error('Error:', error);
             }
@@ -307,20 +830,95 @@ What HR challenge can I help you with today?
             sendBtn.innerHTML = '<span>Send</span><span>→</span>';
         }
 
+        // Show thinking indicator
+        function showThinkingIndicator() {
+            const container = document.getElementById('messagesContainer').querySelector('.space-y-6');
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.id = 'thinking-indicator';
+            thinkingDiv.className = 'flex justify-start fade-in';
+            
+            thinkingDiv.innerHTML = `
+                <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <div class="flex gap-1">
+                            <div class="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                            <div class="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                            <div class="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                        </div>
+                        <p class="text-slate-400 text-sm">Fitz is thinking...</p>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(thinkingDiv);
+            thinkingDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            
+            return thinkingDiv;
+        }
+
+        // Remove thinking indicator
+        function removeThinkingIndicator(thinkingDiv) {
+            if (thinkingDiv && thinkingDiv.parentNode) {
+                thinkingDiv.parentNode.removeChild(thinkingDiv);
+            }
+        }
+
         // Add message to UI
         function addMessage(role, content) {
             const container = document.getElementById('messagesContainer').querySelector('.space-y-6');
             const messageDiv = document.createElement('div');
             messageDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} fade-in`;
             
+            // Check if content has legal warning and format it
+            let formattedContent = content;
+            if (role === 'assistant') {
+                // Look for legal warnings at the start and make them bold and prominent
+                const legalWarnings = [
+                    '⚠️ **This matter involves legal risk.**',
+                    '⚠️ This matter involves legal risk.'
+                ];
+                
+                for (const warning of legalWarnings) {
+                    if (content.includes(warning)) {
+                        // Move warning to start and make it bold/red
+                        formattedContent = content.replace(warning, '');
+                        formattedContent = `<div class="mb-4 p-4 bg-red-500/10 border-2 border-red-500 rounded-lg">
+                            <p class="text-red-400 font-bold text-lg flex items-center gap-2">
+                                <span class="text-2xl">⚠️</span>
+                                <span>IMPORTANT: This matter involves legal risk.</span>
+                            </p>
+                            <p class="text-red-300 mt-2">Please contact one of our Senior Consultants at <a href="mailto:info@fitzgeraldhr.com.au" class="underline hover:text-red-200">info@fitzgeraldhr.com.au</a> for expert guidance on your specific situation and next steps.</p>
+                        </div>` + formattedContent.replace('Please contact one of our Senior Consultants at info@fitzgeraldhr.com.au for expert guidance on your specific situation and next steps.', '');
+                        break;
+                    }
+                }
+                
+                // Format other call-to-actions and make links clickable
+                formattedContent = formattedContent
+                    .replace(/📞 \*\*Need personalised support\?\*\*/g, '<strong class="text-amber-400">📞 Need personalised support?</strong>')
+                    .replace(/✉️ \*\*Questions or need further assistance\?\*\*/g, '<strong class="text-amber-400">✉️ Questions or need further assistance?</strong>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/info@fitzgeraldhr\.com\.au/g, '<a href="mailto:info@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">info@fitzgeraldhr.com.au</a>');
+            }
+            
             messageDiv.innerHTML = `
                 <div class="max-w-3xl ${role === 'user' ? 'bg-amber-500 text-slate-900' : 'bg-slate-800 text-slate-100 border border-slate-700'} rounded-2xl px-6 py-4">
-                    <p class="leading-relaxed whitespace-pre-wrap">${content}</p>
+                    <p class="leading-relaxed whitespace-pre-wrap">${formattedContent}</p>
                 </div>
             `;
             
             container.appendChild(messageDiv);
             messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            
+            // AUTOMATIC DOCUMENT DETECTION - Check if assistant response mentions documents
+            if (role === 'assistant') {
+                const detectedDocType = detectDocumentType(content);
+                if (detectedDocType) {
+                    setTimeout(() => {
+                        addDocumentDownloadButtons(messageDiv, detectedDocType, conversationHistory);
+                    }, 500);
+                }
+            }
         }
 
         // Call Claude API through Netlify Function
