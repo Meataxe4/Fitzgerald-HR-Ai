@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fitzgerald HR Assistant - Beta Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .pulse { animation: pulse 2s ease-in-out infinite; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
+    
+    <!-- Access Code Screen -->
+    <div id="accessScreen" class="min-h-screen flex items-center justify-center p-6">
+        <div class="max-w-md w-full fade-in">
+            <!-- Logo/Branding -->
+            <div class="text-center mb-8">
+                <div class="inline-block bg-gradient-to-r from-amber-500 to-orange-600 p-1 rounded-2xl mb-4">
+                    <div class="bg-slate-900 px-8 py-4 rounded-xl">
+                        <h1 class="text-3xl font-bold text-amber-500">FITZGERALD HR</h1>
+                        <p class="text-slate-400 text-sm mt-1">AI-Powered Hospitality HR</p>
+                    </div>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">Beta Testing Programme</h2>
+                <p class="text-slate-400">Thank you for helping us test Australia's first AI-powered hospitality HR assistant</p>
+            </div>
+
+            <!-- Access Code Form -->
+            <div class="bg-slate-800 rounded-2xl p-8 shadow-2xl border border-slate-700">
+                <label class="block text-slate-300 font-medium mb-3">Enter Your Access Code</label>
+                <input 
+                    type="text" 
+                    id="accessCodeInput"
+                    placeholder="e.g., BETA-VENUE-001"
+                    class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
+                    onkeypress="if(event.key==='Enter') checkAccess()"
+                />
+                <button 
+                    onclick="checkAccess()"
+                    class="w-full mt-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105"
+                >
+                    Access Beta
+                </button>
+                <p id="accessError" class="text-red-400 text-sm mt-3 hidden"></p>
+                
+                <div class="mt-6 pt-6 border-t border-slate-700">
+                    <p class="text-slate-500 text-xs text-center">
+                        Don't have an access code? Contact us at<br/>
+                        <a href="mailto:beta@fitzgeraldhr.com.au" class="text-amber-500 hover:underline">beta@fitzgeraldhr.com.au</a>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Info Cards -->
+            <div class="mt-8 grid grid-cols-3 gap-4">
+                <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-center">
+                    <div class="text-2xl mb-2">🤖</div>
+                    <p class="text-slate-400 text-xs">AI-Powered Guidance</p>
+                </div>
+                <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-center">
+                    <div class="text-2xl mb-2">🇦🇺</div>
+                    <p class="text-slate-400 text-xs">Australian Hospitality</p>
+                </div>
+                <div class="bg-slate-800/50 border border-slate-700 rounded-xl p-4 text-center">
+                    <div class="text-2xl mb-2">⚡</div>
+                    <p class="text-slate-400 text-xs">24/7 Available</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Assistant Screen (Hidden Initially) -->
+    <div id="assistantScreen" class="hidden min-h-screen flex flex-col">
+        <!-- Header -->
+        <div class="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700 px-6 py-4">
+            <div class="max-w-5xl mx-auto flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
+                        <span class="text-xl">🏨</span>
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-bold text-white">Fitzgerald HR Assistant</h1>
+                        <p class="text-xs text-slate-400">Beta Testing - <span id="userCode"></span></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="showFeedback()" class="text-amber-500 hover:text-amber-400 text-sm font-medium transition-colors">
+                        Give Feedback
+                    </button>
+                    <button onclick="logout()" class="text-slate-400 hover:text-white text-sm transition-colors">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Beta Notice -->
+        <div class="bg-amber-500/10 border-b border-amber-500/20 px-6 py-3">
+            <div class="max-w-5xl mx-auto flex items-center gap-3">
+                <span class="text-lg">⚠️</span>
+                <p class="text-amber-200 text-sm">
+                    <strong>Beta Test:</strong> This is a preview. Please share honest feedback on your experience!
+                </p>
+            </div>
+        </div>
+
+        <!-- Messages Container -->
+        <div id="messagesContainer" class="flex-1 overflow-y-auto px-6 py-6">
+            <div class="max-w-5xl mx-auto space-y-6">
+                <!-- Welcome Message -->
+                <div class="flex justify-start">
+                    <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
+                        <p class="text-slate-100 leading-relaxed whitespace-pre-wrap">G'day! I'm your Fitzgerald HR Assistant, specialised in hospitality HR for Australian venues.
+
+I can help you with Fair Work compliance, award interpretation, employee relations, recruitment advice, and more.
+
+What HR challenge can I help you with today?
+
+✉️ For personalised support, contact our Senior Consultants at info@fitzgeraldhr.com.au</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="bg-slate-800/30 border-t border-slate-700/50 px-6 py-3">
+            <div class="max-w-5xl mx-auto">
+                <div class="flex items-start gap-2 text-xs text-slate-400 mb-2">
+                    <span class="text-amber-500">⚠️</span>
+                    <p>This AI assistant provides general guidance only. For complex matters or legal advice, consult with a Fitzgerald HR Senior Consultant.</p>
+                </div>
+                <div class="text-center">
+                    <p class="text-sm text-slate-300">
+                        <span class="text-amber-500 font-semibold">Contact us:</span> info@fitzgeraldhr.com.au
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="bg-slate-800/80 backdrop-blur-sm border-t border-slate-700 px-6 py-4">
+            <div class="max-w-5xl mx-auto flex gap-3">
+                <textarea
+                    id="messageInput"
+                    placeholder="Ask me anything about hospitality HR in Australia..."
+                    class="flex-1 bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 resize-none"
+                    rows="2"
+                    onkeypress="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
+                ></textarea>
+                <button
+                    onclick="sendMessage()"
+                    id="sendButton"
+                    class="px-6 py-3 bg-amber-500 hover:bg-amber-600 disabled:bg-slate-700 disabled:cursor-not-allowed text-slate-900 font-medium rounded-lg transition-colors flex items-center gap-2"
+                >
+                    <span>Send</span>
+                    <span>→</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border border-slate-700 fade-in">
+            <h2 class="text-2xl font-bold text-white mb-4">Beta Feedback</h2>
+            <p class="text-slate-400 mb-6">Your feedback helps us build the best AI assistant for hospitality HR. Thank you!</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-slate-300 font-medium mb-2">How would you rate the AI's responses?</label>
+                    <div class="flex gap-2">
+                        <button onclick="setRating(1)" class="rating-btn px-4 py-2 bg-slate-700 hover:bg-amber-500 text-white rounded-lg transition-all">1 ⭐</button>
+                        <button onclick="setRating(2)" class="rating-btn px-4 py-2 bg-slate-700 hover:bg-amber-500 text-white rounded-lg transition-all">2 ⭐</button>
+                        <button onclick="setRating(3)" class="rating-btn px-4 py-2 bg-slate-700 hover:bg-amber-500 text-white rounded-lg transition-all">3 ⭐</button>
+                        <button onclick="setRating(4)" class="rating-btn px-4 py-2 bg-slate-700 hover:bg-amber-500 text-white rounded-lg transition-all">4 ⭐</button>
+                        <button onclick="setRating(5)" class="rating-btn px-4 py-2 bg-slate-700 hover:bg-amber-500 text-white rounded-lg transition-all">5 ⭐</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-medium mb-2">What did you like?</label>
+                    <textarea id="feedbackLikes" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500" rows="3" placeholder="What worked well for you?"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-medium mb-2">What could be improved?</label>
+                    <textarea id="feedbackImprove" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500" rows="3" placeholder="What would make this better?"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-medium mb-2">Would you pay $79/month for this service?</label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 text-slate-300">
+                            <input type="radio" name="willPay" value="yes" class="text-amber-500">
+                            <span>Yes, definitely</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-slate-300">
+                            <input type="radio" name="willPay" value="maybe" class="text-amber-500">
+                            <span>Maybe</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-slate-300">
+                            <input type="radio" name="willPay" value="no" class="text-amber-500">
+                            <span>No</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button onclick="submitFeedback()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all">
+                    Submit Feedback
+                </button>
+                <button onclick="closeFeedback()" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Valid access codes (you can add more)
+        const VALID_CODES = [
+            'BETA-VENUE-001',
+            'BETA-VENUE-002',
+            'BETA-VENUE-003',
+            'BETA-VENUE-004',
+            'BETA-VENUE-005',
+            'FITZGERALD-TEST',
+            'DEMO-2025'
+        ];
+
+        let currentUser = null;
+        let conversationHistory = [];
+        let feedbackRating = 0;
+
+        // Access code check
+        function checkAccess() {
+            const input = document.getElementById('accessCodeInput').value.trim().toUpperCase();
+            const error = document.getElementById('accessError');
+            
+            if (VALID_CODES.includes(input)) {
+                currentUser = input;
+                document.getElementById('userCode').textContent = input;
+                document.getElementById('accessScreen').classList.add('hidden');
+                document.getElementById('assistantScreen').classList.remove('hidden');
+                error.classList.add('hidden');
+                
+                // Track access
+                trackEvent('beta_access', { code: input });
+            } else {
+                error.textContent = 'Invalid access code. Please check and try again.';
+                error.classList.remove('hidden');
+            }
+        }
+
+        // Send message to AI
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message to UI
+            addMessage('user', message);
+            input.value = '';
+            
+            // Disable send button
+            const sendBtn = document.getElementById('sendButton');
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<span class="pulse">Thinking...</span>';
+            
+            // Add to conversation history
+            conversationHistory.push({ role: 'user', content: message });
+            
+            try {
+                // Call Claude API (you'll need to replace this with your actual API endpoint)
+                const response = await callClaudeAPI(message);
+                
+                // Add AI response to UI
+                addMessage('assistant', response);
+                conversationHistory.push({ role: 'assistant', content: response });
+                
+                // Track usage
+                trackEvent('message_sent', { 
+                    user: currentUser,
+                    messageLength: message.length 
+                });
+                
+            } catch (error) {
+                addMessage('assistant', 'Sorry, I encountered an error. Please try again or contact support if the issue persists.');
+                console.error('Error:', error);
+            }
+            
+            // Re-enable send button
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<span>Send</span><span>→</span>';
+        }
+
+        // Add message to UI
+        function addMessage(role, content) {
+            const container = document.getElementById('messagesContainer').querySelector('.space-y-6');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} fade-in`;
+            
+            messageDiv.innerHTML = `
+                <div class="max-w-3xl ${role === 'user' ? 'bg-amber-500 text-slate-900' : 'bg-slate-800 text-slate-100 border border-slate-700'} rounded-2xl px-6 py-4">
+                    <p class="leading-relaxed whitespace-pre-wrap">${content}</p>
+                </div>
+            `;
+            
+            container.appendChild(messageDiv);
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+
+        // Call Claude API through Netlify Function
+        async function callClaudeAPI(message) {
+            try {
+                const response = await fetch('/.netlify/functions/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        history: conversationHistory.filter(m => m.role !== 'system'),
+                        user: currentUser
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Failed to get response');
+                }
+
+                const data = await response.json();
+                return data.message;
+
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // Feedback functions
+        function showFeedback() {
+            document.getElementById('feedbackModal').classList.remove('hidden');
+        }
+
+        function closeFeedback() {
+            document.getElementById('feedbackModal').classList.add('hidden');
+        }
+
+        function setRating(rating) {
+            feedbackRating = rating;
+            document.querySelectorAll('.rating-btn').forEach((btn, idx) => {
+                if (idx < rating) {
+                    btn.classList.add('bg-amber-500');
+                    btn.classList.remove('bg-slate-700');
+                } else {
+                    btn.classList.remove('bg-amber-500');
+                    btn.classList.add('bg-slate-700');
+                }
+            });
+        }
+
+        function submitFeedback() {
+            const likes = document.getElementById('feedbackLikes').value;
+            const improve = document.getElementById('feedbackImprove').value;
+            const willPay = document.querySelector('input[name="willPay"]:checked')?.value;
+            
+            // Track feedback
+            trackEvent('beta_feedback', {
+                user: currentUser,
+                rating: feedbackRating,
+                likes: likes,
+                improve: improve,
+                willPay: willPay
+            });
+            
+            alert('Thank you for your feedback! This helps us improve.');
+            closeFeedback();
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                location.reload();
+            }
+        }
+
+        // Analytics tracking (you can connect this to Google Analytics or your own system)
+        function trackEvent(eventName, data) {
+            console.log('Event:', eventName, data);
+            // TODO: Send to your analytics platform
+            // Example: gtag('event', eventName, data);
+        }
+    </script>
+</body>
+</html>
