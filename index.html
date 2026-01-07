@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
     <style>
-        /* REMOVED Crisis Mode Pulse Animation */
+        /* NO Crisis Mode Pulse Animation - REMOVED */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -25,7 +25,7 @@
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
     
-    <!-- Access Screen (unchanged) -->
+    <!-- Access Code Screen -->
     <div id="accessScreen" class="min-h-screen flex items-center justify-center p-6">
         <div class="max-w-md w-full fade-in">
             <div class="text-center mb-8">
@@ -81,8 +81,9 @@
         </div>
     </div>
 
-    <!-- Main Assistant Screen -->
+    <!-- Main Assistant Screen (Hidden Initially) -->
     <div id="assistantScreen" class="hidden min-h-screen flex flex-col">
+        <!-- Header -->
         <div class="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700 px-6 py-4">
             <div class="max-w-5xl mx-auto flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -96,18 +97,965 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <!-- Crisis Mode Button - NO PULSE -->
-                    <button onclick="activateCrisisMode()" 
+                    <button onclick="document.getElementById('rosterUpload').click()" 
+                            class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all">
+                        📤 Upload Current Roster
+                    </button>
+                    <p class="text-slate-400 text-sm mt-3">Supports Excel (.xlsx, .xls) or CSV files</p>
+                </div>
+
+                <div class="text-center text-slate-400">
+                    <p class="mb-2">Or manually enter roster details:</p>
+                    <button onclick="showManualRoster()" 
+                            class="text-amber-500 hover:text-amber-400 underline">
+                        Enter Roster Manually
+                    </button>
+                </div>
+
+                <div id="rosterResults" class="hidden space-y-4">
+                    <div class="bg-slate-900 border border-green-500 rounded-lg p-6">
+                        <h3 class="text-green-500 font-bold text-lg mb-4">📊 Current Roster Analysis:</h3>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="bg-slate-800 p-4 rounded">
+                                <p class="text-slate-400 text-sm">Total Labor Cost</p>
+                                <p class="text-2xl font-bold text-white" id="rosterCurrentCost">$4,287</p>
+                            </div>
+                            <div class="bg-slate-800 p-4 rounded">
+                                <p class="text-slate-400 text-sm">Total Hours</p>
+                                <p class="text-2xl font-bold text-white" id="rosterTotalHours">147 hrs</p>
+                            </div>
+                        </div>
+                        <div class="space-y-2 text-sm" id="rosterIssues"></div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-amber-500 rounded-lg p-6">
+                        <h3 class="text-amber-500 font-bold text-lg mb-4">✨ Optimized Roster:</h3>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="bg-slate-800 p-4 rounded">
+                                <p class="text-slate-400 text-sm">Optimized Cost</p>
+                                <p class="text-2xl font-bold text-green-400" id="rosterOptimizedCost">$3,875</p>
+                            </div>
+                            <div class="bg-slate-800 p-4 rounded">
+                                <p class="text-slate-400 text-sm">Savings</p>
+                                <p class="text-2xl font-bold text-green-400" id="rosterSavings">$412</p>
+                            </div>
+                        </div>
+                        <div class="space-y-2 text-sm text-slate-300" id="rosterOptimizations"></div>
+                        
+                        <button onclick="downloadOptimizedRoster()" 
+                                class="w-full mt-4 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+                            📥 Download Optimized Roster
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Termination Risk Assessor Modal -->
+    <div id="terminationRiskModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                        <span>⚖️</span> Termination Risk Assessor
+                    </h2>
+                    <p class="text-slate-400 text-sm">Assess unfair dismissal risk before terminating employment</p>
+                </div>
+                <button onclick="closeToolModal('terminationRiskModal')" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
+
+            <form id="terminationForm" class="space-y-4">
+                <div>
+                    <label class="block text-slate-300 text-sm mb-2">How long has the employee worked for you?</label>
+                    <select id="termTenure" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm">
+                        <option value="">Select...</option>
+                        <option value="under6months">Under 6 months</option>
+                        <option value="6to12months">6-12 months</option>
+                        <option value="over12months">Over 12 months</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 text-sm mb-2">Reason for termination:</label>
+                    <select id="termReason" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm">
+                        <option value="">Select...</option>
+                        <option value="performance">Poor Performance</option>
+                        <option value="misconduct">Misconduct</option>
+                        <option value="serious-misconduct">Serious Misconduct</option>
+                        <option value="redundancy">Redundancy</option>
+                        <option value="incompatibility">Not a Good Fit</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 text-sm mb-2">Have you given formal warnings?</label>
+                    <select id="termWarnings" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm">
+                        <option value="">Select...</option>
+                        <option value="none">No warnings given</option>
+                        <option value="verbal">Verbal warning only</option>
+                        <option value="written">Written warning(s) given</option>
+                        <option value="final">Final written warning given</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 text-sm mb-2">Did you provide opportunity to improve?</label>
+                    <select id="termImprovement" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm">
+                        <option value="">Select...</option>
+                        <option value="no">No</option>
+                        <option value="informal">Informal discussions only</option>
+                        <option value="formal">Formal improvement plan with timeframe</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 text-sm mb-2">Is the employee in any protected category?</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center gap-2 text-slate-300 text-sm">
+                            <input type="checkbox" id="termPregnant" class="rounded">
+                            <span>Pregnant or on parental leave</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-slate-300 text-sm">
+                            <input type="checkbox" id="termInjured" class="rounded">
+                            <span>Recently injured or on workers comp</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-slate-300 text-sm">
+                            <input type="checkbox" id="termComplaint" class="rounded">
+                            <span>Made workplace complaint recently</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-slate-300 text-sm">
+                            <input type="checkbox" id="termUnion" class="rounded">
+                            <span>Union member or delegate</span>
+                        </label>
+                    </div>
+                </div>
+
+                <button type="button" onclick="assessTerminationRisk()" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+                    Assess Risk
+                </button>
+            </form>
+
+            <div id="termRiskResults" class="hidden mt-6"></div>
+        </div>
+    </div>
+
+    <!-- Scenario Analysis Modal -->
+    <div id="scenarioAnalysisModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                        <span>🎯</span> Custom Scenario Analysis
+                    </h2>
+                    <p class="text-slate-400 text-sm">Get tailored advice for your specific situation</p>
+                </div>
+                <button onclick="closeToolModal('scenarioAnalysisModal')" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-slate-300 text-sm mb-2">Tell me about your venue:</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <input type="text" id="scenarioVenueType" placeholder="e.g., Restaurant, Hotel, Café" 
+                               class="bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm placeholder-slate-500">
+                        <input type="text" id="scenarioLocation" placeholder="e.g., Sydney CBD" 
+                               class="bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm placeholder-slate-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 text-sm mb-2">Number of employees:</label>
+                    <input type="number" id="scenarioStaffCount" placeholder="e.g., 15" 
+                           class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm">
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 text-sm mb-2">Describe your situation in detail:</label>
+                    <textarea id="scenarioDescription" rows="6" 
+                              class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white text-sm placeholder-slate-400"
+                              placeholder="Be as specific as possible: What's the issue? What's the context? What have you tried? What are your concerns?"></textarea>
+                </div>
+
+                <button onclick="analyzeScenario()" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+                    Generate Custom Analysis
+                </button>
+
+                <div id="scenarioResults" class="hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Xero Integration Modal -->
+    <div id="xeroIntegrationModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border border-amber-500 fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                        <span>🔗</span> Xero Payroll Integration
+                    </h2>
+                    <p class="text-slate-400 text-sm">Connect to Xero for automatic payroll analysis</p>
+                </div>
+                <button onclick="closeToolModal('xeroIntegrationModal')" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
+
+            <div id="xeroNotConnected" class="space-y-6">
+                <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-6">
+                    <h3 class="text-blue-400 font-bold mb-3">What You'll Get:</h3>
+                    <ul class="space-y-2 text-slate-300 text-sm">
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Automatic labor cost analysis</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Overtime and penalty rate tracking</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Cost trend alerts</span>
+                        </li>
+                        <li class="flex items-start gap-2">
+                            <span class="text-green-400">✓</span>
+                            <span>Compliance risk detection</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-6 text-center">
+                    <p class="text-slate-300 mb-4">Connect your Xero account securely:</p>
+                    <button onclick="connectXero()" 
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-all inline-flex items-center gap-2">
+                        <span>🔗</span>
+                        <span>Connect to Xero</span>
+                    </button>
+                    <p class="text-slate-500 text-xs mt-3">Secure OAuth 2.0 connection</p>
+                </div>
+            </div>
+
+            <div id="xeroConnected" class="hidden space-y-4">
+                <div class="bg-green-500/10 border border-green-500 rounded-lg p-4 text-center">
+                    <p class="text-green-400 font-bold">✓ Connected to Xero</p>
+                </div>
+                <div class="space-y-3" id="xeroAnalysis"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========================================
+        // MAIN APPLICATION CODE
+        // ========================================
+        
+        const VALID_CODES = [
+            'BETA-VENUE-001',
+            'BETA-VENUE-002',
+            'BETA-VENUE-003',
+            'BETA-VENUE-004',
+            'BETA-VENUE-005',
+            'FITZGERALD-TEST',
+            'DEMO-2025'
+        ];
+
+        let currentUser = null;
+        let conversationHistory = [];
+        let feedbackRating = 0;
+
+        // Access code check
+        function checkAccess() {
+            const input = document.getElementById('accessCodeInput').value.trim().toUpperCase();
+            const error = document.getElementById('accessError');
+            
+            if (VALID_CODES.includes(input)) {
+                currentUser = input;
+                document.getElementById('userCode').textContent = input;
+                document.getElementById('accessScreen').classList.add('hidden');
+                document.getElementById('assistantScreen').classList.remove('hidden');
+                error.classList.add('hidden');
+                trackEvent('beta_access', { code: input });
+            } else {
+                error.textContent = 'Invalid access code. Please check and try again.';
+                error.classList.remove('hidden');
+            }
+        }
+
+        // Send message to AI
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            addMessage('user', message);
+            input.value = '';
+            
+            const thinkingDiv = showThinkingIndicator();
+            
+            const sendBtn = document.getElementById('sendButton');
+            sendBtn.disabled = true;
+            sendBtn.innerHTML = '<span class="pulse">●●●</span>';
+            
+            conversationHistory.push({ role: 'user', content: message });
+            
+            try {
+                const response = await callClaudeAPI(message);
+                removeThinkingIndicator(thinkingDiv);
+                addMessage('assistant', response);
+                conversationHistory.push({ role: 'assistant', content: response });
+                trackEvent('message_sent', { user: currentUser, messageLength: message.length });
+            } catch (error) {
+                removeThinkingIndicator(thinkingDiv);
+                addMessage('assistant', 'Sorry, I encountered an error. Please try again or contact support if the issue persists.');
+                console.error('Error:', error);
+            }
+            
+            sendBtn.disabled = false;
+            sendBtn.innerHTML = '<span>Send</span><span>→</span>';
+        }
+
+        function showThinkingIndicator() {
+            const container = document.getElementById('messagesContainer').querySelector('.space-y-6');
+            const thinkingDiv = document.createElement('div');
+            thinkingDiv.id = 'thinking-indicator';
+            thinkingDiv.className = 'flex justify-start fade-in';
+            
+            thinkingDiv.innerHTML = `
+                <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
+                    <div class="flex items-center gap-3">
+                        <div class="flex gap-1">
+                            <div class="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                            <div class="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                            <div class="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                        </div>
+                        <p class="text-slate-400 text-sm">Fitz is thinking...</p>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(thinkingDiv);
+            thinkingDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            
+            return thinkingDiv;
+        }
+
+        function removeThinkingIndicator(thinkingDiv) {
+            if (thinkingDiv && thinkingDiv.parentNode) {
+                thinkingDiv.parentNode.removeChild(thinkingDiv);
+            }
+        }
+
+        function addMessage(role, content) {
+            const container = document.getElementById('messagesContainer').querySelector('.space-y-6');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} fade-in`;
+            
+            let formattedContent = content;
+            if (role === 'assistant') {
+                const legalWarnings = [
+                    '⚠️ **This matter involves legal risk.**',
+                    '⚠️ This matter involves legal risk.'
+                ];
+                
+                for (const warning of legalWarnings) {
+                    if (content.includes(warning)) {
+                        formattedContent = content.replace(warning, '');
+                        formattedContent = `<div class="mb-4 p-4 bg-red-500/10 border-2 border-red-500 rounded-lg">
+                            <p class="text-red-400 font-bold text-lg flex items-center gap-2">
+                                <span class="text-2xl">⚠️</span>
+                                <span>IMPORTANT: This matter involves legal risk.</span>
+                            </p>
+                            <p class="text-red-300 mt-2">Please contact one of our Senior Consultants at <a href="mailto:info@fitzgeraldhr.com.au" class="underline hover:text-red-200">info@fitzgeraldhr.com.au</a> for expert guidance on your specific situation and next steps.</p>
+                        </div>` + formattedContent.replace('Please contact one of our Senior Consultants at info@fitzgeraldhr.com.au for expert guidance on your specific situation and next steps.', '');
+                        break;
+                    }
+                }
+                
+                formattedContent = formattedContent
+                    .replace(/📞 \*\*Need personalised support\?\*\*/g, '<strong class="text-amber-400">📞 Need personalised support?</strong>')
+                    .replace(/✉️ \*\*Questions or need further assistance\?\*\*/g, '<strong class="text-amber-400">✉️ Questions or need further assistance?</strong>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/info@fitzgeraldhr\.com\.au/g, '<a href="mailto:info@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">info@fitzgeraldhr.com.au</a>');
+            }
+            
+            messageDiv.innerHTML = `
+                <div class="max-w-3xl ${role === 'user' ? 'bg-amber-500 text-slate-900' : 'bg-slate-800 text-slate-100 border border-slate-700'} rounded-2xl px-6 py-4">
+                    <p class="leading-relaxed whitespace-pre-wrap">${formattedContent}</p>
+                </div>
+            `;
+            
+            container.appendChild(messageDiv);
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+        }
+
+        async function callClaudeAPI(message) {
+            try {
+                const response = await fetch('/.netlify/functions/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: message,
+                        history: conversationHistory.filter(m => m.role !== 'system'),
+                        user: currentUser
+                    })
+                });
+
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Failed to get response');
+                }
+
+                const data = await response.json();
+                return data.message;
+            } catch (error) {
+                console.error('API Error:', error);
+                throw error;
+            }
+        }
+
+        // Feedback functions
+        function showFeedback() {
+            document.getElementById('feedbackModal').classList.remove('hidden');
+        }
+
+        function closeFeedback() {
+            document.getElementById('feedbackModal').classList.add('hidden');
+        }
+
+        function setRating(rating) {
+            feedbackRating = rating;
+            document.querySelectorAll('.rating-btn').forEach((btn, idx) => {
+                if (idx < rating) {
+                    btn.classList.add('bg-amber-500');
+                    btn.classList.remove('bg-slate-700');
+                } else {
+                    btn.classList.remove('bg-amber-500');
+                    btn.classList.add('bg-slate-700');
+                }
+            });
+        }
+
+        function submitFeedback() {
+            const likes = document.getElementById('feedbackLikes').value;
+            const improve = document.getElementById('feedbackImprove').value;
+            const willPay = document.querySelector('input[name="willPay"]:checked')?.value;
+            
+            trackEvent('beta_feedback', {
+                user: currentUser,
+                rating: feedbackRating,
+                likes: likes,
+                improve: improve,
+                willPay: willPay
+            });
+            
+            alert('Thank you for your feedback! This helps us improve.');
+            closeFeedback();
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                location.reload();
+            }
+        }
+
+        function trackEvent(eventName, data) {
+            console.log('Event:', eventName, data);
+        }
+
+        // CRISIS MODE
+        function activateCrisisMode() {
+            document.getElementById('crisisModal').classList.remove('hidden');
+            trackEvent('crisis_mode_activated', { user: currentUser });
+        }
+
+        function closeCrisisModal() {
+            document.getElementById('crisisModal').classList.add('hidden');
+        }
+
+        async function submitCrisis() {
+            const crisisType = document.getElementById('crisisType').value;
+            const description = document.getElementById('crisisDescription').value;
+            const phone = document.getElementById('crisisPhone').value;
+
+            if (!crisisType || !description || !phone) {
+                alert('Please fill in all fields for urgent assistance');
+                return;
+            }
+
+            const crisisData = {
+                user: currentUser,
+                type: crisisType,
+                description: description,
+                phone: phone,
+                timestamp: new Date().toISOString()
+            };
+
+            const crisisLog = JSON.parse(localStorage.getItem('crisisSubmissions') || '[]');
+            crisisLog.push(crisisData);
+            localStorage.setItem('crisisSubmissions', JSON.stringify(crisisLog));
+
+            trackEvent('crisis_submitted', crisisData);
+
+            alert(`🚨 CRISIS LOGGED\n\nYour urgent request has been received.\n\nA Senior Consultant will call you at ${phone} within 15 minutes.\n\nCrisis ID: ${Date.now()}\n\nIn the meantime:\n• Document everything\n• Preserve evidence\n• Separate involved parties\n• Call 000 if immediate danger`);
+
+            const crisisGuidance = {
+                'injury': 'IMMEDIATE ACTIONS:\n1. Call 000 if serious\n2. Provide first aid\n3. Document incident\n4. Notify WorkCover within 48hrs\n5. Preserve evidence\n\nDO NOT: Move injured person unless necessary',
+                'harassment': 'IMMEDIATE ACTIONS:\n1. Separate complainant and alleged harasser\n2. DO NOT investigate yourself\n3. Document complaint in writing\n4. Preserve evidence (texts, emails)\n5. Ensure no retaliation\n\nDO NOT: Dismiss the complaint',
+                'theft': 'IMMEDIATE ACTIONS:\n1. Secure evidence\n2. Review CCTV footage\n3. Document inventory loss\n4. DO NOT accuse without evidence\n5. Consider police report\n\nDO NOT: Confront employee alone',
+                'violence': 'IMMEDIATE ACTIONS:\n1. CALL 000 IMMEDIATELY\n2. Evacuate if necessary\n3. Secure the area\n4. Do not confront\n5. Document everything\n\nDO NOT: Put yourself at risk'
+            };
+
+            if (crisisGuidance[crisisType]) {
+                addMessage('assistant', `🚨 URGENT GUIDANCE FOR ${crisisType.toUpperCase()}:\n\n${crisisGuidance[crisisType]}\n\n⚠️ A Senior Consultant will call you at ${phone} within 15 minutes to provide expert guidance.`);
+            }
+
+            closeCrisisModal();
+        }
+
+        // VOICE INPUT
+        let recognition = null;
+        let isListening = false;
+
+        function toggleVoiceInput() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert('Voice input not supported in your browser. Try Chrome or Edge.');
+                return;
+            }
+
+            if (isListening) {
+                stopListening();
+            } else {
+                startListening();
+            }
+        }
+
+        function startListening() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-AU';
+
+            recognition.onstart = () => {
+                isListening = true;
+                document.getElementById('voiceIcon').textContent = '🔴';
+                document.getElementById('voiceButton').classList.add('bg-red-600');
+                document.getElementById('messageInput').placeholder = 'Listening...';
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = Array.from(event.results)
+                    .map(result => result[0].transcript)
+                    .join('');
+                document.getElementById('messageInput').value = transcript;
+            };
+
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                stopListening();
+            };
+
+            recognition.onend = () => {
+                stopListening();
+            };
+
+            recognition.start();
+        }
+
+        function stopListening() {
+            if (recognition) {
+                recognition.stop();
+            }
+            isListening = false;
+            document.getElementById('voiceIcon').textContent = '🎤';
+            document.getElementById('voiceButton').classList.remove('bg-red-600');
+            document.getElementById('messageInput').placeholder = 'Ask me anything about hospitality HR in Australia...';
+        }
+
+        // TOOLS MENU
+        function toggleToolsMenu() {
+            const menu = document.getElementById('toolsMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function openTool(toolName) {
+            toggleToolsMenu();
+            
+            const modalMap = {
+                'awardCalculator': 'awardCalculatorModal',
+                'rosterOptimizer': 'rosterOptimizerModal',
+                'terminationRisk': 'terminationRiskModal',
+                'scenarioAnalysis': 'scenarioAnalysisModal',
+                'xeroIntegration': 'xeroIntegrationModal'
+            };
+
+            const modalId = modalMap[toolName];
+            if (modalId) {
+                document.getElementById(modalId).classList.remove('hidden');
+                trackEvent('tool_opened', { tool: toolName, user: currentUser });
+            }
+        }
+
+        function closeToolModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // AWARD CALCULATOR
+        document.addEventListener('DOMContentLoaded', function() {
+            const calcPosition = document.getElementById('calcPosition');
+            if (calcPosition) {
+                calcPosition.addEventListener('change', function() {
+                    const customDiv = document.getElementById('customRateDiv');
+                    if (this.value === 'custom') {
+                        customDiv.classList.remove('hidden');
+                    } else {
+                        customDiv.classList.add('hidden');
+                    }
+                });
+            }
+        });
+
+        function calculateAward() {
+            let baseRate = parseFloat(document.getElementById('calcPosition').value);
+            if (document.getElementById('calcPosition').value === 'custom') {
+                baseRate = parseFloat(document.getElementById('calcCustomRate').value);
+            }
+
+            const dayMultiplier = parseFloat(document.getElementById('calcDay').value);
+            const hours = parseFloat(document.getElementById('calcHours').value);
+            const overtime = parseFloat(document.getElementById('calcOvertime').value);
+
+            if (!baseRate || !hours) {
+                alert('Please enter all required fields');
+                return;
+            }
+
+            const penaltyRate = baseRate * dayMultiplier;
+            const ordinaryPay = penaltyRate * hours;
+            const overtimePay = overtime > 0 ? (baseRate * 1.5 * overtime) : 0;
+            const totalPay = ordinaryPay + overtimePay;
+
+            document.getElementById('resultBaseRate').textContent = `${baseRate.toFixed(2)}/hr`;
+            document.getElementById('resultPenaltyRate').textContent = `${penaltyRate.toFixed(2)}/hr (${dayMultiplier}x)`;
+            document.getElementById('resultOrdinaryPay').textContent = `${ordinaryPay.toFixed(2)}`;
+            document.getElementById('resultOvertimePay').textContent = `${overtimePay.toFixed(2)}`;
+            document.getElementById('resultTotal').textContent = `${totalPay.toFixed(2)}`;
+
+            if (overtime > 0) {
+                document.getElementById('overtimeRow').classList.remove('hidden');
+            } else {
+                document.getElementById('overtimeRow').classList.add('hidden');
+            }
+
+            document.getElementById('calcResults').classList.remove('hidden');
+
+            trackEvent('award_calculated', {
+                user: currentUser,
+                baseRate: baseRate,
+                totalPay: totalPay
+            });
+        }
+
+        function downloadCalculation() {
+            alert('Excel download feature - connect XLSX library for production');
+        }
+
+        // ROSTER OPTIMIZER
+        function handleRosterUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                setTimeout(() => {
+                    document.getElementById('rosterResults').classList.remove('hidden');
+                    
+                    document.getElementById('rosterIssues').innerHTML = `
+                        <p class="text-yellow-400">⚠️ 3 compliance issues found:</p>
+                        <ul class="ml-4 mt-2 space-y-1 text-slate-300">
+                            <li>• John: 6 consecutive days (max 5 recommended)</li>
+                            <li>• Sarah: No meal break on 7-hour shift</li>
+                            <li>• Mike: 52 hours this week (overtime alert)</li>
+                        </ul>
+                    `;
+
+                    document.getElementById('rosterOptimizations').innerHTML = `
+                        <p class="text-green-400 mb-2">💡 Optimization suggestions:</p>
+                        <ul class="ml-4 space-y-2">
+                            <li>✓ Move John's Sunday shift to Tuesday (saves $87 penalty)</li>
+                            <li>✓ Split Sarah's shift into 2 shorter shifts (avoids meal break)</li>
+                            <li>✓ Reduce Mike's hours to 38 (saves $142 overtime)</li>
+                            <li>✓ Swap 3 casual staff to non-penalty days (saves $183)</li>
+                        </ul>
+                    `;
+
+                    trackEvent('roster_uploaded', { user: currentUser, filename: file.name });
+                }, 1500);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function showManualRoster() {
+            alert('Manual roster entry coming soon! For now, please upload an Excel/CSV file.');
+        }
+
+        function downloadOptimizedRoster() {
+            alert('Optimized roster download - implement with XLSX library');
+        }
+
+        // TERMINATION RISK ASSESSOR
+        function assessTerminationRisk() {
+            const tenure = document.getElementById('termTenure').value;
+            const reason = document.getElementById('termReason').value;
+            const warnings = document.getElementById('termWarnings').value;
+            const improvement = document.getElementById('termImprovement').value;
+            const pregnant = document.getElementById('termPregnant').checked;
+            const injured = document.getElementById('termInjured').checked;
+            const complaint = document.getElementById('termComplaint').checked;
+            const union = document.getElementById('termUnion').checked;
+
+            if (!tenure || !reason || !warnings || !improvement) {
+                alert('Please answer all questions');
+                return;
+            }
+
+            let riskScore = 0;
+            let riskFactors = [];
+
+            if (tenure === 'over12months') riskScore += 30;
+            if (reason === 'performance' && warnings === 'none') riskScore += 40;
+            if (reason === 'incompatibility') riskScore += 35;
+            if (warnings === 'none' || warnings === 'verbal') riskScore += 30;
+            if (improvement === 'no' || improvement === 'informal') riskScore += 25;
+            if (pregnant) { riskScore += 50; riskFactors.push('Pregnancy (PROTECTED - HIGH RISK)'); }
+            if (injured) { riskScore += 40; riskFactors.push('Workers compensation (PROTECTED)'); }
+            if (complaint) { riskScore += 45; riskFactors.push('Recent complaint (PROTECTED)'); }
+            if (union) { riskScore += 35; riskFactors.push('Union involvement (PROTECTED)'); }
+
+            if (reason === 'serious-misconduct') riskScore -= 30;
+            if (warnings === 'final') riskScore -= 15;
+            if (tenure === 'under6months') riskScore -= 20;
+
+            let riskLevel, riskColor, riskMessage, recommendations;
+
+            if (riskScore < 30) {
+                riskLevel = 'LOW RISK';
+                riskColor = 'green';
+                riskMessage = 'Termination appears procedurally fair based on the information provided.';
+                recommendations = [
+                    'Ensure all documentation is in order',
+                    'Provide required notice period',
+                    'Prepare termination letter',
+                    'Consider offering final pay on the spot',
+                    'Still recommend consultant review before proceeding'
+                ];
+            } else if (riskScore < 60) {
+                riskLevel = 'MEDIUM RISK';
+                riskColor = 'yellow';
+                riskMessage = 'Some procedural gaps exist. Rectify before terminating.';
+                recommendations = [
+                    'Provide formal warning first',
+                    'Implement performance improvement plan',
+                    'Document all discussions',
+                    'Allow reasonable time to improve',
+                    'MUST consult Senior Consultant before terminating'
+                ];
+            } else {
+                riskLevel = 'HIGH RISK - DO NOT PROCEED';
+                riskColor = 'red';
+                riskMessage = 'Significant unfair dismissal risk. Terminating now likely results in claim.';
+                recommendations = [
+                    'DO NOT TERMINATE without expert guidance',
+                    'Contact Senior Consultant IMMEDIATELY',
+                    'Potential claim cost: $15,000-$50,000+',
+                    'Follow proper process first',
+                    'Consider alternatives to termination'
+                ];
+            }
+
+            const resultsDiv = document.getElementById('termRiskResults');
+            resultsDiv.innerHTML = `
+                <div class="bg-${riskColor}-500/10 border-2 border-${riskColor}-500 rounded-lg p-6">
+                    <h3 class="text-${riskColor}-400 font-bold text-xl mb-3 flex items-center gap-2">
+                        ${riskColor === 'red' ? '🚨' : riskColor === 'yellow' ? '⚠️' : '✓'}
+                        <span>${riskLevel}</span>
+                    </h3>
+                    <p class="text-slate-200 mb-4">${riskMessage}</p>
+                    
+                    ${riskFactors.length > 0 ? `
+                        <div class="bg-red-500/20 border border-red-500 rounded p-3 mb-4">
+                            <p class="text-red-300 font-bold mb-2">🛡️ Protected Characteristics Detected:</p>
+                            <ul class="ml-4 space-y-1 text-red-200 text-sm">
+                                ${riskFactors.map(f => `<li>• ${f}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="mt-4">
+                        <p class="text-slate-300 font-bold mb-2">Recommended Actions:</p>
+                        <ul class="ml-4 space-y-2 text-slate-300 text-sm">
+                            ${recommendations.map(r => `<li>• ${r}</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div class="mt-6 pt-4 border-t border-${riskColor}-500/30">
+                        <button onclick="contactConsultantFromRisk()" 
+                                class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+                            📞 Contact Senior Consultant Now
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            resultsDiv.classList.remove('hidden');
+
+            trackEvent('termination_risk_assessed', {
+                user: currentUser,
+                riskLevel: riskLevel,
+                riskScore: riskScore
+            });
+        }
+
+        function contactConsultantFromRisk() {
+            alert('📞 CONNECTING TO SENIOR CONSULTANT\n\nYour termination risk assessment has been sent to our team.\n\nA consultant will call you within 2 hours to discuss your options.\n\nEmail: info@fitzgeraldhr.com.au\nPhone: [Your Number]');
+        }
+
+        // SCENARIO ANALYSIS
+        async function analyzeScenario() {
+            const venueType = document.getElementById('scenarioVenueType').value;
+            const location = document.getElementById('scenarioLocation').value;
+            const staffCount = document.getElementById('scenarioStaffCount').value;
+            const description = document.getElementById('scenarioDescription').value;
+
+            if (!description) {
+                alert('Please describe your situation');
+                return;
+            }
+
+            document.getElementById('scenarioResults').innerHTML = `
+                <div class="bg-slate-900 border border-amber-500 rounded-lg p-6">
+                    <div class="flex items-center gap-3 text-amber-400 mb-4">
+                        <div class="animate-pulse">⏳</div>
+                        <span>Analyzing your scenario...</span>
+                    </div>
+                </div>
+            `;
+            document.getElementById('scenarioResults').classList.remove('hidden');
+
+            const scenarioContext = `
+CUSTOM SCENARIO ANALYSIS REQUEST:
+
+Venue Type: ${venueType || 'Not specified'}
+Location: ${location || 'Not specified'}
+Staff Count: ${staffCount || 'Not specified'}
+
+SITUATION:
+${description}
+
+Please provide a comprehensive, tailored analysis including:
+1. Key issues identified
+2. Legal/compliance risks specific to this situation
+3. Step-by-step action plan with timeline
+4. Specific considerations for this venue type and size
+5. Estimated costs or savings if relevant
+6. Priority recommendations
+
+Be specific and actionable for THIS particular situation.
+            `;
+
+            try {
+                const response = await callClaudeAPI(scenarioContext);
+                
+                document.getElementById('scenarioResults').innerHTML = `
+                    <div class="bg-slate-900 border border-green-500 rounded-lg p-6">
+                        <h3 class="text-green-500 font-bold text-lg mb-4 flex items-center gap-2">
+                            <span>✅</span>
+                            <span>Custom Analysis for Your Situation</span>
+                        </h3>
+                        <div class="prose prose-invert max-w-none text-slate-200 space-y-3 text-sm">
+                            ${response.replace(/\n/g, '<br>')}
+                        </div>
+                    </div>
+                `;
+
+                trackEvent('scenario_analyzed', { user: currentUser, venueType, staffCount });
+            } catch (error) {
+                document.getElementById('scenarioResults').innerHTML = `
+                    <div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center">
+                        <p class="text-red-400">Error analyzing scenario. Please try again.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // XERO INTEGRATION
+        function connectXero() {
+            alert('🔗 XERO INTEGRATION\n\nThis feature connects to Xero via secure OAuth 2.0.\n\nFor beta testing:\n• This simulates a connection\n• Real integration requires API credentials\n• Contact info@fitzgeraldhr.com.au to enable\n\nProduction features:\n✓ Auto-sync payroll data\n✓ Real-time cost analysis\n✓ Compliance monitoring\n✓ Overtime alerts');
+
+            document.getElementById('xeroNotConnected').classList.add('hidden');
+            document.getElementById('xeroConnected').classList.remove('hidden');
+            
+            document.getElementById('xeroAnalysis').innerHTML = `
+                <div class="bg-slate-900 border border-green-500 rounded-lg p-4">
+                    <h4 class="text-green-400 font-bold mb-3">Last 30 Days Analysis:</h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between py-2 border-b border-slate-700">
+                            <span class="text-slate-300">Total Labor Cost:</span>
+                            <span class="font-bold text-white">$18,473</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-700">
+                            <span class="text-slate-300">Overtime Hours:</span>
+                            <span class="font-bold text-yellow-400">47 hrs (↑23%)</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-700">
+                            <span class="text-slate-300">Sunday Penalties:</span>
+                            <span class="font-bold text-white">$2,341</span>
+                        </div>
+                        <div class="flex justify-between py-2">
+                            <span class="text-slate-300">Compliance Issues:</span>
+                            <span class="font-bold text-red-400">2 detected</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-yellow-500/10 border border-yellow-500 rounded-lg p-4">
+                    <p class="text-yellow-400 font-bold mb-2">⚠️ Alerts:</p>
+                    <ul class="text-sm text-slate-300 space-y-1">
+                        <li>• Employee worked 7 consecutive days (compliance risk)</li>
+                        <li>• Overtime increased 23% vs last month (investigate)</li>
+                    </ul>
+                </div>
+            `;
+
+            trackEvent('xero_connected', { user: currentUser });
+        }
+
+        // Close tools menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const toolsMenu = document.getElementById('toolsMenu');
+            const toolsButton = event.target.closest('button');
+            
+            if (toolsMenu && !toolsMenu.contains(event.target) && (!toolsButton || !toolsButton.onclick?.toString().includes('toggleToolsMenu'))) {
+                toolsMenu.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html>="activateCrisisMode()" 
                             class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-all flex items-center gap-2">
                         <span class="text-xl">🚨</span>
                         <span>URGENT</span>
                     </button>
                     
+                    <!-- Voice Input Button -->
                     <button onclick="toggleVoiceInput()" 
                             id="voiceButton"
                             class="p-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
                         <span id="voiceIcon">🎤</span>
                     </button>
                     
+                    <!-- Tools Menu -->
                     <div class="relative">
                         <button onclick="toggleToolsMenu()" 
                                 class="p-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
@@ -149,6 +1097,7 @@
             </div>
         </div>
 
+        <!-- Beta Notice -->
         <div class="bg-amber-500/10 border-b border-amber-500/20 px-6 py-3">
             <div class="max-w-5xl mx-auto flex items-center gap-3">
                 <span class="text-lg">⚠️</span>
@@ -158,32 +1107,38 @@
             </div>
         </div>
 
+        <!-- Messages Container -->
         <div id="messagesContainer" class="flex-1 overflow-y-auto px-6 py-6">
             <div class="max-w-5xl mx-auto space-y-6">
-                <!-- UPDATED Welcome Message -->
+                <!-- Updated Welcome Message -->
                 <div class="flex justify-start">
                     <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
-                        <p class="text-slate-100 leading-relaxed whitespace-pre-wrap">G'day! I'm Fitz, your AI assistant from Fitzgerald HR, specialised in hospitality HR for Australian venues.
-
-I can help you with Fair Work compliance, award interpretation, employee relations, recruitment advice, and more.
-
-<strong class="text-amber-400">🛠️ Tools Available:</strong> Click the tools icon (🛠️) in the top right to access:
-• Award Calculator
-• Roster Optimiser
-• Termination Risk Assessor
-• Scenario Analysis
-• Xero Integration
-
-<strong class="text-red-400">🚨 Urgent/Critical Situations:</strong> Use the red URGENT button for immediate crisis response.
-
-What HR challenge can I help you with today?
-
-✉️ For personalised support, contact our Senior Consultants at info@fitzgeraldhr.com.au</p>
+                        <p class="text-slate-100 leading-relaxed">G'day! I'm Fitz, your AI assistant from Fitzgerald HR, specialised in hospitality HR for Australian venues.</p>
+                        
+                        <p class="text-slate-100 leading-relaxed mt-3">I can help you with Fair Work compliance, award interpretation, employee relations, recruitment advice, and more.</p>
+                        
+                        <p class="text-amber-400 font-semibold mt-4 mb-2">🛠️ Tools Available:</p>
+                        <p class="text-slate-100 text-sm">Click the tools icon (🛠️) in the top right to access:</p>
+                        <ul class="text-slate-100 text-sm ml-4 mt-1 space-y-1">
+                            <li>• Award Calculator</li>
+                            <li>• Roster Optimiser</li>
+                            <li>• Termination Risk Assessor</li>
+                            <li>• Scenario Analysis</li>
+                            <li>• Xero Integration</li>
+                        </ul>
+                        
+                        <p class="text-red-400 font-semibold mt-4 mb-2">🚨 Urgent/Critical Situations:</p>
+                        <p class="text-slate-100 text-sm">Use the red URGENT button for immediate crisis response.</p>
+                        
+                        <p class="text-slate-100 leading-relaxed mt-4">What HR challenge can I help you with today?</p>
+                        
+                        <p class="text-slate-300 text-sm mt-4">✉️ For personalised support, contact our Senior Consultants at <a href="mailto:info@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">info@fitzgeraldhr.com.au</a></p>
                     </div>
                 </div>
             </div>
         </div>
 
+        <!-- Disclaimer -->
         <div class="bg-slate-800/30 border-t border-slate-700/50 px-6 py-3">
             <div class="max-w-5xl mx-auto">
                 <div class="flex items-start gap-2 text-xs text-slate-400 mb-2">
@@ -198,6 +1153,7 @@ What HR challenge can I help you with today?
             </div>
         </div>
 
+        <!-- Input Area -->
         <div class="bg-slate-800/80 backdrop-blur-sm border-t border-slate-700 px-6 py-4">
             <div class="max-w-5xl mx-auto flex gap-3">
                 <textarea
@@ -219,7 +1175,64 @@ What HR challenge can I help you with today?
         </div>
     </div>
 
-    <!-- All modals remain the same, just updating the Roster modal title -->
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border border-slate-700 fade-in">
+            <h2 class="text-2xl font-bold text-white mb-4">Beta Feedback</h2>
+            <p class="text-slate-400 mb-6">Your feedback helps us build the best AI assistant for hospitality HR. Thank you!</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-slate-300 font-medium mb-2">How would you rate the AI's responses?</label>
+                    <div class="flex gap-2">
+                        <button onclick="setRating(1)" class="rating-btn px-4 py-2 bg-slate-700 hover:bg-amber-500 text-white rounded-lg transition-all">1 ⭐</button>
+                        <button onclick="setRating(2)" class="rating-btn px-4 py-2 bg-slate-700 hover:bg-amber-500 text-white rounded-lg transition-all">2 ⭐</button>
+                        <button onclick="setRating(3)" class="rating-btn px-4 py-2 bg-slate-700 hover:bg-amber-500 text-white rounded-lg transition-all">3 ⭐</button>
+                        <button onclick="setRating(4)" class="rating-btn px-4 py-2 bg-slate-700 hover:bg-amber-500 text-white rounded-lg transition-all">4 ⭐</button>
+                        <button onclick="setRating(5)" class="rating-btn px-4 py-2 bg-slate-700 hover:bg-amber-500 text-white rounded-lg transition-all">5 ⭐</button>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-medium mb-2">What did you like?</label>
+                    <textarea id="feedbackLikes" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500" rows="3" placeholder="What worked well for you?"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-medium mb-2">What could be improved?</label>
+                    <textarea id="feedbackImprove" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500" rows="3" placeholder="What would make this better?"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-medium mb-2">Would you pay $79/month for this service?</label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 text-slate-300">
+                            <input type="radio" name="willPay" value="yes" class="text-amber-500">
+                            <span>Yes, definitely</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-slate-300">
+                            <input type="radio" name="willPay" value="maybe" class="text-amber-500">
+                            <span>Maybe</span>
+                        </label>
+                        <label class="flex items-center gap-2 text-slate-300">
+                            <input type="radio" name="willPay" value="no" class="text-amber-500">
+                            <span>No</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button onclick="submitFeedback()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all">
+                    Submit Feedback
+                </button>
+                <button onclick="closeFeedback()" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Crisis Mode Modal -->
     <div id="crisisModal" class="hidden fixed inset-0 bg-red-900/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
         <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border-4 border-red-500 fade-in">
@@ -288,45 +1301,117 @@ What HR challenge can I help you with today?
         </div>
     </div>
 
-    <!-- Other modals omitted for brevity but remain unchanged -->
-    
-    <script>
-        // All JavaScript from original file remains the same
-        // Just the welcome message content changes when displayed
-        
-        const VALID_CODES = [
-            'BETA-VENUE-001',
-            'BETA-VENUE-002',
-            'BETA-VENUE-003',
-            'BETA-VENUE-004',
-            'BETA-VENUE-005',
-            'FITZGERALD-TEST',
-            'DEMO-2025'
-        ];
+    <!-- Award Calculator Modal -->
+    <div id="awardCalculatorModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                        <span>💰</span> Award Rate Calculator
+                    </h2>
+                    <p class="text-slate-400 text-sm">Calculate exact pay with penalties and loadings</p>
+                </div>
+                <button onclick="closeToolModal('awardCalculatorModal')" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
 
-        let currentUser = null;
-        let conversationHistory = [];
-        let feedbackRating = 0;
+            <div class="space-y-4">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-slate-300 text-sm mb-2">Position / Classification</label>
+                        <select id="calcPosition" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm">
+                            <option value="28.50">Level 1 (Intro) - $28.50</option>
+                            <option value="29.85">Level 2 - $29.85</option>
+                            <option value="31.20">Level 3 - $31.20</option>
+                            <option value="33.89">Level 4 - $33.89</option>
+                            <option value="36.58">Level 5 - $36.58</option>
+                            <option value="custom">Custom Rate</option>
+                        </select>
+                    </div>
 
-        function checkAccess() {
-            const input = document.getElementById('accessCodeInput').value.trim().toUpperCase();
-            const error = document.getElementById('accessError');
-            
-            if (VALID_CODES.includes(input)) {
-                currentUser = input;
-                document.getElementById('userCode').textContent = input;
-                document.getElementById('accessScreen').classList.add('hidden');
-                document.getElementById('assistantScreen').classList.remove('hidden');
-                error.classList.add('hidden');
-                trackEvent('beta_access', { code: input });
-            } else {
-                error.textContent = 'Invalid access code. Please check and try again.';
-                error.classList.remove('hidden');
-            }
-        }
+                    <div id="customRateDiv" class="hidden">
+                        <label class="block text-slate-300 text-sm mb-2">Custom Base Rate ($/hr)</label>
+                        <input type="number" id="calcCustomRate" step="0.01" 
+                               class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm"
+                               placeholder="28.50">
+                    </div>
+                </div>
 
-        // All other functions remain exactly the same
-        // (sendMessage, addMessage, callClaudeAPI, etc.)
-    </script>
-</body>
-</html>
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-slate-300 text-sm mb-2">Day of Week</label>
+                        <select id="calcDay" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm">
+                            <option value="1.0">Monday-Friday</option>
+                            <option value="1.5">Saturday</option>
+                            <option value="1.75">Sunday</option>
+                            <option value="2.5">Public Holiday</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-300 text-sm mb-2">Hours Worked</label>
+                        <input type="number" id="calcHours" step="0.5" value="8" 
+                               class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm">
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-300 text-sm mb-2">Overtime Hours</label>
+                        <input type="number" id="calcOvertime" step="0.5" value="0" 
+                               class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm">
+                    </div>
+                </div>
+
+                <button onclick="calculateAward()" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+                    Calculate Pay
+                </button>
+
+                <div id="calcResults" class="hidden bg-slate-900 border border-amber-500 rounded-lg p-6">
+                    <h3 class="text-amber-500 font-bold text-lg mb-4">Pay Breakdown:</h3>
+                    <div class="space-y-2 text-slate-200">
+                        <div class="flex justify-between py-2 border-b border-slate-700">
+                            <span>Base Rate:</span>
+                            <span class="font-bold" id="resultBaseRate"></span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-700">
+                            <span>Penalty/Loading Rate:</span>
+                            <span class="font-bold" id="resultPenaltyRate"></span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-700">
+                            <span>Ordinary Hours Pay:</span>
+                            <span class="font-bold" id="resultOrdinaryPay"></span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-700" id="overtimeRow">
+                            <span>Overtime Pay (1.5x):</span>
+                            <span class="font-bold" id="resultOvertimePay"></span>
+                        </div>
+                        <div class="flex justify-between py-3 bg-amber-500/10 px-3 rounded mt-3">
+                            <span class="text-lg font-bold">TOTAL PAY:</span>
+                            <span class="text-2xl font-bold text-amber-500" id="resultTotal"></span>
+                        </div>
+                    </div>
+                    <button onclick="downloadCalculation()" 
+                            class="w-full mt-4 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg transition-all text-sm">
+                        📊 Download Excel Breakdown
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Roster Optimizer Modal -->
+    <div id="rosterOptimizerModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-4xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                        <span>📅</span> Roster Cost Optimiser
+                    </h2>
+                    <p class="text-slate-400 text-sm">Upload roster to analyze costs and optimize scheduling</p>
+                </div>
+                <button onclick="closeToolModal('rosterOptimizerModal')" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
+
+            <div class="space-y-6">
+                <div class="bg-slate-900 border-2 border-dashed border-slate-600 rounded-lg p-8 text-center">
+                    <input type="file" id="rosterUpload" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleRosterUpload(event)">
+                    <button onclick
