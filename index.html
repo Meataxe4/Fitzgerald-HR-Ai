@@ -1517,42 +1517,34 @@
         return;
     }
 
-    // Show loading state
     const submitBtn = document.querySelector('#crisisModal button[onclick="submitCrisis()"]');
     const originalText = submitBtn.innerHTML;
     submitBtn.disabled = true;
     submitBtn.innerHTML = '<span class="animate-pulse">⏳ Sending urgent alert...</span>';
 
     try {
-        // YOUR ZAPIER WEBHOOK URL - REPLACE THIS!
-        const zapierWebhookUrl = 'https://hooks.zapier.com/hooks/catch/25966289/uwxhxi0/';
-        
-        const crisisId = Date.now();
-        
-        // Send to Zapier
-        const response = await fetch(zapierWebhookUrl, {
+        // Send to Telegram via Netlify function
+        const response = await fetch('/.netlify/functions/telegram-crisis', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                crisisType: crisisType,
-                description: description,
-                phone: phone,
-                user: currentUser,
-                timestamp: new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' }),
-                crisisId: crisisId
+                crisisType,
+                description,
+                phone,
+                user: currentUser
             })
         });
 
-        // Zapier webhooks return 200 even if they succeed
-        if (response.status === 200) {
-            // Log locally as backup
+        const result = await response.json();
+
+        if (response.ok) {
             const crisisData = {
                 user: currentUser,
                 type: crisisType,
                 description: description,
                 phone: phone,
                 timestamp: new Date().toISOString(),
-                crisisId: crisisId
+                crisisId: result.crisisId
             };
             
             const crisisLog = JSON.parse(localStorage.getItem('crisisSubmissions') || '[]');
@@ -1561,13 +1553,13 @@
             
             trackEvent('crisis_submitted', crisisData);
 
-            alert(`🚨 URGENT ALERT SENT SUCCESSFULLY
+            alert(`🚨 URGENT ALERT SENT VIA TELEGRAM
 
 Your crisis notification has been sent.
 
 A Senior Consultant will contact you at ${phone} within 15 minutes.
 
-Crisis ID: ${crisisId}
+Crisis ID: ${result.crisisId}
 
 In the meantime:
 - Document everything NOW
@@ -1575,50 +1567,46 @@ In the meantime:
 - Separate involved parties
 - Call 000 if immediate danger`);
             
-            // Send immediate guidance based on crisis type
             const crisisGuidance = {
                 'injury': 'IMMEDIATE ACTIONS:\n1. Call 000 if serious\n2. Provide first aid\n3. Document incident\n4. Notify WorkCover within 48hrs\n5. Preserve evidence\n\nDO NOT: Move injured person unless necessary',
                 'harassment': 'IMMEDIATE ACTIONS:\n1. Separate complainant and alleged harasser\n2. DO NOT investigate yourself\n3. Document complaint in writing\n4. Preserve evidence (texts, emails)\n5. Ensure no retaliation\n\nDO NOT: Dismiss the complaint',
                 'theft': 'IMMEDIATE ACTIONS:\n1. Secure evidence\n2. Review CCTV footage\n3. Document inventory loss\n4. DO NOT accuse without evidence\n5. Consider police report\n\nDO NOT: Confront employee alone',
                 'violence': 'IMMEDIATE ACTIONS:\n1. CALL 000 IMMEDIATELY\n2. Evacuate if necessary\n3. Secure the area\n4. Do not confront\n5. Document everything\n\nDO NOT: Put yourself at risk',
-                'walkout': 'IMMEDIATE ACTIONS:\n1. Document who walked out and when\n2. Do NOT threaten employees\n3. Seek legal advice before taking action\n4. Check employment contracts\n5. Consider Fair Work mediation',
-                'discrimination': 'IMMEDIATE ACTIONS:\n1. Document the complaint in detail\n2. Do NOT dismiss or minimize\n3. Separate involved parties if needed\n4. Preserve all evidence\n5. Seek immediate legal advice',
-                'death': 'IMMEDIATE ACTIONS:\n1. Call 000 IMMEDIATELY\n2. Do NOT move the body\n3. Secure the area\n4. Notify WorkSafe\n5. Support affected staff\n6. Seek crisis counseling',
-                'other': 'IMMEDIATE ACTIONS:\n1. Document everything in detail\n2. Preserve all evidence\n3. Separate involved parties if needed\n4. Do NOT take hasty action\n5. Wait for consultant guidance'
+                'walkout': 'IMMEDIATE ACTIONS:\n1. Document who walked out\n2. Do NOT threaten employees\n3. Seek legal advice\n4. Check employment contracts\n5. Consider Fair Work mediation',
+                'discrimination': 'IMMEDIATE ACTIONS:\n1. Document complaint in detail\n2. Do NOT dismiss or minimize\n3. Separate involved parties\n4. Preserve all evidence\n5. Seek immediate legal advice',
+                'death': 'IMMEDIATE ACTIONS:\n1. Call 000 IMMEDIATELY\n2. Do NOT move the body\n3. Secure the area\n4. Notify WorkSafe\n5. Support affected staff',
+                'other': 'IMMEDIATE ACTIONS:\n1. Document everything\n2. Preserve all evidence\n3. Separate involved parties\n4. Do NOT take hasty action\n5. Wait for consultant guidance'
             };
 
             if (crisisGuidance[crisisType]) {
-                addMessage('assistant', `🚨 URGENT GUIDANCE FOR ${crisisType.toUpperCase()}:\n\n${crisisGuidance[crisisType]}\n\n⚠️ ALERT SENT. A Senior Consultant will call you at ${phone} within 15 minutes to provide expert guidance.`);
+                addMessage('assistant', `🚨 URGENT GUIDANCE FOR ${crisisType.toUpperCase()}:\n\n${crisisGuidance[crisisType]}\n\n⚠️ Telegram alert sent. A Senior Consultant will call you at ${phone} within 15 minutes.`);
             }
             
             closeCrisisModal();
             
         } else {
-            throw new Error('Webhook returned error status');
+            throw new Error(result.error || 'Failed to send alert');
         }
         
     } catch (error) {
         console.error('Crisis submission error:', error);
         
-        alert(`⚠️ ALERT SEND FAILED
+        alert(`⚠️ TELEGRAM ALERT FAILED
 
-There was an error sending the notification.
+Error sending notification.
 
-PLEASE CALL EMERGENCY NUMBER IMMEDIATELY:
+PLEASE CALL IMMEDIATELY:
 +61 400 211 014
 
-Your submission has been logged locally as backup.
-
-Error details: ${error.message}`);
+Your submission has been logged locally.`);
         
-        // Still log locally even if webhook fails
         const crisisData = {
             user: currentUser,
             type: crisisType,
             description: description,
             phone: phone,
             timestamp: new Date().toISOString(),
-            webhookFailed: true,
+            failed: true,
             error: error.message
         };
         
@@ -1629,7 +1617,6 @@ Error details: ${error.message}`);
         trackEvent('crisis_submission_failed', crisisData);
         
     } finally {
-        // Re-enable button
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
     }
