@@ -2094,76 +2094,77 @@ function showWizardResults() {
         
         console.log('🎯 Adult path, hiding steps...');
     
-    document.getElementById('wizardSteps').classList.add('hidden');
-    const backBtn = document.getElementById('wizardBackBtn');
-    if (backBtn) backBtn.classList.add('hidden');
-    document.getElementById('wizardResults').classList.remove('hidden');
-    
-    // Calculate classification
-    const result = calculateAwardClassification(wizardData);
-    
-    // Debug logging
-    console.log('Wizard Data:', wizardData);
-    console.log('Calculation Result:', result);
-    
-    // Safety check
-    if (!result || !result.rate) {
-        alert('⚠️ Error calculating award classification. Please try again or contact support.');
-        console.error('Invalid result from calculateAwardClassification:', result);
-        resetWizard();
-        return;
-    }
-    
-    // Populate results
-    document.getElementById('resultAward').textContent = result.award || 'Unknown';
-    document.getElementById('resultLevel').textContent = result.level || 'Unknown';
-    document.getElementById('resultRate').textContent = result.rate ? '$' + result.rate.toFixed(2) : '$0.00';
-    
-    // Penalties
-    let penaltiesHTML = '';
-    if (result.penalties && result.penalties.length > 0) {
-        result.penalties.forEach(penalty => {
-            penaltiesHTML += `<div>• ${penalty}</div>`;
+        document.getElementById('wizardSteps').classList.add('hidden');
+        const backBtn = document.getElementById('wizardBackBtn');
+        if (backBtn) backBtn.classList.add('hidden');
+        document.getElementById('wizardResults').classList.remove('hidden');
+        
+        // Calculate classification
+        const result = calculateAwardClassification(wizardData);
+        
+        // Debug logging
+        console.log('Wizard Data:', wizardData);
+        console.log('Calculation Result:', result);
+        
+        // Safety check
+        if (!result || !result.rate) {
+            alert('⚠️ Error calculating award classification. Please try again or contact support.');
+            console.error('Invalid result from calculateAwardClassification:', result);
+            resetWizard();
+            return;
+        }
+        
+        // Populate results
+        document.getElementById('resultAward').textContent = result.award || 'Unknown';
+        document.getElementById('resultLevel').textContent = result.level || 'Unknown';
+        document.getElementById('resultRate').textContent = result.rate ? '$' + result.rate.toFixed(2) : '$0.00';
+        
+        // Penalties
+        let penaltiesHTML = '';
+        if (result.penalties && result.penalties.length > 0) {
+            result.penalties.forEach(penalty => {
+                penaltiesHTML += `<div>• ${penalty}</div>`;
+            });
+        } else {
+            penaltiesHTML = '<div>Standard rates apply</div>';
+        }
+        document.getElementById('resultPenalties').innerHTML = penaltiesHTML;
+        
+        // Next steps
+        let stepsHTML = '';
+        if (result.nextSteps && result.nextSteps.length > 0) {
+            result.nextSteps.forEach(step => {
+                stepsHTML += `<li>${step}</li>`;
+            });
+        } else {
+            stepsHTML = '<li>Consult with Fitzgerald HR for next steps</li>';
+        }
+        document.getElementById('resultNextSteps').innerHTML = stepsHTML;
+        
+        // Track event
+        trackEvent('award_wizard_completed', {
+            user: currentUser,
+            role: wizardData.role,
+            classification: result.level,
+            rate: result.rate
         });
-    } else {
-        penaltiesHTML = '<div>Standard rates apply</div>';
-    }
-    document.getElementById('resultPenalties').innerHTML = penaltiesHTML;
-    
-    // Next steps
-    let stepsHTML = '';
-    if (result.nextSteps && result.nextSteps.length > 0) {
-        result.nextSteps.forEach(step => {
-            stepsHTML += `<li>${step}</li>`;
-        });
-    } else {
-        stepsHTML = '<li>Consult with Fitzgerald HR for next steps</li>';
-    }
-    document.getElementById('resultNextSteps').innerHTML = stepsHTML;
-    
-    // Track event
-    trackEvent('award_wizard_completed', {
-        user: currentUser,
-        role: wizardData.role,
-        classification: result.level,
-        rate: result.rate
-    });
-} catch (error) {
+        
+        // FORCE SCROLL TO RESULTS - MUST BE INSIDE TRY BLOCK
+        setTimeout(() => {
+            console.log('🎯 Forcing scroll to results...');
+            const resultsDiv = document.getElementById('wizardResults');
+            if (resultsDiv) {
+                resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                console.log('✅ Scrolled to results div');
+            } else {
+                console.error('❌ Results div not found!');
+            }
+        }, 100);
+        
+    } catch (error) {
         console.error('❌ Error in showWizardResults():', error);
         alert('Error showing results: ' + error.message);
     }
-    
-    // FORCE SCROLL TO RESULTS
-    setTimeout(() => {
-        console.log('🎯 Forcing scroll to results...');
-        const resultsDiv = document.getElementById('wizardResults');
-        if (resultsDiv) {
-            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            console.log('✅ Scrolled to results div');
-        } else {
-            console.error('❌ Results div not found!');
-        }
-    }, 100);
 }
 
 function showJuniorRedirect() {
