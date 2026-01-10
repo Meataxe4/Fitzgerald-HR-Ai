@@ -2207,7 +2207,27 @@ function calculateAwardClassification(data) {
     
     // Step 3: Extract the actual rate from the nested JSON structure
     const rateData = getNestedRate(rates, classificationPath);
-    const baseRate = typeof rateData === 'object' ? (rateData.rate || rateData) : rateData;
+    // Handle both formats: {rate: 25.85} (permanent) and 32.31 (casual number)
+let baseRate;
+if (typeof rateData === 'number') {
+    baseRate = rateData;
+} else if (typeof rateData === 'object' && rateData !== null) {
+    baseRate = rateData.rate;
+} else {
+    baseRate = null;
+}
+
+// Safety check
+if (!baseRate || typeof baseRate !== 'number') {
+    console.error('Invalid baseRate:', baseRate, 'from rateData:', rateData);
+    return {
+        award: 'Error',
+        level: 'Rate not found',
+        rate: 0,
+        penalties: ['Error: Could not find rate for this classification'],
+        nextSteps: ['Contact Fitzgerald HR support']
+    };
+}
     const title = (typeof rateData === 'object' && rateData.title) ? rateData.title : classificationPath.split('.').pop().replace(/_/g, ' ');
     
     // Step 4: Calculate applicable penalty rates based on work hours
