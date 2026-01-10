@@ -2137,17 +2137,22 @@ function showWizardResults() {
  * @returns {Object} Classification result with award, level, rate, penalties, and next steps
  */
 function calculateAwardClassification(data) {
+    console.log('🔍 WIZARD DEBUG: Starting classification');
+    console.log('🔍 Input data:', JSON.stringify(data, null, 2));
+    
     // Guard clause - ensure rates are loaded before proceeding
     if (!awardRates) {
+        console.error('❌ Award rates not loaded!');
         return {
             award: 'Hospitality Industry (General) Award MA000009',
             level: 'Error - Rates Not Loaded',
             rate: 0,
             penalties: ['Please refresh the page to load award rates'],
-            nextSteps: ['Refresh the page'],
-            notes: []
+            nextSteps: ['Refresh the page']
         };
     }
+    
+    console.log('✅ Award rates loaded:', awardRates.version);
     
     // Step 1: Determine which rate table to use (casual vs permanent, standard vs casino)
     const isCasual = data.employment === 'casual';
@@ -2158,77 +2163,125 @@ function calculateAwardClassification(data) {
         employmentType = isCasual ? 'casino_adult_casual' : 'casino_adult_fulltime_parttime';
     }
     
+    console.log('🔍 Employment type:', employmentType);
+    
     const rates = awardRates[employmentType];
+    
+    if (!rates) {
+        console.error('❌ No rates found for employment type:', employmentType);
+        return {
+            award: 'Error',
+            level: 'Invalid employment type',
+            rate: 0,
+            penalties: ['Error: Invalid employment type'],
+            nextSteps: ['Contact support']
+        };
+    }
+    
+    console.log('✅ Rates object loaded, keys:', Object.keys(rates));
     
     // Step 2: Get the specific classification path from wizard data or default mapping
     let classificationPath = data.classification;
     
     if (!classificationPath) {
-    // Default role mappings for common positions
-    const roleDefaults = {
-        // Waiters/F&B
-        'waiter': 'level_2.food_beverage_grade2',
-        'bartender': 'level_3.food_beverage_grade3',
+        // Default role mappings for common positions
+        const roleDefaults = {
+            // Waiters/F&B
+            'waiter': 'level_2.food_beverage_grade2',
+            'bartender': 'level_3.food_beverage_grade3',
+            
+            // Cooks
+            'cook': 'level_2.cook_grade1',
+            'cook-basic': 'level_2.cook_grade1',
+            'cook-intermediate': 'level_3.cook_grade2',
+            'cook-qualified': 'level_4.cook_tradesperson_grade3',
+            'chef': 'level_5.cook_tradesperson_grade4',
+            'sous-chef': 'level_6.cook_tradesperson_grade5',
+            
+            // Barista
+            'barista': 'level_1.food_beverage_grade1',
+            
+            // Kitchen Staff
+            'kitchen-hand': 'level_1.kitchen_attendant_grade1',
+            
+            // Supervisors
+            'supervisor': 'level_5.food_beverage_supervisor',
+            
+            // Other roles
+            'housekeeper': 'level_2.guest_service_grade2',
+            'receptionist': 'level_2.front_office_grade1',
+            'admin': 'level_2.clerical_grade1',
+            'security': 'level_2.doorperson_security',
+            'duty-manager': 'managerial_hotel'
+        };
         
-        // Cooks
-        'cook': 'level_2.cook_grade1',
-        'cook-basic': 'level_2.cook_grade1',
-        'cook-intermediate': 'level_3.cook_grade2',
-        'cook-qualified': 'level_4.cook_tradesperson_grade3',
-        'chef': 'level_5.cook_tradesperson_grade4',
-        'sous-chef': 'level_6.cook_tradesperson_grade5',
+        classificationPath = roleDefaults[data.role];
         
-        // Barista
-        'barista': 'level_1.food_beverage_grade1',
-        
-        // Kitchen Staff
-        'kitchen-hand': 'level_1.kitchen_attendant_grade1',
-        
-        // Supervisors
-        'supervisor': 'level_5.food_beverage_supervisor',
-        
-        // Other roles
-        'housekeeper': 'level_2.guest_service_grade2',
-        'receptionist': 'level_2.front_office_grade1',
-        'admin': 'level_2.clerical_grade1',
-        'security': 'level_2.doorperson_security',
-        'duty-manager': 'managerial_hotel'
-    };
-    
-    // Get classification or use default
-    classificationPath = roleDefaults[data.role];
-    
-    // If still no match, use introductory as safe default
-    if (!classificationPath) {
-        console.warn(`No mapping found for role: ${data.role}, using introductory`);
-        classificationPath = 'introductory';
+        if (!classificationPath) {
+            console.warn(`⚠️ No mapping found for role: ${data.role}, using introductory`);
+            classificationPath = 'introductory';
+        }
     }
-}
+    
+    console.log('🔍 Classification path:', classificationPath);
     
     // Step 3: Extract the actual rate from the nested JSON structure
     const rateData = getNestedRate(rates, classificationPath);
-    // Handle both formats: {rate: 25.85} (permanent) and 32.31 (casual number)
-let baseRate;
-if (typeof rateData === 'number') {
-    baseRate = rateData;
-} else if (typeof rateData === 'object' && rateData !== null) {
-    baseRate = rateData.rate;
-} else {
-    baseRate = null;
-}
-
-// Safety check
-if (!baseRate || typeof baseRate !== 'number') {
-    console.error('Invalid baseRate:', baseRate, 'from rateData:', rateData);
-    return {
-        award: 'Error',
-        level: 'Rate not found',
-        rate: 0,
-        penalties: ['Error: Could not find rate for this classification'],
-        nextSteps: ['Contact Fitzgerald HR support']
-    };
-}
-    const title = (typeof rateData === 'object' && rateData.title) ? rateData.title : classificationPath.split('.').pop().replace(/_/g, ' ');
+    console.log('🔍 Rate data retrieved:', rateData);
+    console.log('🔍 Rate data type:', typeof rateData);
+    
+    if (rateData === null || rateData === undefined) {
+        console.error('❌ Rate data is null/undefined for path:', classificationPath);
+        return {
+            award: 'Error',
+            level: 'Rate not found',
+            rate: 0,
+            penalties: [`Error: Could not find rate for classification: ${classificationPath}`],
+            nextSteps: ['Contact Fitzgerald HR support']
+        };
+    }
+    
+    // Handle both formats: {rate: 25.85, title: "..."} (permanent) and 32.31 (casual number)
+    let baseRate;
+    let title;
+    
+    if (typeof rateData === 'number') {
+        // Casual format: just a number like 32.31
+        console.log('✅ Rate is number (casual format):', rateData);
+        baseRate = rateData;
+        title = classificationPath.split('.').pop().replace(/_/g, ' ');
+    } else if (typeof rateData === 'object' && rateData !== null) {
+        // Permanent format: {rate: 25.85, title: "Cook, Grade 1"}
+        console.log('✅ Rate is object (permanent format)');
+        baseRate = rateData.rate;
+        title = rateData.title || classificationPath.split('.').pop().replace(/_/g, ' ');
+    } else {
+        console.error('❌ Unexpected rateData type:', typeof rateData, rateData);
+        return {
+            award: 'Error',
+            level: 'Invalid rate format',
+            rate: 0,
+            penalties: ['Error: Invalid rate data format'],
+            nextSteps: ['Contact support']
+        };
+    }
+    
+    console.log('🔍 Base rate extracted:', baseRate);
+    console.log('🔍 Title extracted:', title);
+    
+    // Final safety check
+    if (!baseRate || typeof baseRate !== 'number' || isNaN(baseRate)) {
+        console.error('❌ Invalid base rate:', baseRate);
+        return {
+            award: 'Error',
+            level: title || 'Unknown',
+            rate: 0,
+            penalties: ['Error: Invalid rate value'],
+            nextSteps: ['Contact Fitzgerald HR support']
+        };
+    }
+    
+    console.log('✅ Valid base rate confirmed:', baseRate);
     
     // Step 4: Calculate applicable penalty rates based on work hours
     const penalties = [];
@@ -2249,12 +2302,12 @@ if (!baseRate || typeof baseRate !== 'number') {
     }
     
     if (isCasual) {
-        penalties.push(`Casual Loading: 25% (already included in rate of $${baseRate.toFixed(2)}/hr)`);
+        penalties.push(`Casual Loading: 25% (already included in base rate of $${baseRate.toFixed(2)}/hr)`);
     }
     
     penalties.push(`Overtime: First 2 hours at 150%, thereafter 200%`);
     
-    return {
+    const result = {
         award: awardRates.award_name,
         level: title,
         rate: baseRate,
@@ -2268,8 +2321,11 @@ if (!baseRate || typeof baseRate !== 'number') {
         ],
         notes: awardRates.notes || []
     };
+    
+    console.log('✅ FINAL RESULT:', JSON.stringify(result, null, 2));
+    
+    return result;
 }
-
 // Reset wizard
 function resetWizard() {
     wizardData = {};
