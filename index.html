@@ -2027,16 +2027,16 @@ function getNestedRate(obj, path) {
 function wizardAnswer(question, answer) {
     wizardData[question] = answer;
     
-    // Special handling for step 3 (populate experience levels)
-    // Note: Experience level population disabled until HTML element added
-    // if (currentWizardStep === 2) {
-    //     setTimeout(populateExperienceLevels, 100);
-    // }
+    console.log('🔍 Wizard Answer:', question, '=', answer);
+    console.log('🔍 Current step:', currentWizardStep, '/', CONFIG.WIZARD_STEPS);
+    console.log('🔍 Wizard data so far:', wizardData);
     
     if (currentWizardStep < CONFIG.WIZARD_STEPS) {
         currentWizardStep++;
+        console.log('🔍 Moving to step:', currentWizardStep);
         updateWizardStep();
     } else {
+        console.log('🔍 Wizard complete! Calling showWizardResults()...');
         showWizardResults();
     }
 }
@@ -2081,11 +2081,18 @@ function wizardGoBack() {
 
 // Show wizard results
 function showWizardResults() {
-    // Check if employee is a junior (19 or younger)
-    if (wizardData.age === 'junior') {
-        showJuniorRedirect();
-        return;
-    }
+    console.log('🎯 showWizardResults() called!');
+    console.log('🎯 Wizard data:', JSON.stringify(wizardData, null, 2));
+    
+    try {
+        // Check if employee is a junior (19 or younger)
+        if (wizardData.age === 'junior') {
+            console.log('🎯 Junior detected, redirecting...');
+            showJuniorRedirect();
+            return;
+        }
+        
+        console.log('🎯 Adult path, hiding steps...');
     
     document.getElementById('wizardSteps').classList.add('hidden');
     const backBtn = document.getElementById('wizardBackBtn');
@@ -2141,6 +2148,10 @@ function showWizardResults() {
         classification: result.level,
         rate: result.rate
     });
+} catch (error) {
+        console.error('❌ Error in showWizardResults():', error);
+        alert('Error showing results: ' + error.message);
+    }
 }
 
 function showJuniorRedirect() {
