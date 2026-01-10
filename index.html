@@ -753,7 +753,7 @@
         <!-- Step Progress -->
         <div class="mb-6">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-sm text-slate-400">Step <span id="wizardCurrentStep">1</span> of 5</span>
+                <span class="text-sm text-slate-400">Step <span id="wizardCurrentStep">1</span> of 6</span>
                 <span class="text-sm text-amber-400" id="wizardProgress">20% Complete</span>
             </div>
             <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
@@ -928,26 +928,39 @@
                 </div>
             </div>
 
-            <!-- Step 5: Employment Type -->
-            <div class="wizard-step hidden" data-step="5">
-                <h3 class="text-lg font-bold text-white mb-4">What type of employment?</h3>
-                <div class="space-y-2">
-                    <button onclick="wizardAnswer('employment', 'casual')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Casual</div>
-                        <div class="text-xs opacity-70">25% loading, no leave entitlements</div>
-                    </button>
-                    <button onclick="wizardAnswer('employment', 'part-time')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Part-Time</div>
-                        <div class="text-xs opacity-70">Regular hours, pro-rata leave</div>
-                    </button>
-                    <button onclick="wizardAnswer('employment', 'full-time')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Full-Time</div>
-                        <div class="text-xs opacity-70">38 hours/week, full entitlements</div>
-                    </button>
-                </div>
-            </div>
+            <!-- Step 5: Age Category (NEW) -->
+<div class="wizard-step hidden" data-step="5">
+    <h3 class="text-lg font-bold text-white mb-4">How old is the employee?</h3>
+    <div class="space-y-2">
+        <button onclick="wizardAnswer('age', 'adult')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+            <div class="font-semibold">20 years or older</div>
+            <div class="text-xs opacity-70">Adult rates apply</div>
+        </button>
+        <button onclick="wizardAnswer('age', 'junior')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+            <div class="font-semibold">19 years or younger</div>
+            <div class="text-xs opacity-70">Junior rates apply (percentage of adult rate)</div>
+        </button>
+    </div>
+</div>
 
-        </div>
+<!-- Step 6: Employment Type -->
+<div class="wizard-step hidden" data-step="6">
+    <h3 class="text-lg font-bold text-white mb-4">What type of employment?</h3>
+    <div class="space-y-2">
+        <button onclick="wizardAnswer('employment', 'casual')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+            <div class="font-semibold">Casual</div>
+            <div class="text-xs opacity-70">25% loading, no leave entitlements</div>
+        </button>
+        <button onclick="wizardAnswer('employment', 'part-time')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+            <div class="font-semibold">Part-Time</div>
+            <div class="text-xs opacity-70">Regular hours, pro-rata leave</div>
+        </button>
+        <button onclick="wizardAnswer('employment', 'full-time')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+            <div class="font-semibold">Full-Time</div>
+            <div class="text-xs opacity-70">38 hours/week, full entitlements</div>
+        </button>
+    </div>
+</div>
 
         <!-- Results (hidden initially) -->
         <div id="wizardResults" class="hidden mt-6">
@@ -1250,7 +1263,7 @@ const CONFIG = {
     },
     
     // Application constants
-    WIZARD_STEPS: 5,
+    WIZARD_STEPS: 6,
     TOOL_SUGGESTION_LIMIT: 2,
     MAX_CONVERSATION_HISTORY: 50,
     
@@ -2043,7 +2056,7 @@ function updateWizardStep() {
     
     // Update progress
     document.getElementById('wizardCurrentStep').textContent = currentWizardStep;
-    const progress = (currentWizardStep / 5) * 100;
+    const progress = (currentWizardStep / 6) * 100;
     document.getElementById('wizardProgress').textContent = `${progress}% Complete`;
     document.getElementById('wizardProgressBar').style.width = `${progress}%`;
     
@@ -2068,6 +2081,12 @@ function wizardGoBack() {
 
 // Show wizard results
 function showWizardResults() {
+    // Check if employee is a junior (19 or younger)
+    if (wizardData.age === 'junior') {
+        showJuniorRedirect();
+        return;
+    }
+    
     document.getElementById('wizardSteps').classList.add('hidden');
     const backBtn = document.getElementById('wizardBackBtn');
     if (backBtn) backBtn.classList.add('hidden');
@@ -2124,6 +2143,88 @@ function showWizardResults() {
     });
 }
 
+function showJuniorRedirect() {
+    document.getElementById('wizardSteps').classList.add('hidden');
+    const backBtn = document.getElementById('wizardBackBtn');
+    if (backBtn) backBtn.classList.add('hidden');
+    document.getElementById('wizardResults').classList.remove('hidden');
+    
+    // Show junior rates redirect message
+    document.getElementById('wizardResults').innerHTML = `
+        <div class="bg-blue-500/10 border-2 border-blue-500 rounded-lg p-6">
+            <h3 class="text-blue-400 font-bold text-xl mb-4 flex items-center gap-2">
+                <span>ℹ️</span>
+                <span>Junior Employee (19 years or younger)</span>
+            </h3>
+            
+            <div class="space-y-4 text-slate-200">
+                <p class="leading-relaxed">
+                    For employees <strong>19 years of age or younger</strong>, junior rates apply. 
+                    Junior rates are calculated as a <strong>percentage of the adult rate</strong> based on the employee's age.
+                </p>
+                
+                <div class="bg-slate-700/50 rounded-lg p-4">
+                    <p class="font-semibold text-amber-400 mb-2">Junior Rate Percentages:</p>
+                    <ul class="text-sm space-y-1 ml-4">
+                        <li>• <strong>Under 16 years:</strong> 40% of adult rate</li>
+                        <li>• <strong>16 years:</strong> 50% of adult rate</li>
+                        <li>• <strong>17 years:</strong> 60% of adult rate</li>
+                        <li>• <strong>18 years:</strong> 70% of adult rate</li>
+                        <li>• <strong>19 years:</strong> 80% of adult rate</li>
+                        <li>• <strong>20 years and over:</strong> 100% (full adult rate)</li>
+                    </ul>
+                </div>
+
+                <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-4">
+                    <p class="font-semibold text-amber-400 mb-2">📋 What You Need to Do:</p>
+                    <ol class="text-sm space-y-2 ml-4">
+                        <li>1. Determine the employee's exact age</li>
+                        <li>2. Find the applicable adult rate for their classification</li>
+                        <li>3. Apply the percentage based on their age</li>
+                        <li>4. Review the full award for additional junior provisions</li>
+                    </ol>
+                </div>
+
+                <div class="bg-green-500/10 border border-green-500 rounded-lg p-4 text-center">
+                    <p class="font-semibold text-green-400 mb-3">
+                        📖 View Full Junior Rates in the Award
+                    </p>
+                    <a href="https://awards.fairwork.gov.au/MA000009.html" 
+                       target="_blank"
+                       class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all">
+                        Open Hospitality Industry Award →
+                    </a>
+                    <p class="text-xs text-slate-400 mt-2">
+                        Opens in new tab • Fair Work Ombudsman official website
+                    </p>
+                </div>
+
+                <div class="bg-slate-700/50 rounded-lg p-4">
+                    <p class="text-sm text-slate-300">
+                        <strong>Need help calculating junior rates?</strong><br/>
+                        Contact Fitzgerald HR for assistance: 
+                        <a href="mailto:info@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">info@fitzgeraldhr.com.au</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button onclick="resetWizard()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-lg transition-all">
+                    ← Start Over
+                </button>
+                <button onclick="closeToolModal('awardWizardModal')" class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-lg transition-all">
+                    Close
+                </button>
+            </div>
+        </div>
+    `;
+    
+    trackEvent('award_wizard_junior_redirect', {
+        user: currentUser,
+        role: wizardData.role
+    });
+}
+
 // Calculate award classification (uses GitHub JSON)
 /**
  * Calculates award classification based on wizard answers
@@ -2140,7 +2241,7 @@ function calculateAwardClassification(data) {
     console.log('🔍 WIZARD DEBUG: Starting classification');
     console.log('🔍 Input data:', JSON.stringify(data, null, 2));
     
-    if (!awardRates) {
+    if (!awardRates || !awardRates.rates) {
         console.error('❌ Award rates not loaded!');
         return {
             award: 'Hospitality Industry (General) Award MA000009',
@@ -2152,170 +2253,148 @@ function calculateAwardClassification(data) {
     }
     
     console.log('✅ Award rates loaded:', awardRates.version);
+    console.log('✅ Total rates in array:', awardRates.rates.length);
     
-    // Determine employment type
+    // Determine employment type for filtering
     const isCasual = data.employment === 'casual';
-    const isVenueCasino = data.venue === 'casino';
+    const employmentType = (isCasual || data.employment === 'part-time') ? 'casual' : 'full_time';
     
-    let employmentType = isCasual ? 'adult_casual' : 'adult_fulltime_parttime';
-    if (isVenueCasino && data.role && data.role.includes('gaming')) {
-        employmentType = isCasual ? 'casino_adult_casual' : 'casino_adult_fulltime_parttime';
-    }
+    console.log('🔍 Employment type for filter:', employmentType);
     
-    console.log('🔍 Employment type:', employmentType);
-    console.log('🔍 DEBUG: Full awardRates keys:', Object.keys(awardRates));
-    console.log('🔍 DEBUG: adult_casual exists?', !!awardRates.adult_casual);
-    
-    const rates = awardRates[employmentType];
-    
-    if (!rates) {
-        console.error('❌ No rates found for employment type:', employmentType);
-        console.error('❌ Available keys:', Object.keys(awardRates));
-        return {
-            award: 'Error',
-            level: 'Invalid employment type',
-            rate: 0,
-            penalties: ['Error: Rates not loaded correctly. Please refresh.'],
-            nextSteps: ['Refresh the page and try again']
-        };
-    }
-    
-    console.log('✅ Rates object loaded, keys:', Object.keys(rates));
-    
-    // BUILD CLASSIFICATION PATH USING EXPERIENCE LEVEL
-    let classificationPath;
-    
-    // Map experience to level prefix
+    // Build classification path based on role and experience
     const levelMap = {
         'intro': 'introductory',
         'level1': 'level_1',
         'level2': 'level_2',
         'level3': 'level_3',
-        'level4': 'level_4'
+        'level4': 'level_4',
+        'level5': 'level_5',
+        'level6': 'level_6'
     };
     
     const levelPrefix = levelMap[data.experience] || 'introductory';
     console.log('🔍 Level prefix from experience:', levelPrefix);
     
-    // Map roles to their classification suffix
+    // Role to classification mapping
     const roleSuffixes = {
         'cook': {
             'introductory': 'introductory',
-            'level_1': 'level_1.food_beverage_grade1', // Cooks start at level 1 as general attendants
+            'level_1': 'level_1.food_beverage_grade1',
             'level_2': 'level_2.cook_grade1',
             'level_3': 'level_3.cook_grade2',
-            'level_4': 'level_4.cook_tradesperson_grade3'
+            'level_4': 'level_4.cook_tradesperson_grade3',
+            'level_5': 'level_5.cook_tradesperson_grade4',
+            'level_6': 'level_6.cook_tradesperson_grade5'
         },
         'waiter': {
             'introductory': 'introductory',
             'level_1': 'level_1.food_beverage_grade1',
             'level_2': 'level_2.food_beverage_grade2',
             'level_3': 'level_3.food_beverage_grade3',
-            'level_4': 'level_4.food_beverage_tradesperson_grade4'
+            'level_4': 'level_4.food_beverage_tradesperson_grade4',
+            'level_5': 'level_5.food_beverage_supervisor',
+            'level_6': 'level_5.food_beverage_supervisor'
         },
         'bartender': {
             'introductory': 'introductory',
             'level_1': 'level_1.food_beverage_grade1',
             'level_2': 'level_2.food_beverage_grade2',
             'level_3': 'level_3.food_beverage_grade3',
-            'level_4': 'level_4.food_beverage_tradesperson_grade4'
+            'level_4': 'level_4.food_beverage_tradesperson_grade4',
+            'level_5': 'level_5.food_beverage_supervisor',
+            'level_6': 'level_5.food_beverage_supervisor'
         },
         'barista': {
             'introductory': 'introductory',
             'level_1': 'level_1.food_beverage_grade1',
             'level_2': 'level_2.food_beverage_grade2',
             'level_3': 'level_3.food_beverage_grade3',
-            'level_4': 'level_4.food_beverage_tradesperson_grade4'
+            'level_4': 'level_4.food_beverage_tradesperson_grade4',
+            'level_5': 'level_5.food_beverage_supervisor',
+            'level_6': 'level_5.food_beverage_supervisor'
         },
         'kitchen-hand': {
             'introductory': 'introductory',
             'level_1': 'level_1.kitchen_attendant_grade1',
             'level_2': 'level_2.kitchen_attendant_grade2',
             'level_3': 'level_3.kitchen_attendant_grade3',
-            'level_4': 'level_3.kitchen_attendant_grade3' // Max at level 3
+            'level_4': 'level_3.kitchen_attendant_grade3',
+            'level_5': 'level_3.kitchen_attendant_grade3',
+            'level_6': 'level_3.kitchen_attendant_grade3'
         },
         'supervisor': {
             'introductory': 'level_2.food_beverage_grade2',
             'level_1': 'level_3.food_beverage_grade3',
             'level_2': 'level_4.food_beverage_tradesperson_grade4',
             'level_3': 'level_5.food_beverage_supervisor',
-            'level_4': 'level_5.food_beverage_supervisor'
+            'level_4': 'level_5.food_beverage_supervisor',
+            'level_5': 'level_5.food_beverage_supervisor',
+            'level_6': 'level_5.food_beverage_supervisor'
         },
         'receptionist': {
             'introductory': 'introductory',
             'level_1': 'level_2.front_office_grade1',
             'level_2': 'level_3.front_office_grade2',
             'level_3': 'level_4.front_office_grade3',
-            'level_4': 'level_5.front_office_supervisor'
+            'level_4': 'level_5.front_office_supervisor',
+            'level_5': 'level_5.front_office_supervisor',
+            'level_6': 'level_5.front_office_supervisor'
         },
         'housekeeper': {
             'introductory': 'introductory',
             'level_1': 'level_1.guest_service_grade1',
             'level_2': 'level_2.guest_service_grade2',
             'level_3': 'level_3.guest_service_grade3',
-            'level_4': 'level_4.guest_service_grade4'
+            'level_4': 'level_4.guest_service_grade4',
+            'level_5': 'level_5.guest_service_supervisor',
+            'level_6': 'level_5.guest_service_supervisor'
         },
         'security': {
             'introductory': 'introductory',
             'level_1': 'level_2.doorperson_security',
             'level_2': 'level_3.timekeeper_security_grade2',
-            'level_3': 'level_4.security_grade2',
-            'level_4': 'level_4.security_grade2'
+            'level_3': 'level_3.timekeeper_security_grade2',
+            'level_4': 'level_3.timekeeper_security_grade2',
+            'level_5': 'level_3.timekeeper_security_grade2',
+            'level_6': 'level_3.timekeeper_security_grade2'
         }
     };
     
-    // Get the classification path based on role AND experience
+    let classificationPath;
     if (roleSuffixes[data.role] && roleSuffixes[data.role][levelPrefix]) {
         classificationPath = roleSuffixes[data.role][levelPrefix];
     } else {
-        // Fallback to introductory
         console.warn(`⚠️ No mapping for role: ${data.role} at level: ${levelPrefix}`);
         classificationPath = 'introductory';
     }
     
     console.log('🔍 Final classification path:', classificationPath);
     
-    // Extract rate data
-    const rateData = getNestedRate(rates, classificationPath);
-    console.log('🔍 Rate data retrieved:', rateData);
-    console.log('🔍 Rate data type:', typeof rateData);
+    // SEARCH THE ARRAY for matching rate
+    const matchingRate = awardRates.rates.find(r => 
+        r.category === 'adult' && 
+        r.employment_type === employmentType && 
+        r.classification === classificationPath
+    );
     
-    if (rateData === null || rateData === undefined) {
-        console.error('❌ Rate data is null/undefined for path:', classificationPath);
+    console.log('🔍 Matching rate found:', matchingRate);
+    
+    if (!matchingRate) {
+        console.error('❌ No rate found for:', { employmentType, classificationPath });
         return {
             award: 'Error',
             level: 'Rate not found',
             rate: 0,
-            penalties: [`Error: Could not find rate for ${classificationPath}`],
+            penalties: [`Error: No rate for ${classificationPath} (${employmentType})`],
             nextSteps: ['Contact Fitzgerald HR support']
         };
     }
     
-    // Handle both formats
-    let baseRate;
-    let title;
+    const baseRate = matchingRate.rate;
+    const title = matchingRate.title;
     
-    if (typeof rateData === 'number') {
-        console.log('✅ Rate is number (casual format):', rateData);
-        baseRate = rateData;
-        title = classificationPath.split('.').pop().replace(/_/g, ' ');
-    } else if (typeof rateData === 'object' && rateData !== null) {
-        console.log('✅ Rate is object (permanent format)');
-        baseRate = rateData.rate;
-        title = rateData.title || classificationPath.split('.').pop().replace(/_/g, ' ');
-    } else {
-        console.error('❌ Unexpected rateData type:', typeof rateData, rateData);
-        return {
-            award: 'Error',
-            level: 'Invalid rate format',
-            rate: 0,
-            penalties: ['Error: Invalid rate data format'],
-            nextSteps: ['Contact support']
-        };
-    }
-    
-    console.log('🔍 Base rate extracted:', baseRate);
-    console.log('🔍 Title extracted:', title);
+    console.log('✅ Base rate:', baseRate);
+    console.log('✅ Title:', title);
     
     if (!baseRate || typeof baseRate !== 'number' || isNaN(baseRate)) {
         console.error('❌ Invalid base rate:', baseRate);
@@ -2327,8 +2406,6 @@ function calculateAwardClassification(data) {
             nextSteps: ['Contact Fitzgerald HR support']
         };
     }
-    
-    console.log('✅ Valid base rate confirmed:', baseRate);
     
     // Calculate penalties
     const penalties = [];
@@ -2355,9 +2432,9 @@ function calculateAwardClassification(data) {
     penalties.push(`Overtime: First 2 hours at 150%, thereafter 200%`);
     
     const result = {
-        award: awardRates.award_name,
-        level: title,
-        rate: baseRate,
+    award: 'Hospitality Industry (General) Award MA000009',
+    level: title,
+    rate: baseRate,
         penalties: penalties,
         nextSteps: [
             'Create written employment contract',
