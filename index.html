@@ -141,9 +141,9 @@
                 <span>Award Calculator</span>
             </button>
             <button onclick="openTool('rosterOptimizer')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3">
-                <span>📅</span>
-                <span>Roster Optimiser</span>
-            </button>
+    	<span>📋</span>
+    	<span>Roster Optimiser</span>
+		</button>
             <button onclick="openTool('terminationRisk')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3">
                 <span>⚖️</span>
                 <span>Termination Risk</span>
@@ -189,15 +189,7 @@
 
 <p class="text-slate-100 leading-relaxed mt-3">I can help you with Fair Work compliance, award interpretation, employee relations, recruitment advice, and more.</p>
 
-<p class="text-amber-400 font-semibold mt-4 mb-2">🛠️ Tools Available:</p>
-<p class="text-slate-100 text-sm">Click the tools icon (🛠️) in the top right to access:</p>
-<ul class="text-slate-100 text-sm ml-4 mt-1 space-y-1">
-    <li>• Award Calculator</li>
-    <li>• Roster Optimiser</li>
-    <li>• Termination Risk Assessor</li>
-    <li>• Scenario Analysis</li>
-    <li>• Xero Integration</li>
-</ul>
+<p class="text-slate-100 text-sm mt-4">💡 <strong>Tip:</strong> I have 8 specialized tools (click 🛠️ above). I'll suggest the right ones as we talk, or browse them anytime.</p>
 
 <p class="text-red-400 font-semibold mt-4 mb-2">🚨 Urgent/Critical Situations:</p>
 <p class="text-slate-100 text-sm">Use the red URGENT button for immediate crisis response.</p>
@@ -391,13 +383,15 @@
                     <div>
                         <label class="block text-slate-300 text-sm mb-2">Position / Classification</label>
                         <select id="calcPosition" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm">
-                            <option value="28.50">Level 1 (Intro) - $28.50</option>
-                            <option value="29.85">Level 2 - $29.85</option>
-                            <option value="31.20">Level 3 - $31.20</option>
-                            <option value="33.89">Level 4 - $33.89</option>
-                            <option value="36.58">Level 5 - $36.58</option>
-                            <option value="custom">Custom Rate</option>
-                        </select>
+    <option value="24.28">Introductory - $24.28</option>
+    <option value="24.95">Level 1 (Food & Beverage) - $24.95</option>
+    <option value="25.85">Level 2 (Cook Grade 1) - $25.85</option>
+    <option value="26.70">Level 3 (Cook Grade 2) - $26.70</option>
+    <option value="28.12">Level 4 (Tradesperson) - $28.12</option>
+    <option value="29.88">Level 5 (Supervisor) - $29.88</option>
+    <option value="30.68">Level 6 (Senior) - $30.68</option>
+    <option value="custom">Custom Rate</option>
+</select>
                     </div>
 
                     <div id="customRateDiv" class="hidden">
@@ -476,8 +470,8 @@
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
-                        <span>📅</span> Roster Cost Optimizer
-                    </h2>
+    		<span>📋</span> Roster Cost Optimizer
+		</h2>
                     <p class="text-slate-400 text-sm">Upload roster to analyze costs and optimize scheduling</p>
                 </div>
                 <button onclick="closeToolModal('rosterOptimizerModal')" class="text-slate-400 hover:text-white text-2xl">×</button>
@@ -1040,7 +1034,7 @@ Be as specific as possible!"></textarea>
                     <span class="text-2xl">🚨</span>
                     <div class="flex-1">
                         <p class="font-bold text-red-400">URGENT: Award Rate Increase</p>
-                        <p class="text-sm text-slate-300 mt-1">Hospitality Award rates increase on 1 July 2025 (23 days)</p>
+                        <p class="text-sm text-slate-300 mt-1">Hospitality Award rates increase on 1 July 2026 </p>
                         <p class="text-xs text-slate-400 mt-2">Action: Update payroll systems & review all employment contracts</p>
                     </div>
                 </div>
@@ -1129,11 +1123,15 @@ Be as specific as possible!"></textarea>
             <h3 class="text-white font-bold mb-4">📅 Upcoming Compliance Dates</h3>
             <div class="space-y-2 text-sm">
                 <div class="flex justify-between py-2 border-b border-slate-700">
-                    <span class="text-slate-300">1 July 2025</span>
+                    <span class="text-slate-300">1 July 2026</span>
                     <span class="text-amber-400">Award Rate Increase</span>
                 </div>
+		<div class="flex justify-between py-2 border-b border-slate-700">
+   		 <span class="text-slate-300">25 April 2026</span>
+   		 <span class="text-amber-400">ANZAC Day (Public Holiday)</span>
+		</div>
                 <div class="flex justify-between py-2 border-b border-slate-700">
-                    <span class="text-slate-300">26 January 2025</span>
+                    <span class="text-slate-300">26 January 2026</span>
                     <span class="text-amber-400">Australia Day (Public Holiday)</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-slate-700">
@@ -1167,6 +1165,55 @@ let wizardData = {};
 let currentWizardStep = 1;
 let recognition = null;
 let isListening = false;
+
+
+// ========================================
+// AWARD RATES - FETCH FROM GITHUB
+// ========================================
+
+let awardRates = null; // Global variable to store rates
+const RATES_URL = 'https://raw.githubusercontent.com/Meataxe4/Fitzgerald-HR-Ai/main/hospitality-award-rates.json';
+
+// Fetch rates on page load
+async function loadAwardRates() {
+    try {
+        const response = await fetch(RATES_URL);
+        if (!response.ok) throw new Error('Failed to load rates');
+        awardRates = await response.json();
+        console.log('✅ Award rates loaded:', awardRates.version);
+        return true;
+    } catch (error) {
+        console.error('❌ Error loading award rates:', error);
+        // Fallback to basic rates if GitHub fails
+        awardRates = getFallbackRates();
+        return false;
+    }
+}
+
+// Fallback rates if GitHub is down
+function getFallbackRates() {
+    return {
+        adult_fulltime_parttime: {
+            introductory: { rate: 24.28 },
+            level_1: { food_beverage_grade1: { rate: 24.95 } },
+            level_2: { cook_grade1: { rate: 25.85 } },
+            level_3: { cook_grade2: { rate: 26.70 } },
+            level_4: { cook_tradesperson_grade3: { rate: 28.12 } },
+            level_5: { cook_tradesperson_grade4: { rate: 29.88 } },
+            level_6: { cook_tradesperson_grade5: { rate: 30.68 } }
+        },
+        penalty_rates: {
+            saturday: 1.5,
+            sunday: 1.75,
+            public_holiday: 2.5,
+            evening_after_7pm: 1.1
+        },
+        casual_loading: 0.25
+    };
+}
+
+// Load rates immediately when page loads
+loadAwardRates();
 
 // ========================================
 // HR DOCUMENT TEMPLATES
@@ -1314,9 +1361,17 @@ function addMessage(role, content) {
     messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
     
     if (role === 'assistant') {
-        const detectedDocType = detectDocumentType(content);
-        if (detectedDocType) {
-            setTimeout(() => addDocumentDownloadButtons(messageDiv, detectedDocType), 500);
+    const detectedDocType = detectDocumentType(content);
+    if (detectedDocType) {
+        setTimeout(() => addDocumentDownloadButtons(messageDiv, detectedDocType), 500);
+    }
+    
+    // Suggest relevant tools based on conversation
+    const lastUserMessage = conversationHistory.filter(m => m.role === 'user').slice(-1)[0];
+    if (lastUserMessage) {
+        const suggestedTools = suggestRelevantTools(lastUserMessage.content, content);
+        if (suggestedTools.length > 0) {
+            setTimeout(() => addToolSuggestions(messageDiv, suggestedTools), 600);
         }
     }
 }
@@ -1344,6 +1399,101 @@ async function callClaudeAPI(message) {
         console.error('API Error:', error);
         throw error;
     }
+}
+
+// ========================================
+// PROACTIVE TOOL SUGGESTIONS
+// ========================================
+
+function suggestRelevantTools(userMessage, assistantResponse) {
+    const lowerMessage = userMessage.toLowerCase();
+    const lowerResponse = assistantResponse.toLowerCase();
+    const combinedText = lowerMessage + ' ' + lowerResponse;
+    
+    const toolKeywords = {
+        'awardWizard': {
+            keywords: ['award rate', 'classification', 'what level', 'pay rate', 'how much should i pay'],
+            name: 'Award Wizard',
+            icon: '🧙',
+            description: 'Find the exact award classification and rate'
+        },
+        'awardCalculator': {
+            keywords: ['calculate', 'how much', 'penalty rate', 'overtime', 'saturday', 'sunday'],
+            name: 'Award Calculator',
+            icon: '💰',
+            description: 'Calculate exact pay with penalties & loadings'
+        },
+        'rosterOptimizer': {
+            keywords: ['roster', 'rostering', 'schedule', 'shifts', 'labour cost'],
+            name: 'Roster Optimiser',
+            icon: '📋',
+            description: 'Analyze and optimize your roster costs'
+        },
+        'rosterStressTester': {
+            keywords: ['compliance', 'consecutive days', 'breaks', 'meal break'],
+            name: 'Roster Stress Test',
+            icon: '🔍',
+            description: 'Find compliance issues in your roster'
+        },
+        'terminationRisk': {
+            keywords: ['terminate', 'termination', 'dismiss', 'fire', 'unfair dismissal'],
+            name: 'Termination Risk Assessor',
+            icon: '⚖️',
+            description: 'Assess unfair dismissal risk'
+        },
+        'complianceCalendar': {
+            keywords: ['deadline', 'when', 'upcoming', 'reminder', 'public holiday'],
+            name: 'Compliance Calendar',
+            icon: '📅',
+            description: 'View upcoming compliance deadlines'
+        },
+        'scenarioAnalysis': {
+            keywords: ['what should i do', 'advice', 'situation', 'help with'],
+            name: 'Scenario Analysis',
+            icon: '🎯',
+            description: 'Get tailored advice for your situation'
+        }
+    };
+    
+    const suggestedTools = [];
+    
+    for (const [toolId, tool] of Object.entries(toolKeywords)) {
+        const keywordMatches = tool.keywords.filter(keyword => combinedText.includes(keyword));
+        if (keywordMatches.length > 0) {
+            suggestedTools.push({ toolId, ...tool, matches: keywordMatches.length });
+        }
+    }
+    
+    suggestedTools.sort((a, b) => b.matches - a.matches);
+    return suggestedTools.slice(0, 2);
+}
+
+function addToolSuggestions(messageDiv, tools) {
+    if (tools.length === 0) return;
+    
+    const suggestionsContainer = document.createElement('div');
+    suggestionsContainer.className = 'mt-4 p-4 bg-blue-500/10 border-l-4 border-blue-500 rounded-r-lg';
+    
+    let html = '<p class="text-blue-400 font-semibold mb-3 flex items-center gap-2">';
+    html += '<span>💡</span><span>Helpful Tools:</span></p><div class="space-y-2">';
+    
+    tools.forEach(tool => {
+        html += `
+            <button onclick="openTool('${tool.toolId}')" 
+                    class="w-full text-left p-3 bg-slate-700/50 hover:bg-slate-600/50 rounded-lg transition-all flex items-center gap-3 group">
+                <span class="text-2xl">${tool.icon}</span>
+                <div class="flex-1">
+                    <p class="text-slate-200 font-medium group-hover:text-amber-400 transition-colors">${tool.name}</p>
+                    <p class="text-xs text-slate-400">${tool.description}</p>
+                </div>
+                <span class="text-slate-400 group-hover:text-amber-400 transition-colors">→</span>
+            </button>
+        `;
+    });
+    
+    html += '</div>';
+    suggestionsContainer.innerHTML = html;
+    messageDiv.querySelector('.max-w-3xl').appendChild(suggestionsContainer);
 }
 
 // ========================================
@@ -1626,12 +1776,123 @@ function downloadCalculation() {
     generateExcelSpreadsheet(data, `Pay_Calculation_${Date.now()}.xlsx`, 'Pay Breakdown');
 }
 
+</script>
+
 // ========================================
 // AWARD WIZARD - COMPLETE IMPLEMENTATION
 // ========================================
 
+let wizardData = {};
+let currentWizardStep = 1;
+
+// Role search filter
+function filterWizardRoles() {
+    const searchTerm = document.getElementById('roleSearch').value.toLowerCase();
+    const roles = document.querySelectorAll('.wizard-role-option');
+    const headers = document.querySelectorAll('#rolesList > div.text-amber-500');
+    
+    roles.forEach(role => {
+        const searchText = role.getAttribute('data-search') || '';
+        const roleText = role.textContent.toLowerCase();
+        const matches = searchText.includes(searchTerm) || roleText.includes(searchTerm);
+        role.style.display = matches ? 'block' : 'none';
+    });
+    
+    // Show/hide category headers if all roles in category are hidden
+    headers.forEach(header => {
+        let nextElement = header.nextElementSibling;
+        let hasVisibleRoles = false;
+        
+        while (nextElement && !nextElement.classList.contains('text-amber-500')) {
+            if (nextElement.style.display !== 'none') {
+                hasVisibleRoles = true;
+                break;
+            }
+            nextElement = nextElement.nextElementSibling;
+        }
+        
+        header.style.display = hasVisibleRoles ? 'block' : 'none';
+    });
+}
+
+// Populate experience levels based on role
+function populateExperienceLevels() {
+    if (!awardRates) {
+        document.getElementById('experienceLevelsList').innerHTML = '<p class="text-red-400">Loading rates...</p>';
+        setTimeout(populateExperienceLevels, 100);
+        return;
+    }
+    
+    const role = wizardData.role;
+    const isCasual = wizardData.employment === 'casual';
+    const employmentType = isCasual ? 'adult_casual' : 'adult_fulltime_parttime';
+    const rates = awardRates[employmentType];
+    
+    let html = '';
+    
+    // Role-specific experience levels
+    const roleExperienceLevels = {
+        'kitchen-hand': ['introductory', 'level_1.kitchen_attendant_grade1', 'level_2.kitchen_attendant_grade2', 'level_3.kitchen_attendant_grade3'],
+        'cook-basic': ['level_2.cook_grade1'],
+        'cook-intermediate': ['level_3.cook_grade2'],
+        'cook-qualified': ['level_4.cook_tradesperson_grade3'],
+        'chef': ['level_5.cook_tradesperson_grade4'],
+        'sous-chef': ['level_6.cook_tradesperson_grade5'],
+        'waiter': ['level_1.food_beverage_grade1', 'level_2.food_beverage_grade2', 'level_3.food_beverage_grade3'],
+        'bartender': ['level_2.food_beverage_grade2', 'level_3.food_beverage_grade3', 'level_4.food_beverage_tradesperson_grade4'],
+        'barista': ['level_1.food_beverage_grade1', 'level_2.food_beverage_grade2'],
+        'housekeeper': ['level_1.guest_service_grade1', 'level_2.guest_service_grade2'],
+        'receptionist': ['level_2.front_office_grade1', 'level_3.front_office_grade2'],
+        'admin': ['level_2.clerical_grade1', 'level_3.clerical_grade2'],
+        'security': ['level_2.doorperson_security', 'level_3.timekeeper_security_grade2'],
+        'supervisor': ['level_5.food_beverage_supervisor', 'level_5.clerical_supervisor', 'level_5.front_office_supervisor'],
+        'duty-manager': ['managerial_hotel']
+    };
+    
+    const levels = roleExperienceLevels[role] || ['introductory', 'level_1.food_beverage_grade1', 'level_2.cook_grade1', 'level_3.cook_grade2'];
+    
+    levels.forEach(levelPath => {
+        const rateData = getNestedRate(rates, levelPath);
+        if (rateData) {
+            const rate = typeof rateData === 'object' ? rateData.rate : rateData;
+            const title = typeof rateData === 'object' ? rateData.title : levelPath;
+            const description = typeof rateData === 'object' ? rateData.description : '';
+            
+            html += `
+                <button onclick="wizardAnswer('classification', '${levelPath}')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+                    <div class="font-semibold">${title}</div>
+                    <div class="text-lg font-bold text-amber-400 mt-1">$${rate.toFixed(2)}/hr</div>
+                    ${description ? `<div class="text-xs opacity-70 mt-1">${description}</div>` : ''}
+                </button>
+            `;
+        }
+    });
+    
+    document.getElementById('experienceLevelsList').innerHTML = html;
+}
+
+// Helper to get nested rate
+function getNestedRate(obj, path) {
+    const parts = path.split('.');
+    let current = obj;
+    for (const part of parts) {
+        if (current && current[part] !== undefined) {
+            current = current[part];
+        } else {
+            return null;
+        }
+    }
+    return current;
+}
+
+// Wizard answer handler
 function wizardAnswer(question, answer) {
     wizardData[question] = answer;
+    
+    // Special handling for step 3 (populate experience levels)
+    if (currentWizardStep === 2) {
+        setTimeout(populateExperienceLevels, 100);
+    }
     
     if (currentWizardStep < 5) {
         currentWizardStep++;
@@ -1641,6 +1902,7 @@ function wizardAnswer(question, answer) {
     }
 }
 
+// Update wizard step display
 function updateWizardStep() {
     // Hide all steps
     document.querySelectorAll('.wizard-step').forEach(step => {
@@ -1653,7 +1915,7 @@ function updateWizardStep() {
         currentStep.classList.remove('hidden');
     }
     
-    // Update progress indicators
+    // Update progress
     document.getElementById('wizardCurrentStep').textContent = currentWizardStep;
     const progress = (currentWizardStep / 5) * 100;
     document.getElementById('wizardProgress').textContent = `${progress}% Complete`;
@@ -1670,6 +1932,7 @@ function updateWizardStep() {
     }
 }
 
+// Go back in wizard
 function wizardGoBack() {
     if (currentWizardStep > 1) {
         currentWizardStep--;
@@ -1677,76 +1940,140 @@ function wizardGoBack() {
     }
 }
 
+// Show wizard results
 function showWizardResults() {
     document.getElementById('wizardSteps').classList.add('hidden');
     const backBtn = document.getElementById('wizardBackBtn');
     if (backBtn) backBtn.classList.add('hidden');
     document.getElementById('wizardResults').classList.remove('hidden');
     
-    const classification = calculateAwardClassification(wizardData);
+    const result = calculateAwardClassification(wizardData);
     
-    document.getElementById('resultAward').textContent = classification.award;
-    document.getElementById('resultLevel').textContent = classification.level;
-    document.getElementById('resultRate').textContent = '$' + classification.rate.toFixed(2);
+    document.getElementById('resultAward').textContent = result.award;
+    document.getElementById('resultLevel').textContent = result.level;
+    document.getElementById('resultRate').textContent = '$' + result.rate.toFixed(2);
     
     let penaltiesHTML = '';
-    classification.penalties.forEach(penalty => {
-        penaltiesHTML += `<div class="text-sm">• ${penalty}</div>`;
+    result.penalties.forEach(penalty => {
+        penaltiesHTML += `<div>• ${penalty}</div>`;
     });
-    document.getElementById('resultPenalties').innerHTML = penaltiesHTML || '<div class="text-sm">No additional loadings for weekday hours</div>';
+    document.getElementById('resultPenalties').innerHTML = penaltiesHTML || '<div>Standard rates apply</div>';
     
     let stepsHTML = '';
-    classification.nextSteps.forEach(step => {
-        stepsHTML += `<li class="text-sm">${step}</li>`;
+    result.nextSteps.forEach(step => {
+        stepsHTML += `<li>${step}</li>`;
     });
     document.getElementById('resultNextSteps').innerHTML = stepsHTML;
     
+    let notesHTML = '';
+    if (result.notes && result.notes.length > 0) {
+        notesHTML = result.notes.join(' • ');
+    }
+    document.getElementById('resultNotes').innerHTML = notesHTML;
+    
     trackEvent('award_wizard_completed', {
         user: currentUser,
-        classification: classification.level,
-        rate: classification.rate
+        role: wizardData.role,
+        classification: result.level,
+        rate: result.rate
     });
 }
 
+// Calculate award classification (uses GitHub JSON)
 function calculateAwardClassification(data) {
-    const experienceRates = {
-        'intro': { rate: 27.50, level: 'Introductory Level' },
-        'level1': { rate: 28.50, level: 'Level 1' },
-        'level2': { rate: 29.85, level: 'Level 2' },
-        'level3': { rate: 31.20, level: 'Level 3' },
-        'level4': { rate: 36.58, level: 'Level 4' }
-    };
+    if (!awardRates) {
+        return {
+            award: 'Hospitality Industry (General) Award MA000009',
+            level: 'Error - Rates Not Loaded',
+            rate: 0,
+            penalties: ['Please refresh the page to load award rates'],
+            nextSteps: ['Refresh the page'],
+            notes: []
+        };
+    }
     
-    const exp = experienceRates[data.experience] || experienceRates['intro'];
-    const baseRate = exp.rate;
+    // Determine employment type
+    const isCasual = data.employment === 'casual';
+    const isVenueCasino = data.venue === 'casino';
+    
+    let employmentType = isCasual ? 'adult_casual' : 'adult_fulltime_parttime';
+    if (isVenueCasino && data.role && data.role.includes('gaming')) {
+        employmentType = isCasual ? 'casino_adult_casual' : 'casino_adult_fulltime_parttime';
+    }
+    
+    const rates = awardRates[employmentType];
+    
+    // Get classification (either from wizard or default role mapping)
+    let classificationPath = data.classification;
+    
+    if (!classificationPath) {
+        // Default role mappings if no specific classification chosen
+        const roleDefaults = {
+            'waiter': 'level_2.food_beverage_grade2',
+            'bartender': 'level_3.food_beverage_grade3',
+            'barista': 'level_1.food_beverage_grade1',
+            'kitchen-hand': 'level_1.kitchen_attendant_grade1',
+            'cook-basic': 'level_2.cook_grade1',
+            'cook-intermediate': 'level_3.cook_grade2',
+            'cook-qualified': 'level_4.cook_tradesperson_grade3',
+            'chef': 'level_5.cook_tradesperson_grade4',
+            'sous-chef': 'level_6.cook_tradesperson_grade5',
+            'housekeeper': 'level_2.guest_service_grade2',
+            'receptionist': 'level_2.front_office_grade1',
+            'admin': 'level_2.clerical_grade1',
+            'security': 'level_2.doorperson_security',
+            'supervisor': 'level_5.food_beverage_supervisor',
+            'duty-manager': 'managerial_hotel'
+        };
+        classificationPath = roleDefaults[data.role] || 'level_2.cook_grade1';
+    }
+    
+    // Get rate data
+    const rateData = getNestedRate(rates, classificationPath);
+    const baseRate = typeof rateData === 'object' ? rateData.rate : rateData;
+    const title = typeof rateData === 'object' ? rateData.title : classificationPath;
+    
+    // Calculate penalties
     const penalties = [];
+    const penaltyRates = awardRates.penalty_rates;
     
     if (data.hours === 'saturday') {
-        penalties.push(`Saturday: 1.5x = $${(baseRate * 1.5).toFixed(2)}/hr`);
+        const saturdayRate = baseRate * penaltyRates.saturday;
+        penalties.push(`Saturday: ${(penaltyRates.saturday * 100)}% = $${saturdayRate.toFixed(2)}/hr`);
     } else if (data.hours === 'sunday') {
-        penalties.push(`Sunday: 1.75x = $${(baseRate * 1.75).toFixed(2)}/hr`);
+        const sundayRate = baseRate * penaltyRates.sunday;
+        penalties.push(`Sunday: ${(penaltyRates.sunday * 100)}% = $${sundayRate.toFixed(2)}/hr`);
     } else if (data.hours === 'public-holiday') {
-        penalties.push(`Public Holiday: 2.5x = $${(baseRate * 2.5).toFixed(2)}/hr`);
+        const publicHolRate = baseRate * penaltyRates.public_holiday;
+        penalties.push(`Public Holiday: ${(penaltyRates.public_holiday * 100)}% = $${publicHolRate.toFixed(2)}/hr`);
+    } else if (data.hours === 'weekday-night') {
+        const eveningRate = baseRate * penaltyRates.evening_after_7pm;
+        penalties.push(`Evening (after 7pm): ${(penaltyRates.evening_after_7pm * 100)}% = $${eveningRate.toFixed(2)}/hr`);
     }
     
-    if (data.employment === 'casual') {
-        penalties.push(`Casual Loading: +25% = $${(baseRate * 1.25).toFixed(2)}/hr`);
+    if (isCasual) {
+        penalties.push(`Casual Loading: 25% (already included in rate of $${baseRate.toFixed(2)}/hr)`);
     }
+    
+    penalties.push(`Overtime: First 2 hours at 150%, thereafter 200%`);
     
     return {
-        award: 'Hospitality Industry (General) Award MA000009',
-        level: exp.level,
+        award: awardRates.award_name,
+        level: title,
         rate: baseRate,
         penalties: penalties,
         nextSteps: [
             'Create written employment contract',
-            'Set up payroll with correct rates',
-            'Provide Fair Work Information Statement',
-            'Review rates annually on July 1'
-        ]
+            'Set up payroll with these exact rates',
+            'Provide Fair Work Information Statement to employee',
+            'Keep employment records for 7 years',
+            `Review rates on ${awardRates.next_review_date}`
+        ],
+        notes: awardRates.notes || []
     };
 }
 
+// Reset wizard
 function resetWizard() {
     wizardData = {};
     currentWizardStep = 1;
@@ -1754,15 +2081,24 @@ function resetWizard() {
     document.getElementById('wizardResults').classList.add('hidden');
     const backBtn = document.getElementById('wizardBackBtn');
     if (backBtn) backBtn.classList.add('hidden');
+    document.getElementById('roleSearch').value = '';
+    filterWizardRoles();
     updateWizardStep();
 }
 
+// Download wizard results
 function downloadWizardResults() {
+    if (!wizardData) return;
+    
+    const result = calculateAwardClassification(wizardData);
+    
     const data = [{
-        'Award': document.getElementById('resultAward').textContent,
-        'Level': document.getElementById('resultLevel').textContent,
-        'Rate': document.getElementById('resultRate').textContent,
-        'Type': wizardData.employment || 'Not specified'
+        'Award': result.award,
+        'Classification': result.level,
+        'Base Rate': '$' + result.rate.toFixed(2),
+        'Employment Type': wizardData.employment || 'Not specified',
+        'Typical Hours': wizardData.hours || 'Not specified',
+        'Penalties': result.penalties.join(' | ')
     }];
     
     generateExcelSpreadsheet(data, `Award_Classification_${Date.now()}.xlsx`, 'Classification');
