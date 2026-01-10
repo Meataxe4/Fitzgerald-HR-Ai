@@ -2140,7 +2140,6 @@ function calculateAwardClassification(data) {
     console.log('🔍 WIZARD DEBUG: Starting classification');
     console.log('🔍 Input data:', JSON.stringify(data, null, 2));
     
-    // Guard clause - ensure rates are loaded before proceeding
     if (!awardRates) {
         console.error('❌ Award rates not loaded!');
         return {
@@ -2153,11 +2152,8 @@ function calculateAwardClassification(data) {
     }
     
     console.log('✅ Award rates loaded:', awardRates.version);
-    console.log('✅ Award rates loaded:', awardRates.version);
-console.log('🔍 DEBUG: Full awardRates keys:', Object.keys(awardRates));
-console.log('🔍 DEBUG: adult_casual exists?', !!awardRates.adult_casual);
-console.log('🔍 DEBUG: adult_casual value:', awardRates.adult_casual);
-    // Step 1: Determine which rate table to use (casual vs permanent, standard vs casino)
+    
+    // Determine employment type
     const isCasual = data.employment === 'casual';
     const isVenueCasino = data.venue === 'casino';
     
@@ -2167,71 +2163,119 @@ console.log('🔍 DEBUG: adult_casual value:', awardRates.adult_casual);
     }
     
     console.log('🔍 Employment type:', employmentType);
+    console.log('🔍 DEBUG: Full awardRates keys:', Object.keys(awardRates));
+    console.log('🔍 DEBUG: adult_casual exists?', !!awardRates.adult_casual);
     
     const rates = awardRates[employmentType];
     
     if (!rates) {
-    console.error('❌ No rates found for employment type:', employmentType);
-    console.error('❌ Available keys in awardRates:', Object.keys(awardRates));
-    console.error('❌ Tried to access:', employmentType);
-    console.error('❌ Full awardRates object:', awardRates);
-    return {
-        award: 'Error',
-        level: 'Invalid employment type',
+        console.error('❌ No rates found for employment type:', employmentType);
+        console.error('❌ Available keys:', Object.keys(awardRates));
+        return {
+            award: 'Error',
+            level: 'Invalid employment type',
             rate: 0,
-            penalties: ['Error: Invalid employment type'],
-            nextSteps: ['Contact support']
+            penalties: ['Error: Rates not loaded correctly. Please refresh.'],
+            nextSteps: ['Refresh the page and try again']
         };
     }
     
     console.log('✅ Rates object loaded, keys:', Object.keys(rates));
     
-    // Step 2: Get the specific classification path from wizard data or default mapping
-    let classificationPath = data.classification;
+    // BUILD CLASSIFICATION PATH USING EXPERIENCE LEVEL
+    let classificationPath;
     
-    if (!classificationPath) {
-        // Default role mappings for common positions
-        const roleDefaults = {
-            // Waiters/F&B
-            'waiter': 'level_2.food_beverage_grade2',
-            'bartender': 'level_3.food_beverage_grade3',
-            
-            // Cooks
-            'cook': 'level_2.cook_grade1',
-            'cook-basic': 'level_2.cook_grade1',
-            'cook-intermediate': 'level_3.cook_grade2',
-            'cook-qualified': 'level_4.cook_tradesperson_grade3',
-            'chef': 'level_5.cook_tradesperson_grade4',
-            'sous-chef': 'level_6.cook_tradesperson_grade5',
-            
-            // Barista
-            'barista': 'level_1.food_beverage_grade1',
-            
-            // Kitchen Staff
-            'kitchen-hand': 'level_1.kitchen_attendant_grade1',
-            
-            // Supervisors
-            'supervisor': 'level_5.food_beverage_supervisor',
-            
-            // Other roles
-            'housekeeper': 'level_2.guest_service_grade2',
-            'receptionist': 'level_2.front_office_grade1',
-            'admin': 'level_2.clerical_grade1',
-            'security': 'level_2.doorperson_security',
-            'duty-manager': 'managerial_hotel'
-        };
-        
-        classificationPath = roleDefaults[data.role];
-        
-        if (!classificationPath) {
-            console.warn(`⚠️ No mapping found for role: ${data.role}, using introductory`);
-            classificationPath = 'introductory';
+    // Map experience to level prefix
+    const levelMap = {
+        'intro': 'introductory',
+        'level1': 'level_1',
+        'level2': 'level_2',
+        'level3': 'level_3',
+        'level4': 'level_4'
+    };
+    
+    const levelPrefix = levelMap[data.experience] || 'introductory';
+    console.log('🔍 Level prefix from experience:', levelPrefix);
+    
+    // Map roles to their classification suffix
+    const roleSuffixes = {
+        'cook': {
+            'introductory': 'introductory',
+            'level_1': 'level_1.food_beverage_grade1', // Cooks start at level 1 as general attendants
+            'level_2': 'level_2.cook_grade1',
+            'level_3': 'level_3.cook_grade2',
+            'level_4': 'level_4.cook_tradesperson_grade3'
+        },
+        'waiter': {
+            'introductory': 'introductory',
+            'level_1': 'level_1.food_beverage_grade1',
+            'level_2': 'level_2.food_beverage_grade2',
+            'level_3': 'level_3.food_beverage_grade3',
+            'level_4': 'level_4.food_beverage_tradesperson_grade4'
+        },
+        'bartender': {
+            'introductory': 'introductory',
+            'level_1': 'level_1.food_beverage_grade1',
+            'level_2': 'level_2.food_beverage_grade2',
+            'level_3': 'level_3.food_beverage_grade3',
+            'level_4': 'level_4.food_beverage_tradesperson_grade4'
+        },
+        'barista': {
+            'introductory': 'introductory',
+            'level_1': 'level_1.food_beverage_grade1',
+            'level_2': 'level_2.food_beverage_grade2',
+            'level_3': 'level_3.food_beverage_grade3',
+            'level_4': 'level_4.food_beverage_tradesperson_grade4'
+        },
+        'kitchen-hand': {
+            'introductory': 'introductory',
+            'level_1': 'level_1.kitchen_attendant_grade1',
+            'level_2': 'level_2.kitchen_attendant_grade2',
+            'level_3': 'level_3.kitchen_attendant_grade3',
+            'level_4': 'level_3.kitchen_attendant_grade3' // Max at level 3
+        },
+        'supervisor': {
+            'introductory': 'level_2.food_beverage_grade2',
+            'level_1': 'level_3.food_beverage_grade3',
+            'level_2': 'level_4.food_beverage_tradesperson_grade4',
+            'level_3': 'level_5.food_beverage_supervisor',
+            'level_4': 'level_5.food_beverage_supervisor'
+        },
+        'receptionist': {
+            'introductory': 'introductory',
+            'level_1': 'level_2.front_office_grade1',
+            'level_2': 'level_3.front_office_grade2',
+            'level_3': 'level_4.front_office_grade3',
+            'level_4': 'level_5.front_office_supervisor'
+        },
+        'housekeeper': {
+            'introductory': 'introductory',
+            'level_1': 'level_1.guest_service_grade1',
+            'level_2': 'level_2.guest_service_grade2',
+            'level_3': 'level_3.guest_service_grade3',
+            'level_4': 'level_4.guest_service_grade4'
+        },
+        'security': {
+            'introductory': 'introductory',
+            'level_1': 'level_2.doorperson_security',
+            'level_2': 'level_3.timekeeper_security_grade2',
+            'level_3': 'level_4.security_grade2',
+            'level_4': 'level_4.security_grade2'
         }
+    };
+    
+    // Get the classification path based on role AND experience
+    if (roleSuffixes[data.role] && roleSuffixes[data.role][levelPrefix]) {
+        classificationPath = roleSuffixes[data.role][levelPrefix];
+    } else {
+        // Fallback to introductory
+        console.warn(`⚠️ No mapping for role: ${data.role} at level: ${levelPrefix}`);
+        classificationPath = 'introductory';
     }
     
-    console.log('🔍 Classification path:', classificationPath);
+    console.log('🔍 Final classification path:', classificationPath);
     
-    // Step 3: Extract the actual rate from the nested JSON structure
+    // Extract rate data
     const rateData = getNestedRate(rates, classificationPath);
     console.log('🔍 Rate data retrieved:', rateData);
     console.log('🔍 Rate data type:', typeof rateData);
@@ -2242,22 +2286,20 @@ console.log('🔍 DEBUG: adult_casual value:', awardRates.adult_casual);
             award: 'Error',
             level: 'Rate not found',
             rate: 0,
-            penalties: [`Error: Could not find rate for classification: ${classificationPath}`],
+            penalties: [`Error: Could not find rate for ${classificationPath}`],
             nextSteps: ['Contact Fitzgerald HR support']
         };
     }
     
-    // Handle both formats: {rate: 25.85, title: "..."} (permanent) and 32.31 (casual number)
+    // Handle both formats
     let baseRate;
     let title;
     
     if (typeof rateData === 'number') {
-        // Casual format: just a number like 32.31
         console.log('✅ Rate is number (casual format):', rateData);
         baseRate = rateData;
         title = classificationPath.split('.').pop().replace(/_/g, ' ');
     } else if (typeof rateData === 'object' && rateData !== null) {
-        // Permanent format: {rate: 25.85, title: "Cook, Grade 1"}
         console.log('✅ Rate is object (permanent format)');
         baseRate = rateData.rate;
         title = rateData.title || classificationPath.split('.').pop().replace(/_/g, ' ');
@@ -2275,7 +2317,6 @@ console.log('🔍 DEBUG: adult_casual value:', awardRates.adult_casual);
     console.log('🔍 Base rate extracted:', baseRate);
     console.log('🔍 Title extracted:', title);
     
-    // Final safety check
     if (!baseRate || typeof baseRate !== 'number' || isNaN(baseRate)) {
         console.error('❌ Invalid base rate:', baseRate);
         return {
@@ -2289,7 +2330,7 @@ console.log('🔍 DEBUG: adult_casual value:', awardRates.adult_casual);
     
     console.log('✅ Valid base rate confirmed:', baseRate);
     
-    // Step 4: Calculate applicable penalty rates based on work hours
+    // Calculate penalties
     const penalties = [];
     const penaltyRates = awardRates.penalty_rates;
     
@@ -2332,6 +2373,7 @@ console.log('🔍 DEBUG: adult_casual value:', awardRates.adult_casual);
     
     return result;
 }
+
 // Reset wizard
 function resetWizard() {
     wizardData = {};
