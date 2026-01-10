@@ -2153,7 +2153,10 @@ function calculateAwardClassification(data) {
     }
     
     console.log('✅ Award rates loaded:', awardRates.version);
-    
+    console.log('✅ Award rates loaded:', awardRates.version);
+console.log('🔍 DEBUG: Full awardRates keys:', Object.keys(awardRates));
+console.log('🔍 DEBUG: adult_casual exists?', !!awardRates.adult_casual);
+console.log('🔍 DEBUG: adult_casual value:', awardRates.adult_casual);
     // Step 1: Determine which rate table to use (casual vs permanent, standard vs casino)
     const isCasual = data.employment === 'casual';
     const isVenueCasino = data.venue === 'casino';
@@ -2168,10 +2171,13 @@ function calculateAwardClassification(data) {
     const rates = awardRates[employmentType];
     
     if (!rates) {
-        console.error('❌ No rates found for employment type:', employmentType);
-        return {
-            award: 'Error',
-            level: 'Invalid employment type',
+    console.error('❌ No rates found for employment type:', employmentType);
+    console.error('❌ Available keys in awardRates:', Object.keys(awardRates));
+    console.error('❌ Tried to access:', employmentType);
+    console.error('❌ Full awardRates object:', awardRates);
+    return {
+        award: 'Error',
+        level: 'Invalid employment type',
             rate: 0,
             penalties: ['Error: Invalid employment type'],
             nextSteps: ['Contact support']
