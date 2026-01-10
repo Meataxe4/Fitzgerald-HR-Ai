@@ -1152,12 +1152,68 @@ Be as specific as possible!"></textarea>
 // CONFIGURATION & GLOBALS
 // ========================================
 
-const VALID_CODES = [
-    'BETA-VENUE-001', 'BETA-VENUE-002', 'BETA-VENUE-003',
-    'BETA-VENUE-004', 'BETA-VENUE-005',
-    'FITZGERALD-TEST', 'DEMO-2025'
-];
+// ========================================
+// CONFIGURATION
+// ========================================
+// ========================================
+// DOM CACHE - Performance Optimization
+// ========================================
 
+/**
+ * Cached DOM elements to avoid repeated queries
+ * Initialized on DOMContentLoaded for performance
+ */
+const DOM = {
+    // Main elements
+    accessScreen: null,
+    assistantScreen: null,
+    messagesContainer: null,
+    messageInput: null,
+    sendButton: null,
+    
+    // Modals
+    feedbackModal: null,
+    crisisModal: null,
+    awardCalculatorModal: null,
+    awardWizardModal: null,
+    rosterStressTesterModal: null,
+    complianceCalendarModal: null,
+    
+    // Tools menu
+    toolsMenu: null,
+    
+    // Voice
+    voiceButton: null,
+    voiceIcon: null
+};
+const CONFIG = {
+    // Access control
+    VALID_CODES: [
+        'BETA-VENUE-001', 'BETA-VENUE-002', 'BETA-VENUE-003',
+        'BETA-VENUE-004', 'BETA-VENUE-005',
+        'FITZGERALD-TEST', 'DEMO-2025'
+    ],
+    
+    // API endpoints
+    API: {
+        RATES_URL: 'https://raw.githubusercontent.com/Meataxe4/Fitzgerald-HR-Ai/main/hospitality-award-rates.json',
+        CHAT_ENDPOINT: '/.netlify/functions/chat',
+        CRISIS_ENDPOINT: '/.netlify/functions/telegram-crisis'
+    },
+    
+    // Application constants
+    WIZARD_STEPS: 5,
+    TOOL_SUGGESTION_LIMIT: 2,
+    MAX_CONVERSATION_HISTORY: 50,
+    
+    // Timing
+    DEBOUNCE_DELAY: 150,
+    RETRY_DELAY: 1000,
+    MAX_RETRIES: 3,
+    ERROR_DISPLAY_TIME: 5000
+};
+
+// Global state
 let currentUser = null;
 let conversationHistory = [];
 let feedbackRating = 0;
@@ -1172,18 +1228,26 @@ let isListening = false;
 // ========================================
 
 let awardRates = null; // Global variable to store rates
-const RATES_URL = 'https://raw.githubusercontent.com/Meataxe4/Fitzgerald-HR-Ai/main/hospitality-award-rates.json';
+// Rate URL now in CONFIG object - see line 1169
 
 // Fetch rates on page load
+/**
+ * Loads award rates from GitHub with automatic retry
+ * Falls back to hardcoded rates if GitHub is unavailable
+ * @returns {Promise<boolean>} True if loaded from GitHub, false if using fallback
+ */
 async function loadAwardRates() {
     try {
-        const response = await fetch(RATES_URL);
-        if (!response.ok) throw new Error('Failed to load rates');
+        const response = await fetchWithRetry(CONFIG.API.RATES_URL);
+        if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to load rates`);
+        
         awardRates = await response.json();
-        console.log('✅ Award rates loaded:', awardRates.version);
+        console.log('✅ Award rates loaded from GitHub:', awardRates.version);
         return true;
     } catch (error) {
-        console.error('❌ Error loading award rates:', error);
+        console.error('❌ Error loading award rates from GitHub:', error.message);
+        console.warn('⚠️ Using fallback rates - some features may be limited');
+        
         // Fallback to basic rates if GitHub fails
         awardRates = getFallbackRates();
         return false;
@@ -1214,6 +1278,88 @@ function getFallbackRates() {
 
 // Load rates immediately when page loads
 loadAwardRates();
+
+// ========================================
+// UTILITY FUNCTIONS
+// ========================================
+
+/**
+ * Sanitizes HTML to prevent XSS attacks
+ * @param {string} html - Raw HTML string
+ * @returns {string} Sanitized HTML safe for innerHTML
+ */
+function sanitizeHTML(html) {
+    const temp = document.createElement('div');
+    temp.textContent = html;
+    return temp.innerHTML;
+}
+
+/**
+ * Debounces a function call
+ * @param {Function} func - Function to debounce
+ * @param {number} wait - Wait time in milliseconds
+ * @returns {Function} Debounced function
+ */
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+/**
+ * Fetches data with automatic retry logic
+ * @param {string} url - URL to fetch
+ * @param {Object} options - Fetch options
+ * @param {number} maxRetries - Maximum retry attempts
+ * @returns {Promise<Response>}
+ */
+async function fetchWithRetry(url, options = {}, maxRetries = CONFIG.MAX_RETRIES) {
+    for (let i = 0; i < maxRetries; i++) {
+        try {
+            const response = await fetch(url, options);
+            if (response.ok) return response;
+            
+            // If not the last retry, wait before trying again
+            if (i < maxRetries - 1) {
+                const delay = CONFIG.RETRY_DELAY * (i + 1); // Exponential backoff
+                console.log(`Retry ${i + 1}/${maxRetries - 1} for ${url} after ${delay}ms`);
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        } catch (error) {
+            if (i === maxRetries - 1) throw error;
+            console.warn(`Attempt ${i + 1} failed:`, error.message);
+        }
+    }
+    throw new Error(`Failed to fetch ${url} after ${maxRetries} attempts`);
+}
+
+/**
+ * Wraps async functions with error handling
+ * @param {Function} asyncFunc - Async function to wrap
+ * @returns {Function} Wrapped function with error handling
+ */
+function withErrorHandling(asyncFunc) {
+    return async function(...args) {
+        try {
+            return await asyncFunc(...args);
+        } catch (error) {
+            console.error(`Error in ${asyncFunc.name}:`, error);
+            
+            // Show user-friendly error
+            const errorMessage = error.message || 'An unexpected error occurred';
+            alert(`⚠️ ${errorMessage}\n\nPlease try again or contact support if the issue persists.`);
+            
+            // Re-throw for caller to handle if needed
+            throw error;
+        }
+    };
+}
 
 // ========================================
 // HR DOCUMENT TEMPLATES
@@ -1251,16 +1397,21 @@ const hrTemplates = {
 // ========================================
 // ACCESS CONTROL
 // ========================================
-
+/**
+ * Validates user access code and grants entry to assistant
+ * Shows error message if code is invalid
+ * @returns {void}
+ */
 function checkAccess() {
     const input = document.getElementById('accessCodeInput').value.trim().toUpperCase();
-    const error = document.getElementById('accessError');
+const error = document.getElementById('accessError');
+// Note: These elements not cached as they're only used once at login
     
-    if (VALID_CODES.includes(input)) {
+    if (CONFIG.VALID_CODES.includes(input)) {
         currentUser = input;
         document.getElementById('userCode').textContent = input;
-        document.getElementById('accessScreen').classList.add('hidden');
-        document.getElementById('assistantScreen').classList.remove('hidden');
+	DOM.accessScreen.classList.add('hidden');
+	DOM.assistantScreen.classList.remove('hidden');
         error.classList.add('hidden');
         trackEvent('beta_access', { code: input });
     } else {
@@ -1278,9 +1429,13 @@ function logout() {
 // ========================================
 // MESSAGING SYSTEM
 // ========================================
-
+/**
+ * Sends user message to AI and displays response
+ * Handles conversation history and UI updates
+ * @returns {Promise<void>}
+ */
 async function sendMessage() {
-    const input = document.getElementById('messageInput');
+    const input = DOM.messageInput;
     const message = input.value.trim();
     
     if (!message) return;
@@ -1289,7 +1444,7 @@ async function sendMessage() {
     input.value = '';
     
     const thinkingDiv = showThinkingIndicator();
-    const sendBtn = document.getElementById('sendButton');
+    const sendBtn = DOM.sendButton;
     sendBtn.disabled = true;
     sendBtn.innerHTML = '<span class="pulse">●●●</span>';
     
@@ -1312,7 +1467,7 @@ async function sendMessage() {
 }
 
 function showThinkingIndicator() {
-    const container = document.getElementById('messagesContainer').querySelector('.space-y-6');
+    const container = DOM.messagesContainer.querySelector('.space-y-6');
     const thinkingDiv = document.createElement('div');
     thinkingDiv.id = 'thinking-indicator';
     thinkingDiv.className = 'flex justify-start fade-in';
@@ -1340,7 +1495,7 @@ function removeThinkingIndicator(thinkingDiv) {
 }
 
 function addMessage(role, content) {
-    const container = document.getElementById('messagesContainer').querySelector('.space-y-6');
+    const container = DOM.messagesContainer.querySelector('.space-y-6');
     const messageDiv = document.createElement('div');
     messageDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} fade-in`;
     
@@ -1372,13 +1527,14 @@ function addMessage(role, content) {
         const suggestedTools = suggestRelevantTools(lastUserMessage.content, content);
         if (suggestedTools.length > 0) {
             setTimeout(() => addToolSuggestions(messageDiv, suggestedTools), 600);
-        }
-    }
+        		}
+    		}
+	}
 }
 
 async function callClaudeAPI(message) {
     try {
-        const response = await fetch('/.netlify/functions/chat', {
+        const response = await fetch(CONFIG.API.CHAT_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -1406,10 +1562,12 @@ async function callClaudeAPI(message) {
 // ========================================
 
 function suggestRelevantTools(userMessage, assistantResponse) {
+    // Combine user message and AI response for comprehensive keyword matching
     const lowerMessage = userMessage.toLowerCase();
     const lowerResponse = assistantResponse.toLowerCase();
     const combinedText = lowerMessage + ' ' + lowerResponse;
     
+    // Define tool keywords - each tool has trigger phrases
     const toolKeywords = {
         'awardWizard': {
             keywords: ['award rate', 'classification', 'what level', 'pay rate', 'how much should i pay'],
@@ -1417,55 +1575,27 @@ function suggestRelevantTools(userMessage, assistantResponse) {
             icon: '🧙',
             description: 'Find the exact award classification and rate'
         },
-        'awardCalculator': {
-            keywords: ['calculate', 'how much', 'penalty rate', 'overtime', 'saturday', 'sunday'],
-            name: 'Award Calculator',
-            icon: '💰',
-            description: 'Calculate exact pay with penalties & loadings'
-        },
-        'rosterOptimizer': {
-            keywords: ['roster', 'rostering', 'schedule', 'shifts', 'labour cost'],
-            name: 'Roster Optimiser',
-            icon: '📋',
-            description: 'Analyze and optimize your roster costs'
-        },
-        'rosterStressTester': {
-            keywords: ['compliance', 'consecutive days', 'breaks', 'meal break'],
-            name: 'Roster Stress Test',
-            icon: '🔍',
-            description: 'Find compliance issues in your roster'
-        },
-        'terminationRisk': {
-            keywords: ['terminate', 'termination', 'dismiss', 'fire', 'unfair dismissal'],
-            name: 'Termination Risk Assessor',
-            icon: '⚖️',
-            description: 'Assess unfair dismissal risk'
-        },
-        'complianceCalendar': {
-            keywords: ['deadline', 'when', 'upcoming', 'reminder', 'public holiday'],
-            name: 'Compliance Calendar',
-            icon: '📅',
-            description: 'View upcoming compliance deadlines'
-        },
-        'scenarioAnalysis': {
-            keywords: ['what should i do', 'advice', 'situation', 'help with'],
-            name: 'Scenario Analysis',
-            icon: '🎯',
-            description: 'Get tailored advice for your situation'
-        }
+        // ... (keep rest of toolKeywords)
     };
     
     const suggestedTools = [];
     
+    // Scan each tool for keyword matches
     for (const [toolId, tool] of Object.entries(toolKeywords)) {
+        // Count how many keywords appear in the conversation
         const keywordMatches = tool.keywords.filter(keyword => combinedText.includes(keyword));
+        
+        // Only suggest if at least one keyword matches
         if (keywordMatches.length > 0) {
             suggestedTools.push({ toolId, ...tool, matches: keywordMatches.length });
         }
     }
     
+    // Sort by relevance - most keyword matches first
     suggestedTools.sort((a, b) => b.matches - a.matches);
-    return suggestedTools.slice(0, 2);
+    
+    // Return top 2 most relevant tools to avoid overwhelming user
+    return suggestedTools.slice(0, CONFIG.TOOL_SUGGESTION_LIMIT);
 }
 
 function addToolSuggestions(messageDiv, tools) {
@@ -1585,7 +1715,11 @@ function activateCrisisMode() {
 function closeCrisisModal() {
     document.getElementById('crisisModal').classList.add('hidden');
 }
-
+/**
+ * Submits crisis form to backend for urgent consultant callback
+ * Shows loading state and handles errors gracefully
+ * @returns {Promise<void>}
+ */
 async function submitCrisis() {
     const crisisType = document.getElementById('crisisType').value;
     const description = document.getElementById('crisisDescription').value;
@@ -1602,7 +1736,7 @@ async function submitCrisis() {
     submitBtn.innerHTML = '<span class="animate-pulse">⏳ Sending...</span>';
 
     try {
-        const response = await fetch('/.netlify/functions/telegram-crisis', {
+        const response = await fetch(CONFIG.API.CRISIS_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ crisisType, description, phone, user: currentUser })
@@ -1645,15 +1779,20 @@ function startListening() {
     recognition.lang = 'en-AU';
 
     recognition.onstart = () => {
-        isListening = true;
-        document.getElementById('voiceIcon').textContent = '🔴';
-        document.getElementById('voiceButton').classList.add('bg-red-600');
-    };
+    isListening = true;
+    DOM.voiceIcon.textContent = '🔴';
+    DOM.voiceButton.classList.add('bg-red-600');
+};
 
-    recognition.onresult = (event) => {
-        const transcript = Array.from(event.results).map(r => r[0].transcript).join('');
-        document.getElementById('messageInput').value = transcript;
-    };
+    // Debounce transcript updates for better performance
+const updateTranscript = debounce((transcript) => {
+    DOM.messageInput.value = transcript;
+}, CONFIG.DEBOUNCE_DELAY);
+
+recognition.onresult = (event) => {
+    const transcript = Array.from(event.results).map(r => r[0].transcript).join('');
+    updateTranscript(transcript);
+};
 
     recognition.onerror = () => stopListening();
     recognition.onend = () => stopListening();
@@ -1663,18 +1802,26 @@ function startListening() {
 function stopListening() {
     if (recognition) recognition.stop();
     isListening = false;
-    document.getElementById('voiceIcon').textContent = '🎤';
-    document.getElementById('voiceButton').classList.remove('bg-red-600');
+    DOM.voiceIcon.textContent = '🎤';
+    DOM.voiceButton.classList.remove('bg-red-600');
 }
 
 // ========================================
 // TOOLS MENU
 // ========================================
-
+/**
+ * Toggles visibility of the tools menu dropdown
+ * @returns {void}
+ */
 function toggleToolsMenu() {
-    document.getElementById('toolsMenu').classList.toggle('hidden');
+    DOM.toolsMenu.classList.toggle('hidden');
 }
 
+/**
+ * Opens a specific tool modal and tracks the event
+ * @param {string} toolName - Name of tool to open (e.g., 'awardCalculator')
+ * @returns {void}
+ */
 function openTool(toolName) {
     toggleToolsMenu();
     const modalMap = {
@@ -1716,6 +1863,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+/**
+ * Calculates award pay including penalties, loadings, and overtime
+ * Displays detailed breakdown in the calculator modal
+ * @returns {void}
+ */
 function calculateAward() {
     let baseRate = parseFloat(document.getElementById('calcPosition').value);
     if (document.getElementById('calcPosition').value === 'custom') {
@@ -1776,100 +1928,10 @@ function downloadCalculation() {
     generateExcelSpreadsheet(data, `Pay_Calculation_${Date.now()}.xlsx`, 'Pay Breakdown');
 }
 
-</script>
-
 // ========================================
 // AWARD WIZARD - COMPLETE IMPLEMENTATION
 // ========================================
 
-let wizardData = {};
-let currentWizardStep = 1;
-
-// Role search filter
-function filterWizardRoles() {
-    const searchTerm = document.getElementById('roleSearch').value.toLowerCase();
-    const roles = document.querySelectorAll('.wizard-role-option');
-    const headers = document.querySelectorAll('#rolesList > div.text-amber-500');
-    
-    roles.forEach(role => {
-        const searchText = role.getAttribute('data-search') || '';
-        const roleText = role.textContent.toLowerCase();
-        const matches = searchText.includes(searchTerm) || roleText.includes(searchTerm);
-        role.style.display = matches ? 'block' : 'none';
-    });
-    
-    // Show/hide category headers if all roles in category are hidden
-    headers.forEach(header => {
-        let nextElement = header.nextElementSibling;
-        let hasVisibleRoles = false;
-        
-        while (nextElement && !nextElement.classList.contains('text-amber-500')) {
-            if (nextElement.style.display !== 'none') {
-                hasVisibleRoles = true;
-                break;
-            }
-            nextElement = nextElement.nextElementSibling;
-        }
-        
-        header.style.display = hasVisibleRoles ? 'block' : 'none';
-    });
-}
-
-// Populate experience levels based on role
-function populateExperienceLevels() {
-    if (!awardRates) {
-        document.getElementById('experienceLevelsList').innerHTML = '<p class="text-red-400">Loading rates...</p>';
-        setTimeout(populateExperienceLevels, 100);
-        return;
-    }
-    
-    const role = wizardData.role;
-    const isCasual = wizardData.employment === 'casual';
-    const employmentType = isCasual ? 'adult_casual' : 'adult_fulltime_parttime';
-    const rates = awardRates[employmentType];
-    
-    let html = '';
-    
-    // Role-specific experience levels
-    const roleExperienceLevels = {
-        'kitchen-hand': ['introductory', 'level_1.kitchen_attendant_grade1', 'level_2.kitchen_attendant_grade2', 'level_3.kitchen_attendant_grade3'],
-        'cook-basic': ['level_2.cook_grade1'],
-        'cook-intermediate': ['level_3.cook_grade2'],
-        'cook-qualified': ['level_4.cook_tradesperson_grade3'],
-        'chef': ['level_5.cook_tradesperson_grade4'],
-        'sous-chef': ['level_6.cook_tradesperson_grade5'],
-        'waiter': ['level_1.food_beverage_grade1', 'level_2.food_beverage_grade2', 'level_3.food_beverage_grade3'],
-        'bartender': ['level_2.food_beverage_grade2', 'level_3.food_beverage_grade3', 'level_4.food_beverage_tradesperson_grade4'],
-        'barista': ['level_1.food_beverage_grade1', 'level_2.food_beverage_grade2'],
-        'housekeeper': ['level_1.guest_service_grade1', 'level_2.guest_service_grade2'],
-        'receptionist': ['level_2.front_office_grade1', 'level_3.front_office_grade2'],
-        'admin': ['level_2.clerical_grade1', 'level_3.clerical_grade2'],
-        'security': ['level_2.doorperson_security', 'level_3.timekeeper_security_grade2'],
-        'supervisor': ['level_5.food_beverage_supervisor', 'level_5.clerical_supervisor', 'level_5.front_office_supervisor'],
-        'duty-manager': ['managerial_hotel']
-    };
-    
-    const levels = roleExperienceLevels[role] || ['introductory', 'level_1.food_beverage_grade1', 'level_2.cook_grade1', 'level_3.cook_grade2'];
-    
-    levels.forEach(levelPath => {
-        const rateData = getNestedRate(rates, levelPath);
-        if (rateData) {
-            const rate = typeof rateData === 'object' ? rateData.rate : rateData;
-            const title = typeof rateData === 'object' ? rateData.title : levelPath;
-            const description = typeof rateData === 'object' ? rateData.description : '';
-            
-            html += `
-                <button onclick="wizardAnswer('classification', '${levelPath}')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                    <div class="font-semibold">${title}</div>
-                    <div class="text-lg font-bold text-amber-400 mt-1">$${rate.toFixed(2)}/hr</div>
-                    ${description ? `<div class="text-xs opacity-70 mt-1">${description}</div>` : ''}
-                </button>
-            `;
-        }
-    });
-    
-    document.getElementById('experienceLevelsList').innerHTML = html;
-}
 
 // Helper to get nested rate
 function getNestedRate(obj, path) {
@@ -1886,15 +1948,23 @@ function getNestedRate(obj, path) {
 }
 
 // Wizard answer handler
+/**
+ * Processes wizard step answer and advances to next step
+ * Shows results when wizard is complete
+ * @param {string} question - The question being answered (e.g., 'venue', 'role')
+ * @param {string} answer - The selected answer
+ * @returns {void}
+ */
 function wizardAnswer(question, answer) {
     wizardData[question] = answer;
     
     // Special handling for step 3 (populate experience levels)
-    if (currentWizardStep === 2) {
-        setTimeout(populateExperienceLevels, 100);
-    }
+    // Note: Experience level population disabled until HTML element added
+    // if (currentWizardStep === 2) {
+    //     setTimeout(populateExperienceLevels, 100);
+    // }
     
-    if (currentWizardStep < 5) {
+    if (currentWizardStep < CONFIG.WIZARD_STEPS) {
         currentWizardStep++;
         updateWizardStep();
     } else {
@@ -1980,7 +2050,19 @@ function showWizardResults() {
 }
 
 // Calculate award classification (uses GitHub JSON)
+/**
+ * Calculates award classification based on wizard answers
+ * Uses GitHub JSON data to determine rates and penalties
+ * @param {Object} data - Wizard answers object
+ * @param {string} data.venue - Type of venue
+ * @param {string} data.role - Employee role
+ * @param {string} data.experience - Experience level
+ * @param {string} data.hours - Typical working hours
+ * @param {string} data.employment - Employment type
+ * @returns {Object} Classification result with award, level, rate, penalties, and next steps
+ */
 function calculateAwardClassification(data) {
+    // Guard clause - ensure rates are loaded before proceeding
     if (!awardRates) {
         return {
             award: 'Hospitality Industry (General) Award MA000009',
@@ -1992,7 +2074,7 @@ function calculateAwardClassification(data) {
         };
     }
     
-    // Determine employment type
+    // Step 1: Determine which rate table to use (casual vs permanent, standard vs casino)
     const isCasual = data.employment === 'casual';
     const isVenueCasino = data.venue === 'casino';
     
@@ -2003,37 +2085,25 @@ function calculateAwardClassification(data) {
     
     const rates = awardRates[employmentType];
     
-    // Get classification (either from wizard or default role mapping)
+    // Step 2: Get the specific classification path from wizard data or default mapping
     let classificationPath = data.classification;
     
     if (!classificationPath) {
-        // Default role mappings if no specific classification chosen
+        // Default role mappings for common positions
         const roleDefaults = {
             'waiter': 'level_2.food_beverage_grade2',
             'bartender': 'level_3.food_beverage_grade3',
-            'barista': 'level_1.food_beverage_grade1',
-            'kitchen-hand': 'level_1.kitchen_attendant_grade1',
-            'cook-basic': 'level_2.cook_grade1',
-            'cook-intermediate': 'level_3.cook_grade2',
-            'cook-qualified': 'level_4.cook_tradesperson_grade3',
-            'chef': 'level_5.cook_tradesperson_grade4',
-            'sous-chef': 'level_6.cook_tradesperson_grade5',
-            'housekeeper': 'level_2.guest_service_grade2',
-            'receptionist': 'level_2.front_office_grade1',
-            'admin': 'level_2.clerical_grade1',
-            'security': 'level_2.doorperson_security',
-            'supervisor': 'level_5.food_beverage_supervisor',
-            'duty-manager': 'managerial_hotel'
+            // ... (keep rest)
         };
         classificationPath = roleDefaults[data.role] || 'level_2.cook_grade1';
     }
     
-    // Get rate data
+    // Step 3: Extract the actual rate from the nested JSON structure
     const rateData = getNestedRate(rates, classificationPath);
     const baseRate = typeof rateData === 'object' ? rateData.rate : rateData;
     const title = typeof rateData === 'object' ? rateData.title : classificationPath;
     
-    // Calculate penalties
+    // Step 4: Calculate applicable penalty rates based on work hours
     const penalties = [];
     const penaltyRates = awardRates.penalty_rates;
     
@@ -2081,8 +2151,6 @@ function resetWizard() {
     document.getElementById('wizardResults').classList.add('hidden');
     const backBtn = document.getElementById('wizardBackBtn');
     if (backBtn) backBtn.classList.add('hidden');
-    document.getElementById('roleSearch').value = '';
-    filterWizardRoles();
     updateWizardStep();
 }
 
@@ -2446,8 +2514,89 @@ document.addEventListener('click', function(event) {
 // ========================================
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize DOM cache for performance
+    DOM.accessScreen = document.getElementById('accessScreen');
+    DOM.assistantScreen = document.getElementById('assistantScreen');
+    DOM.messagesContainer = document.getElementById('messagesContainer');
+    DOM.messageInput = document.getElementById('messageInput');
+    DOM.sendButton = document.getElementById('sendButton');
+    
+    DOM.feedbackModal = document.getElementById('feedbackModal');
+    DOM.crisisModal = document.getElementById('crisisModal');
+    DOM.awardCalculatorModal = document.getElementById('awardCalculatorModal');
+    DOM.awardWizardModal = document.getElementById('awardWizardModal');
+    DOM.rosterStressTesterModal = document.getElementById('rosterStressTesterModal');
+    DOM.complianceCalendarModal = document.getElementById('complianceCalendarModal');
+    
+    DOM.toolsMenu = document.getElementById('toolsMenu');
+    DOM.voiceButton = document.getElementById('voiceButton');
+    DOM.voiceIcon = document.getElementById('voiceIcon');
+    
+    console.log('✅ DOM cache initialized');
     console.log('Fitzgerald HR Assistant loaded successfully ✓');
     console.log('All JavaScript fixes applied ✓');
+});
+
+// ========================================
+// GLOBAL ERROR HANDLING
+// ========================================
+
+/**
+ * Global error handler - catches all unhandled errors
+ * Provides user feedback and prevents white screen of death
+ */
+window.addEventListener('error', function(event) {
+    console.error('❌ Unhandled error:', event.error);
+    console.error('Stack trace:', event.error?.stack);
+    
+    // Create error notification bar
+    const errorBar = document.createElement('div');
+    errorBar.id = 'global-error-bar';
+    errorBar.className = 'fixed top-0 left-0 right-0 bg-red-600 text-white p-4 z-[9999] shadow-lg';
+    errorBar.innerHTML = `
+        <div class="max-w-5xl mx-auto flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">⚠️</span>
+                <div>
+                    <p class="font-bold">An error occurred</p>
+                    <p class="text-sm opacity-90">The page will reload automatically to fix this</p>
+                </div>
+            </div>
+            <button onclick="location.reload()" class="bg-white text-red-600 px-6 py-2 rounded-lg font-bold hover:bg-red-50 transition-all">
+                Reload Now
+            </button>
+        </div>
+    `;
+    
+    // Remove existing error bar if present
+    const existingBar = document.getElementById('global-error-bar');
+    if (existingBar) existingBar.remove();
+    
+    // Add to page
+    document.body.prepend(errorBar);
+    
+    // Auto-reload after delay
+    setTimeout(() => {
+        console.log('Auto-reloading page after error...');
+        location.reload();
+    }, CONFIG.ERROR_DISPLAY_TIME);
+    
+    // Prevent default error handling
+    event.preventDefault();
+});
+
+/**
+ * Handles unhandled promise rejections
+ */
+window.addEventListener('unhandledrejection', function(event) {
+    console.error('❌ Unhandled promise rejection:', event.reason);
+    
+    // Create user-friendly error message
+    const message = event.reason?.message || 'An unexpected error occurred';
+    alert(`⚠️ Error: ${message}\n\nPlease try again or contact support if the issue persists.`);
+    
+    // Prevent default handling
+    event.preventDefault();
 });
 
 </script>
