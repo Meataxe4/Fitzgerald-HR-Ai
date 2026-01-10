@@ -2208,7 +2208,7 @@ function calculateAwardClassification(data) {
     // Step 3: Extract the actual rate from the nested JSON structure
     const rateData = getNestedRate(rates, classificationPath);
     const baseRate = typeof rateData === 'object' ? (rateData.rate || rateData) : rateData;
-    const title = typeof rateData === 'object' ? rateData.title : classificationPath;
+    const title = (typeof rateData === 'object' && rateData.title) ? rateData.title : classificationPath.split('.').pop().replace(/_/g, ' ');
     
     // Step 4: Calculate applicable penalty rates based on work hours
     const penalties = [];
