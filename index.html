@@ -2152,6 +2152,18 @@ function showWizardResults() {
         console.error('❌ Error in showWizardResults():', error);
         alert('Error showing results: ' + error.message);
     }
+    
+    // FORCE SCROLL TO RESULTS
+    setTimeout(() => {
+        console.log('🎯 Forcing scroll to results...');
+        const resultsDiv = document.getElementById('wizardResults');
+        if (resultsDiv) {
+            resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            console.log('✅ Scrolled to results div');
+        } else {
+            console.error('❌ Results div not found!');
+        }
+    }, 100);
 }
 
 function showJuniorRedirect() {
