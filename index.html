@@ -197,17 +197,24 @@
 <p class="text-slate-100 leading-relaxed mt-4">What HR challenge can I help you with today?</p>
 
 <p class="text-slate-300 text-sm mt-4">✉️ For personalised support, contact our Senior Consultants at <a href="mailto:info@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">info@fitzgeraldhr.com.au</a></p>
+
+<p class="text-yellow-400 text-xs mt-4 bg-yellow-500/10 border border-yellow-500/30 rounded p-3">
+    ⚠️ <strong>Award Rates:</strong> Data effective 1 July 2025 - 30 June 2026. 
+    Always verify at <a href="https://www.fairwork.gov.au" target="_blank" class="underline hover:text-yellow-300">fairwork.gov.au</a> 
+    before making payroll decisions.
+</p>
                     </div>
                 </div>
             </div>
         </div>
+</div>
 
         <!-- Disclaimer -->
         <div class="bg-slate-800/30 border-t border-slate-700/50 px-6 py-3">
             <div class="max-w-5xl mx-auto">
                 <div class="flex items-start gap-2 text-xs text-slate-400 mb-2">
                     <span class="text-amber-500">⚠️</span>
-                    <p>This AI assistant provides general guidance only. For complex matters or legal advice, consult with a Fitzgerald HR Senior Consultant.</p>
+                    <p>This AI assistant provides general guidance only. For complex matters or legal advice, consult with a Senior Fitzgerald HR  Consultant.</p>
                 </div>
                 <div class="text-center">
                     <p class="text-sm text-slate-300">
@@ -785,46 +792,87 @@
             </div>
 
             <!-- Step 2: Role -->
-            <div class="wizard-step hidden" data-step="2">
-                <h3 class="text-lg font-bold text-white mb-4">What's their role?</h3>
-                <div class="space-y-2">
-                    <button onclick="wizardAnswer('role', 'waiter')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
-                        <span class="text-2xl">👔</span>
-                        <div>
-                            <div class="font-semibold">Waiter / Food & Beverage Attendant</div>
-                            <div class="text-xs opacity-70">Takes orders, serves food & drinks</div>
-                        </div>
-                    </button>
-                    <button onclick="wizardAnswer('role', 'cook')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
-                        <span class="text-2xl">👨‍🍳</span>
-                        <div>
-                            <div class="font-semibold">Cook / Chef</div>
-                            <div class="text-xs opacity-70">Prepares food in kitchen</div>
-                        </div>
-                    </button>
-                    <button onclick="wizardAnswer('role', 'barista')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
-                        <span class="text-2xl">☕</span>
-                        <div>
-                            <div class="font-semibold">Barista</div>
-                            <div class="text-xs opacity-70">Makes coffee & beverages</div>
-                        </div>
-                    </button>
-                    <button onclick="wizardAnswer('role', 'kitchen-hand')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
-                        <span class="text-2xl">🧹</span>
-                        <div>
-                            <div class="font-semibold">Kitchen Hand / Dishwasher</div>
-                            <div class="text-xs opacity-70">Cleaning, prep work</div>
-                        </div>
-                    </button>
-                    <button onclick="wizardAnswer('role', 'supervisor')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
-                        <span class="text-2xl">👔</span>
-                        <div>
-                            <div class="font-semibold">Supervisor / Shift Manager</div>
-                            <div class="text-xs opacity-70">Manages team & operations</div>
-                        </div>
-                    </button>
-                </div>
+<div class="wizard-step hidden" data-step="2">
+    <h3 class="text-lg font-bold text-white mb-4">What's their role?</h3>
+    <div class="space-y-2">
+        <!-- Food & Beverage -->
+        <button onclick="wizardAnswer('role', 'waiter')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
+            <span class="text-2xl">👔</span>
+            <div>
+                <div class="font-semibold">Waiter / Food & Beverage Attendant</div>
+                <div class="text-xs opacity-70">Takes orders, serves food & drinks</div>
             </div>
+        </button>
+        
+        <button onclick="wizardAnswer('role', 'bartender')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
+            <span class="text-2xl">🍸</span>
+            <div>
+                <div class="font-semibold">Bartender</div>
+                <div class="text-xs opacity-70">Makes and serves drinks at bar</div>
+            </div>
+        </button>
+        
+        <button onclick="wizardAnswer('role', 'barista')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
+            <span class="text-2xl">☕</span>
+            <div>
+                <div class="font-semibold">Barista</div>
+                <div class="text-xs opacity-70">Makes coffee & beverages</div>
+            </div>
+        </button>
+        
+        <!-- Kitchen -->
+        <button onclick="wizardAnswer('role', 'cook')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
+            <span class="text-2xl">👨‍🍳</span>
+            <div>
+                <div class="font-semibold">Cook / Chef</div>
+                <div class="text-xs opacity-70">Prepares food in kitchen</div>
+            </div>
+        </button>
+        
+        <button onclick="wizardAnswer('role', 'kitchen-hand')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
+            <span class="text-2xl">🧹</span>
+            <div>
+                <div class="font-semibold">Kitchen Hand / Dishwasher</div>
+                <div class="text-xs opacity-70">Cleaning, prep work</div>
+            </div>
+        </button>
+        
+        <!-- Management -->
+        <button onclick="wizardAnswer('role', 'supervisor')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
+            <span class="text-2xl">👔</span>
+            <div>
+                <div class="font-semibold">Supervisor / Shift Manager</div>
+                <div class="text-xs opacity-70">Manages team & operations</div>
+            </div>
+        </button>
+        
+        <!-- Front of House -->
+        <button onclick="wizardAnswer('role', 'receptionist')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
+            <span class="text-2xl">📞</span>
+            <div>
+                <div class="font-semibold">Receptionist / Front Desk</div>
+                <div class="text-xs opacity-70">Check-in, guest services</div>
+            </div>
+        </button>
+        
+        <button onclick="wizardAnswer('role', 'housekeeper')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
+            <span class="text-2xl">🛏️</span>
+            <div>
+                <div class="font-semibold">Housekeeper / Room Attendant</div>
+                <div class="text-xs opacity-70">Cleans rooms, maintains facilities</div>
+            </div>
+        </button>
+        
+        <!-- Other -->
+        <button onclick="wizardAnswer('role', 'security')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
+            <span class="text-2xl">🛡️</span>
+            <div>
+                <div class="font-semibold">Security / Door Person</div>
+                <div class="text-xs opacity-70">Venue security, crowd control</div>
+            </div>
+        </button>
+    </div>
+</div>
 
             <!-- Step 3: Experience -->
             <div class="wizard-step hidden" data-step="3">
@@ -1935,15 +1983,23 @@ function downloadCalculation() {
 
 // Helper to get nested rate
 function getNestedRate(obj, path) {
+    // Handle non-nested paths (like 'introductory' or 'managerial_hotel')
+    if (!path.includes('.')) {
+        return obj[path] || null;
+    }
+    
     const parts = path.split('.');
     let current = obj;
+    
     for (const part of parts) {
         if (current && current[part] !== undefined) {
             current = current[part];
         } else {
+            console.error(`Path not found: ${path} at part: ${part}`);
             return null;
         }
     }
+    
     return current;
 }
 
@@ -2017,30 +2073,49 @@ function showWizardResults() {
     if (backBtn) backBtn.classList.add('hidden');
     document.getElementById('wizardResults').classList.remove('hidden');
     
+    // Calculate classification
     const result = calculateAwardClassification(wizardData);
     
-    document.getElementById('resultAward').textContent = result.award;
-    document.getElementById('resultLevel').textContent = result.level;
-    document.getElementById('resultRate').textContent = '$' + result.rate.toFixed(2);
+    // Debug logging
+    console.log('Wizard Data:', wizardData);
+    console.log('Calculation Result:', result);
     
+    // Safety check
+    if (!result || !result.rate) {
+        alert('⚠️ Error calculating award classification. Please try again or contact support.');
+        console.error('Invalid result from calculateAwardClassification:', result);
+        resetWizard();
+        return;
+    }
+    
+    // Populate results
+    document.getElementById('resultAward').textContent = result.award || 'Unknown';
+    document.getElementById('resultLevel').textContent = result.level || 'Unknown';
+    document.getElementById('resultRate').textContent = result.rate ? '$' + result.rate.toFixed(2) : '$0.00';
+    
+    // Penalties
     let penaltiesHTML = '';
-    result.penalties.forEach(penalty => {
-        penaltiesHTML += `<div>• ${penalty}</div>`;
-    });
-    document.getElementById('resultPenalties').innerHTML = penaltiesHTML || '<div>Standard rates apply</div>';
+    if (result.penalties && result.penalties.length > 0) {
+        result.penalties.forEach(penalty => {
+            penaltiesHTML += `<div>• ${penalty}</div>`;
+        });
+    } else {
+        penaltiesHTML = '<div>Standard rates apply</div>';
+    }
+    document.getElementById('resultPenalties').innerHTML = penaltiesHTML;
     
+    // Next steps
     let stepsHTML = '';
-    result.nextSteps.forEach(step => {
-        stepsHTML += `<li>${step}</li>`;
-    });
+    if (result.nextSteps && result.nextSteps.length > 0) {
+        result.nextSteps.forEach(step => {
+            stepsHTML += `<li>${step}</li>`;
+        });
+    } else {
+        stepsHTML = '<li>Consult with Fitzgerald HR for next steps</li>';
+    }
     document.getElementById('resultNextSteps').innerHTML = stepsHTML;
     
-    let notesHTML = '';
-    if (result.notes && result.notes.length > 0) {
-        notesHTML = result.notes.join(' • ');
-    }
-    document.getElementById('resultNotes').innerHTML = notesHTML;
-    
+    // Track event
     trackEvent('award_wizard_completed', {
         user: currentUser,
         role: wizardData.role,
@@ -2089,14 +2164,46 @@ function calculateAwardClassification(data) {
     let classificationPath = data.classification;
     
     if (!classificationPath) {
-        // Default role mappings for common positions
-        const roleDefaults = {
-            'waiter': 'level_2.food_beverage_grade2',
-            'bartender': 'level_3.food_beverage_grade3',
-            // ... (keep rest)
-        };
-        classificationPath = roleDefaults[data.role] || 'level_2.cook_grade1';
+    // Default role mappings for common positions
+    const roleDefaults = {
+        // Waiters/F&B
+        'waiter': 'level_2.food_beverage_grade2',
+        'bartender': 'level_3.food_beverage_grade3',
+        
+        // Cooks
+        'cook': 'level_2.cook_grade1',
+        'cook-basic': 'level_2.cook_grade1',
+        'cook-intermediate': 'level_3.cook_grade2',
+        'cook-qualified': 'level_4.cook_tradesperson_grade3',
+        'chef': 'level_5.cook_tradesperson_grade4',
+        'sous-chef': 'level_6.cook_tradesperson_grade5',
+        
+        // Barista
+        'barista': 'level_1.food_beverage_grade1',
+        
+        // Kitchen Staff
+        'kitchen-hand': 'level_1.kitchen_attendant_grade1',
+        
+        // Supervisors
+        'supervisor': 'level_5.food_beverage_supervisor',
+        
+        // Other roles
+        'housekeeper': 'level_2.guest_service_grade2',
+        'receptionist': 'level_2.front_office_grade1',
+        'admin': 'level_2.clerical_grade1',
+        'security': 'level_2.doorperson_security',
+        'duty-manager': 'managerial_hotel'
+    };
+    
+    // Get classification or use default
+    classificationPath = roleDefaults[data.role];
+    
+    // If still no match, use introductory as safe default
+    if (!classificationPath) {
+        console.warn(`No mapping found for role: ${data.role}, using introductory`);
+        classificationPath = 'introductory';
     }
+}
     
     // Step 3: Extract the actual rate from the nested JSON structure
     const rateData = getNestedRate(rates, classificationPath);
