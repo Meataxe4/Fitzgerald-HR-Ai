@@ -8,38 +8,7 @@
     <!-- Document Generation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script>
-// Early function definition - loaded before body
-function checkAccess() {
-    const input = document.getElementById('accessCodeInput');
-    const error = document.getElementById('accessError');
     
-    if (!input || !error) {
-        console.error('Elements not found yet');
-        return;
-    }
-    
-    const value = input.value.trim().toUpperCase();
-    
-    const VALID_CODES = [
-        'BETA-VENUE-001', 'BETA-VENUE-002', 'BETA-VENUE-003',
-        'BETA-VENUE-004', 'BETA-VENUE-005',
-        'FITZGERALD-TEST', 'DEMO-2025'
-    ];
-    
-    if (VALID_CODES.includes(value)) {
-        window.currentUser = value;
-        document.getElementById('userCode').textContent = value;
-        document.getElementById('accessScreen').classList.add('hidden');
-        document.getElementById('assistantScreen').classList.remove('hidden');
-        error.classList.add('hidden');
-        console.log('✅ Access granted:', value);
-    } else {
-        error.textContent = 'Invalid access code. Please check and try again.';
-        error.classList.remove('hidden');
-    }
-}
-</script>
     <style>
         /* Crisis Mode Pulse Animation */
     </style>
@@ -82,7 +51,7 @@ function checkAccess() {
                     id="accessCodeInput"
                     placeholder="e.g., BETA-VENUE-001"
                     class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
-                    onkeypress="if(event.key==='Enter') checkAccess();"
+                    onkeypress="if(event.key==='Enter') checkAccess()"
                 />
                 <button 
                     onclick="checkAccess()"
@@ -238,6 +207,7 @@ function checkAccess() {
                 </div>
             </div>
         </div>
+</div>
 
         <!-- Disclaimer -->
         <div class="bg-slate-800/30 border-t border-slate-700/50 px-6 py-3">
@@ -1213,67 +1183,17 @@ Be as specific as possible!"></textarea>
         <div class="mt-6 bg-slate-900 rounded-lg p-6">
             <h3 class="text-white font-bold mb-4">📅 Upcoming Compliance Dates</h3>
             <div class="space-y-2 text-sm">
-                <!-- Award/Compliance Dates -->
                 <div class="flex justify-between py-2 border-b border-slate-700">
                     <span class="text-slate-300">1 July 2026</span>
-                    <span class="text-amber-400">🚨 Award Rate Increase</span>
+                    <span class="text-amber-400">Award Rate Increase</span>
                 </div>
-                
-                <!-- National Public Holidays -->
-                <div class="mt-4 mb-2 pt-3 border-t border-slate-700">
-                    <p class="font-bold text-amber-400">🇦🇺 National Public Holidays 2026</p>
-                </div>
-                
+		<div class="flex justify-between py-2 border-b border-slate-700">
+   		 <span class="text-slate-300">25 April 2026</span>
+   		 <span class="text-amber-400">ANZAC Day (Public Holiday)</span>
+		</div>
                 <div class="flex justify-between py-2 border-b border-slate-700">
-                    <span class="text-slate-300">1 January 2026</span>
-                    <span class="text-amber-400">New Year's Day</span>
-                </div>
-                <div class="flex justify-between py-2 border-b border-slate-700">
-                    <span class="text-slate-300">27 January 2026</span>
-                    <span class="text-amber-400">Australia Day</span>
-                </div>
-                <div class="flex justify-between py-2 border-b border-slate-700">
-                    <span class="text-slate-300">18 April 2026</span>
-                    <span class="text-amber-400">Good Friday</span>
-                </div>
-                <div class="flex justify-between py-2 border-b border-slate-700">
-                    <span class="text-slate-300">19 April 2026</span>
-                    <span class="text-amber-400">Easter Saturday</span>
-                </div>
-                <div class="flex justify-between py-2 border-b border-slate-700">
-                    <span class="text-slate-300">20 April 2026</span>
-                    <span class="text-amber-400">Easter Monday</span>
-                </div>
-                <div class="flex justify-between py-2 border-b border-slate-700">
-                    <span class="text-slate-300">25 April 2026</span>
-                    <span class="text-amber-400">ANZAC Day</span>
-                </div>
-                <div class="flex justify-between py-2 border-b border-slate-700">
-                    <span class="text-slate-300">8 June 2026</span>
-                    <span class="text-amber-400">Queen's Birthday</span>
-                </div>
-                <div class="flex justify-between py-2 border-b border-slate-700">
-                    <span class="text-slate-300">25 December 2026</span>
-                    <span class="text-amber-400">Christmas Day</span>
-                </div>
-                <div class="flex justify-between py-2 border-b border-slate-700">
-                    <span class="text-slate-300">26 December 2026</span>
-                    <span class="text-amber-400">Boxing Day</span>
-                </div>
-                
-                <!-- Link to State/Territory Holidays -->
-                <div class="mt-4 p-3 bg-blue-500/10 border border-blue-500 rounded-lg text-center">
-                    <p class="text-blue-400 text-sm font-semibold mb-2">📍 State & Territory Public Holidays</p>
-                    <a href="https://www.fairwork.gov.au/employment-conditions/public-holidays/2026-public-holidays" 
-                       target="_blank"
-                       class="text-amber-400 hover:text-amber-300 underline text-sm">
-                        View all 2026 public holidays by state →
-                    </a>
-                </div>
-                
-                <!-- Recurring Compliance -->
-                <div class="mt-4 pt-3 border-t border-slate-700">
-                    <p class="font-bold text-slate-300 mb-2">🔄 Recurring Compliance</p>
+                    <span class="text-slate-300">26 January 2026</span>
+                    <span class="text-amber-400">Australia Day (Public Holiday)</span>
                 </div>
                 <div class="flex justify-between py-2 border-b border-slate-700">
                     <span class="text-slate-300">Monthly</span>
@@ -1286,7 +1206,9 @@ Be as specific as possible!"></textarea>
             </div>
         </div>
     </div>
-   <script>
+</div>
+
+    <script>
 // ========================================
 // CONFIGURATION & GLOBALS
 // ========================================
@@ -1541,6 +1463,23 @@ const hrTemplates = {
  * Shows error message if code is invalid
  * @returns {void}
  */
+function checkAccess() {
+    const input = document.getElementById('accessCodeInput').value.trim().toUpperCase();
+const error = document.getElementById('accessError');
+// Note: These elements not cached as they're only used once at login
+    
+    if (CONFIG.VALID_CODES.includes(input)) {
+        currentUser = input;
+        document.getElementById('userCode').textContent = input;
+	DOM.accessScreen.classList.add('hidden');
+	DOM.assistantScreen.classList.remove('hidden');
+        error.classList.add('hidden');
+        trackEvent('beta_access', { code: input });
+    } else {
+        error.textContent = 'Invalid access code. Please check and try again.';
+        error.classList.remove('hidden');
+    }
+}
 
 function logout() {
     if (confirm('Are you sure you want to logout?')) {
@@ -1638,21 +1577,20 @@ function addMessage(role, content) {
     messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
     
     if (role === 'assistant') {
-    // Suggest relevant tools FIRST (at start of response)
-    const lastUserMessage = conversationHistory.filter(m => m.role === 'user').slice(-1)[0];
-    if (lastUserMessage) {
-        const suggestedTools = suggestRelevantTools(lastUserMessage.content, content);
-        if (suggestedTools.length > 0) {
-            // Add tools at the START (prepend instead of append)
-            setTimeout(() => addToolSuggestionsAtStart(messageDiv, suggestedTools), 100);
-        }
-    }
-    
-    // Then document downloads at the end
     const detectedDocType = detectDocumentType(content);
     if (detectedDocType) {
         setTimeout(() => addDocumentDownloadButtons(messageDiv, detectedDocType), 500);
     }
+    
+    // Suggest relevant tools based on conversation
+    const lastUserMessage = conversationHistory.filter(m => m.role === 'user').slice(-1)[0];
+    if (lastUserMessage) {
+        const suggestedTools = suggestRelevantTools(lastUserMessage.content, content);
+        if (suggestedTools.length > 0) {
+            setTimeout(() => addToolSuggestions(messageDiv, suggestedTools), 600);
+        		}
+    		}
+	}
 }
 
 async function callClaudeAPI(message) {
@@ -1693,41 +1631,12 @@ function suggestRelevantTools(userMessage, assistantResponse) {
     // Define tool keywords - each tool has trigger phrases
     const toolKeywords = {
         'awardWizard': {
-            keywords: ['award rate', 'classification', 'what level', 'pay rate', 'how much should i pay', 'how much do i pay', 'what should i pay', 'pay them', 'salary', 'wage', 'hourly rate', 'per hour', 'dollar', 'payment', 'payroll', 'correct rate', 'award wage'],
+            keywords: ['award rate', 'classification', 'what level', 'pay rate', 'how much should i pay'],
             name: 'Award Wizard',
             icon: '🧙',
             description: 'Find the exact award classification and rate'
         },
-        'rosterOptimizer': {
-            keywords: ['roster', 'schedule', 'shift', 'shifts', 'staffing', 'labor cost', 'labour cost', 'optimize roster', 'roster costs', 'staff schedule', 'rostering', 'rota', 'who works when', 'coverage', 'staff coverage', 'help with roster', 'roster help'],
-            name: 'Roster Optimizer',
-            icon: '📋',
-            description: 'Analyze and optimize your roster costs'
-        },
-        'rosterStressTester': {
-            keywords: ['compliance check', 'roster compliance', 'legal risk', 'roster issues', 'break requirements', 'rest days', 'consecutive days', 'roster violations'],
-            name: 'Roster Stress Test',
-            icon: '🔍',
-            description: 'Check your roster for compliance risks'
-        },
-        'complianceCalendar': {
-            keywords: ['deadline', 'compliance date', 'public holiday', 'when is', 'upcoming', 'reminder', 'important dates'],
-            name: 'Compliance Calendar',
-            icon: '📅',
-            description: 'View upcoming compliance deadlines'
-        },
-        'terminationRisk': {
-            keywords: ['fire', 'terminate', 'dismissal', 'unfair dismissal', 'sack', 'let go', 'end employment'],
-            name: 'Termination Risk Assessor',
-            icon: '⚖️',
-            description: 'Assess legal risks before termination'
-        },
-        'awardCalculator': {
-            keywords: ['calculate pay', 'overtime', 'penalty rates', 'weekend rates', 'night shift'],
-            name: 'Award Calculator',
-            icon: '💰',
-            description: 'Calculate pay with penalties'
-        }
+        // ... (keep rest of toolKeywords)
     };
     
     const suggestedTools = [];
@@ -1777,36 +1686,7 @@ function addToolSuggestions(messageDiv, tools) {
     suggestionsContainer.innerHTML = html;
     messageDiv.querySelector('.max-w-3xl').appendChild(suggestionsContainer);
 }
-function addToolSuggestionsAtStart(messageDiv, tools) {
-    if (tools.length === 0) return;
-    
-    const suggestionsContainer = document.createElement('div');
-    suggestionsContainer.className = 'mb-4 p-4 bg-amber-500/10 border-l-4 border-amber-500 rounded-r-lg';
-    
-    let html = '<p class="text-amber-400 font-bold mb-3 flex items-center gap-2">';
-    html += '<span>💡</span><span>Recommended Tools:</span></p><div class="space-y-2">';
-    
-    tools.forEach(tool => {
-        html += `
-            <button onclick="openTool('${tool.toolId}')" 
-                    class="w-full text-left p-3 bg-slate-700/50 hover:bg-slate-600/50 rounded-lg transition-all flex items-center gap-3 group">
-                <span class="text-2xl">${tool.icon}</span>
-                <div class="flex-1">
-                    <p class="text-slate-200 font-medium group-hover:text-amber-400 transition-colors">${tool.name}</p>
-                    <p class="text-xs text-slate-400">${tool.description}</p>
-                </div>
-                <span class="text-slate-400 group-hover:text-amber-400 transition-colors">→</span>
-            </button>
-        `;
-    });
-    
-    html += '</div>';
-    suggestionsContainer.innerHTML = html;
-    
-    // Prepend to start of message content
-    const messageContent = messageDiv.querySelector('.max-w-3xl');
-    messageContent.insertBefore(suggestionsContainer, messageContent.firstChild);
-}
+
 // ========================================
 // DOCUMENT GENERATION
 // ========================================
@@ -2017,17 +1897,11 @@ function openTool(toolName) {
     };
     const modalId = modalMap[toolName];
     if (modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) {
-            modal.classList.remove('hidden');
-            trackEvent('tool_opened', { tool: toolName, user: currentUser });
-        } else {
-            console.error('❌ Modal not found:', modalId);
-        }
-    } else {
-        console.error('❌ Unknown tool:', toolName);
+        document.getElementById(modalId).classList.remove('hidden');
+        trackEvent('tool_opened', { tool: toolName, user: currentUser });
     }
 }
+
 function closeToolModal(modalId) {
     document.getElementById(modalId).classList.add('hidden');
 }
