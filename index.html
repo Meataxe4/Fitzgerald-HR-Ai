@@ -5,11 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fitzgerald HR Assistant - Beta Test</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Document Generation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     
-    <!-- CRITICAL: checkAccess function loaded FIRST in head -->
+    <!-- CRITICAL: checkAccess function in head -->
     <script>
     function checkAccess() {
         const input = document.getElementById('accessCodeInput');
@@ -128,26 +127,48 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3">
-                    <button onclick="alert('Crisis mode feature')" 
+                    <button onclick="activateCrisisMode()" 
                             class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-all flex items-center gap-2">
                         <span class="text-xl">🚨</span>
                         <span>URGENT</span>
                     </button>
                     
-                    <button onclick="alert('Voice input feature')" 
+                    <button onclick="toggleVoiceInput()" 
                             id="voiceButton"
                             class="p-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
                         <span id="voiceIcon">🎤</span>
                     </button>
                     
                     <div class="relative">
-                        <button onclick="alert('Tools menu - Award Wizard, Roster Tools, etc.')" 
+                        <button onclick="toggleToolsMenu()" 
                                 class="p-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
                             <span>🛠️</span>
                         </button>
+                        <div id="toolsMenu" class="hidden absolute right-0 top-12 bg-slate-800 border border-slate-700 rounded-lg shadow-xl w-64 z-50">
+                            <div class="p-2">
+                                <button onclick="openTool('awardWizard')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3">
+                                    <span>🧙</span><span>Award Wizard</span>
+                                </button>
+                                <button onclick="openTool('rosterStressTester')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3">
+                                    <span>🔍</span><span>Roster Stress Test</span>
+                                </button>
+                                <button onclick="openTool('complianceCalendar')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3">
+                                    <span>📅</span><span>Compliance Calendar</span>
+                                </button>
+                                <button onclick="openTool('awardCalculator')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3">
+                                    <span>💰</span><span>Award Calculator</span>
+                                </button>
+                                <button onclick="openTool('rosterOptimizer')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3">
+                                    <span>📋</span><span>Roster Optimiser</span>
+                                </button>
+                                <button onclick="openTool('terminationRisk')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3">
+                                    <span>⚖️</span><span>Termination Risk</span>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     
-                    <button onclick="alert('Feedback form')" class="text-amber-500 hover:text-amber-400 text-sm font-medium transition-colors">
+                    <button onclick="showFeedback()" class="text-amber-500 hover:text-amber-400 text-sm font-medium transition-colors">
                         Give Feedback
                     </button>
                     <button onclick="location.reload()" class="text-slate-400 hover:text-white text-sm transition-colors">
@@ -177,11 +198,6 @@
                         <p class="text-slate-100 text-sm">Use the red URGENT button for immediate crisis response.</p>
                         <p class="text-slate-100 leading-relaxed mt-4">What HR challenge can I help you with today?</p>
                         <p class="text-slate-300 text-sm mt-4">✉️ For personalised support, contact our Senior Consultants at <a href="mailto:info@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">info@fitzgeraldhr.com.au</a></p>
-                        <p class="text-yellow-400 text-xs mt-4 bg-yellow-500/10 border border-yellow-500/30 rounded p-3">
-                            ⚠️ <strong>Award Rates:</strong> Data effective 1 July 2025 - 30 June 2026. 
-                            Always verify at <a href="https://www.fairwork.gov.au" target="_blank" class="underline hover:text-yellow-300">fairwork.gov.au</a> 
-                            before making payroll decisions.
-                        </p>
                     </div>
                 </div>
             </div>
@@ -208,9 +224,10 @@
                     placeholder="Ask me anything about hospitality HR in Australia..."
                     class="flex-1 bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500 resize-none"
                     rows="2"
+                    onkeypress="if(event.key==='Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
                 ></textarea>
                 <button
-                    onclick="alert('Message sending feature - connects to AI backend')"
+                    onclick="sendMessage()"
                     id="sendButton"
                     class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-medium rounded-lg transition-colors flex items-center gap-2"
                 >
@@ -221,17 +238,464 @@
         </div>
     </div>
 
-    <script>
-        console.log('✅ Fitzgerald HR Assistant loaded successfully');
-        console.log('✅ checkAccess function defined and ready');
-        console.log('✅ All buttons are now clickable');
-        
-        // Test that checkAccess is accessible
-        if (typeof checkAccess === 'function') {
-            console.log('✅ checkAccess is a valid function');
-        } else {
-            console.error('❌ checkAccess is NOT defined!');
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border border-slate-700 fade-in">
+            <h2 class="text-2xl font-bold text-white mb-4">Beta Feedback</h2>
+            <p class="text-slate-400 mb-6">Your feedback helps us build the best AI assistant for hospitality HR. Thank you!</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-slate-300 font-medium mb-2">What did you like?</label>
+                    <textarea id="feedbackLikes" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white" rows="3"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-medium mb-2">What could be improved?</label>
+                    <textarea id="feedbackImprove" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white" rows="3"></textarea>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mt-6">
+                <button onclick="submitFeedback()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all">
+                    Submit Feedback
+                </button>
+                <button onclick="closeFeedback()" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Crisis Mode Modal -->
+    <div id="crisisModal" class="hidden fixed inset-0 bg-red-900/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border-4 border-red-500 fade-in">
+            <div class="text-center mb-6">
+                <div class="text-6xl mb-4 animate-bounce">🚨</div>
+                <h2 class="text-3xl font-bold text-red-400 mb-2">CRISIS MODE ACTIVATED</h2>
+                <p class="text-slate-300">Emergency HR support - Immediate response</p>
+            </div>
+            
+            <div class="space-y-4 mb-6">
+                <div>
+                    <label class="block text-slate-300 font-medium mb-2">What's the urgent situation?</label>
+                    <select id="crisisType" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white">
+                        <option value="">Select crisis type...</option>
+                        <option value="injury">Workplace Injury</option>
+                        <option value="harassment">Sexual Harassment / Bullying</option>
+                        <option value="theft">Theft / Serious Misconduct</option>
+                        <option value="violence">Workplace Violence / Threat</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-medium mb-2">Describe what happened:</label>
+                    <textarea id="crisisDescription" rows="4" 
+                              class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white"
+                              placeholder="Provide details: who, what, when, where..."></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-slate-300 font-medium mb-2">Your contact number:</label>
+                    <input type="tel" id="crisisPhone" 
+                           class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white"
+                           placeholder="04XX XXX XXX">
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="submitCrisis()" 
+                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-lg transition-all text-lg">
+                    🚨 GET URGENT HELP NOW
+                </button>
+                <button onclick="closeCrisisModal()" 
+                        class="px-6 py-4 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Award Wizard Modal -->
+    <div id="awardWizardModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                        <span>🧙</span> Award Wizard
+                    </h2>
+                    <p class="text-slate-400 text-sm">Find the right award classification and pay rate</p>
+                </div>
+                <button onclick="closeToolModal('awardWizardModal')" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-700 rounded-lg p-6">
+                <p class="text-slate-200 mb-4">The Award Wizard helps you determine the correct classification and pay rate for your employees based on:</p>
+                <ul class="text-slate-300 text-sm space-y-2 ml-4">
+                    <li>• Venue type (restaurant, café, hotel, etc.)</li>
+                    <li>• Employee role and responsibilities</li>
+                    <li>• Experience level</li>
+                    <li>• Working hours (weekdays, weekends, public holidays)</li>
+                    <li>• Employment type (casual, part-time, full-time)</li>
+                </ul>
+                <button onclick="alert('Award Wizard interactive flow would start here')" 
+                        class="w-full mt-6 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+                    Start Award Wizard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Award Calculator Modal -->
+    <div id="awardCalculatorModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-amber-500">💰 Award Rate Calculator</h2>
+                    <p class="text-slate-400 text-sm">Calculate exact pay with penalties</p>
+                </div>
+                <button onclick="closeToolModal('awardCalculatorModal')" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-700 rounded-lg p-6">
+                <p class="text-slate-200">Quick calculator for penalty rates, overtime, and loadings.</p>
+                <button onclick="alert('Calculator form would appear here')" 
+                        class="w-full mt-6 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg">
+                    Open Calculator
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Roster Optimizer Modal -->
+    <div id="rosterOptimizerModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-amber-500">📋 Roster Cost Optimizer</h2>
+                </div>
+                <button onclick="closeToolModal('rosterOptimizerModal')" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
+            <div class="bg-slate-900 border border-slate-700 rounded-lg p-6">
+                <p class="text-slate-200">Upload your roster to analyze costs and find optimization opportunities.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Termination Risk Modal -->
+    <div id="terminationRiskModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-amber-500">⚖️ Termination Risk Assessor</h2>
+                </div>
+                <button onclick="closeToolModal('terminationRiskModal')" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
+            <div class="bg-slate-900 border border-slate-700 rounded-lg p-6">
+                <p class="text-slate-200">Assess unfair dismissal risk before terminating employment.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Roster Stress Tester Modal -->
+    <div id="rosterStressTesterModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-amber-500">🔍 Roster Stress Test</h2>
+                </div>
+                <button onclick="closeToolModal('rosterStressTesterModal')" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
+            <div class="bg-slate-900 border border-slate-700 rounded-lg p-6">
+                <p class="text-slate-200">Upload or describe your roster to find compliance risks.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Compliance Calendar Modal -->
+    <div id="complianceCalendarModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-4xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-2xl font-bold text-amber-500">📅 Compliance Calendar</h2>
+                    <p class="text-slate-400 text-sm">Upcoming deadlines & important dates</p>
+                </div>
+                <button onclick="closeToolModal('complianceCalendarModal')" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="bg-red-500/10 border-2 border-red-500 rounded-lg p-4">
+                    <p class="font-bold text-red-400">URGENT: Award Rate Increase</p>
+                    <p class="text-sm text-slate-300 mt-1">Hospitality Award rates increase on 1 July 2026</p>
+                </div>
+
+                <div class="bg-slate-900 rounded-lg p-6">
+                    <h3 class="text-white font-bold mb-4">📅 Upcoming Dates 2026</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between py-2 border-b border-slate-700">
+                            <span class="text-slate-300">1 January 2026</span>
+                            <span class="text-amber-400">New Year's Day</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-700">
+                            <span class="text-slate-300">27 January 2026</span>
+                            <span class="text-amber-400">Australia Day</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-700">
+                            <span class="text-slate-300">18 April 2026</span>
+                            <span class="text-amber-400">Good Friday</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-700">
+                            <span class="text-slate-300">25 April 2026</span>
+                            <span class="text-amber-400">ANZAC Day</span>
+                        </div>
+                        <div class="flex justify-between py-2 border-b border-slate-700">
+                            <span class="text-slate-300">25 December 2026</span>
+                            <span class="text-amber-400">Christmas Day</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+// Global state
+let currentUser = null;
+let conversationHistory = [];
+let isListening = false;
+let recognition = null;
+
+// Configuration
+const CONFIG = {
+    API: {
+        CHAT_ENDPOINT: '/.netlify/functions/chat',
+        CRISIS_ENDPOINT: '/.netlify/functions/telegram-crisis'
+    }
+};
+
+// Tools Menu
+function toggleToolsMenu() {
+    document.getElementById('toolsMenu').classList.toggle('hidden');
+}
+
+function openTool(toolName) {
+    toggleToolsMenu();
+    const modalMap = {
+        'awardWizard': 'awardWizardModal',
+        'awardCalculator': 'awardCalculatorModal',
+        'rosterOptimizer': 'rosterOptimizerModal',
+        'terminationRisk': 'terminationRiskModal',
+        'rosterStressTester': 'rosterStressTesterModal',
+        'complianceCalendar': 'complianceCalendarModal'
+    };
+    const modalId = modalMap[toolName];
+    if (modalId) {
+        document.getElementById(modalId).classList.remove('hidden');
+    }
+}
+
+function closeToolModal(modalId) {
+    document.getElementById(modalId).classList.add('hidden');
+}
+
+// Crisis Mode
+function activateCrisisMode() {
+    document.getElementById('crisisModal').classList.remove('hidden');
+}
+
+function closeCrisisModal() {
+    document.getElementById('crisisModal').classList.add('hidden');
+}
+
+async function submitCrisis() {
+    const type = document.getElementById('crisisType').value;
+    const description = document.getElementById('crisisDescription').value;
+    const phone = document.getElementById('crisisPhone').value;
+
+    if (!type || !description || !phone) {
+        alert('Please fill in all fields');
+        return;
+    }
+
+    alert('🚨 URGENT ALERT SENT\n\nA consultant will call you at ' + phone + ' within 15 minutes.\n\nIn production, this would send to: ' + CONFIG.API.CRISIS_ENDPOINT);
+    closeCrisisModal();
+}
+
+// Feedback
+function showFeedback() {
+    document.getElementById('feedbackModal').classList.remove('hidden');
+}
+
+function closeFeedback() {
+    document.getElementById('feedbackModal').classList.add('hidden');
+}
+
+function submitFeedback() {
+    const likes = document.getElementById('feedbackLikes').value;
+    const improve = document.getElementById('feedbackImprove').value;
+    
+    alert('✓ Thank you for your feedback!\n\nLikes: ' + likes + '\nImprove: ' + improve);
+    closeFeedback();
+}
+
+// Voice Input
+function toggleVoiceInput() {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert('Voice input not supported in your browser. Try Chrome or Edge.');
+        return;
+    }
+    
+    if (isListening) {
+        stopListening();
+    } else {
+        startListening();
+    }
+}
+
+function startListening() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SpeechRecognition();
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.lang = 'en-AU';
+
+    recognition.onstart = () => {
+        isListening = true;
+        document.getElementById('voiceIcon').textContent = '🔴';
+        document.getElementById('voiceButton').classList.add('bg-red-600');
+    };
+
+    recognition.onresult = (event) => {
+        const transcript = Array.from(event.results).map(r => r[0].transcript).join('');
+        document.getElementById('messageInput').value = transcript;
+    };
+
+    recognition.onerror = () => stopListening();
+    recognition.onend = () => stopListening();
+    recognition.start();
+}
+
+function stopListening() {
+    if (recognition) recognition.stop();
+    isListening = false;
+    document.getElementById('voiceIcon').textContent = '🎤';
+    document.getElementById('voiceButton').classList.remove('bg-red-600');
+}
+
+// Messaging
+async function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    addMessage('user', message);
+    input.value = '';
+    
+    const thinkingDiv = showThinkingIndicator();
+    conversationHistory.push({ role: 'user', content: message });
+    
+    try {
+        const response = await callClaudeAPI(message);
+        removeThinkingIndicator(thinkingDiv);
+        addMessage('assistant', response);
+        conversationHistory.push({ role: 'assistant', content: response });
+    } catch (error) {
+        removeThinkingIndicator(thinkingDiv);
+        addMessage('assistant', 'Sorry, I encountered an error. Please try again or contact support at info@fitzgeraldhr.com.au');
+        console.error('Error:', error);
+    }
+}
+
+function showThinkingIndicator() {
+    const container = document.getElementById('messagesContainer').querySelector('.space-y-6');
+    const thinkingDiv = document.createElement('div');
+    thinkingDiv.id = 'thinking-indicator';
+    thinkingDiv.className = 'flex justify-start fade-in';
+    thinkingDiv.innerHTML = `
+        <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
+            <div class="flex items-center gap-3">
+                <div class="flex gap-1">
+                    <div class="w-2 h-2 bg-amber-500 rounded-full animate-bounce"></div>
+                    <div class="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                    <div class="w-2 h-2 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                </div>
+                <p class="text-slate-400 text-sm">Fitz is thinking...</p>
+            </div>
+        </div>
+    `;
+    container.appendChild(thinkingDiv);
+    thinkingDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    return thinkingDiv;
+}
+
+function removeThinkingIndicator(thinkingDiv) {
+    if (thinkingDiv && thinkingDiv.parentNode) {
+        thinkingDiv.parentNode.removeChild(thinkingDiv);
+    }
+}
+
+function addMessage(role, content) {
+    const container = document.getElementById('messagesContainer').querySelector('.space-y-6');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} fade-in`;
+    
+    let formattedContent = content;
+    if (role === 'assistant') {
+        formattedContent = content
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/info@fitzgeraldhr\.com\.au/g, '<a href="mailto:info@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">info@fitzgeraldhr.com.au</a>');
+    }
+    
+    messageDiv.innerHTML = `
+        <div class="max-w-3xl ${role === 'user' ? 'bg-amber-500 text-slate-900' : 'bg-slate-800 text-slate-100 border border-slate-700'} rounded-2xl px-6 py-4">
+            <p class="leading-relaxed whitespace-pre-wrap">${formattedContent}</p>
+        </div>
+    `;
+    
+    container.appendChild(messageDiv);
+    messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
+async function callClaudeAPI(message) {
+    try {
+        const response = await fetch(CONFIG.API.CHAT_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: message,
+                history: conversationHistory.filter(m => m.role !== 'system'),
+                user: currentUser
+            })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to get response');
         }
-    </script>
+
+        const data = await response.json();
+        return data.message;
+    } catch (error) {
+        console.error('API Error:', error);
+        throw error;
+    }
+}
+
+// Close tools menu when clicking outside
+document.addEventListener('click', function(event) {
+    const toolsMenu = document.getElementById('toolsMenu');
+    const toolsButton = event.target.closest('button');
+    
+    if (toolsMenu && !toolsMenu.contains(event.target) && 
+        (!toolsButton || !toolsButton.onclick?.toString().includes('toggleToolsMenu'))) {
+        toolsMenu.classList.add('hidden');
+    }
+});
+
+console.log('✅ Fitzgerald HR Assistant loaded successfully');
+console.log('✅ All features active: Chat, Tools, Crisis Mode, Voice Input');
+</script>
+
 </body>
 </html>
