@@ -2216,85 +2216,116 @@ function showWizardResults() {
     }
 }
 function showJuniorRedirect() {
-    document.getElementById('wizardSteps').classList.add('hidden');
-    const backBtn = document.getElementById('wizardBackBtn');
-    if (backBtn) backBtn.classList.add('hidden');
-    document.getElementById('wizardResults').classList.remove('hidden');
+    console.log('🎯 showJuniorRedirect() called');
     
-    // Show junior rates redirect message
-    document.getElementById('wizardResults').innerHTML = `
-        <div class="bg-blue-500/10 border-2 border-blue-500 rounded-lg p-6">
-            <h3 class="text-blue-400 font-bold text-xl mb-4 flex items-center gap-2">
-                <span>ℹ️</span>
-                <span>Junior Employee (19 years or younger)</span>
-            </h3>
-            
-            <div class="space-y-4 text-slate-200">
-                <p class="leading-relaxed">
-                    For employees <strong>19 years of age or younger</strong>, junior rates apply. 
-                    Junior rates are calculated as a <strong>percentage of the adult rate</strong> based on the employee's age.
-                </p>
+    try {
+        // Build the junior redirect HTML
+        const juniorHTML = `
+            <div class="bg-blue-500/10 border-2 border-blue-500 rounded-lg p-6">
+                <h3 class="text-blue-400 font-bold text-xl mb-4 flex items-center gap-2">
+                    <span>ℹ️</span>
+                    <span>Junior Employee (19 years or younger)</span>
+                </h3>
                 
-                <div class="bg-slate-700/50 rounded-lg p-4">
-                    <p class="font-semibold text-amber-400 mb-2">Junior Rate Percentages:</p>
-                    <ul class="text-sm space-y-1 ml-4">
-                        <li>• <strong>Under 16 years:</strong> 40% of adult rate</li>
-                        <li>• <strong>16 years:</strong> 50% of adult rate</li>
-                        <li>• <strong>17 years:</strong> 60% of adult rate</li>
-                        <li>• <strong>18 years:</strong> 70% of adult rate</li>
-                        <li>• <strong>19 years:</strong> 80% of adult rate</li>
-                        <li>• <strong>20 years and over:</strong> 100% (full adult rate)</li>
-                    </ul>
+                <div class="space-y-4 text-slate-200">
+                    <p class="leading-relaxed">
+                        For employees <strong>19 years of age or younger</strong>, junior rates apply. 
+                        Junior rates are calculated as a <strong>percentage of the adult rate</strong> based on the employee's age.
+                    </p>
+                    
+                    <div class="bg-slate-700/50 rounded-lg p-4">
+                        <p class="font-semibold text-amber-400 mb-2">Junior Rate Percentages:</p>
+                        <ul class="text-sm space-y-1 ml-4">
+                            <li>• <strong>Under 16 years:</strong> 40% of adult rate</li>
+                            <li>• <strong>16 years:</strong> 50% of adult rate</li>
+                            <li>• <strong>17 years:</strong> 60% of adult rate</li>
+                            <li>• <strong>18 years:</strong> 70% of adult rate</li>
+                            <li>• <strong>19 years:</strong> 80% of adult rate</li>
+                            <li>• <strong>20 years and over:</strong> 100% (full adult rate)</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-4">
+                        <p class="font-semibold text-amber-400 mb-2">📋 What You Need to Do:</p>
+                        <ol class="text-sm space-y-2 ml-4">
+                            <li>1. Determine the employee's exact age</li>
+                            <li>2. Find the applicable adult rate for their classification</li>
+                            <li>3. Apply the percentage based on their age</li>
+                            <li>4. Review the full award for additional junior provisions</li>
+                        </ol>
+                    </div>
+
+                    <div class="bg-green-500/10 border border-green-500 rounded-lg p-4 text-center">
+                        <p class="font-semibold text-green-400 mb-3">
+                            📖 View Full Junior Rates in the Award
+                        </p>
+                        <a href="https://awards.fairwork.gov.au/MA000009.html" 
+                           target="_blank"
+                           class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all">
+                            Open Hospitality Industry Award →
+                        </a>
+                        <p class="text-xs text-slate-400 mt-2">
+                            Opens in new tab • Fair Work Ombudsman official website
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-700/50 rounded-lg p-4">
+                        <p class="text-sm text-slate-300">
+                            <strong>Need help calculating junior rates?</strong><br/>
+                            Contact Fitzgerald HR for assistance: 
+                            <a href="mailto:info@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">info@fitzgeraldhr.com.au</a>
+                        </p>
+                    </div>
                 </div>
 
-                <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-4">
-                    <p class="font-semibold text-amber-400 mb-2">📋 What You Need to Do:</p>
-                    <ol class="text-sm space-y-2 ml-4">
-                        <li>1. Determine the employee's exact age</li>
-                        <li>2. Find the applicable adult rate for their classification</li>
-                        <li>3. Apply the percentage based on their age</li>
-                        <li>4. Review the full award for additional junior provisions</li>
-                    </ol>
-                </div>
-
-                <div class="bg-green-500/10 border border-green-500 rounded-lg p-4 text-center">
-                    <p class="font-semibold text-green-400 mb-3">
-                        📖 View Full Junior Rates in the Award
-                    </p>
-                    <a href="https://awards.fairwork.gov.au/MA000009.html" 
-                       target="_blank"
-                       class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all">
-                        Open Hospitality Industry Award →
-                    </a>
-                    <p class="text-xs text-slate-400 mt-2">
-                        Opens in new tab • Fair Work Ombudsman official website
-                    </p>
-                </div>
-
-                <div class="bg-slate-700/50 rounded-lg p-4">
-                    <p class="text-sm text-slate-300">
-                        <strong>Need help calculating junior rates?</strong><br/>
-                        Contact Fitzgerald HR for assistance: 
-                        <a href="mailto:info@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">info@fitzgeraldhr.com.au</a>
-                    </p>
+                <div class="flex gap-3 mt-6">
+                    <button onclick="resetWizard()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-lg transition-all">
+                        ← Start Over
+                    </button>
+                    <button onclick="closeToolModal('awardWizardModal')" class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-lg transition-all">
+                        Close
+                    </button>
                 </div>
             </div>
-
-            <div class="flex gap-3 mt-6">
-                <button onclick="resetWizard()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-lg transition-all">
-                    ← Start Over
-                </button>
-                <button onclick="closeToolModal('awardWizardModal')" class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-lg transition-all">
-                    Close
-                </button>
-            </div>
-        </div>
-    `;
-    
-    trackEvent('award_wizard_junior_redirect', {
-        user: currentUser,
-        role: wizardData.role
-    });
+        `;
+        
+        // REPLACE wizardSteps content with junior message (SAME AS ADULT PATH)
+        const wizardStepsDiv = document.getElementById('wizardSteps');
+        if (wizardStepsDiv) {
+            wizardStepsDiv.innerHTML = juniorHTML;
+            wizardStepsDiv.classList.remove('hidden'); // Keep it visible
+            console.log('✅ Junior redirect inserted into wizardSteps div');
+        } else {
+            console.error('❌ wizardSteps div not found!');
+            return;
+        }
+        
+        // Hide back button and progress bar
+        const backBtn = document.getElementById('wizardBackBtn');
+        if (backBtn) backBtn.classList.add('hidden');
+        
+        // Hide progress bar
+        const progressContainer = wizardStepsDiv.previousElementSibling;
+        if (progressContainer && progressContainer.querySelector('#wizardProgressBar')) {
+            progressContainer.classList.add('hidden');
+        }
+        
+        // Track event
+        try {
+            trackEvent('award_wizard_junior_redirect', {
+                user: currentUser,
+                role: wizardData.role
+            });
+        } catch (trackError) {
+            console.warn('⚠️ Tracking failed:', trackError);
+        }
+        
+        console.log('🎉 Junior redirect complete!');
+        
+    } catch (error) {
+        console.error('❌ Error in showJuniorRedirect():', error);
+        alert('Error showing junior information: ' + error.message);
+    }
 }
 
 // Calculate award classification (uses GitHub JSON)
