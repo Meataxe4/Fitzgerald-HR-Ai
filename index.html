@@ -8,7 +8,38 @@
     <!-- Document Generation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+// Early function definition - loaded before body
+function checkAccess() {
+    const input = document.getElementById('accessCodeInput');
+    const error = document.getElementById('accessError');
     
+    if (!input || !error) {
+        console.error('Elements not found yet');
+        return;
+    }
+    
+    const value = input.value.trim().toUpperCase();
+    
+    const VALID_CODES = [
+        'BETA-VENUE-001', 'BETA-VENUE-002', 'BETA-VENUE-003',
+        'BETA-VENUE-004', 'BETA-VENUE-005',
+        'FITZGERALD-TEST', 'DEMO-2025'
+    ];
+    
+    if (VALID_CODES.includes(value)) {
+        window.currentUser = value;
+        document.getElementById('userCode').textContent = value;
+        document.getElementById('accessScreen').classList.add('hidden');
+        document.getElementById('assistantScreen').classList.remove('hidden');
+        error.classList.add('hidden');
+        console.log('✅ Access granted:', value);
+    } else {
+        error.textContent = 'Invalid access code. Please check and try again.';
+        error.classList.remove('hidden');
+    }
+}
+</script>
     <style>
         /* Crisis Mode Pulse Animation */
     </style>
@@ -51,7 +82,7 @@
                     id="accessCodeInput"
                     placeholder="e.g., BETA-VENUE-001"
                     class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
-                    onkeypress="if(event.key==='Enter') checkAccess()"
+                    onkeypress="if(event.key==='Enter') checkAccess();"
                 />
                 <button 
                     onclick="checkAccess()"
@@ -1510,23 +1541,6 @@ const hrTemplates = {
  * Shows error message if code is invalid
  * @returns {void}
  */
-function checkAccess() {
-    const input = document.getElementById('accessCodeInput').value.trim().toUpperCase();
-const error = document.getElementById('accessError');
-// Note: These elements not cached as they're only used once at login
-    
-    if (CONFIG.VALID_CODES.includes(input)) {
-        currentUser = input;
-        document.getElementById('userCode').textContent = input;
-	DOM.accessScreen.classList.add('hidden');
-	DOM.assistantScreen.classList.remove('hidden');
-        error.classList.add('hidden');
-        trackEvent('beta_access', { code: input });
-    } else {
-        error.textContent = 'Invalid access code. Please check and try again.';
-        error.classList.remove('hidden');
-    }
-}
 
 function logout() {
     if (confirm('Are you sure you want to logout?')) {
