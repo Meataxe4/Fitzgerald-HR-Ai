@@ -739,7 +739,7 @@
 <!-- Add this after your other modals (after xeroIntegrationModal) -->
 
 <div id="awardWizardModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-    <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+    <div id="awardWizardContainer" class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
@@ -2094,24 +2094,7 @@ function showWizardResults() {
         
         console.log('🎯 Adult path, proceeding...');
         
-        // Hide wizard steps
-        const wizardStepsDiv = document.getElementById('wizardSteps');
-        const wizardBackBtn = document.getElementById('wizardBackBtn');
-        const wizardResultsDiv = document.getElementById('wizardResults');
-        
-        if (!wizardResultsDiv) {
-            console.error('❌ FATAL: wizardResults div not found in DOM!');
-            alert('Error: Results container not found. Please refresh and try again.');
-            return;
-        }
-        
-        console.log('✅ All required DOM elements found');
-        
-        // Hide steps and back button
-        if (wizardStepsDiv) wizardStepsDiv.classList.add('hidden');
-        if (wizardBackBtn) wizardBackBtn.classList.add('hidden');
-        
-        // Calculate classification
+        // Calculate classification FIRST
         console.log('🔍 Calculating classification...');
         const result = calculateAwardClassification(wizardData);
         console.log('🔍 Calculation complete:', result);
@@ -2124,69 +2107,95 @@ function showWizardResults() {
             return;
         }
         
-        console.log('✅ Calculation valid, populating results...');
+        console.log('✅ Calculation valid, building results HTML...');
         
-        // Populate all result fields
-        const resultAward = document.getElementById('resultAward');
-        const resultLevel = document.getElementById('resultLevel');
-        const resultRate = document.getElementById('resultRate');
-        const resultPenalties = document.getElementById('resultPenalties');
-        const resultNextSteps = document.getElementById('resultNextSteps');
-        
-        if (resultAward) resultAward.textContent = result.award || 'Unknown';
-        if (resultLevel) resultLevel.textContent = result.level || 'Unknown';
-        if (resultRate) resultRate.textContent = result.rate ? '$' + result.rate.toFixed(2) : '$0.00';
-        
-        // Penalties
-        if (resultPenalties) {
-            let penaltiesHTML = '';
-            if (result.penalties && result.penalties.length > 0) {
-                result.penalties.forEach(penalty => {
-                    penaltiesHTML += `<div>• ${penalty}</div>`;
-                });
-            } else {
-                penaltiesHTML = '<div>Standard rates apply</div>';
-            }
-            resultPenalties.innerHTML = penaltiesHTML;
+        // Build the complete results HTML
+        let penaltiesHTML = '';
+        if (result.penalties && result.penalties.length > 0) {
+            result.penalties.forEach(penalty => {
+                penaltiesHTML += `<div>• ${penalty}</div>`;
+            });
+        } else {
+            penaltiesHTML = '<div>Standard rates apply</div>';
         }
         
-        // Next steps
-        if (resultNextSteps) {
-            let stepsHTML = '';
-            if (result.nextSteps && result.nextSteps.length > 0) {
-                result.nextSteps.forEach(step => {
-                    stepsHTML += `<li>${step}</li>`;
-                });
-            } else {
-                stepsHTML = '<li>Consult with Fitzgerald HR for next steps</li>';
-            }
-            resultNextSteps.innerHTML = stepsHTML;
+        let stepsHTML = '';
+        if (result.nextSteps && result.nextSteps.length > 0) {
+            result.nextSteps.forEach(step => {
+                stepsHTML += `<li>${step}</li>`;
+            });
+        } else {
+            stepsHTML = '<li>Consult with Fitzgerald HR for next steps</li>';
         }
         
-        console.log('✅ All fields populated');
+        const resultsHTML = `
+            <div class="bg-green-500/10 border-2 border-green-500 rounded-lg p-6">
+                <h3 class="text-green-400 font-bold text-xl mb-4 flex items-center gap-2">
+                    <span>✅</span>
+                    <span>Award Classification Complete!</span>
+                </h3>
+                
+                <div class="space-y-4 text-slate-200">
+                    <div class="bg-slate-700/50 rounded-lg p-4">
+                        <p class="text-sm text-slate-400 mb-1">Applicable Award</p>
+                        <p class="font-bold text-lg">${result.award || 'Unknown'}</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-slate-700/50 rounded-lg p-4">
+                            <p class="text-sm text-slate-400 mb-1">Classification Level</p>
+                            <p class="font-bold">${result.level || 'Unknown'}</p>
+                        </div>
+                        <div class="bg-slate-700/50 rounded-lg p-4">
+                            <p class="text-sm text-slate-400 mb-1">Base Rate (per hour)</p>
+                            <p class="font-bold text-2xl text-amber-400">$${result.rate ? result.rate.toFixed(2) : '0.00'}</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-4">
+                        <p class="font-semibold text-amber-400 mb-2">Penalty Rates & Loadings:</p>
+                        <div class="text-sm space-y-1">${penaltiesHTML}</div>
+                    </div>
+
+                    <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-4">
+                        <p class="font-semibold text-blue-400 mb-2">📝 Next Steps:</p>
+                        <ul class="text-sm space-y-1">${stepsHTML}</ul>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-6">
+                    <button onclick="downloadWizardResults()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+                        📄 Download Summary
+                    </button>
+                    <button onclick="resetWizard()" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
+                        Start Over
+                    </button>
+                </div>
+            </div>
+        `;
         
-        // Show results div
-        wizardResultsDiv.classList.remove('hidden');
-        console.log('✅ Results div visible');
+        // REPLACE wizardSteps content with results
+        const wizardStepsDiv = document.getElementById('wizardSteps');
+        if (wizardStepsDiv) {
+            wizardStepsDiv.innerHTML = resultsHTML;
+            wizardStepsDiv.classList.remove('hidden'); // Keep it visible
+            console.log('✅ Results inserted into wizardSteps div');
+        } else {
+            console.error('❌ wizardSteps div not found!');
+            return;
+        }
         
-        // Force scroll IMMEDIATELY (not in setTimeout initially)
-        console.log('🎯 Attempting immediate scroll...');
-        wizardResultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        console.log('✅ Immediate scroll executed');
+        // Hide back button and progress bar
+        const backBtn = document.getElementById('wizardBackBtn');
+        if (backBtn) backBtn.classList.add('hidden');
         
-        // ALSO try after a delay (belt and suspenders approach)
-        setTimeout(() => {
-            console.log('🎯 Backup scroll executing...');
-            const resultsCheck = document.getElementById('wizardResults');
-            if (resultsCheck) {
-                resultsCheck.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                console.log('✅ Backup scroll complete');
-            } else {
-                console.error('❌ Results div disappeared!');
-            }
-        }, 200);
+        // Hide progress bar
+        const progressContainer = wizardStepsDiv.previousElementSibling;
+        if (progressContainer && progressContainer.querySelector('#wizardProgressBar')) {
+            progressContainer.classList.add('hidden');
+        }
         
-        // Track event LAST (so it doesn't interfere)
+        // Track event
         try {
             trackEvent('award_wizard_completed', {
                 user: currentUser,
@@ -2196,10 +2205,9 @@ function showWizardResults() {
             });
         } catch (trackError) {
             console.warn('⚠️ Tracking failed:', trackError);
-            // Don't let tracking failure break the wizard
         }
         
-        console.log('🎉 showWizardResults() complete!');
+        console.log('🎉 showWizardResults() complete - results displayed!');
         
     } catch (error) {
         console.error('❌ FATAL ERROR in showWizardResults():', error);
