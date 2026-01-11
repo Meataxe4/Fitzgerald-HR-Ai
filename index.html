@@ -2092,90 +2092,121 @@ function showWizardResults() {
             return;
         }
         
-        console.log('🎯 Adult path, hiding steps...');
-    
-        document.getElementById('wizardSteps').classList.add('hidden');
-        const backBtn = document.getElementById('wizardBackBtn');
-        if (backBtn) backBtn.classList.add('hidden');
+        console.log('🎯 Adult path, proceeding...');
+        
+        // Hide wizard steps
+        const wizardStepsDiv = document.getElementById('wizardSteps');
+        const wizardBackBtn = document.getElementById('wizardBackBtn');
+        const wizardResultsDiv = document.getElementById('wizardResults');
+        
+        if (!wizardResultsDiv) {
+            console.error('❌ FATAL: wizardResults div not found in DOM!');
+            alert('Error: Results container not found. Please refresh and try again.');
+            return;
+        }
+        
+        console.log('✅ All required DOM elements found');
+        
+        // Hide steps and back button
+        if (wizardStepsDiv) wizardStepsDiv.classList.add('hidden');
+        if (wizardBackBtn) wizardBackBtn.classList.add('hidden');
         
         // Calculate classification
+        console.log('🔍 Calculating classification...');
         const result = calculateAwardClassification(wizardData);
-        
-        // Debug logging
-        console.log('Wizard Data:', wizardData);
-        console.log('Calculation Result:', result);
+        console.log('🔍 Calculation complete:', result);
         
         // Safety check
         if (!result || !result.rate) {
+            console.error('❌ Invalid result:', result);
             alert('⚠️ Error calculating award classification. Please try again or contact support.');
-            console.error('Invalid result from calculateAwardClassification:', result);
             resetWizard();
             return;
         }
         
-        // GET THE RESULTS DIV FIRST (before removing hidden class)
-        const resultsDiv = document.getElementById('wizardResults');
-        if (!resultsDiv) {
-            console.error('❌ wizardResults div not found in DOM!');
-            return;
-        }
+        console.log('✅ Calculation valid, populating results...');
         
-        // Populate results
-        document.getElementById('resultAward').textContent = result.award || 'Unknown';
-        document.getElementById('resultLevel').textContent = result.level || 'Unknown';
-        document.getElementById('resultRate').textContent = result.rate ? '$' + result.rate.toFixed(2) : '$0.00';
+        // Populate all result fields
+        const resultAward = document.getElementById('resultAward');
+        const resultLevel = document.getElementById('resultLevel');
+        const resultRate = document.getElementById('resultRate');
+        const resultPenalties = document.getElementById('resultPenalties');
+        const resultNextSteps = document.getElementById('resultNextSteps');
+        
+        if (resultAward) resultAward.textContent = result.award || 'Unknown';
+        if (resultLevel) resultLevel.textContent = result.level || 'Unknown';
+        if (resultRate) resultRate.textContent = result.rate ? '$' + result.rate.toFixed(2) : '$0.00';
         
         // Penalties
-        let penaltiesHTML = '';
-        if (result.penalties && result.penalties.length > 0) {
-            result.penalties.forEach(penalty => {
-                penaltiesHTML += `<div>• ${penalty}</div>`;
-            });
-        } else {
-            penaltiesHTML = '<div>Standard rates apply</div>';
+        if (resultPenalties) {
+            let penaltiesHTML = '';
+            if (result.penalties && result.penalties.length > 0) {
+                result.penalties.forEach(penalty => {
+                    penaltiesHTML += `<div>• ${penalty}</div>`;
+                });
+            } else {
+                penaltiesHTML = '<div>Standard rates apply</div>';
+            }
+            resultPenalties.innerHTML = penaltiesHTML;
         }
-        document.getElementById('resultPenalties').innerHTML = penaltiesHTML;
         
         // Next steps
-        let stepsHTML = '';
-        if (result.nextSteps && result.nextSteps.length > 0) {
-            result.nextSteps.forEach(step => {
-                stepsHTML += `<li>${step}</li>`;
-            });
-        } else {
-            stepsHTML = '<li>Consult with Fitzgerald HR for next steps</li>';
-        }
-        document.getElementById('resultNextSteps').innerHTML = stepsHTML;
-        
-        // NOW show the results (AFTER populating)
-        resultsDiv.classList.remove('hidden');
-        console.log('✅ Results div unhidden');
-        
-        // Track event
-        trackEvent('award_wizard_completed', {
-            user: currentUser,
-            role: wizardData.role,
-            classification: result.level,
-            rate: result.rate
-        });
-        
-        // FORCE SCROLL TO RESULTS
-        setTimeout(() => {
-            console.log('🎯 Forcing scroll to results...');
-            if (resultsDiv) {
-                resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                console.log('✅ Scrolled to results div');
+        if (resultNextSteps) {
+            let stepsHTML = '';
+            if (result.nextSteps && result.nextSteps.length > 0) {
+                result.nextSteps.forEach(step => {
+                    stepsHTML += `<li>${step}</li>`;
+                });
             } else {
-                console.error('❌ Results div not found for scrolling!');
+                stepsHTML = '<li>Consult with Fitzgerald HR for next steps</li>';
             }
-        }, 150);
+            resultNextSteps.innerHTML = stepsHTML;
+        }
+        
+        console.log('✅ All fields populated');
+        
+        // Show results div
+        wizardResultsDiv.classList.remove('hidden');
+        console.log('✅ Results div visible');
+        
+        // Force scroll IMMEDIATELY (not in setTimeout initially)
+        console.log('🎯 Attempting immediate scroll...');
+        wizardResultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        console.log('✅ Immediate scroll executed');
+        
+        // ALSO try after a delay (belt and suspenders approach)
+        setTimeout(() => {
+            console.log('🎯 Backup scroll executing...');
+            const resultsCheck = document.getElementById('wizardResults');
+            if (resultsCheck) {
+                resultsCheck.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                console.log('✅ Backup scroll complete');
+            } else {
+                console.error('❌ Results div disappeared!');
+            }
+        }, 200);
+        
+        // Track event LAST (so it doesn't interfere)
+        try {
+            trackEvent('award_wizard_completed', {
+                user: currentUser,
+                role: wizardData.role,
+                classification: result.level,
+                rate: result.rate
+            });
+        } catch (trackError) {
+            console.warn('⚠️ Tracking failed:', trackError);
+            // Don't let tracking failure break the wizard
+        }
+        
+        console.log('🎉 showWizardResults() complete!');
         
     } catch (error) {
-        console.error('❌ Error in showWizardResults():', error);
-        alert('Error showing results: ' + error.message);
+        console.error('❌ FATAL ERROR in showWizardResults():', error);
+        console.error('Stack:', error.stack);
+        alert('Critical error showing results: ' + error.message + '\n\nPlease refresh and try again.');
     }
 }
-
 function showJuniorRedirect() {
     document.getElementById('wizardSteps').classList.add('hidden');
     const backBtn = document.getElementById('wizardBackBtn');
