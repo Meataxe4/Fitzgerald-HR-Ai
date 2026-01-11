@@ -2097,7 +2097,6 @@ function showWizardResults() {
         document.getElementById('wizardSteps').classList.add('hidden');
         const backBtn = document.getElementById('wizardBackBtn');
         if (backBtn) backBtn.classList.add('hidden');
-        document.getElementById('wizardResults').classList.remove('hidden');
         
         // Calculate classification
         const result = calculateAwardClassification(wizardData);
@@ -2111,6 +2110,13 @@ function showWizardResults() {
             alert('⚠️ Error calculating award classification. Please try again or contact support.');
             console.error('Invalid result from calculateAwardClassification:', result);
             resetWizard();
+            return;
+        }
+        
+        // GET THE RESULTS DIV FIRST (before removing hidden class)
+        const resultsDiv = document.getElementById('wizardResults');
+        if (!resultsDiv) {
+            console.error('❌ wizardResults div not found in DOM!');
             return;
         }
         
@@ -2141,6 +2147,10 @@ function showWizardResults() {
         }
         document.getElementById('resultNextSteps').innerHTML = stepsHTML;
         
+        // NOW show the results (AFTER populating)
+        resultsDiv.classList.remove('hidden');
+        console.log('✅ Results div unhidden');
+        
         // Track event
         trackEvent('award_wizard_completed', {
             user: currentUser,
@@ -2149,17 +2159,16 @@ function showWizardResults() {
             rate: result.rate
         });
         
-        // FORCE SCROLL TO RESULTS - MUST BE INSIDE TRY BLOCK
+        // FORCE SCROLL TO RESULTS
         setTimeout(() => {
             console.log('🎯 Forcing scroll to results...');
-            const resultsDiv = document.getElementById('wizardResults');
             if (resultsDiv) {
                 resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 console.log('✅ Scrolled to results div');
             } else {
-                console.error('❌ Results div not found!');
+                console.error('❌ Results div not found for scrolling!');
             }
-        }, 100);
+        }, 150);
         
     } catch (error) {
         console.error('❌ Error in showWizardResults():', error);
