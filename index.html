@@ -1512,6 +1512,14 @@ async function sendMessage() {
     
     if (!message) return;
     
+    // ✨ NEW: Check for high-risk topics BEFORE sending
+    const risk = detectHighRiskTopic(message);
+    if (risk) {
+        showHighRiskWarning(risk);
+        // Don't clear input - user might want to copy it for email to consultant
+        return; // Stop here - don't send to AI until they acknowledge
+    }
+    
     addMessage('user', message);
     input.value = '';
     
@@ -1537,7 +1545,6 @@ async function sendMessage() {
     sendBtn.disabled = false;
     sendBtn.innerHTML = '<span>Send</span><span>→</span>';
 }
-
 function showThinkingIndicator() {
     const container = DOM.messagesContainer.querySelector('.space-y-6');
     const thinkingDiv = document.createElement('div');
