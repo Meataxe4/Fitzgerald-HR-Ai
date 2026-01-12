@@ -246,6 +246,15 @@
         </div>
     </div>
 
+<!-- Hidden Netlify Form for Beta Feedback Collection -->
+    <form name="beta-feedback" method="POST" data-netlify="true" hidden>
+        <input type="text" name="user">
+        <input type="text" name="rating">
+        <textarea name="likes"></textarea>
+        <textarea name="improve"></textarea>
+        <input type="text" name="willPay">
+    </form>
+
     <!-- Feedback Modal -->
     <div id="feedbackModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
         <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border border-slate-700 fade-in">
@@ -275,7 +284,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-slate-300 font-medium mb-2">Would you pay $79/month for this service?</label>
+                    <label class="block text-slate-300 font-medium mb-2">Would you pay $49/month for this service?</label>
                     <div class="flex gap-4">
                         <label class="flex items-center gap-2 text-slate-300">
                             <input type="radio" name="willPay" value="yes" class="text-amber-500">
@@ -3088,14 +3097,43 @@ function submitFeedback() {
     const improve = document.getElementById('feedbackImprove').value;
     const willPay = document.querySelector('input[name="willPay"]:checked')?.value;
     
-    trackEvent('beta_feedback', {
-        user: currentUser,
-        rating: feedbackRating,
-        likes, improve, willPay
+    // Submit to Netlify Forms
+    fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            'form-name': 'beta-feedback',
+            'user': currentUser,
+            'rating': feedbackRating,
+            'likes': likes,
+            'improve': improve,
+            'willPay': willPay
+        }).toString()
+    })
+    .then(() => {
+        trackEvent('beta_feedback', {
+            user: currentUser,
+            rating: feedbackRating,
+            likes, improve, willPay
+        });
+        
+        alert('✓ Thank you! Your feedback has been submitted.\n\nWe really appreciate your help improving this tool!');
+        closeFeedback();
+        
+        // Reset form
+        document.getElementById('feedbackLikes').value = '';
+        document.getElementById('feedbackImprove').value = '';
+        document.querySelectorAll('input[name="willPay"]').forEach(r => r.checked = false);
+        feedbackRating = 0;
+        document.querySelectorAll('.rating-btn').forEach(btn => {
+            btn.classList.remove('bg-amber-500');
+            btn.classList.add('bg-slate-700');
+        });
+    })
+    .catch(err => {
+        console.error('Feedback submission error:', err);
+        alert('⚠️ Error submitting feedback. Please try again or email us at info@fitzgeraldhr.com.au');
     });
-    
-    alert('Thank you! Your feedback helps us improve.');
-    closeFeedback();
 }
 
 // ========================================
