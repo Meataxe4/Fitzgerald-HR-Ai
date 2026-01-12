@@ -247,7 +247,8 @@
     </div>
 
 <!-- Hidden Netlify Form for Beta Feedback Collection -->
-    <form name="beta-feedback" method="POST" data-netlify="true" hidden>
+    <form name="beta-feedback" netlify netlify-honeypot="bot-field" hidden>
+        <input type="hidden" name="bot-field" />
         <input type="text" name="user">
         <input type="text" name="rating">
         <textarea name="likes"></textarea>
