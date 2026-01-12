@@ -3138,6 +3138,316 @@ function submitFeedback() {
 }
 
 // ========================================
+// HIGH-RISK DETECTION & WARNING SYSTEM
+// ========================================
+
+/**
+ * Detects high-risk topics in user messages
+ * @param {string} message - User's message
+ * @returns {Object|null} Risk object with type and severity, or null if no risk
+ */
+function detectHighRiskTopic(message) {
+    const lowerMessage = message.toLowerCase();
+    
+    // Define high-risk keywords by category
+    const riskCategories = {
+        termination: {
+            keywords: ['terminate', 'termination', 'fire', 'firing', 'dismiss', 'dismissal', 
+                      'sack', 'sacking', 'let go', 'end employment', 'redundancy', 'redundant'],
+            title: 'Employment Termination',
+            severity: 'critical'
+        },
+        investigation: {
+            keywords: ['investigate', 'investigation', 'allegation', 'complaint', 'misconduct',
+                      'serious misconduct', 'theft', 'harassment', 'bullying', 'discrimination'],
+            title: 'Workplace Investigation',
+            severity: 'critical'
+        },
+        legal: {
+            keywords: ['legal action', 'lawsuit', 'sue', 'suing', 'unfair dismissal', 
+                      'workers comp claim', 'discrimination claim', 'adverse action', 
+                      'general protections', 'fair work complaint'],
+            title: 'Legal Matter',
+            severity: 'critical'
+        },
+        harassment: {
+            keywords: ['sexual harassment', 'harassment', 'hostile workplace', 'inappropriate behavior',
+                      'assault', 'threatening', 'violence', 'abuse'],
+            title: 'Harassment/Safety Issue',
+            severity: 'critical'
+        },
+        performance: {
+            keywords: ['performance manage', 'pip', 'performance improvement', 'final warning',
+                      'written warning', 'underperforming'],
+            title: 'Performance Management',
+            severity: 'high'
+        }
+    };
+    
+    // Check each category
+    for (const [category, config] of Object.entries(riskCategories)) {
+        const hasKeyword = config.keywords.some(keyword => lowerMessage.includes(keyword));
+        if (hasKeyword) {
+            return {
+                category: category,
+                title: config.title,
+                severity: config.severity
+            };
+        }
+    }
+    
+    return null;
+}
+
+/**
+ * Shows high-risk warning modal
+ * @param {Object} risk - Risk object from detectHighRiskTopic
+ */
+function showHighRiskWarning(risk) {
+    const modal = document.createElement('div');
+    modal.id = 'highRiskWarning';
+    modal.className = 'fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-[100]';
+    
+    const severityColors = {
+        critical: 'red-600',
+        high: 'orange-600'
+    };
+    
+    const color = severityColors[risk.severity] || 'red-600';
+    
+    modal.innerHTML = `
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border-4 border-${color} fade-in shadow-2xl">
+            <!-- Alert Header -->
+            <div class="text-center mb-6">
+                <div class="text-6xl mb-4 animate-pulse">⚠️</div>
+                <h2 class="text-3xl font-bold text-${color} mb-2">HIGH-RISK LEGAL MATTER</h2>
+                <p class="text-slate-300 text-lg">${risk.title} Detected</p>
+            </div>
+            
+            <!-- Warning Message -->
+            <div class="bg-${color}/20 border-2 border-${color} rounded-lg p-6 mb-6">
+                <p class="text-white font-bold text-lg mb-3">🚨 STOP: DO NOT PROCEED WITHOUT EXPERT ADVICE</p>
+                <p class="text-slate-200 leading-relaxed">
+                    You are dealing with a <strong>high-risk legal matter</strong> that could result in:
+                </p>
+                <ul class="mt-3 space-y-2 text-slate-200">
+                    <li class="flex items-start gap-2">
+                        <span class="text-${color} font-bold">•</span>
+                        <span>Unfair dismissal claims (up to $100,000+ in compensation)</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-${color} font-bold">•</span>
+                        <span>General protections claims (uncapped compensation)</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-${color} font-bold">•</span>
+                        <span>Discrimination or harassment claims</span>
+                    </li>
+                    <li class="flex items-start gap-2">
+                        <span class="text-${color} font-bold">•</span>
+                        <span>Serious reputational damage to your business</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <!-- Required Actions -->
+            <div class="bg-slate-700/50 rounded-lg p-6 mb-6">
+                <p class="text-amber-400 font-bold text-lg mb-3">📋 REQUIRED IMMEDIATE ACTIONS:</p>
+                <ol class="space-y-2 text-slate-200">
+                    <li class="flex items-start gap-3">
+                        <span class="font-bold text-amber-400">1.</span>
+                        <span><strong>STOP</strong> any action until you speak with a Senior Consultant</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="font-bold text-amber-400">2.</span>
+                        <span><strong>DOCUMENT</strong> everything (dates, witnesses, evidence)</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="font-bold text-amber-400">3.</span>
+                        <span><strong>CONTACT</strong> Fitzgerald HR immediately (details below)</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="font-bold text-amber-400">4.</span>
+                        <span><strong>DO NOT</strong> discuss this matter with the employee yet</span>
+                    </li>
+                </ol>
+            </div>
+            
+            <!-- Contact Information -->
+            <div class="bg-green-500/10 border-2 border-green-500 rounded-lg p-6 mb-6">
+                <p class="text-green-400 font-bold text-xl mb-4 text-center">
+                    📞 CONTACT SENIOR CONSULTANT NOW
+                </p>
+                <div class="space-y-3 text-center">
+                    <div>
+                        <p class="text-slate-400 text-sm">Email (Recommended):</p>
+                        <a href="mailto:info@fitzgeraldhr.com.au?subject=URGENT: ${risk.title} - ${currentUser}" 
+                           class="text-green-400 hover:text-green-300 font-bold text-lg underline">
+                            info@fitzgeraldhr.com.au
+                        </a>
+                    </div>
+                    <div>
+                        <p class="text-slate-400 text-sm">Phone (Urgent Matters):</p>
+                        <a href="tel:+61400211014" 
+                           class="text-green-400 hover:text-green-300 font-bold text-lg">
+                            +61 400 211 014
+                        </a>
+                    </div>
+                </div>
+                <p class="text-slate-400 text-xs text-center mt-4">
+                    Reference: ${currentUser} - ${new Date().toLocaleString('en-AU')}
+                </p>
+            </div>
+            
+            <!-- Disclaimer -->
+            <div class="bg-yellow-500/10 border border-yellow-500 rounded-lg p-4 mb-6">
+                <p class="text-yellow-300 text-sm">
+                    <strong>⚠️ Important:</strong> This AI assistant provides general guidance only. 
+                    For legal matters and high-risk situations, you <strong>MUST</strong> consult with 
+                    a qualified HR professional before taking any action.
+                </p>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex gap-3">
+                <button onclick="contactConsultant('${risk.category}')" 
+                        class="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg transition-all text-lg">
+                    ✉️ Email Consultant Now
+                </button>
+                <button onclick="acknowledgeRiskAndContinue()" 
+                        class="px-6 py-4 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
+                    I Understand
+                </button>
+            </div>
+            
+            <p class="text-center text-slate-500 text-xs mt-4">
+                By continuing, you acknowledge this is general information only and is not legal advice
+            </p>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Track the warning display
+    trackEvent('high_risk_warning_shown', {
+        user: currentUser,
+        category: risk.category,
+        title: risk.title,
+        severity: risk.severity
+    });
+}
+
+/**
+ * Opens email client with pre-filled urgent consultation request
+ */
+function contactConsultant(category) {
+    const subject = encodeURIComponent(`URGENT: ${category} consultation - ${currentUser}`);
+    const body = encodeURIComponent(`Hi Fitzgerald HR Team,
+
+I need urgent advice regarding a ${category} matter.
+
+User ID: ${currentUser}
+Date/Time: ${new Date().toLocaleString('en-AU')}
+Matter Type: ${category}
+
+Brief Description:
+[Please describe your situation here]
+
+I understand this is a high-risk matter and I'm seeking professional guidance before taking any action.
+
+Thank you,
+[Your Name]
+[Your Venue]
+[Your Phone]`);
+    
+    window.location.href = `mailto:info@fitzgeraldhr.com.au?subject=${subject}&body=${body}`;
+    
+    // Close the warning modal
+    closeHighRiskWarning();
+    
+    trackEvent('consultant_contacted', {
+        user: currentUser,
+        category: category,
+        method: 'email'
+    });
+}
+
+/**
+ * Acknowledges risk and allows user to continue (with persistent warning)
+ */
+function acknowledgeRiskAndContinue() {
+    closeHighRiskWarning();
+    
+    // Add persistent warning banner at top of chat
+    addPersistentRiskBanner();
+    
+    trackEvent('high_risk_acknowledged', {
+        user: currentUser
+    });
+}
+
+/**
+ * Closes the high-risk warning modal
+ */
+function closeHighRiskWarning() {
+    const modal = document.getElementById('highRiskWarning');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+/**
+ * Adds a persistent warning banner to chat interface
+ */
+function addPersistentRiskBanner() {
+    // Remove existing banner if present
+    const existing = document.getElementById('persistentRiskBanner');
+    if (existing) return; // Already showing
+    
+    const banner = document.createElement('div');
+    banner.id = 'persistentRiskBanner';
+    banner.className = 'bg-red-600/90 border-b-4 border-red-700 px-6 py-4 sticky top-0 z-50';
+    banner.innerHTML = `
+        <div class="max-w-5xl mx-auto flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">⚠️</span>
+                <div>
+                    <p class="text-white font-bold">HIGH-RISK MATTER IN PROGRESS</p>
+                    <p class="text-red-100 text-sm">This conversation involves legal risk. Contact consultant before taking action.</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <a href="mailto:info@fitzgeraldhr.com.au" 
+                   class="bg-white text-red-600 px-4 py-2 rounded-lg font-bold hover:bg-red-50 transition-all text-sm whitespace-nowrap">
+                    📧 Email Consultant
+                </a>
+                <button onclick="dismissRiskBanner()" 
+                        class="text-white hover:text-red-200 px-2 text-xl">
+                    ×
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Insert after header
+    const header = document.querySelector('#assistantScreen > div:first-child');
+    if (header && header.nextSibling) {
+        header.parentNode.insertBefore(banner, header.nextSibling);
+    }
+}
+
+/**
+ * Dismisses the persistent risk banner (but logs the dismissal)
+ */
+function dismissRiskBanner() {
+    const banner = document.getElementById('persistentRiskBanner');
+    if (banner) {
+        banner.remove();
+        trackEvent('risk_banner_dismissed', { user: currentUser });
+    }
+}
+
+// ========================================
 // ANALYTICS & UTILITIES
 // ========================================
 
