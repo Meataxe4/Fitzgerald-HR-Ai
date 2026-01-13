@@ -108,6 +108,13 @@
                         <span class="text-xl">🚨</span>
                         <span>URGENT</span>
                     </button>
+		<!-- Admin Dashboard Button (hidden by default) -->
+		<button onclick="openAdminDashboard()" 
+        id="adminButton"
+        class="hidden px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg transition-all flex items-center gap-2">
+    			<span>📊</span>
+    			<span>ADMIN</span>
+		</button>
                     
                     <!-- Voice Input Button -->
                     <button onclick="toggleVoiceInput()" 
@@ -158,7 +165,12 @@
             </button>
         </div>
     </div>
-</div>                    
+</div>              
+		<button onclick="showVenueSettings()" 
+        		class="text-slate-400 hover:text-amber-400 text-sm font-medium transition-colors flex items-center gap-1">
+    			<span>⚙️</span>
+    			<span>Settings</span>
+		</button>      
                     <button onclick="showFeedback()" class="text-amber-500 hover:text-amber-400 text-sm font-medium transition-colors">
                         Give Feedback
                     </button>
@@ -1220,6 +1232,312 @@ Be as specific as possible!"></textarea>
 </div>
 
     <script>
+
+<!-- ========================================== -->
+<!-- VENUE ONBOARDING MODAL -->
+<!-- ========================================== -->
+
+<div id="venueOnboardingModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border-2 border-amber-500 fade-in">
+        <div class="text-center mb-6">
+            <div class="text-6xl mb-4">🏨</div>
+            <h2 class="text-3xl font-bold text-amber-500 mb-2">Let's Get to Know Your Venue</h2>
+            <p class="text-slate-300">This helps me give you tailored advice. Takes 2 minutes.</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="mb-6">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-sm text-slate-400">Step <span id="onboardingStep">1</span> of 5</span>
+                <span class="text-sm text-amber-400" id="onboardingProgress">20% Complete</span>
+            </div>
+            <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div id="onboardingProgressBar" class="h-full bg-amber-500 transition-all duration-300" style="width: 20%"></div>
+            </div>
+        </div>
+
+        <!-- Step 1: Venue Type -->
+        <div id="onboardingStepContent" class="space-y-6">
+            <div class="onboarding-step" data-step="1">
+                <h3 class="text-xl font-bold text-white mb-4">What type of venue do you run?</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="saveOnboardingAnswer('venueType', 'restaurant')" class="onboarding-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all">
+                        <div class="text-3xl mb-2">🍽️</div>
+                        <div class="font-semibold">Restaurant</div>
+                    </button>
+                    <button onclick="saveOnboardingAnswer('venueType', 'cafe')" class="onboarding-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all">
+                        <div class="text-3xl mb-2">☕</div>
+                        <div class="font-semibold">Café</div>
+                    </button>
+                    <button onclick="saveOnboardingAnswer('venueType', 'hotel')" class="onboarding-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all">
+                        <div class="text-3xl mb-2">🏨</div>
+                        <div class="font-semibold">Hotel/Pub</div>
+                    </button>
+                    <button onclick="saveOnboardingAnswer('venueType', 'fastfood')" class="onboarding-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all">
+                        <div class="text-3xl mb-2">🍔</div>
+                        <div class="font-semibold">Fast Food</div>
+                    </button>
+                    <button onclick="saveOnboardingAnswer('venueType', 'club')" class="onboarding-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all">
+                        <div class="text-3xl mb-2">🎵</div>
+                        <div class="font-semibold">Club/Bar</div>
+                    </button>
+                    <button onclick="saveOnboardingAnswer('venueType', 'other')" class="onboarding-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all">
+                        <div class="text-3xl mb-2">🏢</div>
+                        <div class="font-semibold">Other</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 2: Location -->
+            <div class="onboarding-step hidden" data-step="2">
+                <h3 class="text-xl font-bold text-white mb-4">Where is your venue located?</h3>
+                <select id="onboardingLocation" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white text-lg mb-4">
+                    <option value="">Select state...</option>
+                    <option value="NSW">New South Wales</option>
+                    <option value="VIC">Victoria</option>
+                    <option value="QLD">Queensland</option>
+                    <option value="SA">South Australia</option>
+                    <option value="WA">Western Australia</option>
+                    <option value="TAS">Tasmania</option>
+                    <option value="NT">Northern Territory</option>
+                    <option value="ACT">Australian Capital Territory</option>
+                </select>
+                <input type="text" id="onboardingCity" placeholder="City/Suburb (e.g., Sydney CBD)" 
+                       class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 mb-4">
+                <button onclick="saveOnboardingLocation()" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+                    Next →
+                </button>
+            </div>
+
+            <!-- Step 3: Staff Count -->
+            <div class="onboarding-step hidden" data-step="3">
+                <h3 class="text-xl font-bold text-white mb-4">How many staff do you have?</h3>
+                <div class="grid grid-cols-2 gap-3">
+                    <button onclick="saveOnboardingAnswer('staffCount', '1-5')" class="onboarding-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all">
+                        <div class="text-3xl mb-2">👤</div>
+                        <div class="font-semibold">1-5 staff</div>
+                        <div class="text-xs opacity-70">Small team</div>
+                    </button>
+                    <button onclick="saveOnboardingAnswer('staffCount', '6-15')" class="onboarding-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all">
+                        <div class="text-3xl mb-2">👥</div>
+                        <div class="font-semibold">6-15 staff</div>
+                        <div class="text-xs opacity-70">Medium team</div>
+                    </button>
+                    <button onclick="saveOnboardingAnswer('staffCount', '16-30')" class="onboarding-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all">
+                        <div class="text-3xl mb-2">👨‍👩‍👧‍👦</div>
+                        <div class="font-semibold">16-30 staff</div>
+                        <div class="text-xs opacity-70">Large team</div>
+                    </button>
+                    <button onclick="saveOnboardingAnswer('staffCount', '30+')" class="onboarding-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all">
+                        <div class="text-3xl mb-2">🏢</div>
+                        <div class="font-semibold">30+ staff</div>
+                        <div class="text-xs opacity-70">Enterprise</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 4: Primary Award -->
+            <div class="onboarding-step hidden" data-step="4">
+                <h3 class="text-xl font-bold text-white mb-4">Which award covers most of your staff?</h3>
+                <div class="space-y-3">
+                    <button onclick="saveOnboardingAnswer('primaryAward', 'Hospitality Industry (General) Award')" 
+                            class="onboarding-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+                        <div class="font-semibold">Hospitality Industry (General) Award</div>
+                        <div class="text-xs opacity-70">Restaurants, cafés, hotels, pubs</div>
+                    </button>
+                    <button onclick="saveOnboardingAnswer('primaryAward', 'Fast Food Industry Award')" 
+                            class="onboarding-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+                        <div class="font-semibold">Fast Food Industry Award</div>
+                        <div class="text-xs opacity-70">QSR, takeaway, delivery</div>
+                    </button>
+                    <button onclick="saveOnboardingAnswer('primaryAward', 'Registered and Licensed Clubs Award')" 
+                            class="onboarding-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+                        <div class="font-semibold">Registered and Licensed Clubs Award</div>
+                        <div class="text-xs opacity-70">RSL, sporting clubs, social clubs</div>
+                    </button>
+                    <button onclick="saveOnboardingAnswer('primaryAward', 'Not sure')" 
+                            class="onboarding-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+                        <div class="font-semibold">🤷 Not sure</div>
+                        <div class="text-xs opacity-70">I'll help you figure this out</div>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 5: Main Challenge -->
+            <div class="onboarding-step hidden" data-step="5">
+                <h3 class="text-xl font-bold text-white mb-4">What's your biggest HR challenge right now?</h3>
+                <div class="space-y-2">
+                    <button onclick="saveOnboardingAnswer('mainChallenge', 'rostering', true)" 
+                            class="onboarding-option w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+                        <div class="font-semibold">📅 Rostering & compliance</div>
+                    </button>
+                    <button onclick="saveOnboardingAnswer('mainChallenge', 'awards', true)" 
+                            class="onboarding-option w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+                        <div class="font-semibold">💰 Understanding award rates</div>
+                    </button>
+                    <button onclick="saveOnboardingAnswer('mainChallenge', 'performance', true)" 
+                            class="onboarding-option w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+                        <div class="font-semibold">📊 Performance management</div>
+                    </button>
+                    <button onclick="saveOnboardingAnswer('mainChallenge', 'hiring', true)" 
+                            class="onboarding-option w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+                        <div class="font-semibold">🤝 Hiring & onboarding</div>
+                    </button>
+                    <button onclick="saveOnboardingAnswer('mainChallenge', 'termination', true)" 
+                            class="onboarding-option w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+                        <div class="font-semibold">⚖️ Terminations & disputes</div>
+                    </button>
+                    <button onclick="saveOnboardingAnswer('mainChallenge', 'general', true)" 
+                            class="onboarding-option w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+                        <div class="font-semibold">📚 General compliance</div>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Skip Button -->
+        <button onclick="skipOnboarding()" class="mt-4 text-slate-400 hover:text-white text-sm transition-colors">
+            Skip for now →
+        </button>
+    </div>
+</div>
+
+<!-- Venue Settings Modal -->
+<div id="venueSettingsModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                    <span>⚙️</span> Venue Settings
+                </h2>
+                <p class="text-slate-400 text-sm">Update your venue information</p>
+            </div>
+            <button onclick="closeVenueSettings()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+
+        <div id="venueSettingsContent" class="space-y-4">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
+        <div class="flex gap-3 mt-6">
+            <button onclick="saveVenueSettings()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+                💾 Save Changes
+            </button>
+            <button onclick="closeVenueSettings()" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- ADMIN DASHBOARD -->
+<!-- ========================================== -->
+
+<div id="adminDashboard" class="hidden min-h-screen bg-slate-900">
+    <!-- Admin Header -->
+    <div class="bg-slate-800 border-b border-slate-700 px-6 py-4">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl font-bold text-amber-500">📊 Fitzgerald HR - Admin Dashboard</h1>
+                <p class="text-slate-400 text-sm">User analytics & conversation insights</p>
+            </div>
+            <button onclick="closeAdminDashboard()" 
+                    class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
+                ← Back to Chat
+            </button>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto p-6">
+        <!-- Overview Stats -->
+        <div class="grid grid-cols-4 gap-4 mb-6">
+            <div class="bg-slate-800 border border-slate-700 rounded-lg p-6">
+                <div class="text-slate-400 text-sm mb-1">Total Users</div>
+                <div class="text-3xl font-bold text-white" id="statsTotalUsers">-</div>
+            </div>
+            <div class="bg-slate-800 border border-slate-700 rounded-lg p-6">
+                <div class="text-slate-400 text-sm mb-1">Conversations</div>
+                <div class="text-3xl font-bold text-white" id="statsConversations">-</div>
+            </div>
+            <div class="bg-slate-800 border border-slate-700 rounded-lg p-6">
+                <div class="text-slate-400 text-sm mb-1">Avg Questions/User</div>
+                <div class="text-3xl font-bold text-white" id="statsAvgQuestions">-</div>
+            </div>
+            <div class="bg-slate-800 border border-slate-700 rounded-lg p-6">
+                <div class="text-slate-400 text-sm mb-1">High-Risk Warnings</div>
+                <div class="text-3xl font-bold text-red-400" id="statsWarnings">-</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="bg-slate-800 border border-slate-700 rounded-lg mb-6">
+            <div class="flex border-b border-slate-700">
+                <button onclick="showAdminTab('overview')" 
+                        class="admin-tab px-6 py-3 font-semibold text-amber-500 border-b-2 border-amber-500"
+                        data-tab="overview">
+                    Overview
+                </button>
+                <button onclick="showAdminTab('themes')" 
+                        class="admin-tab px-6 py-3 font-semibold text-slate-400 hover:text-white"
+                        data-tab="themes">
+                    Top Themes
+                </button>
+                <button onclick="showAdminTab('conversations')" 
+                        class="admin-tab px-6 py-3 font-semibold text-slate-400 hover:text-white"
+                        data-tab="conversations">
+                    Conversations
+                </button>
+                <button onclick="showAdminTab('users')" 
+                        class="admin-tab px-6 py-3 font-semibold text-slate-400 hover:text-white"
+                        data-tab="users">
+                    Users
+                </button>
+                <button onclick="showAdminTab('risks')" 
+                        class="admin-tab px-6 py-3 font-semibold text-slate-400 hover:text-white"
+                        data-tab="risks">
+                    🚨 High Risk
+                </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="p-6">
+                <!-- Overview Tab -->
+                <div id="tabOverview" class="admin-tab-content">
+                    <div id="overviewContent">Loading...</div>
+                </div>
+
+                <!-- Themes Tab -->
+                <div id="tabThemes" class="admin-tab-content hidden">
+                    <div id="themesContent">Loading...</div>
+                </div>
+
+                <!-- Conversations Tab -->
+                <div id="tabConversations" class="admin-tab-content hidden">
+                    <div class="mb-4">
+                        <input type="text" id="searchConversations" 
+                               placeholder="Search conversations..." 
+                               class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white"
+                               oninput="filterConversations()">
+                    </div>
+                    <div id="conversationsContent">Loading...</div>
+                </div>
+
+                <!-- Users Tab -->
+                <div id="tabUsers" class="admin-tab-content hidden">
+                    <div id="usersContent">Loading...</div>
+                </div>
+
+                <!-- High Risk Tab -->
+                <div id="tabRisks" class="admin-tab-content hidden">
+                    <div id="risksContent">Loading...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 // ========================================
 // CONFIGURATION & GLOBALS
 // ========================================
@@ -2048,18 +2366,341 @@ const hrTemplates = {
  * Shows error message if code is invalid
  * @returns {void}
  */
+
+// ========================================
+// VENUE MEMORY SYSTEM
+// ========================================
+
+// Global venue profile storage
+let venueProfile = {
+    venueType: null,
+    location: null,
+    city: null,
+    staffCount: null,
+    primaryAward: null,
+    mainChallenge: null,
+    setupComplete: false,
+    setupDate: null,
+    venueName: null // Optional - can ask later
+};
+
+let onboardingCurrentStep = 1;
+const ONBOARDING_STEPS = 5;
+
+/**
+ * Check if user needs onboarding
+ */
+function checkOnboardingStatus() {
+    // Check localStorage for existing profile
+    const savedProfile = localStorage.getItem('venueProfile_' + currentUser);
+    
+    if (savedProfile) {
+        venueProfile = JSON.parse(savedProfile);
+        console.log('✅ Venue profile loaded:', venueProfile);
+        return venueProfile.setupComplete;
+    }
+    
+    return false;
+}
+
+/**
+ * Show onboarding modal for new users
+ */
+function showOnboarding() {
+    document.getElementById('venueOnboardingModal').classList.remove('hidden');
+    updateOnboardingStep();
+}
+
+/**
+ * Save onboarding answer and move to next step
+ */
+function saveOnboardingAnswer(field, value, isLastStep = false) {
+    venueProfile[field] = value;
+    console.log('Saved:', field, '=', value);
+    
+    if (isLastStep) {
+        completeOnboarding();
+    } else {
+        onboardingCurrentStep++;
+        updateOnboardingStep();
+    }
+}
+
+/**
+ * Save location (has multiple inputs)
+ */
+function saveOnboardingLocation() {
+    const location = document.getElementById('onboardingLocation').value;
+    const city = document.getElementById('onboardingCity').value.trim();
+    
+    if (!location) {
+        alert('Please select a state');
+        return;
+    }
+    
+    venueProfile.location = location;
+    venueProfile.city = city || '';
+    
+    onboardingCurrentStep++;
+    updateOnboardingStep();
+}
+
+/**
+ * Update onboarding UI for current step
+ */
+function updateOnboardingStep() {
+    // Hide all steps
+    document.querySelectorAll('.onboarding-step').forEach(step => {
+        step.classList.add('hidden');
+    });
+    
+    // Show current step
+    const currentStepEl = document.querySelector(`[data-step="${onboardingCurrentStep}"]`);
+    if (currentStepEl) {
+        currentStepEl.classList.remove('hidden');
+    }
+    
+    // Update progress
+    document.getElementById('onboardingStep').textContent = onboardingCurrentStep;
+    const progress = (onboardingCurrentStep / ONBOARDING_STEPS) * 100;
+    document.getElementById('onboardingProgress').textContent = `${progress}% Complete`;
+    document.getElementById('onboardingProgressBar').style.width = `${progress}%`;
+}
+
+/**
+ * Complete onboarding
+ */
+function completeOnboarding() {
+    venueProfile.setupComplete = true;
+    venueProfile.setupDate = new Date().toISOString();
+    
+    // Save to localStorage
+    localStorage.setItem('venueProfile_' + currentUser, JSON.stringify(venueProfile));
+    
+    // Save to backend (if you have one)
+    saveVenueProfileToBackend(venueProfile);
+    
+    // Close modal
+    document.getElementById('venueOnboardingModal').classList.add('hidden');
+    
+    // Show success message
+    addMessage('assistant', `✅ **Great! I've got your venue details saved.**
+
+I now know you run a **${getVenueTypeLabel(venueProfile.venueType)}** in **${venueProfile.city || venueProfile.location}** with **${venueProfile.staffCount}** staff under the **${venueProfile.primaryAward}**.
+
+All my advice will now be tailored specifically for your venue. You can update these details anytime by clicking the ⚙️ Settings button in the top menu.
+
+What can I help you with today?`);
+    
+    trackEvent('onboarding_completed', venueProfile);
+}
+
+/**
+ * Skip onboarding (user can do it later)
+ */
+function skipOnboarding() {
+    if (confirm('You can always complete this later in Settings. Skip for now?')) {
+        document.getElementById('venueOnboardingModal').classList.add('hidden');
+        
+        addMessage('assistant', 'No worries! You can tell me about your venue anytime by clicking the ⚙️ Settings button. What can I help you with today?');
+        
+        trackEvent('onboarding_skipped', { user: currentUser });
+    }
+}
+
+/**
+ * Get human-readable venue type label
+ */
+function getVenueTypeLabel(type) {
+    const labels = {
+        'restaurant': 'restaurant',
+        'cafe': 'café',
+        'hotel': 'hotel/pub',
+        'fastfood': 'fast food venue',
+        'club': 'club/bar',
+        'other': 'hospitality venue'
+    };
+    return labels[type] || type;
+}
+
+/**
+ * Save venue profile to backend
+ */
+async function saveVenueProfileToBackend(profile) {
+    try {
+        // This would connect to your Netlify function
+        const response = await fetch('/.netlify/functions/save-venue-profile', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: currentUser,
+                profile: profile
+            })
+        });
+        
+        if (response.ok) {
+            console.log('✅ Venue profile saved to backend');
+        }
+    } catch (error) {
+        console.error('⚠️ Could not save to backend:', error);
+        // Still works with localStorage
+    }
+}
+
+/**
+ * Show venue settings modal
+ */
+function showVenueSettings() {
+    const modal = document.getElementById('venueSettingsModal');
+    const content = document.getElementById('venueSettingsContent');
+    
+    // Build settings form
+    content.innerHTML = `
+        <div class="space-y-4">
+            <div>
+                <label class="block text-slate-300 text-sm mb-2">Venue Name (Optional)</label>
+                <input type="text" id="settingsVenueName" value="${venueProfile.venueName || ''}" 
+                       placeholder="e.g., Joe's Bistro"
+                       class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+            </div>
+            
+            <div>
+                <label class="block text-slate-300 text-sm mb-2">Venue Type</label>
+                <select id="settingsVenueType" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                    <option value="restaurant" ${venueProfile.venueType === 'restaurant' ? 'selected' : ''}>Restaurant</option>
+                    <option value="cafe" ${venueProfile.venueType === 'cafe' ? 'selected' : ''}>Café</option>
+                    <option value="hotel" ${venueProfile.venueType === 'hotel' ? 'selected' : ''}>Hotel/Pub</option>
+                    <option value="fastfood" ${venueProfile.venueType === 'fastfood' ? 'selected' : ''}>Fast Food</option>
+                    <option value="club" ${venueProfile.venueType === 'club' ? 'selected' : ''}>Club/Bar</option>
+                    <option value="other" ${venueProfile.venueType === 'other' ? 'selected' : ''}>Other</option>
+                </select>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-slate-300 text-sm mb-2">State</label>
+                    <select id="settingsLocation" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                        <option value="NSW" ${venueProfile.location === 'NSW' ? 'selected' : ''}>NSW</option>
+                        <option value="VIC" ${venueProfile.location === 'VIC' ? 'selected' : ''}>VIC</option>
+                        <option value="QLD" ${venueProfile.location === 'QLD' ? 'selected' : ''}>QLD</option>
+                        <option value="SA" ${venueProfile.location === 'SA' ? 'selected' : ''}>SA</option>
+                        <option value="WA" ${venueProfile.location === 'WA' ? 'selected' : ''}>WA</option>
+                        <option value="TAS" ${venueProfile.location === 'TAS' ? 'selected' : ''}>TAS</option>
+                        <option value="NT" ${venueProfile.location === 'NT' ? 'selected' : ''}>NT</option>
+                        <option value="ACT" ${venueProfile.location === 'ACT' ? 'selected' : ''}>ACT</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-300 text-sm mb-2">City/Suburb</label>
+                    <input type="text" id="settingsCity" value="${venueProfile.city || ''}" 
+                           class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-slate-300 text-sm mb-2">Staff Count</label>
+                <select id="settingsStaffCount" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                    <option value="1-5" ${venueProfile.staffCount === '1-5' ? 'selected' : ''}>1-5 staff</option>
+                    <option value="6-15" ${venueProfile.staffCount === '6-15' ? 'selected' : ''}>6-15 staff</option>
+                    <option value="16-30" ${venueProfile.staffCount === '16-30' ? 'selected' : ''}>16-30 staff</option>
+                    <option value="30+" ${venueProfile.staffCount === '30+' ? 'selected' : ''}>30+ staff</option>
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-slate-300 text-sm mb-2">Primary Award</label>
+                <select id="settingsPrimaryAward" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                    <option value="Hospitality Industry (General) Award" ${venueProfile.primaryAward === 'Hospitality Industry (General) Award' ? 'selected' : ''}>Hospitality Industry Award</option>
+                    <option value="Fast Food Industry Award" ${venueProfile.primaryAward === 'Fast Food Industry Award' ? 'selected' : ''}>Fast Food Industry Award</option>
+                    <option value="Registered and Licensed Clubs Award" ${venueProfile.primaryAward === 'Registered and Licensed Clubs Award' ? 'selected' : ''}>Clubs Award</option>
+                    <option value="Not sure" ${venueProfile.primaryAward === 'Not sure' ? 'selected' : ''}>Not sure</option>
+                </select>
+            </div>
+        </div>
+    `;
+    
+    modal.classList.remove('hidden');
+}
+
+/**
+ * Save venue settings
+ */
+function saveVenueSettings() {
+    venueProfile.venueName = document.getElementById('settingsVenueName').value.trim();
+    venueProfile.venueType = document.getElementById('settingsVenueType').value;
+    venueProfile.location = document.getElementById('settingsLocation').value;
+    venueProfile.city = document.getElementById('settingsCity').value.trim();
+    venueProfile.staffCount = document.getElementById('settingsStaffCount').value;
+    venueProfile.primaryAward = document.getElementById('settingsPrimaryAward').value;
+    
+    // Save to localStorage
+    localStorage.setItem('venueProfile_' + currentUser, JSON.stringify(venueProfile));
+    
+    // Save to backend
+    saveVenueProfileToBackend(venueProfile);
+    
+    closeVenueSettings();
+    
+    alert('✅ Venue settings saved!');
+    trackEvent('venue_settings_updated', venueProfile);
+}
+
+/**
+ * Close venue settings modal
+ */
+function closeVenueSettings() {
+    document.getElementById('venueSettingsModal').classList.add('hidden');
+}
+
+/**
+ * Get venue context for AI prompts
+ */
+function getVenueContext() {
+    if (!venueProfile.setupComplete) {
+        return '';
+    }
+    
+    const venueName = venueProfile.venueName ? `"${venueProfile.venueName}" - a ` : '';
+    
+    return `
+VENUE CONTEXT (provide tailored advice based on this):
+- Venue: ${venueName}${getVenueTypeLabel(venueProfile.venueType)} in ${venueProfile.city || ''} ${venueProfile.location}
+- Staff: ${venueProfile.staffCount}
+- Award: ${venueProfile.primaryAward}
+- Main concern: ${venueProfile.mainChallenge}
+
+When providing advice, reference their specific venue type and location where relevant.
+`;
+}
+
 function checkAccess() {
     const input = document.getElementById('accessCodeInput').value.trim().toUpperCase();
-const error = document.getElementById('accessError');
-// Note: These elements not cached as they're only used once at login
+    const error = document.getElementById('accessError');
     
     if (CONFIG.VALID_CODES.includes(input)) {
         currentUser = input;
         document.getElementById('userCode').textContent = input;
-	DOM.accessScreen.classList.add('hidden');
-	DOM.assistantScreen.classList.remove('hidden');
+        DOM.accessScreen.classList.add('hidden');
+        DOM.assistantScreen.classList.remove('hidden');
         error.classList.add('hidden');
         trackEvent('beta_access', { code: input });
+	// Show admin button for admin codes
+	if (['FITZGERALD-TEST', 'DEMO-2025'].includes(input)) {
+    	document.getElementById('adminButton').classList.remove('hidden');
+	}
+        
+        // CHECK IF USER NEEDS ONBOARDING
+        const hasCompletedOnboarding = checkOnboardingStatus();
+        if (!hasCompletedOnboarding) {
+            // Show onboarding after 1 second
+            setTimeout(() => {
+                showOnboarding();
+            }, 1000);
+        } else {
+            // Welcome back message
+            const venueName = venueProfile.venueName || 'your venue';
+            addMessage('assistant', `👋 Welcome back! I remember you run ${venueName} (${getVenueTypeLabel(venueProfile.venueType)}) in ${venueProfile.city || venueProfile.location}. What can I help you with today?`);
+        }
     } else {
         error.textContent = 'Invalid access code. Please check and try again.';
         error.classList.remove('hidden');
@@ -2070,6 +2711,457 @@ function logout() {
     if (confirm('Are you sure you want to logout?')) {
         location.reload();
     }
+}
+
+// ========================================
+// ADMIN DASHBOARD
+// ========================================
+
+/**
+ * Open admin dashboard
+ */
+function openAdminDashboard() {
+    // Hide main chat
+    DOM.assistantScreen.classList.add('hidden');
+    
+    // Show admin dashboard
+    document.getElementById('adminDashboard').classList.remove('hidden');
+    
+    // Load dashboard data
+    loadAdminDashboard();
+}
+
+/**
+ * Close admin dashboard
+ */
+function closeAdminDashboard() {
+    document.getElementById('adminDashboard').classList.add('hidden');
+    DOM.assistantScreen.classList.remove('hidden');
+}
+
+/**
+ * Load all admin dashboard data
+ */
+function loadAdminDashboard() {
+    const conversationsLog = JSON.parse(localStorage.getItem('conversationsLog') || '[]');
+    const analyticsLog = JSON.parse(localStorage.getItem('analyticsLog') || '[]');
+    const themesLog = JSON.parse(localStorage.getItem('themesLog') || '{}');
+    
+    // Calculate stats
+    const uniqueUsers = [...new Set(conversationsLog.map(c => c.userId))];
+    const totalConversations = conversationsLog.length;
+    const avgQuestions = totalConversations > 0 ? (totalConversations / uniqueUsers.length).toFixed(1) : 0;
+    const highRiskCount = conversationsLog.filter(c => c.riskDetected).length;
+    
+    // Update stats
+    document.getElementById('statsTotal Users').textContent = uniqueUsers.length;
+    document.getElementById('statsConversations').textContent = totalConversations;
+    document.getElementById('statsAvgQuestions').textContent = avgQuestions;
+    document.getElementById('statsWarnings').textContent = highRiskCount;
+    
+    // Load tab content
+    loadOverviewTab(conversationsLog, analyticsLog, themesLog);
+    loadThemesTab(themesLog, conversationsLog);
+    loadConversationsTab(conversationsLog);
+    loadUsersTab(conversationsLog);
+    loadRisksTab(conversationsLog);
+}
+
+/**
+ * Show specific admin tab
+ */
+function showAdminTab(tabName) {
+    // Update tab buttons
+    document.querySelectorAll('.admin-tab').forEach(btn => {
+        btn.classList.remove('text-amber-500', 'border-b-2', 'border-amber-500');
+        btn.classList.add('text-slate-400');
+    });
+    
+    const activeBtn = document.querySelector(`[data-tab="${tabName}"]`);
+    if (activeBtn) {
+        activeBtn.classList.remove('text-slate-400');
+        activeBtn.classList.add('text-amber-500', 'border-b-2', 'border-amber-500');
+    }
+    
+    // Show tab content
+    document.querySelectorAll('.admin-tab-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+    
+    const tabMap = {
+        'overview': 'tabOverview',
+        'themes': 'tabThemes',
+        'conversations': 'tabConversations',
+        'users': 'tabUsers',
+        'risks': 'tabRisks'
+    };
+    
+    const contentId = tabMap[tabName];
+    if (contentId) {
+        document.getElementById(contentId).classList.remove('hidden');
+    }
+}
+
+/**
+ * Load Overview Tab
+ */
+function loadOverviewTab(conversations, analytics, themes) {
+    const last7Days = conversations.filter(c => {
+        const date = new Date(c.timestamp);
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return date > weekAgo;
+    });
+    
+    let html = `
+        <div class="space-y-6">
+            <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-4">
+                <h3 class="text-blue-400 font-bold mb-3">📈 Last 7 Days</h3>
+                <div class="grid grid-cols-3 gap-4 text-sm">
+                    <div>
+                        <div class="text-slate-400">New Conversations</div>
+                        <div class="text-2xl font-bold text-white">${last7Days.length}</div>
+                    </div>
+                    <div>
+                        <div class="text-slate-400">Unique Users</div>
+                        <div class="text-2xl font-bold text-white">${[...new Set(last7Days.map(c => c.userId))].length}</div>
+                    </div>
+                    <div>
+                        <div class="text-slate-400">High-Risk Flags</div>
+                        <div class="text-2xl font-bold text-red-400">${last7Days.filter(c => c.riskDetected).length}</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <h3 class="text-white font-bold mb-3">🔥 Most Active Users (Last 7 Days)</h3>
+                ${getMostActiveUsers(last7Days)}
+            </div>
+            
+            <div>
+                <h3 class="text-white font-bold mb-3">⏰ Recent Activity</h3>
+                ${getRecentActivity(conversations.slice(-10).reverse())}
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('overviewContent').innerHTML = html;
+}
+
+/**
+ * Get most active users
+ */
+function getMostActiveUsers(conversations) {
+    const userCounts = {};
+    conversations.forEach(c => {
+        userCounts[c.userId] = (userCounts[c.userId] || 0) + 1;
+    });
+    
+    const sorted = Object.entries(userCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+    
+    if (sorted.length === 0) {
+        return '<p class="text-slate-400 text-sm">No activity in last 7 days</p>';
+    }
+    
+    return sorted.map(([userId, count]) => `
+        <div class="flex items-center justify-between py-2 border-b border-slate-700">
+            <span class="text-slate-300">${userId}</span>
+            <span class="text-amber-400 font-bold">${count} questions</span>
+        </div>
+    `).join('');
+}
+
+/**
+ * Get recent activity
+ */
+function getRecentActivity(conversations) {
+    if (conversations.length === 0) {
+        return '<p class="text-slate-400 text-sm">No recent activity</p>';
+    }
+    
+    return conversations.map(c => {
+        const date = new Date(c.timestamp);
+        const timeAgo = getTimeAgo(date);
+        const preview = c.userMessage.substring(0, 60) + (c.userMessage.length > 60 ? '...' : '');
+        const riskBadge = c.riskDetected ? '<span class="text-red-400 text-xs">🚨 HIGH RISK</span>' : '';
+        
+        return `
+            <div class="bg-slate-700/50 rounded-lg p-3 mb-2">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="text-slate-400 text-xs">${c.userId} • ${timeAgo}</span>
+                    ${riskBadge}
+                </div>
+                <p class="text-slate-200 text-sm">${preview}</p>
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * Load Themes Tab
+ */
+function loadThemesTab(themes, conversations) {
+    const themeLabels = {
+        'casual_conversion': 'Casual Conversion',
+        'sunday_penalty': 'Sunday Penalty Rates',
+        'meal_breaks': 'Meal Breaks',
+        'termination': 'Termination',
+        'performance': 'Performance Management',
+        'award_rates': 'Award Rates',
+        'rostering': 'Rostering',
+        'harassment': 'Harassment',
+        'hiring': 'Hiring',
+        'leave': 'Leave'
+    };
+    
+    const sorted = Object.entries(themes)
+        .sort((a, b) => b[1] - a[1]);
+    
+    if (sorted.length === 0) {
+        document.getElementById('themesContent').innerHTML = '<p class="text-slate-400">No themes detected yet</p>';
+        return;
+    }
+    
+    const total = sorted.reduce((sum, [_, count]) => sum + count, 0);
+    
+    let html = `
+        <div class="space-y-4">
+            <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-4 mb-4">
+                <h3 class="text-amber-400 font-bold mb-2">📊 Theme Analysis</h3>
+                <p class="text-slate-300 text-sm">Total questions analyzed: ${total}</p>
+            </div>
+            
+            <div class="space-y-2">
+                ${sorted.map(([theme, count], index) => {
+                    const percentage = ((count / total) * 100).toFixed(1);
+                    const label = themeLabels[theme] || theme;
+                    
+                    return `
+                        <div class="bg-slate-700/50 rounded-lg p-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-2xl font-bold text-amber-500">#${index + 1}</span>
+                                    <span class="text-white font-semibold">${label}</span>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-amber-400 font-bold">${count} times</div>
+                                    <div class="text-slate-400 text-xs">${percentage}%</div>
+                                </div>
+                            </div>
+                            <div class="w-full bg-slate-600 rounded-full h-2">
+                                <div class="bg-amber-500 h-2 rounded-full" style="width: ${percentage}%"></div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+            
+            <button onclick="exportThemes()" 
+                    class="w-full mt-4 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-lg transition-all">
+                📥 Export Theme Data
+            </button>
+        </div>
+    `;
+    
+    document.getElementById('themesContent').innerHTML = html;
+}
+
+/**
+ * Load Conversations Tab
+ */
+function loadConversationsTab(conversations) {
+    if (conversations.length === 0) {
+        document.getElementById('conversationsContent').innerHTML = '<p class="text-slate-400">No conversations yet</p>';
+        return;
+    }
+    
+    const html = conversations.slice().reverse().map(c => {
+        const date = new Date(c.timestamp);
+        const timeAgo = getTimeAgo(date);
+        const riskBadge = c.riskDetected 
+            ? `<span class="bg-red-500 text-white text-xs px-2 py-1 rounded">🚨 ${c.riskCategory || 'HIGH RISK'}</span>` 
+            : '';
+        
+        return `
+            <div class="bg-slate-700/50 rounded-lg p-4 mb-3 conversation-item" data-user="${c.userId}" data-message="${c.userMessage.toLowerCase()}">
+                <div class="flex items-center justify-between mb-2">
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-400 text-sm">${c.userId}</span>
+                        <span class="text-slate-500 text-xs">•</span>
+                        <span class="text-slate-500 text-xs">${timeAgo}</span>
+                    </div>
+                    ${riskBadge}
+                </div>
+                <div class="mb-2">
+                    <div class="text-amber-400 text-xs mb-1">USER:</div>
+                    <div class="text-slate-200 text-sm">${c.userMessage}</div>
+                </div>
+                <div>
+                    <div class="text-blue-400 text-xs mb-1">AI RESPONSE:</div>
+                    <div class="text-slate-300 text-sm">${c.aiResponse.substring(0, 200)}${c.aiResponse.length > 200 ? '...' : ''}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    document.getElementById('conversationsContent').innerHTML = html;
+}
+
+/**
+ * Filter conversations by search
+ */
+function filterConversations() {
+    const searchTerm = document.getElementById('searchConversations').value.toLowerCase();
+    const items = document.querySelectorAll('.conversation-item');
+    
+    items.forEach(item => {
+        const message = item.getAttribute('data-message');
+        const userId = item.getAttribute('data-user').toLowerCase();
+        
+        if (message.includes(searchTerm) || userId.includes(searchTerm)) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+/**
+ * Load Users Tab
+ */
+function loadUsersTab(conversations) {
+    const userStats = {};
+    
+    conversations.forEach(c => {
+        if (!userStats[c.userId]) {
+            userStats[c.userId] = {
+                totalQuestions: 0,
+                highRiskCount: 0,
+                venueType: c.venueProfile?.type || 'Unknown',
+                location: c.venueProfile?.location || 'Unknown',
+                lastActive: c.timestamp
+            };
+        }
+        
+        userStats[c.userId].totalQuestions++;
+        if (c.riskDetected) userStats[c.userId].highRiskCount++;
+        
+        if (new Date(c.timestamp) > new Date(userStats[c.userId].lastActive)) {
+            userStats[c.userId].lastActive = c.timestamp;
+        }
+    });
+    
+    const sorted = Object.entries(userStats)
+        .sort((a, b) => b[1].totalQuestions - a[1].totalQuestions);
+    
+    if (sorted.length === 0) {
+        document.getElementById('usersContent').innerHTML = '<p class="text-slate-400">No users yet</p>';
+        return;
+    }
+    
+    const html = sorted.map(([userId, stats]) => {
+        const lastActive = getTimeAgo(new Date(stats.lastActive));
+        
+        return `
+            <div class="bg-slate-700/50 rounded-lg p-4 mb-3">
+                <div class="flex items-center justify-between mb-3">
+                    <div>
+                        <div class="text-white font-bold">${userId}</div>
+                        <div class="text-slate-400 text-xs">${stats.venueType} • ${stats.location}</div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-amber-400 font-bold">${stats.totalQuestions} questions</div>
+                        <div class="text-slate-500 text-xs">Last active: ${lastActive}</div>
+                    </div>
+                </div>
+                ${stats.highRiskCount > 0 ? `
+                    <div class="bg-red-500/10 border border-red-500 rounded px-3 py-1 text-xs text-red-400">
+                        🚨 ${stats.highRiskCount} high-risk conversation${stats.highRiskCount > 1 ? 's' : ''}
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    }).join('');
+    
+    document.getElementById('usersContent').innerHTML = html;
+}
+
+/**
+ * Load High Risk Tab
+ */
+function loadRisksTab(conversations) {
+    const highRisk = conversations.filter(c => c.riskDetected);
+    
+    if (highRisk.length === 0) {
+        document.getElementById('risksContent').innerHTML = `
+            <div class="bg-green-500/10 border border-green-500 rounded-lg p-6 text-center">
+                <div class="text-4xl mb-2">✅</div>
+                <p class="text-green-400 font-bold">No high-risk conversations detected</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const html = highRisk.slice().reverse().map(c => {
+        const date = new Date(c.timestamp);
+        const timeAgo = getTimeAgo(date);
+        
+        return `
+            <div class="bg-red-500/10 border-2 border-red-500 rounded-lg p-4 mb-3">
+                <div class="flex items-center justify-between mb-2">
+                    <div>
+                        <span class="text-red-400 font-bold">🚨 ${c.riskCategory?.toUpperCase() || 'HIGH RISK'}</span>
+                        <span class="text-slate-500 text-xs ml-2">•</span>
+                        <span class="text-slate-400 text-xs ml-2">${c.userId}</span>
+                    </div>
+                    <span class="text-slate-500 text-xs">${timeAgo}</span>
+                </div>
+                <div class="bg-slate-800 rounded p-3">
+                    <div class="text-slate-200 text-sm mb-2">${c.userMessage}</div>
+                    <div class="text-slate-400 text-xs">Response: ${c.aiResponse.substring(0, 100)}...</div>
+                </div>
+                <div class="mt-2 flex gap-2">
+                    <button class="text-xs bg-green-600 hover:bg-green-700 px-3 py-1 rounded text-white">
+                        ✉️ Email User
+                    </button>
+                    <button class="text-xs bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-white">
+                        📋 Export
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    document.getElementById('risksContent').innerHTML = html;
+}
+
+/**
+ * Get time ago string
+ */
+function getTimeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    
+    if (seconds < 60) return 'just now';
+    if (seconds < 3600) return Math.floor(seconds / 60) + ' mins ago';
+    if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ago';
+    return Math.floor(seconds / 86400) + ' days ago';
+}
+
+/**
+ * Export themes data
+ */
+function exportThemes() {
+    const themes = JSON.parse(localStorage.getItem('themesLog') || '{}');
+    const csv = 'Theme,Count\n' + Object.entries(themes).map(([theme, count]) => `${theme},${count}`).join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `themes_${Date.now()}.csv`;
+    a.click();
 }
 
 // ========================================
@@ -2086,7 +3178,7 @@ async function sendMessage() {
     
     if (!message) return;
     
-    // Check for high-risk topics BEFORE sending
+    // Check for high-risk topics
     const risk = detectHighRiskTopic(message);
     
     addMessage('user', message);
@@ -2110,8 +3202,7 @@ async function sendMessage() {
             finalResponse = warningBox + response;
             
             // Track the high-risk detection
-            trackEvent('high_risk_warning_shown', {
-                user: currentUser,
+            trackEventAdvanced('high_risk_warning_shown', {
                 category: risk.category,
                 title: risk.title,
                 severity: risk.severity
@@ -2120,11 +3211,27 @@ async function sendMessage() {
         
         addMessage('assistant', finalResponse);
         conversationHistory.push({ role: 'assistant', content: response });
-        trackEvent('message_sent', { user: currentUser, messageLength: message.length });
+        
+        // SAVE FULL CONVERSATION TO ANALYTICS
+        saveConversationToAnalytics(message, response, {
+            riskDetected: risk ? true : false,
+            riskCategory: risk?.category || null,
+            messageLength: message.length,
+            responseLength: response.length
+        });
+        
+        trackEventAdvanced('message_sent', { 
+            messageLength: message.length,
+            hasRisk: risk ? true : false
+        });
     } catch (error) {
         removeThinkingIndicator(thinkingDiv);
         addMessage('assistant', 'Sorry, I encountered an error. Please try again or contact support.');
         console.error('Error:', error);
+        
+        trackEventAdvanced('message_error', {
+            error: error.message
+        });
     }
     
     sendBtn.disabled = false;
@@ -2269,13 +3376,20 @@ function addMessage(role, content) {
 
 async function callClaudeAPI(message) {
     try {
+        // Add venue context to the conversation
+        const venueContext = getVenueContext();
+        const enhancedHistory = venueContext 
+            ? [{ role: 'system', content: venueContext }, ...conversationHistory.filter(m => m.role !== 'system')]
+            : conversationHistory.filter(m => m.role !== 'system');
+        
         const response = await fetch(CONFIG.API.CHAT_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 message: message,
-                history: conversationHistory.filter(m => m.role !== 'system'),
-                user: currentUser
+                history: enhancedHistory,
+                user: currentUser,
+                venueProfile: venueProfile.setupComplete ? venueProfile : null
             })
         });
 
@@ -3813,6 +4927,121 @@ function generateDocumentId() {
     return 'DOC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
 }
 
+/ ========================================
+// ADVANCED ANALYTICS SYSTEM
+// ========================================
+
+/**
+ * Enhanced tracking that saves to localStorage for admin dashboard
+ */
+function trackEventAdvanced(eventType, data) {
+    // Call original trackEvent
+    trackEvent(eventType, data);
+    
+    // Save to analytics log
+    const analyticsLog = JSON.parse(localStorage.getItem('analyticsLog') || '[]');
+    
+    const logEntry = {
+        id: Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+        timestamp: new Date().toISOString(),
+        eventType: eventType,
+        userId: currentUser,
+        venueProfile: venueProfile.setupComplete ? {
+            type: venueProfile.venueType,
+            location: venueProfile.location,
+            staffCount: venueProfile.staffCount
+        } : null,
+        ...data
+    };
+    
+    analyticsLog.push(logEntry);
+    
+    // Keep last 1000 events (prevent localStorage overflow)
+    if (analyticsLog.length > 1000) {
+        analyticsLog.splice(0, analyticsLog.length - 1000);
+    }
+    
+    localStorage.setItem('analyticsLog', JSON.stringify(analyticsLog));
+    
+    // Also save to backend if available
+    sendAnalyticsToBackend(logEntry);
+}
+
+/**
+ * Save full conversation to analytics
+ */
+function saveConversationToAnalytics(userMessage, aiResponse, metadata = {}) {
+    const conversation = {
+        id: Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+        timestamp: new Date().toISOString(),
+        userId: currentUser,
+        userMessage: userMessage,
+        aiResponse: aiResponse,
+        venueProfile: venueProfile.setupComplete ? venueProfile : null,
+        ...metadata
+    };
+    
+    // Save to conversations log
+    const conversationsLog = JSON.parse(localStorage.getItem('conversationsLog') || '[]');
+    conversationsLog.push(conversation);
+    
+    // Keep last 500 conversations
+    if (conversationsLog.length > 500) {
+        conversationsLog.splice(0, conversationsLog.length - 500);
+    }
+    
+    localStorage.setItem('conversationsLog', JSON.stringify(conversationsLog));
+    
+    // Extract themes/keywords
+    extractThemes(userMessage);
+}
+
+/**
+ * Extract themes from user messages
+ */
+function extractThemes(message) {
+    const lowerMessage = message.toLowerCase();
+    
+    const themes = {
+        'casual_conversion': ['casual conversion', '12 months', 'permanent', 'casual to full'],
+        'sunday_penalty': ['sunday', 'penalty rate', 'weekend rate'],
+        'meal_breaks': ['break', 'meal break', 'lunch break', '5 hours'],
+        'termination': ['fire', 'dismiss', 'terminate', 'sack', 'let go'],
+        'performance': ['performance', 'pip', 'warning', 'underperforming'],
+        'award_rates': ['award rate', 'how much', 'pay rate', 'classification'],
+        'rostering': ['roster', 'shift', 'schedule', 'hours'],
+        'harassment': ['harassment', 'bullying', 'discrimination'],
+        'hiring': ['hire', 'recruit', 'onboard', 'new employee'],
+        'leave': ['annual leave', 'sick leave', 'personal leave']
+    };
+    
+    const themesLog = JSON.parse(localStorage.getItem('themesLog') || '{}');
+    
+    for (const [theme, keywords] of Object.entries(themes)) {
+        if (keywords.some(keyword => lowerMessage.includes(keyword))) {
+            themesLog[theme] = (themesLog[theme] || 0) + 1;
+        }
+    }
+    
+    localStorage.setItem('themesLog', JSON.stringify(themesLog));
+}
+
+/**
+ * Send analytics to backend (optional)
+ */
+async function sendAnalyticsToBackend(data) {
+    try {
+        await fetch('/.netlify/functions/save-analytics', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+    } catch (error) {
+        // Fail silently - localStorage backup works
+        console.log('Analytics saved locally');
+    }
+}
+
 // ========================================
 // EVENT LISTENERS
 // ========================================
@@ -3920,3 +5149,4 @@ window.addEventListener('unhandledrejection', function(event) {
 </script>
 </body>
 </html>
+
