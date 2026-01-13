@@ -2210,12 +2210,30 @@ function addMessage(role, content) {
                     break;
                 }
             }
-            
-            // Format other text (only if no HTML present)
-            if (!formattedContent.includes('<div')) {
-                formattedContent = formattedContent
+        }
+        
+        // Format the text content (convert markdown and add line breaks)
+        // Only format if it doesn't contain our warning HTML
+        if (!formattedContent.includes('<div class="mb-3 p-3 bg-red-500/10')) {
+            formattedContent = formattedContent
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n\n/g, '</p><p class="mt-3">')
+                .replace(/info@fitzgeraldhr\.com\.au/g, '<a href="mailto:info@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">info@fitzgeraldhr.com.au</a>');
+            formattedContent = '<p>' + formattedContent + '</p>';
+        } else {
+            // If it has the warning, format the text AFTER the warning
+            const parts = formattedContent.split('</div>\n\n');
+            if (parts.length > 1) {
+                const warningPart = parts[0] + '</div>\n\n';
+                let textPart = parts[1];
+                
+                textPart = textPart
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\n\n/g, '</p><p class="mt-3">')
                     .replace(/info@fitzgeraldhr\.com\.au/g, '<a href="mailto:info@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">info@fitzgeraldhr.com.au</a>');
+                textPart = '<p>' + textPart + '</p>';
+                
+                formattedContent = warningPart + textPart;
             }
         }
     }
