@@ -2672,7 +2672,7 @@ When providing advice, reference their specific venue type and location where re
 `;
 }
 
-window.checkAccess = function()
+window.checkAccess = function() {
     const input = document.getElementById('accessCodeInput').value.trim().toUpperCase();
     const error = document.getElementById('accessError');
     
@@ -2705,8 +2705,8 @@ window.checkAccess = function()
     } else {
         error.textContent = 'Invalid access code. Please check and try again.';
         error.classList.remove('hidden');
-    }
-}
+	}
+};
 
 function logout() {
     if (confirm('Are you sure you want to logout?')) {
