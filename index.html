@@ -2433,6 +2433,7 @@ async function sendMessage() {
         }
         
         addMessage('assistant', finalResponse);
+	trackConversation(message, response);
         conversationHistory.push({ role: 'assistant', content: response });
         trackEvent('message_sent', { user: currentUser, messageLength: message.length });
     } catch (error) {
