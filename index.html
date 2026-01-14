@@ -2392,7 +2392,7 @@ function checkAccess() {
         DOM.assistantScreen.classList.remove('hidden');
         error.classList.add('hidden');
         trackEvent('beta_access', { code: input });
-
+        
         // Show admin button for admin codes
         if (['FITZGERALD-TEST', 'DEMO-2025'].includes(input)) {
             const adminBtn = document.getElementById('adminButton');
@@ -2401,20 +2401,25 @@ function checkAccess() {
             }
         }
         
-// CHECK IF USER NEEDS ONBOARDING
-const hasCompletedOnboarding = checkOnboardingStatus();
-if (!hasCompletedOnboarding) {
-    setTimeout(() => {
-        showOnboarding();
-    }, 1000);
-} else {
-    const userName = venueProfile.userName || '';
-    const venueName = venueProfile.venueName || 'your venue';
-    const city = venueProfile.city || '';
-    const state = venueProfile.location || '';
-    const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
-    const locationText = city ? `${city}, ${state}` : state;
-    addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+        // CHECK IF USER NEEDS ONBOARDING
+        const hasCompletedOnboarding = checkOnboardingStatus();
+        if (!hasCompletedOnboarding) {
+            setTimeout(() => {
+                showOnboarding();
+            }, 1000);
+        } else {
+            const userName = venueProfile.userName || '';
+            const venueName = venueProfile.venueName || 'your venue';
+            const city = venueProfile.city || '';
+            const state = venueProfile.location || '';
+            const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
+            const locationText = city ? `${city}, ${state}` : state;
+            addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+        }
+    } else {
+        error.textContent = 'Invalid access code. Please check and try again.';
+        error.classList.remove('hidden');
+    }
 }
 
 // ========================================
