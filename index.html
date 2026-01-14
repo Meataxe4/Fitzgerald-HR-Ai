@@ -2461,11 +2461,12 @@ function addMessage(role, content) {
 
 async function callClaudeAPI(message) {
     try {
+        const venueContext = getVenueContext();
         const response = await fetch(CONFIG.API.CHAT_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                message: message,
+                message: venueContext + message,
                 history: conversationHistory.filter(m => m.role !== 'system'),
                 user: currentUser
             })
