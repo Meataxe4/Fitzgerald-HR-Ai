@@ -2408,14 +2408,15 @@ function checkAccess() {
                 showOnboarding();
             }, 1000);
         } else {
+            const userName = venueProfile.userName || '';
             const venueName = venueProfile.venueName || 'your venue';
-            addMessage('assistant', `👋 Welcome back ${userName}!! I remember you run ${venueName} in ${venueProfile.city || venueProfile.location}. What can I help you with today?`);
+            const city = venueProfile.city || '';
+            const state = venueProfile.location || '';
+            const venueTypeLabel = getVenueTypeLabel(venueProfile.venueType);
+            const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
+            const locationText = city ? `${city}, ${state}` : state;
+            addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
         }
-    } else {
-        error.textContent = 'Invalid access code. Please check and try again.';
-        error.classList.remove('hidden');
-    }
-}
 
 // ========================================
 // MESSAGING SYSTEM
