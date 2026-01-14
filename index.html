@@ -2409,7 +2409,7 @@ function checkAccess() {
             }, 1000);
         } else {
             const venueName = venueProfile.venueName || 'your venue';
-            addMessage('assistant', `👋 Welcome back! I remember you run ${venueName} (${getVenueTypeLabel(venueProfile.venueType)}) in ${venueProfile.city || venueProfile.location}. What can I help you with today?`);
+            addMessage('assistant', `👋 Welcome back ${userName}!! I remember you run ${venueName} in ${venueProfile.city || venueProfile.location}. What can I help you with today?`);
         }
     } else {
         error.textContent = 'Invalid access code. Please check and try again.';
