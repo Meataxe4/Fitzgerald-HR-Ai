@@ -2769,6 +2769,177 @@ function closeToolModal(modalId) {
 }
 
 // ========================================
+// VENUE ONBOARDING & PROFILE SYSTEM
+// ========================================
+
+function checkOnboardingStatus() {
+    const saved = localStorage.getItem('venueProfile_' + currentUser);
+    if (saved) {
+        venueProfile = JSON.parse(saved);
+        return venueProfile.setupComplete;
+    }
+    return false;
+}
+
+function showOnboarding() {
+    document.getElementById('venueOnboardingModal').classList.remove('hidden');
+    updateOnboardingStep();
+}
+
+function saveOnboardingAnswer(field, value, isLastStep = false) {
+    venueProfile[field] = value;
+    if (isLastStep) {
+        completeOnboarding();
+    } else {
+        onboardingCurrentStep++;
+        updateOnboardingStep();
+    }
+}
+
+function saveOnboardingLocation() {
+    const location = document.getElementById('onboardingLocation').value;
+    const city = document.getElementById('onboardingCity').value.trim();
+    if (!location) {
+        alert('Please select a state');
+        return;
+    }
+    venueProfile.location = location;
+    venueProfile.city = city || '';
+    onboardingCurrentStep++;
+    updateOnboardingStep();
+}
+
+function updateOnboardingStep() {
+    document.querySelectorAll('.onboarding-step').forEach(step => step.classList.add('hidden'));
+    const current = document.querySelector(`[data-step="${onboardingCurrentStep}"]`);
+    if (current) current.classList.remove('hidden');
+    
+    document.getElementById('onboardingStep').textContent = onboardingCurrentStep;
+    const progress = (onboardingCurrentStep / ONBOARDING_STEPS) * 100;
+    document.getElementById('onboardingProgress').textContent = `${progress}% Complete`;
+    document.getElementById('onboardingProgressBar').style.width = `${progress}%`;
+}
+
+function completeOnboarding() {
+    venueProfile.setupComplete = true;
+    venueProfile.setupDate = new Date().toISOString();
+    localStorage.setItem('venueProfile_' + currentUser, JSON.stringify(venueProfile));
+    
+    document.getElementById('venueOnboardingModal').classList.add('hidden');
+    
+    const venueType = getVenueTypeLabel(venueProfile.venueType);
+    addMessage('assistant', `✅ **Great! I've got your venue details saved.**
+
+I now know you run a **${venueType}** in **${venueProfile.city || venueProfile.location}** with **${venueProfile.staffCount}** staff.
+
+All my advice will be tailored for your venue. Update these anytime in ⚙️ Settings.
+
+What can I help you with?`);
+    
+    trackEvent('onboarding_completed', venueProfile);
+}
+
+function skipOnboarding() {
+    if (confirm('Skip onboarding? You can complete it later in Settings.')) {
+        document.getElementById('venueOnboardingModal').classList.add('hidden');
+        addMessage('assistant', 'No problem! Set up your venue profile anytime in ⚙️ Settings. What can I help you with?');
+    }
+}
+
+function getVenueTypeLabel(type) {
+    const labels = { 
+        restaurant: 'restaurant', 
+        cafe: 'café', 
+        hotel: 'hotel/pub', 
+        fastfood: 'fast food venue', 
+        club: 'club/bar', 
+        other: 'hospitality venue' 
+    };
+    return labels[type] || type;
+}
+
+function showVenueSettings() {
+    const modal = document.getElementById('venueSettingsModal');
+    const content = document.getElementById('venueSettingsContent');
+    
+    content.innerHTML = `
+        <div class="space-y-4">
+            <div>
+                <label class="block text-slate-300 text-sm mb-2">Venue Name (Optional)</label>
+                <input type="text" id="settingsVenueName" value="${venueProfile.venueName || ''}" 
+                       placeholder="e.g., Joe's Bistro"
+                       class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+            </div>
+            
+            <div>
+                <label class="block text-slate-300 text-sm mb-2">Venue Type</label>
+                <select id="settingsVenueType" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                    <option value="restaurant" ${venueProfile.venueType === 'restaurant' ? 'selected' : ''}>Restaurant</option>
+                    <option value="cafe" ${venueProfile.venueType === 'cafe' ? 'selected' : ''}>Café</option>
+                    <option value="hotel" ${venueProfile.venueType === 'hotel' ? 'selected' : ''}>Hotel/Pub</option>
+                    <option value="fastfood" ${venueProfile.venueType === 'fastfood' ? 'selected' : ''}>Fast Food</option>
+                </select>
+            </div>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-slate-300 text-sm mb-2">State</label>
+                    <select id="settingsLocation" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                        <option value="NSW" ${venueProfile.location === 'NSW' ? 'selected' : ''}>NSW</option>
+                        <option value="VIC" ${venueProfile.location === 'VIC' ? 'selected' : ''}>VIC</option>
+                        <option value="QLD" ${venueProfile.location === 'QLD' ? 'selected' : ''}>QLD</option>
+                        <option value="SA" ${venueProfile.location === 'SA' ? 'selected' : ''}>SA</option>
+                        <option value="WA" ${venueProfile.location === 'WA' ? 'selected' : ''}>WA</option>
+                        <option value="TAS" ${venueProfile.location === 'TAS' ? 'selected' : ''}>TAS</option>
+                        <option value="NT" ${venueProfile.location === 'NT' ? 'selected' : ''}>NT</option>
+                        <option value="ACT" ${venueProfile.location === 'ACT' ? 'selected' : ''}>ACT</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-slate-300 text-sm mb-2">City/Suburb</label>
+                    <input type="text" id="settingsCity" value="${venueProfile.city || ''}" 
+                           class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-slate-300 text-sm mb-2">Staff Count</label>
+                <select id="settingsStaffCount" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                    <option value="1-5" ${venueProfile.staffCount === '1-5' ? 'selected' : ''}>1-5 staff</option>
+                    <option value="6-15" ${venueProfile.staffCount === '6-15' ? 'selected' : ''}>6-15 staff</option>
+                    <option value="16-30" ${venueProfile.staffCount === '16-30' ? 'selected' : ''}>16-30 staff</option>
+                    <option value="30+" ${venueProfile.staffCount === '30+' ? 'selected' : ''}>30+ staff</option>
+                </select>
+            </div>
+        </div>
+    `;
+    
+    modal.classList.remove('hidden');
+}
+
+function saveVenueSettings() {
+    venueProfile.venueName = document.getElementById('settingsVenueName').value.trim();
+    venueProfile.venueType = document.getElementById('settingsVenueType').value;
+    venueProfile.location = document.getElementById('settingsLocation').value;
+    venueProfile.city = document.getElementById('settingsCity').value.trim();
+    venueProfile.staffCount = document.getElementById('settingsStaffCount').value;
+    
+    localStorage.setItem('venueProfile_' + currentUser, JSON.stringify(venueProfile));
+    closeVenueSettings();
+    alert('✅ Venue settings saved!');
+}
+
+function closeVenueSettings() {
+    document.getElementById('venueSettingsModal').classList.add('hidden');
+}
+
+function getVenueContext() {
+    if (!venueProfile.setupComplete) return '';
+    const venueName = venueProfile.venueName ? `"${venueProfile.venueName}" - a ` : '';
+    return `\nVENUE CONTEXT: ${venueName}${getVenueTypeLabel(venueProfile.venueType)} in ${venueProfile.city || ''} ${venueProfile.location}, ${venueProfile.staffCount} staff, Award: ${venueProfile.primaryAward}\n`;
+}
+
+// ========================================
 // AWARD CALCULATOR
 // ========================================
 
