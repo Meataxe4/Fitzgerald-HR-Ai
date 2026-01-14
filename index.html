@@ -3044,9 +3044,16 @@ function showVenueSettings() {
     content.innerHTML = `
         <div class="space-y-4">
             <div>
-                <label class="block text-slate-300 text-sm mb-2">Venue Name (Optional)</label>
+                <label class="block text-slate-300 text-sm mb-2">Your Name</label>
+                <input type="text" id="settingsUserName" value="${venueProfile.userName || ''}" 
+                       placeholder="e.g., Sarah Johnson"
+                       class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+            </div>
+            
+            <div>
+                <label class="block text-slate-300 text-sm mb-2">Venue Name</label>
                 <input type="text" id="settingsVenueName" value="${venueProfile.venueName || ''}" 
-                       placeholder="e.g., Joe's Bistro"
+                       placeholder="e.g., The Golden Fork"
                        class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
             </div>
             
@@ -3091,12 +3098,29 @@ function showVenueSettings() {
                 </select>
             </div>
         </div>
+                    <label class="block text-slate-300 text-sm mb-2">City/Suburb</label>
+                    <input type="text" id="settingsCity" value="${venueProfile.city || ''}" 
+                           class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-slate-300 text-sm mb-2">Staff Count</label>
+                <select id="settingsStaffCount" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                    <option value="1-5" ${venueProfile.staffCount === '1-5' ? 'selected' : ''}>1-5 staff</option>
+                    <option value="6-15" ${venueProfile.staffCount === '6-15' ? 'selected' : ''}>6-15 staff</option>
+                    <option value="16-30" ${venueProfile.staffCount === '16-30' ? 'selected' : ''}>16-30 staff</option>
+                    <option value="30+" ${venueProfile.staffCount === '30+' ? 'selected' : ''}>30+ staff</option>
+                </select>
+            </div>
+        </div>
     `;
     
     modal.classList.remove('hidden');
 }
 
 function saveVenueSettings() {
+    venueProfile.userName = document.getElementById('settingsUserName').value.trim();
     venueProfile.venueName = document.getElementById('settingsVenueName').value.trim();
     venueProfile.venueType = document.getElementById('settingsVenueType').value;
     venueProfile.location = document.getElementById('settingsLocation').value;
