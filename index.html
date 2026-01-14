@@ -3057,7 +3057,387 @@ function saveVenueSettings() {
 }
 
 function closeVenueSettings() {
+
     document.getElementById('venueSettingsModal').classList.add('hidden');
+}
+
+// ========================================
+// ADMIN ANALYTICS SYSTEM
+// ========================================
+
+function trackConversation(userMessage, assistantResponse) {
+    const conversation = {
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        user: currentUser,
+        userMessage: userMessage,
+        assistantResponse: assistantResponse,
+        theme: detectTheme(userMessage),
+        isHighRisk: detectHighRiskTopic(userMessage) !== null,
+        venue: venueProfile.setupComplete ? {
+            type: venueProfile.venueType,
+            location: venueProfile.location,
+            staffCount: venueProfile.staffCount
+        } : null
+    };
+    
+    // Add to conversations array
+    const stored = JSON.parse(localStorage.getItem('analytics_conversations') || '[]');
+    stored.push(conversation);
+    localStorage.setItem('analytics_conversations', JSON.stringify(stored));
+    
+    // Update theme counts
+    updateThemeCount(conversation.theme);
+    
+    // Track high-risk if applicable
+    if (conversation.isHighRisk) {
+        trackHighRiskTopic(userMessage);
+    }
+    
+    // Update user profile
+    updateUserProfile(currentUser, userMessage);
+}
+
+function detectTheme(message) {
+    const lowerMessage = message.toLowerCase();
+    
+    const themes = {
+        'Award Rates & Pay': ['award rate', 'pay rate', 'wage', 'salary', 'how much', 'penalty rate', 'overtime', 'casual loading'],
+        'Rostering & Hours': ['roster', 'schedule', 'shift', 'hours', 'break', 'rest day', 'overtime'],
+        'Termination & Dismissal': ['terminate', 'fire', 'dismiss', 'sack', 'let go', 'redundancy'],
+        'Performance Management': ['performance', 'pip', 'warning', 'underperform', 'improvement'],
+        'Recruitment & Hiring': ['hire', 'recruit', 'interview', 'job ad', 'onboard', 'new employee'],
+        'Leave & Entitlements': ['annual leave', 'sick leave', 'personal leave', 'long service', 'parental leave'],
+        'Workplace Issues': ['complaint', 'harassment', 'bullying', 'discrimination', 'conflict'],
+        'Contracts & Agreements': ['contract', 'employment agreement', 'casual conversion', 'fixed term'],
+        'Compliance & Legal': ['fair work', 'compliance', 'legal', 'lawsuit', 'claim', 'ombudsman'],
+        'General HR Advice': []
+    };
+    
+    for (const [theme, keywords] of Object.entries(themes)) {
+        if (keywords.some(keyword => lowerMessage.includes(keyword))) {
+            return theme;
+        }
+    }
+    
+    return 'General HR Advice';
+}
+
+function updateThemeCount(theme) {
+    const stored = JSON.parse(localStorage.getItem('analytics_themes') || '{}');
+    stored[theme] = (stored[theme] || 0) + 1;
+    localStorage.setItem('analytics_themes', JSON.stringify(stored));
+}
+
+function trackHighRiskTopic(message) {
+    const risk = detectHighRiskTopic(message);
+    if (!risk) return;
+    
+    const highRiskEntry = {
+        id: Date.now(),
+        timestamp: new Date().toISOString(),
+        user: currentUser,
+        category: risk.category,
+        title: risk.title,
+        severity: risk.severity,
+        message: message.substring(0, 200) // First 200 chars only
+    };
+    
+    const stored = JSON.parse(localStorage.getItem('analytics_highrisk') || '[]');
+    stored.push(highRiskEntry);
+    localStorage.setItem('analytics_highrisk', JSON.stringify(stored));
+}
+
+function updateUserProfile(user, message) {
+    const profiles = JSON.parse(localStorage.getItem('analytics_users') || '{}');
+    
+    if (!profiles[user]) {
+        profiles[user] = {
+            firstSeen: new Date().toISOString(),
+            messageCount: 0,
+            lastActive: null,
+            venue: venueProfile.setupComplete ? venueProfile : null,
+            topThemes: {}
+        };
+    }
+    
+    profiles[user].messageCount++;
+    profiles[user].lastActive = new Date().toISOString();
+    
+    const theme = detectTheme(message);
+    profiles[user].topThemes[theme] = (profiles[user].topThemes[theme] || 0) + 1;
+    
+    localStorage.setItem('analytics_users', JSON.stringify(profiles));
+}
+
+function showAdminDashboard() {
+    document.getElementById('adminDashboardModal').classList.remove('hidden');
+    loadAnalytics();
+}
+
+function closeAdminDashboard() {
+    document.getElementById('adminDashboardModal').classList.add('hidden');
+}
+
+function loadAnalytics() {
+    // Load stats
+    const conversations = JSON.parse(localStorage.getItem('analytics_conversations') || '[]');
+    const users = JSON.parse(localStorage.getItem('analytics_users') || '{}');
+    
+    const uniqueUsers = Object.keys(users).length;
+    const totalMessages = conversations.length;
+    const today = new Date().toDateString();
+    const activeToday = conversations.filter(c => new Date(c.timestamp).toDateString() === today).length;
+    
+    document.getElementById('statTotalUsers').textContent = uniqueUsers;
+    document.getElementById('statTotalMessages').textContent = totalMessages;
+    document.getElementById('statActiveToday').textContent = activeToday;
+    document.getElementById('statAvgSession').textContent = '5m'; // Simplified
+    
+    // Load conversations tab by default
+    switchAdminTab('conversations');
+}
+
+function switchAdminTab(tabName) {
+    // Update tab buttons
+    document.querySelectorAll('.admin-tab').forEach(btn => {
+        if (btn.dataset.tab === tabName) {
+            btn.classList.add('text-purple-400', 'border-b-2', 'border-purple-400', 'font-semibold');
+            btn.classList.remove('text-slate-400');
+        } else {
+            btn.classList.remove('text-purple-400', 'border-b-2', 'border-purple-400', 'font-semibold');
+            btn.classList.add('text-slate-400');
+        }
+    });
+    
+    // Hide all content
+    document.querySelectorAll('.admin-tab-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+    
+    // Show selected content
+    const contentMap = {
+        'conversations': 'adminConversationsTab',
+        'themes': 'adminThemesTab',
+        'users': 'adminUsersTab',
+        'highrisk': 'adminHighRiskTab'
+    };
+    
+    document.getElementById(contentMap[tabName]).classList.remove('hidden');
+    
+    // Load data for selected tab
+    if (tabName === 'conversations') loadConversations();
+    if (tabName === 'themes') loadThemes();
+    if (tabName === 'users') loadUsers();
+    if (tabName === 'highrisk') loadHighRisk();
+}
+
+function loadConversations() {
+    const conversations = JSON.parse(localStorage.getItem('analytics_conversations') || '[]');
+    const list = document.getElementById('conversationsList');
+    
+    if (conversations.length === 0) {
+        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No conversations yet</div>';
+        return;
+    }
+    
+    let html = '';
+    conversations.reverse().forEach(conv => {
+        const date = new Date(conv.timestamp).toLocaleString('en-AU');
+        const riskBadge = conv.isHighRisk ? '<span class="text-xs bg-red-500 text-white px-2 py-1 rounded">HIGH RISK</span>' : '';
+        
+        html += `
+            <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 hover:border-purple-500 transition-all">
+                <div class="flex items-start justify-between mb-2">
+                    <div>
+                        <span class="text-purple-400 font-semibold">${conv.user}</span>
+                        <span class="text-slate-500 text-xs ml-2">${date}</span>
+                        ${riskBadge}
+                    </div>
+                    <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${conv.theme}</span>
+                </div>
+                <div class="text-sm">
+                    <p class="text-slate-300 mb-2"><strong>User:</strong> ${conv.userMessage}</p>
+                    <p class="text-slate-400 text-xs"><strong>Response:</strong> ${conv.assistantResponse.substring(0, 150)}...</p>
+                </div>
+            </div>
+        `;
+    });
+    
+    list.innerHTML = html;
+}
+
+function loadThemes() {
+    const themes = JSON.parse(localStorage.getItem('analytics_themes') || '{}');
+    const list = document.getElementById('themesList');
+    
+    if (Object.keys(themes).length === 0) {
+        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No themes tracked yet</div>';
+        return;
+    }
+    
+    // Sort by count
+    const sorted = Object.entries(themes).sort((a, b) => b[1] - a[1]);
+    
+    let html = '';
+    sorted.forEach(([theme, count]) => {
+        const percentage = ((count / Object.values(themes).reduce((a, b) => a + b, 0)) * 100).toFixed(1);
+        html += `
+            <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-purple-400 font-semibold">${theme}</span>
+                    <span class="text-2xl font-bold text-purple-400">${count}</span>
+                </div>
+                <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+                    <div class="h-full bg-purple-500" style="width: ${percentage}%"></div>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">${percentage}% of all queries</p>
+            </div>
+        `;
+    });
+    
+    list.innerHTML = html;
+}
+
+function loadUsers() {
+    const users = JSON.parse(localStorage.getItem('analytics_users') || '{}');
+    const list = document.getElementById('usersList');
+    
+    if (Object.keys(users).length === 0) {
+        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No users yet</div>';
+        return;
+    }
+    
+    let html = '';
+    Object.entries(users).forEach(([userId, profile]) => {
+        const topTheme = Object.entries(profile.topThemes).sort((a, b) => b[1] - a[1])[0];
+        const venueInfo = profile.venue ? `${profile.venue.venueType} in ${profile.venue.location}` : 'No venue info';
+        
+        html += `
+            <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                <div class="flex items-start justify-between mb-3">
+                    <div>
+                        <p class="text-purple-400 font-semibold">${userId}</p>
+                        <p class="text-xs text-slate-400">${venueInfo}</p>
+                    </div>
+                    <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${profile.messageCount} messages</span>
+                </div>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                        <p class="text-slate-500">First seen:</p>
+                        <p class="text-slate-300">${new Date(profile.firstSeen).toLocaleDateString('en-AU')}</p>
+                    </div>
+                    <div>
+                        <p class="text-slate-500">Top theme:</p>
+                        <p class="text-slate-300">${topTheme ? topTheme[0] : 'N/A'}</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    list.innerHTML = html;
+}
+
+function loadHighRisk() {
+    const highRisk = JSON.parse(localStorage.getItem('analytics_highrisk') || '[]');
+    const list = document.getElementById('highRiskList');
+    
+    if (highRisk.length === 0) {
+        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No high-risk topics detected</div>';
+        return;
+    }
+    
+    let html = '';
+    highRisk.reverse().forEach(risk => {
+        const date = new Date(risk.timestamp).toLocaleString('en-AU');
+        const colorMap = { critical: 'red', high: 'yellow', medium: 'blue' };
+        const color = colorMap[risk.severity] || 'gray';
+        
+        html += `
+            <div class="bg-slate-900 border-2 border-${color}-500 rounded-lg p-4">
+                <div class="flex items-start justify-between mb-2">
+                    <div>
+                        <span class="text-${color}-400 font-semibold">${risk.title}</span>
+                        <span class="text-slate-500 text-xs ml-2">${date}</span>
+                    </div>
+                    <span class="text-xs bg-${color}-500 text-white px-2 py-1 rounded uppercase">${risk.severity}</span>
+                </div>
+                <p class="text-slate-400 text-xs mb-2"><strong>User:</strong> ${risk.user}</p>
+                <p class="text-slate-300 text-sm">${risk.message}</p>
+            </div>
+        `;
+    });
+    
+    list.innerHTML = html;
+}
+
+function filterConversations() {
+    const search = document.getElementById('conversationSearch').value.toLowerCase();
+    const conversations = JSON.parse(localStorage.getItem('analytics_conversations') || '[]');
+    
+    const filtered = conversations.filter(conv => 
+        conv.userMessage.toLowerCase().includes(search) ||
+        conv.assistantResponse.toLowerCase().includes(search) ||
+        conv.theme.toLowerCase().includes(search)
+    );
+    
+    const list = document.getElementById('conversationsList');
+    
+    if (filtered.length === 0) {
+        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No matches found</div>';
+        return;
+    }
+    
+    let html = '';
+    filtered.reverse().forEach(conv => {
+        const date = new Date(conv.timestamp).toLocaleString('en-AU');
+        const riskBadge = conv.isHighRisk ? '<span class="text-xs bg-red-500 text-white px-2 py-1 rounded">HIGH RISK</span>' : '';
+        
+        html += `
+            <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 hover:border-purple-500 transition-all">
+                <div class="flex items-start justify-between mb-2">
+                    <div>
+                        <span class="text-purple-400 font-semibold">${conv.user}</span>
+                        <span class="text-slate-500 text-xs ml-2">${date}</span>
+                        ${riskBadge}
+                    </div>
+                    <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${conv.theme}</span>
+                </div>
+                <div class="text-sm">
+                    <p class="text-slate-300 mb-2"><strong>User:</strong> ${conv.userMessage}</p>
+                    <p class="text-slate-400 text-xs"><strong>Response:</strong> ${conv.assistantResponse.substring(0, 150)}...</p>
+                </div>
+            </div>
+        `;
+    });
+    
+    list.innerHTML = html;
+}
+
+function refreshAnalytics() {
+    loadAnalytics();
+    alert('✅ Analytics refreshed!');
+}
+
+function exportAnalytics() {
+    const conversations = JSON.parse(localStorage.getItem('analytics_conversations') || '[]');
+    const themes = JSON.parse(localStorage.getItem('analytics_themes') || '{}');
+    const users = JSON.parse(localStorage.getItem('analytics_users') || '{}');
+    
+    // Prepare data for Excel
+    const data = conversations.map(conv => ({
+        'Timestamp': new Date(conv.timestamp).toLocaleString('en-AU'),
+        'User': conv.user,
+        'Theme': conv.theme,
+        'High Risk': conv.isHighRisk ? 'YES' : 'NO',
+        'User Message': conv.userMessage,
+        'Assistant Response': conv.assistantResponse.substring(0, 500)
+    }));
+    
+    generateExcelSpreadsheet(data, `Analytics_Export_${Date.now()}.xlsx`, 'Conversations');
+    
+    alert('✅ Analytics exported to Excel!');
 }
 
 function getVenueContext() {
