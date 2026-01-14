@@ -1296,6 +1296,25 @@ let isListening = false;
 
 
 // ========================================
+// VENUE MEMORY SYSTEM - GLOBAL STATE
+// ========================================
+
+let venueProfile = {
+    venueType: null,
+    location: null,
+    city: null,
+    staffCount: null,
+    primaryAward: null,
+    mainChallenge: null,
+    setupComplete: false,
+    setupDate: null,
+    venueName: null
+};
+
+let onboardingCurrentStep = 1;
+const ONBOARDING_STEPS = 5;
+
+// ========================================
 // AWARD RATES - FETCH FROM GITHUB
 // ========================================
 
@@ -3920,4 +3939,4 @@ window.addEventListener('unhandledrejection', function(event) {
 </script>
 </body>
 </html>
-
+ 
