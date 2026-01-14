@@ -2954,6 +2954,26 @@ function saveOnboardingAnswer(field, value, isLastStep = false) {
     }
 }
 
+function saveOnboardingNameAndVenue() {
+    const userName = document.getElementById('onboardingUserName').value.trim();
+    const venueName = document.getElementById('onboardingVenueName').value.trim();
+    
+    if (!userName) {
+        alert('Please enter your name');
+        return;
+    }
+    
+    if (!venueName) {
+        alert('Please enter your venue name');
+        return;
+    }
+    
+    venueProfile.userName = userName;
+    venueProfile.venueName = venueName;
+    onboardingCurrentStep++;
+    updateOnboardingStep();
+}
+
 function saveOnboardingLocation() {
     const location = document.getElementById('onboardingLocation').value;
     const city = document.getElementById('onboardingCity').value.trim();
