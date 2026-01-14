@@ -2369,6 +2369,14 @@ function checkAccess() {
         DOM.assistantScreen.classList.remove('hidden');
         error.classList.add('hidden');
         trackEvent('beta_access', { code: input });
+
+        // Show admin button for admin codes
+        if (['FITZGERALD-TEST', 'DEMO-2025'].includes(input)) {
+            const adminBtn = document.getElementById('adminButton');
+            if (adminBtn) {
+                adminBtn.classList.remove('hidden');
+            }
+        }
         
         // CHECK IF USER NEEDS ONBOARDING
         const hasCompletedOnboarding = checkOnboardingStatus();
