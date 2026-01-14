@@ -2238,25 +2238,29 @@ const hrTemplates = {
  */
 function checkAccess() {
     const input = document.getElementById('accessCodeInput').value.trim().toUpperCase();
-const error = document.getElementById('accessError');
-// Note: These elements not cached as they're only used once at login
+    const error = document.getElementById('accessError');
     
     if (CONFIG.VALID_CODES.includes(input)) {
         currentUser = input;
         document.getElementById('userCode').textContent = input;
-	DOM.accessScreen.classList.add('hidden');
-	DOM.assistantScreen.classList.remove('hidden');
+        DOM.accessScreen.classList.add('hidden');
+        DOM.assistantScreen.classList.remove('hidden');
         error.classList.add('hidden');
         trackEvent('beta_access', { code: input });
+        
+        // CHECK IF USER NEEDS ONBOARDING
+        const hasCompletedOnboarding = checkOnboardingStatus();
+        if (!hasCompletedOnboarding) {
+            setTimeout(() => {
+                showOnboarding();
+            }, 1000);
+        } else {
+            const venueName = venueProfile.venueName || 'your venue';
+            addMessage('assistant', `👋 Welcome back! I remember you run ${venueName} (${getVenueTypeLabel(venueProfile.venueType)}) in ${venueProfile.city || venueProfile.location}. What can I help you with today?`);
+        }
     } else {
         error.textContent = 'Invalid access code. Please check and try again.';
         error.classList.remove('hidden');
-    }
-}
-
-function logout() {
-    if (confirm('Are you sure you want to logout?')) {
-        location.reload();
     }
 }
 
