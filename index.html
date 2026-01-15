@@ -1048,7 +1048,6 @@
 <!-- ========================================== -->
 <!-- NEW MODAL: AWARD WIZARD -->
 <!-- ========================================== -->
-<!-- Add this after your other modals (after xeroIntegrationModal) -->
 
 <div id="awardWizardModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
     <div id="awardWizardContainer" class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
@@ -3664,13 +3663,17 @@ function wizardAnswer(question, answer) {
 
 // Update wizard step display
 function updateWizardStep() {
-    // Hide all steps
-    document.querySelectorAll('.wizard-step').forEach(step => {
+    // Get the Award Wizard container specifically
+    const wizardModal = document.getElementById('awardWizardModal');
+    if (!wizardModal) return;
+    
+    // Hide all steps ONLY within the Award Wizard
+    wizardModal.querySelectorAll('.wizard-step').forEach(step => {
         step.classList.add('hidden');
     });
     
-    // Show current step
-    const currentStep = document.querySelector(`[data-step="${currentWizardStep}"]`);
+    // Show current step ONLY within the Award Wizard
+    const currentStep = wizardModal.querySelector(`[data-step="${currentWizardStep}"]`);
     if (currentStep) {
         currentStep.classList.remove('hidden');
     }
@@ -3691,7 +3694,7 @@ function updateWizardStep() {
         }
     }
 }
-
+    
 // Go back in wizard
 function wizardGoBack() {
     if (currentWizardStep > 1) {
