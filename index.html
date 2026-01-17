@@ -2464,6 +2464,104 @@ const hrTemplates = {
         function generateDocumentId() {
             return 'DOC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
         }
+
+	// ========================================
+	// DAILY TIPS SYSTEM
+	// ========================================
+
+const dailyTips = [
+    { icon: "💡", tip: "Did you know? You must give 30-min breaks for shifts over 5 hours" },
+    { icon: "⚠️", tip: "Award rates increase on 1 July each year - mark your calendar!" },
+    { icon: "📝", tip: "Always document performance conversations in writing" },
+    { icon: "🕒", tip: "Casuals must be paid within 7 days of completing their shift" },
+    { icon: "📋", tip: "Keep employment records for 7 years minimum - it's the law" },
+    { icon: "⚖️", tip: "Unfair dismissal claims must be lodged within 21 days" },
+    { icon: "💰", tip: "Casual loading is 25% on top of permanent rates" },
+    { icon: "🔄", tip: "Regular casuals may request conversion to permanent after 12 months" },
+    { icon: "📅", tip: "Public holidays require 2.5x pay or time off in lieu" },
+    { icon: "✍️", tip: "Use written employment contracts for all staff - avoid disputes" },
+    { icon: "🚨", tip: "Document workplace incidents immediately while details are fresh" },
+    { icon: "📞", tip: "Return employee calls within 24 hours during disputes" },
+    { icon: "⏰", tip: "Minimum shift length is usually 3 hours for casual employees" },
+    { icon: "🎓", tip: "Provide a Fair Work Information Statement to all new employees" },
+    { icon: "💼", tip: "Probation periods are typically 3-6 months - put it in writing" },
+    { icon: "🔐", tip: "Store employee personal information securely - privacy laws apply" },
+    { icon: "📊", tip: "Review your payroll monthly - catch errors before they compound" },
+    { icon: "🤝", tip: "Consider offering unpaid trial shifts (max 1-2 hours for assessment)" },
+    { icon: "🌟", tip: "Recognize good performance regularly - it reduces turnover" },
+    { icon: "📱", tip: "Use the tools menu (🛠️) to access specialised calculators" }
+];
+
+let currentDailyTipIndex = -1; // Start at -1 so first call gets index 0
+
+function getDailyTip() {
+    // Get tip based on day of month for consistency
+    const today = new Date().getDate();
+    return dailyTips[today % dailyTips.length];
+}
+
+function updateDailyTipBanner() {
+    const tipElement = document.getElementById('dailyTipContent');
+    const iconElement = document.getElementById('dailyTipIcon');
+    
+    if (!tipElement || !iconElement) return;
+    
+    const tipData = getDailyTip();
+    
+    // Fade out
+    const banner = document.getElementById('dailyTipBanner');
+    if (banner) {
+        banner.style.transition = 'opacity 0.3s ease-out';
+        banner.style.opacity = '0.7';
+    }
+    
+    setTimeout(() => {
+        iconElement.textContent = tipData.icon;
+        tipElement.textContent = tipData.tip;
+        
+        // Fade in
+        if (banner) {
+            banner.style.opacity = '1';
+        }
+    }, 300);
+}
+
+function rotateTipManually() {
+    // Cycle to next tip
+    currentDailyTipIndex = (currentDailyTipIndex + 1) % dailyTips.length;
+    
+    const tipElement = document.getElementById('dailyTipContent');
+    const iconElement = document.getElementById('dailyTipIcon');
+    const banner = document.getElementById('dailyTipBanner');
+    
+    if (!tipElement || !iconElement || !banner) return;
+    
+    const tipData = dailyTips[currentDailyTipIndex];
+    
+    // Fade out
+    banner.style.transition = 'opacity 0.3s ease-out';
+    banner.style.opacity = '0.7';
+    
+    setTimeout(() => {
+        iconElement.textContent = tipData.icon;
+        tipElement.textContent = tipData.tip;
+        
+        // Fade in
+        banner.style.opacity = '1';
+    }, 300);
+    
+    trackEvent('daily_tip_rotated', { 
+        user: currentUser, 
+        tipIndex: currentDailyTipIndex 
+    });
+}
+
+// Auto-rotate tips every 30 seconds
+function startDailyTipRotation() {
+    setInterval(() => {
+        rotateTipManually();
+    }, 30000); // 30 seconds
+}
         
         // 2. Multi-page document generation
         function generateMultiPageDocument(sections, filename, metadata = {}) {
@@ -2531,6 +2629,12 @@ function checkAccess() {
             const locationText = city ? `${city}, ${state}` : state;
             addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
         }
+
+	// Initialize and start daily tip rotation**
+        setTimeout(() => {
+            updateDailyTipBanner();
+            startDailyTipRotation();
+        }, 500);
     } else {
         error.textContent = 'Invalid access code. Please check and try again.';
         error.classList.remove('hidden');
