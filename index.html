@@ -3101,6 +3101,13 @@ ${data.consequences}
 
 Generate a complete, professional formal warning letter following Australian employment law best practices.
 
+**CRITICAL FORMATTING REQUIREMENTS:**
+1. Use ## for major sections (e.g., ## EMPLOYEE DETAILS)
+2. Use blank lines between paragraphs
+3. Use **text** for emphasis
+4. Structure clearly with proper spacing
+5. Each section should be clearly separated
+
 REQUIREMENTS:
 1. **Expand the issue description** - Take the brief description and expand with appropriate context while staying factual
 2. **Use formal, professional language** - Clear, firm but respectful
@@ -3119,6 +3126,38 @@ REQUIREMENTS:
 4. **Maintain procedural fairness**
 5. **Be specific and actionable**
 6. **Professional tone** - firm but not threatening
+
+Example structure:
+# FORMAL WARNING LETTER
+
+## DATE AND RECIPIENT
+Date: [Date]
+Employee Name: [Name]
+Position: [Position]
+
+## SUBJECT
+Subject: Formal Written Warning - [Issue]
+
+## ISSUE DESCRIPTION
+[Detailed description of what occurred]
+
+## PREVIOUS DISCUSSIONS
+[Reference to verbal warnings if applicable]
+
+## REQUIRED IMPROVEMENTS
+[Specific expectations]
+
+## TIMEFRAME
+[Clear timeframe for improvement]
+
+## CONSEQUENCES
+[What happens if no improvement]
+
+## RIGHT TO RESPOND
+[7 days to respond in writing]
+
+## SIGNATURES
+[Signature sections]
 
 Format as a complete business letter with proper structure.
 
@@ -3158,7 +3197,45 @@ ${data.supportProvided || 'To be determined'}
 
 Generate a professional Record of Discussion document.
 
+**CRITICAL FORMATTING REQUIREMENTS:**
+1. Use ## for major sections (e.g., ## MEETING DETAILS)
+2. Use blank lines between paragraphs
+3. Use **text** for emphasis
+4. Structure clearly with proper spacing
+5. Each section should be clearly separated
+
 This is an INFORMAL record (not formal disciplinary action).
+
+Example structure:
+# RECORD OF DISCUSSION
+
+## MEETING DETAILS
+Date: [Date]
+Employee: [Name]
+Position: [Position]
+Manager: [Manager Name]
+Location: [Location]
+
+## PURPOSE OF DISCUSSION
+[Type and brief overview]
+
+## SUMMARY OF DISCUSSION
+[What was discussed - expanded appropriately]
+
+## EMPLOYEE RESPONSE
+[Employee's acknowledgment and comments]
+
+## AGREED ACTIONS
+[Clear, specific actions agreed upon]
+
+## REVIEW DATE
+[When progress will be reviewed]
+
+## SUPPORT PROVIDED
+[Support or resources offered]
+
+## SIGNATURES
+[Signature sections for both parties with note that signature = discussion occurred, not agreement]
 
 Include:
 - Header with date, employee details, manager name
@@ -3207,6 +3284,13 @@ Location: ${data.meetingLocation}
 
 Generate a legally compliant Letter of Allegation.
 
+**CRITICAL FORMATTING REQUIREMENTS:**
+1. Use ## for major sections (e.g., ## ALLEGATION DETAILS)
+2. Use blank lines between paragraphs
+3. Use **text** for emphasis
+4. Structure clearly with proper spacing
+5. Each section should be clearly separated
+
 CRITICAL REQUIREMENTS:
 1. **Neutral tone** - No presumption of guilt
 2. **Clear process** - Explain investigation steps
@@ -3218,6 +3302,47 @@ CRITICAL REQUIREMENTS:
 5. **Meeting details**
 6. **Suspension details** (if applicable)
 7. **Next steps clearly outlined**
+
+Example structure:
+# PRIVATE & CONFIDENTIAL
+# LETTER OF ALLEGATION
+
+## DATE AND RECIPIENT
+Date: [Date]
+Employee Name: [Name]
+Position: [Position]
+
+## SUBJECT
+Subject: Allegation of [Type] - Investigation Process
+
+## NATURE OF ALLEGATION
+[Factual description - not conclusive]
+
+## INVESTIGATION PROCESS
+[Clear explanation of what will happen]
+
+## SUSPENSION ARRANGEMENTS
+[If applicable - details of suspension and pay status]
+
+## INVESTIGATION MEETING
+Date: [Date]
+Time: [Time]
+Location: [Location]
+
+## YOUR RIGHTS
+- Right to bring a support person
+- Opportunity to respond to allegations
+- Procedural fairness will be maintained
+- You may seek legal advice
+
+## CONFIDENTIALITY
+[Importance of confidentiality during investigation]
+
+## NEXT STEPS
+[What happens after the meeting]
+
+## CONTACT INFORMATION
+[Who to contact with questions]
 
 Include:
 - PRIVATE & CONFIDENTIAL header
@@ -3240,12 +3365,30 @@ TONE: Professional, neutral, procedurally fair. This is NOT a punishment - it's 
 }
 
 function showDocumentPreview(generatedDoc) {
-    // Format for display
+    // Format for display with better paragraph handling
     let formattedDoc = generatedDoc
-        .replace(/\n\n/g, '</p><p>')
-        .replace(/\n/g, '<br>');
-    
-    formattedDoc = '<p>' + formattedDoc + '</p>';
+        // First, normalize line breaks
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n')
+        // Convert markdown-style headers to HTML headers
+        .replace(/^### (.*$)/gm, '<h3 style="color: #1E3A5F; margin-top: 20px; font-size: 16px;">$1</h3>')
+        .replace(/^## (.*$)/gm, '<h2 style="color: #1E3A5F; margin-top: 25px; font-size: 18px;">$1</h2>')
+        .replace(/^# (.*$)/gm, '<h1 style="color: #E2A14A; border-bottom: 3px solid #E2A14A; padding-bottom: 10px; font-size: 24px;">$1</h1>')
+        // Convert **text** to bold
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Handle section markers (## or ---)
+        .replace(/^---$/gm, '<hr style="margin: 20px 0; border: 1px solid #ccc;">')
+        // Split into paragraphs (double line break = new paragraph)
+        .split(/\n\n+/)
+        .map(para => {
+            // Skip empty paragraphs
+            if (!para.trim()) return '';
+            // If it's already HTML (starts with <), leave it
+            if (para.trim().startsWith('<')) return para;
+            // Otherwise wrap in <p> tag
+            return `<p style="margin-bottom: 12px;">${para.replace(/\n/g, '<br>')}</p>`;
+        })
+        .join('\n');
     
     document.getElementById('documentPreviewContent').innerHTML = formattedDoc;
     document.getElementById('documentPreviewModal').classList.remove('hidden');
