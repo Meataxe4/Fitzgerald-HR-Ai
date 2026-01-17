@@ -1708,22 +1708,26 @@ Be as specific as possible!"></textarea>
             <div id="documentStepContent"></div>
 
             <!-- Navigation buttons -->
-            <div class="flex gap-3 mt-6">
-                <button id="docBackBtn" onclick="docWizardGoBack()" 
-                        class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
-                    ← Back
-                </button>
-                <button id="docNextBtn" onclick="docWizardNext()" 
-                        class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
-                    Next Step →
-                </button>
-            </div>
+		<div class="flex gap-3 mt-6">
+    		<button id="docBackBtn" onclick="docWizardGoBack()" 
+            class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
+        ← Back
+   		</button>
+    		<button id="docNextBtn" onclick="docWizardNext()" 
+            class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+        Next Step →
+    		</button>
+    		<button id="docStartOverBtn" onclick="resetDocumentBuilder()" 
+            class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all">
+        🔄 Start Over
+    		</button>
+	    </div>
         </div>
 
         <!-- AI Generation Loading -->
         <div id="documentGenerating" class="hidden text-center py-12">
             <div class="text-6xl mb-4 animate-bounce">🤖</div>
-            <h3 class="text-amber-400 font-bold text-xl mb-2">AI is generating your document...</h3>
+            <h3 class="text-amber-400 font-bold text-xl mb-2">Fitz is generating your document...</h3>
             <p class="text-slate-400 text-sm">This may take 10-20 seconds</p>
             <div class="mt-6 flex justify-center gap-2">
                 <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
@@ -2948,6 +2952,17 @@ function showDocumentStep(stepNumber) {
     } else {
         nextBtn.innerHTML = 'Next Step →';
     }
+
+/ Show/hide start over button based on step
+const startOverBtn = document.getElementById('docStartOverBtn');
+if (startOverBtn) {
+    if (stepNumber > 1) {
+        startOverBtn.classList.remove('hidden');
+    } else {
+        startOverBtn.classList.add('hidden');
+    }
+}
+
 }
 
 function docWizardNext() {
@@ -3224,9 +3239,9 @@ TONE: Professional, neutral, procedurally fair. This is NOT a punishment - it's 
     return prompt;
 }
 
-function showDocumentPreview(document) {
+function showDocumentPreview(generatedDoc) {
     // Format for display
-    let formattedDoc = document
+    let formattedDoc = generatedDoc
         .replace(/\n\n/g, '</p><p>')
         .replace(/\n/g, '<br>');
     
@@ -3238,6 +3253,33 @@ function showDocumentPreview(document) {
 
 function closeDocumentPreview() {
     document.getElementById('documentPreviewModal').classList.add('hidden');
+}
+
+function resetDocumentBuilder() {
+    // Confirm reset
+    if (!confirm('Start over? This will clear all your entered information.')) {
+        return;
+    }
+    
+    // Reset state
+    documentBuilderState.currentType = null;
+    documentBuilderState.currentStep = 1;
+    documentBuilderState.data = {};
+    documentBuilderState.generatedDocument = null;
+    
+    // Hide all wizard sections
+    document.getElementById('documentWizardSteps').classList.add('hidden');
+    document.getElementById('documentGenerating').classList.add('hidden');
+    
+    // Show template selection
+    document.getElementById('documentTemplateSelection').classList.remove('hidden');
+    
+    // Reset progress
+    document.getElementById('docCurrentStep').textContent = '1';
+    document.getElementById('docProgress').textContent = '0% Complete';
+    document.getElementById('docProgressBar').style.width = '0%';
+    
+    console.log('🔄 Document Builder reset');
 }
 
 async function regenerateDocument() {
