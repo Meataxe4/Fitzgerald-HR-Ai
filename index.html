@@ -8,6 +8,7 @@
     <!-- Document Generation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
         /* Crisis Mode Pulse Animation */
@@ -1586,6 +1587,37 @@ const CONFIG = {
     ERROR_DISPLAY_TIME: 5000
 };
 
+// ========================================
+// SUPABASE CONFIGURATION
+// ========================================
+const SUPABASE_CONFIG = {
+    url: 'https://vaundmbbbyqmbbcavulo.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZhdW5kbWJiYnlxbWJiY2F2dWxvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njg2MDcwMzAsImV4cCI6MjA4NDE4MzAzMH0.2ynWsEBn3YJFXUBinm2e4XgnHiUM9hYbaZ1SfVk__pI'
+};
+
+// Initialize Supabase client
+let supabaseClient = null;
+
+// Initialize Supabase when page loads
+function initializeSupabase() {
+    try {
+        // Check if Supabase library loaded
+        if (typeof supabase === 'undefined') {
+            console.error('❌ Supabase library not loaded - check script tag');
+            return false;
+        }
+        
+        // Create client
+        supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+        console.log('✅ Supabase initialized successfully');
+        console.log('📊 Connected to:', SUPABASE_CONFIG.url);
+        return true;
+    } catch (error) {
+        console.error('❌ Error initializing Supabase:', error);
+        return false;
+    }
+}
+
 // Global state
 let currentUser = null;
 let conversationHistory = [];
@@ -3129,36 +3161,52 @@ function closeVenueSettings() {
 // ADMIN ANALYTICS SYSTEM
 // ========================================
 
-function trackConversation(userMessage, assistantResponse) {
+async function trackConversation(userMessage, assistantResponse) {
     const conversation = {
-        id: Date.now(),
         timestamp: new Date().toISOString(),
-        user: currentUser,
-        userMessage: userMessage,
-        assistantResponse: assistantResponse,
+        user_code: currentUser,
+        user_message: userMessage,
+        assistant_response: assistantResponse,
         theme: detectTheme(userMessage),
-        isHighRisk: detectHighRiskTopic(userMessage) !== null,
-        venue: venueProfile.setupComplete ? {
-            type: venueProfile.venueType,
-            location: venueProfile.location,
-            staffCount: venueProfile.staffCount
-        } : null
+        is_high_risk: detectHighRiskTopic(userMessage) !== null,
+        venue_type: venueProfile.setupComplete ? venueProfile.venueType : null,
+        venue_location: venueProfile.setupComplete ? venueProfile.location : null,
+        venue_staff_count: venueProfile.setupComplete ? venueProfile.staffCount : null
     };
     
-    // Add to conversations array
+    // 1. Save to localStorage as backup
     const stored = JSON.parse(localStorage.getItem('analytics_conversations') || '[]');
     stored.push(conversation);
     localStorage.setItem('analytics_conversations', JSON.stringify(stored));
     
-    // Update theme counts
+    // 2. Save to Supabase (centralized database)
+    if (supabaseClient) {
+        try {
+            const { data, error } = await supabaseClient
+                .from('conversations')
+                .insert([conversation]);
+            
+            if (error) {
+                console.error('❌ Supabase save error:', error);
+            } else {
+                console.log('✅ Conversation saved to Supabase');
+            }
+        } catch (err) {
+            console.error('❌ Failed to save to Supabase:', err);
+        }
+    } else {
+        console.warn('⚠️ Supabase not initialized - conversation only saved locally');
+    }
+    
+    // 3. Update theme counts
     updateThemeCount(conversation.theme);
     
-    // Track high-risk if applicable
-    if (conversation.isHighRisk) {
+    // 4. Track high-risk if applicable
+    if (conversation.is_high_risk) {
         trackHighRiskTopic(userMessage);
     }
     
-    // Update user profile
+    // 5. Update user profile
     updateUserProfile(currentUser, userMessage);
 }
 
@@ -3187,51 +3235,137 @@ function detectTheme(message) {
     return 'General HR Advice';
 }
 
-function updateThemeCount(theme) {
+async function updateThemeCount(theme) {
+    // Update localStorage
     const stored = JSON.parse(localStorage.getItem('analytics_themes') || '{}');
     stored[theme] = (stored[theme] || 0) + 1;
     localStorage.setItem('analytics_themes', JSON.stringify(stored));
+    
+    // Update Supabase
+    if (supabaseClient) {
+        try {
+            // Try to increment existing record
+            const { data: existing } = await supabaseClient
+                .from('themes')
+                .select('count')
+                .eq('theme', theme)
+                .single();
+            
+            if (existing) {
+                // Update existing
+                await supabaseClient
+                    .from('themes')
+                    .update({ 
+                        count: existing.count + 1,
+                        last_updated: new Date().toISOString()
+                    })
+                    .eq('theme', theme);
+            } else {
+                // Insert new
+                await supabaseClient
+                    .from('themes')
+                    .insert([{ theme: theme, count: 1 }]);
+            }
+        } catch (err) {
+            console.error('Error updating theme count:', err);
+        }
+    }
 }
 
-function trackHighRiskTopic(message) {
+async function trackHighRiskTopic(message) {
     const risk = detectHighRiskTopic(message);
     if (!risk) return;
     
     const highRiskEntry = {
-        id: Date.now(),
         timestamp: new Date().toISOString(),
-        user: currentUser,
+        user_code: currentUser,
         category: risk.category,
         title: risk.title,
         severity: risk.severity,
-        message: message.substring(0, 200) // First 200 chars only
+        message_preview: message.substring(0, 200)
     };
     
+    // Save to localStorage
     const stored = JSON.parse(localStorage.getItem('analytics_highrisk') || '[]');
     stored.push(highRiskEntry);
     localStorage.setItem('analytics_highrisk', JSON.stringify(stored));
+    
+    // Save to Supabase
+    if (supabaseClient) {
+        try {
+            await supabaseClient
+                .from('high_risk_topics')
+                .insert([highRiskEntry]);
+            console.log('✅ High-risk topic saved to Supabase');
+        } catch (err) {
+            console.error('Error saving high-risk topic:', err);
+        }
+    }
 }
 
-function updateUserProfile(user, message) {
+async function updateUserProfile(user, message) {
+    // Update localStorage
     const profiles = JSON.parse(localStorage.getItem('analytics_users') || '{}');
     
     if (!profiles[user]) {
         profiles[user] = {
-            firstSeen: new Date().toISOString(),
-            messageCount: 0,
-            lastActive: null,
+            first_seen: new Date().toISOString(),
+            message_count: 0,
+            last_active: null,
             venue: venueProfile.setupComplete ? venueProfile : null,
             topThemes: {}
         };
     }
     
-    profiles[user].messageCount++;
-    profiles[user].lastActive = new Date().toISOString();
+    profiles[user].message_count++;
+    profiles[user].last_active = new Date().toISOString();
     
     const theme = detectTheme(message);
     profiles[user].topThemes[theme] = (profiles[user].topThemes[theme] || 0) + 1;
     
     localStorage.setItem('analytics_users', JSON.stringify(profiles));
+    
+    // Update Supabase
+    if (supabaseClient) {
+        try {
+            const { data: existing } = await supabaseClient
+                .from('user_profiles')
+                .select('message_count')
+                .eq('user_code', user)
+                .single();
+            
+            if (existing) {
+                // Update existing profile
+                await supabaseClient
+                    .from('user_profiles')
+                    .update({ 
+                        message_count: existing.message_count + 1,
+                        last_active: new Date().toISOString(),
+                        venue_name: venueProfile.venueName || null,
+                        venue_type: venueProfile.venueType || null,
+                        venue_location: venueProfile.location || null,
+                        venue_city: venueProfile.city || null,
+                        staff_count: venueProfile.staffCount || null
+                    })
+                    .eq('user_code', user);
+            } else {
+                // Insert new profile
+                await supabaseClient
+                    .from('user_profiles')
+                    .insert([{
+                        user_code: user,
+                        message_count: 1,
+                        venue_name: venueProfile.venueName || null,
+                        venue_type: venueProfile.venueType || null,
+                        venue_location: venueProfile.location || null,
+                        venue_city: venueProfile.city || null,
+                        staff_count: venueProfile.staffCount || null
+                    }]);
+            }
+        } catch (err) {
+            console.error('Error updating user profile:', err);
+        }
+    }
 }
 
 function showAdminDashboard() {
@@ -3243,23 +3377,41 @@ function closeAdminDashboard() {
     document.getElementById('adminDashboardModal').classList.add('hidden');
 }
 
-function loadAnalytics() {
-    // Load stats
-    const conversations = JSON.parse(localStorage.getItem('analytics_conversations') || '[]');
-    const users = JSON.parse(localStorage.getItem('analytics_users') || '{}');
+async function loadAnalytics() {
+    if (!supabaseClient) {
+        alert('⚠️ Database not connected. Check console for errors.');
+        return;
+    }
     
-    const uniqueUsers = Object.keys(users).length;
-    const totalMessages = conversations.length;
-    const today = new Date().toDateString();
-    const activeToday = conversations.filter(c => new Date(c.timestamp).toDateString() === today).length;
-    
-    document.getElementById('statTotalUsers').textContent = uniqueUsers;
-    document.getElementById('statTotalMessages').textContent = totalMessages;
-    document.getElementById('statActiveToday').textContent = activeToday;
-    document.getElementById('statAvgSession').textContent = '5m'; // Simplified
-    
-    // Load conversations tab by default
-    switchAdminTab('conversations');
+    try {
+        // Load total counts from Supabase
+        const { count: convCount } = await supabaseClient
+            .from('conversations')
+            .select('*', { count: 'exact', head: true });
+        
+        const { count: userCount } = await supabaseClient
+            .from('user_profiles')
+            .select('*', { count: 'exact', head: true });
+        
+        // Get today's activity
+        const today = new Date().toISOString().split('T')[0];
+        const { count: todayCount } = await supabaseClient
+            .from('conversations')
+            .select('*', { count: 'exact', head: true })
+            .gte('timestamp', today);
+        
+        // Update stats
+        document.getElementById('statTotalUsers').textContent = userCount || 0;
+        document.getElementById('statTotalMessages').textContent = convCount || 0;
+        document.getElementById('statActiveToday').textContent = todayCount || 0;
+        document.getElementById('statAvgSession').textContent = '5m'; // Simplified
+        
+        // Load conversations tab by default
+        switchAdminTab('conversations');
+    } catch (error) {
+        console.error('Error loading analytics:', error);
+        alert('Error loading analytics. Check console.');
+    }
 }
 
 function switchAdminTab(tabName) {
@@ -3296,144 +3448,220 @@ function switchAdminTab(tabName) {
     if (tabName === 'highrisk') loadHighRisk();
 }
 
-function loadConversations() {
-    const conversations = JSON.parse(localStorage.getItem('analytics_conversations') || '[]');
+async function loadConversations() {
     const list = document.getElementById('conversationsList');
     
-    if (conversations.length === 0) {
-        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No conversations yet</div>';
+    // Show loading state
+    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading conversations...</div>';
+    
+    if (!supabaseClient) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Database not connected</div>';
         return;
     }
     
-    let html = '';
-    conversations.reverse().forEach(conv => {
-        const date = new Date(conv.timestamp).toLocaleString('en-AU');
-        const riskBadge = conv.isHighRisk ? '<span class="text-xs bg-red-500 text-white px-2 py-1 rounded">HIGH RISK</span>' : '';
+    try {
+        // Fetch from Supabase
+        const { data: conversations, error } = await supabaseClient
+            .from('conversations')
+            .select('*')
+            .order('timestamp', { ascending: false })
+            .limit(50);
         
-        html += `
-            <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 hover:border-purple-500 transition-all">
-                <div class="flex items-start justify-between mb-2">
-                    <div>
-                        <span class="text-purple-400 font-semibold">${conv.user}</span>
-                        <span class="text-slate-500 text-xs ml-2">${date}</span>
-                        ${riskBadge}
+        if (error) throw error;
+        
+        if (!conversations || conversations.length === 0) {
+            list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No conversations yet</div>';
+            return;
+        }
+        
+        let html = '';
+        conversations.forEach(conv => {
+            const date = new Date(conv.timestamp).toLocaleString('en-AU');
+            const riskBadge = conv.is_high_risk ? '<span class="text-xs bg-red-500 text-white px-2 py-1 rounded">HIGH RISK</span>' : '';
+            
+            html += `
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 hover:border-purple-500 transition-all">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <span class="text-purple-400 font-semibold">${conv.user_code}</span>
+                            <span class="text-slate-500 text-xs ml-2">${date}</span>
+                            ${riskBadge}
+                        </div>
+                        <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${conv.theme || 'N/A'}</span>
                     </div>
-                    <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${conv.theme}</span>
+                    <div class="text-sm">
+                        <p class="text-slate-300 mb-2"><strong>User:</strong> ${conv.user_message}</p>
+                        <p class="text-slate-400 text-xs"><strong>Response:</strong> ${conv.assistant_response.substring(0, 150)}...</p>
+                    </div>
                 </div>
-                <div class="text-sm">
-                    <p class="text-slate-300 mb-2"><strong>User:</strong> ${conv.userMessage}</p>
-                    <p class="text-slate-400 text-xs"><strong>Response:</strong> ${conv.assistantResponse.substring(0, 150)}...</p>
-                </div>
-            </div>
-        `;
-    });
-    
-    list.innerHTML = html;
+            `;
+        });
+        
+        list.innerHTML = html;
+    } catch (error) {
+        console.error('Error loading conversations:', error);
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data</div>';
+    }
 }
 
-function loadThemes() {
-    const themes = JSON.parse(localStorage.getItem('analytics_themes') || '{}');
+async function loadThemes() {
     const list = document.getElementById('themesList');
     
-    if (Object.keys(themes).length === 0) {
-        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No themes tracked yet</div>';
+    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading themes...</div>';
+    
+    if (!supabaseClient) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Database not connected</div>';
         return;
     }
     
-    // Sort by count
-    const sorted = Object.entries(themes).sort((a, b) => b[1] - a[1]);
-    
-    let html = '';
-    sorted.forEach(([theme, count]) => {
-        const percentage = ((count / Object.values(themes).reduce((a, b) => a + b, 0)) * 100).toFixed(1);
-        html += `
-            <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-purple-400 font-semibold">${theme}</span>
-                    <span class="text-2xl font-bold text-purple-400">${count}</span>
+    try {
+        const { data: themes, error } = await supabaseClient
+            .from('themes')
+            .select('*')
+            .order('count', { ascending: false });
+        
+        if (error) throw error;
+        
+        if (!themes || themes.length === 0) {
+            list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No themes tracked yet</div>';
+            return;
+        }
+        
+        const totalCount = themes.reduce((sum, t) => sum + t.count, 0);
+        
+        let html = '';
+        themes.forEach(themeData => {
+            const percentage = ((themeData.count / totalCount) * 100).toFixed(1);
+            html += `
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-purple-400 font-semibold">${themeData.theme}</span>
+                        <span class="text-2xl font-bold text-purple-400">${themeData.count}</span>
+                    </div>
+                    <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-purple-500" style="width: ${percentage}%"></div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1">${percentage}% of all queries</p>
                 </div>
-                <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
-                    <div class="h-full bg-purple-500" style="width: ${percentage}%"></div>
-                </div>
-                <p class="text-xs text-slate-400 mt-1">${percentage}% of all queries</p>
-            </div>
-        `;
-    });
-    
-    list.innerHTML = html;
+            `;
+        });
+        
+        list.innerHTML = html;
+    } catch (error) {
+        console.error('Error loading themes:', error);
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data</div>';
+    }
 }
 
-function loadUsers() {
-    const users = JSON.parse(localStorage.getItem('analytics_users') || '{}');
+async function loadUsers() {
     const list = document.getElementById('usersList');
     
-    if (Object.keys(users).length === 0) {
-        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No users yet</div>';
+    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading users...</div>';
+    
+    if (!supabaseClient) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Database not connected</div>';
         return;
     }
     
-    let html = '';
-    Object.entries(users).forEach(([userId, profile]) => {
-        const topTheme = Object.entries(profile.topThemes).sort((a, b) => b[1] - a[1])[0];
-        const venueInfo = profile.venue ? `${profile.venue.venueType} in ${profile.venue.location}` : 'No venue info';
+    try {
+        const { data: users, error } = await supabaseClient
+            .from('user_profiles')
+            .select('*')
+            .order('last_active', { ascending: false });
         
-        html += `
-            <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
-                <div class="flex items-start justify-between mb-3">
-                    <div>
-                        <p class="text-purple-400 font-semibold">${userId}</p>
-                        <p class="text-xs text-slate-400">${venueInfo}</p>
+        if (error) throw error;
+        
+        if (!users || users.length === 0) {
+            list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No users yet</div>';
+            return;
+        }
+        
+        let html = '';
+        users.forEach(profile => {
+            const venueInfo = profile.venue_type 
+                ? `${profile.venue_type} in ${profile.venue_location}` 
+                : 'No venue info';
+            
+            html += `
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <p class="text-purple-400 font-semibold">${profile.user_code}</p>
+                            <p class="text-xs text-slate-400">${venueInfo}</p>
+                        </div>
+                        <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${profile.message_count} messages</span>
                     </div>
-                    <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${profile.messageCount} messages</span>
+                    <div class="grid grid-cols-2 gap-2 text-xs">
+                        <div>
+                            <p class="text-slate-500">First seen:</p>
+                            <p class="text-slate-300">${new Date(profile.first_seen).toLocaleDateString('en-AU')}</p>
+                        </div>
+                        <div>
+                            <p class="text-slate-500">Last active:</p>
+                            <p class="text-slate-300">${new Date(profile.last_active).toLocaleDateString('en-AU')}</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="grid grid-cols-2 gap-2 text-xs">
-                    <div>
-                        <p class="text-slate-500">First seen:</p>
-                        <p class="text-slate-300">${new Date(profile.firstSeen).toLocaleDateString('en-AU')}</p>
-                    </div>
-                    <div>
-                        <p class="text-slate-500">Top theme:</p>
-                        <p class="text-slate-300">${topTheme ? topTheme[0] : 'N/A'}</p>
-                    </div>
-                </div>
-            </div>
-        `;
-    });
-    
-    list.innerHTML = html;
+            `;
+        });
+        
+        list.innerHTML = html;
+    } catch (error) {
+        console.error('Error loading users:', error);
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data</div>';
+    }
 }
 
-function loadHighRisk() {
-    const highRisk = JSON.parse(localStorage.getItem('analytics_highrisk') || '[]');
+async function loadHighRisk() {
     const list = document.getElementById('highRiskList');
     
-    if (highRisk.length === 0) {
-        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No high-risk topics detected</div>';
+    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading high-risk topics...</div>';
+    
+    if (!supabaseClient) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Database not connected</div>';
         return;
     }
     
-    let html = '';
-    highRisk.reverse().forEach(risk => {
-        const date = new Date(risk.timestamp).toLocaleString('en-AU');
-        const colorMap = { critical: 'red', high: 'yellow', medium: 'blue' };
-        const color = colorMap[risk.severity] || 'gray';
+    try {
+        const { data: highRisk, error } = await supabaseClient
+            .from('high_risk_topics')
+            .select('*')
+            .order('timestamp', { ascending: false })
+            .limit(50);
         
-        html += `
-            <div class="bg-slate-900 border-2 border-${color}-500 rounded-lg p-4">
-                <div class="flex items-start justify-between mb-2">
-                    <div>
-                        <span class="text-${color}-400 font-semibold">${risk.title}</span>
-                        <span class="text-slate-500 text-xs ml-2">${date}</span>
+        if (error) throw error;
+        
+        if (!highRisk || highRisk.length === 0) {
+            list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No high-risk topics detected</div>';
+            return;
+        }
+        
+        let html = '';
+        highRisk.forEach(risk => {
+            const date = new Date(risk.timestamp).toLocaleString('en-AU');
+            const colorMap = { critical: 'red', high: 'yellow', medium: 'blue' };
+            const color = colorMap[risk.severity] || 'gray';
+            
+            html += `
+                <div class="bg-slate-900 border-2 border-${color}-500 rounded-lg p-4">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <span class="text-${color}-400 font-semibold">${risk.title}</span>
+                            <span class="text-slate-500 text-xs ml-2">${date}</span>
+                        </div>
+                        <span class="text-xs bg-${color}-500 text-white px-2 py-1 rounded uppercase">${risk.severity}</span>
                     </div>
-                    <span class="text-xs bg-${color}-500 text-white px-2 py-1 rounded uppercase">${risk.severity}</span>
+                    <p class="text-slate-400 text-xs mb-2"><strong>User:</strong> ${risk.user_code}</p>
+                    <p class="text-slate-300 text-sm">${risk.message_preview}</p>
                 </div>
-                <p class="text-slate-400 text-xs mb-2"><strong>User:</strong> ${risk.user}</p>
-                <p class="text-slate-300 text-sm">${risk.message}</p>
-            </div>
-        `;
-    });
-    
-    list.innerHTML = html;
+            `;
+        });
+        
+        list.innerHTML = html;
+    } catch (error) {
+        console.error('Error loading high-risk topics:', error);
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data</div>';
+    }
 }
 
 function filterConversations() {
@@ -4868,6 +5096,12 @@ document.addEventListener('DOMContentLoaded', function() {
     DOM.toolsMenu = document.getElementById('toolsMenu');
     DOM.voiceButton = document.getElementById('voiceButton');
     DOM.voiceIcon = document.getElementById('voiceIcon');
+    
+    // Initialize Supabase
+    const supabaseInitialized = initializeSupabase();
+    if (!supabaseInitialized) {
+        console.warn('⚠️ Supabase initialization failed - analytics will only save locally');
+    }
     
     console.log('✅ DOM cache initialized');
     console.log('Fitzgerald HR Assistant loaded successfully ✓');
