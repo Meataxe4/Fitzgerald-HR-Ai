@@ -85,6 +85,49 @@
                     <p class="text-slate-400 text-xs">24/7 Available</p>
                 </div>
             </div>
+
+<!-- Social Proof Section -->
+<div class="mt-8 bg-gradient-to-br from-amber-500/5 to-orange-600/5 border border-amber-500/30 rounded-2xl p-6">
+    <div class="text-center mb-4">
+        <p class="text-amber-400 font-bold text-lg">Trusted by Australian Hospitality Venues</p>
+        <p class="text-slate-400 text-sm mt-1">Real results from beta testers</p>
+    </div>
+    
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="text-center">
+            <div class="bg-slate-800 rounded-lg p-4 border border-slate-700">
+                <p class="text-3xl font-bold text-amber-500">$12k</p>
+                <p class="text-slate-400 text-xs mt-1">Avg. Annual Savings</p>
+            </div>
+        </div>
+        <div class="text-center">
+            <div class="bg-slate-800 rounded-lg p-4 border border-slate-700">
+                <p class="text-3xl font-bold text-amber-500">&lt;90s</p>
+                <p class="text-slate-400 text-xs mt-1">Avg. Response Time</p>
+            </div>
+        </div>
+        <div class="text-center">
+            <div class="bg-slate-800 rounded-lg p-4 border border-slate-700">
+                <p class="text-3xl font-bold text-amber-500">24/7</p>
+                <p class="text-slate-400 text-xs mt-1">Always Available</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Testimonial Carousel -->
+    <div id="testimonialCarousel" class="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+        <div class="testimonial-slide">
+            <div class="flex items-start gap-3 mb-2">
+                <div class="text-2xl">⭐⭐⭐⭐⭐</div>
+            </div>
+            <p class="text-slate-200 text-sm italic mb-3">
+                "Saved me $300 on a consultant call. Got my answer in 2 minutes instead of waiting days for a callback."
+            </p>
+            <p class="text-slate-500 text-xs">— Phil A., Pub Owner, Sydney</p>
+        </div>
+    </div>
+</div>
         </div>
     </div>
 
@@ -5068,6 +5111,72 @@ function generateDocumentId() {
 }
 
 // ========================================
+// TESTIMONIAL ROTATION SYSTEM
+// ========================================
+
+const testimonials = [
+    {
+        quote: "Saved me $300 on a consultant call. Got my answer in 2 minutes instead of waiting days for a callback.",
+        author: "Phil A., Pub Owner, Sydney",
+        rating: 5
+    },
+    {
+        quote: "The Award Wizard is brilliant. No more guessing if I'm paying staff correctly.",
+        author: "Michael S., Café Owner/Manager, Sydney",
+        rating: 5
+    },
+    {
+        quote: "Crisis mode saved my business. Had an urgent termination issue at 11pm - got expert guidance immediately.",
+        author: "Evan G., Hotel Manager, Brisbane",
+        rating: 5
+    },
+    {
+        quote: "Finally understand penalty rates. The calculator alone is worth the subscription.",
+        author: "Emma R., Restaurant Owner, Melbourne",
+        rating: 5
+    }
+];
+
+let currentTestimonialIndex = 0;
+
+function rotateTestimonial() {
+    const carousel = document.getElementById('testimonialCarousel');
+    if (!carousel) return;
+    
+    currentTestimonialIndex = (currentTestimonialIndex + 1) % testimonials.length;
+    const testimonial = testimonials[currentTestimonialIndex];
+    
+    // Fade out
+    carousel.style.opacity = '0';
+    carousel.style.transition = 'opacity 0.3s ease-out';
+    
+    setTimeout(() => {
+        // Update content
+        const stars = '⭐'.repeat(testimonial.rating);
+        carousel.innerHTML = `
+            <div class="testimonial-slide">
+                <div class="flex items-start gap-3 mb-2">
+                    <div class="text-2xl">${stars}</div>
+                </div>
+                <p class="text-slate-200 text-sm italic mb-3">
+                    "${testimonial.quote}"
+                </p>
+                <p class="text-slate-500 text-xs">— ${testimonial.author}</p>
+            </div>
+        `;
+        
+        // Fade in
+        carousel.style.opacity = '1';
+    }, 300);
+}
+
+// Start rotation when on access screen
+function startTestimonialRotation() {
+    // Rotate every 5 seconds
+    setInterval(rotateTestimonial, 5000);
+}
+
+// ========================================
 // EVENT LISTENERS
 // ========================================
 
@@ -5109,6 +5218,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!supabaseInitialized) {
         console.warn('⚠️ Supabase initialization failed - analytics will only save locally');
     }
+    
+    startTestimonialRotation();
     
     console.log('✅ DOM cache initialized');
     console.log('Fitzgerald HR Assistant loaded successfully ✓');
