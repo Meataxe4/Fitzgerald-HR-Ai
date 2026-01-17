@@ -3000,8 +3000,9 @@ function docWizardNext() {
     });
     
     if (!allValid) return;
-
-if (documentBuilderState.currentType === 'recordOfDiscussion') {
+    
+    // Validation for Record of Discussion
+    if (documentBuilderState.currentType === 'recordOfDiscussion' && documentBuilderState.currentStep === 2) {
         // Check 24 hours notice
         if (documentBuilderState.data.noticeProvided === 'No') {
             alert(
@@ -3010,7 +3011,7 @@ if (documentBuilderState.currentType === 'recordOfDiscussion') {
                 'This ensures procedural fairness and gives the employee time to prepare and arrange a support person if desired.\n\n' +
                 'Please schedule the meeting and provide proper notice before continuing.'
             );
-            return; // Stop progression
+            return;
         }
         
         // Check support person offer
@@ -3026,7 +3027,7 @@ if (documentBuilderState.currentType === 'recordOfDiscussion') {
                 'This is a legal requirement for procedural fairness.\n\n' +
                 'Please offer this right to the employee before continuing.'
             );
-            return; // Stop progression
+            return;
         }
     }
     
@@ -3037,13 +3038,6 @@ if (documentBuilderState.currentType === 'recordOfDiscussion') {
     } else {
         // All steps complete - generate document
         generateDocumentWithAI();
-    }
-}
-
-function docWizardGoBack() {
-    if (documentBuilderState.currentStep > 1) {
-        documentBuilderState.currentStep--;
-        showDocumentStep(documentBuilderState.currentStep);
     }
 }
 
