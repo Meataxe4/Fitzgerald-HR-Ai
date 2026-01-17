@@ -212,6 +212,10 @@
                 <span>💰</span>
                 <span>Award Calculator</span>
             </button>
+	    <button onclick="openTool('documentBuilder')" class="w-full text-left px-4 py-3 hover:bg-slate-700 			rounded-lg text-slate-200 flex items-center gap-3">
+    		<span>📝</span>
+    		<span>Document Builder</span>
+	    </button>
             <button onclick="openTool('rosterOptimizer')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3">
     	<span>📋</span>
     	<span>Roster Optimiser</span>
@@ -1082,6 +1086,11 @@
                     data-tab="highrisk">
                 🚨 High-Risk Topics
             </button>
+	    <button onclick="switchAdminTab('documents')" 
+        	class="admin-tab px-4 py-2 text-slate-400 hover:text-purple-400 transition-colors" 
+        	data-tab="documents">
+    	     📝 Generated Documents
+	    </button>
         </div>
 
         <!-- Tab Content -->
@@ -1110,6 +1119,11 @@
             <div id="adminHighRiskTab" class="admin-tab-content hidden">
                 <div id="highRiskList" class="space-y-3"></div>
             </div>
+
+	    <!-- Documents Tab -->
+		<div id="adminDocumentsTab" class="admin-tab-content hidden">
+    		<div id="documentsList" class="space-y-3"></div>
+	    </div>
         </div>
 
         <!-- Export Button -->
@@ -1602,6 +1616,178 @@ Be as specific as possible!"></textarea>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Document Builder Modal -->
+<div id="documentBuilderModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                    <span>📝</span> Document Builder
+                </h2>
+                <p class="text-slate-400 text-sm">AI-powered HR document generation</p>
+            </div>
+            <button onclick="closeToolModal('documentBuilderModal')" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+
+        <!-- Template Selection Screen -->
+        <div id="documentTemplateSelection" class="space-y-4">
+            <p class="text-slate-300 mb-4">Choose a document type:</p>
+            
+            <!-- Record of Discussion -->
+            <button onclick="selectDocumentType('recordOfDiscussion')" 
+                    class="w-full text-left p-6 bg-slate-700 hover:bg-green-600 rounded-lg transition-all border-2 border-transparent hover:border-green-500">
+                <div class="flex items-start gap-4">
+                    <div class="text-4xl">📋</div>
+                    <div class="flex-1">
+                        <h3 class="text-white font-bold text-lg mb-1">Record of Discussion</h3>
+                        <p class="text-slate-300 text-sm mb-2">For: Coaching, minor issues, informal feedback</p>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded">Low Risk</span>
+                            <span class="text-slate-500 text-xs">• 5 quick questions</span>
+                        </div>
+                    </div>
+                </div>
+            </button>
+
+            <!-- Formal Warning -->
+            <button onclick="selectDocumentType('formalWarning')" 
+                    class="w-full text-left p-6 bg-slate-700 hover:bg-yellow-600 rounded-lg transition-all border-2 border-transparent hover:border-yellow-500">
+                <div class="flex items-start gap-4">
+                    <div class="text-4xl">⚠️</div>
+                    <div class="flex-1">
+                        <h3 class="text-white font-bold text-lg mb-1">Formal Warning Letter</h3>
+                        <p class="text-slate-300 text-sm mb-2">For: Performance/conduct issues requiring formal action</p>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs rounded">Medium Risk</span>
+                            <span class="text-slate-500 text-xs">• 7 questions • AI-enhanced</span>
+                        </div>
+                    </div>
+                </div>
+            </button>
+
+            <!-- Letter of Allegation -->
+            <button onclick="selectDocumentType('letterOfAllegation')" 
+                    class="w-full text-left p-6 bg-slate-700 hover:bg-red-600 rounded-lg transition-all border-2 border-transparent hover:border-red-500">
+                <div class="flex items-start gap-4">
+                    <div class="text-4xl">🔍</div>
+                    <div class="flex-1">
+                        <h3 class="text-white font-bold text-lg mb-1">Letter of Allegation</h3>
+                        <p class="text-slate-300 text-sm mb-2">For: Serious misconduct requiring investigation</p>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-1 bg-red-500/20 text-red-400 text-xs rounded font-bold">HIGH RISK</span>
+                            <span class="text-slate-500 text-xs">• 6 questions • Consultant review required</span>
+                        </div>
+                    </div>
+                </div>
+            </button>
+
+            <div class="mt-6 bg-amber-500/10 border border-amber-500 rounded-lg p-4">
+                <p class="text-amber-300 text-sm">
+                    <strong>⚠️ Important:</strong> All generated documents must be reviewed by a Fitzgerald HR consultant before use.
+                </p>
+            </div>
+        </div>
+
+        <!-- Wizard Steps (Hidden initially) -->
+        <div id="documentWizardSteps" class="hidden">
+            <!-- Progress bar -->
+            <div class="mb-6">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm text-slate-400">Step <span id="docCurrentStep">1</span> of <span id="docTotalSteps">7</span></span>
+                    <span class="text-sm text-amber-400" id="docProgress">14% Complete</span>
+                </div>
+                <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+                    <div id="docProgressBar" class="h-full bg-amber-500 transition-all duration-300" style="width: 14%"></div>
+                </div>
+            </div>
+
+            <!-- Step content container -->
+            <div id="documentStepContent"></div>
+
+            <!-- Navigation buttons -->
+            <div class="flex gap-3 mt-6">
+                <button id="docBackBtn" onclick="docWizardGoBack()" 
+                        class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
+                    ← Back
+                </button>
+                <button id="docNextBtn" onclick="docWizardNext()" 
+                        class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+                    Next Step →
+                </button>
+            </div>
+        </div>
+
+        <!-- AI Generation Loading -->
+        <div id="documentGenerating" class="hidden text-center py-12">
+            <div class="text-6xl mb-4 animate-bounce">🤖</div>
+            <h3 class="text-amber-400 font-bold text-xl mb-2">AI is generating your document...</h3>
+            <p class="text-slate-400 text-sm">This may take 10-20 seconds</p>
+            <div class="mt-6 flex justify-center gap-2">
+                <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Document Preview Modal -->
+<div id="documentPreviewModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl max-w-5xl w-full border-2 border-amber-500 fade-in max-h-[90vh] flex flex-col">
+        
+        <!-- Header -->
+        <div class="p-6 border-b border-slate-700">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-2xl font-bold text-amber-500">📄 Preview Your Document</h2>
+                    <p class="text-slate-400 text-sm mt-1">Review carefully before downloading</p>
+                </div>
+                <button onclick="closeDocumentPreview()" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
+        </div>
+
+        <!-- Document Content (scrollable) -->
+        <div class="flex-1 overflow-y-auto p-8 bg-white">
+            <div id="documentPreviewContent" class="max-w-3xl mx-auto prose prose-slate" 
+                 style="font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.8; color: #000;">
+                <!-- AI-generated document appears here -->
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="p-6 border-t border-slate-700 bg-slate-800">
+            <div class="flex gap-3 mb-4">
+                <button onclick="regenerateDocument()" 
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all text-sm flex items-center gap-2">
+                    <span>🔄</span>
+                    <span>Regenerate</span>
+                </button>
+                <button onclick="requestDocumentChange()" 
+                        class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all text-sm flex items-center gap-2">
+                    <span>✨</span>
+                    <span>Request Changes</span>
+                </button>
+                <button onclick="downloadGeneratedDocument()" 
+                        class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2">
+                    <span>📥</span>
+                    <span>Download Word Document</span>
+                </button>
+            </div>
+            
+            <div class="bg-red-500/10 border-2 border-red-500 rounded-lg p-4">
+                <p class="text-red-300 font-bold text-sm flex items-center gap-2 mb-2">
+                    <span>⚠️</span>
+                    <span>CRITICAL: This document MUST be reviewed by a consultant before use</span>
+                </p>
+                <p class="text-red-200 text-xs">
+                    Contact: <a href="mailto:info@fitzgeraldhr.com.au" class="underline hover:text-red-100">info@fitzgeraldhr.com.au</a> | +61 400 211 014
+                </p>
+            </div>
+        </div>
+
     </div>
 </div>
 
@@ -2465,6 +2651,761 @@ const hrTemplates = {
             return 'DOC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
         }
 
+// ========================================
+// DOCUMENT BUILDER SYSTEM
+// ========================================
+
+const documentBuilderState = {
+    currentType: null,
+    currentStep: 1,
+    totalSteps: 0,
+    data: {},
+    generatedDocument: null,
+    isGenerating: false
+};
+
+// Document template configurations
+const documentWizardSteps = {
+    formalWarning: [
+        {
+            id: 1,
+            title: "Employee Details",
+            fields: [
+                { name: "employeeName", label: "Employee's full name", type: "text", required: true, placeholder: "e.g., Blake Smith" },
+                { name: "position", label: "Position/Role", type: "text", required: true, placeholder: "e.g., Chef" },
+                { name: "employmentType", label: "Employment Type", type: "select", 
+                  options: ["Full-Time", "Part-Time", "Casual"], required: true }
+            ]
+        },
+        {
+            id: 2,
+            title: "What Happened?",
+            fields: [
+                { name: "issueDescription", label: "Briefly describe the issue", 
+                  type: "textarea", placeholder: "e.g., Repeatedly late for shifts", required: true, rows: 3 },
+                { name: "issueDate", label: "When did this occur? (most recent)", type: "date", required: true },
+                { name: "witnesses", label: "Any witnesses? (optional)", type: "text", required: false, placeholder: "Names of witnesses" }
+            ]
+        },
+        {
+            id: 3,
+            title: "Previous Action",
+            fields: [
+                { name: "hadVerbalWarnings", label: "Have you given verbal warnings?", 
+                  type: "radio", options: ["Yes", "No"], required: true },
+                { name: "verbalWarningCount", label: "How many verbal warnings?", 
+                  type: "number", min: 1, max: 10, placeholder: "e.g., 3",
+                  showIf: { field: "hadVerbalWarnings", value: "Yes" } },
+                { name: "warningLevel", label: "This warning is:", type: "select",
+                  options: ["First formal warning", "Second formal warning", "Final warning"], required: true }
+            ]
+        },
+        {
+            id: 4,
+            title: "What Needs to Change?",
+            fields: [
+                { name: "expectations", label: "What specific improvements do you expect?", 
+                  type: "textarea", placeholder: "e.g., Arrive on time for all shifts", required: true, rows: 3 },
+                { name: "timeframe", label: "Timeframe for improvement", type: "select",
+                  options: ["Immediate", "2 weeks", "1 month", "3 months"], required: true }
+            ]
+        },
+        {
+            id: 5,
+            title: "Consequences",
+            fields: [
+                { name: "consequences", label: "What happens if behaviour continues?", 
+                  type: "textarea", placeholder: "e.g., Further disciplinary action up to and including termination", 
+                  required: true, rows: 2 }
+            ]
+        }
+    ],
+    recordOfDiscussion: [
+        {
+            id: 1,
+            title: "Employee & Meeting Details",
+            fields: [
+                { name: "employeeName", label: "Employee's full name", type: "text", required: true },
+                { name: "position", label: "Position/Role", type: "text", required: true },
+                { name: "discussionDate", label: "Date of discussion", type: "date", required: true },
+                { name: "location", label: "Location", type: "text", required: false, placeholder: "e.g., Manager's office" }
+            ]
+        },
+        {
+            id: 2,
+            title: "What Was Discussed?",
+            fields: [
+                { name: "issueType", label: "Type of discussion", type: "select",
+                  options: ["Performance concern", "Attendance issue", "Behaviour concern", "Policy clarification", "General feedback", "Other"],
+                  required: true },
+                { name: "issueDescription", label: "What was discussed?", type: "textarea", required: true, rows: 4 }
+            ]
+        },
+        {
+            id: 3,
+            title: "Employee Response",
+            fields: [
+                { name: "employeeAcknowledged", label: "Did the employee acknowledge the issue?", 
+                  type: "radio", options: ["Yes", "No", "Partially"], required: true },
+                { name: "employeeComments", label: "What did the employee say? (optional)", 
+                  type: "textarea", required: false, rows: 3, placeholder: "Employee's perspective or explanation" }
+            ]
+        },
+        {
+            id: 4,
+            title: "Agreed Actions",
+            fields: [
+                { name: "agreedActions", label: "What actions did you both agree on?", 
+                  type: "textarea", required: true, rows: 3, placeholder: "Specific steps the employee will take" },
+                { name: "reviewTimeframe", label: "When will you review progress?", type: "select",
+                  options: ["1 week", "2 weeks", "1 month", "As needed"], required: true }
+            ]
+        },
+        {
+            id: 5,
+            title: "Support Offered",
+            fields: [
+                { name: "supportProvided", label: "What support or resources did you offer?", 
+                  type: "textarea", required: false, rows: 2, 
+                  placeholder: "e.g., Training, mentoring, written procedures" }
+            ]
+        }
+    ],
+    letterOfAllegation: [
+        {
+            id: 1,
+            title: "Employee Details",
+            fields: [
+                { name: "employeeName", label: "Employee's full name", type: "text", required: true },
+                { name: "position", label: "Position/Role", type: "text", required: true },
+                { name: "employmentType", label: "Employment Type", type: "select", 
+                  options: ["Full-Time", "Part-Time", "Casual"], required: true }
+            ]
+        },
+        {
+            id: 2,
+            title: "Allegation Details",
+            fields: [
+                { name: "allegationType", label: "Type of allegation", type: "select",
+                  options: ["Theft", "Harassment", "Bullying", "Serious safety breach", "Fraud", "Violence/threats", "Other serious misconduct"],
+                  required: true },
+                { name: "allegationDescription", label: "Describe the allegation", 
+                  type: "textarea", required: true, rows: 4, 
+                  placeholder: "What specifically is alleged to have occurred?" },
+                { name: "incidentDate", label: "Date of alleged incident", type: "date", required: true }
+            ]
+        },
+        {
+            id: 3,
+            title: "Source & Evidence",
+            fields: [
+                { name: "allegationSource", label: "Who made the allegation?", type: "select",
+                  options: ["Anonymous complaint", "Named complainant", "Management observed", "Multiple witnesses"],
+                  required: true },
+                { name: "evidenceExists", label: "What evidence exists?", 
+                  type: "textarea", required: false, rows: 2,
+                  placeholder: "e.g., Witness statements, CCTV, documents" }
+            ]
+        },
+        {
+            id: 4,
+            title: "Investigation Process",
+            fields: [
+                { name: "investigator", label: "Who will conduct the investigation?", type: "text",
+                  required: true, placeholder: "e.g., HR Manager, External investigator" },
+                { name: "suspensionRequired", label: "Suspension during investigation?", type: "select",
+                  options: ["No suspension - continue work", "Yes - on full pay", "Yes - without pay (serious misconduct only)"],
+                  required: true }
+            ]
+        },
+        {
+            id: 5,
+            title: "Investigation Meeting",
+            fields: [
+                { name: "meetingDate", label: "Meeting date", type: "date", required: true },
+                { name: "meetingTime", label: "Meeting time", type: "time", required: true },
+                { name: "meetingLocation", label: "Meeting location", type: "text", required: true }
+            ]
+        }
+    ]
+};
+
+function selectDocumentType(type) {
+    documentBuilderState.currentType = type;
+    documentBuilderState.currentStep = 1;
+    documentBuilderState.data = {};
+    documentBuilderState.totalSteps = documentWizardSteps[type].length;
+    
+    // Hide template selection
+    document.getElementById('documentTemplateSelection').classList.add('hidden');
+    
+    // Show wizard
+    document.getElementById('documentWizardSteps').classList.remove('hidden');
+    
+    // Update total steps
+    document.getElementById('docTotalSteps').textContent = documentBuilderState.totalSteps;
+    
+    // Show first step
+    showDocumentStep(1);
+    
+    trackEvent('document_type_selected', { user: currentUser, type: type });
+}
+
+function showDocumentStep(stepNumber) {
+    const steps = documentWizardSteps[documentBuilderState.currentType];
+    const step = steps[stepNumber - 1];
+    
+    if (!step) return;
+    
+    // Update progress
+    document.getElementById('docCurrentStep').textContent = stepNumber;
+    const progress = Math.round((stepNumber / documentBuilderState.totalSteps) * 100);
+    document.getElementById('docProgress').textContent = `${progress}% Complete`;
+    document.getElementById('docProgressBar').style.width = `${progress}%`;
+    
+    // Build step HTML
+    let html = `<h3 class="text-xl font-bold text-white mb-4">${step.title}</h3><div class="space-y-4">`;
+    
+    step.fields.forEach(field => {
+        // Check conditional display
+        if (field.showIf) {
+            const conditionField = field.showIf.field;
+            const conditionValue = field.showIf.value;
+            if (documentBuilderState.data[conditionField] !== conditionValue) {
+                return; // Skip this field
+            }
+        }
+        
+        html += `<div>`;
+        html += `<label class="block text-slate-300 text-sm mb-2">
+                    ${field.label}${field.required ? ' <span class="text-red-400">*</span>' : ''}
+                 </label>`;
+        
+        if (field.type === 'text') {
+            html += `<input type="text" id="field_${field.name}" 
+                           placeholder="${field.placeholder || ''}"
+                           value="${documentBuilderState.data[field.name] || ''}"
+                           class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white"
+                           ${field.required ? 'required' : ''}>`;
+        } else if (field.type === 'textarea') {
+            html += `<textarea id="field_${field.name}" rows="${field.rows || 3}"
+                              placeholder="${field.placeholder || ''}"
+                              class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white"
+                              ${field.required ? 'required' : ''}>${documentBuilderState.data[field.name] || ''}</textarea>`;
+        } else if (field.type === 'select') {
+            html += `<select id="field_${field.name}" 
+                            class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white"
+                            ${field.required ? 'required' : ''}>
+                        <option value="">Select...</option>`;
+            field.options.forEach(opt => {
+                const selected = documentBuilderState.data[field.name] === opt ? 'selected' : '';
+                html += `<option value="${opt}" ${selected}>${opt}</option>`;
+            });
+            html += `</select>`;
+        } else if (field.type === 'radio') {
+            field.options.forEach(opt => {
+                const checked = documentBuilderState.data[field.name] === opt ? 'checked' : '';
+                html += `<label class="flex items-center gap-2 text-slate-300 mb-2">
+                            <input type="radio" name="field_${field.name}" value="${opt}" ${checked}
+                                   class="text-amber-500">
+                            <span>${opt}</span>
+                         </label>`;
+            });
+        } else if (field.type === 'date') {
+            const today = new Date().toISOString().split('T')[0];
+            html += `<input type="date" id="field_${field.name}" 
+                           value="${documentBuilderState.data[field.name] || today}"
+                           class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white"
+                           ${field.required ? 'required' : ''}>`;
+        } else if (field.type === 'time') {
+            html += `<input type="time" id="field_${field.name}" 
+                           value="${documentBuilderState.data[field.name] || ''}"
+                           class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white"
+                           ${field.required ? 'required' : ''}>`;
+        } else if (field.type === 'number') {
+            html += `<input type="number" id="field_${field.name}" 
+                           min="${field.min || 0}" max="${field.max || 100}"
+                           placeholder="${field.placeholder || ''}"
+                           value="${documentBuilderState.data[field.name] || ''}"
+                           class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white"
+                           ${field.required ? 'required' : ''}>`;
+        }
+        
+        html += `</div>`;
+    });
+    
+    html += `</div>`;
+    
+    document.getElementById('documentStepContent').innerHTML = html;
+    
+    // Show/hide back button
+    document.getElementById('docBackBtn').style.display = stepNumber > 1 ? 'block' : 'none';
+    
+    // Update next button text
+    const nextBtn = document.getElementById('docNextBtn');
+    if (stepNumber === documentBuilderState.totalSteps) {
+        nextBtn.innerHTML = '✨ Generate Document';
+    } else {
+        nextBtn.innerHTML = 'Next Step →';
+    }
+}
+
+function docWizardNext() {
+    // Save current step data
+    const steps = documentWizardSteps[documentBuilderState.currentType];
+    const step = steps[documentBuilderState.currentStep - 1];
+    
+    let allValid = true;
+    
+    step.fields.forEach(field => {
+        // Skip if conditional and not shown
+        if (field.showIf) {
+            const conditionField = field.showIf.field;
+            const conditionValue = field.showIf.value;
+            if (documentBuilderState.data[conditionField] !== conditionValue) {
+                return;
+            }
+        }
+        
+        let value;
+        if (field.type === 'radio') {
+            const radio = document.querySelector(`input[name="field_${field.name}"]:checked`);
+            value = radio ? radio.value : '';
+        } else {
+            const element = document.getElementById(`field_${field.name}`);
+            value = element ? element.value.trim() : '';
+        }
+        
+        if (field.required && !value) {
+            allValid = false;
+            alert(`Please fill in: ${field.label}`);
+        }
+        
+        documentBuilderState.data[field.name] = value;
+    });
+    
+    if (!allValid) return;
+    
+    // Move to next step or generate
+    if (documentBuilderState.currentStep < documentBuilderState.totalSteps) {
+        documentBuilderState.currentStep++;
+        showDocumentStep(documentBuilderState.currentStep);
+    } else {
+        // All steps complete - generate document
+        generateDocumentWithAI();
+    }
+}
+
+function docWizardGoBack() {
+    if (documentBuilderState.currentStep > 1) {
+        documentBuilderState.currentStep--;
+        showDocumentStep(documentBuilderState.currentStep);
+    }
+}
+
+async function generateDocumentWithAI() {
+    // Hide wizard, show loading
+    document.getElementById('documentWizardSteps').classList.add('hidden');
+    document.getElementById('documentGenerating').classList.remove('hidden');
+    
+    documentBuilderState.isGenerating = true;
+    
+    try {
+        const prompt = buildDocumentPrompt();
+        const response = await callClaudeAPI(prompt);
+        
+        documentBuilderState.generatedDocument = response;
+        
+        // Close document builder modal
+        closeToolModal('documentBuilderModal');
+        
+        // Show preview modal
+        showDocumentPreview(response);
+        
+        // Log the generation
+        await logDocumentGeneration();
+        
+        trackEvent('document_generated_ai', {
+            user: currentUser,
+            type: documentBuilderState.currentType,
+            employeeName: documentBuilderState.data.employeeName
+        });
+        
+    } catch (error) {
+        console.error('Document generation error:', error);
+        alert('⚠️ Error generating document. Please try again or contact support.');
+        
+        // Reset to wizard
+        document.getElementById('documentGenerating').classList.add('hidden');
+        document.getElementById('documentWizardSteps').classList.remove('hidden');
+    } finally {
+        documentBuilderState.isGenerating = false;
+    }
+}
+
+function buildDocumentPrompt() {
+    const type = documentBuilderState.currentType;
+    const data = documentBuilderState.data;
+    
+    const venueContext = venueProfile.setupComplete ? 
+        `Venue: ${venueProfile.venueName} (${venueProfile.venueType}) in ${venueProfile.city}, ${venueProfile.location}` :
+        `Australian hospitality venue`;
+    
+    let prompt = '';
+    
+    if (type === 'formalWarning') {
+        prompt = `You are generating a FORMAL WARNING LETTER for Australian hospitality HR.
+
+VENUE CONTEXT:
+${venueContext}
+Award: Hospitality Industry (General) Award MA000009
+Manager: ${venueProfile.userName || '[Manager Name]'}
+
+EMPLOYEE DETAILS:
+- Name: ${data.employeeName}
+- Position: ${data.position}
+- Employment Type: ${data.employmentType}
+
+ISSUE DETAILS:
+${data.issueDescription}
+Date: ${data.issueDate}
+${data.witnesses ? `Witnesses: ${data.witnesses}` : 'No witnesses mentioned'}
+
+PREVIOUS ACTION TAKEN:
+${data.hadVerbalWarnings === 'Yes' ? 
+  `${data.verbalWarningCount || 'Multiple'} verbal warning(s) have been given` : 
+  'No prior formal warnings'}
+This is a ${data.warningLevel.toLowerCase()}.
+
+REQUIRED IMPROVEMENTS:
+${data.expectations}
+Timeframe: ${data.timeframe}
+
+CONSEQUENCES:
+${data.consequences}
+
+Generate a complete, professional formal warning letter following Australian employment law best practices.
+
+REQUIREMENTS:
+1. **Expand the issue description** - Take the brief description and expand with appropriate context while staying factual
+2. **Use formal, professional language** - Clear, firm but respectful
+3. **Include all legal requirements**:
+   - Dated header with full employee details
+   - Clear subject line
+   - Detailed description of the issue (expanded from brief description)
+   - Reference to previous warnings
+   - Specific, measurable improvement expectations
+   - Clear timeframe
+   - Stated consequences
+   - Right to respond (7 days in writing)
+   - Warning retention period (12 months)
+   - Signature sections
+
+4. **Maintain procedural fairness**
+5. **Be specific and actionable**
+6. **Professional tone** - firm but not threatening
+
+Format as a complete business letter with proper structure.
+
+DO NOT add fictional details. Expand and contextualize what was provided.`;
+    
+    } else if (type === 'recordOfDiscussion') {
+        prompt = `You are generating a RECORD OF DISCUSSION for Australian hospitality HR.
+
+VENUE CONTEXT:
+${venueContext}
+Manager: ${venueProfile.userName || '[Manager Name]'}
+
+MEETING DETAILS:
+- Employee: ${data.employeeName}
+- Position: ${data.position}
+- Date: ${data.discussionDate}
+- Location: ${data.location || 'Workplace'}
+
+DISCUSSION TYPE: ${data.issueType}
+
+WHAT WAS DISCUSSED:
+${data.issueDescription}
+
+EMPLOYEE RESPONSE:
+${data.employeeAcknowledged === 'Yes' ? 'Employee acknowledged the issue' : 
+  data.employeeAcknowledged === 'No' ? 'Employee did not acknowledge the issue' :
+  'Employee partially acknowledged the issue'}
+${data.employeeComments ? `Employee comments: ${data.employeeComments}` : ''}
+
+AGREED ACTIONS:
+${data.agreedActions}
+
+REVIEW TIMEFRAME: ${data.reviewTimeframe}
+
+SUPPORT PROVIDED:
+${data.supportProvided || 'To be determined'}
+
+Generate a professional Record of Discussion document.
+
+This is an INFORMAL record (not formal disciplinary action).
+
+Include:
+- Header with date, employee details, manager name
+- Purpose/type of discussion
+- Summary of what was discussed (expanded appropriately)
+- Employee's response
+- Agreed actions (clear and specific)
+- Support offered
+- Review date
+- Signature sections for both parties
+- Note that signature = discussion occurred, not agreement
+
+Keep professional but less formal than a warning letter.`;
+    
+    } else if (type === 'letterOfAllegation') {
+        prompt = `You are generating a LETTER OF ALLEGATION for serious workplace misconduct investigation.
+
+⚠️ THIS IS HIGH-RISK - MUST BE LEGALLY SOUND
+
+VENUE CONTEXT:
+${venueContext}
+Manager: ${venueProfile.userName || '[Manager Name]'}
+
+EMPLOYEE:
+- Name: ${data.employeeName}
+- Position: ${data.position}
+- Employment Type: ${data.employmentType}
+
+ALLEGATION:
+Type: ${data.allegationType}
+${data.allegationDescription}
+Date of incident: ${data.incidentDate}
+
+SOURCE:
+${data.allegationSource}
+${data.evidenceExists ? `Evidence: ${data.evidenceExists}` : ''}
+
+INVESTIGATION:
+Investigator: ${data.investigator}
+Suspension: ${data.suspensionRequired}
+
+MEETING SCHEDULED:
+Date: ${data.meetingDate}
+Time: ${data.meetingTime}
+Location: ${data.meetingLocation}
+
+Generate a legally compliant Letter of Allegation.
+
+CRITICAL REQUIREMENTS:
+1. **Neutral tone** - No presumption of guilt
+2. **Clear process** - Explain investigation steps
+3. **Employee rights**:
+   - Right to support person
+   - Opportunity to respond
+   - Procedural fairness
+4. **Confidentiality requirements**
+5. **Meeting details**
+6. **Suspension details** (if applicable)
+7. **Next steps clearly outlined**
+
+Include:
+- PRIVATE & CONFIDENTIAL header
+- Date and recipient details
+- Clear subject line
+- Nature of allegation (factual, not conclusive)
+- Investigation process explanation
+- Suspension details if applicable
+- Meeting details (date, time, location)
+- Support person rights
+- Confidentiality requirements
+- Next steps after investigation
+- Advice they can seek legal counsel
+- Signature section
+
+TONE: Professional, neutral, procedurally fair. This is NOT a punishment - it's the start of a fair process.`;
+    }
+    
+    return prompt;
+}
+
+function showDocumentPreview(document) {
+    // Format for display
+    let formattedDoc = document
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br>');
+    
+    formattedDoc = '<p>' + formattedDoc + '</p>';
+    
+    document.getElementById('documentPreviewContent').innerHTML = formattedDoc;
+    document.getElementById('documentPreviewModal').classList.remove('hidden');
+}
+
+function closeDocumentPreview() {
+    document.getElementById('documentPreviewModal').classList.add('hidden');
+}
+
+async function regenerateDocument() {
+    if (!confirm('Regenerate the document? This will create a new version.')) return;
+    
+    closeDocumentPreview();
+    
+    // Reopen document builder modal
+    document.getElementById('documentBuilderModal').classList.remove('hidden');
+    
+    // Show generating state
+    document.getElementById('documentTemplateSelection').classList.add('hidden');
+    document.getElementById('documentWizardSteps').classList.add('hidden');
+    document.getElementById('documentGenerating').classList.remove('hidden');
+    
+    await generateDocumentWithAI();
+}
+
+function requestDocumentChange() {
+    const change = prompt(
+        "What would you like to change?\n\n" +
+        "Examples:\n" +
+        "- Make the tone more supportive\n" +
+        "- Add more detail about the impact\n" +
+        "- Soften the consequences section\n" +
+        "- Make it firmer\n\n" +
+        "Your request:"
+    );
+    
+    if (!change) return;
+    
+    closeDocumentPreview();
+    document.getElementById('documentBuilderModal').classList.remove('hidden');
+    document.getElementById('documentGenerating').classList.remove('hidden');
+    
+    // Regenerate with additional instruction
+    const originalPrompt = buildDocumentPrompt();
+    const modifiedPrompt = originalPrompt + `\n\nADDITIONAL INSTRUCTION FROM USER:\n${change}`;
+    
+    callClaudeAPI(modifiedPrompt).then(response => {
+        documentBuilderState.generatedDocument = response;
+        closeToolModal('documentBuilderModal');
+        showDocumentPreview(response);
+    });
+}
+
+function downloadGeneratedDocument() {
+    const content = documentBuilderState.generatedDocument;
+    const type = documentBuilderState.currentType;
+    const employeeName = documentBuilderState.data.employeeName || 'Employee';
+    
+    const typeNames = {
+        formalWarning: 'Formal_Warning',
+        recordOfDiscussion: 'Record_of_Discussion',
+        letterOfAllegation: 'Letter_of_Allegation'
+    };
+    
+    const filename = `${typeNames[type]}_${employeeName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.doc`;
+    
+    const metadata = {
+        documentId: generateDocumentId(),
+        userName: currentUser,
+        generatedAt: new Date().toISOString(),
+        documentType: type,
+        employeeName: employeeName
+    };
+    
+    // Add watermark and disclaimer
+    const watermarkedContent = `
+        <div style="text-align: center; padding: 20px; background: #fff3cd; border: 3px solid #ff6b6b; margin-bottom: 30px;">
+            <h2 style="color: #d32f2f; margin: 0;">⚠️ DRAFT DOCUMENT - REQUIRES CONSULTANT REVIEW</h2>
+            <p style="margin: 10px 0 0 0; color: #666;">Generated by Fitzgerald HR AI Assistant | MUST BE REVIEWED BEFORE USE</p>
+        </div>
+        
+        ${content}
+        
+        <div style="margin-top: 60px; padding: 30px; background: #fff3cd; border: 3px solid #ff6b6b;">
+            <h3 style="color: #d32f2f;">⚠️ CRITICAL LEGAL DISCLAIMER</h3>
+            <p><strong>This document was generated by AI and is a DRAFT ONLY.</strong></p>
+            <p>Before using this document, you MUST:</p>
+            <ul>
+                <li>Have it reviewed by a Fitzgerald HR Senior Consultant</li>
+                <li>Verify all details are accurate</li>
+                <li>Ensure it complies with your specific circumstances</li>
+            </ul>
+            <p><strong>Contact: info@fitzgeraldhr.com.au | +61 400 211 014</strong></p>
+            <p style="font-size: 11px; color: #666;">Document ID: ${metadata.documentId} | Generated: ${metadata.generatedAt}</p>
+        </div>
+    `;
+    
+    generateWordDocument(watermarkedContent, filename, metadata);
+    
+    // Log the download
+    logDocumentDownload(metadata);
+    
+    closeDocumentPreview();
+    
+    alert(
+        '✅ Document Downloaded!\n\n' +
+        'CRITICAL REMINDERS:\n' +
+        '1. This is a DRAFT document\n' +
+        '2. MUST be reviewed by a consultant\n' +
+        '3. Do not issue without professional review\n\n' +
+        'Contact: info@fitzgeraldhr.com.au'
+    );
+}
+
+// Log document generation to database
+async function logDocumentGeneration() {
+    const log = {
+        document_id: generateDocumentId(),
+        user_code: currentUser,
+        document_type: documentBuilderState.currentType,
+        employee_name: documentBuilderState.data.employeeName || null,
+        generated_at: new Date().toISOString(),
+        downloaded: false,
+        venue_name: venueProfile.venueName || null,
+        venue_location: venueProfile.location || null
+    };
+    
+    // Store in localStorage
+    const logs = JSON.parse(localStorage.getItem('documentLogs_' + currentUser) || '[]');
+    logs.push(log);
+    localStorage.setItem('documentLogs_' + currentUser, JSON.stringify(logs));
+    
+    // Store in Supabase
+    if (supabaseClient) {
+        try {
+            const { error } = await supabaseClient
+                .from('generated_documents')
+                .insert([log]);
+            
+            if (error) {
+                console.error('Supabase insert error:', error);
+            } else {
+                console.log('✅ Document generation logged to Supabase');
+            }
+        } catch (err) {
+            console.error('Error logging to Supabase:', err);
+        }
+    }
+}
+
+// Log document download
+async function logDocumentDownload(metadata) {
+    const downloadLog = {
+        document_id: metadata.documentId,
+        user_code: currentUser,
+        downloaded_at: new Date().toISOString(),
+        document_type: documentBuilderState.currentType,
+        employee_name: metadata.employeeName
+    };
+    
+    // Update Supabase
+    if (supabaseClient) {
+        try {
+            await supabaseClient
+                .from('generated_documents')
+                .update({ downloaded: true, downloaded_at: downloadLog.downloaded_at })
+                .eq('document_id', metadata.documentId);
+        } catch (err) {
+            console.error('Error logging download:', err);
+        }
+    }
+    
+    trackEvent('document_downloaded', downloadLog);
+}
+
 	// ========================================
 	// DAILY TIPS SYSTEM
 	// ========================================
@@ -2598,12 +3539,18 @@ function checkAccess() {
     const input = document.getElementById('accessCodeInput').value.trim().toUpperCase();
     const error = document.getElementById('accessError');
     
+    // Direct DOM access instead of cache
+    const accessScreen = document.getElementById('accessScreen');
+    const assistantScreen = document.getElementById('assistantScreen');
+    const userCodeEl = document.getElementById('userCode');
+    
     if (CONFIG.VALID_CODES.includes(input)) {
         currentUser = input;
-        document.getElementById('userCode').textContent = input;
-        DOM.accessScreen.classList.add('hidden');
-        DOM.assistantScreen.classList.remove('hidden');
-        error.classList.add('hidden');
+        if (userCodeEl) userCodeEl.textContent = input;
+        if (accessScreen) accessScreen.classList.add('hidden');
+        if (assistantScreen) assistantScreen.classList.remove('hidden');
+        if (error) error.classList.add('hidden');
+        
         trackEvent('beta_access', { code: input });
         
         // Show admin button for admin codes
@@ -2630,7 +3577,7 @@ function checkAccess() {
             addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
         }
 
-	// Initialize and start daily tip rotation**
+        // Initialize and start daily tip rotation
         setTimeout(() => {
             updateDailyTipBanner();
             startDailyTipRotation();
@@ -3139,6 +4086,7 @@ function openTool(toolName) {
         'awardWizard': 'awardWizardModal',
         'rosterStressTester': 'rosterStressTesterModal',
         'complianceCalendar': 'complianceCalendarModal'
+	'documentBuilder': 'documentBuilderModal'
     };
     const modalId = modalMap[toolName];
     if (modalId) {
@@ -3634,6 +4582,7 @@ function switchAdminTab(tabName) {
     if (tabName === 'themes') loadThemes();
     if (tabName === 'users') loadUsers();
     if (tabName === 'highrisk') loadHighRisk();
+    if (tabName === 'documents') loadDocuments();
 }
 
 async function loadConversations() {
@@ -3848,6 +4797,123 @@ async function loadHighRisk() {
         list.innerHTML = html;
     } catch (error) {
         console.error('Error loading high-risk topics:', error);
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data</div>';
+    }
+}
+
+async function loadDocuments() {
+    const list = document.getElementById('documentsList');
+    
+    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading documents...</div>';
+    
+    if (!supabaseClient) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Database not connected</div>';
+        return;
+    }
+    
+    try {
+        const { data: documents, error } = await supabaseClient
+            .from('generated_documents')
+            .select('*')
+            .order('generated_at', { ascending: false })
+            .limit(100);
+        
+        if (error) throw error;
+        
+        if (!documents || documents.length === 0) {
+            list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No documents generated yet</div>';
+            return;
+        }
+        
+        // Group by document type
+        const grouped = {
+            formalWarning: [],
+            recordOfDiscussion: [],
+            letterOfAllegation: []
+        };
+        
+        documents.forEach(doc => {
+            if (grouped[doc.document_type]) {
+                grouped[doc.document_type].push(doc);
+            }
+        });
+        
+        let html = '<div class="space-y-6">';
+        
+        // Stats summary
+        html += `
+            <div class="grid grid-cols-4 gap-4 mb-6">
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                    <p class="text-slate-400 text-xs mb-1">Total Generated</p>
+                    <p class="text-3xl font-bold text-purple-400">${documents.length}</p>
+                </div>
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                    <p class="text-slate-400 text-xs mb-1">Downloaded</p>
+                    <p class="text-3xl font-bold text-green-400">${documents.filter(d => d.downloaded).length}</p>
+                </div>
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                    <p class="text-slate-400 text-xs mb-1">Warnings</p>
+                    <p class="text-3xl font-bold text-yellow-400">${grouped.formalWarning.length}</p>
+                </div>
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                    <p class="text-slate-400 text-xs mb-1">Investigations</p>
+                    <p class="text-3xl font-bold text-red-400">${grouped.letterOfAllegation.length}</p>
+                </div>
+            </div>
+        `;
+        
+        // Document list
+        documents.forEach(doc => {
+            const date = new Date(doc.generated_at).toLocaleString('en-AU');
+            const typeEmoji = {
+                formalWarning: '⚠️',
+                recordOfDiscussion: '📋',
+                letterOfAllegation: '🔍'
+            };
+            const typeName = {
+                formalWarning: 'Formal Warning',
+                recordOfDiscussion: 'Record of Discussion',
+                letterOfAllegation: 'Letter of Allegation'
+            };
+            const typeColor = {
+                formalWarning: 'yellow',
+                recordOfDiscussion: 'green',
+                letterOfAllegation: 'red'
+            };
+            
+            const color = typeColor[doc.document_type] || 'blue';
+            
+            html += `
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 hover:border-${color}-500 transition-all">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex items-center gap-3">
+                            <span class="text-2xl">${typeEmoji[doc.document_type]}</span>
+                            <div>
+                                <p class="text-${color}-400 font-semibold">${typeName[doc.document_type]}</p>
+                                <p class="text-slate-500 text-xs">${date}</p>
+                            </div>
+                        </div>
+                        <div class="flex flex-col items-end gap-2">
+                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${doc.user_code}</span>
+                            ${doc.downloaded ? 
+                                '<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">✓ Downloaded</span>' : 
+                                '<span class="text-xs bg-slate-700 text-slate-400 px-2 py-1 rounded">Not downloaded</span>'}
+                        </div>
+                    </div>
+                    <div class="text-sm">
+                        <p class="text-slate-300"><strong>Employee:</strong> ${doc.employee_name || 'N/A'}</p>
+                        ${doc.venue_name ? `<p class="text-slate-400 text-xs mt-1">Venue: ${doc.venue_name}</p>` : ''}
+                        <p class="text-slate-500 text-xs mt-2">Document ID: ${doc.document_id}</p>
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        
+        list.innerHTML = html;
+    } catch (error) {
+        console.error('Error loading documents:', error);
         list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data</div>';
     }
 }
@@ -5429,3 +6495,5 @@ window.addEventListener('unhandledrejection', function(event) {
 </script>
 </body>
 </html>
+
+
