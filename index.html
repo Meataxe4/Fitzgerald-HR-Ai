@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1638,19 +1639,19 @@ Be as specific as possible!"></textarea>
             
             <!-- Record of Discussion -->
             <button onclick="selectDocumentType('recordOfDiscussion')" 
-                    class="w-full text-left p-6 bg-slate-700 hover:bg-green-600 rounded-lg transition-all border-2 border-transparent hover:border-green-500">
-                <div class="flex items-start gap-4">
-                    <div class="text-4xl">📋</div>
-                    <div class="flex-1">
-                        <h3 class="text-white font-bold text-lg mb-1">Record of Discussion</h3>
-                        <p class="text-slate-300 text-sm mb-2">For: Coaching, minor issues, informal feedback</p>
-                        <div class="flex items-center gap-2">
-                            <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded">Low Risk</span>
-                            <span class="text-slate-500 text-xs">• 5 quick questions</span>
-                        </div>
-                    </div>
-                </div>
-            </button>
+        class="w-full text-left p-6 bg-slate-700 hover:bg-green-600 rounded-lg transition-all border-2 border-transparent hover:border-green-500">
+    <div class="flex items-start gap-4">
+        <div class="text-4xl">📋</div>
+        <div class="flex-1">
+            <h3 class="text-white font-bold text-lg mb-1">Record of Discussion Template & Script</h3>
+            <p class="text-slate-300 text-sm mb-2">For: Coaching conversations, minor issues, performance discussions</p>
+            <div class="flex items-center gap-2">
+                <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded">Template + Script</span>
+                <span class="text-slate-500 text-xs">• 3 quick questions • Manager conversation guide</span>
+            </div>
+        </div>
+    </div>
+</button>
 
             <!-- Formal Warning -->
             <button onclick="selectDocumentType('formalWarning')" 
@@ -2725,56 +2726,36 @@ const documentWizardSteps = {
         }
     ],
     recordOfDiscussion: [
-        {
-            id: 1,
-            title: "Employee & Meeting Details",
-            fields: [
-                { name: "employeeName", label: "Employee's full name", type: "text", required: true },
-                { name: "position", label: "Position/Role", type: "text", required: true },
-                { name: "discussionDate", label: "Date of discussion", type: "date", required: true },
-                { name: "location", label: "Location", type: "text", required: false, placeholder: "e.g., Manager's office" }
-            ]
-        },
-        {
-            id: 2,
-            title: "What Was Discussed?",
-            fields: [
-                { name: "issueType", label: "Type of discussion", type: "select",
-                  options: ["Performance concern", "Attendance issue", "Behaviour concern", "Policy clarification", "General feedback", "Other"],
-                  required: true },
-                { name: "issueDescription", label: "What was discussed?", type: "textarea", required: true, rows: 4 }
-            ]
-        },
-        {
-            id: 3,
-            title: "Employee Response",
-            fields: [
-                { name: "employeeAcknowledged", label: "Did the employee acknowledge the issue?", 
-                  type: "radio", options: ["Yes", "No", "Partially"], required: true },
-                { name: "employeeComments", label: "What did the employee say? (optional)", 
-                  type: "textarea", required: false, rows: 3, placeholder: "Employee's perspective or explanation" }
-            ]
-        },
-        {
-            id: 4,
-            title: "Agreed Actions",
-            fields: [
-                { name: "agreedActions", label: "What actions did you both agree on?", 
-                  type: "textarea", required: true, rows: 3, placeholder: "Specific steps the employee will take" },
-                { name: "reviewTimeframe", label: "When will you review progress?", type: "select",
-                  options: ["1 week", "2 weeks", "1 month", "As needed"], required: true }
-            ]
-        },
-        {
-            id: 5,
-            title: "Support Offered",
-            fields: [
-                { name: "supportProvided", label: "What support or resources did you offer?", 
-                  type: "textarea", required: false, rows: 2, 
-                  placeholder: "e.g., Training, mentoring, written procedures" }
-            ]
-        }
-    ],
+    {
+        id: 1,
+        title: "Employee Details",
+        fields: [
+            { name: "employeeName", label: "Employee's full name", type: "text", required: true, placeholder: "e.g., Sarah Johnson" },
+            { name: "position", label: "Position/Role", type: "text", required: true, placeholder: "e.g., Waiter" }
+        ]
+    },
+    {
+        id: 2,
+        title: "Meeting Preparation - CRITICAL",
+        fields: [
+            { name: "notice24hours", label: "Has employee been provided 24 hours notice of the meeting?", 
+              type: "radio", options: ["Yes", "No"], required: true },
+            { name: "supportPersonOffered", label: "Has employee been offered to bring a support person to the meeting?", 
+              type: "radio", options: ["Yes", "No"], required: true }
+        ]
+    },
+    {
+        id: 3,
+        title: "Issue Details",
+        fields: [
+            { name: "allegations", label: "What is/are the allegation(s)? (List them clearly)", 
+              type: "textarea", required: true, rows: 4, 
+              placeholder: "e.g., Late to shift on 3 occasions\nIncorrect uniform worn\nRude to customer" },
+            { name: "witnesses", label: "Were there any witnesses?", 
+              type: "text", required: false, placeholder: "Names of witnesses (if any)" }
+        ]
+    }
+],
     letterOfAllegation: [
         {
             id: 1,
@@ -3001,6 +2982,13 @@ function docWizardNext() {
     
     if (!allValid) return;
     
+    // SPECIAL VALIDATION FOR RECORD OF DISCUSSION STEP 2
+    if (documentBuilderState.currentType === 'recordOfDiscussion' && documentBuilderState.currentStep === 2) {
+        if (!validateRecordOfDiscussionStep2()) {
+            return; // Stop progression if validation fails
+        }
+    }
+    
     // Move to next step or generate
     if (documentBuilderState.currentStep < documentBuilderState.totalSteps) {
         documentBuilderState.currentStep++;
@@ -3009,6 +2997,58 @@ function docWizardNext() {
         // All steps complete - generate document
         generateDocumentWithAI();
     }
+}
+
+function validateRecordOfDiscussionStep2() {
+    const notice24hours = documentBuilderState.data.notice24hours;
+    const supportPersonOffered = documentBuilderState.data.supportPersonOffered;
+    
+    // Check 24 hours notice
+    if (notice24hours === 'No') {
+        alert('⚠️ IMPORTANT: You must provide the employee with 24 hours notice before the meeting.\n\n' +
+              'This is a requirement of procedural fairness.\n\n' +
+              'Please schedule the meeting for at least 24 hours from now before continuing.');
+        return false;
+    }
+    
+    // Check support person
+    if (supportPersonOffered === 'No') {
+        alert('⚠️ IMPORTANT: You must offer the employee the right to bring a support person.\n\n' +
+              'A support person can be:\n' +
+              '• A family member or friend\n' +
+              '• A union representative\n' +
+              '• A fellow employee (if appropriate and no conflict of interest)\n\n' +
+              'Please inform the employee of this right before continuing.');
+        return false;
+    }
+    
+    return true;
+}
+
+function validateRecordOfDiscussionStep2() {
+    const notice24hours = documentBuilderState.data.notice24hours;
+    const supportPersonOffered = documentBuilderState.data.supportPersonOffered;
+    
+    // Check 24 hours notice
+    if (notice24hours === 'No') {
+        alert('⚠️ IMPORTANT: You must provide the employee with 24 hours notice before the meeting.\n\n' +
+              'This is a requirement of procedural fairness.\n\n' +
+              'Please schedule the meeting for at least 24 hours from now before continuing.');
+        return false;
+    }
+    
+    // Check support person
+    if (supportPersonOffered === 'No') {
+        alert('⚠️ IMPORTANT: You must offer the employee the right to bring a support person.\n\n' +
+              'A support person can be:\n' +
+              '• A family member or friend\n' +
+              '• A union representative\n' +
+              '• A fellow employee (if appropriate and no conflict of interest)\n\n' +
+              'Please inform the employee of this right before continuing.');
+        return false;
+    }
+    
+    return true;
 }
 
 function docWizardGoBack() {
@@ -3164,91 +3204,195 @@ Format as a complete business letter with proper structure.
 DO NOT add fictional details. Expand and contextualize what was provided.`;
     
     } else if (type === 'recordOfDiscussion') {
-        prompt = `You are generating a RECORD OF DISCUSSION for Australian hospitality HR.
+    prompt = `You are generating a RECORD OF DISCUSSION TEMPLATE & CONVERSATION SCRIPT for Australian hospitality managers.
+
+THIS IS A TEMPLATE/SCRIPT - NOT A COMPLETED DOCUMENT.
+The manager will use this during the actual conversation with the employee.
 
 VENUE CONTEXT:
 ${venueContext}
 Manager: ${venueProfile.userName || '[Manager Name]'}
 
-MEETING DETAILS:
-- Employee: ${data.employeeName}
+EMPLOYEE DETAILS:
+- Name: ${data.employeeName}
 - Position: ${data.position}
-- Date: ${data.discussionDate}
-- Location: ${data.location || 'Workplace'}
 
-DISCUSSION TYPE: ${data.issueType}
+MEETING PREPARATION CHECKLIST:
+- 24 hours notice given: ${data.notice24hours}
+- Support person offered: ${data.supportPersonOffered}
 
-WHAT WAS DISCUSSED:
-${data.issueDescription}
+ALLEGATIONS:
+${data.allegations}
 
-EMPLOYEE RESPONSE:
-${data.employeeAcknowledged === 'Yes' ? 'Employee acknowledged the issue' : 
-  data.employeeAcknowledged === 'No' ? 'Employee did not acknowledge the issue' :
-  'Employee partially acknowledged the issue'}
-${data.employeeComments ? `Employee comments: ${data.employeeComments}` : ''}
-
-AGREED ACTIONS:
-${data.agreedActions}
-
-REVIEW TIMEFRAME: ${data.reviewTimeframe}
-
-SUPPORT PROVIDED:
-${data.supportProvided || 'To be determined'}
-
-Generate a professional Record of Discussion document.
+WITNESSES (if any):
+${data.witnesses || 'None mentioned'}
 
 **CRITICAL FORMATTING REQUIREMENTS:**
-1. Use ## for major sections (e.g., ## MEETING DETAILS)
-2. Use blank lines between paragraphs
-3. Use **text** for emphasis
-4. Structure clearly with proper spacing
-5. Each section should be clearly separated
+1. Use **bold** for what the MANAGER should say (the script)
+2. Use *italics* for INSTRUCTIONS to the manager
+3. Use regular text for sections the manager fills in DURING or AFTER the meeting
+4. Use ## for major sections
+5. Use blank lines between paragraphs
 
-This is an INFORMAL record (not formal disciplinary action).
+Generate a conversation template that:
 
-Example structure:
-# RECORD OF DISCUSSION
+1. **Provides a complete script** for the manager to follow during the meeting
+2. **Uses bold text** for what the manager should actually SAY
+3. **Uses italics** for instructions/guidance (e.g., *Listen carefully and take notes*)
+4. **Leaves space** for the manager to write the employee's responses
+5. **Guides the manager** through difficult conversations with prompts like:
+   - *Ask clarifying questions*
+   - *Allow the employee time to respond*
+   - *Remain calm and professional*
 
-## MEETING DETAILS
-Date: [Date]
-Employee: [Name]
-Position: [Position]
-Manager: [Manager Name]
-Location: [Location]
+STRUCTURE:
 
-## PURPOSE OF DISCUSSION
-[Type and brief overview]
+## BEFORE THE MEETING
+*Print this document and have it in front of you during the meeting*
+*Review the allegations and gather any evidence*
+*Prepare to listen - this is a two-way conversation*
 
-## SUMMARY OF DISCUSSION
-[What was discussed - expanded appropriately]
+## MEETING SCRIPT
 
-## EMPLOYEE RESPONSE
-[Employee's acknowledgment and comments]
+### OPENING THE MEETING
+**Manager Script (say this):**
+**"Thank you for meeting with me today, [Employee Name]. As mentioned in my notice, we need to discuss [brief description]."**
 
-## AGREED ACTIONS
-[Clear, specific actions agreed upon]
+**"You have the right to have a support person present. Have you brought someone with you, or would you like to reschedule to arrange one?"**
 
-## REVIEW DATE
-[When progress will be reviewed]
+*Wait for response - write it here:*
+___________________________________
 
-## SUPPORT PROVIDED
-[Support or resources offered]
+### EXPLAINING THE ISSUE
+**Manager Script:**
+**"I want to talk with you about [describe allegation]. Specifically:**
+${data.allegations.split('\n').map(a => `**• ${a.trim()}**`).join('\n')}
 
-## SIGNATURES
-[Signature sections for both parties with note that signature = discussion occurred, not agreement]
+**"This is concerning because [explain the impact - e.g., affects team morale, customer service, safety]."**
 
-Include:
-- Header with date, employee details, manager name
-- Purpose/type of discussion
-- Summary of what was discussed (expanded appropriately)
-- Employee's response
-- Agreed actions (clear and specific)
-- Support offered
-- Review date
-- Signature sections for both parties
-- Note that signature = discussion occurred, not agreement
+*Pause and let the employee process this information*
 
-Keep professional but less formal than a warning letter.`;
+### GETTING THE EMPLOYEE'S PERSPECTIVE
+**Manager Script:**
+**"I'd like to hear your perspective on this. Can you tell me what happened from your point of view?"**
+
+*This is critical - LISTEN carefully and take detailed notes:*
+
+Employee's response:
+_________________________________________
+_________________________________________
+_________________________________________
+
+*Ask follow-up questions:*
+- "Can you help me understand why this happened?"
+- "What was going through your mind at the time?"
+- "Is there anything else I should know about this situation?"
+
+Additional notes:
+_________________________________________
+_________________________________________
+
+### DISCUSSING EXPECTATIONS
+**Manager Script:**
+**"Moving forward, here's what I need to see:**
+${data.allegations.split('\n').map(a => {
+    const issue = a.trim();
+    return `**• [State the expected standard related to: ${issue}]**`;
+}).join('\n')}
+
+**"Do you understand these expectations?"**
+
+*Wait for acknowledgment - note their response:*
+___________________________________
+
+**"Do you feel you can meet these expectations?"**
+
+*Note their response:*
+___________________________________
+
+### AGREEING ON NEXT STEPS
+**Manager Script:**
+**"Let's agree on what happens next. I propose:**
+**• [Specific action the employee will take]**
+**• [Any support you will provide]**
+**• We'll review progress in [timeframe - e.g., 2 weeks]"**
+
+*Discuss and agree on actions - write them here:*
+
+Agreed actions:
+1. _________________________________
+2. _________________________________
+3. _________________________________
+
+Support provided:
+_________________________________
+
+Review date: ___________________
+
+### CLOSING THE MEETING
+**Manager Script:**
+**"Thank you for being open to this discussion. I'm confident we can move forward positively."**
+
+**"Do you have any questions or anything else you'd like to add?"**
+
+*Note any final comments:*
+___________________________________
+
+**"I'll document this conversation and provide you with a copy. You'll have an opportunity to add your own comments if you wish."**
+
+## AFTER THE MEETING
+
+*Complete the following sections and provide a copy to the employee within 24-48 hours:*
+
+### SUMMARY OF DISCUSSION
+*Write a brief, factual summary of what was discussed:*
+_________________________________________
+_________________________________________
+
+### EMPLOYEE'S PERSPECTIVE
+*Summarize what the employee said:*
+_________________________________________
+_________________________________________
+
+### AGREED ACTIONS
+*List the specific actions agreed upon:*
+1. _________________________________
+2. _________________________________
+
+### SUPPORT PROVIDED
+*Detail any support, training, or resources offered:*
+_________________________________________
+
+### NEXT REVIEW DATE
+*When will you check in on progress?*
+Date: ___________________
+
+### SIGNATURES
+Employee Signature: _________________ Date: _______
+*Signing acknowledges the discussion occurred, not necessarily agreement*
+
+Manager Signature: _________________ Date: _______
+
+### EMPLOYEE COMMENTS (OPTIONAL)
+*The employee may add their own comments or perspective:*
+_________________________________________
+_________________________________________
+
+---
+
+**IMPORTANT REMINDERS FOR MANAGER:**
+✓ Stay calm and professional throughout
+✓ Listen more than you talk
+✓ Focus on facts, not emotions
+✓ Be respectful and fair
+✓ Document everything accurately
+✓ Provide a copy to the employee
+
+*If the employee becomes defensive or emotional, remain calm and suggest taking a short break if needed.*
+
+*If you're unsure how to proceed at any point, pause the meeting and contact Fitzgerald HR: info@fitzgeraldhr.com.au*
+`;
+}
     
     } else if (type === 'letterOfAllegation') {
         prompt = `You are generating a LETTER OF ALLEGATION for serious workplace misconduct investigation.
