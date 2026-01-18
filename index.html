@@ -8,7 +8,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Document Generation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
@@ -2381,303 +2380,246 @@ const hrTemplates = {
         // DOCUMENT GENERATION FUNCTIONS
         // ========================================
         
-        async function generateWordDocument(content, filename = 'document.docx', metadata = {}) {
+        function formatContentForWord(content) {
+    return content
+        // Normalize line breaks
+        .replace(/\r\n/g, '\n')
+        .replace(/\r/g, '\n')
+        
+        // Convert ## headers to proper HTML with Word styles
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+        
+        // Convert **bold** to <strong>
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        
+        // Convert *italic* to <em> (but not part of **)
+        .replace(/(?<!\*)\*([^\*\n]+?)\*(?!\*)/g, '<em>$1</em>')
+        
+        // Convert bullet points
+        .replace(/^[•\-] (.+)$/gm, '<li>$1</li>')
+        
+        // Convert underscores to underlined spans
+        .replace(/_{5,}/g, '<span style="text-decoration: underline; display: inline-block; min-width: 200px;">$&</span>')
+        
+        // Split by double newlines to create paragraphs
+        .split(/\n\n+/)
+        .map(block => {
+            block = block.trim();
+            if (!block) return '';
+            
+            // If it's already an HTML element, return it
+            if (block.startsWith('<h') || block.startsWith('<li>') || block.startsWith('<div')) {
+                return block;
+            }
+            
+            // Wrap list items in <ul>
+            if (block.includes('<li>')) {
+                return '<ul>' + block + '</ul>';
+            }
+            
+            // Convert single newlines to <br> within paragraphs
+            block = block.replace(/\n/g, '<br>');
+            
+            // Wrap in paragraph
+            return '<p>' + block + '</p>';
+        })
+        .join('\n');
+}
+
+function generateWordDocument(content, filename = 'document.doc', metadata = {}) {
     try {
-        // Check if docx library is loaded
-        if (typeof docx === 'undefined') {
-            console.error('❌ docx library not loaded');
-            alert('Document library not loaded. Please refresh the page and try again.');
-            return false;
-        }
+        // Format the content
+        const formattedContent = formatContentForWord(content);
+        
+        // Create Word-compatible HTML with proper XML namespaces
+        const wordHTML = `
+<html xmlns:o='urn:schemas-microsoft-com:office:office' 
+      xmlns:w='urn:schemas-microsoft-com:office:word' 
+      xmlns='http://www.w3.org/TR/REC-html40'>
 
-        const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle, UnderlineType } = docx;
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name=ProgId content=Word.Document>
+<meta name=Generator content="Microsoft Word 15">
+<meta name=Originator content="Microsoft Word 15">
 
-        // Parse the HTML-formatted content into docx elements
-        const children = parseContentToDocx(content);
+<!--[if gte mso 9]>
+<xml>
+<w:WordDocument>
+<w:View>Print</w:View>
+<w:Zoom>100</w:Zoom>
+<w:DoNotOptimizeForBrowser/>
+</w:WordDocument>
+</xml>
+<![endif]-->
 
-        // Add footer
-        children.push(
-            new Paragraph({ text: '', spacing: { before: 400 } }),
-            new Paragraph({
-                border: { top: { color: "CCCCCC", space: 1, style: BorderStyle.SINGLE, size: 6 } },
-                spacing: { before: 200, after: 100 }
-            }),
-            new Paragraph({
-                children: [
-                    new TextRun({ text: "FITZGERALD HR", bold: true, size: 22 }),
-                    new TextRun({ text: " - AI-Powered Hospitality HR Solutions", size: 22 })
-                ],
-                spacing: { after: 100 }
-            }),
-            new Paragraph({
-                children: [new TextRun({ text: "Email: info@fitzgeraldhr.com.au", size: 20 })],
-                spacing: { after: 100 }
-            }),
-            new Paragraph({
-                children: [
-                    new TextRun({ 
-                        text: `Generated on ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}`,
-                        size: 20,
-                        color: "666666"
-                    })
-                ],
-                spacing: { after: 100 }
-            }),
-            new Paragraph({
-                children: [
-                    new TextRun({ text: `Document ID: ${metadata.documentId || 'N/A'} | `, bold: true, size: 18, color: "666666" }),
-                    new TextRun({ text: `Generated for: ${metadata.userName || currentUser || 'Beta User'}`, size: 18, color: "666666" })
-                ],
-                spacing: { after: 100 }
-            }),
-            new Paragraph({
-                children: [
-                    new TextRun({ 
-                        text: "For personalised advice and document review, contact our Senior Consultants.",
-                        size: 18,
-                        italics: true,
-                        color: "666666"
-                    })
-                ]
-            })
-        );
+<style>
+<!--
+/* Font Definitions */
+@font-face {
+    font-family: "Cambria Math";
+}
+@font-face {
+    font-family: Calibri;
+}
 
-        // Create the document
-        const doc = new Document({
-            sections: [{
-                properties: {
-                    page: {
-                        margin: {
-                            top: 1440,    // 1 inch = 1440 twips
-                            right: 1440,
-                            bottom: 1440,
-                            left: 1440
-                        }
-                    }
-                },
-                children: children
-            }]
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal {
+    margin: 0cm;
+    margin-bottom: .0001pt;
+    font-size: 11.0pt;
+    font-family: "Calibri", sans-serif;
+    line-height: 115%;
+}
+
+h1 {
+    margin-top: 12.0pt;
+    margin-right: 0cm;
+    margin-bottom: 12.0pt;
+    margin-left: 0cm;
+    page-break-after: avoid;
+    font-size: 20.0pt;
+    font-family: "Calibri", sans-serif;
+    color: #E2A14A;
+    font-weight: bold;
+    border-bottom: 3.0pt solid #E2A14A;
+    padding-bottom: 6.0pt;
+}
+
+h2 {
+    margin-top: 16.0pt;
+    margin-right: 0cm;
+    margin-bottom: 8.0pt;
+    margin-left: 0cm;
+    page-break-after: avoid;
+    font-size: 14.0pt;
+    font-family: "Calibri", sans-serif;
+    color: #1E3A5F;
+    font-weight: bold;
+}
+
+h3 {
+    margin-top: 12.0pt;
+    margin-right: 0cm;
+    margin-bottom: 6.0pt;
+    margin-left: 0cm;
+    page-break-after: avoid;
+    font-size: 12.0pt;
+    font-family: "Calibri", sans-serif;
+    color: #1E3A5F;
+    font-weight: bold;
+}
+
+p {
+    margin-top: 0cm;
+    margin-right: 0cm;
+    margin-bottom: 8.0pt;
+    margin-left: 0cm;
+    font-size: 11.0pt;
+    font-family: "Calibri", sans-serif;
+    line-height: 115%;
+}
+
+strong, b {
+    font-weight: bold;
+}
+
+em, i {
+    font-style: italic;
+}
+
+ul {
+    margin-left: 36.0pt;
+    margin-bottom: 8.0pt;
+}
+
+li {
+    margin-bottom: 4.0pt;
+    font-size: 11.0pt;
+    font-family: "Calibri", sans-serif;
+}
+
+.warning {
+    background: #FFF3CD;
+    border-left: 4.0pt solid #FF6B6B;
+    padding: 12.0pt;
+    margin: 12.0pt 0cm;
+    page-break-inside: avoid;
+}
+
+.footer {
+    margin-top: 36.0pt;
+    border-top: 2.0pt solid #CCCCCC;
+    padding-top: 12.0pt;
+    font-size: 9.0pt;
+    color: #666666;
+}
+
+@page Section1 {
+    size: 595.3pt 841.9pt;
+    margin: 72.0pt 72.0pt 72.0pt 72.0pt;
+}
+
+div.Section1 {
+    page: Section1;
+}
+-->
+</style>
+
+</head>
+
+<body lang=EN-AU style='tab-interval:36.0pt'>
+
+<div class=Section1>
+
+${formattedContent}
+
+<div class="footer">
+<p><strong>FITZGERALD HR</strong> - AI-Powered Hospitality HR Solutions</p>
+<p>Email: info@fitzgeraldhr.com.au</p>
+<p>This document was generated by Fitz, your AI HR Assistant, on ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}</p>
+<p><strong>Document ID:</strong> ${metadata.documentId || 'N/A'} | <strong>Generated for:</strong> ${metadata.userName || currentUser || 'Beta User'}</p>
+<p><em>For personalised advice and document review, contact our Senior Consultants.</em></p>
+</div>
+
+</div>
+
+</body>
+</html>`;
+
+        // Create blob with proper encoding
+        const blob = new Blob(['\ufeff', wordHTML], {
+            type: 'application/msword'
         });
-
-        // Generate and download
-        const blob = await Packer.toBlob(doc);
         
-        // Ensure filename ends with .docx
-        if (!filename.endsWith('.docx')) {
-            filename = filename.replace(/\.(doc|txt)$/, '.docx') || filename + '.docx';
+        // Save the file
+        if (typeof saveAs !== 'undefined') {
+            saveAs(blob, filename);
+        } else {
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
         }
         
-        saveAs(blob, filename);
-
         // Track document generation
         trackDocumentGeneration(filename, metadata);
-
+        
         console.log('✅ Document generated:', filename);
         return true;
-
+        
     } catch (error) {
         console.error('❌ Error generating document:', error);
-        alert('Error generating document: ' + error.message + '\n\nPlease try again or contact support.');
+        alert('Error generating document: ' + error.message);
         return false;
     }
 }
-
-// Helper function to parse HTML content into docx elements
-function parseContentToDocx(htmlContent) {
-    const { Paragraph, TextRun, HeadingLevel, AlignmentType, UnderlineType } = docx;
-    const children = [];
-
-    // Split content by major sections
-    const lines = htmlContent.split('\n');
-    let currentParagraphText = '';
-    let inWarningBox = false;
-
-    for (let line of lines) {
-        line = line.trim();
-        if (!line) {
-            // Empty line - if we have accumulated text, create paragraph
-            if (currentParagraphText) {
-                children.push(createParagraphFromText(currentParagraphText));
-                currentParagraphText = '';
-            }
-            continue;
-        }
-
-        // Check for warning boxes
-        if (line.includes('<div') && line.includes('warning')) {
-            inWarningBox = true;
-            continue;
-        }
-        if (line.includes('</div>') && inWarningBox) {
-            inWarningBox = false;
-            continue;
-        }
-
-        // Parse headers
-        if (line.startsWith('# ')) {
-            if (currentParagraphText) {
-                children.push(createParagraphFromText(currentParagraphText));
-                currentParagraphText = '';
-            }
-            const text = line.replace(/^# /, '').replace(/<[^>]*>/g, '');
-            children.push(new Paragraph({
-                text: text,
-                heading: HeadingLevel.HEADING_1,
-                spacing: { before: 240, after: 120 }
-            }));
-            continue;
-        }
-
-        if (line.startsWith('## ')) {
-            if (currentParagraphText) {
-                children.push(createParagraphFromText(currentParagraphText));
-                currentParagraphText = '';
-            }
-            const text = line.replace(/^## /, '').replace(/<[^>]*>/g, '');
-            children.push(new Paragraph({
-                text: text,
-                heading: HeadingLevel.HEADING_2,
-                spacing: { before: 200, after: 100 }
-            }));
-            continue;
-        }
-
-        if (line.startsWith('### ')) {
-            if (currentParagraphText) {
-                children.push(createParagraphFromText(currentParagraphText));
-                currentParagraphText = '';
-            }
-            const text = line.replace(/^### /, '').replace(/<[^>]*>/g, '');
-            children.push(new Paragraph({
-                text: text,
-                heading: HeadingLevel.HEADING_3,
-                spacing: { before: 160, after: 80 }
-            }));
-            continue;
-        }
-
-        // Skip HTML tags we don't need
-        if (line.startsWith('<') && line.endsWith('>')) {
-            continue;
-        }
-
-        // Accumulate text for paragraph
-        currentParagraphText += (currentParagraphText ? ' ' : '') + line;
-    }
-
-    // Add any remaining text
-    if (currentParagraphText) {
-        children.push(createParagraphFromText(currentParagraphText));
-    }
-
-    return children;
-}
-
-// Helper to create a paragraph with formatted text (bold, italic, etc.)
-function createParagraphFromText(text) {
-    const { Paragraph, TextRun, UnderlineType } = docx;
-    
-    // Remove HTML tags
-    text = text.replace(/<[^>]*>/g, '');
-    
-    const textRuns = [];
-    let remainingText = text;
-    
-    // Parse **bold** text
-    const boldRegex = /\*\*(.*?)\*\*/g;
-    let lastIndex = 0;
-    let match;
-    
-    while ((match = boldRegex.exec(text)) !== null) {
-        // Add text before bold
-        if (match.index > lastIndex) {
-            const beforeText = text.substring(lastIndex, match.index);
-            textRuns.push(...parseItalicText(beforeText));
-        }
-        // Add bold text
-        textRuns.push(...parseItalicText(match[1], true));
-        lastIndex = match.index + match[0].length;
-    }
-    
-    // Add remaining text
-    if (lastIndex < text.length) {
-        textRuns.push(...parseItalicText(text.substring(lastIndex)));
-    }
-    
-    // Handle underlines for fill-in fields
-    const finalRuns = textRuns.map(run => {
-        if (run.text && run.text.includes('_____')) {
-            return new TextRun({
-                ...run,
-                underline: { type: UnderlineType.SINGLE }
-            });
-        }
-        return run;
-    });
-    
-    return new Paragraph({
-        children: finalRuns.length > 0 ? finalRuns : [new TextRun(text)],
-        spacing: { after: 120 }
-    });
-}
-
-// Helper to parse italic text
-function parseItalicText(text, isBold = false) {
-    const { TextRun } = docx;
-    const textRuns = [];
-    
-    const italicRegex = /\*(.*?)\*/g;
-    let lastIndex = 0;
-    let match;
-    
-    while ((match = italicRegex.exec(text)) !== null) {
-        // Add text before italic
-        if (match.index > lastIndex) {
-            textRuns.push(new TextRun({
-                text: text.substring(lastIndex, match.index),
-                bold: isBold
-            }));
-        }
-        // Add italic text
-        textRuns.push(new TextRun({
-            text: match[1],
-            bold: isBold,
-            italics: true
-        }));
-        lastIndex = match.index + match[0].length;
-    }
-    
-    // Add remaining text
-    if (lastIndex < text.length) {
-        textRuns.push(new TextRun({
-            text: text.substring(lastIndex),
-            bold: isBold
-        }));
-    }
-    
-    return textRuns.length > 0 ? textRuns : [new TextRun({ text: text, bold: isBold })];
-}
-        
-        function generateExcelSpreadsheet(data, filename = 'spreadsheet.xlsx', sheetName = 'HR Data') {
-            const wb = XLSX.utils.book_new();
-            const ws = XLSX.utils.json_to_sheet(data);
-            
-            // Set column widths
-            const colWidths = [];
-            Object.keys(data[0] || {}).forEach(() => {
-                colWidths.push({ wch: 20 });
-            });
-            ws['!cols'] = colWidths;
-            
-            XLSX.utils.book_append_sheet(wb, ws, sheetName);
-            XLSX.writeFile(wb, filename);
-            
-            // Track document generation
-            trackDocumentGeneration(filename, { type: 'excel', rows: data.length });
-            
-            return true;
-        }
-
         // ========================================
         // SMART DOCUMENT DETECTION & BUTTONS
         // ========================================
@@ -3917,7 +3859,7 @@ function downloadGeneratedDocument() {
             letterOfAllegation: 'Letter_of_Allegation'
         };
         
-        const filename = `${typeNames[type]}_${employeeName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.docx`;
+        const filename = `${typeNames[type]}_${employeeName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.doc`;
         
         const metadata = {
             documentId: generateDocumentId(),
