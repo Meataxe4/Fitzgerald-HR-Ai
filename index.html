@@ -2953,15 +2953,15 @@ function showDocumentStep(stepNumber) {
         nextBtn.innerHTML = 'Next Step →';
     }
 
-// Show/hide start over button based on step
-const startOverBtn = document.getElementById('docStartOverBtn');
-if (startOverBtn) {
-    if (stepNumber > 1) {
-        startOverBtn.classList.remove('hidden');
-    } else {
-        startOverBtn.classList.add('hidden');
+    // Show/hide start over button based on step
+    const startOverBtn = document.getElementById('docStartOverBtn');
+    if (startOverBtn) {
+        if (stepNumber > 1) {
+            startOverBtn.classList.remove('hidden');
+        } else {
+            startOverBtn.classList.add('hidden');
+        }
     }
-}
 
 }
 
@@ -6831,5 +6831,6 @@ window.addEventListener('unhandledrejection', function(event) {
 </script>
 </body>
 </html>
+
 
 
