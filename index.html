@@ -3209,6 +3209,14 @@ DO NOT add fictional details. Expand and contextualize what was provided.`;
 THIS IS A TEMPLATE/SCRIPT - NOT A COMPLETED DOCUMENT.
 The manager will use this during the actual conversation with the employee.
 
+⚠️ CRITICAL: This is a PROCEDURAL FAIRNESS meeting. NO outcome or decision is made during this meeting. The purpose is to:
+1. Present allegations to the employee
+2. Give the employee the opportunity to respond
+3. Gather information and the employee's perspective
+4. Adjourn to consider all information before making any decision
+
+A follow-up meeting will be scheduled 24-48 hours later to deliver the outcome after proper consideration.
+
 VENUE CONTEXT:
 ${venueContext}
 Manager: ${venueProfile.userName || '[Manager Name]'}
@@ -3244,6 +3252,7 @@ Generate a conversation template that:
    - *Ask clarifying questions*
    - *Allow the employee time to respond*
    - *Remain calm and professional*
+6. **CLEARLY STATES** that no decision will be made today - this is just to hear their side
 
 STRUCTURE:
 
@@ -3251,144 +3260,185 @@ STRUCTURE:
 *Print this document and have it in front of you during the meeting*
 *Review the allegations and gather any evidence*
 *Prepare to listen - this is a two-way conversation*
+*Remember: You are NOT making a decision today - only gathering information*
 
 ## MEETING SCRIPT
 
 ### OPENING THE MEETING
 **Manager Script (say this):**
-**"Thank you for meeting with me today, [Employee Name]. As mentioned in my notice, we need to discuss [brief description]."**
+**"Thank you for meeting with me today, ${data.employeeName}. As mentioned in my notice, we need to discuss some concerns about [brief description]."**
 
 **"You have the right to have a support person present. Have you brought someone with you, or would you like to reschedule to arrange one?"**
 
 *Wait for response - write it here:*
 ___________________________________
 
-### EXPLAINING THE ISSUE
+### EXPLAINING THE PURPOSE
 **Manager Script:**
-**"I want to talk with you about [describe allegation]. Specifically:**
+**"Before we start, I want to be clear about the purpose of this meeting:**
+**• I'm going to explain some allegations/concerns**
+**• You'll have the opportunity to respond and give your side of the story**
+**• I'm here to listen and gather information**
+**• No decision will be made today - I need time to properly consider everything you tell me**
+**• We'll schedule a follow-up meeting in the next 24-48 hours where I'll share my decision**
+
+**"Does that make sense?"**
+
+*Wait for acknowledgment:*
+___________________________________
+
+### PRESENTING THE ALLEGATIONS
+**Manager Script:**
+**"The reason for this meeting is that I've received information about the following:**
+
 ${data.allegations.split('\n').map(a => `**• ${a.trim()}**`).join('\n')}
 
-**"This is concerning because [explain the impact - e.g., affects team morale, customer service, safety]."**
+*Pause after presenting each allegation - let them absorb the information*
 
-*Pause and let the employee process this information*
+**"These matters are serious because [explain the impact - e.g., they affect workplace safety, team morale, customer service, or breach company policy]."**
 
-### GETTING THE EMPLOYEE'S PERSPECTIVE
+### GIVING THE EMPLOYEE THE OPPORTUNITY TO RESPOND
 **Manager Script:**
-**"I'd like to hear your perspective on this. Can you tell me what happened from your point of view?"**
+**"Now I'd like to hear your side of the story. This is your opportunity to respond to these allegations. Can you tell me what happened from your perspective?"**
 
-*This is critical - LISTEN carefully and take detailed notes:*
+*This is CRITICAL - LISTEN carefully without interrupting. Take detailed notes of everything they say:*
 
-Employee's response:
+Employee's response to allegations:
+_________________________________________
+_________________________________________
+_________________________________________
+_________________________________________
+_________________________________________
+
+*After they finish, ask clarifying questions:*
+**"Thank you for explaining. Can I ask a few questions to make sure I understand correctly?"**
+
+**Clarifying questions to ask:**
+- **"When you say [repeat something they said], can you explain what you mean?"**
+- **"Were there any other circumstances I should know about?"**
+- **"Is there anyone who can support what you're telling me?"**
+- **"Is there anything else you'd like to add?"**
+
+Additional information from employee:
 _________________________________________
 _________________________________________
 _________________________________________
 
-*Ask follow-up questions:*
-- "Can you help me understand why this happened?"
-- "What was going through your mind at the time?"
-- "Is there anything else I should know about this situation?"
-
-Additional notes:
-_________________________________________
-_________________________________________
-
-### DISCUSSING EXPECTATIONS
+### EVIDENCE OR WITNESSES
+*If the employee mentions evidence or witnesses:*
 **Manager Script:**
-**"Moving forward, here's what I need to see:**
-${data.allegations.split('\n').map(a => {
-    const issue = a.trim();
-    return `**• [State the expected standard related to: ${issue}]**`;
-}).join('\n')}
+**"You mentioned [evidence/witness]. Can you provide me with [details/their name] so I can consider this as part of my review?"**
 
-**"Do you understand these expectations?"**
+Evidence/witnesses mentioned:
+_________________________________________
+_________________________________________
 
-*Wait for acknowledgment - note their response:*
+### EXPLAINING NEXT STEPS
+**Manager Script:**
+**"Thank you for being open with me and sharing your perspective. I want to be clear about what happens next:**
+
+**• I'm going to take time to properly consider everything you've told me today**
+**• I'll review all the information, evidence, and your response**
+**• I'll schedule a follow-up meeting with you within the next 24-48 hours**
+**• At that meeting, I'll let you know my decision and what happens next**
+**• You won't hear anything before that meeting - I need time to think this through properly"**
+
+*Set a specific date/time now for the follow-up meeting:*
+
+**Manager Script:**
+**"Can we schedule our follow-up meeting for [DATE] at [TIME]?"**
+
+Follow-up meeting scheduled:
+Date: ___________________
+Time: ___________________
+
+### CLOSING THE MEETING
+**Manager Script:**
+**"Do you have any questions about the process or what happens next?"**
+
+*Note any questions/concerns:*
 ___________________________________
 
-**"Do you feel you can meet these expectations?"**
+**"Thank you for attending this meeting and sharing your side of the story. I'll see you at our follow-up meeting on [DATE]."**
 
-*Note their response:*
-___________________________________
+*If they have a support person:*
+**"Thank you also for attending [support person name]."**
 
-### AGREEING ON NEXT STEPS
-**Manager Script:**
-**"Let's agree on what happens next. I propose:**
-**• [Specific action the employee will take]**
-**• [Any support you will provide]**
-**• We'll review progress in [timeframe - e.g., 2 weeks]"**
+## AFTER THE MEETING
 
-*Discuss and agree on actions - write them here:*
+*Complete the following sections IMMEDIATELY after the meeting while details are fresh:*
 
-Agreed actions:
+### SUMMARY OF ALLEGATIONS PRESENTED
+*Write a brief, factual summary of what allegations you presented:*
+_________________________________________
+_________________________________________
+
+### EMPLOYEE'S RESPONSE SUMMARY
+*Summarize the key points of what the employee said in response:*
+_________________________________________
+_________________________________________
+_________________________________________
+
+### EMPLOYEE'S EXPLANATION/MITIGATING CIRCUMSTANCES
+*Note any explanations, mitigating factors, or context the employee provided:*
+_________________________________________
+_________________________________________
+
+### EVIDENCE/WITNESSES TO FOLLOW UP
+*List any evidence you need to review or witnesses you need to speak to:*
 1. _________________________________
 2. _________________________________
 3. _________________________________
 
-Support provided:
-_________________________________
+### MANAGER'S NOTES FOR CONSIDERATION
+*Before making your decision, consider:*
+- How credible is the employee's explanation?
+- Does their response change the seriousness of the allegations?
+- What evidence supports or contradicts their version?
+- Are there any mitigating circumstances?
+- What is the appropriate outcome (if allegations are substantiated)?
 
-Review date: ___________________
+*DO NOT write your decision here - this is just for your own consideration process*
 
-### CLOSING THE MEETING
-**Manager Script:**
-**"Thank you for being open to this discussion. I'm confident we can move forward positively."**
-
-**"Do you have any questions or anything else you'd like to add?"**
-
-*Note any final comments:*
-___________________________________
-
-**"I'll document this conversation and provide you with a copy. You'll have an opportunity to add your own comments if you wish."**
-
-## AFTER THE MEETING
-
-*Complete the following sections and provide a copy to the employee within 24-48 hours:*
-
-### SUMMARY OF DISCUSSION
-*Write a brief, factual summary of what was discussed:*
-_________________________________________
-_________________________________________
-
-### EMPLOYEE'S PERSPECTIVE
-*Summarize what the employee said:*
-_________________________________________
-_________________________________________
-
-### AGREED ACTIONS
-*List the specific actions agreed upon:*
-1. _________________________________
-2. _________________________________
-
-### SUPPORT PROVIDED
-*Detail any support, training, or resources offered:*
-_________________________________________
-
-### NEXT REVIEW DATE
-*When will you check in on progress?*
+### MEETING ATTENDEES
+Employee: ${data.employeeName}
+Manager: ${venueProfile.userName || '[Manager Name]'}
+Support Person (if present): _________________________________
 Date: ___________________
+Time: ___________________
 
-### SIGNATURES
-Employee Signature: _________________ Date: _______
-*Signing acknowledges the discussion occurred, not necessarily agreement*
-
-Manager Signature: _________________ Date: _______
-
-### EMPLOYEE COMMENTS (OPTIONAL)
-*The employee may add their own comments or perspective:*
-_________________________________________
-_________________________________________
+### NEXT STEPS BEFORE FOLLOW-UP MEETING
+*What you need to do before the follow-up meeting:*
+□ Review all evidence and witness statements
+□ Consider the employee's response fairly
+□ Determine if allegations are substantiated
+□ Decide on appropriate outcome (if substantiated)
+□ Prepare outcome letter (if formal warning required)
+□ Schedule follow-up meeting (DONE: [DATE/TIME])
 
 ---
 
 **IMPORTANT REMINDERS FOR MANAGER:**
-✓ Stay calm and professional throughout
-✓ Listen more than you talk
-✓ Focus on facts, not emotions
-✓ Be respectful and fair
-✓ Document everything accurately
-✓ Provide a copy to the employee
 
-*If the employee becomes defensive or emotional, remain calm and suggest taking a short break if needed.*
+✓ DO NOT make or hint at any decision during this meeting
+✓ Your role today is to LISTEN and GATHER INFORMATION only
+✓ Take detailed notes - they may be important later
+✓ Remain calm, professional, and neutral
+✓ Give the employee adequate time to respond
+✓ Ask open-ended questions to get their full story
+✓ Schedule the follow-up meeting before they leave
+
+**PROCEDURAL FAIRNESS CHECKLIST:**
+□ Employee given 24 hours notice ✓
+□ Employee offered support person ✓
+□ Allegations clearly explained ✓
+□ Employee given genuine opportunity to respond ✓
+□ Employee's response documented ✓
+□ Follow-up meeting scheduled ✓
+□ No decision made during this meeting ✓
+
+**⚠️ CRITICAL LEGAL REQUIREMENT:**
+This meeting is ONLY for gathering information. You MUST take time (24-48 hours) to properly consider the employee's response before making any decision. Failing to do this could result in a finding of unfair dismissal if the matter proceeds to termination.
 
 *If you're unsure how to proceed at any point, pause the meeting and contact Fitzgerald HR: info@fitzgeraldhr.com.au*
 `;
