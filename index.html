@@ -9,7 +9,7 @@
     <!-- Document Generation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
     
@@ -2474,289 +2474,85 @@ function convertAIContentToHTML(rawContent) {
     return html;
 }
 
-function parseHTMLForPDF(html) {
-    const elements = [];
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    
-    const traverse = (node) => {
-        if (node.nodeType === Node.TEXT_NODE) {
-            const text = node.textContent.trim();
-            if (text) {
-                return [{ type: 'text', text: text }];
-            }
-            return [];
-        }
-        
-        if (node.nodeType !== Node.ELEMENT_NODE) return [];
-        
-        const tagName = node.tagName.toLowerCase();
-        
-        switch (tagName) {
-            case 'h1':
-                elements.push({ type: 'h1', text: node.textContent.trim() });
-                break;
-                
-            case 'h2':
-                elements.push({ type: 'h2', text: node.textContent.trim() });
-                break;
-                
-            case 'h3':
-                elements.push({ type: 'h3', text: node.textContent.trim() });
-                break;
-                
-            case 'p':
-                const segments = [];
-                parseInlineElements(node, segments);
-                
-                if (segments.length > 0) {
-                    elements.push({ type: 'p', segments: segments });
-                } else {
-                    const text = node.textContent.trim();
-                    if (text) {
-                        elements.push({ type: 'p', text: text });
-                    }
-                }
-                break;
-                
-            case 'li':
-                elements.push({ type: 'li', text: node.textContent.trim() });
-                break;
-                
-            case 'ul':
-            case 'ol':
-                for (const child of node.children) {
-                    traverse(child);
-                }
-                elements.push({ type: 'space' });
-                break;
-                
-            case 'br':
-                elements.push({ type: 'space' });
-                break;
-                
-            case 'hr':
-                elements.push({ type: 'line' });
-                break;
-                
-            default:
-                for (const child of node.childNodes) {
-                    traverse(child);
-                }
-        }
-    };
-    
-    traverse(doc.body);
-    return elements;
-}
 
-function parseInlineElements(node, segments) {
-    for (const child of node.childNodes) {
-        if (child.nodeType === Node.TEXT_NODE) {
-            const text = child.textContent.trim();
-            if (text) {
-                segments.push({ text: text, bold: false, italic: false });
-            }
-        } else if (child.nodeType === Node.ELEMENT_NODE) {
-            const tagName = child.tagName.toLowerCase();
-            const text = child.textContent.trim();
-            
-            if (text) {
-                if (tagName === 'strong' || tagName === 'b') {
-                    segments.push({ text: text, bold: true, italic: false });
-                } else if (tagName === 'em' || tagName === 'i') {
-                    segments.push({ text: text, bold: false, italic: true });
-                } else {
-                    segments.push({ text: text, bold: false, italic: false });
-                }
-            }
-        }
-    }
-}
 
 async function generatePDFDocument(content, filename = 'document.pdf', metadata = {}) {
     try {
-        if (typeof window.jspdf === 'undefined') {
-            alert('PDF library not loaded. Please refresh and try again.');
+        // Check if html2pdf is loaded
+        if (typeof html2pdf === 'undefined') {
+            console.error('❌ html2pdf library not loaded');
+            alert('PDF library not loaded. Please refresh the page and try again.');
             return false;
         }
 
-        const { jsPDF } = window.jspdf;
+        console.log('📄 Generating PDF with html2pdf...');
 
-        console.log('📄 Generating text-based PDF...');
-
-        // Convert content to HTML first
-        const htmlContent = convertAIContentToHTML(content);
+        // Get the preview element (already formatted perfectly)
+        const previewElement = document.getElementById('documentPreviewContent');
         
-        // Parse HTML into structured elements
-        const elements = parseHTMLForPDF(htmlContent);
-        
-        console.log('✅ Parsed', elements.length, 'elements');
-
-        // Create PDF
-        const pdf = new jsPDF({
-            orientation: 'portrait',
-            unit: 'mm',
-            format: 'a4'
-        });
-
-        const pageWidth = pdf.internal.pageSize.getWidth();
-        const pageHeight = pdf.internal.pageSize.getHeight();
-        const margin = 20;
-        const maxWidth = pageWidth - (margin * 2);
-        let yPosition = margin;
-
-        // Render each element
-        for (const element of elements) {
-            // Check for page break
-            if (yPosition > pageHeight - 30) {
-                pdf.addPage();
-                yPosition = margin;
-            }
-
-            switch (element.type) {
-                case 'h1':
-                    yPosition += 5;
-                    pdf.setFontSize(18);
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.setTextColor(226, 161, 74);
-                    
-                    const h1Lines = pdf.splitTextToSize(element.text, maxWidth);
-                    pdf.text(h1Lines, margin, yPosition);
-                    yPosition += h1Lines.length * 7;
-                    
-                    // Underline
-                    pdf.setDrawColor(226, 161, 74);
-                    pdf.setLineWidth(0.5);
-                    pdf.line(margin, yPosition, margin + 80, yPosition);
-                    yPosition += 8;
-                    break;
-
-                case 'h2':
-                    yPosition += 4;
-                    pdf.setFontSize(14);
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.setTextColor(30, 58, 95);
-                    
-                    const h2Lines = pdf.splitTextToSize(element.text, maxWidth);
-                    pdf.text(h2Lines, margin, yPosition);
-                    yPosition += h2Lines.length * 6 + 4;
-                    break;
-
-                case 'h3':
-                    yPosition += 3;
-                    pdf.setFontSize(12);
-                    pdf.setFont('helvetica', 'bold');
-                    pdf.setTextColor(30, 58, 95);
-                    
-                    const h3Lines = pdf.splitTextToSize(element.text, maxWidth);
-                    pdf.text(h3Lines, margin, yPosition);
-                    yPosition += h3Lines.length * 5 + 3;
-                    break;
-
-                case 'p':
-                    pdf.setFontSize(11);
-                    pdf.setTextColor(0, 0, 0);
-                    
-                    // Check if paragraph contains formatting
-                    if (element.segments && element.segments.length > 0) {
-                        // Render with mixed formatting
-                        for (const segment of element.segments) {
-                            pdf.setFont('helvetica', segment.bold ? 'bold' : (segment.italic ? 'italic' : 'normal'));
-                            
-                            const segLines = pdf.splitTextToSize(segment.text, maxWidth);
-                            for (const line of segLines) {
-                                if (yPosition > pageHeight - 30) {
-                                    pdf.addPage();
-                                    yPosition = margin;
-                                }
-                                pdf.text(line, margin, yPosition);
-                                yPosition += 5;
-                            }
-                        }
-                    } else {
-                        // Plain paragraph
-                        pdf.setFont('helvetica', 'normal');
-                        const pLines = pdf.splitTextToSize(element.text, maxWidth);
-                        
-                        for (const line of pLines) {
-                            if (yPosition > pageHeight - 30) {
-                                pdf.addPage();
-                                yPosition = margin;
-                            }
-                            pdf.text(line, margin, yPosition);
-                            yPosition += 5;
-                        }
-                    }
-                    yPosition += 3;
-                    break;
-
-                case 'li':
-                    pdf.setFontSize(11);
-                    pdf.setFont('helvetica', 'normal');
-                    pdf.setTextColor(0, 0, 0);
-                    
-                    pdf.text('•', margin, yPosition);
-                    
-                    const liLines = pdf.splitTextToSize(element.text, maxWidth - 10);
-                    pdf.text(liLines, margin + 6, yPosition);
-                    yPosition += liLines.length * 5 + 2;
-                    break;
-
-                case 'space':
-                    yPosition += 5;
-                    break;
-
-                case 'line':
-                    pdf.setDrawColor(200, 200, 200);
-                    pdf.setLineWidth(0.3);
-                    pdf.line(margin, yPosition, pageWidth - margin, yPosition);
-                    yPosition += 5;
-                    break;
-            }
+        if (!previewElement) {
+            alert('Preview not found. Please try again.');
+            return false;
         }
 
+        // Create a clone to add footer
+        const container = document.createElement('div');
+        container.style.padding = '20px';
+        container.style.backgroundColor = 'white';
+        container.style.fontFamily = 'Times New Roman, serif';
+        container.style.fontSize = '12pt';
+        container.style.lineHeight = '1.6';
+        
+        // Clone the preview content
+        const contentClone = previewElement.cloneNode(true);
+        container.appendChild(contentClone);
+        
         // Add footer
-        yPosition += 10;
-        if (yPosition > pageHeight - 40) {
-            pdf.addPage();
-            yPosition = margin;
-        }
+        const footer = document.createElement('div');
+        footer.style.marginTop = '30px';
+        footer.style.paddingTop = '15px';
+        footer.style.borderTop = '2px solid #ccc';
+        footer.style.fontSize = '9pt';
+        footer.style.color = '#666';
+        footer.innerHTML = `
+            <p style="margin: 3px 0;"><strong>FITZGERALD HR</strong> - AI-Powered Hospitality HR Solutions</p>
+            <p style="margin: 3px 0;">Email: info@fitzgeraldhr.com.au</p>
+            <p style="margin: 3px 0;">Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}</p>
+            <p style="margin: 3px 0;">Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}</p>
+            <p style="margin: 3px 0;"><em>For personalised advice and document review, contact our Senior Consultants.</em></p>
+        `;
+        container.appendChild(footer);
 
-        pdf.setDrawColor(200, 200, 200);
-        pdf.setLineWidth(0.5);
-        pdf.line(margin, yPosition, pageWidth - margin, yPosition);
-        yPosition += 6;
+        // Configure html2pdf options
+        const options = {
+            margin: [10, 10, 10, 10],
+            filename: filename,
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+                scale: 2,
+                useCORS: true,
+                letterRendering: true,
+                logging: false
+            },
+            jsPDF: { 
+                unit: 'mm', 
+                format: 'a4', 
+                orientation: 'portrait' 
+            },
+            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        };
 
-        pdf.setFontSize(10);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(0, 0, 0);
-        pdf.text('FITZGERALD HR - AI-Powered Hospitality HR Solutions', margin, yPosition);
-        yPosition += 5;
+        // Generate PDF
+        await html2pdf().set(options).from(container).save();
 
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(9);
-        pdf.text('Email: info@fitzgeraldhr.com.au', margin, yPosition);
-        yPosition += 4;
-
-        pdf.text(`Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}`, margin, yPosition);
-        yPosition += 4;
-
-        pdf.text(`Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}`, margin, yPosition);
-        yPosition += 4;
-
-        pdf.setFont('helvetica', 'italic');
-        pdf.text('For personalised advice and document review, contact our Senior Consultants.', margin, yPosition);
-
-        // Save
-        pdf.save(filename);
+        // Track document generation
         trackDocumentGeneration(filename, metadata);
 
-        console.log('✅ PDF generated:', filename);
+        console.log('✅ PDF generated successfully:', filename);
         return true;
 
     } catch (error) {
-        console.error('❌ PDF error:', error);
+        console.error('❌ PDF generation error:', error);
         alert('Error generating PDF: ' + error.message);
         return false;
     }
