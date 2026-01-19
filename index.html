@@ -2439,289 +2439,154 @@ async function generatePDFDocument(content, filename = 'document.pdf', metadata 
             return false;
         }
 
+        if (typeof html2canvas === 'undefined') {
+            console.error('❌ html2canvas library not loaded');
+            alert('PDF conversion library not loaded. Please refresh the page and try again.');
+            return false;
+        }
+
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({
+
+        // Create a temporary container with the formatted content
+        const tempContainer = document.createElement('div');
+        tempContainer.style.position = 'absolute';
+        tempContainer.style.left = '-9999px';
+        tempContainer.style.top = '0';
+        tempContainer.style.width = '210mm'; // A4 width
+        tempContainer.style.padding = '20mm';
+        tempContainer.style.backgroundColor = 'white';
+        tempContainer.style.fontFamily = 'Arial, sans-serif';
+        tempContainer.style.fontSize = '11pt';
+        tempContainer.style.lineHeight = '1.6';
+        tempContainer.style.color = '#000000';
+        
+        // Add CSS styles for proper formatting
+        const style = document.createElement('style');
+        style.textContent = `
+            .pdf-content h1 {
+                color: #E2A14A;
+                font-size: 20pt;
+                font-weight: bold;
+                border-bottom: 3px solid #E2A14A;
+                padding-bottom: 6pt;
+                margin-top: 12pt;
+                margin-bottom: 12pt;
+            }
+            .pdf-content h2 {
+                color: #1E3A5F;
+                font-size: 14pt;
+                font-weight: bold;
+                margin-top: 16pt;
+                margin-bottom: 8pt;
+            }
+            .pdf-content h3 {
+                color: #1E3A5F;
+                font-size: 12pt;
+                font-weight: bold;
+                margin-top: 12pt;
+                margin-bottom: 6pt;
+            }
+            .pdf-content p {
+                margin-bottom: 8pt;
+                font-size: 11pt;
+            }
+            .pdf-content strong {
+                font-weight: bold;
+            }
+            .pdf-content em {
+                font-style: italic;
+            }
+            .pdf-content ul {
+                margin-left: 20pt;
+                margin-bottom: 8pt;
+            }
+            .pdf-content li {
+                margin-bottom: 4pt;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        tempContainer.className = 'pdf-content';
+        tempContainer.innerHTML = content;
+        
+        document.body.appendChild(tempContainer);
+
+        // Add footer
+        const footer = document.createElement('div');
+        footer.style.marginTop = '40px';
+        footer.style.paddingTop = '20px';
+        footer.style.borderTop = '2px solid #cccccc';
+        footer.style.fontSize = '9pt';
+        footer.style.color = '#666666';
+        footer.innerHTML = `
+            <p style="margin-bottom: 5px;"><strong>FITZGERALD HR</strong> - AI-Powered Hospitality HR Solutions</p>
+            <p style="margin-bottom: 5px;">Email: info@fitzgeraldhr.com.au</p>
+            <p style="margin-bottom: 5px;">Generated on ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}</p>
+            <p style="margin-bottom: 5px;"><strong>Document ID:</strong> ${metadata.documentId || 'N/A'} | <strong>Generated for:</strong> ${metadata.userName || currentUser || 'Beta User'}</p>
+            <p style="margin-bottom: 0;"><em>For personalised advice and document review, contact our Senior Consultants.</em></p>
+        `;
+        tempContainer.appendChild(footer);
+
+        // Wait a moment for styles to apply
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Convert to canvas
+        console.log('📸 Capturing content as image...');
+        const canvas = await html2canvas(tempContainer, {
+            scale: 2, // Higher quality
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff'
+        });
+
+        // Remove temporary elements
+        document.body.removeChild(tempContainer);
+        document.head.removeChild(style);
+
+        // Create PDF
+        const imgData = canvas.toDataURL('image/jpeg', 1.0);
+        const pdf = new jsPDF({
             orientation: 'portrait',
             unit: 'mm',
             format: 'a4'
         });
 
-        const pageHeight = doc.internal.pageSize.height;
-        const pageWidth = doc.internal.pageSize.width;
-        const margin = 20;
-        const maxWidth = pageWidth - (margin * 2);
-        let yPosition = 20;
-
-        // Parse content properly
-        const parsedContent = parseContentForPDF(content);
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
         
-        console.log('📄 Parsed PDF content:', parsedContent.length, 'elements');
+        // Calculate dimensions
+        const imgWidth = pageWidth;
+        const imgHeight = (canvas.height * pageWidth) / canvas.width;
+        
+        let heightLeft = imgHeight;
+        let position = 0;
 
-        for (let i = 0; i < parsedContent.length; i++) {
-            const item = parsedContent[i];
+        // Add first page
+        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
 
-            // Check if we need a new page (leave room for footer)
-            if (yPosition > pageHeight - 40) {
-                doc.addPage();
-                yPosition = 20;
-            }
-
-            switch (item.type) {
-                case 'h1':
-                    doc.setFontSize(18);
-                    doc.setFont('helvetica', 'bold');
-                    doc.setTextColor(226, 161, 74); // Amber color
-                    
-                    const h1Lines = doc.splitTextToSize(item.text, maxWidth);
-                    doc.text(h1Lines, margin, yPosition);
-                    yPosition += (h1Lines.length * 7);
-                    
-                    // Add underline
-                    doc.setDrawColor(226, 161, 74);
-                    doc.setLineWidth(0.8);
-                    doc.line(margin, yPosition, margin + 60, yPosition);
-                    yPosition += 8;
-                    
-                    doc.setTextColor(0, 0, 0); // Reset to black
-                    break;
-
-                case 'h2':
-                    yPosition += 3; // Extra space before h2
-                    doc.setFontSize(14);
-                    doc.setFont('helvetica', 'bold');
-                    doc.setTextColor(30, 58, 95); // Dark blue
-                    
-                    const h2Lines = doc.splitTextToSize(item.text, maxWidth);
-                    doc.text(h2Lines, margin, yPosition);
-                    yPosition += (h2Lines.length * 6) + 4;
-                    
-                    doc.setTextColor(0, 0, 0);
-                    break;
-
-                case 'h3':
-                    yPosition += 2;
-                    doc.setFontSize(12);
-                    doc.setFont('helvetica', 'bold');
-                    doc.setTextColor(30, 58, 95);
-                    
-                    const h3Lines = doc.splitTextToSize(item.text, maxWidth);
-                    doc.text(h3Lines, margin, yPosition);
-                    yPosition += (h3Lines.length * 5) + 3;
-                    
-                    doc.setTextColor(0, 0, 0);
-                    break;
-
-                case 'p':
-                    doc.setFontSize(10);
-                    doc.setTextColor(0, 0, 0);
-                    
-                    // Check if text contains bold markers
-                    const hasBold = item.text.includes('**');
-                    
-                    if (hasBold) {
-                        // Parse bold/italic segments
-                        const segments = parseTextSegments(item.text);
-                        
-                        for (const segment of segments) {
-                            const font = segment.bold ? 'bold' : 'normal';
-                            doc.setFont('helvetica', font);
-                            
-                            const segmentLines = doc.splitTextToSize(segment.text, maxWidth);
-                            
-                            for (const line of segmentLines) {
-                                if (yPosition > pageHeight - 40) {
-                                    doc.addPage();
-                                    yPosition = 20;
-                                }
-                                doc.text(line, margin, yPosition);
-                                yPosition += 5;
-                            }
-                        }
-                    } else {
-                        // Regular paragraph without formatting
-                        doc.setFont('helvetica', 'normal');
-                        const pLines = doc.splitTextToSize(item.text, maxWidth);
-                        
-                        for (const line of pLines) {
-                            if (yPosition > pageHeight - 40) {
-                                doc.addPage();
-                                yPosition = 20;
-                            }
-                            doc.text(line, margin, yPosition);
-                            yPosition += 5;
-                        }
-                    }
-                    
-                    yPosition += 2; // Space after paragraph
-                    break;
-
-                case 'li':
-                    doc.setFontSize(10);
-                    doc.setFont('helvetica', 'normal');
-                    doc.setTextColor(0, 0, 0);
-                    
-                    // Draw bullet point
-                    doc.circle(margin + 1, yPosition - 1, 0.5, 'F');
-                    
-                    const liLines = doc.splitTextToSize(item.text, maxWidth - 8);
-                    doc.text(liLines, margin + 5, yPosition);
-                    yPosition += (liLines.length * 5) + 1;
-                    break;
-
-                case 'space':
-                    yPosition += 4;
-                    break;
-
-                case 'underline':
-                    // For fill-in fields
-                    doc.setFontSize(10);
-                    doc.setFont('helvetica', 'normal');
-                    const underlineWidth = 80;
-                    doc.line(margin, yPosition, margin + underlineWidth, yPosition);
-                    yPosition += 6;
-                    break;
-            }
+        // Add additional pages if needed
+        while (heightLeft > 0) {
+            position = heightLeft - imgHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
         }
-
-        // Add footer
-        yPosition += 10;
-        if (yPosition > pageHeight - 50) {
-            doc.addPage();
-            yPosition = 20;
-        }
-
-        doc.setDrawColor(200, 200, 200);
-        doc.setLineWidth(0.5);
-        doc.line(margin, yPosition, pageWidth - margin, yPosition);
-        yPosition += 8;
-
-        doc.setFontSize(11);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(0, 0, 0);
-        doc.text('FITZGERALD HR - AI-Powered Hospitality HR Solutions', margin, yPosition);
-        yPosition += 6;
-
-        doc.setFont('helvetica', 'normal');
-        doc.setFontSize(9);
-        doc.text('Email: info@fitzgeraldhr.com.au', margin, yPosition);
-        yPosition += 5;
-
-        const dateStr = `Generated on ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}`;
-        doc.text(dateStr, margin, yPosition);
-        yPosition += 5;
-
-        const idStr = `Document ID: ${metadata.documentId || 'N/A'} | Generated for: ${metadata.userName || currentUser || 'Beta User'}`;
-        doc.text(idStr, margin, yPosition);
-        yPosition += 5;
-
-        doc.setFont('helvetica', 'italic');
-        doc.text('For personalised advice and document review, contact our Senior Consultants.', margin, yPosition);
 
         // Save the PDF
-        doc.save(filename);
+        pdf.save(filename);
 
         // Track document generation
         trackDocumentGeneration(filename, metadata);
 
-        console.log('✅ PDF generated:', filename);
+        console.log('✅ PDF generated successfully:', filename);
         return true;
 
     } catch (error) {
         console.error('❌ Error generating PDF:', error);
-        alert('Error generating PDF: ' + error.message);
+        alert('Error generating PDF: ' + error.message + '\n\nPlease try again or contact support.');
         return false;
     }
-}
-
-// Helper function to parse content into PDF elements
-function parseContentForPDF(htmlContent) {
-    const elements = [];
-    
-    console.log('🔍 Original content length:', htmlContent.length);
-    
-    // Clean and normalize the content
-    let content = htmlContent
-        // First remove the watermark div completely
-        .replace(/<div[^>]*style="[^"]*background[^"]*#fff3cd[^"]*"[^>]*>[\s\S]*?DRAFT DOCUMENT[\s\S]*?<\/div>/gi, '')
-        // Convert headers
-        .replace(/## ([^\n]+)/g, '\n##H2##$1##H2##\n')
-        .replace(/### ([^\n]+)/g, '\n##H3##$1##H3##\n')
-        .replace(/# ([^\n]+)/g, '\n##H1##$1##H1##\n')
-        // Mark bold text
-        .replace(/\*\*([^*]+)\*\*/g, '##BOLD##$1##BOLD##')
-        // Mark italic text  
-        .replace(/\*([^*\n]+)\*/g, '##ITALIC##$1##ITALIC##')
-        // Convert bullets
-        .replace(/^[•\-] /gm, '##LI##')
-        // Remove HTML tags
-        .replace(/<[^>]*>/g, '')
-        // Clean up multiple spaces
-        .replace(/  +/g, ' ');
-
-    // Split into lines
-    const lines = content.split('\n');
-    
-    for (let line of lines) {
-        line = line.trim();
-        
-        if (!line) {
-            elements.push({ type: 'space' });
-            continue;
-        }
-
-        // Check for headers
-        if (line.includes('##H1##')) {
-            const text = line.replace(/##H1##/g, '').trim();
-            if (text) elements.push({ type: 'h1', text: text });
-        } else if (line.includes('##H2##')) {
-            const text = line.replace(/##H2##/g, '').trim();
-            if (text) elements.push({ type: 'h2', text: text });
-        } else if (line.includes('##H3##')) {
-            const text = line.replace(/##H3##/g, '').trim();
-            if (text) elements.push({ type: 'h3', text: text });
-        } else if (line.startsWith('##LI##')) {
-            const text = line.replace('##LI##', '').trim();
-            if (text) elements.push({ type: 'li', text: text });
-        } else if (line.includes('_____')) {
-            elements.push({ type: 'underline' });
-        } else {
-            // Regular paragraph
-            if (line) elements.push({ type: 'p', text: line });
-        }
-    }
-    
-    console.log('✅ Parsed into', elements.length, 'elements');
-    
-    return elements;
-}
-
-// Helper to parse bold/italic segments
-function parseTextSegments(text) {
-    const segments = [];
-    let currentText = text;
-    
-    // Split by bold markers
-    const parts = currentText.split('##BOLD##');
-    
-    for (let i = 0; i < parts.length; i++) {
-        if (i % 2 === 0) {
-            // Not bold
-            if (parts[i].trim()) {
-                segments.push({ text: parts[i].trim(), bold: false });
-            }
-        } else {
-            // Bold
-            if (parts[i].trim()) {
-                segments.push({ text: parts[i].trim(), bold: true });
-            }
-        }
-    }
-    
-    if (segments.length === 0) {
-        segments.push({ text: text, bold: false });
-    }
-    
-    return segments;
 }
 
         // ========================================
