@@ -9,7 +9,8 @@
     <!-- Document Generation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
     
@@ -2430,120 +2431,202 @@ const hrTemplates = {
         .join('\n');
 }
 
-function convertAIContentToHTML(rawContent) {
-    console.log('🔄 Converting AI content to HTML...');
-    
-    let html = rawContent
-        // Convert markdown headers to HTML
-        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-        
-        // Convert **bold** to <strong>
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        
-        // Convert *italic* to <em>
-        .replace(/(?<!\*)\*([^\*\n]+?)\*(?!\*)/g, '<em>$1</em>')
-        
-        // Convert bullet points
-        .replace(/^[•\-\*] (.+)$/gm, '<li>$1</li>')
-        
-        // Wrap consecutive list items in <ul>
-        .replace(/(<li>.*<\/li>\s*)+/gs, '<ul>$&</ul>')
-        
-        // Convert double line breaks to paragraph breaks
-        .split('\n\n')
-        .map(block => {
-            block = block.trim();
-            if (!block) return '';
-            
-            // Skip if already HTML element
-            if (block.startsWith('<h') || block.startsWith('<ul') || block.startsWith('<div')) {
-                return block;
+function convertHTMLToPdfMake(html, metadata) {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    const content = [];
+
+    const processNode = (node) => {
+        if (node.nodeType === Node.TEXT_NODE) {
+            const text = node.textContent.trim();
+            if (text) {
+                return { text: text };
             }
-            
-            // Convert single line breaks to <br>
-            block = block.replace(/\n/g, '<br>');
-            
-            // Wrap in paragraph
-            return '<p>' + block + '</p>';
-        })
-        .join('\n\n');
-    
-    console.log('✅ Converted to HTML');
-    return html;
+            return null;
+        }
+
+        if (node.nodeType !== Node.ELEMENT_NODE) return null;
+
+        const tagName = node.tagName.toLowerCase();
+
+        switch (tagName) {
+            case 'h1':
+                return {
+                    text: node.textContent.trim(),
+                    style: 'header1',
+                    margin: [0, 10, 0, 5]
+                };
+
+            case 'h2':
+                return {
+                    text: node.textContent.trim(),
+                    style: 'header2',
+                    margin: [0, 8, 0, 4]
+                };
+
+            case 'h3':
+                return {
+                    text: node.textContent.trim(),
+                    style: 'header3',
+                    margin: [0, 6, 0, 3]
+                };
+
+            case 'p':
+                const pContent = [];
+                for (const child of node.childNodes) {
+                    const processed = processInlineNode(child);
+                    if (processed) {
+                        if (Array.isArray(processed)) {
+                            pContent.push(...processed);
+                        } else {
+                            pContent.push(processed);
+                        }
+                    }
+                }
+                return {
+                    text: pContent.length > 0 ? pContent : node.textContent.trim(),
+                    margin: [0, 0, 0, 5]
+                };
+
+            case 'ul':
+                const listItems = [];
+                for (const li of node.querySelectorAll('li')) {
+                    listItems.push(li.textContent.trim());
+                }
+                return {
+                    ul: listItems,
+                    margin: [0, 0, 0, 5]
+                };
+
+            case 'li':
+                return {
+                    text: node.textContent.trim(),
+                    margin: [0, 0, 0, 2]
+                };
+
+            case 'br':
+                return { text: '', margin: [0, 3, 0, 0] };
+
+            default:
+                const children = [];
+                for (const child of node.childNodes) {
+                    const processed = processNode(child);
+                    if (processed) children.push(processed);
+                }
+                return children.length > 0 ? children : null;
+        }
+    };
+
+    const processInlineNode = (node) => {
+        if (node.nodeType === Node.TEXT_NODE) {
+            const text = node.textContent.trim();
+            return text ? { text: text } : null;
+        }
+
+        const tagName = node.tagName?.toLowerCase();
+        const text = node.textContent.trim();
+
+        if (!text) return null;
+
+        switch (tagName) {
+            case 'strong':
+            case 'b':
+                return { text: text, bold: true };
+            case 'em':
+            case 'i':
+                return { text: text, italics: true };
+            default:
+                return { text: text };
+        }
+    };
+
+    // Process all body children
+    for (const child of doc.body.childNodes) {
+        const processed = processNode(child);
+        if (processed) {
+            if (Array.isArray(processed)) {
+                content.push(...processed);
+            } else {
+                content.push(processed);
+            }
+        }
+    }
+
+    // Add footer
+    content.push(
+        { text: '', margin: [0, 20, 0, 0] },
+        {
+            canvas: [
+                {
+                    type: 'line',
+                    x1: 0, y1: 0,
+                    x2: 515, y2: 0,
+                    lineWidth: 1,
+                    lineColor: '#cccccc'
+                }
+            ],
+            margin: [0, 0, 0, 10]
+        },
+        { text: 'FITZGERALD HR - AI-Powered Hospitality HR Solutions', bold: true, fontSize: 10, margin: [0, 0, 0, 4] },
+        { text: 'Email: info@fitzgeraldhr.com.au', fontSize: 9, margin: [0, 0, 0, 3] },
+        { text: `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}`, fontSize: 9, margin: [0, 0, 0, 3] },
+        { text: `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}`, fontSize: 9, margin: [0, 0, 0, 3] },
+        { text: 'For personalised advice and document review, contact our Senior Consultants.', fontSize: 9, italics: true, color: '#666666' }
+    );
+
+    // Define document with styles
+    return {
+        content: content,
+        styles: {
+            header1: {
+                fontSize: 18,
+                bold: true,
+                color: '#E2A14A',
+                decoration: 'underline',
+                decorationColor: '#E2A14A'
+            },
+            header2: {
+                fontSize: 14,
+                bold: true,
+                color: '#1E3A5F'
+            },
+            header3: {
+                fontSize: 12,
+                bold: true,
+                color: '#1E3A5F'
+            }
+        },
+        defaultStyle: {
+            fontSize: 11,
+            font: 'Roboto'
+        },
+        pageMargins: [40, 40, 40, 40]
+    };
 }
 
 
 
 async function generatePDFDocument(content, filename = 'document.pdf', metadata = {}) {
     try {
-        // Check if html2pdf is loaded
-        if (typeof html2pdf === 'undefined') {
-            console.error('❌ html2pdf library not loaded');
+        // Check if pdfMake is loaded
+        if (typeof pdfMake === 'undefined') {
+            console.error('❌ pdfMake library not loaded');
             alert('PDF library not loaded. Please refresh the page and try again.');
             return false;
         }
 
-        console.log('📄 Generating PDF with html2pdf...');
+        console.log('📄 Generating PDF with pdfMake...');
 
-        // Get the preview element (already formatted perfectly)
-        const previewElement = document.getElementById('documentPreviewContent');
+        // Convert content to HTML first
+        const htmlContent = convertAIContentToHTML(content);
         
-        if (!previewElement) {
-            alert('Preview not found. Please try again.');
-            return false;
-        }
-
-        // Create a clone to add footer
-        const container = document.createElement('div');
-        container.style.padding = '20px';
-        container.style.backgroundColor = 'white';
-        container.style.fontFamily = 'Times New Roman, serif';
-        container.style.fontSize = '12pt';
-        container.style.lineHeight = '1.6';
+        // Parse HTML to pdfMake document definition
+        const docDefinition = convertHTMLToPdfMake(htmlContent, metadata);
         
-        // Clone the preview content
-        const contentClone = previewElement.cloneNode(true);
-        container.appendChild(contentClone);
-        
-        // Add footer
-        const footer = document.createElement('div');
-        footer.style.marginTop = '30px';
-        footer.style.paddingTop = '15px';
-        footer.style.borderTop = '2px solid #ccc';
-        footer.style.fontSize = '9pt';
-        footer.style.color = '#666';
-        footer.innerHTML = `
-            <p style="margin: 3px 0;"><strong>FITZGERALD HR</strong> - AI-Powered Hospitality HR Solutions</p>
-            <p style="margin: 3px 0;">Email: info@fitzgeraldhr.com.au</p>
-            <p style="margin: 3px 0;">Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}</p>
-            <p style="margin: 3px 0;">Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}</p>
-            <p style="margin: 3px 0;"><em>For personalised advice and document review, contact our Senior Consultants.</em></p>
-        `;
-        container.appendChild(footer);
-
-        // Configure html2pdf options
-        const options = {
-            margin: [10, 10, 10, 10],
-            filename: filename,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { 
-                scale: 2,
-                useCORS: true,
-                letterRendering: true,
-                logging: false
-            },
-            jsPDF: { 
-                unit: 'mm', 
-                format: 'a4', 
-                orientation: 'portrait' 
-            },
-            pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-        };
+        console.log('✅ Document definition created');
 
         // Generate PDF
-        await html2pdf().set(options).from(container).save();
+        pdfMake.createPdf(docDefinition).download(filename);
 
         // Track document generation
         trackDocumentGeneration(filename, metadata);
