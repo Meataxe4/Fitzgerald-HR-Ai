@@ -8,8 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Document Generation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html-docx-js/0.3.1/html-docx.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <style>
         /* Crisis Mode Pulse Animation */
@@ -2380,240 +2380,114 @@ const hrTemplates = {
         // DOCUMENT GENERATION FUNCTIONS
         // ========================================
         
-        function formatContentForWord(content) {
-    return content
-        // Normalize line breaks
-        .replace(/\r\n/g, '\n')
-        .replace(/\r/g, '\n')
         
-        // Convert ## headers to proper HTML with Word styles
-        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-        
-        // Convert **bold** to <strong>
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        
-        // Convert *italic* to <em> (but not part of **)
-        .replace(/(?<!\*)\*([^\*\n]+?)\*(?!\*)/g, '<em>$1</em>')
-        
-        // Convert bullet points
-        .replace(/^[•\-] (.+)$/gm, '<li>$1</li>')
-        
-        // Convert underscores to underlined spans
-        .replace(/_{5,}/g, '<span style="text-decoration: underline; display: inline-block; min-width: 200px;">$&</span>')
-        
-        // Split by double newlines to create paragraphs
-        .split(/\n\n+/)
-        .map(block => {
-            block = block.trim();
-            if (!block) return '';
-            
-            // If it's already an HTML element, return it
-            if (block.startsWith('<h') || block.startsWith('<li>') || block.startsWith('<div')) {
-                return block;
-            }
-            
-            // Wrap list items in <ul>
-            if (block.includes('<li>')) {
-                return '<ul>' + block + '</ul>';
-            }
-            
-            // Convert single newlines to <br> within paragraphs
-            block = block.replace(/\n/g, '<br>');
-            
-            // Wrap in paragraph
-            return '<p>' + block + '</p>';
-        })
-        .join('\n');
-}
 
-function generateWordDocument(content, filename = 'document.doc', metadata = {}) {
+function generateWordDocument(content, filename = 'document.docx', metadata = {}) {
     try {
-        // Format the content
-        const formattedContent = formatContentForWord(content);
-        
-        // Create Word-compatible HTML with proper XML namespaces
-        const wordHTML = `
-<html xmlns:o='urn:schemas-microsoft-com:office:office' 
-      xmlns:w='urn:schemas-microsoft-com:office:word' 
-      xmlns='http://www.w3.org/TR/REC-html40'>
-
+        // Simple, clean HTML structure that Word understands
+        const htmlContent = `
+<!DOCTYPE html>
+<html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name=ProgId content=Word.Document>
-<meta name=Generator content="Microsoft Word 15">
-<meta name=Originator content="Microsoft Word 15">
-
-<!--[if gte mso 9]>
-<xml>
-<w:WordDocument>
-<w:View>Print</w:View>
-<w:Zoom>100</w:Zoom>
-<w:DoNotOptimizeForBrowser/>
-</w:WordDocument>
-</xml>
-<![endif]-->
-
-<style>
-<!--
-/* Font Definitions */
-@font-face {
-    font-family: "Cambria Math";
-}
-@font-face {
-    font-family: Calibri;
-}
-
-/* Style Definitions */
-p.MsoNormal, li.MsoNormal, div.MsoNormal {
-    margin: 0cm;
-    margin-bottom: .0001pt;
-    font-size: 11.0pt;
-    font-family: "Calibri", sans-serif;
-    line-height: 115%;
-}
-
-h1 {
-    margin-top: 12.0pt;
-    margin-right: 0cm;
-    margin-bottom: 12.0pt;
-    margin-left: 0cm;
-    page-break-after: avoid;
-    font-size: 20.0pt;
-    font-family: "Calibri", sans-serif;
-    color: #E2A14A;
-    font-weight: bold;
-    border-bottom: 3.0pt solid #E2A14A;
-    padding-bottom: 6.0pt;
-}
-
-h2 {
-    margin-top: 16.0pt;
-    margin-right: 0cm;
-    margin-bottom: 8.0pt;
-    margin-left: 0cm;
-    page-break-after: avoid;
-    font-size: 14.0pt;
-    font-family: "Calibri", sans-serif;
-    color: #1E3A5F;
-    font-weight: bold;
-}
-
-h3 {
-    margin-top: 12.0pt;
-    margin-right: 0cm;
-    margin-bottom: 6.0pt;
-    margin-left: 0cm;
-    page-break-after: avoid;
-    font-size: 12.0pt;
-    font-family: "Calibri", sans-serif;
-    color: #1E3A5F;
-    font-weight: bold;
-}
-
-p {
-    margin-top: 0cm;
-    margin-right: 0cm;
-    margin-bottom: 8.0pt;
-    margin-left: 0cm;
-    font-size: 11.0pt;
-    font-family: "Calibri", sans-serif;
-    line-height: 115%;
-}
-
-strong, b {
-    font-weight: bold;
-}
-
-em, i {
-    font-style: italic;
-}
-
-ul {
-    margin-left: 36.0pt;
-    margin-bottom: 8.0pt;
-}
-
-li {
-    margin-bottom: 4.0pt;
-    font-size: 11.0pt;
-    font-family: "Calibri", sans-serif;
-}
-
-.warning {
-    background: #FFF3CD;
-    border-left: 4.0pt solid #FF6B6B;
-    padding: 12.0pt;
-    margin: 12.0pt 0cm;
-    page-break-inside: avoid;
-}
-
-.footer {
-    margin-top: 36.0pt;
-    border-top: 2.0pt solid #CCCCCC;
-    padding-top: 12.0pt;
-    font-size: 9.0pt;
-    color: #666666;
-}
-
-@page Section1 {
-    size: 595.3pt 841.9pt;
-    margin: 72.0pt 72.0pt 72.0pt 72.0pt;
-}
-
-div.Section1 {
-    page: Section1;
-}
--->
-</style>
-
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Calibri, Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #000000;
+        }
+        h1 {
+            color: #E2A14A;
+            font-size: 20pt;
+            font-weight: bold;
+            border-bottom: 3pt solid #E2A14A;
+            padding-bottom: 6pt;
+            margin-top: 12pt;
+            margin-bottom: 12pt;
+        }
+        h2 {
+            color: #1E3A5F;
+            font-size: 14pt;
+            font-weight: bold;
+            margin-top: 16pt;
+            margin-bottom: 8pt;
+        }
+        h3 {
+            color: #1E3A5F;
+            font-size: 12pt;
+            font-weight: bold;
+            margin-top: 12pt;
+            margin-bottom: 6pt;
+        }
+        p {
+            margin-top: 0;
+            margin-bottom: 8pt;
+        }
+        strong {
+            font-weight: bold;
+        }
+        em {
+            font-style: italic;
+        }
+        ul {
+            margin-left: 20pt;
+        }
+        li {
+            margin-bottom: 4pt;
+        }
+        .warning {
+            background-color: #FFF3CD;
+            border-left: 4pt solid #FF6B6B;
+            padding: 12pt;
+            margin: 12pt 0;
+        }
+        .footer {
+            margin-top: 36pt;
+            border-top: 2pt solid #CCCCCC;
+            padding-top: 12pt;
+            font-size: 9pt;
+            color: #666666;
+        }
+    </style>
 </head>
-
-<body lang=EN-AU style='tab-interval:36.0pt'>
-
-<div class=Section1>
-
-${formattedContent}
-
-<div class="footer">
-<p><strong>FITZGERALD HR</strong> - AI-Powered Hospitality HR Solutions</p>
-<p>Email: info@fitzgeraldhr.com.au</p>
-<p>This document was generated by Fitz, your AI HR Assistant, on ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}</p>
-<p><strong>Document ID:</strong> ${metadata.documentId || 'N/A'} | <strong>Generated for:</strong> ${metadata.userName || currentUser || 'Beta User'}</p>
-<p><em>For personalised advice and document review, contact our Senior Consultants.</em></p>
-</div>
-
-</div>
-
+<body>
+    ${content}
+    
+    <div class="footer">
+        <p><strong>FITZGERALD HR</strong> - AI-Powered Hospitality HR Solutions</p>
+        <p>Email: info@fitzgeraldhr.com.au</p>
+        <p>Generated on ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}</p>
+        <p><strong>Document ID:</strong> ${metadata.documentId || 'N/A'} | <strong>User:</strong> ${metadata.userName || currentUser || 'Beta User'}</p>
+        <p><em>For personalised advice and document review, contact our Senior Consultants.</em></p>
+    </div>
 </body>
 </html>`;
 
-        // Create blob with proper encoding
-        const blob = new Blob(['\ufeff', wordHTML], {
-            type: 'application/msword'
-        });
-        
-        // Save the file
-        if (typeof saveAs !== 'undefined') {
-            saveAs(blob, filename);
+        // Check if htmlDocx is available
+        if (typeof htmlDocx !== 'undefined') {
+            // Use html-docx-js library
+            const converted = htmlDocx.asBlob(htmlContent);
+            
+            // Ensure filename ends with .docx
+            if (!filename.endsWith('.docx')) {
+                filename = filename.replace(/\.doc$/, '.docx') + (!filename.includes('.') ? '.docx' : '');
+            }
+            
+            saveAs(converted, filename);
         } else {
-            const url = window.URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
+            // Fallback to simple HTML export if library not loaded
+            console.warn('html-docx-js not loaded, using HTML fallback');
+            const blob = new Blob([htmlContent], { type: 'application/msword' });
+            saveAs(blob, filename.replace('.docx', '.doc'));
         }
-        
+
         // Track document generation
         trackDocumentGeneration(filename, metadata);
-        
+
         console.log('✅ Document generated:', filename);
         return true;
-        
+
     } catch (error) {
         console.error('❌ Error generating document:', error);
         alert('Error generating document: ' + error.message);
@@ -3859,7 +3733,7 @@ function downloadGeneratedDocument() {
             letterOfAllegation: 'Letter_of_Allegation'
         };
         
-        const filename = `${typeNames[type]}_${employeeName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.doc`;
+        const filename = `${typeNames[type]}_${employeeName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.docx`;
         
         const metadata = {
             documentId: generateDocumentId(),
