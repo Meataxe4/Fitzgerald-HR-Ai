@@ -2483,8 +2483,17 @@ function convertHTMLToPdfMake(html, metadata) {
                         }
                     }
                 }
+                
+                // If we have inline content with breaks, use the array format
+                if (pContent.length > 0) {
+                    return {
+                        text: pContent,
+                        margin: [0, 0, 0, 5]
+                    };
+                }
+                
                 return {
-                    text: pContent.length > 0 ? pContent : node.textContent.trim(),
+                    text: node.textContent.trim(),
                     margin: [0, 0, 0, 5]
                 };
 
@@ -2505,7 +2514,7 @@ function convertHTMLToPdfMake(html, metadata) {
                 };
 
             case 'br':
-                return { text: '\n' }; // Changed from empty text with margin
+                return { text: '\n' };
 
             default:
                 const children = [];
@@ -2520,34 +2529,69 @@ function convertHTMLToPdfMake(html, metadata) {
     const processInlineNode = (node) => {
         if (node.nodeType === Node.TEXT_NODE) {
             const text = node.textContent;
-            // Don't trim - preserve spaces between inline elements
-            return text ? { text: text } : null;
+            // Don't trim to preserve spacing
+            if (text) {
+                return { text: text };
+            }
+            return null;
         }
 
-        const tagName = node.tagName?.toLowerCase();
+        if (!node.tagName) return null;
         
-        // Handle <br> tags as line breaks
+        const tagName = node.tagName.toLowerCase();
+        
+        // Handle <br> as actual newline character
         if (tagName === 'br') {
             return { text: '\n' };
         }
 
+        // Process children for styled elements
         const children = [];
         for (const child of node.childNodes) {
             const processed = processInlineNode(child);
             if (processed) {
-                children.push(processed);
+                if (Array.isArray(processed)) {
+                    children.push(...processed);
+                } else {
+                    children.push(processed);
+                }
             }
         }
 
-        if (children.length === 0) return null;
+        if (children.length === 0) {
+            const text = node.textContent;
+            if (!text) return null;
+            
+            switch (tagName) {
+                case 'strong':
+                case 'b':
+                    return { text: text, bold: true };
+                case 'em':
+                case 'i':
+                    return { text: text, italics: true };
+                default:
+                    return { text: text };
+            }
+        }
 
+        // Apply formatting to children
         switch (tagName) {
             case 'strong':
             case 'b':
-                return children.map(child => ({ ...child, bold: true }));
+                return children.map(child => {
+                    if (typeof child === 'object' && child.text) {
+                        return { ...child, bold: true };
+                    }
+                    return child;
+                });
             case 'em':
             case 'i':
-                return children.map(child => ({ ...child, italics: true }));
+                return children.map(child => {
+                    if (typeof child === 'object' && child.text) {
+                        return { ...child, italics: true };
+                    }
+                    return child;
+                });
             default:
                 return children;
         }
