@@ -2472,26 +2472,31 @@ function convertHTMLToPdfMake(html, metadata) {
                 };
 
             case 'p':
-                const pContent = [];
-                for (const child of node.childNodes) {
-                    const processed = processInlineNode(child);
-                    if (processed) {
-                        if (Array.isArray(processed)) {
-                            pContent.push(...processed);
-                        } else {
-                            pContent.push(processed);
-                        }
+                // Split paragraph content by <br> tags
+                const innerHTML = node.innerHTML;
+                const lines = innerHTML.split(/<br\s*\/?>/i);
+                
+                if (lines.length > 1) {
+                    // Multiple lines - create separate text blocks
+                    const textBlocks = lines
+                        .map(line => {
+                            // Parse each line for formatting
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = line;
+                            return processInlineContent(tempDiv);
+                        })
+                        .filter(block => block && block.text);
+                    
+                    if (textBlocks.length > 0) {
+                        // Join with newline characters
+                        return {
+                            text: textBlocks.map(block => block.text).join('\n'),
+                            margin: [0, 0, 0, 5]
+                        };
                     }
                 }
                 
-                // If we have inline content with breaks, use the array format
-                if (pContent.length > 0) {
-                    return {
-                        text: pContent,
-                        margin: [0, 0, 0, 5]
-                    };
-                }
-                
+                // Single line paragraph
                 return {
                     text: node.textContent.trim(),
                     margin: [0, 0, 0, 5]
@@ -2526,74 +2531,49 @@ function convertHTMLToPdfMake(html, metadata) {
         }
     };
 
+    // Helper function to process inline content
+    const processInlineContent = (element) => {
+        const text = element.textContent.trim();
+        if (!text) return null;
+        
+        // Check for bold/italic
+        const strong = element.querySelector('strong, b');
+        const em = element.querySelector('em, i');
+        
+        if (strong && strong.textContent === text) {
+            return { text: text, bold: true };
+        }
+        if (em && em.textContent === text) {
+            return { text: text, italics: true };
+        }
+        
+        return { text: text };
+    };
+
     const processInlineNode = (node) => {
         if (node.nodeType === Node.TEXT_NODE) {
-            const text = node.textContent;
-            // Don't trim to preserve spacing
-            if (text) {
-                return { text: text };
-            }
-            return null;
+            const text = node.textContent.trim();
+            return text ? { text: text } : null;
         }
 
-        if (!node.tagName) return null;
+        const tagName = node.tagName?.toLowerCase();
         
-        const tagName = node.tagName.toLowerCase();
-        
-        // Handle <br> as actual newline character
         if (tagName === 'br') {
             return { text: '\n' };
         }
 
-        // Process children for styled elements
-        const children = [];
-        for (const child of node.childNodes) {
-            const processed = processInlineNode(child);
-            if (processed) {
-                if (Array.isArray(processed)) {
-                    children.push(...processed);
-                } else {
-                    children.push(processed);
-                }
-            }
-        }
+        const text = node.textContent.trim();
+        if (!text) return null;
 
-        if (children.length === 0) {
-            const text = node.textContent;
-            if (!text) return null;
-            
-            switch (tagName) {
-                case 'strong':
-                case 'b':
-                    return { text: text, bold: true };
-                case 'em':
-                case 'i':
-                    return { text: text, italics: true };
-                default:
-                    return { text: text };
-            }
-        }
-
-        // Apply formatting to children
         switch (tagName) {
             case 'strong':
             case 'b':
-                return children.map(child => {
-                    if (typeof child === 'object' && child.text) {
-                        return { ...child, bold: true };
-                    }
-                    return child;
-                });
+                return { text: text, bold: true };
             case 'em':
             case 'i':
-                return children.map(child => {
-                    if (typeof child === 'object' && child.text) {
-                        return { ...child, italics: true };
-                    }
-                    return child;
-                });
+                return { text: text, italics: true };
             default:
-                return children;
+                return { text: text };
         }
     };
 
