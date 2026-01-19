@@ -2474,89 +2474,124 @@ function convertAIContentToHTML(rawContent) {
     return html;
 }
 
+function parseHTMLForPDF(html) {
+    const elements = [];
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    
+    const traverse = (node) => {
+        if (node.nodeType === Node.TEXT_NODE) {
+            const text = node.textContent.trim();
+            if (text) {
+                return [{ type: 'text', text: text }];
+            }
+            return [];
+        }
+        
+        if (node.nodeType !== Node.ELEMENT_NODE) return [];
+        
+        const tagName = node.tagName.toLowerCase();
+        
+        switch (tagName) {
+            case 'h1':
+                elements.push({ type: 'h1', text: node.textContent.trim() });
+                break;
+                
+            case 'h2':
+                elements.push({ type: 'h2', text: node.textContent.trim() });
+                break;
+                
+            case 'h3':
+                elements.push({ type: 'h3', text: node.textContent.trim() });
+                break;
+                
+            case 'p':
+                const segments = [];
+                parseInlineElements(node, segments);
+                
+                if (segments.length > 0) {
+                    elements.push({ type: 'p', segments: segments });
+                } else {
+                    const text = node.textContent.trim();
+                    if (text) {
+                        elements.push({ type: 'p', text: text });
+                    }
+                }
+                break;
+                
+            case 'li':
+                elements.push({ type: 'li', text: node.textContent.trim() });
+                break;
+                
+            case 'ul':
+            case 'ol':
+                for (const child of node.children) {
+                    traverse(child);
+                }
+                elements.push({ type: 'space' });
+                break;
+                
+            case 'br':
+                elements.push({ type: 'space' });
+                break;
+                
+            case 'hr':
+                elements.push({ type: 'line' });
+                break;
+                
+            default:
+                for (const child of node.childNodes) {
+                    traverse(child);
+                }
+        }
+    };
+    
+    traverse(doc.body);
+    return elements;
+}
+
+function parseInlineElements(node, segments) {
+    for (const child of node.childNodes) {
+        if (child.nodeType === Node.TEXT_NODE) {
+            const text = child.textContent.trim();
+            if (text) {
+                segments.push({ text: text, bold: false, italic: false });
+            }
+        } else if (child.nodeType === Node.ELEMENT_NODE) {
+            const tagName = child.tagName.toLowerCase();
+            const text = child.textContent.trim();
+            
+            if (text) {
+                if (tagName === 'strong' || tagName === 'b') {
+                    segments.push({ text: text, bold: true, italic: false });
+                } else if (tagName === 'em' || tagName === 'i') {
+                    segments.push({ text: text, bold: false, italic: true });
+                } else {
+                    segments.push({ text: text, bold: false, italic: false });
+                }
+            }
+        }
+    }
+}
+
 async function generatePDFDocument(content, filename = 'document.pdf', metadata = {}) {
     try {
-        if (typeof window.jspdf === 'undefined' || typeof html2canvas === 'undefined') {
-            alert('PDF libraries not loaded. Please refresh and try again.');
+        if (typeof window.jspdf === 'undefined') {
+            alert('PDF library not loaded. Please refresh and try again.');
             return false;
         }
 
         const { jsPDF } = window.jspdf;
 
-        // Get the preview content element
-        const previewElement = document.getElementById('documentPreviewContent');
+        console.log('📄 Generating text-based PDF...');
+
+        // Convert content to HTML first
+        const htmlContent = convertAIContentToHTML(content);
         
-        if (!previewElement) {
-            alert('Preview not found. Please try again.');
-            return false;
-        }
-
-        console.log('📸 Converting preview to PDF...');
-
-        // Create a temporary styled container for better rendering
-        const tempContainer = document.createElement('div');
-        tempContainer.style.cssText = `
-            position: absolute;
-            left: -9999px;
-            top: 0;
-            width: 800px;
-            padding: 40px;
-            background: white;
-            font-family: 'Times New Roman', serif;
-            font-size: 12pt;
-            line-height: 1.8;
-            color: #000;
-        `;
-
-        // Clone the preview content with styles
-        const clone = previewElement.cloneNode(true);
+        // Parse HTML into structured elements
+        const elements = parseHTMLForPDF(htmlContent);
         
-        // Apply inline styles to preserve formatting in canvas
-        const applyInlineStyles = (element) => {
-            if (element.nodeType !== 1) return; // Skip non-element nodes
-            
-            const computedStyle = window.getComputedStyle(element);
-            
-            // Copy essential styles inline
-            element.style.color = computedStyle.color;
-            element.style.fontSize = computedStyle.fontSize;
-            element.style.fontWeight = computedStyle.fontWeight;
-            element.style.fontStyle = computedStyle.fontStyle;
-            element.style.fontFamily = computedStyle.fontFamily;
-            element.style.marginTop = computedStyle.marginTop;
-            element.style.marginBottom = computedStyle.marginBottom;
-            element.style.lineHeight = computedStyle.lineHeight;
-            element.style.textAlign = computedStyle.textAlign;
-            element.style.borderBottom = computedStyle.borderBottom;
-            element.style.paddingBottom = computedStyle.paddingBottom;
-            
-            // Recursively apply to children
-            for (let child of element.children) {
-                applyInlineStyles(child);
-            }
-        };
-        
-        applyInlineStyles(clone);
-        tempContainer.appendChild(clone);
-        document.body.appendChild(tempContainer);
-
-        // Wait for styles to apply
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        // Capture with html2canvas
-        const canvas = await html2canvas(tempContainer, {
-            scale: 2,
-            useCORS: true,
-            logging: false,
-            backgroundColor: '#ffffff',
-            allowTaint: true,
-            foreignObjectRendering: false
-        });
-
-        // Remove temporary container
-        document.body.removeChild(tempContainer);
-
-        console.log('✅ Canvas created:', canvas.width, 'x', canvas.height);
+        console.log('✅ Parsed', elements.length, 'elements');
 
         // Create PDF
         const pdf = new jsPDF({
@@ -2567,47 +2602,161 @@ async function generatePDFDocument(content, filename = 'document.pdf', metadata 
 
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
-        const margin = 10;
-        
-        const imgWidth = pageWidth - (margin * 2);
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
-        let heightLeft = imgHeight;
-        let position = margin;
+        const margin = 20;
+        const maxWidth = pageWidth - (margin * 2);
+        let yPosition = margin;
 
-        // Convert canvas to image
-        const imgData = canvas.toDataURL('image/png', 1.0);
+        // Render each element
+        for (const element of elements) {
+            // Check for page break
+            if (yPosition > pageHeight - 30) {
+                pdf.addPage();
+                yPosition = margin;
+            }
 
-        // Add first page
-        pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
-        heightLeft -= (pageHeight - margin * 2);
+            switch (element.type) {
+                case 'h1':
+                    yPosition += 5;
+                    pdf.setFontSize(18);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(226, 161, 74);
+                    
+                    const h1Lines = pdf.splitTextToSize(element.text, maxWidth);
+                    pdf.text(h1Lines, margin, yPosition);
+                    yPosition += h1Lines.length * 7;
+                    
+                    // Underline
+                    pdf.setDrawColor(226, 161, 74);
+                    pdf.setLineWidth(0.5);
+                    pdf.line(margin, yPosition, margin + 80, yPosition);
+                    yPosition += 8;
+                    break;
 
-        // Add additional pages if needed
-        while (heightLeft > 0) {
-            position = heightLeft - imgHeight + margin;
-            pdf.addPage();
-            pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
-            heightLeft -= (pageHeight - margin * 2);
+                case 'h2':
+                    yPosition += 4;
+                    pdf.setFontSize(14);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(30, 58, 95);
+                    
+                    const h2Lines = pdf.splitTextToSize(element.text, maxWidth);
+                    pdf.text(h2Lines, margin, yPosition);
+                    yPosition += h2Lines.length * 6 + 4;
+                    break;
+
+                case 'h3':
+                    yPosition += 3;
+                    pdf.setFontSize(12);
+                    pdf.setFont('helvetica', 'bold');
+                    pdf.setTextColor(30, 58, 95);
+                    
+                    const h3Lines = pdf.splitTextToSize(element.text, maxWidth);
+                    pdf.text(h3Lines, margin, yPosition);
+                    yPosition += h3Lines.length * 5 + 3;
+                    break;
+
+                case 'p':
+                    pdf.setFontSize(11);
+                    pdf.setTextColor(0, 0, 0);
+                    
+                    // Check if paragraph contains formatting
+                    if (element.segments && element.segments.length > 0) {
+                        // Render with mixed formatting
+                        for (const segment of element.segments) {
+                            pdf.setFont('helvetica', segment.bold ? 'bold' : (segment.italic ? 'italic' : 'normal'));
+                            
+                            const segLines = pdf.splitTextToSize(segment.text, maxWidth);
+                            for (const line of segLines) {
+                                if (yPosition > pageHeight - 30) {
+                                    pdf.addPage();
+                                    yPosition = margin;
+                                }
+                                pdf.text(line, margin, yPosition);
+                                yPosition += 5;
+                            }
+                        }
+                    } else {
+                        // Plain paragraph
+                        pdf.setFont('helvetica', 'normal');
+                        const pLines = pdf.splitTextToSize(element.text, maxWidth);
+                        
+                        for (const line of pLines) {
+                            if (yPosition > pageHeight - 30) {
+                                pdf.addPage();
+                                yPosition = margin;
+                            }
+                            pdf.text(line, margin, yPosition);
+                            yPosition += 5;
+                        }
+                    }
+                    yPosition += 3;
+                    break;
+
+                case 'li':
+                    pdf.setFontSize(11);
+                    pdf.setFont('helvetica', 'normal');
+                    pdf.setTextColor(0, 0, 0);
+                    
+                    pdf.text('•', margin, yPosition);
+                    
+                    const liLines = pdf.splitTextToSize(element.text, maxWidth - 10);
+                    pdf.text(liLines, margin + 6, yPosition);
+                    yPosition += liLines.length * 5 + 2;
+                    break;
+
+                case 'space':
+                    yPosition += 5;
+                    break;
+
+                case 'line':
+                    pdf.setDrawColor(200, 200, 200);
+                    pdf.setLineWidth(0.3);
+                    pdf.line(margin, yPosition, pageWidth - margin, yPosition);
+                    yPosition += 5;
+                    break;
+            }
         }
 
-        // Add metadata footer on last page
-        const totalPages = pdf.internal.getNumberOfPages();
-        pdf.setPage(totalPages);
-        
-        pdf.setFontSize(8);
-        pdf.setTextColor(150, 150, 150);
-        pdf.text(`Document ID: ${metadata.documentId || 'N/A'} | Generated: ${new Date().toLocaleDateString('en-AU')}`, margin, pageHeight - 5);
+        // Add footer
+        yPosition += 10;
+        if (yPosition > pageHeight - 40) {
+            pdf.addPage();
+            yPosition = margin;
+        }
+
+        pdf.setDrawColor(200, 200, 200);
+        pdf.setLineWidth(0.5);
+        pdf.line(margin, yPosition, pageWidth - margin, yPosition);
+        yPosition += 6;
+
+        pdf.setFontSize(10);
+        pdf.setFont('helvetica', 'bold');
+        pdf.setTextColor(0, 0, 0);
+        pdf.text('FITZGERALD HR - AI-Powered Hospitality HR Solutions', margin, yPosition);
+        yPosition += 5;
+
+        pdf.setFont('helvetica', 'normal');
+        pdf.setFontSize(9);
+        pdf.text('Email: info@fitzgeraldhr.com.au', margin, yPosition);
+        yPosition += 4;
+
+        pdf.text(`Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}`, margin, yPosition);
+        yPosition += 4;
+
+        pdf.text(`Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}`, margin, yPosition);
+        yPosition += 4;
+
+        pdf.setFont('helvetica', 'italic');
+        pdf.text('For personalised advice and document review, contact our Senior Consultants.', margin, yPosition);
 
         // Save
         pdf.save(filename);
-
         trackDocumentGeneration(filename, metadata);
 
-        console.log('✅ PDF saved:', filename);
+        console.log('✅ PDF generated:', filename);
         return true;
 
     } catch (error) {
-        console.error('❌ PDF generation error:', error);
+        console.error('❌ PDF error:', error);
         alert('Error generating PDF: ' + error.message);
         return false;
     }
