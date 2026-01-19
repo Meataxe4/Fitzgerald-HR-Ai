@@ -11,6 +11,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
     
     <style>
         /* Crisis Mode Pulse Animation */
@@ -2498,29 +2499,44 @@ async function generatePDFDocument(content, filename = 'document.pdf', metadata 
                     break;
 
                 case 'p':
-                    doc.setFontSize(11);
-                    doc.setFont(undefined, 'normal');
-                    doc.setTextColor(0, 0, 0);
-                    
-                    // Handle bold and italic text
-                    const segments = parseTextSegments(item.text);
-                    for (const segment of segments) {
-                        if (segment.bold && segment.italic) {
-                            doc.setFont(undefined, 'bolditalic');
-                        } else if (segment.bold) {
-                            doc.setFont(undefined, 'bold');
-                        } else if (segment.italic) {
-                            doc.setFont(undefined, 'italic');
-                        } else {
-                            doc.setFont(undefined, 'normal');
-                        }
-                        
-                        const lines = doc.splitTextToSize(segment.text, maxWidth);
-                        doc.text(lines, margin, yPosition);
-                        yPosition += lines.length * 5;
-                    }
-                    yPosition += 3;
-                    break;
+    doc.setFontSize(11);
+    doc.setTextColor(0, 0, 0);
+    
+    // Parse segments for formatting
+    const segments = parseTextSegments(item.text);
+    let currentX = margin;
+    
+    for (const segment of segments) {
+        // Set font style
+        if (segment.bold && segment.italic) {
+            doc.setFont(undefined, 'bolditalic');
+        } else if (segment.bold) {
+            doc.setFont(undefined, 'bold');
+        } else if (segment.italic) {
+            doc.setFont(undefined, 'italic');
+        } else {
+            doc.setFont(undefined, 'normal');
+        }
+        
+        // Split text properly
+        const lines = doc.splitTextToSize(segment.text, maxWidth);
+        
+        for (let i = 0; i < lines.length; i++) {
+            if (yPosition > pageHeight - 30) {
+                doc.addPage();
+                yPosition = 20;
+            }
+            
+            doc.text(lines[i], margin, yPosition);
+            
+            if (i < lines.length - 1) {
+                yPosition += 5.5;
+            }
+        }
+    }
+    
+    yPosition += 6; // Space after paragraph
+    break;
 
                 case 'li':
                     doc.setFontSize(11);
@@ -2589,45 +2605,64 @@ async function generatePDFDocument(content, filename = 'document.pdf', metadata 
 // Helper function to parse content into PDF elements
 function parseContentForPDF(htmlContent) {
     const elements = [];
-    const lines = htmlContent.split('\n');
+    
+    // First, clean up the HTML and convert markdown headers
+    let content = htmlContent
+        // Remove watermark divs but keep their content
+        .replace(/<div[^>]*class=".*?warning.*?"[^>]*>/gi, '\n⚠️ ')
+        .replace(/<div[^>]*>/gi, '\n')
+        .replace(/<\/div>/gi, '\n')
+        // Convert HTML headers to markdown
+        .replace(/<h1[^>]*>(.*?)<\/h1>/gi, '\n# $1\n')
+        .replace(/<h2[^>]*>(.*?)<\/h2>/gi, '\n## $1\n')
+        .replace(/<h3[^>]*>(.*?)<\/h3>/gi, '\n### $1\n')
+        // Convert paragraphs
+        .replace(/<p[^>]*>/gi, '\n')
+        .replace(/<\/p>/gi, '\n')
+        // Convert lists
+        .replace(/<li[^>]*>/gi, '\n• ')
+        .replace(/<\/li>/gi, '')
+        .replace(/<\/?ul[^>]*>/gi, '\n')
+        // Convert line breaks
+        .replace(/<br\s*\/?>/gi, '\n')
+        // Remove remaining HTML tags
+        .replace(/<[^>]*>/g, '')
+        // Decode HTML entities
+        .replace(/&nbsp;/g, ' ')
+        .replace(/&amp;/g, '&')
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"');
+
+    // Split by lines
+    const lines = content.split('\n');
 
     for (let line of lines) {
         line = line.trim();
         
+        // Skip empty lines but add spacing
         if (!line) {
-            elements.push({ type: 'space' });
+            if (elements.length > 0 && elements[elements.length - 1].type !== 'space') {
+                elements.push({ type: 'space' });
+            }
             continue;
         }
 
-        // Remove HTML tags but preserve structure
-        const cleanLine = line
-            .replace(/<div[^>]*>/gi, '')
-            .replace(/<\/div>/gi, '')
-            .replace(/<br\s*\/?>/gi, '\n')
-            .replace(/<ul[^>]*>/gi, '')
-            .replace(/<\/ul>/gi, '');
-
-        // Headers
-        if (line.startsWith('# ')) {
-            elements.push({ type: 'h1', text: cleanLine.replace(/^# /, '') });
+        // Parse headers
+        if (line.startsWith('### ')) {
+            elements.push({ type: 'h3', text: line.replace(/^### /, '') });
         } else if (line.startsWith('## ')) {
-            elements.push({ type: 'h2', text: cleanLine.replace(/^## /, '') });
-        } else if (line.startsWith('### ')) {
-            elements.push({ type: 'h3', text: cleanLine.replace(/^### /, '') });
-        } else if (line.match(/^<li[^>]*>/)) {
-            const text = cleanLine.replace(/<\/?li[^>]*>/gi, '').replace(/<[^>]*>/g, '');
-            elements.push({ type: 'li', text: text });
-        } else if (line.startsWith('<h1')) {
-            const text = cleanLine.replace(/<\/?h1[^>]*>/gi, '');
-            elements.push({ type: 'h1', text: text });
-        } else if (line.startsWith('<h2')) {
-            const text = cleanLine.replace(/<\/?h2[^>]*>/gi, '');
-            elements.push({ type: 'h2', text: text });
-        } else if (line.startsWith('<h3')) {
-            const text = cleanLine.replace(/<\/?h3[^>]*>/gi, '');
-            elements.push({ type: 'h3', text: text });
-        } else if (cleanLine && !cleanLine.startsWith('<')) {
-            elements.push({ type: 'p', text: cleanLine });
+            elements.push({ type: 'h2', text: line.replace(/^## /, '') });
+        } else if (line.startsWith('# ')) {
+            elements.push({ type: 'h1', text: line.replace(/^# /, '') });
+        } 
+        // Parse bullet points
+        else if (line.startsWith('• ') || line.startsWith('- ')) {
+            elements.push({ type: 'li', text: line.replace(/^[•\-] /, '') });
+        }
+        // Regular paragraphs
+        else {
+            elements.push({ type: 'p', text: line });
         }
     }
 
@@ -2637,18 +2672,45 @@ function parseContentForPDF(htmlContent) {
 // Helper to parse bold/italic segments
 function parseTextSegments(text) {
     const segments = [];
-    let remaining = text;
     
-    // Simple approach - just strip markup for now
-    const cleaned = text
-        .replace(/<[^>]*>/g, '')
-        .replace(/\*\*/g, '')
-        .replace(/\*/g, '');
+    // Remove HTML tags first
+    text = text.replace(/<[^>]*>/g, '');
     
-    segments.push({ text: cleaned, bold: false, italic: false });
+    // Parse **bold** and *italic*
+    let lastIndex = 0;
+    const boldRegex = /\*\*(.+?)\*\*/g;
+    let match;
+    
+    while ((match = boldRegex.exec(text)) !== null) {
+        // Add text before bold
+        if (match.index > lastIndex) {
+            const before = text.substring(lastIndex, match.index);
+            if (before) {
+                segments.push({ text: before, bold: false, italic: false });
+            }
+        }
+        
+        // Add bold text
+        segments.push({ text: match[1], bold: true, italic: false });
+        lastIndex = match.index + match[0].length;
+    }
+    
+    // Add remaining text
+    if (lastIndex < text.length) {
+        const remaining = text.substring(lastIndex);
+        if (remaining) {
+            segments.push({ text: remaining, bold: false, italic: false });
+        }
+    }
+    
+    // If no segments, add the whole text
+    if (segments.length === 0) {
+        segments.push({ text: text, bold: false, italic: false });
+    }
     
     return segments;
 }
+
         // ========================================
         // SMART DOCUMENT DETECTION & BUTTONS
         // ========================================
