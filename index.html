@@ -2483,7 +2483,7 @@ async function generatePDFDocument(content, filename = 'document.pdf', metadata 
 
         const { jsPDF } = window.jspdf;
 
-        // Get the ACTUAL preview content that's already formatted
+        // Get the preview content element
         const previewElement = document.getElementById('documentPreviewContent');
         
         if (!previewElement) {
@@ -2493,15 +2493,68 @@ async function generatePDFDocument(content, filename = 'document.pdf', metadata 
 
         console.log('📸 Converting preview to PDF...');
 
-        // Capture the preview as an image
-        const canvas = await html2canvas(previewElement, {
+        // Create a temporary styled container for better rendering
+        const tempContainer = document.createElement('div');
+        tempContainer.style.cssText = `
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            width: 800px;
+            padding: 40px;
+            background: white;
+            font-family: 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.8;
+            color: #000;
+        `;
+
+        // Clone the preview content with styles
+        const clone = previewElement.cloneNode(true);
+        
+        // Apply inline styles to preserve formatting in canvas
+        const applyInlineStyles = (element) => {
+            if (element.nodeType !== 1) return; // Skip non-element nodes
+            
+            const computedStyle = window.getComputedStyle(element);
+            
+            // Copy essential styles inline
+            element.style.color = computedStyle.color;
+            element.style.fontSize = computedStyle.fontSize;
+            element.style.fontWeight = computedStyle.fontWeight;
+            element.style.fontStyle = computedStyle.fontStyle;
+            element.style.fontFamily = computedStyle.fontFamily;
+            element.style.marginTop = computedStyle.marginTop;
+            element.style.marginBottom = computedStyle.marginBottom;
+            element.style.lineHeight = computedStyle.lineHeight;
+            element.style.textAlign = computedStyle.textAlign;
+            element.style.borderBottom = computedStyle.borderBottom;
+            element.style.paddingBottom = computedStyle.paddingBottom;
+            
+            // Recursively apply to children
+            for (let child of element.children) {
+                applyInlineStyles(child);
+            }
+        };
+        
+        applyInlineStyles(clone);
+        tempContainer.appendChild(clone);
+        document.body.appendChild(tempContainer);
+
+        // Wait for styles to apply
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        // Capture with html2canvas
+        const canvas = await html2canvas(tempContainer, {
             scale: 2,
             useCORS: true,
             logging: false,
             backgroundColor: '#ffffff',
-            windowWidth: 800,
-            windowHeight: previewElement.scrollHeight
+            allowTaint: true,
+            foreignObjectRendering: false
         });
+
+        // Remove temporary container
+        document.body.removeChild(tempContainer);
 
         console.log('✅ Canvas created:', canvas.width, 'x', canvas.height);
 
@@ -2514,39 +2567,36 @@ async function generatePDFDocument(content, filename = 'document.pdf', metadata 
 
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
+        const margin = 10;
         
-        const imgWidth = pageWidth - 20; // 10mm margin on each side
+        const imgWidth = pageWidth - (margin * 2);
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
         
         let heightLeft = imgHeight;
-        let position = 10; // 10mm top margin
+        let position = margin;
 
         // Convert canvas to image
-        const imgData = canvas.toDataURL('image/png');
+        const imgData = canvas.toDataURL('image/png', 1.0);
 
         // Add first page
-        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-        heightLeft -= (pageHeight - 20);
+        pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+        heightLeft -= (pageHeight - margin * 2);
 
-        // Add additional pages if content is longer
+        // Add additional pages if needed
         while (heightLeft > 0) {
-            position = heightLeft - imgHeight + 10;
+            position = heightLeft - imgHeight + margin;
             pdf.addPage();
-            pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
-            heightLeft -= (pageHeight - 20);
+            pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+            heightLeft -= (pageHeight - margin * 2);
         }
 
-        // Add footer to last page
-        const lastPageNum = pdf.internal.getNumberOfPages();
-        pdf.setPage(lastPageNum);
+        // Add metadata footer on last page
+        const totalPages = pdf.internal.getNumberOfPages();
+        pdf.setPage(totalPages);
         
-        const footerY = pageHeight - 20;
-        pdf.setFontSize(9);
-        pdf.setTextColor(100, 100, 100);
-        
-        pdf.text('FITZGERALD HR - AI-Powered Hospitality HR', 10, footerY);
-        pdf.text(`Generated: ${new Date().toLocaleDateString('en-AU')}`, 10, footerY + 5);
-        pdf.text(`Doc ID: ${metadata.documentId || 'N/A'}`, 10, footerY + 10);
+        pdf.setFontSize(8);
+        pdf.setTextColor(150, 150, 150);
+        pdf.text(`Document ID: ${metadata.documentId || 'N/A'} | Generated: ${new Date().toLocaleDateString('en-AU')}`, margin, pageHeight - 5);
 
         // Save
         pdf.save(filename);
