@@ -3995,33 +3995,51 @@ function showDocumentPreview(generatedDoc) {
 
 function closeDocumentPreview() {
     document.getElementById('documentPreviewModal').classList.add('hidden');
+    // Reset the document builder silently so it's ready for next use
+    resetDocumentBuilderSilent();
 }
 
-function resetDocumentBuilder() {
-    // Confirm reset
-    if (!confirm('Start over? This will clear all your entered information.')) {
-        return;
-    }
+// Silent reset (used when closing modal)
+function resetDocumentBuilderSilent() {
+    console.log('🔄 Resetting Document Builder (silent)...');
     
     // Reset state
     documentBuilderState.currentType = null;
     documentBuilderState.currentStep = 1;
     documentBuilderState.data = {};
     documentBuilderState.generatedDocument = null;
+    documentBuilderState.isGenerating = false;
     
     // Hide all wizard sections
-    document.getElementById('documentWizardSteps').classList.add('hidden');
-    document.getElementById('documentGenerating').classList.add('hidden');
+    const wizardSteps = document.getElementById('documentWizardSteps');
+    const generating = document.getElementById('documentGenerating');
+    const templateSelection = document.getElementById('documentTemplateSelection');
     
-    // Show template selection
-    document.getElementById('documentTemplateSelection').classList.remove('hidden');
+    if (wizardSteps) wizardSteps.classList.add('hidden');
+    if (generating) generating.classList.add('hidden');
+    if (templateSelection) templateSelection.classList.remove('hidden');
     
     // Reset progress
-    document.getElementById('docCurrentStep').textContent = '1';
-    document.getElementById('docProgress').textContent = '0% Complete';
-    document.getElementById('docProgressBar').style.width = '0%';
+    const currentStep = document.getElementById('docCurrentStep');
+    const progress = document.getElementById('docProgress');
+    const progressBar = document.getElementById('docProgressBar');
     
-    console.log('🔄 Document Builder reset');
+    if (currentStep) currentStep.textContent = '1';
+    if (progress) progress.textContent = '0% Complete';
+    if (progressBar) progressBar.style.width = '0%';
+    
+    console.log('✅ Document Builder reset (silent)');
+}
+
+// Reset with confirmation (used when user clicks "Start Over" button)
+function resetDocumentBuilder() {
+    // Confirm reset
+    if (!confirm('Start over? This will clear all your entered information.')) {
+        return;
+    }
+    
+    // Call the silent reset
+    resetDocumentBuilderSilent();
 }
 
 async function regenerateDocument() {
@@ -4890,6 +4908,11 @@ function openTool(toolName) {
 
 function closeToolModal(modalId) {
     document.getElementById(modalId).classList.add('hidden');
+    
+    // Special handling for Document Builder - reset it silently when closed
+    if (modalId === 'documentBuilderModal') {
+        resetDocumentBuilderSilent();
+    }
 }
 
 // ========================================
