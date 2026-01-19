@@ -2454,126 +2454,64 @@ function convertHTMLToPdfMake(html, metadata) {
                 return {
                     text: node.textContent.trim(),
                     style: 'header1',
-                    margin: [0, 15, 0, 10]
+                    margin: [0, 10, 0, 5]
                 };
 
             case 'h2':
                 return {
                     text: node.textContent.trim(),
                     style: 'header2',
-                    margin: [0, 12, 0, 6]
+                    margin: [0, 8, 0, 4]
                 };
 
             case 'h3':
                 return {
                     text: node.textContent.trim(),
                     style: 'header3',
-                    margin: [0, 10, 0, 5]
+                    margin: [0, 6, 0, 3]
                 };
 
             case 'p':
                 const pContent = [];
-                let hasFormatting = false;
-                
-                // Check if paragraph has inline formatting (strong, em, etc.)
                 for (const child of node.childNodes) {
                     const processed = processInlineNode(child);
                     if (processed) {
                         if (Array.isArray(processed)) {
                             pContent.push(...processed);
-                            hasFormatting = true;
                         } else {
                             pContent.push(processed);
-                            if (processed.bold || processed.italics) {
-                                hasFormatting = true;
-                            }
                         }
                     }
                 }
-                
-                // Return formatted text or plain text
-                if (hasFormatting && pContent.length > 0) {
-                    return {
-                        text: pContent,
-                        margin: [0, 0, 0, 6],
-                        lineHeight: 1.3
-                    };
-                } else {
-                    const plainText = node.textContent.trim();
-                    if (plainText) {
-                        return {
-                            text: plainText,
-                            margin: [0, 0, 0, 6],
-                            lineHeight: 1.3
-                        };
-                    }
-                }
-                return null;
+                return {
+                    text: pContent.length > 0 ? pContent : node.textContent.trim(),
+                    margin: [0, 0, 0, 5]
+                };
 
             case 'ul':
                 const listItems = [];
                 for (const li of node.querySelectorAll('li')) {
                     listItems.push(li.textContent.trim());
                 }
-                if (listItems.length > 0) {
-                    return {
-                        ul: listItems,
-                        margin: [0, 5, 0, 8]
-                    };
-                }
-                return null;
+                return {
+                    ul: listItems,
+                    margin: [0, 0, 0, 5]
+                };
 
             case 'li':
-                // Handle if processed separately (shouldn't happen with ul above)
                 return {
                     text: node.textContent.trim(),
-                    margin: [0, 0, 0, 3]
+                    margin: [0, 0, 0, 2]
                 };
 
             case 'br':
-                return { text: '\n', margin: [0, 0, 0, 0] };
-
-            case 'hr':
-                return {
-                    canvas: [
-                        {
-                            type: 'line',
-                            x1: 0, y1: 0,
-                            x2: 515, y2: 0,
-                            lineWidth: 0.5,
-                            lineColor: '#cccccc'
-                        }
-                    ],
-                    margin: [0, 10, 0, 10]
-                };
-
-            case 'div':
-                // Process div children
-                const divChildren = [];
-                for (const child of node.childNodes) {
-                    const processed = processNode(child);
-                    if (processed) {
-                        if (Array.isArray(processed)) {
-                            divChildren.push(...processed);
-                        } else {
-                            divChildren.push(processed);
-                        }
-                    }
-                }
-                return divChildren.length > 0 ? divChildren : null;
+                return { text: '\n' }; // Changed from empty text with margin
 
             default:
-                // Process children for unknown tags
                 const children = [];
                 for (const child of node.childNodes) {
                     const processed = processNode(child);
-                    if (processed) {
-                        if (Array.isArray(processed)) {
-                            children.push(...processed);
-                        } else {
-                            children.push(processed);
-                        }
-                    }
+                    if (processed) children.push(processed);
                 }
                 return children.length > 0 ? children : null;
         }
@@ -2581,36 +2519,38 @@ function convertHTMLToPdfMake(html, metadata) {
 
     const processInlineNode = (node) => {
         if (node.nodeType === Node.TEXT_NODE) {
-            const text = node.textContent.trim();
+            const text = node.textContent;
+            // Don't trim - preserve spaces between inline elements
             return text ? { text: text } : null;
         }
 
-        if (node.nodeType !== Node.ELEMENT_NODE) return null;
+        const tagName = node.tagName?.toLowerCase();
+        
+        // Handle <br> tags as line breaks
+        if (tagName === 'br') {
+            return { text: '\n' };
+        }
 
-        const tagName = node.tagName.toLowerCase();
-        
-        // Handle nested inline elements
-        if (tagName === 'strong' || tagName === 'b') {
-            // Check for nested em/i
-            const em = node.querySelector('em, i');
-            if (em) {
-                return { text: node.textContent.trim(), bold: true, italics: true };
+        const children = [];
+        for (const child of node.childNodes) {
+            const processed = processInlineNode(child);
+            if (processed) {
+                children.push(processed);
             }
-            return { text: node.textContent.trim(), bold: true };
         }
-        
-        if (tagName === 'em' || tagName === 'i') {
-            // Check for nested strong/b
-            const strong = node.querySelector('strong, b');
-            if (strong) {
-                return { text: node.textContent.trim(), bold: true, italics: true };
-            }
-            return { text: node.textContent.trim(), italics: true };
+
+        if (children.length === 0) return null;
+
+        switch (tagName) {
+            case 'strong':
+            case 'b':
+                return children.map(child => ({ ...child, bold: true }));
+            case 'em':
+            case 'i':
+                return children.map(child => ({ ...child, italics: true }));
+            default:
+                return children;
         }
-        
-        // For other tags, just return the text
-        const text = node.textContent.trim();
-        return text ? { text: text } : null;
     };
 
     // Process all body children
@@ -2671,8 +2611,7 @@ function convertHTMLToPdfMake(html, metadata) {
         },
         defaultStyle: {
             fontSize: 11,
-            font: 'Roboto',
-            lineHeight: 1.3
+            font: 'Roboto'
         },
         pageMargins: [40, 40, 40, 40]
     };
