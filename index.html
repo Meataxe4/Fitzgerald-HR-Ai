@@ -2430,121 +2430,82 @@ const hrTemplates = {
         .join('\n');
 }
 
+function convertAIContentToHTML(rawContent) {
+    console.log('🔄 Converting AI content to HTML...');
+    
+    let html = rawContent
+        // Convert markdown headers to HTML
+        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
+        
+        // Convert **bold** to <strong>
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        
+        // Convert *italic* to <em>
+        .replace(/(?<!\*)\*([^\*\n]+?)\*(?!\*)/g, '<em>$1</em>')
+        
+        // Convert bullet points
+        .replace(/^[•\-\*] (.+)$/gm, '<li>$1</li>')
+        
+        // Wrap consecutive list items in <ul>
+        .replace(/(<li>.*<\/li>\s*)+/gs, '<ul>$&</ul>')
+        
+        // Convert double line breaks to paragraph breaks
+        .split('\n\n')
+        .map(block => {
+            block = block.trim();
+            if (!block) return '';
+            
+            // Skip if already HTML element
+            if (block.startsWith('<h') || block.startsWith('<ul') || block.startsWith('<div')) {
+                return block;
+            }
+            
+            // Convert single line breaks to <br>
+            block = block.replace(/\n/g, '<br>');
+            
+            // Wrap in paragraph
+            return '<p>' + block + '</p>';
+        })
+        .join('\n\n');
+    
+    console.log('✅ Converted to HTML');
+    return html;
+}
+
 async function generatePDFDocument(content, filename = 'document.pdf', metadata = {}) {
     try {
-        // Check if jsPDF is loaded
-        if (typeof window.jspdf === 'undefined') {
-            console.error('❌ jsPDF library not loaded');
-            alert('PDF library not loaded. Please refresh the page and try again.');
-            return false;
-        }
-
-        if (typeof html2canvas === 'undefined') {
-            console.error('❌ html2canvas library not loaded');
-            alert('PDF conversion library not loaded. Please refresh the page and try again.');
+        if (typeof window.jspdf === 'undefined' || typeof html2canvas === 'undefined') {
+            alert('PDF libraries not loaded. Please refresh and try again.');
             return false;
         }
 
         const { jsPDF } = window.jspdf;
 
-        // Create a temporary container with the formatted content
-        const tempContainer = document.createElement('div');
-        tempContainer.style.position = 'absolute';
-        tempContainer.style.left = '-9999px';
-        tempContainer.style.top = '0';
-        tempContainer.style.width = '210mm'; // A4 width
-        tempContainer.style.padding = '20mm';
-        tempContainer.style.backgroundColor = 'white';
-        tempContainer.style.fontFamily = 'Arial, sans-serif';
-        tempContainer.style.fontSize = '11pt';
-        tempContainer.style.lineHeight = '1.6';
-        tempContainer.style.color = '#000000';
+        // Get the ACTUAL preview content that's already formatted
+        const previewElement = document.getElementById('documentPreviewContent');
         
-        // Add CSS styles for proper formatting
-        const style = document.createElement('style');
-        style.textContent = `
-            .pdf-content h1 {
-                color: #E2A14A;
-                font-size: 20pt;
-                font-weight: bold;
-                border-bottom: 3px solid #E2A14A;
-                padding-bottom: 6pt;
-                margin-top: 12pt;
-                margin-bottom: 12pt;
-            }
-            .pdf-content h2 {
-                color: #1E3A5F;
-                font-size: 14pt;
-                font-weight: bold;
-                margin-top: 16pt;
-                margin-bottom: 8pt;
-            }
-            .pdf-content h3 {
-                color: #1E3A5F;
-                font-size: 12pt;
-                font-weight: bold;
-                margin-top: 12pt;
-                margin-bottom: 6pt;
-            }
-            .pdf-content p {
-                margin-bottom: 8pt;
-                font-size: 11pt;
-            }
-            .pdf-content strong {
-                font-weight: bold;
-            }
-            .pdf-content em {
-                font-style: italic;
-            }
-            .pdf-content ul {
-                margin-left: 20pt;
-                margin-bottom: 8pt;
-            }
-            .pdf-content li {
-                margin-bottom: 4pt;
-            }
-        `;
-        document.head.appendChild(style);
-        
-        tempContainer.className = 'pdf-content';
-        tempContainer.innerHTML = content;
-        
-        document.body.appendChild(tempContainer);
+        if (!previewElement) {
+            alert('Preview not found. Please try again.');
+            return false;
+        }
 
-        // Add footer
-        const footer = document.createElement('div');
-        footer.style.marginTop = '40px';
-        footer.style.paddingTop = '20px';
-        footer.style.borderTop = '2px solid #cccccc';
-        footer.style.fontSize = '9pt';
-        footer.style.color = '#666666';
-        footer.innerHTML = `
-            <p style="margin-bottom: 5px;"><strong>FITZGERALD HR</strong> - AI-Powered Hospitality HR Solutions</p>
-            <p style="margin-bottom: 5px;">Email: info@fitzgeraldhr.com.au</p>
-            <p style="margin-bottom: 5px;">Generated on ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}</p>
-            <p style="margin-bottom: 5px;"><strong>Document ID:</strong> ${metadata.documentId || 'N/A'} | <strong>Generated for:</strong> ${metadata.userName || currentUser || 'Beta User'}</p>
-            <p style="margin-bottom: 0;"><em>For personalised advice and document review, contact our Senior Consultants.</em></p>
-        `;
-        tempContainer.appendChild(footer);
+        console.log('📸 Converting preview to PDF...');
 
-        // Wait a moment for styles to apply
-        await new Promise(resolve => setTimeout(resolve, 100));
-
-        // Convert to canvas
-        console.log('📸 Capturing content as image...');
-        const canvas = await html2canvas(tempContainer, {
-            scale: 2, // Higher quality
+        // Capture the preview as an image
+        const canvas = await html2canvas(previewElement, {
+            scale: 2,
             useCORS: true,
             logging: false,
-            backgroundColor: '#ffffff'
+            backgroundColor: '#ffffff',
+            windowWidth: 800,
+            windowHeight: previewElement.scrollHeight
         });
 
-        // Remove temporary elements
-        document.body.removeChild(tempContainer);
-        document.head.removeChild(style);
+        console.log('✅ Canvas created:', canvas.width, 'x', canvas.height);
 
         // Create PDF
-        const imgData = canvas.toDataURL('image/jpeg', 1.0);
         const pdf = new jsPDF({
             orientation: 'portrait',
             unit: 'mm',
@@ -2554,37 +2515,50 @@ async function generatePDFDocument(content, filename = 'document.pdf', metadata 
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
         
-        // Calculate dimensions
-        const imgWidth = pageWidth;
-        const imgHeight = (canvas.height * pageWidth) / canvas.width;
+        const imgWidth = pageWidth - 20; // 10mm margin on each side
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
         
         let heightLeft = imgHeight;
-        let position = 0;
+        let position = 10; // 10mm top margin
+
+        // Convert canvas to image
+        const imgData = canvas.toDataURL('image/png');
 
         // Add first page
-        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+        pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+        heightLeft -= (pageHeight - 20);
 
-        // Add additional pages if needed
+        // Add additional pages if content is longer
         while (heightLeft > 0) {
-            position = heightLeft - imgHeight;
+            position = heightLeft - imgHeight + 10;
             pdf.addPage();
-            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
+            pdf.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+            heightLeft -= (pageHeight - 20);
         }
 
-        // Save the PDF
+        // Add footer to last page
+        const lastPageNum = pdf.internal.getNumberOfPages();
+        pdf.setPage(lastPageNum);
+        
+        const footerY = pageHeight - 20;
+        pdf.setFontSize(9);
+        pdf.setTextColor(100, 100, 100);
+        
+        pdf.text('FITZGERALD HR - AI-Powered Hospitality HR', 10, footerY);
+        pdf.text(`Generated: ${new Date().toLocaleDateString('en-AU')}`, 10, footerY + 5);
+        pdf.text(`Doc ID: ${metadata.documentId || 'N/A'}`, 10, footerY + 10);
+
+        // Save
         pdf.save(filename);
 
-        // Track document generation
         trackDocumentGeneration(filename, metadata);
 
-        console.log('✅ PDF generated successfully:', filename);
+        console.log('✅ PDF saved:', filename);
         return true;
 
     } catch (error) {
-        console.error('❌ Error generating PDF:', error);
-        alert('Error generating PDF: ' + error.message + '\n\nPlease try again or contact support.');
+        console.error('❌ PDF generation error:', error);
+        alert('Error generating PDF: ' + error.message);
         return false;
     }
 }
@@ -3702,42 +3676,15 @@ TONE: Professional, neutral, procedurally fair. This is NOT a punishment - it's 
 }
 
 function showDocumentPreview(generatedDoc) {
-    // Format for display with better paragraph handling
-    let formattedDoc = generatedDoc
-        // First, normalize line breaks
-        .replace(/\r\n/g, '\n')
-        .replace(/\r/g, '\n')
-        // Convert markdown-style headers to HTML headers
-        .replace(/^### (.*$)/gm, '<h3 style="color: #1E3A5F; margin-top: 20px; margin-bottom: 10px; font-size: 16px; font-weight: bold;">$1</h3>')
-        .replace(/^## (.*$)/gm, '<h2 style="color: #1E3A5F; margin-top: 25px; margin-bottom: 12px; font-size: 18px; font-weight: bold;">$1</h2>')
-        .replace(/^# (.*$)/gm, '<h1 style="color: #E2A14A; border-bottom: 3px solid #E2A14A; padding-bottom: 10px; margin-top: 20px; margin-bottom: 15px; font-size: 24px; font-weight: bold;">$1</h1>')
-        // Convert **text** to bold
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        // Convert *text* to italic (but not if it's part of **)
-        .replace(/(?<!\*)\*(?!\*)([^\*]+?)\*(?!\*)/g, '<em>$1</em>')
-        // Handle section markers (--- or horizontal rules)
-        .replace(/^---$/gm, '<hr style="margin: 20px 0; border: 1px solid #ccc;">')
-        // Convert bullet points
-        .replace(/^• (.+)$/gm, '<li style="margin-bottom: 8px;">$1</li>')
-        // Wrap consecutive <li> items in <ul>
-        .replace(/(<li[^>]*>.*?<\/li>\s*)+/gs, '<ul style="margin-left: 20px; margin-bottom: 12px;">$&</ul>')
-        // Split into paragraphs (double line break = new paragraph)
-        .split(/\n\n+/)
-        .map(para => {
-            // Skip empty paragraphs
-            if (!para.trim()) return '';
-            // If it's already HTML (starts with <), leave it
-            if (para.trim().startsWith('<')) return para;
-            // Handle underscores (for fill-in fields)
-            if (para.includes('_____')) {
-                para = para.replace(/_{5,}/g, '<span class="underline-field">$&</span>');
-            }
-            // Otherwise wrap in <p> tag
-            return `<p style="margin-bottom: 12px; line-height: 1.6;">${para.replace(/\n/g, '<br>')}</p>`;
-        })
-        .join('\n');
+    console.log('📄 Showing document preview...');
+    console.log('Raw content sample:', generatedDoc.substring(0, 200));
     
-    document.getElementById('documentPreviewContent').innerHTML = formattedDoc;
+    // Convert the AI-generated content to proper HTML
+    const formattedHTML = convertAIContentToHTML(generatedDoc);
+    
+    console.log('Formatted HTML sample:', formattedHTML.substring(0, 200));
+    
+    document.getElementById('documentPreviewContent').innerHTML = formattedHTML;
     document.getElementById('documentPreviewModal').classList.remove('hidden');
 }
 
