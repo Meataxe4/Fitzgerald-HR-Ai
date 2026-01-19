@@ -2432,6 +2432,9 @@ const hrTemplates = {
 }
 
 function convertHTMLToPdfMake(html, metadata) {
+    console.log('=== INPUT HTML ===');
+    console.log(html);
+
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
     const content = [];
@@ -2570,6 +2573,9 @@ function convertHTMLToPdfMake(html, metadata) {
         { text: `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}`, fontSize: 9, margin: [0, 0, 0, 3] },
         { text: 'For personalised advice and document review, contact our Senior Consultants.', fontSize: 9, italics: true, color: '#666666' }
     );
+
+    console.log('=== FINAL CONTENT ARRAY ===');
+    console.log(JSON.stringify(content, null, 2));
 
     // Define document with styles
     return {
