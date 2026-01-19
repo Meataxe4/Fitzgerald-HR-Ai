@@ -2434,7 +2434,7 @@ const hrTemplates = {
 function convertHTMLToPdfMake(html, metadata) {
     console.log('=== INPUT HTML ===');
     console.log(html);
-
+    
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
     const content = [];
@@ -2443,7 +2443,7 @@ function convertHTMLToPdfMake(html, metadata) {
         if (node.nodeType === Node.TEXT_NODE) {
             const text = node.textContent.trim();
             if (text) {
-                return { text: text + ' ' }; // Add space after text nodes
+                return { text: text };
             }
             return null;
         }
@@ -2475,35 +2475,75 @@ function convertHTMLToPdfMake(html, metadata) {
                 };
 
             case 'p':
-                // Get the HTML and manually split by <br> tags
-                let htmlContent = node.innerHTML;
+                // CRITICAL FIX: Split innerHTML by <br> tags
+                let innerHTML = node.innerHTML;
+                console.log('Processing paragraph innerHTML:', innerHTML);
                 
-                // Split by <br> and process each part
-                const parts = htmlContent.split(/<br\s*\/?>/gi);
-                const lines = [];
+                // Split by <br> with optional attributes and closing tag
+                const segments = innerHTML.split(/<br\s*\/?>/i);
+                console.log('Split into segments:', segments);
                 
-                for (let part of parts) {
-                    part = part.trim();
-                    if (part) {
-                        // Strip HTML tags but keep the text
-                        const tempDiv = document.createElement('div');
-                        tempDiv.innerHTML = part;
-                        const lineText = tempDiv.textContent.trim();
-                        if (lineText) {
-                            lines.push(lineText);
+                if (segments.length > 1) {
+                    // We have line breaks - process each segment
+                    const lines = [];
+                    
+                    for (let segment of segments) {
+                        segment = segment.trim();
+                        if (!segment) continue;
+                        
+                        // Create a temp element to parse HTML in this segment
+                        const temp = document.createElement('div');
+                        temp.innerHTML = segment;
+                        
+                        // Extract text with formatting
+                        const textParts = [];
+                        
+                        for (const child of temp.childNodes) {
+                            if (child.nodeType === Node.TEXT_NODE) {
+                                const txt = child.textContent.trim();
+                                if (txt) textParts.push({ text: txt });
+                            } else if (child.nodeType === Node.ELEMENT_NODE) {
+                                const txt = child.textContent.trim();
+                                if (!txt) continue;
+                                
+                                const elem = child.tagName.toLowerCase();
+                                if (elem === 'strong' || elem === 'b') {
+                                    textParts.push({ text: txt, bold: true });
+                                } else if (elem === 'em' || elem === 'i') {
+                                    textParts.push({ text: txt, italics: true });
+                                } else {
+                                    textParts.push({ text: txt });
+                                }
+                            }
+                        }
+                        
+                        if (textParts.length > 0) {
+                            lines.push(textParts);
                         }
                     }
-                }
-                
-                if (lines.length > 0) {
-                    // Join lines with actual newlines
+                    
+                    console.log('Created lines:', lines);
+                    
+                    // Flatten lines with newlines between them
+                    const allParts = [];
+                    for (let i = 0; i < lines.length; i++) {
+                        allParts.push(...lines[i]);
+                        if (i < lines.length - 1) {
+                            allParts.push({ text: '\n' });
+                        }
+                    }
+                    
                     return {
-                        text: lines.join('\n'),
+                        text: allParts,
                         margin: [0, 0, 0, 5]
                     };
                 }
                 
-                return null;
+                // No line breaks - simple paragraph
+                return {
+                    text: node.textContent.trim(),
+                    margin: [0, 0, 0, 5]
+                };
 
             case 'ul':
                 const listItems = [];
@@ -2552,6 +2592,9 @@ function convertHTMLToPdfMake(html, metadata) {
         }
     }
 
+    console.log('=== FINAL CONTENT ARRAY ===');
+    console.log(JSON.stringify(content, null, 2));
+
     // Add footer
     content.push(
         { text: '', margin: [0, 20, 0, 0] },
@@ -2573,9 +2616,6 @@ function convertHTMLToPdfMake(html, metadata) {
         { text: `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}`, fontSize: 9, margin: [0, 0, 0, 3] },
         { text: 'For personalised advice and document review, contact our Senior Consultants.', fontSize: 9, italics: true, color: '#666666' }
     );
-
-    console.log('=== FINAL CONTENT ARRAY ===');
-    console.log(JSON.stringify(content, null, 2));
 
     // Define document with styles
     return {
