@@ -2394,12 +2394,8 @@ const hrTemplates = {
         .replace(/^## (.+)$/gm, '<h2>$1</h2>')
         .replace(/^# (.+)$/gm, '<h1>$1</h1>')
         
-        // Convert **bold** to <strong> with proper spacing
-        // This handles bold text and ensures spaces before/after
-        .replace(/(\S)\*\*(.+?)\*\*(\S)/g, '$1 <strong>$2</strong> $3')  // Space on both sides if surrounded by non-space
-        .replace(/^(\s*)\*\*(.+?)\*\*/gm, '$1<strong>$2</strong> ')      // Space after if at start of line
-        .replace(/\*\*(.+?)\*\*(\s*)$/gm, ' <strong>$1</strong>$2')      // Space before if at end of line
-        .replace(/\*\*(.+?)\*\*/g, ' <strong>$1</strong> ')              // Default: space on both sides
+        // REMOVE bold formatting - just strip the ** markers
+        .replace(/\*\*(.+?)\*\*/g, '$1')
         
         // Convert *italic* to <em> (but not part of **)
         .replace(/(?<!\*)\*([^\*\n]+?)\*(?!\*)/g, '<em>$1</em>')
@@ -2409,9 +2405,6 @@ const hrTemplates = {
         
         // Convert underscores to underlined spans
         .replace(/_{5,}/g, '<span style="text-decoration: underline; display: inline-block; min-width: 200px;">$&</span>')
-        
-        // Clean up multiple spaces that might have been created
-        .replace(/  +/g, ' ')
         
         // Split by double newlines to create paragraphs
         .split(/\n\n+/)
