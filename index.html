@@ -13,6 +13,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pizzip/3.1.4/pizzip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docxtemplater/3.37.11/docxtemplater.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     
     <style>
         /* Crisis Mode Pulse Animation */
@@ -2431,6 +2434,126 @@ const hrTemplates = {
         .join('\n');
 }
 
+async function generatePDFDocument(content, filename = 'document.pdf', metadata = {}) {
+    try {
+        if (typeof pdfMake === 'undefined') {
+            console.error('❌ pdfMake library not loaded');
+            alert('PDF library not loaded. Please refresh the page and try again.');
+            return false;
+        }
+
+        console.log('📄 Generating PDF with pdfMake...');
+        const htmlContent = formatContentForWord(content);
+        const docDefinition = convertHTMLToPdfMake(htmlContent, metadata);
+        
+        console.log('✅ Document definition created');
+        pdfMake.createPdf(docDefinition).download(filename);
+        trackDocumentGeneration(filename, metadata);
+
+        console.log('✅ PDF generated successfully:', filename);
+        return true;
+
+    } catch (error) {
+        console.error('❌ PDF generation error:', error);
+        alert('Error generating PDF: ' + error.message);
+        return false;
+    }
+}
+
+function generatePDFFromHTML(htmlContent, filename, metadata) {
+    const printWindow = window.open('', '_blank');
+    
+    const footerHTML = `
+        <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #ccc; font-size: 10px; color: #666;">
+            <p style="margin: 5px 0;"><strong>FITZGERALD HR - AI-Powered Hospitality HR Solutions</strong></p>
+            <p style="margin: 5px 0;">Email: info@fitzgeraldhr.com.au</p>
+            <p style="margin: 5px 0;">Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}</p>
+            <p style="margin: 5px 0;">Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}</p>
+            <p style="margin: 5px 0; font-style: italic;">For personalised advice and document review, contact our Senior Consultants.</p>
+        </div>
+    `;
+    
+    printWindow.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>${filename}</title>
+    <style>
+        @page { margin: 2cm; }
+        body {
+            font-family: 'Calibri', 'Arial', sans-serif;
+            font-size: 11pt;
+            line-height: 1.6;
+            color: #000;
+            max-width: 100%;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #E2A14A;
+            font-size: 18pt;
+            border-bottom: 3px solid #E2A14A;
+            padding-bottom: 5px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+        h2 {
+            color: #1E3A5F;
+            font-size: 14pt;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+        h3 {
+            color: #1E3A5F;
+            font-size: 12pt;
+            margin-top: 12px;
+            margin-bottom: 6px;
+        }
+        p { margin: 0 0 10px 0; }
+        strong { font-weight: bold; }
+        em { font-style: italic; }
+        ul { margin: 10px 0; padding-left: 25px; }
+        li { margin-bottom: 5px; }
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ff6b6b;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        @media print {
+            body { padding: 0; }
+            .no-print { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <p style="color: #E2A14A; font-size: 10pt; margin: 0;">⚠️ General guidance only - consult Fitzgerald HR for specific advice.</p>
+    </div>
+    
+    ${htmlContent}
+    
+    ${footerHTML}
+    
+    <div class="no-print" style="margin-top: 30px; padding: 20px; background: #f5f5f5; border-radius: 8px; text-align: center;">
+        <p style="margin-bottom: 15px; font-size: 14px;">To save as PDF: Click Print below, then choose "Save as PDF" as your printer</p>
+        <button onclick="window.print()" style="padding: 12px 30px; font-size: 14px; background: #E2A14A; border: none; color: white; border-radius: 5px; cursor: pointer; margin-right: 10px; font-weight: bold;">
+            🖨️ Print / Save as PDF
+        </button>
+        <button onclick="window.close()" style="padding: 12px 30px; font-size: 14px; background: #666; border: none; color: white; border-radius: 5px; cursor: pointer;">
+            Close
+        </button>
+    </div>
+</body>
+</html>
+    `);
+    
+    printWindow.document.close();
+    console.log('✅ PDF preview window opened - user can save as PDF');
+    return true;
+}
+
 function convertHTMLToPdfMake(html, metadata) {
     console.log('=== INPUT HTML ===');
     console.log(html);
@@ -2647,40 +2770,6 @@ function convertHTMLToPdfMake(html, metadata) {
     };
 }
 
-async function generatePDFDocument(content, filename = 'document.pdf', metadata = {}) {
-    try {
-        // Check if pdfMake is loaded
-        if (typeof pdfMake === 'undefined') {
-            console.error('❌ pdfMake library not loaded');
-            alert('PDF library not loaded. Please refresh the page and try again.');
-            return false;
-        }
-
-        console.log('📄 Generating PDF with pdfMake...');
-
-        // Convert content to HTML first
-        const htmlContent = convertAIContentToHTML(content);
-        
-        // Parse HTML to pdfMake document definition
-        const docDefinition = convertHTMLToPdfMake(htmlContent, metadata);
-        
-        console.log('✅ Document definition created');
-
-        // Generate PDF
-        pdfMake.createPdf(docDefinition).download(filename);
-
-        // Track document generation
-        trackDocumentGeneration(filename, metadata);
-
-        console.log('✅ PDF generated successfully:', filename);
-        return true;
-
-    } catch (error) {
-        console.error('❌ PDF generation error:', error);
-        alert('Error generating PDF: ' + error.message);
-        return false;
-    }
-}
 
 function generatePDFFromHTML(htmlContent, filename, metadata) {
     // Create a new window with the formatted content
@@ -2959,264 +3048,7 @@ function generatePDFFromHTML(htmlContent, filename, metadata) {
 // PDF GENERATION HELPER FUNCTIONS
 // ========================================
 
-function convertAIContentToHTML(rawContent) {
-    console.log('🔄 Converting AI content to HTML...');
-    
-    let html = rawContent
-        // Convert markdown headers to HTML
-        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-        
-        // Convert **bold** to <strong>
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        
-        // Convert *italic* to <em>
-        .replace(/(?<!\*)\*([^\*\n]+?)\*(?!\*)/g, '<em>$1</em>')
-        
-        // Convert bullet points
-        .replace(/^[•\-\*] (.+)$/gm, '<li>$1</li>')
-        
-        // Wrap consecutive list items in <ul>
-        .replace(/(<li>.*?<\/li>\s*)+/gs, '<ul>$&</ul>')
-        
-        // Convert double line breaks to paragraph breaks
-        .split('\n\n')
-        .map(block => {
-            block = block.trim();
-            if (!block) return '';
-            
-            // Skip if already HTML element
-            if (block.startsWith('<h') || block.startsWith('<ul') || block.startsWith('<div')) {
-                return block;
-            }
-            
-            // Convert single line breaks to <br>
-            block = block.replace(/\n/g, '<br>');
-            
-            // Wrap in paragraph
-            return '<p>' + block + '</p>';
-        })
-        .join('\n\n');
-    
-    console.log('✅ Converted to HTML');
-    return html;
-}
 
-function convertHTMLToPdfMake(html, metadata) {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const content = [];
-
-    const processNode = (node) => {
-        if (node.nodeType === Node.TEXT_NODE) {
-            const text = node.textContent.trim();
-            if (text) {
-                return { text: text };
-            }
-            return null;
-        }
-
-        if (node.nodeType !== Node.ELEMENT_NODE) return null;
-
-        const tagName = node.tagName.toLowerCase();
-
-        switch (tagName) {
-            case 'h1':
-                return {
-                    text: node.textContent.trim(),
-                    style: 'header1',
-                    margin: [0, 10, 0, 5]
-                };
-
-            case 'h2':
-                return {
-                    text: node.textContent.trim(),
-                    style: 'header2',
-                    margin: [0, 8, 0, 4]
-                };
-
-            case 'h3':
-                return {
-                    text: node.textContent.trim(),
-                    style: 'header3',
-                    margin: [0, 6, 0, 3]
-                };
-
-            case 'p':
-                const pContent = [];
-                for (const child of node.childNodes) {
-                    const processed = processInlineNode(child);
-                    if (processed) {
-                        if (Array.isArray(processed)) {
-                            pContent.push(...processed);
-                        } else {
-                            pContent.push(processed);
-                        }
-                    }
-                }
-                return {
-                    text: pContent.length > 0 ? pContent : node.textContent.trim(),
-                    margin: [0, 0, 0, 5]
-                };
-
-            case 'ul':
-                const listItems = [];
-                for (const li of node.querySelectorAll('li')) {
-                    listItems.push(li.textContent.trim());
-                }
-                return {
-                    ul: listItems,
-                    margin: [0, 0, 0, 5]
-                };
-
-            case 'li':
-                return {
-                    text: node.textContent.trim(),
-                    margin: [0, 0, 0, 2]
-                };
-
-            case 'br':
-                return { text: '', margin: [0, 3, 0, 0] };
-
-            default:
-                const children = [];
-                for (const child of node.childNodes) {
-                    const processed = processNode(child);
-                    if (processed) children.push(processed);
-                }
-                return children.length > 0 ? children : null;
-        }
-    };
-
-    const processInlineNode = (node) => {
-        if (node.nodeType === Node.TEXT_NODE) {
-            const text = node.textContent.trim();
-            return text ? { text: text } : null;
-        }
-
-        const tagName = node.tagName?.toLowerCase();
-        const text = node.textContent.trim();
-
-        if (!text) return null;
-
-        switch (tagName) {
-            case 'strong':
-            case 'b':
-                return { text: text, bold: true };
-            case 'em':
-            case 'i':
-                return { text: text, italics: true };
-            default:
-                return { text: text };
-        }
-    };
-
-    // Process all body children
-    for (const child of doc.body.childNodes) {
-        const processed = processNode(child);
-        if (processed) {
-            if (Array.isArray(processed)) {
-                content.push(...processed);
-            } else {
-                content.push(processed);
-            }
-        }
-    }
-
-    // Add footer
-    content.push(
-        { text: '', margin: [0, 20, 0, 0] },
-        {
-            canvas: [
-                {
-                    type: 'line',
-                    x1: 0, y1: 0,
-                    x2: 515, y2: 0,
-                    lineWidth: 1,
-                    lineColor: '#cccccc'
-                }
-            ],
-            margin: [0, 0, 0, 10]
-        },
-        { text: 'FITZGERALD HR - AI-Powered Hospitality HR Solutions', bold: true, fontSize: 10, margin: [0, 0, 0, 4] },
-        { text: 'Email: info@fitzgeraldhr.com.au', fontSize: 9, margin: [0, 0, 0, 3] },
-        { text: `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}`, fontSize: 9, margin: [0, 0, 0, 3] },
-        { text: `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}`, fontSize: 9, margin: [0, 0, 0, 3] },
-        { text: 'For personalised advice and document review, contact our Senior Consultants.', fontSize: 9, italics: true, color: '#666666' }
-    );
-
-    // Define document with styles
-    return {
-        content: content,
-        styles: {
-            header1: {
-                fontSize: 18,
-                bold: true,
-                color: '#E2A14A',
-                decoration: 'underline',
-                decorationColor: '#E2A14A'
-            },
-            header2: {
-                fontSize: 14,
-                bold: true,
-                color: '#1E3A5F'
-            },
-            header3: {
-                fontSize: 12,
-                bold: true,
-                color: '#1E3A5F'
-            }
-        },
-        defaultStyle: {
-            fontSize: 11,
-            font: 'Roboto'
-        },
-        pageMargins: [40, 40, 40, 40]
-    };
-}
-
-
-        function generatePDFDocument(content, filename = 'document.pdf') {
-            const printWindow = window.open('', '_blank');
-            
-            printWindow.document.write(`
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <title>${filename}</title>
-    <style>
-        @media print {
-            body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20mm; font-size: 11pt; }
-            h1 { color: #E2A14A; border-bottom: 3px solid #E2A14A; page-break-after: avoid; }
-            h2 { color: #1E3A5F; page-break-after: avoid; margin-top: 20px; }
-            .warning { background: #fff3cd; border-left: 4px solid #ff6b6b; padding: 15px; page-break-inside: avoid; }
-            .no-print { display: none; }
-            .header { text-align: center; margin-bottom: 20px; }
-        }
-        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; }
-        h1 { color: #E2A14A; border-bottom: 3px solid #E2A14A; }
-        h2 { color: #1E3A5F; margin-top: 20px; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .warning { background: #fff3cd; border-left: 4px solid #ff6b6b; padding: 20px; margin: 25px 0; }
-        ul { margin-left: 20px; }
-        li { margin-bottom: 8px; }
-    </style>
-</head>
-<body>
-    ${content}
-    <div class="no-print" style="margin-top: 40px; text-align: center; padding: 20px; background: #f0f0f0; border-radius: 10px;">
-        <p style="margin-bottom: 15px; font-size: 16px; color: #333;">Use your browser's print function and select "Save as PDF"</p>
-        <button onclick="window.print()" style="padding: 12px 24px; font-size: 16px; background: #E2A14A; border: none; color: white; border-radius: 5px; cursor: pointer; margin-right: 10px;">Print / Save as PDF</button>
-        <button onclick="window.close()" style="padding: 12px 24px; font-size: 16px; background: #666; border: none; color: white; border-radius: 5px; cursor: pointer;">Close</button>
-    </div>
-</body>
-</html>`);
-            
-            printWindow.document.close();
-            return true;
-        }
         
         // ========================================
         // ADVANCED FEATURES
@@ -4264,42 +4096,40 @@ async function downloadGeneratedDocument() {
             letterOfAllegation: 'Letter_of_Allegation'
         };
         
-        const filename = `${typeNames[type]}_${employeeName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.pdf`;
+        const filename = `${typeNames[type]}_${employeeName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.docx`;
         
-        const metadata = {
-            documentId: generateDocumentId(),
-            userName: currentUser,
-            generatedAt: new Date().toISOString(),
-            documentType: type,
-            employeeName: employeeName
+        // GitHub template URLs (UPDATE WITH YOUR REPO!)
+        const templateFiles = {
+            'recordOfDiscussion': 'https://raw.githubusercontent.com/Meataxe4/Fitzgerald-HR-Ai/main/templates/ROD.docx',
+            'formalWarning': 'https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/main/templates/FormalWarning.docx',
+            'letterOfAllegation': 'https://raw.githubusercontent.com/YOUR-USERNAME/YOUR-REPO/main/templates/LetterOfAllegation.docx'
         };
         
-        // Get the FORMATTED HTML from the preview (which looks perfect!)
-        const previewElement = document.getElementById('documentPreviewContent');
-        
-        if (!previewElement) {
-            throw new Error('Preview content not found');
+        const templatePath = templateFiles[type];
+        if (!templatePath) {
+            alert('Template not found');
+            return;
         }
         
-        // Get the innerHTML which is already perfectly formatted
-        const formattedHTML = previewElement.innerHTML;
+        // Prepare data for template
+        const templateData = {
+            ...documentBuilderState.data,
+            documentId: generateDocumentId(),
+            generatedDate: new Date().toLocaleDateString('en-AU'),
+            generatedTime: new Date().toLocaleTimeString('en-AU')
+        };
         
-        console.log('📄 Using formatted HTML from preview');
-        console.log('HTML sample:', formattedHTML.substring(0, 200));
-        
-        // Pass the formatted HTML directly to pdfMake converter
-        const docDefinition = convertHTMLToPdfMake(formattedHTML, metadata);
-        
-        console.log('✅ Document definition created');
-        
-        // Generate PDF
-        if (typeof pdfMake === 'undefined') {
-            throw new Error('pdfMake not loaded');
-        }
-        
-        pdfMake.createPdf(docDefinition).download(filename);
+        // Fill and download template
+        await fillWordTemplate(templatePath, templateData, filename);
         
         // Track
+        const metadata = {
+            documentId: templateData.documentId,
+            userName: currentUser,
+            employeeName: employeeName,
+            documentType: type
+        };
+        
         trackDocumentGeneration(filename, metadata);
         logDocumentDownload(metadata);
         
@@ -4322,6 +4152,61 @@ async function downloadGeneratedDocument() {
         return false;
     }
 }
+
+// ========================================
+// WORD TEMPLATE FILLER FUNCTION (NEW)
+// ========================================
+
+async function fillWordTemplate(templatePath, data, outputFilename) {
+    try {
+        console.log('📄 Loading Word template from:', templatePath);
+        
+        // Fetch the template file from GitHub
+        const response = await fetch(templatePath);
+        if (!response.ok) {
+            throw new Error(`Template not found: ${templatePath}`);
+        }
+        
+        const templateBlob = await response.blob();
+        const arrayBuffer = await templateBlob.arrayBuffer();
+        
+        // Load template with docxtemplater
+        const zip = new PizZip(arrayBuffer);
+        const doc = new window.docxtemplater(zip, {
+            paragraphLoop: true,
+            linebreaks: true,
+        });
+        
+        console.log('✅ Template loaded successfully');
+        console.log('📝 Filling in data:', data);
+        
+        // Set the template data
+        doc.setData(data);
+        
+        // Render the document (replace all placeholders)
+        doc.render();
+        
+        console.log('✅ Data filled successfully');
+        
+        // Generate the output as a blob
+        const outputBlob = doc.getZip().generate({
+            type: 'blob',
+            mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        });
+        
+        // Download the file
+        saveAs(outputBlob, outputFilename);
+        
+        console.log('✅ Document downloaded:', outputFilename);
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Error filling template:', error);
+        alert('Error generating document: ' + error.message);
+        return false;
+    }
+}
+
 
 // Log document generation to database
 async function logDocumentGeneration() {
