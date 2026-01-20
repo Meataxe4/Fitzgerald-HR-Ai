@@ -2400,8 +2400,8 @@ const hrTemplates = {
         // Convert *italic* to <em> (but not part of **)
         .replace(/(?<!\*)\*([^\*\n]+?)\*(?!\*)/g, '<em>$1</em>')
         
-        // Convert bullet points
-        .replace(/^[•\-] (.+)$/gm, '<li>$1</li>')
+        // Convert bullet points (with proper spacing)
+        .replace(/^[•\-] (.+)$/gm, '<li style="margin-bottom: 8px;">$1</li>')
         
         // Convert underscores to underlined spans
         .replace(/_{5,}/g, '<span style="text-decoration: underline; display: inline-block; min-width: 200px;">$&</span>')
@@ -2417,16 +2417,16 @@ const hrTemplates = {
                 return block;
             }
             
-            // Wrap list items in <ul>
-            if (block.includes('<li>')) {
-                return '<ul>' + block + '</ul>';
+            // Wrap list items in <ul> with proper styling
+            if (block.includes('<li')) {
+                return '<ul style="margin-top: 10px; margin-bottom: 15px; padding-left: 20px;">' + block + '</ul>';
             }
             
             // Convert single newlines to <br> within paragraphs
             block = block.replace(/\n/g, '<br>');
             
-            // Wrap in paragraph
-            return '<p>' + block + '</p>';
+            // Wrap in paragraph with spacing
+            return '<p style="margin-bottom: 12px; line-height: 1.6;">' + block + '</p>';
         })
         .join('\n');
 }
@@ -2454,21 +2454,21 @@ function convertHTMLToPdfMake(html, metadata) {
                 return {
                     text: node.textContent.trim(),
                     style: 'header1',
-                    margin: [0, 10, 0, 5]
+                    margin: [0, 15, 0, 10]
                 };
 
             case 'h2':
                 return {
                     text: node.textContent.trim(),
                     style: 'header2',
-                    margin: [0, 8, 0, 4]
+                    margin: [0, 12, 0, 6]
                 };
 
             case 'h3':
                 return {
                     text: node.textContent.trim(),
                     style: 'header3',
-                    margin: [0, 6, 0, 3]
+                    margin: [0, 10, 0, 5]
                 };
 
             case 'p':
@@ -2485,7 +2485,7 @@ function convertHTMLToPdfMake(html, metadata) {
                 }
                 return {
                     text: pContent.length > 0 ? pContent : node.textContent.trim(),
-                    margin: [0, 0, 0, 5]
+                    margin: [0, 0, 0, 8]  // Increased bottom margin
                 };
 
             case 'ul':
@@ -2495,17 +2495,18 @@ function convertHTMLToPdfMake(html, metadata) {
                 }
                 return {
                     ul: listItems,
-                    margin: [0, 0, 0, 5]
+                    margin: [20, 5, 0, 10],  // Left indent + spacing
+                    style: 'bulletList'
                 };
 
             case 'li':
                 return {
                     text: node.textContent.trim(),
-                    margin: [0, 0, 0, 2]
+                    margin: [0, 2, 0, 2]
                 };
 
             case 'br':
-                return { text: '', margin: [0, 3, 0, 0] };
+                return { text: '', margin: [0, 5, 0, 0] };
 
             default:
                 const children = [];
@@ -2554,7 +2555,7 @@ function convertHTMLToPdfMake(html, metadata) {
 
     // Add footer
     content.push(
-        { text: '', margin: [0, 20, 0, 0] },
+        { text: '', margin: [0, 30, 0, 0] },
         {
             canvas: [
                 {
@@ -2588,19 +2589,25 @@ function convertHTMLToPdfMake(html, metadata) {
             header2: {
                 fontSize: 14,
                 bold: true,
-                color: '#1E3A5F'
+                color: '#1E3A5F',
+                margin: [0, 12, 0, 6]
             },
             header3: {
                 fontSize: 12,
                 bold: true,
                 color: '#1E3A5F'
+            },
+            bulletList: {
+                fontSize: 11,
+                lineHeight: 1.4
             }
         },
         defaultStyle: {
             fontSize: 11,
-            font: 'Roboto'
+            font: 'Roboto',
+            lineHeight: 1.3
         },
-        pageMargins: [40, 40, 40, 40]
+        pageMargins: [40, 40, 40, 60]
     };
 }
 
@@ -3532,7 +3539,7 @@ function buildDocumentPrompt() {
     let prompt = '';
     
     if (type === 'formalWarning') {
-        prompt = `You are generating a FORMAL WARNING LETTER for Australian hospitality HR.
+    prompt = `You are generating a FORMAL WARNING LETTER for Australian hospitality HR.
 
 VENUE CONTEXT:
 ${venueContext}
@@ -3566,10 +3573,16 @@ Generate a complete, professional formal warning letter following Australian emp
 
 **CRITICAL FORMATTING REQUIREMENTS:**
 1. Use ## for major sections (e.g., ## EMPLOYEE DETAILS)
-2. Use blank lines between paragraphs
+2. Use blank lines between ALL paragraphs and sections
 3. Use **text** for emphasis
-4. Structure clearly with proper spacing
-5. Each section should be clearly separated
+4. For lists, use bullet points with "• " prefix
+5. Structure clearly with proper spacing
+6. Separate each major section with a blank line before and after
+
+**IMPORTANT: Format lists clearly with bullet points like this:**
+- First item
+- Second item
+- Third item
 
 REQUIREMENTS:
 1. **Expand the issue description** - Take the brief description and expand with appropriate context while staying factual
@@ -3579,9 +3592,9 @@ REQUIREMENTS:
    - Clear subject line
    - Detailed description of the issue (expanded from brief description)
    - Reference to previous warnings
-   - Specific, measurable improvement expectations
+   - Specific, measurable improvement expectations (use bullet points)
    - Clear timeframe
-   - Stated consequences
+   - Stated consequences (use bullet points)
    - Right to respond (7 days in writing)
    - Warning retention period (12 months)
    - Signature sections
@@ -3591,38 +3604,60 @@ REQUIREMENTS:
 6. **Professional tone** - firm but not threatening
 
 Example structure:
+
 # FORMAL WARNING LETTER
 
 ## DATE AND RECIPIENT
+
 Date: [Date]
+
 Employee Name: [Name]
+
 Position: [Position]
 
 ## SUBJECT
+
 Subject: Formal Written Warning - [Issue]
 
 ## ISSUE DESCRIPTION
-[Detailed description of what occurred]
+
+[Detailed description of what occurred, with specific dates and facts]
 
 ## PREVIOUS DISCUSSIONS
+
 [Reference to verbal warnings if applicable]
 
 ## REQUIRED IMPROVEMENTS
-[Specific expectations]
+
+You are required to:
+
+- [Specific expectation 1]
+- [Specific expectation 2]
+- [Specific expectation 3]
 
 ## TIMEFRAME
+
 [Clear timeframe for improvement]
 
 ## CONSEQUENCES
-[What happens if no improvement]
 
-## RIGHT TO RESPOND
-[7 days to respond in writing]
+Failure to meet these expectations may result in:
+
+- [Consequence 1]
+- [Consequence 2]
+- Termination of employment
+
+## WARNING RETENTION
+
+This warning will remain on your employee file for 12 months from the date of this letter.
 
 ## SIGNATURES
-[Signature sections]
 
-Format as a complete business letter with proper structure.
+Employee Signature: _________________________ Date: __________
+
+Manager Signature: _________________________ Date: __________
+
+Format as a complete business letter with proper structure and clear spacing between all sections.
 
 DO NOT add fictional details. Expand and contextualize what was provided.`;
     
