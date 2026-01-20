@@ -3685,7 +3685,6 @@ function docWizardGoBack() {
 }
 
 async function generateDocumentWithAI() {
-    // Hide wizard, show loading
     document.getElementById('documentWizardSteps').classList.add('hidden');
     document.getElementById('documentGenerating').classList.remove('hidden');
     
@@ -3695,15 +3694,18 @@ async function generateDocumentWithAI() {
         const prompt = buildDocumentPrompt();
         const response = await callClaudeAPI(prompt);
         
+        // Store in state
         documentBuilderState.generatedDocument = response;
         
-        // Close document builder modal
+        // CRITICAL: BACKUP TO LOCALSTORAGE
+        localStorage.setItem('lastGeneratedDocument', response);
+        localStorage.setItem('lastGeneratedDocumentType', documentBuilderState.currentType);
+        localStorage.setItem('lastGeneratedDocumentData', JSON.stringify(documentBuilderState.data));
+        
+        console.log('✅ Document saved to state AND localStorage');
+        
         closeToolModal('documentBuilderModal');
-        
-        // Show preview modal
         showDocumentPreview(response);
-        
-        // Log the generation
         await logDocumentGeneration();
         
         trackEvent('document_generated_ai', {
@@ -3716,471 +3718,11 @@ async function generateDocumentWithAI() {
         console.error('Document generation error:', error);
         alert('⚠️ Error generating document. Please try again or contact support.');
         
-        // Reset to wizard
         document.getElementById('documentGenerating').classList.add('hidden');
         document.getElementById('documentWizardSteps').classList.remove('hidden');
     } finally {
         documentBuilderState.isGenerating = false;
     }
-}
-
-function buildDocumentPrompt() {
-    const type = documentBuilderState.currentType;
-    const data = documentBuilderState.data;
-    
-    const venueContext = venueProfile.setupComplete ? 
-        `Venue: ${venueProfile.venueName} (${venueProfile.venueType}) in ${venueProfile.city}, ${venueProfile.location}` :
-        `Australian hospitality venue`;
-    
-    let prompt = '';
-    
-    if (type === 'formalWarning') {
-        prompt = `You are generating a FORMAL WARNING LETTER for Australian hospitality HR.
-
-VENUE CONTEXT:
-${venueContext}
-Award: Hospitality Industry (General) Award MA000009
-Manager: ${venueProfile.userName || '[Manager Name]'}
-
-EMPLOYEE DETAILS:
-- Name: ${data.employeeName}
-- Position: ${data.position}
-- Employment Type: ${data.employmentType}
-
-ISSUE DETAILS:
-${data.issueDescription}
-Date: ${data.issueDate}
-${data.witnesses ? `Witnesses: ${data.witnesses}` : 'No witnesses mentioned'}
-
-PREVIOUS ACTION TAKEN:
-${data.hadVerbalWarnings === 'Yes' ? 
-  `${data.verbalWarningCount || 'Multiple'} verbal warning(s) have been given` : 
-  'No prior formal warnings'}
-This is a ${data.warningLevel.toLowerCase()}.
-
-REQUIRED IMPROVEMENTS:
-${data.expectations}
-Timeframe: ${data.timeframe}
-
-CONSEQUENCES:
-${data.consequences}
-
-Generate a complete, professional formal warning letter following Australian employment law best practices.
-
-**CRITICAL FORMATTING REQUIREMENTS:**
-1. Use ## for major sections (e.g., ## EMPLOYEE DETAILS)
-2. Use blank lines between paragraphs
-3. Use **text** for emphasis
-4. Structure clearly with proper spacing
-5. Each section should be clearly separated
-
-REQUIREMENTS:
-1. **Expand the issue description** - Take the brief description and expand with appropriate context while staying factual
-2. **Use formal, professional language** - Clear, firm but respectful
-3. **Include all legal requirements**:
-   - Dated header with full employee details
-   - Clear subject line
-   - Detailed description of the issue (expanded from brief description)
-   - Reference to previous warnings
-   - Specific, measurable improvement expectations
-   - Clear timeframe
-   - Stated consequences
-   - Right to respond (7 days in writing)
-   - Warning retention period (12 months)
-   - Signature sections
-
-4. **Maintain procedural fairness**
-5. **Be specific and actionable**
-6. **Professional tone** - firm but not threatening
-
-Example structure:
-# FORMAL WARNING LETTER
-
-## DATE AND RECIPIENT
-Date: [Date]
-Employee Name: [Name]
-Position: [Position]
-
-## SUBJECT
-Subject: Formal Written Warning - [Issue]
-
-## ISSUE DESCRIPTION
-[Detailed description of what occurred]
-
-## PREVIOUS DISCUSSIONS
-[Reference to verbal warnings if applicable]
-
-## REQUIRED IMPROVEMENTS
-[Specific expectations]
-
-## TIMEFRAME
-[Clear timeframe for improvement]
-
-## CONSEQUENCES
-[What happens if no improvement]
-
-## RIGHT TO RESPOND
-[7 days to respond in writing]
-
-## SIGNATURES
-[Signature sections]
-
-Format as a complete business letter with proper structure.
-
-DO NOT add fictional details. Expand and contextualize what was provided.`;
-    
-    } else if (type === 'recordOfDiscussion') {
-    prompt = `You are generating a RECORD OF DISCUSSION TEMPLATE & CONVERSATION SCRIPT for Australian hospitality managers.
-
-THIS IS A TEMPLATE/SCRIPT - NOT A COMPLETED DOCUMENT.
-The manager will use this during the actual conversation with the employee.
-
-⚠️ CRITICAL: This is a PROCEDURAL FAIRNESS meeting. NO outcome or decision is made during this meeting. The purpose is to:
-1. Present allegations to the employee
-2. Give the employee the opportunity to respond
-3. Gather information and the employee's perspective
-4. Adjourn to consider all information before making any decision
-
-A follow-up meeting will be scheduled 24-48 hours later to deliver the outcome after proper consideration.
-
-VENUE CONTEXT:
-${venueContext}
-Manager: ${venueProfile.userName || '[Manager Name]'}
-
-EMPLOYEE DETAILS:
-- Name: ${data.employeeName}
-- Position: ${data.position}
-
-MEETING PREPARATION CHECKLIST:
-- 24 hours notice given: ${data.notice24hours}
-- Support person offered: ${data.supportPersonOffered}
-
-ALLEGATIONS:
-${data.allegations}
-
-WITNESSES (if any):
-${data.witnesses || 'None mentioned'}
-
-**CRITICAL FORMATTING REQUIREMENTS:**
-1. Use **bold** for what the MANAGER should say (the script)
-2. Use *italics* for INSTRUCTIONS to the manager
-3. Use regular text for sections the manager fills in DURING or AFTER the meeting
-4. Use ## for major sections
-5. Use blank lines between paragraphs
-
-Generate a conversation template that:
-
-1. **Provides a complete script** for the manager to follow during the meeting
-2. **Uses bold text** for what the manager should actually SAY
-3. **Uses italics** for instructions/guidance (e.g., *Listen carefully and take notes*)
-4. **Leaves space** for the manager to write the employee's responses
-5. **Guides the manager** through difficult conversations with prompts like:
-   - *Ask clarifying questions*
-   - *Allow the employee time to respond*
-   - *Remain calm and professional*
-6. **CLEARLY STATES** that no decision will be made today - this is just to hear their side
-
-STRUCTURE:
-
-## BEFORE THE MEETING
-*Print this document and have it in front of you during the meeting*
-*Review the allegations and gather any evidence*
-*Prepare to listen - this is a two-way conversation*
-*Remember: You are NOT making a decision today - only gathering information*
-
-## MEETING SCRIPT
-
-### OPENING THE MEETING
-**Manager Script (say this):**
-**"Thank you for meeting with me today, ${data.employeeName}. As mentioned in my notice, we need to discuss some concerns about [brief description]."**
-
-**"You have the right to have a support person present. Have you brought someone with you, or would you like to reschedule to arrange one?"**
-
-*Wait for response - write it here:*
-___________________________________
-
-### EXPLAINING THE PURPOSE
-**Manager Script:**
-**"Before we start, I want to be clear about the purpose of this meeting:**
-**• I'm going to explain some allegations/concerns**
-**• You'll have the opportunity to respond and give your side of the story**
-**• I'm here to listen and gather information**
-**• No decision will be made today - I need time to properly consider everything you tell me**
-**• We'll schedule a follow-up meeting in the next 24-48 hours where I'll share my decision**
-
-**"Does that make sense?"**
-
-*Wait for acknowledgment:*
-___________________________________
-
-### PRESENTING THE ALLEGATIONS
-**Manager Script:**
-**"The reason for this meeting is that I've received information about the following:**
-
-${data.allegations.split('\n').map(a => `**• ${a.trim()}**`).join('\n')}
-
-*Pause after presenting each allegation - let them absorb the information*
-
-**"These matters are serious because [explain the impact - e.g., they affect workplace safety, team morale, customer service, or breach company policy]."**
-
-### GIVING THE EMPLOYEE THE OPPORTUNITY TO RESPOND
-**Manager Script:**
-**"Now I'd like to hear your side of the story. This is your opportunity to respond to these allegations. Can you tell me what happened from your perspective?"**
-
-*This is CRITICAL - LISTEN carefully without interrupting. Take detailed notes of everything they say:*
-
-Employee's response to allegations:
-_________________________________________
-_________________________________________
-_________________________________________
-_________________________________________
-_________________________________________
-
-*After they finish, ask clarifying questions:*
-**"Thank you for explaining. Can I ask a few questions to make sure I understand correctly?"**
-
-**Clarifying questions to ask:**
-- **"When you say [repeat something they said], can you explain what you mean?"**
-- **"Were there any other circumstances I should know about?"**
-- **"Is there anyone who can support what you're telling me?"**
-- **"Is there anything else you'd like to add?"**
-
-Additional information from employee:
-_________________________________________
-_________________________________________
-_________________________________________
-
-### EVIDENCE OR WITNESSES
-*If the employee mentions evidence or witnesses:*
-**Manager Script:**
-**"You mentioned [evidence/witness]. Can you provide me with [details/their name] so I can consider this as part of my review?"**
-
-Evidence/witnesses mentioned:
-_________________________________________
-_________________________________________
-
-### EXPLAINING NEXT STEPS
-**Manager Script:**
-**"Thank you for being open with me and sharing your perspective. I want to be clear about what happens next:**
-
-**• I'm going to take time to properly consider everything you've told me today**
-**• I'll review all the information, evidence, and your response**
-**• I'll schedule a follow-up meeting with you within the next 24-48 hours**
-**• At that meeting, I'll let you know my decision and what happens next**
-**• You won't hear anything before that meeting - I need time to think this through properly"**
-
-*Set a specific date/time now for the follow-up meeting:*
-
-**Manager Script:**
-**"Can we schedule our follow-up meeting for [DATE] at [TIME]?"**
-
-Follow-up meeting scheduled:
-Date: ___________________
-Time: ___________________
-
-### CLOSING THE MEETING
-**Manager Script:**
-**"Do you have any questions about the process or what happens next?"**
-
-*Note any questions/concerns:*
-___________________________________
-
-**"Thank you for attending this meeting and sharing your side of the story. I'll see you at our follow-up meeting on [DATE]."**
-
-*If they have a support person:*
-**"Thank you also for attending [support person name]."**
-
-## AFTER THE MEETING
-
-*Complete the following sections IMMEDIATELY after the meeting while details are fresh:*
-
-### SUMMARY OF ALLEGATIONS PRESENTED
-*Write a brief, factual summary of what allegations you presented:*
-_________________________________________
-_________________________________________
-
-### EMPLOYEE'S RESPONSE SUMMARY
-*Summarize the key points of what the employee said in response:*
-_________________________________________
-_________________________________________
-_________________________________________
-
-### EMPLOYEE'S EXPLANATION/MITIGATING CIRCUMSTANCES
-*Note any explanations, mitigating factors, or context the employee provided:*
-_________________________________________
-_________________________________________
-
-### EVIDENCE/WITNESSES TO FOLLOW UP
-*List any evidence you need to review or witnesses you need to speak to:*
-1. _________________________________
-2. _________________________________
-3. _________________________________
-
-### MANAGER'S NOTES FOR CONSIDERATION
-*Before making your decision, consider:*
-- How credible is the employee's explanation?
-- Does their response change the seriousness of the allegations?
-- What evidence supports or contradicts their version?
-- Are there any mitigating circumstances?
-- What is the appropriate outcome (if allegations are substantiated)?
-
-*DO NOT write your decision here - this is just for your own consideration process*
-
-### MEETING ATTENDEES
-Employee: ${data.employeeName}
-Manager: ${venueProfile.userName || '[Manager Name]'}
-Support Person (if present): _________________________________
-Date: ___________________
-Time: ___________________
-
-### NEXT STEPS BEFORE FOLLOW-UP MEETING
-*What you need to do before the follow-up meeting:*
-□ Review all evidence and witness statements
-□ Consider the employee's response fairly
-□ Determine if allegations are substantiated
-□ Decide on appropriate outcome (if substantiated)
-□ Prepare outcome letter (if formal warning required)
-□ Schedule follow-up meeting (DONE: [DATE/TIME])
-
----
-
-**IMPORTANT REMINDERS FOR MANAGER:**
-
-✓ DO NOT make or hint at any decision during this meeting
-✓ Your role today is to LISTEN and GATHER INFORMATION only
-✓ Take detailed notes - they may be important later
-✓ Remain calm, professional, and neutral
-✓ Give the employee adequate time to respond
-✓ Ask open-ended questions to get their full story
-✓ Schedule the follow-up meeting before they leave
-
-**PROCEDURAL FAIRNESS CHECKLIST:**
-□ Employee given 24 hours notice ✓
-□ Employee offered support person ✓
-□ Allegations clearly explained ✓
-□ Employee given genuine opportunity to respond ✓
-□ Employee's response documented ✓
-□ Follow-up meeting scheduled ✓
-□ No decision made during this meeting ✓
-
-**⚠️ CRITICAL LEGAL REQUIREMENT:**
-This meeting is ONLY for gathering information. You MUST take time (24-48 hours) to properly consider the employee's response before making any decision. Failing to do this could result in a finding of unfair dismissal if the matter proceeds to termination.
-
-*If you're unsure how to proceed at any point, pause the meeting and contact Fitzgerald HR: info@fitzgeraldhr.com.au*
-`;
-    
-    } else if (type === 'letterOfAllegation') {
-        prompt = `You are generating a LETTER OF ALLEGATION for serious workplace misconduct investigation.
-
-⚠️ THIS IS HIGH-RISK - MUST BE LEGALLY SOUND
-
-VENUE CONTEXT:
-${venueContext}
-Manager: ${venueProfile.userName || '[Manager Name]'}
-
-EMPLOYEE:
-- Name: ${data.employeeName}
-- Position: ${data.position}
-- Employment Type: ${data.employmentType}
-
-ALLEGATION:
-Type: ${data.allegationType}
-${data.allegationDescription}
-Date of incident: ${data.incidentDate}
-
-SOURCE:
-${data.allegationSource}
-${data.evidenceExists ? `Evidence: ${data.evidenceExists}` : ''}
-
-INVESTIGATION:
-Investigator: ${data.investigator}
-Suspension: ${data.suspensionRequired}
-
-MEETING SCHEDULED:
-Date: ${data.meetingDate}
-Time: ${data.meetingTime}
-Location: ${data.meetingLocation}
-
-Generate a legally compliant Letter of Allegation.
-
-**CRITICAL FORMATTING REQUIREMENTS:**
-1. Use ## for major sections (e.g., ## ALLEGATION DETAILS)
-2. Use blank lines between paragraphs
-3. Use **text** for emphasis
-4. Structure clearly with proper spacing
-5. Each section should be clearly separated
-
-CRITICAL REQUIREMENTS:
-1. **Neutral tone** - No presumption of guilt
-2. **Clear process** - Explain investigation steps
-3. **Employee rights**:
-   - Right to support person
-   - Opportunity to respond
-   - Procedural fairness
-4. **Confidentiality requirements**
-5. **Meeting details**
-6. **Suspension details** (if applicable)
-7. **Next steps clearly outlined**
-
-Example structure:
-# PRIVATE & CONFIDENTIAL
-# LETTER OF ALLEGATION
-
-## DATE AND RECIPIENT
-Date: [Date]
-Employee Name: [Name]
-Position: [Position]
-
-## SUBJECT
-Subject: Allegation of [Type] - Investigation Process
-
-## NATURE OF ALLEGATION
-[Factual description - not conclusive]
-
-## INVESTIGATION PROCESS
-[Clear explanation of what will happen]
-
-## SUSPENSION ARRANGEMENTS
-[If applicable - details of suspension and pay status]
-
-## INVESTIGATION MEETING
-Date: [Date]
-Time: [Time]
-Location: [Location]
-
-## YOUR RIGHTS
-- Right to bring a support person
-- Opportunity to respond to allegations
-- Procedural fairness will be maintained
-- You may seek legal advice
-
-## CONFIDENTIALITY
-[Importance of confidentiality during investigation]
-
-## NEXT STEPS
-[What happens after the meeting]
-
-## CONTACT INFORMATION
-[Who to contact with questions]
-
-Include:
-- PRIVATE & CONFIDENTIAL header
-- Date and recipient details
-- Clear subject line
-- Nature of allegation (factual, not conclusive)
-- Investigation process explanation
-- Suspension details if applicable
-- Meeting details (date, time, location)
-- Support person rights
-- Confidentiality requirements
-- Next steps after investigation
-- Advice they can seek legal counsel
-- Signature section
-
-TONE: Professional, neutral, procedurally fair. This is NOT a punishment - it's the start of a fair process.`;
-    }
-    
-    return prompt;
 }
 
 function showDocumentPreview(generatedDoc) {
@@ -4291,17 +3833,31 @@ function requestDocumentChange() {
 
 async function downloadGeneratedDocument() {
     try {
-        const type = documentBuilderState.currentType;
-        const employeeName = documentBuilderState.data.employeeName || 'Employee';
+        console.log('🔍 Download attempt started...');
+        console.log('🔍 State:', documentBuilderState);
         
-        // SAVE THE CONTENT FIRST - before any modal operations
-        const rawContent = documentBuilderState.generatedDocument;
+        // Try state first, fallback to localStorage
+        let rawContent = documentBuilderState.generatedDocument;
+        let type = documentBuilderState.currentType;
+        let data = documentBuilderState.data;
         
         if (!rawContent) {
-            throw new Error('No document content found');
+            console.warn('⚠️ Content not in state, checking localStorage...');
+            rawContent = localStorage.getItem('lastGeneratedDocument');
+            type = localStorage.getItem('lastGeneratedDocumentType');
+            const dataStr = localStorage.getItem('lastGeneratedDocumentData');
+            if (dataStr) {
+                data = JSON.parse(dataStr);
+            }
         }
         
-        console.log('📄 Document content exists, length:', rawContent.length);
+        if (!rawContent) {
+            throw new Error('No document content found in state or localStorage');
+        }
+        
+        console.log('✅ Document content found, length:', rawContent.length);
+        
+        const employeeName = data?.employeeName || 'Employee';
         
         const typeNames = {
             formalWarning: 'Formal_Warning',
@@ -4321,23 +3877,19 @@ async function downloadGeneratedDocument() {
         
         console.log('📄 Converting content to PDF...');
         
-        // Convert raw content to pdfMake format DIRECTLY
         const docDefinition = convertRawContentToPdfMake(rawContent, metadata);
         
         console.log('✅ Document definition created');
         
-        // Generate PDF
         if (typeof pdfMake === 'undefined') {
             throw new Error('pdfMake not loaded');
         }
         
         pdfMake.createPdf(docDefinition).download(filename);
         
-        // Track
         trackDocumentGeneration(filename, metadata);
         logDocumentDownload(metadata);
         
-        // NOW close the preview
         closeDocumentPreview();
         
         alert(
@@ -4354,8 +3906,7 @@ async function downloadGeneratedDocument() {
     } catch (error) {
         console.error('❌ Download error:', error);
         console.error('Stack:', error.stack);
-        console.error('Document state:', documentBuilderState);
-        alert('Download failed: ' + error.message);
+        alert('Download failed: ' + error.message + '\n\nCheck console for details.');
         return false;
     }
 }
