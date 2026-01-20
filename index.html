@@ -2394,8 +2394,12 @@ const hrTemplates = {
         .replace(/^## (.+)$/gm, '<h2>$1</h2>')
         .replace(/^# (.+)$/gm, '<h1>$1</h1>')
         
-        // Convert **bold** to <strong>
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        // Convert **bold** to <strong> with proper spacing
+        // This handles bold text and ensures spaces before/after
+        .replace(/(\S)\*\*(.+?)\*\*(\S)/g, '$1 <strong>$2</strong> $3')  // Space on both sides if surrounded by non-space
+        .replace(/^(\s*)\*\*(.+?)\*\*/gm, '$1<strong>$2</strong> ')      // Space after if at start of line
+        .replace(/\*\*(.+?)\*\*(\s*)$/gm, ' <strong>$1</strong>$2')      // Space before if at end of line
+        .replace(/\*\*(.+?)\*\*/g, ' <strong>$1</strong> ')              // Default: space on both sides
         
         // Convert *italic* to <em> (but not part of **)
         .replace(/(?<!\*)\*([^\*\n]+?)\*(?!\*)/g, '<em>$1</em>')
@@ -2405,6 +2409,9 @@ const hrTemplates = {
         
         // Convert underscores to underlined spans
         .replace(/_{5,}/g, '<span style="text-decoration: underline; display: inline-block; min-width: 200px;">$&</span>')
+        
+        // Clean up multiple spaces that might have been created
+        .replace(/  +/g, ' ')
         
         // Split by double newlines to create paragraphs
         .split(/\n\n+/)
@@ -3579,6 +3586,7 @@ Generate a complete, professional formal warning letter following Australian emp
 5. Structure clearly with proper spacing
 6. Separate each major section with a blank line before and after
 7. ALWAYS add a space after colons in labels (e.g., "Date: " not "Date:")
+8. ALWAYS add spaces around bold text (e.g., "within **seven (7) days** of receiving" not "within**seven (7) days**of receiving")
 
 **IMPORTANT: Format lists clearly with bullet points like this:**
 - First item
@@ -3596,7 +3604,6 @@ REQUIREMENTS:
    - Specific, measurable improvement expectations (use bullet points)
    - Clear timeframe
    - Stated consequences (use bullet points)
-   - Right to respond (7 days in writing)
    - Warning retention period (12 months)
    - Signature sections
 
@@ -7348,3 +7355,4 @@ window.addEventListener('unhandledrejection', function(event) {
 </script>
 </body>
 </html>
+
