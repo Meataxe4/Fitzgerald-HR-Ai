@@ -3984,7 +3984,7 @@ function showDocumentPreview(generatedDoc) {
     console.log('Raw content sample:', generatedDoc.substring(0, 200));
     
     // Convert the AI-generated content to proper HTML
-    const formattedHTML = convertAIContentToHTML(generatedDoc);
+    const formattedHTML = formatContentForWord(generatedDoc);
     
     console.log('Formatted HTML sample:', formattedHTML.substring(0, 200));
     
