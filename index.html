@@ -4198,8 +4198,8 @@ function showDocumentPreview(generatedDoc) {
 
 function closeDocumentPreview() {
     document.getElementById('documentPreviewModal').classList.add('hidden');
-    // Reset the document builder silently so it's ready for next use
-    resetDocumentBuilderSilent();
+    // DON'T reset the document builder here - user might want to download again
+    // resetDocumentBuilderSilent(); // REMOVE THIS LINE IF IT EXISTS
 }
 
 // Silent reset (used when closing modal)
@@ -4294,6 +4294,15 @@ async function downloadGeneratedDocument() {
         const type = documentBuilderState.currentType;
         const employeeName = documentBuilderState.data.employeeName || 'Employee';
         
+        // SAVE THE CONTENT FIRST - before any modal operations
+        const rawContent = documentBuilderState.generatedDocument;
+        
+        if (!rawContent) {
+            throw new Error('No document content found');
+        }
+        
+        console.log('📄 Document content exists, length:', rawContent.length);
+        
         const typeNames = {
             formalWarning: 'Formal_Warning',
             recordOfDiscussion: 'Record_of_Discussion',
@@ -4310,15 +4319,7 @@ async function downloadGeneratedDocument() {
             employeeName: employeeName
         };
         
-        // USE THE RAW CONTENT - not the preview HTML
-        const rawContent = documentBuilderState.generatedDocument;
-        
-        if (!rawContent) {
-            throw new Error('No document content found');
-        }
-        
-        console.log('📄 Using raw AI content for PDF');
-        console.log('Raw content sample:', rawContent.substring(0, 200));
+        console.log('📄 Converting content to PDF...');
         
         // Convert raw content to pdfMake format DIRECTLY
         const docDefinition = convertRawContentToPdfMake(rawContent, metadata);
@@ -4336,6 +4337,7 @@ async function downloadGeneratedDocument() {
         trackDocumentGeneration(filename, metadata);
         logDocumentDownload(metadata);
         
+        // NOW close the preview
         closeDocumentPreview();
         
         alert(
@@ -4351,6 +4353,8 @@ async function downloadGeneratedDocument() {
         
     } catch (error) {
         console.error('❌ Download error:', error);
+        console.error('Stack:', error.stack);
+        console.error('Document state:', documentBuilderState);
         alert('Download failed: ' + error.message);
         return false;
     }
