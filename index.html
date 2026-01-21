@@ -3309,68 +3309,6 @@ letterOfAllegation: [
         ]
     }
 ]
-Step 2: Create validation function for Letter of Allegation
-Add this new function after the validateFormalWarningProceduralFairness() function:
-javascriptfunction validateLetterOfAllegationMeetingPrep() {
-    // Only validate on Step 2 (Meeting Preparation)
-    if (documentBuilderState.currentStep !== 2) {
-        return true;
-    }
-    
-    const notice24hours = documentBuilderState.data.notice24hours;
-    const supportPersonOffered = documentBuilderState.data.supportPersonOffered;
-    
-    // Check 24 hours notice
-    if (notice24hours === 'No') {
-        alert(
-            '⚠️ IMPORTANT: You must provide the employee with 24 hours notice before the meeting.\n\n' +
-            'This is a requirement of procedural fairness.\n\n' +
-            'Please schedule the meeting for at least 24 hours from now before continuing.'
-        );
-        
-        trackEvent('procedural_fairness_violation', {
-            user: currentUser,
-            violation: '24_hour_notice_not_provided',
-            documentType: 'letterOfAllegation'
-        });
-        
-        // Clear the answer so they can correct it
-        documentBuilderState.data.notice24hours = '';
-        
-        // Re-render the current step
-        showDocumentStep(documentBuilderState.currentStep);
-        
-        return false;
-    }
-    
-    // Check support person offered
-    if (supportPersonOffered === 'No') {
-        alert(
-            '⚠️ IMPORTANT: You must offer the employee the right to bring a support person.\n\n' +
-            'A support person can be:\n' +
-            '• A family member or friend\n' +
-            '• A union representative\n' +
-            '• A fellow employee (if appropriate and no conflict of interest)\n\n' +
-            'Please inform the employee of this right before continuing.'
-        );
-        
-        trackEvent('procedural_fairness_violation', {
-            user: currentUser,
-            violation: 'support_person_not_offered',
-            documentType: 'letterOfAllegation'
-        });
-        
-        // Clear the answer so they can correct it
-        documentBuilderState.data.supportPersonOffered = '';
-        
-        // Re-render the current step
-        showDocumentStep(documentBuilderState.currentStep);
-        
-        return false;
-    }
-    
-    return true; // Both checks passed
-}
 
 function selectDocumentType(type) {
     documentBuilderState.currentType = type;
@@ -3740,6 +3678,68 @@ function validateFormalWarningProceduralFairness() {
     
     return true; // Other steps don't need validation
 }
+
+function validateLetterOfAllegationMeetingPrep() {
+    // Only validate on Step 2 (Meeting Preparation)
+    if (documentBuilderState.currentStep !== 2) {
+        return true;
+    }
+    
+    const notice24hours = documentBuilderState.data.notice24hours;
+    const supportPersonOffered = documentBuilderState.data.supportPersonOffered;
+    
+    // Check 24 hours notice
+    if (notice24hours === 'No') {
+        alert(
+            '⚠️ IMPORTANT: You must provide the employee with 24 hours notice before the meeting.\n\n' +
+            'This is a requirement of procedural fairness.\n\n' +
+            'Please schedule the meeting for at least 24 hours from now before continuing.'
+        );
+        
+        trackEvent('procedural_fairness_violation', {
+            user: currentUser,
+            violation: '24_hour_notice_not_provided',
+            documentType: 'letterOfAllegation'
+        });
+        
+        // Clear the answer so they can correct it
+        documentBuilderState.data.notice24hours = '';
+        
+        // Re-render the current step
+        showDocumentStep(documentBuilderState.currentStep);
+        
+        return false;
+    }
+    
+    // Check support person offered
+    if (supportPersonOffered === 'No') {
+        alert(
+            '⚠️ IMPORTANT: You must offer the employee the right to bring a support person.\n\n' +
+            'A support person can be:\n' +
+            '• A family member or friend\n' +
+            '• A union representative\n' +
+            '• A fellow employee (if appropriate and no conflict of interest)\n\n' +
+            'Please inform the employee of this right before continuing.'
+        );
+        
+        trackEvent('procedural_fairness_violation', {
+            user: currentUser,
+            violation: 'support_person_not_offered',
+            documentType: 'letterOfAllegation'
+        });
+        
+        // Clear the answer so they can correct it
+        documentBuilderState.data.supportPersonOffered = '';
+        
+        // Re-render the current step
+        showDocumentStep(documentBuilderState.currentStep);
+        
+        return false;
+    }
+    
+    return true; // Both checks passed
+}
+
 
 function validateRecordOfDiscussionStep2() {
     const notice24hours = documentBuilderState.data.notice24hours;
