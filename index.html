@@ -3502,14 +3502,14 @@ async function generateDocumentWithAI() {
         
         documentBuilderState.generatedDocument = response;
         
+        // ✅ LOG DOCUMENT GENERATION HERE - AFTER data is complete
+        await logDocumentGeneration();
+        
         // Close document builder modal
         closeToolModal('documentBuilderModal');
         
         // Show preview modal
         showDocumentPreview(response);
-        
-        // Log the generation
-        await logDocumentGeneration();
         
         trackEvent('document_generated_ai', {
             user: currentUser,
@@ -4318,20 +4318,34 @@ async function downloadGeneratedDocument() {
     }
 }
 
-// Log document generation to database
 async function logDocumentGeneration() {
+    // ✅ Validate that we have the required data
+    if (!documentBuilderState.currentType) {
+        console.error('❌ Cannot log - no document type');
+        return;
+    }
+    
+    if (!documentBuilderState.data.employeeName) {
+        console.warn('⚠️ No employee name in wizard data:', documentBuilderState.data);
+    }
+    
     const log = {
         document_id: generateDocumentId(),
         user_code: currentUser,
         document_type: documentBuilderState.currentType,
-        employee_name: documentBuilderState.data.employeeName || null,
+        employee_name: documentBuilderState.data.employeeName || 'Unknown', // ✅ Better fallback
         generated_at: new Date().toISOString(),
         downloaded: false,
         venue_name: venueProfile.venueName || null,
-        venue_location: venueProfile.location || null
+        venue_location: venueProfile.location || null,
+        venue_city: venueProfile.city || null,
+        venue_type: venueProfile.venueType || null,
+        staff_count: venueProfile.staffCount || null
     };
     
-    // Store in localStorage
+    console.log('📊 Logging document generation:', log);
+    
+    // Store in localStorage as backup
     const logs = JSON.parse(localStorage.getItem('documentLogs_' + currentUser) || '[]');
     logs.push(log);
     localStorage.setItem('documentLogs_' + currentUser, JSON.stringify(logs));
@@ -4339,18 +4353,20 @@ async function logDocumentGeneration() {
     // Store in Supabase
     if (supabaseClient) {
         try {
-            const { error } = await supabaseClient
+            const { data, error } = await supabaseClient
                 .from('generated_documents')
                 .insert([log]);
             
             if (error) {
-                console.error('Supabase insert error:', error);
+                console.error('❌ Supabase insert error:', error);
             } else {
-                console.log('✅ Document generation logged to Supabase');
+                console.log('✅ Document generation logged to Supabase:', data);
             }
         } catch (err) {
-            console.error('Error logging to Supabase:', err);
+            console.error('❌ Error logging to Supabase:', err);
         }
+    } else {
+        console.warn('⚠️ Supabase not connected - only saved locally');
     }
 }
 
