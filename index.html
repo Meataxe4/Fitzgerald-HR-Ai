@@ -2519,27 +2519,28 @@ function convertHTMLToPdfMake(html, metadata) {
     };
 
     const processInlineNode = (node) => {
-        if (node.nodeType === Node.TEXT_NODE) {
-            const text = node.textContent.trim();
-            return text ? { text: text } : null;
-        }
-
-        const tagName = node.tagName?.toLowerCase();
+    if (node.nodeType === Node.TEXT_NODE) {
         const text = node.textContent.trim();
+        return text ? { text: text } : null;
+    }
 
-        if (!text) return null;
+    const tagName = node.tagName?.toLowerCase();
+    const text = node.textContent.trim();
 
-        switch (tagName) {
-            case 'strong':
-            case 'b':
-                return { text: text, bold: true };
-            case 'em':
-            case 'i':
-                return { text: text, italics: true };
-            default:
-                return { text: text };
-        }
-    };
+    if (!text) return null;
+
+    switch (tagName) {
+        case 'strong':
+        case 'b':
+            // REMOVE BOLD - just return normal text
+            return { text: text };  // Removed the bold: true property
+        case 'em':
+        case 'i':
+            return { text: text, italics: true };
+        default:
+            return { text: text };
+    }
+};
 
     // Process all body children
     for (const child of doc.body.childNodes) {
@@ -7348,4 +7349,3 @@ window.addEventListener('unhandledrejection', function(event) {
 </script>
 </body>
 </html>
-
