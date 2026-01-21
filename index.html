@@ -3240,6 +3240,26 @@ formalWarning: [
         },
         {
             id: 2,
+            title: "Meeting Preparation - CRITICAL",
+            fields: [
+                { 
+                    name: "notice24hours", 
+                    label: "Has employee been provided 24 hours notice of the meeting?", 
+                    type: "radio", 
+                    options: ["Yes", "No"], 
+                    required: true 
+                },
+                { 
+                    name: "supportPersonOffered", 
+                    label: "Has employee been offered to bring a support person to the meeting?", 
+                    type: "radio", 
+                    options: ["Yes", "No"], 
+                    required: true 
+                }
+            ]
+        },
+        {
+            id: 3,
             title: "Allegation Details",
             fields: [
                 { name: "allegationType", label: "Type of allegation", type: "select",
@@ -3252,7 +3272,7 @@ formalWarning: [
             ]
         },
         {
-            id: 3,
+            id: 4,
             title: "Source & Evidence",
             fields: [
                 { name: "allegationSource", label: "Who made the allegation?", type: "select",
@@ -3264,7 +3284,7 @@ formalWarning: [
             ]
         },
         {
-            id: 4,
+            id: 5,
             title: "Investigation Process",
             fields: [
                 { name: "investigator", label: "Who will conduct the investigation?", type: "text",
@@ -3275,7 +3295,7 @@ formalWarning: [
             ]
         },
         {
-            id: 5,
+            id: 6,
             title: "Investigation Meeting",
             fields: [
                 { name: "meetingDate", label: "Meeting date", type: "date", required: true },
@@ -3453,14 +3473,21 @@ function docWizardNext() {
     
     if (!allValid) return;
     
-    // ✅ SPECIAL VALIDATION FOR FORMAL WARNING
+    // ✅ VALIDATION FOR FORMAL WARNING
     if (documentBuilderState.currentType === 'formalWarning') {
         if (!validateFormalWarningProceduralFairness()) {
-            return; // Block progression if validation fails
+            return;
         }
     }
     
-    // SPECIAL VALIDATION FOR RECORD OF DISCUSSION STEP 2
+    // ✅ VALIDATION FOR LETTER OF ALLEGATION
+    if (documentBuilderState.currentType === 'letterOfAllegation') {
+        if (!validateLetterOfAllegationMeetingPrep()) {
+            return;
+        }
+    }
+    
+    // ✅ VALIDATION FOR RECORD OF DISCUSSION
     if (documentBuilderState.currentType === 'recordOfDiscussion' && documentBuilderState.currentStep === 2) {
         if (!validateRecordOfDiscussionStep2()) {
             return;
@@ -3477,175 +3504,65 @@ function docWizardNext() {
     }
 }
 
-function validateFormalWarningProceduralFairness() {
-    // Step 1: Check Record of Discussion completed
-    if (documentBuilderState.currentStep === 1) {
-        const completedROD = documentBuilderState.data.completedRecordOfDiscussion;
-        
-        if (completedROD === 'No') {
-            const userChoice = confirm(
-                '⚠️ PROCEDURAL FAIRNESS REQUIREMENT\n\n' +
-                'You must complete the Record of Discussion process BEFORE issuing a Formal Warning.\n\n' +
-                'This involves:\n' +
-                '1. Presenting allegations to the employee\n' +
-                '2. Giving them the opportunity to respond\n' +
-                '3. Documenting the conversation\n' +
-                '4. Considering their response before making a decision\n\n' +
-                'Skipping this step could result in an unfair dismissal claim.\n\n' +
-                '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
-                'Click OK to go to Record of Discussion builder\n' +
-                'Click CANCEL to go back and change your answer'
-            );
-            
-            if (userChoice) {
-                // User chose to go to Record of Discussion
-                trackEvent('procedural_fairness_redirect', {
-                    user: currentUser,
-                    from: 'formalWarning',
-                    to: 'recordOfDiscussion',
-                    reason: 'incomplete_ROD'
-                });
-                
-                // Close formal warning modal
-                closeToolModal('documentBuilderModal');
-                
-                // Reset the document builder
-                resetDocumentBuilderSilent();
-                
-                // Open Record of Discussion builder after a short delay
-                setTimeout(() => {
-                    documentBuilderState.currentType = 'recordOfDiscussion';
-                    documentBuilderState.currentStep = 1;
-                    documentBuilderState.data = {};
-                    documentBuilderState.totalSteps = documentWizardSteps.recordOfDiscussion.length;
-                    
-                    // Show modal
-                    document.getElementById('documentBuilderModal').classList.remove('hidden');
-                    
-                    // Hide template selection, show wizard
-                    document.getElementById('documentTemplateSelection').classList.add('hidden');
-                    document.getElementById('documentWizardSteps').classList.remove('hidden');
-                    
-                    // Update total steps
-                    document.getElementById('docTotalSteps').textContent = documentBuilderState.totalSteps;
-                    
-                    // Show first step
-                    showDocumentStep(1);
-                    
-                    // Show a helpful message
-                    alert('📋 Record of Discussion Builder\n\nComplete this process first, then return to the Formal Warning.');
-                }, 300);
-            } else {
-                // User chose to go back - just stay on current step
-                // Clear the answer so they can select again
-                documentBuilderState.data.completedRecordOfDiscussion = '';
-                
-                // Re-render the current step
-                showDocumentStep(documentBuilderState.currentStep);
-            }
-            
-            return false; // Block progression either way
-        }
-        
-        return true; // Allow progression
+function validateLetterOfAllegationMeetingPrep() {
+    // Only validate on Step 2 (Meeting Preparation)
+    if (documentBuilderState.currentStep !== 2) {
+        return true;
     }
     
-    // Step 2: Check meeting preparation
-    if (documentBuilderState.currentStep === 2) {
-        const providedNotice = documentBuilderState.data.providedNotice24hours;
-        const offeredSupport = documentBuilderState.data.offeredSupportPerson;
+    const notice24hours = documentBuilderState.data.notice24hours;
+    const supportPersonOffered = documentBuilderState.data.supportPersonOffered;
+    
+    // Check 24 hours notice
+    if (notice24hours === 'No') {
+        alert(
+            '⚠️ IMPORTANT: You must provide the employee with 24 hours notice before the meeting.\n\n' +
+            'This is a requirement of procedural fairness.\n\n' +
+            'Please schedule the meeting for at least 24 hours from now before continuing.'
+        );
         
-        // Check 24 hours notice
-        if (providedNotice === 'No') {
-            const goBack = confirm(
-                '⚠️ CRITICAL REQUIREMENT: 24 Hours Notice\n\n' +
-                'You MUST provide the employee with at least 24 hours notice before the outcome meeting.\n\n' +
-                'This is a fundamental requirement of procedural fairness.\n\n' +
-                'Please schedule the meeting for at least 24 hours from now.\n\n' +
-                '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
-                'Click OK to return to main chat\n' +
-                'Click CANCEL to go back and change your answer'
-            );
-            
-            if (goBack) {
-                // User chose to exit
-                trackEvent('procedural_fairness_violation', {
-                    user: currentUser,
-                    violation: '24_hour_notice_not_provided',
-                    documentType: 'formalWarning',
-                    action: 'exit_to_chat'
-                });
-                
-                // Return to main chat
-                closeToolModal('documentBuilderModal');
-                resetDocumentBuilderSilent();
-            } else {
-                // User chose to go back - clear the answer
-                documentBuilderState.data.providedNotice24hours = '';
-                
-                trackEvent('procedural_fairness_violation', {
-                    user: currentUser,
-                    violation: '24_hour_notice_not_provided',
-                    documentType: 'formalWarning',
-                    action: 'went_back_to_correct'
-                });
-                
-                // Re-render the current step
-                showDocumentStep(documentBuilderState.currentStep);
-            }
-            
-            return false;
-        }
+        trackEvent('procedural_fairness_violation', {
+            user: currentUser,
+            violation: '24_hour_notice_not_provided',
+            documentType: 'letterOfAllegation'
+        });
         
-        // Check support person offered
-        if (offeredSupport === 'No') {
-            const goBack = confirm(
-                '⚠️ CRITICAL REQUIREMENT: Support Person Rights\n\n' +
-                'You MUST offer the employee the right to have a support person present at the outcome meeting.\n\n' +
-                'A support person can be:\n' +
-                '• A family member or friend\n' +
-                '• A union representative\n' +
-                '• A fellow employee (if no conflict of interest)\n\n' +
-                'Please inform the employee of this right.\n\n' +
-                '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
-                'Click OK to return to main chat\n' +
-                'Click CANCEL to go back and change your answer'
-            );
-            
-            if (goBack) {
-                // User chose to exit
-                trackEvent('procedural_fairness_violation', {
-                    user: currentUser,
-                    violation: 'support_person_not_offered',
-                    documentType: 'formalWarning',
-                    action: 'exit_to_chat'
-                });
-                
-                // Return to main chat
-                closeToolModal('documentBuilderModal');
-                resetDocumentBuilderSilent();
-            } else {
-                // User chose to go back - clear the answer
-                documentBuilderState.data.offeredSupportPerson = '';
-                
-                trackEvent('procedural_fairness_violation', {
-                    user: currentUser,
-                    violation: 'support_person_not_offered',
-                    documentType: 'formalWarning',
-                    action: 'went_back_to_correct'
-                });
-                
-                // Re-render the current step
-                showDocumentStep(documentBuilderState.currentStep);
-            }
-            
-            return false;
-        }
+        // Clear the answer so they can correct it
+        documentBuilderState.data.notice24hours = '';
         
-        return true; // Both checks passed
+        // Re-render the current step
+        showDocumentStep(documentBuilderState.currentStep);
+        
+        return false;
     }
     
-    return true; // Other steps don't need validation
+    // Check support person offered
+    if (supportPersonOffered === 'No') {
+        alert(
+            '⚠️ IMPORTANT: You must offer the employee the right to bring a support person.\n\n' +
+            'A support person can be:\n' +
+            '• A family member or friend\n' +
+            '• A union representative\n' +
+            '• A fellow employee (if appropriate and no conflict of interest)\n\n' +
+            'Please inform the employee of this right before continuing.'
+        );
+        
+        trackEvent('procedural_fairness_violation', {
+            user: currentUser,
+            violation: 'support_person_not_offered',
+            documentType: 'letterOfAllegation'
+        });
+        
+        // Clear the answer so they can correct it
+        documentBuilderState.data.supportPersonOffered = '';
+        
+        // Re-render the current step
+        showDocumentStep(documentBuilderState.currentStep);
+        
+        return false;
+    }
+    
+    return true; // Both checks passed
 }
 
 function validateRecordOfDiscussionStep2() {
