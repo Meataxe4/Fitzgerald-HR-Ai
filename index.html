@@ -3227,64 +3227,150 @@ formalWarning: [
         ]
     }
 ],
-    letterOfAllegation: [
-        {
-            id: 1,
-            title: "Employee Details",
-            fields: [
-                { name: "employeeName", label: "Employee's full name", type: "text", required: true },
-                { name: "position", label: "Position/Role", type: "text", required: true },
-                { name: "employmentType", label: "Employment Type", type: "select", 
-                  options: ["Full-Time", "Part-Time", "Casual"], required: true }
-            ]
-        },
-        {
-            id: 2,
-            title: "Allegation Details",
-            fields: [
-                { name: "allegationType", label: "Type of allegation", type: "select",
-                  options: ["Theft", "Harassment", "Bullying", "Serious safety breach", "Fraud", "Violence/threats", "Other serious misconduct"],
-                  required: true },
-                { name: "allegationDescription", label: "Describe the allegation", 
-                  type: "textarea", required: true, rows: 4, 
-                  placeholder: "What specifically is alleged to have occurred?" },
-                { name: "incidentDate", label: "Date of alleged incident", type: "date", required: true }
-            ]
-        },
-        {
-            id: 3,
-            title: "Source & Evidence",
-            fields: [
-                { name: "allegationSource", label: "Who made the allegation?", type: "select",
-                  options: ["Anonymous complaint", "Named complainant", "Management observed", "Multiple witnesses"],
-                  required: true },
-                { name: "evidenceExists", label: "What evidence exists?", 
-                  type: "textarea", required: false, rows: 2,
-                  placeholder: "e.g., Witness statements, CCTV, documents" }
-            ]
-        },
-        {
-            id: 4,
-            title: "Investigation Process",
-            fields: [
-                { name: "investigator", label: "Who will conduct the investigation?", type: "text",
-                  required: true, placeholder: "e.g., HR Manager, External investigator" },
-                { name: "suspensionRequired", label: "Suspension during investigation?", type: "select",
-                  options: ["No suspension - continue work", "Yes - on full pay", "Yes - without pay (serious misconduct only)"],
-                  required: true }
-            ]
-        },
-        {
-            id: 5,
-            title: "Investigation Meeting",
-            fields: [
-                { name: "meetingDate", label: "Meeting date", type: "date", required: true },
-                { name: "meetingTime", label: "Meeting time", type: "time", required: true },
-                { name: "meetingLocation", label: "Meeting location", type: "text", required: true }
-            ]
-        }
-    ]
-};
+letterOfAllegation: [
+    {
+        id: 1,
+        title: "Employee Details",
+        fields: [
+            { name: "employeeName", label: "Employee's full name", type: "text", required: true },
+            { name: "position", label: "Position/Role", type: "text", required: true },
+            { name: "employmentType", label: "Employment Type", type: "select", 
+              options: ["Full-Time", "Part-Time", "Casual"], required: true }
+        ]
+    },
+    // ✅ NEW STEP 2: Meeting Preparation - CRITICAL
+    {
+        id: 2,
+        title: "Meeting Preparation - CRITICAL",
+        fields: [
+            { 
+                name: "notice24hours", 
+                label: "Has employee been provided 24 hours notice of the meeting?", 
+                type: "radio", 
+                options: ["Yes", "No"], 
+                required: true 
+            },
+            { 
+                name: "supportPersonOffered", 
+                label: "Has employee been offered to bring a support person to the meeting?", 
+                type: "radio", 
+                options: ["Yes", "No"], 
+                required: true 
+            }
+        ]
+    },
+    // ✅ OLD STEP 2 becomes STEP 3
+    {
+        id: 3,
+        title: "Allegation Details",
+        fields: [
+            { name: "allegationType", label: "Type of allegation", type: "select",
+              options: ["Theft", "Harassment", "Bullying", "Serious safety breach", "Fraud", "Violence/threats", "Other serious misconduct"],
+              required: true },
+            { name: "allegationDescription", label: "Describe the allegation", 
+              type: "textarea", required: true, rows: 4, 
+              placeholder: "What specifically is alleged to have occurred?" },
+            { name: "incidentDate", label: "Date of alleged incident", type: "date", required: true }
+        ]
+    },
+    // ✅ OLD STEP 3 becomes STEP 4
+    {
+        id: 4,
+        title: "Source & Evidence",
+        fields: [
+            { name: "allegationSource", label: "Who made the allegation?", type: "select",
+              options: ["Anonymous complaint", "Named complainant", "Management observed", "Multiple witnesses"],
+              required: true },
+            { name: "evidenceExists", label: "What evidence exists?", 
+              type: "textarea", required: false, rows: 2,
+              placeholder: "e.g., Witness statements, CCTV, documents" }
+        ]
+    },
+    // ✅ OLD STEP 4 becomes STEP 5
+    {
+        id: 5,
+        title: "Investigation Process",
+        fields: [
+            { name: "investigator", label: "Who will conduct the investigation?", type: "text",
+              required: true, placeholder: "e.g., HR Manager, External investigator" },
+            { name: "suspensionRequired", label: "Suspension during investigation?", type: "select",
+              options: ["No suspension - continue work", "Yes - on full pay", "Yes - without pay (serious misconduct only)"],
+              required: true }
+        ]
+    },
+    // ✅ OLD STEP 5 becomes STEP 6
+    {
+        id: 6,
+        title: "Investigation Meeting",
+        fields: [
+            { name: "meetingDate", label: "Meeting date", type: "date", required: true },
+            { name: "meetingTime", label: "Meeting time", type: "time", required: true },
+            { name: "meetingLocation", label: "Meeting location", type: "text", required: true }
+        ]
+    }
+]
+Step 2: Create validation function for Letter of Allegation
+Add this new function after the validateFormalWarningProceduralFairness() function:
+javascriptfunction validateLetterOfAllegationMeetingPrep() {
+    // Only validate on Step 2 (Meeting Preparation)
+    if (documentBuilderState.currentStep !== 2) {
+        return true;
+    }
+    
+    const notice24hours = documentBuilderState.data.notice24hours;
+    const supportPersonOffered = documentBuilderState.data.supportPersonOffered;
+    
+    // Check 24 hours notice
+    if (notice24hours === 'No') {
+        alert(
+            '⚠️ IMPORTANT: You must provide the employee with 24 hours notice before the meeting.\n\n' +
+            'This is a requirement of procedural fairness.\n\n' +
+            'Please schedule the meeting for at least 24 hours from now before continuing.'
+        );
+        
+        trackEvent('procedural_fairness_violation', {
+            user: currentUser,
+            violation: '24_hour_notice_not_provided',
+            documentType: 'letterOfAllegation'
+        });
+        
+        // Clear the answer so they can correct it
+        documentBuilderState.data.notice24hours = '';
+        
+        // Re-render the current step
+        showDocumentStep(documentBuilderState.currentStep);
+        
+        return false;
+    }
+    
+    // Check support person offered
+    if (supportPersonOffered === 'No') {
+        alert(
+            '⚠️ IMPORTANT: You must offer the employee the right to bring a support person.\n\n' +
+            'A support person can be:\n' +
+            '• A family member or friend\n' +
+            '• A union representative\n' +
+            '• A fellow employee (if appropriate and no conflict of interest)\n\n' +
+            'Please inform the employee of this right before continuing.'
+        );
+        
+        trackEvent('procedural_fairness_violation', {
+            user: currentUser,
+            violation: 'support_person_not_offered',
+            documentType: 'letterOfAllegation'
+        });
+        
+        // Clear the answer so they can correct it
+        documentBuilderState.data.supportPersonOffered = '';
+        
+        // Re-render the current step
+        showDocumentStep(documentBuilderState.currentStep);
+        
+        return false;
+    }
+    
+    return true; // Both checks passed
+}
 
 function selectDocumentType(type) {
     documentBuilderState.currentType = type;
@@ -3453,14 +3539,21 @@ function docWizardNext() {
     
     if (!allValid) return;
     
-    // ✅ SPECIAL VALIDATION FOR FORMAL WARNING
+    // ✅ VALIDATION FOR FORMAL WARNING
     if (documentBuilderState.currentType === 'formalWarning') {
         if (!validateFormalWarningProceduralFairness()) {
-            return; // Block progression if validation fails
+            return;
         }
     }
     
-    // SPECIAL VALIDATION FOR RECORD OF DISCUSSION STEP 2
+    // ✅ VALIDATION FOR LETTER OF ALLEGATION
+    if (documentBuilderState.currentType === 'letterOfAllegation') {
+        if (!validateLetterOfAllegationMeetingPrep()) {
+            return;
+        }
+    }
+    
+    // ✅ VALIDATION FOR RECORD OF DISCUSSION
     if (documentBuilderState.currentType === 'recordOfDiscussion' && documentBuilderState.currentStep === 2) {
         if (!validateRecordOfDiscussionStep2()) {
             return;
