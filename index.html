@@ -2805,8 +2805,8 @@ function convertAIContentToHTML(rawContent) {
         .replace(/^## (.+)$/gm, '<h2>$1</h2>')
         .replace(/^# (.+)$/gm, '<h1>$1</h1>')
         
-        // Convert **bold** to <strong>
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        // REMOVE bold - just strip the ** markers
+	.replace(/\*\*(.+?)\*\*/g, '$1')
         
         // Convert *italic* to <em>
         .replace(/(?<!\*)\*([^\*\n]+?)\*(?!\*)/g, '<em>$1</em>')
