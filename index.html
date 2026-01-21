@@ -3413,10 +3413,15 @@ function docWizardNext() {
     
     if (!allValid) return;
     
+    // ✅ ADD THIS DEBUG LOGGING
+    console.log('🔍 Step', documentBuilderState.currentStep, 'complete');
+    console.log('🔍 Current wizard data:', JSON.stringify(documentBuilderState.data, null, 2));
+    console.log('🔍 Current step:', documentBuilderState.currentStep, '/', documentBuilderState.totalSteps);
+    
     // SPECIAL VALIDATION FOR RECORD OF DISCUSSION STEP 2
     if (documentBuilderState.currentType === 'recordOfDiscussion' && documentBuilderState.currentStep === 2) {
         if (!validateRecordOfDiscussionStep2()) {
-            return; // Stop progression if validation fails
+            return;
         }
     }
     
@@ -3425,6 +3430,10 @@ function docWizardNext() {
         documentBuilderState.currentStep++;
         showDocumentStep(documentBuilderState.currentStep);
     } else {
+        // ✅ ADD THIS DEBUG LOGGING
+        console.log('🎯 ALL STEPS COMPLETE - About to generate document');
+        console.log('🎯 Final wizard data:', JSON.stringify(documentBuilderState.data, null, 2));
+        
         // All steps complete - generate document
         generateDocumentWithAI();
     }
@@ -3490,6 +3499,10 @@ function docWizardGoBack() {
 }
 
 async function generateDocumentWithAI() {
+    console.log('📄 generateDocumentWithAI() called');
+    console.log('📄 Document type:', documentBuilderState.currentType);
+    console.log('📄 Wizard data at generation:', JSON.stringify(documentBuilderState.data, null, 2));
+    
     // Hide wizard, show loading
     document.getElementById('documentWizardSteps').classList.add('hidden');
     document.getElementById('documentGenerating').classList.remove('hidden');
@@ -3498,12 +3511,25 @@ async function generateDocumentWithAI() {
     
     try {
         const prompt = buildDocumentPrompt();
+        console.log('📄 Prompt built, calling Claude API...');
+        
         const response = await callClaudeAPI(prompt);
+        console.log('📄 Response received from API');
         
         documentBuilderState.generatedDocument = response;
         
-        // ✅ LOG DOCUMENT GENERATION HERE - AFTER data is complete
+        // ✅ LOG BEFORE CALLING
+        console.log('📊 About to log document generation');
+        console.log('📊 Data to log:', {
+            type: documentBuilderState.currentType,
+            employeeName: documentBuilderState.data.employeeName,
+            allData: documentBuilderState.data
+        });
+        
+        // Log the generation
         await logDocumentGeneration();
+        
+        console.log('✅ Document generation logged successfully');
         
         // Close document builder modal
         closeToolModal('documentBuilderModal');
@@ -3518,7 +3544,7 @@ async function generateDocumentWithAI() {
         });
         
     } catch (error) {
-        console.error('Document generation error:', error);
+        console.error('❌ Document generation error:', error);
         alert('⚠️ Error generating document. Please try again or contact support.');
         
         // Reset to wizard
@@ -4319,21 +4345,22 @@ async function downloadGeneratedDocument() {
 }
 
 async function logDocumentGeneration() {
-    // ✅ Validate that we have the required data
+    console.log('📊 logDocumentGeneration() called');
+    console.log('📊 currentType:', documentBuilderState.currentType);
+    console.log('📊 employeeName:', documentBuilderState.data.employeeName);
+    console.log('📊 Full data object:', JSON.stringify(documentBuilderState.data, null, 2));
+    
+    // Validate that we have the required data
     if (!documentBuilderState.currentType) {
         console.error('❌ Cannot log - no document type');
         return;
-    }
-    
-    if (!documentBuilderState.data.employeeName) {
-        console.warn('⚠️ No employee name in wizard data:', documentBuilderState.data);
     }
     
     const log = {
         document_id: generateDocumentId(),
         user_code: currentUser,
         document_type: documentBuilderState.currentType,
-        employee_name: documentBuilderState.data.employeeName || 'Unknown', // ✅ Better fallback
+        employee_name: documentBuilderState.data.employeeName || 'Unknown',
         generated_at: new Date().toISOString(),
         downloaded: false,
         venue_name: venueProfile.venueName || null,
@@ -4343,27 +4370,34 @@ async function logDocumentGeneration() {
         staff_count: venueProfile.staffCount || null
     };
     
-    console.log('📊 Logging document generation:', log);
+    console.log('📊 Log object to insert:', JSON.stringify(log, null, 2));
     
     // Store in localStorage as backup
     const logs = JSON.parse(localStorage.getItem('documentLogs_' + currentUser) || '[]');
     logs.push(log);
     localStorage.setItem('documentLogs_' + currentUser, JSON.stringify(logs));
+    console.log('✅ Saved to localStorage');
     
     // Store in Supabase
     if (supabaseClient) {
         try {
+            console.log('📊 Attempting Supabase insert...');
+            
             const { data, error } = await supabaseClient
                 .from('generated_documents')
-                .insert([log]);
+                .insert([log])
+                .select(); // ✅ Add .select() to see what was inserted
             
             if (error) {
                 console.error('❌ Supabase insert error:', error);
+                console.error('❌ Error details:', JSON.stringify(error, null, 2));
             } else {
-                console.log('✅ Document generation logged to Supabase:', data);
+                console.log('✅ Document logged to Supabase successfully');
+                console.log('✅ Inserted data:', JSON.stringify(data, null, 2));
             }
         } catch (err) {
-            console.error('❌ Error logging to Supabase:', err);
+            console.error('❌ Exception logging to Supabase:', err);
+            console.error('❌ Exception stack:', err.stack);
         }
     } else {
         console.warn('⚠️ Supabase not connected - only saved locally');
