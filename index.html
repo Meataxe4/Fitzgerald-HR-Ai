@@ -4250,8 +4250,19 @@ function requestDocumentChange() {
 
 async function downloadGeneratedDocument() {
     try {
-        const type = documentBuilderState.currentType;
-        const employeeName = documentBuilderState.data.employeeName || 'Employee';
+        // CAPTURE the type and data IMMEDIATELY before anything else
+        const savedType = documentBuilderState.currentType;
+        const savedEmployeeName = documentBuilderState.data.employeeName || 'Employee';
+        const savedData = { ...documentBuilderState.data }; // Clone the data object
+        
+        console.log('🔒 CAPTURED type:', savedType);
+        console.log('🔒 CAPTURED employee name:', savedEmployeeName);
+        
+        if (!savedType) {
+            console.error('❌ Document type is missing!');
+            alert('Error: Document type not found. Please try generating the document again.');
+            return false;
+        }
         
         const typeNames = {
             formalWarning: 'Formal_Warning',
@@ -4259,28 +4270,26 @@ async function downloadGeneratedDocument() {
             letterOfAllegation: 'Letter_of_Allegation'
         };
         
-        const filename = `${typeNames[type]}_${employeeName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.pdf`;
+        const filename = `${typeNames[savedType]}_${savedEmployeeName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.pdf`;
         
         const metadata = {
             documentId: generateDocumentId(),
             userName: currentUser,
             generatedAt: new Date().toISOString(),
-            documentType: type,
-            employeeName: employeeName
+            documentType: savedType,
+            employeeName: savedEmployeeName
         };
         
-        // Get the FORMATTED HTML from the preview (which looks perfect!)
+        // Get the FORMATTED HTML from the preview
         const previewElement = document.getElementById('documentPreviewContent');
         
         if (!previewElement) {
             throw new Error('Preview content not found');
         }
         
-        // Get the innerHTML which is already perfectly formatted
         const formattedHTML = previewElement.innerHTML;
         
-        console.log('📄 Using formatted HTML from preview');
-        console.log('HTML sample:', formattedHTML.substring(0, 200));
+        console.log('📄 Using saved type:', savedType);
         
         // Pass the formatted HTML directly to pdfMake converter
         const docDefinition = convertHTMLToPdfMake(formattedHTML, metadata);
@@ -4294,10 +4303,54 @@ async function downloadGeneratedDocument() {
         
         pdfMake.createPdf(docDefinition).download(filename);
         
+        // LOG TO DATABASE using SAVED values (not from state)
+        console.log('📝 Logging to database with saved type:', savedType);
+        
+        // Create log object directly here instead of relying on state
+        const log = {
+            document_id: metadata.documentId,
+            user_code: currentUser,
+            document_type: savedType,  // Use saved type!
+            employee_name: savedEmployeeName,  // Use saved name!
+            generated_at: new Date().toISOString(),
+            downloaded: false,
+            venue_name: venueProfile.venueName || null,
+            venue_type: venueProfile.venueType || null,
+            venue_location: venueProfile.location || null,
+            venue_city: venueProfile.city || null
+        };
+        
+        console.log('📝 Log object:', log);
+        
+        // Save to localStorage
+        const logs = JSON.parse(localStorage.getItem('documentLogs_' + currentUser) || '[]');
+        logs.push(log);
+        localStorage.setItem('documentLogs_' + currentUser, JSON.stringify(logs));
+        
+        // Save to Supabase
+        if (supabaseClient) {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('generated_documents')
+                    .insert([log]);
+                
+                if (error) {
+                    console.error('❌ Supabase error:', error);
+                } else {
+                    console.log('✅ Saved to Supabase!');
+                }
+            } catch (err) {
+                console.error('❌ Exception:', err);
+            }
+        }
+        
         // Track
         trackDocumentGeneration(filename, metadata);
-        logDocumentDownload(metadata);
         
+        // Mark as downloaded
+        await logDocumentDownload(metadata);
+        
+        // NOW close the preview
         closeDocumentPreview();
         
         alert(
