@@ -4328,29 +4328,35 @@ async function logDocumentGeneration() {
         generated_at: new Date().toISOString(),
         downloaded: false,
         venue_name: venueProfile.venueName || null,
-        venue_location: venueProfile.location || null
+        venue_location: venueProfile.location || null  // Only this venue field
     };
+    
+    console.log('📝 Logging document generation:', log);
     
     // Store in localStorage
     const logs = JSON.parse(localStorage.getItem('documentLogs_' + currentUser) || '[]');
     logs.push(log);
     localStorage.setItem('documentLogs_' + currentUser, JSON.stringify(logs));
+    console.log('✅ Saved to localStorage. Total docs:', logs.length);
     
     // Store in Supabase
     if (supabaseClient) {
         try {
-            const { error } = await supabaseClient
+            const { data, error } = await supabaseClient
                 .from('generated_documents')
                 .insert([log]);
             
             if (error) {
-                console.error('Supabase insert error:', error);
+                console.error('❌ Supabase insert error:', error);
+                console.error('Error details:', JSON.stringify(error, null, 2));
             } else {
                 console.log('✅ Document generation logged to Supabase');
             }
         } catch (err) {
-            console.error('Error logging to Supabase:', err);
+            console.error('❌ Error logging to Supabase:', err);
         }
+    } else {
+        console.warn('⚠️ Supabase client not initialized');
     }
 }
 
