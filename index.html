@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -4406,6 +4405,8 @@ async function logDocumentGeneration() {
 
 // Log document download
 async function logDocumentDownload(metadata) {
+    console.log('📥 Logging document download:', metadata);
+    
     const downloadLog = {
         document_id: metadata.documentId,
         user_code: currentUser,
@@ -4414,15 +4415,27 @@ async function logDocumentDownload(metadata) {
         employee_name: metadata.employeeName
     };
     
-    // Update Supabase
+    // Update Supabase - set downloaded = true
     if (supabaseClient) {
         try {
-            await supabaseClient
+            console.log('📥 Updating Supabase downloaded status...');
+            
+            const { data, error } = await supabaseClient
                 .from('generated_documents')
-                .update({ downloaded: true, downloaded_at: downloadLog.downloaded_at })
-                .eq('document_id', metadata.documentId);
+                .update({ 
+                    downloaded: true, 
+                    downloaded_at: downloadLog.downloaded_at 
+                })
+                .eq('document_id', metadata.documentId)
+                .select();
+            
+            if (error) {
+                console.error('❌ Error updating download status:', error);
+            } else {
+                console.log('✅ Download status updated:', data);
+            }
         } catch (err) {
-            console.error('Error logging download:', err);
+            console.error('❌ Exception updating download status:', err);
         }
     }
     
@@ -5854,76 +5867,86 @@ async function loadDocuments() {
             return;
         }
         
-        // Group by document type
-        const grouped = {
-            formalWarning: [],
-            recordOfDiscussion: [],
-            letterOfAllegation: []
-        };
+        console.log('📊 Documents loaded:', documents.length);
+        console.log('📊 Sample document:', documents[0]);
         
-        documents.forEach(doc => {
-            if (grouped[doc.document_type]) {
-                grouped[doc.document_type].push(doc);
-            }
+        // ✅ Calculate stats properly
+        const totalGenerated = documents.length;
+        const totalDownloaded = documents.filter(d => d.downloaded === true).length;
+        const totalWarnings = documents.filter(d => d.document_type === 'formalWarning').length;
+        const totalInvestigations = documents.filter(d => d.document_type === 'letterOfAllegation').length;
+        const totalRecords = documents.filter(d => d.document_type === 'recordOfDiscussion').length;
+        
+        console.log('📊 Stats:', {
+            total: totalGenerated,
+            downloaded: totalDownloaded,
+            warnings: totalWarnings,
+            investigations: totalInvestigations,
+            records: totalRecords
         });
         
         let html = '<div class="space-y-6">';
         
-        // Stats summary
+        // Stats summary with REAL data
         html += `
             <div class="grid grid-cols-4 gap-4 mb-6">
                 <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
                     <p class="text-slate-400 text-xs mb-1">Total Generated</p>
-                    <p class="text-3xl font-bold text-purple-400">${documents.length}</p>
+                    <p class="text-3xl font-bold text-purple-400">${totalGenerated}</p>
                 </div>
                 <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
                     <p class="text-slate-400 text-xs mb-1">Downloaded</p>
-                    <p class="text-3xl font-bold text-green-400">${documents.filter(d => d.downloaded).length}</p>
+                    <p class="text-3xl font-bold text-green-400">${totalDownloaded}</p>
                 </div>
                 <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
                     <p class="text-slate-400 text-xs mb-1">Warnings</p>
-                    <p class="text-3xl font-bold text-yellow-400">${grouped.formalWarning.length}</p>
+                    <p class="text-3xl font-bold text-yellow-400">${totalWarnings}</p>
                 </div>
                 <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
                     <p class="text-slate-400 text-xs mb-1">Investigations</p>
-                    <p class="text-3xl font-bold text-red-400">${grouped.letterOfAllegation.length}</p>
+                    <p class="text-3xl font-bold text-red-400">${totalInvestigations}</p>
                 </div>
             </div>
         `;
         
+        // Document type emoji and name mapping
+        const typeEmoji = {
+            formalWarning: '⚠️',
+            recordOfDiscussion: '📋',
+            letterOfAllegation: '🔍'
+        };
+        
+        const typeName = {
+            formalWarning: 'Formal Warning',
+            recordOfDiscussion: 'Record of Discussion',
+            letterOfAllegation: 'Letter of Allegation'
+        };
+        
+        const typeColor = {
+            formalWarning: 'yellow',
+            recordOfDiscussion: 'green',
+            letterOfAllegation: 'red'
+        };
+        
         // Document list
         documents.forEach(doc => {
             const date = new Date(doc.generated_at).toLocaleString('en-AU');
-            const typeEmoji = {
-                formalWarning: '⚠️',
-                recordOfDiscussion: '📋',
-                letterOfAllegation: '🔍'
-            };
-            const typeName = {
-                formalWarning: 'Formal Warning',
-                recordOfDiscussion: 'Record of Discussion',
-                letterOfAllegation: 'Letter of Allegation'
-            };
-            const typeColor = {
-                formalWarning: 'yellow',
-                recordOfDiscussion: 'green',
-                letterOfAllegation: 'red'
-            };
-            
+            const emoji = typeEmoji[doc.document_type] || '📄';
+            const name = typeName[doc.document_type] || doc.document_type || 'Unknown Document';
             const color = typeColor[doc.document_type] || 'blue';
             
             html += `
                 <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 hover:border-${color}-500 transition-all">
                     <div class="flex items-start justify-between mb-2">
                         <div class="flex items-center gap-3">
-                            <span class="text-2xl">${typeEmoji[doc.document_type]}</span>
+                            <span class="text-2xl">${emoji}</span>
                             <div>
-                                <p class="text-${color}-400 font-semibold">${typeName[doc.document_type]}</p>
+                                <p class="text-${color}-400 font-semibold">${name}</p>
                                 <p class="text-slate-500 text-xs">${date}</p>
                             </div>
                         </div>
                         <div class="flex flex-col items-end gap-2">
-                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${doc.user_code}</span>
+                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${doc.user_code || 'Unknown User'}</span>
                             ${doc.downloaded ? 
                                 '<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">✓ Downloaded</span>' : 
                                 '<span class="text-xs bg-slate-700 text-slate-400 px-2 py-1 rounded">Not downloaded</span>'}
@@ -5932,7 +5955,7 @@ async function loadDocuments() {
                     <div class="text-sm">
                         <p class="text-slate-300"><strong>Employee:</strong> ${doc.employee_name || 'N/A'}</p>
                         ${doc.venue_name ? `<p class="text-slate-400 text-xs mt-1">Venue: ${doc.venue_name}</p>` : ''}
-                        <p class="text-slate-500 text-xs mt-2">Document ID: ${doc.document_id}</p>
+                        <p class="text-slate-500 text-xs mt-2">Document ID: ${doc.document_id || 'N/A'}</p>
                     </div>
                 </div>
             `;
