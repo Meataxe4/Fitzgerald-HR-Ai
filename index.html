@@ -3696,16 +3696,28 @@ WITNESSES (if any):
 ${data.witnesses || 'None mentioned'}
 
 **CRITICAL FORMATTING REQUIREMENTS:**
-1. Use **bold** for what the MANAGER should say (the script)
-2. Use *italics* for INSTRUCTIONS to the manager
-3. Use regular text for sections the manager fills in DURING or AFTER the meeting
-4. Use ## for major sections
-5. Use blank lines between paragraphs
+1. Use ## for major sections (e.g., ## BEFORE THE MEETING)
+2. Use blank lines between ALL paragraphs and sections
+3. DO NOT use **bold** formatting - use plain text only
+4. For lists, use bullet points with "• " prefix
+5. Structure clearly with proper spacing
+6. Separate each major section with a blank line before and after
+7. **ALWAYS add a space after colons in labels** (e.g., "Employee Name: Blake" not "Employee Name:Blake")
+8. For manager scripts, prefix with "MANAGER SAYS: " instead of using bold
+
+**IMPORTANT: Format lists clearly with bullet points like this:**
+- First item
+- Second item
+- Third item
+
+**IMPORTANT: Always include a space after colons:**
+✓ CORRECT: "Date: 20 January 2026"
+✗ WRONG: "Date:20 January 2026"
 
 Generate a conversation template that:
 
 1. **Provides a complete script** for the manager to follow during the meeting
-2. **Uses bold text** for what the manager should actually SAY
+2. **Uses "MANAGER SAYS:" prefix** for what the manager should actually SAY
 3. **Uses italics** for instructions/guidance (e.g., *Listen carefully and take notes*)
 4. **Leaves space** for the manager to write the employee's responses
 5. **Guides the manager** through difficult conversations with prompts like:
@@ -3717,6 +3729,7 @@ Generate a conversation template that:
 STRUCTURE:
 
 ## BEFORE THE MEETING
+
 *Print this document and have it in front of you during the meeting*
 *Review the allegations and gather any evidence*
 *Prepare to listen - this is a two-way conversation*
@@ -3725,133 +3738,146 @@ STRUCTURE:
 ## MEETING SCRIPT
 
 ### OPENING THE MEETING
-**Manager Script (say this):**
-**"Thank you for meeting with me today, ${data.employeeName}. As mentioned in my notice, we need to discuss some concerns about [brief description]."**
 
-**"You have the right to have a support person present. Have you brought someone with you, or would you like to reschedule to arrange one?"**
+MANAGER SAYS: "Thank you for meeting with me today, ${data.employeeName}. As mentioned in my notice, we need to discuss some concerns about [brief description]."
+
+MANAGER SAYS: "You have the right to have a support person present. Have you brought someone with you, or would you like to reschedule to arrange one?"
 
 *Wait for response - write it here:*
-___________________________________
+__________________________________________________________________________________
 
 ### EXPLAINING THE PURPOSE
-**Manager Script:**
-**"Before we start, I want to be clear about the purpose of this meeting:**
-**• I'm going to explain some allegations/concerns**
-**• You'll have the opportunity to respond and give your side of the story**
-**• I'm here to listen and gather information**
-**• No decision will be made today - I need time to properly consider everything you tell me**
-**• We'll schedule a follow-up meeting in the next 24-48 hours where I'll share my decision**
 
-**"Does that make sense?"**
+MANAGER SAYS: "Before we start, I want to be clear about the purpose of this meeting:
+
+- I'm going to explain some allegations/concerns
+- You'll have the opportunity to respond and give your side of the story
+- I'm here to listen and gather information
+- No decision will be made today - I need time to properly consider everything you tell me
+- We'll schedule a follow-up meeting in the next 24-48 hours where I'll share my decision
+
+Does that make sense?"
 
 *Wait for acknowledgment:*
 ___________________________________
 
 ### PRESENTING THE ALLEGATIONS
-**Manager Script:**
-**"The reason for this meeting is that I've received information about the following:**
 
-${data.allegations.split('\n').map(a => `**• ${a.trim()}**`).join('\n')}
+MANAGER SAYS: "The reason for this meeting is that I've received information about the following:"
+
+${data.allegations.split('\n').map(a => `• ${a.trim()}`).join('\n')}
 
 *Pause after presenting each allegation - let them absorb the information*
 
-**"These matters are serious because [explain the impact - e.g., they affect workplace safety, team morale, customer service, or breach company policy]."**
+MANAGER SAYS: "These matters are serious because [explain the impact - e.g., they affect workplace safety, team morale, customer service, or breach company policy]."
 
 ### GIVING THE EMPLOYEE THE OPPORTUNITY TO RESPOND
-**Manager Script:**
-**"Now I'd like to hear your side of the story. This is your opportunity to respond to these allegations. Can you tell me what happened from your perspective?"**
+
+MANAGER SAYS: "Now I'd like to hear your side of the story. This is your opportunity to respond to these allegations. Can you tell me what happened from your perspective?"
 
 *This is CRITICAL - LISTEN carefully without interrupting. Take detailed notes of everything they say:*
 
 Employee's response to allegations:
-_________________________________________
-_________________________________________
-_________________________________________
-_________________________________________
-_________________________________________
+__________________________________________________________________________________
+__________________________________________________________________________________
+__________________________________________________________________________________
+__________________________________________________________________________________
+__________________________________________________________________________________
 
 *After they finish, ask clarifying questions:*
-**"Thank you for explaining. Can I ask a few questions to make sure I understand correctly?"**
 
-**Clarifying questions to ask:**
-- **"When you say [repeat something they said], can you explain what you mean?"**
-- **"Were there any other circumstances I should know about?"**
-- **"Is there anyone who can support what you're telling me?"**
-- **"Is there anything else you'd like to add?"**
+MANAGER SAYS: "Thank you for explaining. Can I ask a few questions to make sure I understand correctly?"
+
+Clarifying questions to ask:
+
+- "When you say [repeat something they said], can you explain what you mean?"
+- "Were there any other circumstances I should know about?"
+- "Is there anyone who can support what you're telling me?"
+- "Is there anything else you'd like to add?"
 
 Additional information from employee:
-_________________________________________
-_________________________________________
-_________________________________________
+__________________________________________________________________________________
+__________________________________________________________________________________
+__________________________________________________________________________________
 
 ### EVIDENCE OR WITNESSES
+
 *If the employee mentions evidence or witnesses:*
-**Manager Script:**
-**"You mentioned [evidence/witness]. Can you provide me with [details/their name] so I can consider this as part of my review?"**
+
+MANAGER SAYS: "You mentioned [evidence/witness]. Can you provide me with [details/their name] so I can consider this as part of my review?"
 
 Evidence/witnesses mentioned:
-_________________________________________
-_________________________________________
+__________________________________________________________________________________
+__________________________________________________________________________________
 
 ### EXPLAINING NEXT STEPS
-**Manager Script:**
-**"Thank you for being open with me and sharing your perspective. I want to be clear about what happens next:**
 
-**• I'm going to take time to properly consider everything you've told me today**
-**• I'll review all the information, evidence, and your response**
-**• I'll schedule a follow-up meeting with you within the next 24-48 hours**
-**• At that meeting, I'll let you know my decision and what happens next**
-**• You won't hear anything before that meeting - I need time to think this through properly"**
+MANAGER SAYS: "Thank you for being open with me and sharing your perspective. I want to be clear about what happens next:
+
+- I'm going to take time to properly consider everything you've told me today
+- I'll review all the information, evidence, and your response
+- I'll schedule a follow-up meeting with you within the next 24-48 hours
+- At that meeting, I'll let you know my decision and what happens next
+- You won't hear anything before that meeting - I need time to think this through properly"
 
 *Set a specific date/time now for the follow-up meeting:*
 
-**Manager Script:**
-**"Can we schedule our follow-up meeting for [DATE] at [TIME]?"**
+MANAGER SAYS: "Can we schedule our follow-up meeting for [DATE] at [TIME]?"
 
 Follow-up meeting scheduled:
+
 Date: ___________________
+
 Time: ___________________
 
 ### CLOSING THE MEETING
-**Manager Script:**
-**"Do you have any questions about the process or what happens next?"**
+
+MANAGER SAYS: "Do you have any questions about the process or what happens next?"
 
 *Note any questions/concerns:*
-___________________________________
+__________________________________________________________________________________
 
-**"Thank you for attending this meeting and sharing your side of the story. I'll see you at our follow-up meeting on [DATE]."**
+MANAGER SAYS: "Thank you for attending this meeting and sharing your side of the story. I'll see you at our follow-up meeting on [DATE]."
 
 *If they have a support person:*
-**"Thank you also for attending [support person name]."**
+
+MANAGER SAYS: "Thank you also for attending [support person name]."
 
 ## AFTER THE MEETING
 
 *Complete the following sections IMMEDIATELY after the meeting while details are fresh:*
 
 ### SUMMARY OF ALLEGATIONS PRESENTED
+
 *Write a brief, factual summary of what allegations you presented:*
-_________________________________________
-_________________________________________
+__________________________________________________________________________________
+__________________________________________________________________________________
 
 ### EMPLOYEE'S RESPONSE SUMMARY
+
 *Summarize the key points of what the employee said in response:*
-_________________________________________
-_________________________________________
-_________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
+________________________________________________________________________________
 
 ### EMPLOYEE'S EXPLANATION/MITIGATING CIRCUMSTANCES
+
 *Note any explanations, mitigating factors, or context the employee provided:*
-_________________________________________
-_________________________________________
+__________________________________________________________________________________
+__________________________________________________________________________________
 
 ### EVIDENCE/WITNESSES TO FOLLOW UP
+
 *List any evidence you need to review or witnesses you need to speak to:*
-1. _________________________________
-2. _________________________________
-3. _________________________________
+
+- __________________________________________________________________________________
+- __________________________________________________________________________________
+- __________________________________________________________________________________
 
 ### MANAGER'S NOTES FOR CONSIDERATION
+
 *Before making your decision, consider:*
+
 - How credible is the employee's explanation?
 - Does their response change the seriousness of the allegations?
 - What evidence supports or contradicts their version?
@@ -3861,20 +3887,27 @@ _________________________________________
 *DO NOT write your decision here - this is just for your own consideration process*
 
 ### MEETING ATTENDEES
+
 Employee: ${data.employeeName}
+
 Manager: ${venueProfile.userName || '[Manager Name]'}
+
 Support Person (if present): _________________________________
+
 Date: ___________________
+
 Time: ___________________
 
 ### NEXT STEPS BEFORE FOLLOW-UP MEETING
+
 *What you need to do before the follow-up meeting:*
-□ Review all evidence and witness statements
-□ Consider the employee's response fairly
-□ Determine if allegations are substantiated
-□ Decide on appropriate outcome (if substantiated)
-□ Prepare outcome letter (if formal warning required)
-□ Schedule follow-up meeting (DONE: [DATE/TIME])
+
+☐ Review all evidence and witness statements
+☐ Consider the employee's response fairly
+☐ Determine if allegations are substantiated
+☐ Decide on appropriate outcome (if substantiated)
+☐ Prepare outcome letter (if formal warning required)
+☐ Schedule follow-up meeting (DONE: [DATE/TIME])
 
 ---
 
@@ -3889,22 +3922,24 @@ Time: ___________________
 ✓ Schedule the follow-up meeting before they leave
 
 **PROCEDURAL FAIRNESS CHECKLIST:**
-□ Employee given 24 hours notice ✓
-□ Employee offered support person ✓
-□ Allegations clearly explained ✓
-□ Employee given genuine opportunity to respond ✓
-□ Employee's response documented ✓
-□ Follow-up meeting scheduled ✓
-□ No decision made during this meeting ✓
+
+☐ Employee given 24 hours notice ✓
+☐ Employee offered support person ✓
+☐ Allegations clearly explained ✓
+☐ Employee given genuine opportunity to respond ✓
+☐ Employee's response documented ✓
+☐ Follow-up meeting scheduled ✓
+☐ No decision made during this meeting ✓
 
 **⚠️ CRITICAL LEGAL REQUIREMENT:**
+
 This meeting is ONLY for gathering information. You MUST take time (24-48 hours) to properly consider the employee's response before making any decision. Failing to do this could result in a finding of unfair dismissal if the matter proceeds to termination.
 
 *If you're unsure how to proceed at any point, pause the meeting and contact Fitzgerald HR: info@fitzgeraldhr.com.au*
 `;
     
     } else if (type === 'letterOfAllegation') {
-        prompt = `You are generating a LETTER OF ALLEGATION for serious workplace misconduct investigation.
+    prompt = `You are generating a LETTER OF ALLEGATION for serious workplace misconduct investigation.
 
 ⚠️ THIS IS HIGH-RISK - MUST BE LEGALLY SOUND
 
@@ -3935,16 +3970,28 @@ Date: ${data.meetingDate}
 Time: ${data.meetingTime}
 Location: ${data.meetingLocation}
 
-Generate a legally compliant Letter of Allegation.
-
 **CRITICAL FORMATTING REQUIREMENTS:**
 1. Use ## for major sections (e.g., ## ALLEGATION DETAILS)
-2. Use blank lines between paragraphs
-3. Use **text** for emphasis
-4. Structure clearly with proper spacing
-5. Each section should be clearly separated
+2. Use blank lines between ALL paragraphs and sections
+3. DO NOT use bold formatting - use plain text only
+4. For lists, use bullet points with "• " prefix
+5. Structure clearly with proper spacing
+6. Separate each major section with a blank line before and after
+7. **ALWAYS add a space after colons in labels** (e.g., "Date: 20 January 2026" not "Date:20 January 2026")
+
+**IMPORTANT: Format lists clearly with bullet points like this:**
+- First item
+- Second item
+- Third item
+
+**IMPORTANT: Always include a space after colons:**
+✓ CORRECT: "Date: 20 January 2026"
+✗ WRONG: "Date:20 January 2026"
+
+Generate a legally compliant Letter of Allegation.
 
 CRITICAL REQUIREMENTS:
+
 1. **Neutral tone** - No presumption of guilt
 2. **Clear process** - Explain investigation steps
 3. **Employee rights**:
@@ -3957,45 +4004,124 @@ CRITICAL REQUIREMENTS:
 7. **Next steps clearly outlined**
 
 Example structure:
+
 # PRIVATE & CONFIDENTIAL
+
 # LETTER OF ALLEGATION
 
 ## DATE AND RECIPIENT
+
 Date: [Date]
+
 Employee Name: [Name]
+
 Position: [Position]
 
+Employment Type: [Type]
+
 ## SUBJECT
+
 Subject: Allegation of [Type] - Investigation Process
 
 ## NATURE OF ALLEGATION
+
 [Factual description - not conclusive]
 
+We have received information regarding an alleged incident of ${data.allegationType} that occurred on or around ${data.incidentDate}.
+
+The allegation is as follows:
+
+${data.allegationDescription}
+
+Please note that this letter does not constitute a finding of guilt or wrongdoing. It is simply to inform you of the allegation and the investigation process that will follow.
+
 ## INVESTIGATION PROCESS
-[Clear explanation of what will happen]
+
+We will be conducting a thorough and fair investigation into this matter. The investigation will include:
+
+- Meeting with you to hear your response to the allegation
+- Reviewing any relevant evidence
+- Speaking with any witnesses (if applicable)
+- Considering all information before making any decision
+
+The investigation will be conducted by: ${data.investigator}
 
 ## SUSPENSION ARRANGEMENTS
-[If applicable - details of suspension and pay status]
+
+${data.suspensionRequired.includes('No suspension') ? 
+  'You are not suspended during this investigation and should continue to attend work as normal.' :
+  data.suspensionRequired.includes('full pay') ?
+  'You are suspended on full pay during this investigation. You should not attend the workplace unless specifically requested. You will continue to receive your normal pay during this period.' :
+  'You are suspended without pay during this investigation due to the serious nature of the alleged misconduct. You should not attend the workplace unless specifically requested.'}
 
 ## INVESTIGATION MEETING
-Date: [Date]
-Time: [Time]
-Location: [Location]
+
+You are required to attend an investigation meeting to respond to this allegation:
+
+Date: ${data.meetingDate}
+
+Time: ${data.meetingTime}
+
+Location: ${data.meetingLocation}
 
 ## YOUR RIGHTS
-- Right to bring a support person
-- Opportunity to respond to allegations
-- Procedural fairness will be maintained
-- You may seek legal advice
+
+You have the following rights during this investigation:
+
+- Right to bring a support person to the meeting (this can be a work colleague, family member, or union representative)
+- Opportunity to respond to the allegations in full
+- Right to provide evidence or witness names that support your version of events
+- Procedural fairness will be maintained throughout the investigation
+- You may seek legal advice if you wish
 
 ## CONFIDENTIALITY
-[Importance of confidentiality during investigation]
+
+This matter is confidential. You must not discuss the allegation or investigation with other employees (except your nominated support person or union representative). Breaching confidentiality may be considered a separate matter of misconduct.
 
 ## NEXT STEPS
-[What happens after the meeting]
+
+After the investigation meeting:
+
+- Your response will be considered along with all other evidence
+- A decision will be made regarding the allegation
+- You will be informed of the outcome in writing
+- If the allegation is substantiated, disciplinary action may be taken, which could include termination of employment
 
 ## CONTACT INFORMATION
-[Who to contact with questions]
+
+If you have any questions about this process or need to discuss the meeting arrangements, please contact:
+
+${venueProfile.userName || '[Manager Name]'}
+
+Email: [email]
+
+Phone: [phone]
+
+We encourage you to seek advice from a union representative or legal advisor if you wish.
+
+---
+
+This is a serious matter and we are committed to conducting a fair and thorough investigation.
+
+Please confirm receipt of this letter and your attendance at the scheduled meeting.
+
+Yours sincerely,
+
+${venueProfile.userName || '[Manager Name]'}
+
+[Title]
+
+${venueProfile.venueName || '[Venue Name]'}
+
+Date: [Date]
+
+---
+
+IMPORTANT LEGAL NOTICE:
+
+This letter must be reviewed by a Fitzgerald HR Senior Consultant before being issued to the employee.
+
+Contact: info@fitzgeraldhr.com.au
 
 Include:
 - PRIVATE & CONFIDENTIAL header
@@ -4008,13 +4134,9 @@ Include:
 - Support person rights
 - Confidentiality requirements
 - Next steps after investigation
-- Advice they can seek legal counsel
 - Signature section
 
 TONE: Professional, neutral, procedurally fair. This is NOT a punishment - it's the start of a fair process.`;
-    }
-    
-    return prompt;
 }
 
 function showDocumentPreview(generatedDoc) {
