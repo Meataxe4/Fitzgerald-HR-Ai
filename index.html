@@ -3227,7 +3227,7 @@ formalWarning: [
         ]
     }
 ],
-letterOfAllegation: [
+    letterOfAllegation: [
     {
         id: 1,
         title: "Employee Details",
@@ -3679,6 +3679,7 @@ function validateFormalWarningProceduralFairness() {
     return true; // Other steps don't need validation
 }
 
+
 function validateLetterOfAllegationMeetingPrep() {
     // Only validate on Step 2 (Meeting Preparation)
     if (documentBuilderState.currentStep !== 2) {
@@ -3739,7 +3740,6 @@ function validateLetterOfAllegationMeetingPrep() {
     
     return true; // Both checks passed
 }
-
 
 function validateRecordOfDiscussionStep2() {
     const notice24hours = documentBuilderState.data.notice24hours;
