@@ -4321,7 +4321,9 @@ async function downloadGeneratedDocument() {
         
         // Track
         trackDocumentGeneration(filename, metadata);
-        logDocumentDownload(metadata);
+        
+        // ✅ CRITICAL: Log the download and update database
+        await logDocumentDownload(metadata);
         
         closeDocumentPreview();
         
@@ -4405,41 +4407,75 @@ async function logDocumentGeneration() {
 
 // Log document download
 async function logDocumentDownload(metadata) {
-    console.log('📥 Logging document download:', metadata);
+    console.log('📥 Logging document download');
+    console.log('📥 Metadata:', metadata);
+    console.log('📥 Current user:', currentUser);
+    console.log('📥 Document type:', documentBuilderState.currentType);
+    console.log('📥 Employee name:', documentBuilderState.data.employeeName);
     
-    const downloadLog = {
-        document_id: metadata.documentId,
-        user_code: currentUser,
-        downloaded_at: new Date().toISOString(),
-        document_type: documentBuilderState.currentType,
-        employee_name: metadata.employeeName
-    };
-    
-    // Update Supabase - set downloaded = true
-    if (supabaseClient) {
-        try {
-            console.log('📥 Updating Supabase downloaded status...');
-            
-            const { data, error } = await supabaseClient
-                .from('generated_documents')
-                .update({ 
-                    downloaded: true, 
-                    downloaded_at: downloadLog.downloaded_at 
-                })
-                .eq('document_id', metadata.documentId)
-                .select();
-            
-            if (error) {
-                console.error('❌ Error updating download status:', error);
-            } else {
-                console.log('✅ Download status updated:', data);
-            }
-        } catch (err) {
-            console.error('❌ Exception updating download status:', err);
-        }
+    if (!supabaseClient) {
+        console.warn('⚠️ Supabase not connected - cannot update download status');
+        return;
     }
     
-    trackEvent('document_downloaded', downloadLog);
+    try {
+        // Find the most recent document for this user with this employee name
+        // (since we just generated it moments ago)
+        const { data: recentDocs, error: fetchError } = await supabaseClient
+            .from('generated_documents')
+            .select('*')
+            .eq('user_code', currentUser)
+            .eq('document_type', documentBuilderState.currentType)
+            .eq('employee_name', documentBuilderState.data.employeeName)
+            .order('generated_at', { ascending: false })
+            .limit(1);
+        
+        if (fetchError) {
+            console.error('❌ Error fetching document:', fetchError);
+            return;
+        }
+        
+        if (!recentDocs || recentDocs.length === 0) {
+            console.error('❌ No matching document found to update');
+            console.error('❌ Search criteria:', {
+                user_code: currentUser,
+                document_type: documentBuilderState.currentType,
+                employee_name: documentBuilderState.data.employeeName
+            });
+            return;
+        }
+        
+        const docToUpdate = recentDocs[0];
+        console.log('📥 Found document to update:', docToUpdate);
+        
+        // Update the downloaded status
+        const { data: updateData, error: updateError } = await supabaseClient
+            .from('generated_documents')
+            .update({ 
+                downloaded: true, 
+                downloaded_at: new Date().toISOString()
+            })
+            .eq('id', docToUpdate.id) // Use the primary key ID
+            .select();
+        
+        if (updateError) {
+            console.error('❌ Error updating download status:', updateError);
+        } else {
+            console.log('✅ Download status updated successfully');
+            console.log('✅ Updated record:', updateData);
+        }
+        
+    } catch (err) {
+        console.error('❌ Exception in logDocumentDownload:', err);
+        console.error('❌ Stack:', err.stack);
+    }
+    
+    // Track event
+    trackEvent('document_downloaded', {
+        user: currentUser,
+        documentType: documentBuilderState.currentType,
+        employeeName: documentBuilderState.data.employeeName
+    });
 }
 
 	// ========================================
