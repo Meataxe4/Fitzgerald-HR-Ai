@@ -4328,12 +4328,14 @@ async function logDocumentGeneration() {
         generated_at: new Date().toISOString(),
         downloaded: false,
         venue_name: venueProfile.venueName || null,
-        venue_location: venueProfile.location || null  // Only this venue field
+        venue_type: venueProfile.venueType || null,  // Changed from venue_location
+        venue_location: venueProfile.location || null,  // State/location
+        venue_city: venueProfile.city || null  // Added city separately
     };
     
     console.log('📝 Logging document generation:', log);
     
-    // Store in localStorage
+    // Store in localStorage (keep as backup)
     const logs = JSON.parse(localStorage.getItem('documentLogs_' + currentUser) || '[]');
     logs.push(log);
     localStorage.setItem('documentLogs_' + currentUser, JSON.stringify(logs));
