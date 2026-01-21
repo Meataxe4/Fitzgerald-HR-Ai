@@ -3096,7 +3096,8 @@ const documentBuilderState = {
     totalSteps: 0,
     data: {},
     generatedDocument: null,
-    isGenerating: false
+    isGenerating: false,
+    lastGeneratedDocId: null
 };
 
 // Document template configurations
@@ -3517,16 +3518,15 @@ async function generateDocumentWithAI() {
         
         documentBuilderState.generatedDocument = response;
         
-        // ✅ LOG BEFORE CALLING
-        console.log('📊 About to log document generation');
-        console.log('📊 Data to log:', {
-            type: documentBuilderState.currentType,
-            employeeName: documentBuilderState.data.employeeName,
-            allData: documentBuilderState.data
-        });
+        // ✅ STORE the document ID that was just logged
+        // This happens BEFORE any resets
+        const logResult = await logDocumentGeneration();
         
-        // Log the generation
-        await logDocumentGeneration();
+        // ✅ Store the database ID so we can update it later
+        if (logResult && logResult.id) {
+            documentBuilderState.lastGeneratedDocId = logResult.id;
+            console.log('✅ Stored document database ID:', logResult.id);
+        }
         
         console.log('✅ Document generation logged successfully');
         
@@ -4354,7 +4354,7 @@ async function logDocumentGeneration() {
     // Validate that we have the required data
     if (!documentBuilderState.currentType) {
         console.error('❌ Cannot log - no document type');
-        return;
+        return null;
     }
     
     const log = {
@@ -4387,75 +4387,55 @@ async function logDocumentGeneration() {
             const { data, error } = await supabaseClient
                 .from('generated_documents')
                 .insert([log])
-                .select(); // ✅ Add .select() to see what was inserted
+                .select(); // ✅ This returns the inserted record including its ID
             
             if (error) {
                 console.error('❌ Supabase insert error:', error);
                 console.error('❌ Error details:', JSON.stringify(error, null, 2));
+                return null;
             } else {
                 console.log('✅ Document logged to Supabase successfully');
                 console.log('✅ Inserted data:', JSON.stringify(data, null, 2));
+                // ✅ Return the inserted record (includes database ID)
+                return data[0];
             }
         } catch (err) {
             console.error('❌ Exception logging to Supabase:', err);
             console.error('❌ Exception stack:', err.stack);
+            return null;
         }
     } else {
         console.warn('⚠️ Supabase not connected - only saved locally');
+        return null;
     }
 }
 
 // Log document download
 async function logDocumentDownload(metadata) {
     console.log('📥 Logging document download');
-    console.log('📥 Metadata:', metadata);
-    console.log('📥 Current user:', currentUser);
-    console.log('📥 Document type:', documentBuilderState.currentType);
-    console.log('📥 Employee name:', documentBuilderState.data.employeeName);
+    console.log('📥 Stored doc ID:', documentBuilderState.lastGeneratedDocId);
     
     if (!supabaseClient) {
         console.warn('⚠️ Supabase not connected - cannot update download status');
         return;
     }
     
+    if (!documentBuilderState.lastGeneratedDocId) {
+        console.error('❌ No document ID stored - cannot update download status');
+        return;
+    }
+    
     try {
-        // Find the most recent document for this user with this employee name
-        // (since we just generated it moments ago)
-        const { data: recentDocs, error: fetchError } = await supabaseClient
-            .from('generated_documents')
-            .select('*')
-            .eq('user_code', currentUser)
-            .eq('document_type', documentBuilderState.currentType)
-            .eq('employee_name', documentBuilderState.data.employeeName)
-            .order('generated_at', { ascending: false })
-            .limit(1);
+        console.log('📥 Updating document ID:', documentBuilderState.lastGeneratedDocId);
         
-        if (fetchError) {
-            console.error('❌ Error fetching document:', fetchError);
-            return;
-        }
-        
-        if (!recentDocs || recentDocs.length === 0) {
-            console.error('❌ No matching document found to update');
-            console.error('❌ Search criteria:', {
-                user_code: currentUser,
-                document_type: documentBuilderState.currentType,
-                employee_name: documentBuilderState.data.employeeName
-            });
-            return;
-        }
-        
-        const docToUpdate = recentDocs[0];
-        console.log('📥 Found document to update:', docToUpdate);
-        
-        // Update the downloaded status
+        // Update the downloaded status using the stored database ID
         const { data: updateData, error: updateError } = await supabaseClient
             .from('generated_documents')
             .update({ 
                 downloaded: true, 
                 downloaded_at: new Date().toISOString()
             })
-            .eq('id', docToUpdate.id) // Use the primary key ID
+            .eq('id', documentBuilderState.lastGeneratedDocId)
             .select();
         
         if (updateError) {
@@ -4463,6 +4443,9 @@ async function logDocumentDownload(metadata) {
         } else {
             console.log('✅ Download status updated successfully');
             console.log('✅ Updated record:', updateData);
+            
+            // Clear the stored ID after successful update
+            documentBuilderState.lastGeneratedDocId = null;
         }
         
     } catch (err) {
@@ -4472,9 +4455,7 @@ async function logDocumentDownload(metadata) {
     
     // Track event
     trackEvent('document_downloaded', {
-        user: currentUser,
-        documentType: documentBuilderState.currentType,
-        employeeName: documentBuilderState.data.employeeName
+        user: currentUser
     });
 }
 
