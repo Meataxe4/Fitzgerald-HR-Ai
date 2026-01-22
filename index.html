@@ -3605,6 +3605,88 @@ function docWizardNext() {
     }
 }
 
+
+function validateFormalWarningProceduralFairness() {
+    // Only validate on Step 1 and Step 2
+    if (documentBuilderState.currentStep === 1) {
+        const completedROD = documentBuilderState.data.completedRecordOfDiscussion;
+        
+        if (completedROD === 'No') {
+            alert(
+                '⚠️ PROCEDURAL FAIRNESS REQUIRED\n\n' +
+                'You MUST complete the Record of Discussion process before issuing a Formal Warning.\n\n' +
+                'This means:\n' +
+                '1. Hold a documented conversation with the employee\n' +
+                '2. Present the allegations/concerns\n' +
+                '3. Give the employee the opportunity to respond\n' +
+                '4. Document their response\n\n' +
+                'Without this step, a Formal Warning may be deemed procedurally unfair.\n\n' +
+                'Please complete the Record of Discussion first.'
+            );
+            
+            trackEvent('procedural_fairness_violation', {
+                user: currentUser,
+                violation: 'rod_not_completed',
+                documentType: 'formalWarning'
+            });
+            
+            documentBuilderState.data.completedRecordOfDiscussion = '';
+            showDocumentStep(documentBuilderState.currentStep);
+            return false;
+        }
+        
+        return true;
+    }
+    
+    if (documentBuilderState.currentStep === 2) {
+        const providedNotice = documentBuilderState.data.providedNotice24hours;
+        const offeredSupport = documentBuilderState.data.offeredSupportPerson;
+        
+        if (providedNotice === 'No') {
+            alert(
+                '⚠️ IMPORTANT: You must provide the employee with 24 hours notice before the outcome meeting.\n\n' +
+                'This is a requirement of procedural fairness.\n\n' +
+                'Please schedule the outcome meeting for at least 24 hours from now before continuing.'
+            );
+            
+            trackEvent('procedural_fairness_violation', {
+                user: currentUser,
+                violation: '24_hour_notice_not_provided',
+                documentType: 'formalWarning'
+            });
+            
+            documentBuilderState.data.providedNotice24hours = '';
+            showDocumentStep(documentBuilderState.currentStep);
+            return false;
+        }
+        
+        if (offeredSupport === 'No') {
+            alert(
+                '⚠️ IMPORTANT: You must offer the employee the right to bring a support person.\n\n' +
+                'A support person can be:\n' +
+                '• A family member or friend\n' +
+                '• A union representative\n' +
+                '• A fellow employee (if appropriate)\n\n' +
+                'Please inform the employee of this right before continuing.'
+            );
+            
+            trackEvent('procedural_fairness_violation', {
+                user: currentUser,
+                violation: 'support_person_not_offered',
+                documentType: 'formalWarning'
+            });
+            
+            documentBuilderState.data.offeredSupportPerson = '';
+            showDocumentStep(documentBuilderState.currentStep);
+            return false;
+        }
+        
+        return true;
+    }
+    
+    return true;
+}
+
 function validateLetterOfAllegationMeetingPrep() {
     // Only validate on Step 2 (Meeting Preparation)
     if (documentBuilderState.currentStep !== 2) {
@@ -7997,3 +8079,4 @@ window.addEventListener('unhandledrejection', function(event) {
 </script>
 </body>
 </html>
+
