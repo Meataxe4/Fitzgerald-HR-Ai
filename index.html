@@ -1096,38 +1096,38 @@
 	    </button>
         </div>
 
-        <!-- Tab Content -->
-        <div id="adminTabContent" class="min-h-[400px]">
-            <!-- Conversations Tab -->
-            <div id="adminConversationsTab" class="admin-tab-content">
-                <div class="bg-slate-900 rounded-lg p-4 mb-4">
-                    <input type="text" id="conversationSearch" placeholder="🔍 Search conversations..." 
-                           onkeyup="filterConversations()"
-                           class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm">
-                </div>
-                <div id="conversationsList" class="space-y-3 max-h-[500px] overflow-y-auto"></div>
-            </div>
-
-            <!-- Themes Tab -->
-            <div id="adminThemesTab" class="admin-tab-content hidden">
-                <div id="themesList" class="space-y-3"></div>
-            </div>
-
-            <!-- Users Tab -->
-            <div id="adminUsersTab" class="admin-tab-content hidden">
-                <div id="usersList" class="space-y-3"></div>
-            </div>
-
-            <!-- High-Risk Tab -->
-            <div id="adminHighRiskTab" class="admin-tab-content hidden">
-                <div id="highRiskList" class="space-y-3"></div>
-            </div>
-
-	    <!-- Documents Tab -->
-		<div id="adminDocumentsTab" class="admin-tab-content hidden">
-    		<div id="documentsList" class="space-y-3"></div>
-	    </div>
+<!-- Tab Content -->
+<div id="adminTabContent" class="min-h-[400px] max-h-[500px] overflow-y-auto">
+    <!-- Conversations Tab -->
+    <div id="adminConversationsTab" class="admin-tab-content">
+        <div class="bg-slate-900 rounded-lg p-4 mb-4">
+            <input type="text" id="conversationSearch" placeholder="🔍 Search conversations..." 
+                   onkeyup="filterConversations()"
+                   class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm">
         </div>
+        <div id="conversationsList" class="space-y-3"></div>
+    </div>
+
+    <!-- Themes Tab -->
+    <div id="adminThemesTab" class="admin-tab-content hidden">
+        <div id="themesList" class="space-y-3"></div>
+    </div>
+
+    <!-- Users Tab -->
+    <div id="adminUsersTab" class="admin-tab-content hidden">
+        <div id="usersList" class="space-y-3"></div>
+    </div>
+
+    <!-- High-Risk Tab -->
+    <div id="adminHighRiskTab" class="admin-tab-content hidden">
+        <div id="highRiskList" class="space-y-3"></div>
+    </div>
+
+    <!-- Documents Tab -->
+    <div id="adminDocumentsTab" class="admin-tab-content hidden">
+        <div id="documentsList" class="space-y-3"></div>
+    </div>
+</div>
 
         <!-- Export Button -->
         <div class="mt-6 flex gap-3">
@@ -1646,7 +1646,7 @@ Be as specific as possible!"></textarea>
             <div class="text-4xl">📋</div>
             <div class="flex-1">
                 <h3 class="text-white font-bold text-lg mb-1">Record of Discussion Template & Script</h3>
-                <p class="text-slate-300 text-sm mb-2">For: Coaching conversations, minor issues, performance discussions</p>
+                <p class="text-slate-300 text-sm mb-2">For: For behaviour and minor misconduct concerns</p>
                 <div class="flex items-center gap-2">
                     <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded">Template + Script</span>
                     <span class="text-slate-500 text-xs">• 3 quick questions • Manager conversation guide</span>
@@ -8574,4 +8574,5 @@ window.addEventListener('unhandledrejection', function(event) {
 </script>
 </body>
 </html>
+
 
