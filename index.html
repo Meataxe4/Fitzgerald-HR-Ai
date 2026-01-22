@@ -1635,64 +1635,80 @@ Be as specific as possible!"></textarea>
             <button onclick="closeToolModal('documentBuilderModal')" class="text-slate-400 hover:text-white text-2xl">×</button>
         </div>
 
-        <!-- Template Selection Screen -->
-        <div id="documentTemplateSelection" class="space-y-4">
-            <p class="text-slate-300 mb-4">Choose a document type:</p>
-            
-            <!-- Record of Discussion -->
-            <button onclick="selectDocumentType('recordOfDiscussion')" 
+<!-- Template Selection Screen -->
+<div id="documentTemplateSelection" class="space-y-4">
+    <p class="text-slate-300 mb-4">Choose a document type:</p>
+    
+    <!-- 1. Record of Discussion - GREEN -->
+    <button onclick="selectDocumentType('recordOfDiscussion')" 
         class="w-full text-left p-6 bg-slate-700 hover:bg-green-600 rounded-lg transition-all border-2 border-transparent hover:border-green-500">
-    <div class="flex items-start gap-4">
-        <div class="text-4xl">📋</div>
-        <div class="flex-1">
-            <h3 class="text-white font-bold text-lg mb-1">Record of Discussion Template & Script</h3>
-            <p class="text-slate-300 text-sm mb-2">For: Coaching conversations, minor issues, performance discussions</p>
-            <div class="flex items-center gap-2">
-                <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded">Template + Script</span>
-                <span class="text-slate-500 text-xs">• 3 quick questions • Manager conversation guide</span>
+        <div class="flex items-start gap-4">
+            <div class="text-4xl">📋</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold text-lg mb-1">Record of Discussion Template & Script</h3>
+                <p class="text-slate-300 text-sm mb-2">For: Coaching conversations, minor issues, performance discussions</p>
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded">Template + Script</span>
+                    <span class="text-slate-500 text-xs">• 3 quick questions • Manager conversation guide</span>
+                </div>
             </div>
         </div>
+    </button>
+
+    <!-- 2. Letter of Allegation - AMBER (MOVED TO 2ND) -->
+    <button onclick="selectDocumentType('letterOfAllegation')" 
+            class="w-full text-left p-6 bg-slate-700 hover:bg-amber-600 rounded-lg transition-all border-2 border-transparent hover:border-amber-500">
+        <div class="flex items-start gap-4">
+            <div class="text-4xl">🔍</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold text-lg mb-1">Letter of Allegation</h3>
+                <p class="text-slate-300 text-sm mb-2">For: Serious misconduct requiring investigation</p>
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-1 bg-amber-500/20 text-amber-400 text-xs rounded font-bold">HIGH RISK</span>
+                    <span class="text-slate-500 text-xs">• 6 questions • Consultant review required</span>
+                </div>
+            </div>
+        </div>
+    </button>
+
+    <!-- 3. Formal Warning - LIGHTER RED (MOVED TO 3RD) -->
+    <button onclick="selectDocumentType('formalWarning')" 
+            class="w-full text-left p-6 bg-slate-700 hover:bg-orange-600 rounded-lg transition-all border-2 border-transparent hover:border-orange-500">
+        <div class="flex items-start gap-4">
+            <div class="text-4xl">⚠️</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold text-lg mb-1">Formal Warning Letter</h3>
+                <p class="text-slate-300 text-sm mb-2">For: Performance/conduct issues requiring formal action</p>
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-1 bg-orange-500/20 text-orange-400 text-xs rounded">Medium Risk</span>
+                    <span class="text-slate-500 text-xs">• 7 questions • AI-enhanced</span>
+                </div>
+            </div>
+        </div>
+    </button>
+
+    <!-- 4. Termination Process - DARK RED (NEW) -->
+    <button onclick="showTerminationConsultantRequired()" 
+            class="w-full text-left p-6 bg-slate-700 hover:bg-red-700 rounded-lg transition-all border-2 border-transparent hover:border-red-600">
+        <div class="flex items-start gap-4">
+            <div class="text-4xl">🚨</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold text-lg mb-1">Termination Process</h3>
+                <p class="text-slate-300 text-sm mb-2">For: Employment termination - requires expert guidance</p>
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-1 bg-red-600/30 text-red-300 text-xs rounded font-bold">CRITICAL RISK</span>
+                    <span class="text-slate-500 text-xs">• Senior Consultant required • Full compliance review</span>
+                </div>
+            </div>
+        </div>
+    </button>
+
+    <div class="mt-6 bg-amber-500/10 border border-amber-500 rounded-lg p-4">
+        <p class="text-amber-300 text-sm">
+            <strong>⚠️ Important:</strong> All generated documents must be reviewed by a Fitzgerald HR consultant before use.
+        </p>
     </div>
-</button>
-
-            <!-- Formal Warning -->
-            <button onclick="selectDocumentType('formalWarning')" 
-                    class="w-full text-left p-6 bg-slate-700 hover:bg-yellow-600 rounded-lg transition-all border-2 border-transparent hover:border-yellow-500">
-                <div class="flex items-start gap-4">
-                    <div class="text-4xl">⚠️</div>
-                    <div class="flex-1">
-                        <h3 class="text-white font-bold text-lg mb-1">Formal Warning Letter</h3>
-                        <p class="text-slate-300 text-sm mb-2">For: Performance/conduct issues requiring formal action</p>
-                        <div class="flex items-center gap-2">
-                            <span class="px-2 py-1 bg-yellow-500/20 text-yellow-400 text-xs rounded">Medium Risk</span>
-                            <span class="text-slate-500 text-xs">• 7 questions • AI-enhanced</span>
-                        </div>
-                    </div>
-                </div>
-            </button>
-
-            <!-- Letter of Allegation -->
-            <button onclick="selectDocumentType('letterOfAllegation')" 
-                    class="w-full text-left p-6 bg-slate-700 hover:bg-red-600 rounded-lg transition-all border-2 border-transparent hover:border-red-500">
-                <div class="flex items-start gap-4">
-                    <div class="text-4xl">🔍</div>
-                    <div class="flex-1">
-                        <h3 class="text-white font-bold text-lg mb-1">Letter of Allegation</h3>
-                        <p class="text-slate-300 text-sm mb-2">For: Serious misconduct requiring investigation</p>
-                        <div class="flex items-center gap-2">
-                            <span class="px-2 py-1 bg-red-500/20 text-red-400 text-xs rounded font-bold">HIGH RISK</span>
-                            <span class="text-slate-500 text-xs">• 6 questions • Consultant review required</span>
-                        </div>
-                    </div>
-                </div>
-            </button>
-
-            <div class="mt-6 bg-amber-500/10 border border-amber-500 rounded-lg p-4">
-                <p class="text-amber-300 text-sm">
-                    <strong>⚠️ Important:</strong> All generated documents must be reviewed by a Fitzgerald HR consultant before use.
-                </p>
-            </div>
-        </div>
+</div>
 
         <!-- Wizard Steps (Hidden initially) -->
         <div id="documentWizardSteps" class="hidden">
@@ -1795,6 +1811,91 @@ Be as specific as possible!"></textarea>
             </div>
         </div>
 
+    </div>
+</div>
+
+<!-- Termination Consultant Required Modal -->
+<div id="terminationConsultantModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border-4 border-red-600 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="text-center mb-6">
+            <div class="text-6xl mb-4">🚨</div>
+            <h2 class="text-3xl font-bold text-red-400 mb-2">Senior Consultant Required</h2>
+            <p class="text-slate-300">Termination is the highest-risk HR decision</p>
+        </div>
+
+        <div class="bg-red-500/10 border-2 border-red-500 rounded-lg p-6 mb-6">
+            <h3 class="text-red-300 font-bold mb-3 flex items-center gap-2">
+                <span>⚖️</span>
+                <span>Why Expert Guidance is Critical:</span>
+            </h3>
+            <ul class="text-red-200 text-sm space-y-2 ml-4">
+                <li>• Unfair dismissal claims can cost $20,000 - $80,000+ in legal fees and compensation</li>
+                <li>• Procedural errors cannot be fixed after termination</li>
+                <li>• General protections claims have severe penalties (up to 6 months salary)</li>
+                <li>• Every termination must follow strict Fair Work procedures</li>
+            </ul>
+        </div>
+
+        <div class="bg-slate-900 rounded-lg p-6 mb-6">
+            <h3 class="text-white font-bold mb-4">📋 Documentation Required:</h3>
+            <div class="space-y-3 text-slate-300 text-sm">
+                <div class="flex items-start gap-3">
+                    <span class="text-amber-400 text-xl">✓</span>
+                    <div>
+                        <p class="font-semibold">Completed Record of Discussion OR Letter of Allegation</p>
+                        <p class="text-slate-400 text-xs">(Depending on severity of misconduct)</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="text-amber-400 text-xl">✓</span>
+                    <div>
+                        <p class="font-semibold">Employee's responses and statements</p>
+                        <p class="text-slate-400 text-xs">(All documentation from investigation/discussion process)</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <span class="text-amber-400 text-xl">✓</span>
+                    <div>
+                        <p class="font-semibold">Evidence</p>
+                        <p class="text-slate-400 text-xs">(Witness statements, CCTV footage, documentation, etc.)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <!-- Risk Assessor Tool -->
+            <button onclick="openTerminationRiskFromModal()" 
+                    class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 px-6 rounded-lg transition-all flex items-center justify-center gap-3">
+                <span class="text-2xl">⚖️</span>
+                <div class="text-left">
+                    <p class="text-lg">Run Termination Risk Assessment</p>
+                    <p class="text-xs opacity-90">Understand your risk level before proceeding</p>
+                </div>
+            </button>
+
+            <!-- Contact Consultant -->
+            <button onclick="openTerminationConsultantEmail()" 
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 px-6 rounded-lg transition-all flex items-center justify-center gap-3">
+                <span class="text-2xl">✉️</span>
+                <div class="text-left">
+                    <p class="text-lg">Contact Senior Consultant</p>
+                    <p class="text-xs opacity-90">Get expert guidance on your termination process</p>
+                </div>
+            </button>
+
+            <!-- Close -->
+            <button onclick="closeTerminationConsultantModal()" 
+                    class="w-full bg-slate-700 hover:bg-slate-600 text-white py-3 px-6 rounded-lg transition-all">
+                Close
+            </button>
+        </div>
+
+        <div class="mt-6 text-center">
+            <p class="text-slate-400 text-sm">
+                📞 Urgent? Call us: <a href="tel:+61400211014" class="text-amber-400 hover:underline font-semibold">+61 400 211 014</a>
+            </p>
+        </div>
     </div>
 </div>
 
@@ -7588,6 +7689,212 @@ document.addEventListener('click', function(event) {
         toolsMenu.classList.add('hidden');
     }
 });
+
+// ========================================
+// TERMINATION PROCESS FUNCTIONS
+// ========================================
+
+function showTerminationConsultantRequired() {
+    // Close document builder
+    closeToolModal('documentBuilderModal');
+    
+    // Show termination consultant modal
+    document.getElementById('terminationConsultantModal').classList.remove('hidden');
+    
+    trackEvent('termination_process_viewed', {
+        user: currentUser,
+        timestamp: new Date().toISOString()
+    });
+}
+
+function closeTerminationConsultantModal() {
+    document.getElementById('terminationConsultantModal').classList.add('hidden');
+}
+
+function openTerminationRiskFromModal() {
+    // Close termination modal
+    closeTerminationConsultantModal();
+    
+    // Open termination risk assessor tool
+    openTool('terminationRisk');
+    
+    trackEvent('termination_risk_opened_from_modal', {
+        user: currentUser
+    });
+}
+
+function openTerminationConsultantEmail() {
+    // Gather venue and user context
+    const venueName = venueProfile.venueName || '[Your Venue Name]';
+    const venueLocation = venueProfile.city ? `${venueProfile.city}, ${venueProfile.location}` : '[Location]';
+    const userName = venueProfile.userName || '[Your Name]';
+    const userCode = currentUser || '[User Code]';
+    
+    // Build comprehensive email with smart pre-population
+    const subject = encodeURIComponent(`URGENT: Termination Guidance Required - ${venueName}`);
+    
+    const body = encodeURIComponent(
+`Dear Fitzgerald HR Senior Consultant,
+
+I require urgent expert guidance on an employment termination process to ensure full compliance with Fair Work requirements and minimize legal risk.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+VENUE DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Venue Name: ${venueName}
+Location: ${venueLocation}
+Contact Name: ${userName}
+User Code: ${userCode}
+Phone: [Your Phone Number]
+Preferred Contact Time: [e.g., 9am-5pm AEDT]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EMPLOYEE DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Employee Name: [Full Name]
+Position: [e.g., Chef, Waiter]
+Employment Type: [Full-Time / Part-Time / Casual]
+Length of Service: [e.g., 2 years 3 months]
+Current Status: [Active / Suspended / On leave]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REASON FOR TERMINATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Primary Reason: [Select one]
+☐ Performance (ongoing underperformance)
+☐ Misconduct (policy breach, insubordination)
+☐ Serious Misconduct (theft, harassment, violence)
+☐ Redundancy (genuine operational reasons)
+☐ Other: [Specify]
+
+Brief Description:
+[Describe the issue in 2-3 sentences - What happened? When? How many times?]
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PROCEDURAL FAIRNESS COMPLETED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☐ Record of Discussion completed (for performance/minor misconduct)
+☐ Letter of Allegation issued (for serious misconduct)
+☐ Verbal warnings given - How many? [   ]
+☐ Written warnings given - How many? [   ]
+☐ Formal investigation conducted
+☐ Employee given opportunity to respond
+☐ Performance Improvement Plan implemented
+
+Date of most recent warning/discussion: [DD/MM/YYYY]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EMPLOYEE'S RESPONSE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Has the employee provided a response/explanation? [Yes / No]
+
+Summary of employee's response:
+[What did they say? Any mitigating circumstances? Acknowledgment of issues?]
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+EVIDENCE AVAILABLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☐ Witness statements - How many? [   ]
+☐ CCTV footage
+☐ Written documentation (emails, messages, reports)
+☐ Time and attendance records
+☐ Customer complaints
+☐ Performance records/KPIs
+☐ Photos/screenshots
+☐ Other: [Specify]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RISK FACTORS (Please check any that apply)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+☐ Employee is pregnant or on parental leave
+☐ Employee has made a workplace complaint recently
+☐ Employee is on workers compensation
+☐ Employee is a union member/delegate
+☐ Employee has raised safety concerns
+☐ Employee has requested flexible work arrangements
+☐ Employee has a disability or ongoing medical condition
+☐ Possible discrimination concerns (age, race, gender, etc.)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+URGENCY & TIMELINE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+When do you plan to terminate? [Date]
+
+Urgency Level:
+☐ Critical (within 24-48 hours)
+☐ Urgent (within 1 week)
+☐ Standard (within 2 weeks)
+
+Reason for urgency:
+[e.g., Workplace safety risk, business continuity, ongoing damage]
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+DOCUMENTATION ATTACHED
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Please attach the following documents to this email:
+☐ Completed Record of Discussion / Letter of Allegation
+☐ All warning letters issued
+☐ Employee's responses/statements
+☐ Witness statements
+☐ Evidence (CCTV, photos, documents)
+☐ Employment contract
+☐ Position description
+☐ Any other relevant documentation
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SPECIFIC QUESTIONS/CONCERNS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[List any specific questions or concerns you have about this termination]
+
+
+
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+I understand that termination carries significant legal risk and I am seeking expert guidance to ensure:
+1. Full compliance with Fair Work procedures
+2. Procedurally fair process is followed
+3. All documentation is legally sound
+4. Risk of unfair dismissal claim is minimized
+
+Please contact me as soon as possible to discuss this matter.
+
+Best regards,
+${userName}
+${venueName}
+`
+    );
+    
+    // Open email client with pre-populated fields
+    const mailtoLink = `mailto:info@fitzgeraldhr.com.au?subject=${subject}&body=${body}`;
+    window.location.href = mailtoLink;
+    
+    // Track event
+    trackEvent('termination_consultant_email_opened', {
+        user: currentUser,
+        venue: venueName,
+        timestamp: new Date().toISOString()
+    });
+    
+    // Show confirmation
+    setTimeout(() => {
+        alert(
+            '✉️ Email Template Opened\n\n' +
+            'Your email client should open with a pre-filled template.\n\n' +
+            'Please:\n' +
+            '1. Complete all [ ] fields\n' +
+            '2. Attach required documentation\n' +
+            '3. Review and send\n\n' +
+            'A Senior Consultant will respond within 2 business hours.'
+        );
+    }, 500);
+    
+    // Close modal
+    closeTerminationConsultantModal();
+}
 
 // ========================================
 // INITIALIZATION
