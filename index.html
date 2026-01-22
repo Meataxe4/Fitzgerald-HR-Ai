@@ -1655,7 +1655,24 @@ Be as specific as possible!"></textarea>
         </div>
     </button>
 
-    <!-- 2. Letter of Allegation - AMBER (MOVED TO 2ND) -->
+
+    <!-- 2. Performance Improvement Plan - BLUE (NEW) -->
+    <button onclick="selectDocumentType('performanceImprovementPlan')" 
+            class="w-full text-left p-6 bg-slate-700 hover:bg-blue-600 rounded-lg transition-all border-2 border-transparent hover:border-blue-500">
+        <div class="flex items-start gap-4">
+            <div class="text-4xl">📊</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold text-lg mb-1">Performance Improvement Plan (PIP)</h3>
+                <p class="text-slate-300 text-sm mb-2">For: Structured 12-week performance improvement process</p>
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded">12-Week Process</span>
+                    <span class="text-slate-500 text-xs">• 8 questions • SMART goals • Weekly check-ins</span>
+                </div>
+            </div>
+        </div>
+    </button>
+
+    <!-- 3. Letter of Allegation - AMBER (MOVED TO 2ND) -->
     <button onclick="selectDocumentType('letterOfAllegation')" 
             class="w-full text-left p-6 bg-slate-700 hover:bg-amber-600 rounded-lg transition-all border-2 border-transparent hover:border-amber-500">
         <div class="flex items-start gap-4">
@@ -1671,7 +1688,7 @@ Be as specific as possible!"></textarea>
         </div>
     </button>
 
-    <!-- 3. Formal Warning - LIGHTER RED (MOVED TO 3RD) -->
+    <!-- 4. Formal Warning - LIGHTER RED (MOVED TO 3RD) -->
     <button onclick="selectDocumentType('formalWarning')" 
             class="w-full text-left p-6 bg-slate-700 hover:bg-orange-600 rounded-lg transition-all border-2 border-transparent hover:border-orange-500">
         <div class="flex items-start gap-4">
@@ -1687,7 +1704,7 @@ Be as specific as possible!"></textarea>
         </div>
     </button>
 
-    <!-- 4. Termination Process - DARK RED (NEW) -->
+    <!-- 5. Termination Process - DARK RED (NEW) -->
     <button onclick="showTerminationConsultantRequired()" 
             class="w-full text-left p-6 bg-slate-700 hover:bg-red-700 rounded-lg transition-all border-2 border-transparent hover:border-red-600">
         <div class="flex items-start gap-4">
@@ -3328,6 +3345,135 @@ formalWarning: [
         ]
     }
 ],
+
+    performanceImprovementPlan: [
+        // Step 1: Employee Details
+        {
+            id: 1,
+            title: "Employee Details",
+            fields: [
+                { name: "employeeName", label: "Employee's full name", type: "text", required: true, placeholder: "e.g., Sarah Johnson" },
+                { name: "position", label: "Position/Role", type: "text", required: true, placeholder: "e.g., Waiter" },
+                { name: "employmentType", label: "Employment Type", type: "select", 
+                  options: ["Full-Time", "Part-Time", "Casual"], required: true },
+                { name: "managerName", label: "Manager/Supervisor Name", type: "text", required: true, placeholder: "Your name" }
+            ]
+        },
+        
+        // Step 2: Performance Issues (Data-Driven)
+        {
+            id: 2,
+            title: "Performance Issues - Be Specific",
+            fields: [
+                { name: "performanceIssue1", label: "Issue #1 - What specific performance problem?", 
+                  type: "textarea", required: true, rows: 3,
+                  placeholder: "e.g., Slow service - average drink prep time is 4 minutes vs team average of 2.5 minutes" },
+                { name: "performanceData1", label: "What data/evidence supports this?", 
+                  type: "textarea", required: true, rows: 2,
+                  placeholder: "e.g., Till data shows 12 customer complaints in last month about wait times. Guest review average 2.8/5 stars." },
+                { name: "performanceIssue2", label: "Issue #2 (optional)", 
+                  type: "textarea", required: false, rows: 3,
+                  placeholder: "e.g., Order accuracy errors - 15% error rate vs team average of 3%" },
+                { name: "performanceData2", label: "Data/evidence for Issue #2", 
+                  type: "textarea", required: false, rows: 2,
+                  placeholder: "e.g., POS system shows 18 incorrect orders in last 2 weeks" }
+            ]
+        },
+        
+        // Step 3: SMART Goals
+        {
+            id: 3,
+            title: "SMART Goals - What Must Improve?",
+            fields: [
+                { name: "goal1", label: "Goal #1 (Specific, Measurable, Achievable, Relevant, Time-bound)", 
+                  type: "textarea", required: true, rows: 3,
+                  placeholder: "e.g., Reduce average drink preparation time from 4 minutes to 2.5 minutes within 4 weeks" },
+                { name: "goal2", label: "Goal #2 (if applicable)", 
+                  type: "textarea", required: false, rows: 3,
+                  placeholder: "e.g., Achieve order accuracy of 97% or higher (max 1 error per 30 orders) within 8 weeks" },
+                { name: "goal3", label: "Goal #3 (if applicable)", 
+                  type: "textarea", required: false, rows: 3,
+                  placeholder: "e.g., Improve guest satisfaction score to 4.2/5 or higher within 12 weeks" }
+            ]
+        },
+        
+        // Step 4: Action Plan & Support
+        {
+            id: 4,
+            title: "Action Plan - How Will We Help Them Improve?",
+            fields: [
+                { name: "trainingProvided", label: "What training/coaching will be provided?", 
+                  type: "textarea", required: true, rows: 4,
+                  placeholder: "e.g., \n• 2-hour cocktail making refresher course (Week 1)\n• Shadow experienced bartender for 3 shifts (Week 2)\n• Daily 15-min coaching sessions with supervisor (Weeks 1-4)\n• Access to online mixology tutorials" },
+                { name: "resourcesProvided", label: "What resources/tools will be provided?", 
+                  type: "textarea", required: true, rows: 3,
+                  placeholder: "e.g., Recipe cards, speed pouring practice kit, timer for self-monitoring" },
+                { name: "managerSupport", label: "What will the manager/supervisor do to support?", 
+                  type: "textarea", required: true, rows: 3,
+                  placeholder: "e.g., Weekly one-on-one check-ins, real-time feedback during shifts, track progress data" }
+            ]
+        },
+        
+        // Step 5: Employee Responsibilities
+        {
+            id: 5,
+            title: "Employee Responsibilities",
+            fields: [
+                { name: "employeeActions", label: "What is the employee expected to do?", 
+                  type: "textarea", required: true, rows: 4,
+                  placeholder: "e.g., \n• Attend all scheduled training sessions\n• Practice drink preparation techniques during quiet periods\n• Review recipe cards before each shift\n• Ask for help when unsure\n• Track own times and report progress weekly" }
+            ]
+        },
+        
+        // Step 6: Review Schedule
+        {
+            id: 6,
+            title: "Review Schedule & Timeline",
+            fields: [
+                { name: "pipStartDate", label: "PIP Start Date", type: "date", required: true },
+                { name: "weeklyCheckins", label: "Weekly check-in day/time", type: "text", required: true, 
+                  placeholder: "e.g., Every Monday at 10am" },
+                { name: "week4ReviewDate", label: "Week 4 Formal Review Date", type: "date", required: true },
+                { name: "week8ReviewDate", label: "Week 8 Formal Review Date", type: "date", required: true },
+                { name: "week12ReviewDate", label: "Week 12 Final Review Date", type: "date", required: true }
+            ]
+        },
+        
+        // Step 7: Consequences
+        {
+            id: 7,
+            title: "Consequences - What Happens If No Improvement?",
+            fields: [
+                { name: "week4Consequence", label: "If no significant improvement by Week 4:", 
+                  type: "select", required: true,
+                  options: ["First Formal Warning for Performance", "Extend PIP by 4 weeks with modified goals", "Other (specify in notes)"] },
+                { name: "week8Consequence", label: "If no significant improvement by Week 8:", 
+                  type: "select", required: true,
+                  options: ["Second Formal Warning for Performance", "Final Written Warning", "Other (specify in notes)"] },
+                { name: "week12Consequence", label: "If no significant improvement by Week 12:", 
+                  type: "select", required: true,
+                  options: ["Termination of employment", "Demotion to different role", "Extended PIP (only if substantial progress made)", "Other (specify in notes)"] },
+                { name: "consequenceNotes", label: "Additional notes on consequences (optional)", 
+                  type: "textarea", required: false, rows: 2 }
+            ]
+        },
+        
+        // Step 8: Final Confirmation
+        {
+            id: 8,
+            title: "Final Confirmation",
+            fields: [
+                { name: "pipDiscussed", label: "Have you discussed this PIP with the employee before creating it?", 
+                  type: "radio", options: ["Yes - we've had a preliminary discussion", "No - this is the first formal step"], required: true },
+                { name: "supportPersonOffered", label: "Will you offer the employee the right to have a support person when presenting the PIP?", 
+                  type: "radio", options: ["Yes", "No"], required: true },
+                { name: "additionalNotes", label: "Any additional notes or context?", 
+                  type: "textarea", required: false, rows: 3,
+                  placeholder: "Optional: Any other relevant information" }
+            ]
+        }
+    ],
+
     letterOfAllegation: [
         {
             id: 1,
@@ -4472,6 +4618,352 @@ Include:
 
 TONE: Professional, neutral, procedurally fair. This is NOT a punishment - it's the start of a fair process.`;
 	}
+
+    } else if (type === 'performanceImprovementPlan') {
+        prompt = `You are generating a PERFORMANCE IMPROVEMENT PLAN (PIP) for Australian hospitality HR.
+
+⚠️ THIS IS A FORMAL 12-WEEK STRUCTURED PROCESS
+
+VENUE CONTEXT:
+${venueContext}
+Award: Hospitality Industry (General) Award MA000009
+Manager: ${data.managerName || venueProfile.userName || '[Manager Name]'}
+
+EMPLOYEE DETAILS:
+- Name: ${data.employeeName}
+- Position: ${data.position}
+- Employment Type: ${data.employmentType}
+
+PERFORMANCE ISSUES IDENTIFIED:
+Issue #1: ${data.performanceIssue1}
+Evidence: ${data.performanceData1}
+
+${data.performanceIssue2 ? `Issue #2: ${data.performanceIssue2}\nEvidence: ${data.performanceData2}` : ''}
+
+SMART GOALS SET:
+Goal #1: ${data.goal1}
+${data.goal2 ? `Goal #2: ${data.goal2}` : ''}
+${data.goal3 ? `Goal #3: ${data.goal3}` : ''}
+
+ACTION PLAN:
+Training/Coaching: ${data.trainingProvided}
+Resources: ${data.resourcesProvided}
+Manager Support: ${data.managerSupport}
+
+EMPLOYEE RESPONSIBILITIES:
+${data.employeeActions}
+
+TIMELINE:
+- PIP Start: ${data.pipStartDate}
+- Weekly Check-ins: ${data.weeklyCheckins}
+- Week 4 Review: ${data.week4ReviewDate}
+- Week 8 Review: ${data.week8ReviewDate}
+- Week 12 Final Review: ${data.week12ReviewDate}
+
+CONSEQUENCES:
+- Week 4: ${data.week4Consequence}
+- Week 8: ${data.week8Consequence}
+- Week 12: ${data.week12Consequence}
+${data.consequenceNotes ? `Notes: ${data.consequenceNotes}` : ''}
+
+**CRITICAL FORMATTING REQUIREMENTS:**
+1. Use ## for major sections (e.g., ## PERFORMANCE ISSUES)
+2. Use blank lines between ALL paragraphs and sections
+3. DO NOT use **bold** formatting - use plain text only
+4. For lists, use bullet points with "• " prefix
+5. Structure clearly with proper spacing
+6. **ALWAYS add a space after colons in labels** (e.g., "Date: 20 January 2026" not "Date:20 January 2026")
+
+Generate a complete, professionally structured 12-Week Performance Improvement Plan.
+
+REQUIREMENTS:
+
+1. **Professional business document format**
+2. **Clear structure** with these sections:
+   - Header (CONFIDENTIAL - PERFORMANCE IMPROVEMENT PLAN)
+   - Employee and Manager Details
+   - Purpose of PIP
+   - Performance Issues Identified (with data/evidence)
+   - SMART Goals (numbered, clear, measurable)
+   - Action Plan (detailed steps, training, resources)
+   - Roles and Responsibilities (Manager & Employee tables)
+   - Timeline and Review Schedule (12-week calendar)
+   - Progress Measurement (how success will be tracked)
+   - Consequences (staged - Week 4, 8, 12)
+   - Support Available
+   - Employee Acknowledgment Section
+   - Signature Blocks
+
+3. **Use a supportive but clear tone** - this is to help the employee succeed, not punish them
+4. **Make goals SMART** - expand on the brief goals provided with more specific detail
+5. **Weekly check-in template** - provide a simple weekly check-in form at the end
+6. **Be specific about consequences** but frame as progressive steps
+7. **Include measurement criteria** for each goal
+
+Example structure:
+
+# CONFIDENTIAL
+
+# PERFORMANCE IMPROVEMENT PLAN
+
+## EMPLOYEE DETAILS
+
+Employee Name: ${data.employeeName}
+
+Position: ${data.position}
+
+Employment Type: ${data.employmentType}
+
+Manager/Supervisor: ${data.managerName}
+
+PIP Start Date: ${data.pipStartDate}
+
+PIP Duration: 12 weeks
+
+## PURPOSE OF THIS PERFORMANCE IMPROVEMENT PLAN
+
+This Performance Improvement Plan (PIP) has been developed to support ${data.employeeName} in addressing performance concerns and achieving the expected standards for the ${data.position} role.
+
+The purpose of this plan is to:
+
+- Clearly identify the specific performance issues that need improvement
+- Set measurable goals with realistic timeframes
+- Provide structured support, training, and resources
+- Establish regular check-ins and feedback mechanisms
+- Outline the consequences if performance does not improve
+
+This is a supportive process designed to help you succeed. We are committed to providing you with the tools, training, and support needed to meet these goals.
+
+## PERFORMANCE ISSUES IDENTIFIED
+
+The following performance issues have been identified based on objective data and observations:
+
+### Issue 1: [Expand on ${data.performanceIssue1}]
+
+Evidence:
+
+- ${data.performanceData1}
+
+Impact: [Explain how this impacts the business, team, or customers]
+
+### Issue 2: [If applicable - expand on ${data.performanceIssue2}]
+
+Evidence:
+
+- ${data.performanceData2}
+
+Impact: [Explain impact]
+
+## SMART GOALS
+
+To address these performance issues, the following SMART goals have been established:
+
+### Goal 1: [Expand ${data.goal1}]
+
+- Specific: [What exactly needs to improve]
+- Measurable: [How will we measure success - specific numbers/metrics]
+- Achievable: [Why this is realistic given training and support]
+- Relevant: [How this relates to role expectations]
+- Time-bound: [Specific deadline - Week 4, 8, or 12]
+
+Success Criteria: [Define what "success" looks like - be very specific]
+
+### Goal 2: [If applicable]
+
+[Same structure as Goal 1]
+
+### Goal 3: [If applicable]
+
+[Same structure as Goal 1]
+
+## ACTION PLAN
+
+To help you achieve these goals, we will provide the following support:
+
+### Training and Development
+
+${data.trainingProvided}
+
+### Resources and Tools
+
+${data.resourcesProvided}
+
+### Manager/Supervisor Support
+
+${data.managerSupport}
+
+## ROLES AND RESPONSIBILITIES
+
+### Employee Responsibilities
+
+You are expected to:
+
+${data.employeeActions}
+
+### Manager/Supervisor Responsibilities
+
+Your manager/supervisor will:
+
+- Conduct weekly check-in meetings on ${data.weeklyCheckins}
+- Provide regular feedback and coaching
+- Track progress toward goals
+- Remove barriers to success where possible
+- Conduct formal reviews at Week 4, Week 8, and Week 12
+- Maintain confidentiality of this process
+
+## TIMELINE AND REVIEW SCHEDULE
+
+This is a 12-week structured process with regular check-ins and formal reviews:
+
+### Weekly Check-ins
+
+When: ${data.weeklyCheckins}
+
+Purpose: Quick progress check, address questions, provide feedback
+
+Duration: 15-30 minutes
+
+### Formal Review Points
+
+Week 4 Review: ${data.week4ReviewDate}
+
+Purpose: Assess progress on goals, adjust plan if needed, determine next steps
+
+Week 8 Review: ${data.week8ReviewDate}
+
+Purpose: Mid-point assessment, confirm trajectory, address any challenges
+
+Week 12 Final Review: ${data.week12ReviewDate}
+
+Purpose: Final assessment of overall performance improvement
+
+## PROGRESS MEASUREMENT
+
+Progress will be measured using the following methods:
+
+- [Specific metrics for Goal 1 - e.g., till data, customer feedback scores]
+- [Specific metrics for Goal 2 - e.g., accuracy reports, manager observations]
+- [Specific metrics for Goal 3 - e.g., review ratings, speed measurements]
+- Direct observation and feedback from managers and team members
+- Customer feedback and reviews
+- Self-assessment and reflection
+
+Data will be collected weekly and reviewed at each check-in.
+
+## CONSEQUENCES OF NON-IMPROVEMENT
+
+This PIP is designed to support your success. However, if performance does not improve significantly, the following consequences will apply:
+
+### Week 4 Review
+
+If there is no significant improvement by Week 4:
+
+${data.week4Consequence}
+
+### Week 8 Review
+
+If there is no significant improvement by Week 8:
+
+${data.week8Consequence}
+
+### Week 12 Final Review
+
+If performance standards have not been met by Week 12:
+
+${data.week12Consequence}
+
+${data.consequenceNotes ? `Additional notes: ${data.consequenceNotes}` : ''}
+
+"Significant improvement" means demonstrable progress toward the stated goals as measured by the agreed metrics and criteria.
+
+## SUPPORT AVAILABLE
+
+We want you to succeed. If you are struggling or need additional support at any time:
+
+- Speak with your manager/supervisor immediately
+- Request additional training or resources if needed
+- Ask questions if goals or expectations are unclear
+- Seek support from HR if you have concerns about the process
+
+You have the right to have a support person present at any formal review meeting. This can be a work colleague, family member, or union representative.
+
+## CONFIDENTIALITY
+
+This Performance Improvement Plan is confidential. You should not discuss the details of this plan with other employees (except your nominated support person or union representative).
+
+## EMPLOYEE ACKNOWLEDGMENT
+
+I acknowledge that:
+
+- I have received and read this Performance Improvement Plan
+- The performance issues and expectations have been clearly explained to me
+- I understand the goals I am expected to achieve
+- I understand the support and resources that will be provided
+- I understand the timeline and review process
+- I understand the consequences if my performance does not improve
+- I have been offered the right to have a support person present at review meetings
+- I have had the opportunity to ask questions about this plan
+
+This acknowledgment does not mean I agree with all aspects of this plan, but confirms I understand it.
+
+Employee Signature: _________________________ Date: __________
+
+Manager/Supervisor Signature: _________________________ Date: __________
+
+---
+
+## WEEKLY CHECK-IN TEMPLATE
+
+Week Number: _____     Date: __________
+
+Goals Review:
+
+Goal 1 Progress:
+
+- Current status: [On track / Behind / Ahead]
+- Evidence of progress:
+- Challenges faced:
+- Support needed:
+
+Goal 2 Progress:
+
+- Current status: [On track / Behind / Ahead]
+- Evidence of progress:
+- Challenges faced:
+- Support needed:
+
+Action Items for Next Week:
+
+1. ___________________________________
+2. ___________________________________
+3. ___________________________________
+
+Employee Comments:
+
+__________________________________________
+
+Manager Comments:
+
+__________________________________________
+
+Employee Signature: _______________ Date: ______
+
+Manager Signature: _______________ Date: ______
+
+---
+
+**IMPORTANT REMINDER:**
+
+This PIP must be reviewed by a Fitzgerald HR Senior Consultant before presenting to the employee to ensure it is legally compliant and procedurally fair.
+
+Contact: info@fitzgeraldhr.com.au
+
+Format as a complete, professional business document with clear structure and spacing.
+
+This is a SUPPORTIVE document - the tone should be firm but encouraging. The goal is to help the employee succeed, not to create a paper trail for termination (although it may be used that way if improvement doesn't occur).
+
+DO NOT add fictional details. Use the specific information provided. Expand and add professional context where appropriate.`;
+    }
 
     return prompt;
 }
@@ -6236,23 +6728,26 @@ async function loadDocuments() {
         `;
         
         // Document type emoji and name mapping
-        const typeEmoji = {
-            formalWarning: '⚠️',
-            recordOfDiscussion: '📋',
-            letterOfAllegation: '🔍'
-        };
-        
-        const typeName = {
-            formalWarning: 'Formal Warning',
-            recordOfDiscussion: 'Record of Discussion',
-            letterOfAllegation: 'Letter of Allegation'
-        };
-        
-        const typeColor = {
-            formalWarning: 'yellow',
-            recordOfDiscussion: 'green',
-            letterOfAllegation: 'red'
-        };
+	const typeEmoji = {
+          formalWarning: '⚠️',
+          recordOfDiscussion: '📋',
+          performanceImprovementPlan: '📊',  // NEW
+          letterOfAllegation: '🔍'
+	};
+
+	const typeName = {
+          formalWarning: 'Formal Warning',
+          recordOfDiscussion: 'Record of Discussion',
+          performanceImprovementPlan: 'Performance Improvement Plan',  // NEW
+          letterOfAllegation: 'Letter of Allegation'
+	};
+
+	const typeColor = {
+    	  formalWarning: 'yellow',
+    	  recordOfDiscussion: 'green',
+    	  performanceImprovementPlan: 'blue',  // NEW
+    	  letterOfAllegation: 'red'
+	};
         
         // Document list
         documents.forEach(doc => {
@@ -8079,4 +8574,3 @@ window.addEventListener('unhandledrejection', function(event) {
 </script>
 </body>
 </html>
-
