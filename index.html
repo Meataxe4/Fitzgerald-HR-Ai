@@ -2753,23 +2753,55 @@ async function generatePDFDocument(content, filename = 'document.pdf', metadata 
         // SMART DOCUMENT DETECTION & BUTTONS
         // ========================================
         
-        function detectDocumentType(content) {
-            const lowerContent = content.toLowerCase();
-            
-            const documentKeywords = {
-                'employmentContract': ['employment contract', 'hire', 'new employee', 'employment agreement', 'contract of employment'],
-                'warningLetter': ['warning', 'disciplinary', 'performance issue', 'misconduct', 'written warning'],
-                'performanceReview': ['performance review', 'performance appraisal', 'performance evaluation', 'annual review']
-            };
-            
-            for (const [docType, keywords] of Object.entries(documentKeywords)) {
-                if (keywords.some(keyword => lowerContent.includes(keyword))) {
-                    return docType;
-                }
-            }
-            
-            return null;
+function detectDocumentType(content) {
+    const lowerContent = content.toLowerCase();
+    
+    const documentKeywords = {
+        'warningLetter': [
+            'warning letter', 
+            'formal warning', 
+            'written warning', 
+            'discipline', 
+            'disciplinary action',
+            'performance issue',
+            'misconduct',
+            'final warning',
+            'first warning',
+            'issue a warning',
+            'give a warning'
+        ],
+        'employmentContract': [
+            'employment contract', 
+            'hire', 
+            'new employee',
+            'employment agreement',
+            'contract of employment',
+            'offer letter'
+        ],
+        'performanceReview': [
+            'performance review', 
+            'performance appraisal', 
+            'performance evaluation', 
+            'annual review',
+            'performance meeting'
+        ]
+    };
+    
+    // Count matches for each document type
+    let maxMatches = 0;
+    let detectedType = null;
+    
+    for (const [docType, keywords] of Object.entries(documentKeywords)) {
+        const matches = keywords.filter(keyword => lowerContent.includes(keyword)).length;
+        if (matches > maxMatches) {
+            maxMatches = matches;
+            detectedType = docType;
         }
+    }
+    
+    // Only return if we have at least one strong match
+    return maxMatches > 0 ? detectedType : null;
+}
         
         function extractDataFromConversation(messages, documentType) {
             // Parse conversation to extract relevant data
@@ -5180,18 +5212,94 @@ function detectDocumentType(content) {
 
 function addDocumentDownloadButtons(messageDiv, documentType) {
     const buttonContainer = document.createElement('div');
-    buttonContainer.className = 'mt-4 p-4 bg-slate-700/50 rounded-lg border border-amber-500/30';
-    buttonContainer.innerHTML = `
-        <p class="text-amber-400 font-semibold mb-3">📄 Generate Document</p>
-        <div class="flex gap-2">
-            <button onclick="downloadDocument('${documentType}', 'word')" 
-                    class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm">
-                📝 Download Word
-            </button>
-        </div>
-        <p class="text-xs text-slate-400 mt-3">⚠️ Must be reviewed by consultant before use</p>
-    `;
+    buttonContainer.className = 'mt-4 p-4 bg-amber-500/10 border-l-4 border-amber-500 rounded-r-lg';
+    
+    // Map old document types to new builder types
+    const typeMapping = {
+        'employmentContract': null, // Not in builder yet
+        'warningLetter': 'formalWarning',
+        'performanceReview': null // Not in builder yet
+    };
+    
+    const builderType = typeMapping[documentType];
+    
+    if (builderType) {
+        buttonContainer.innerHTML = `
+            <div class="flex items-start gap-3">
+                <span class="text-2xl">📝</span>
+                <div class="flex-1">
+                    <p class="text-amber-400 font-semibold mb-2">Document Builder Available</p>
+                    <p class="text-slate-300 text-sm mb-3">I can help you create this document with step-by-step guidance.</p>
+                    <button onclick="openDocumentBuilderForType('${builderType}')" 
+                            class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2">
+                        <span>📄</span>
+                        <span>Open Document Builder</span>
+                    </button>
+                    <p class="text-xs text-slate-400 mt-2 text-center">AI-powered • Step-by-step • Professional output</p>
+                </div>
+            </div>
+        `;
+    } else {
+        // Fallback for document types not yet in builder
+        buttonContainer.innerHTML = `
+            <div class="flex items-start gap-3">
+                <span class="text-2xl">📧</span>
+                <div class="flex-1">
+                    <p class="text-amber-400 font-semibold mb-2">Professional Document Required</p>
+                    <p class="text-slate-300 text-sm mb-3">For this document type, please contact our Senior Consultants for a customized template.</p>
+                    <a href="mailto:info@fitzgeraldhr.com.au?subject=Document Request - ${documentType}" 
+                       class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2 block">
+                        <span>✉️</span>
+                        <span>Contact Consultant</span>
+                    </a>
+                </div>
+            </div>
+        `;
+    }
+    
     messageDiv.querySelector('.max-w-3xl').appendChild(buttonContainer);
+}
+
+function openDocumentBuilderForType(documentType) {
+    console.log('📄 Opening Document Builder for type:', documentType);
+    
+    // Close any open modals first
+    const openModals = document.querySelectorAll('.fixed.inset-0:not(.hidden)');
+    openModals.forEach(modal => modal.classList.add('hidden'));
+    
+    // Reset document builder state
+    documentBuilderState.currentType = documentType;
+    documentBuilderState.currentStep = 1;
+    documentBuilderState.data = {};
+    documentBuilderState.totalSteps = documentWizardSteps[documentType].length;
+    documentBuilderState.generatedDocument = null;
+    documentBuilderState.isGenerating = false;
+    
+    // Open the document builder modal
+    document.getElementById('documentBuilderModal').classList.remove('hidden');
+    
+    // Hide template selection, show wizard directly
+    document.getElementById('documentTemplateSelection').classList.add('hidden');
+    document.getElementById('documentWizardSteps').classList.remove('hidden');
+    document.getElementById('documentGenerating').classList.add('hidden');
+    
+    // Update progress
+    document.getElementById('docTotalSteps').textContent = documentBuilderState.totalSteps;
+    document.getElementById('docCurrentStep').textContent = '1';
+    document.getElementById('docProgress').textContent = '0% Complete';
+    document.getElementById('docProgressBar').style.width = '0%';
+    
+    // Show first step
+    showDocumentStep(1);
+    
+    // Track event
+    trackEvent('document_builder_opened_from_chat', {
+        user: currentUser,
+        documentType: documentType,
+        source: 'ai_suggestion'
+    });
+    
+    console.log('✅ Document Builder opened for:', documentType);
 }
 
 function downloadDocument(documentType, format) {
@@ -7997,3 +8105,4 @@ window.addEventListener('unhandledrejection', function(event) {
 </script>
 </body>
 </html>
+
