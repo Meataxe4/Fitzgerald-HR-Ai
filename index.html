@@ -2055,6 +2055,114 @@ let analyticsData = {
 };
 
 // ========================================
+// ENHANCED DOCUMENT BUILDER DETECTION
+// ========================================
+
+/**
+ * Detects if user message requires Document Builder tool
+ * Returns tool suggestion object or null
+ */
+function detectDocumentBuilderNeed(message) {
+    const lowerMessage = message.toLowerCase();
+    
+    const documentTriggers = {
+        formalWarning: {
+            keywords: ['formal warning', 'written warning', 'issue a warning', 'give a warning', 'write a warning', 'warning letter'],
+            title: 'Formal Warning Required',
+            description: 'Use Document Builder to create a legally compliant formal warning letter'
+        },
+        recordOfDiscussion: {
+            keywords: ['record of discussion', 'document conversation', 'discussion meeting', 'talk to employee about', 'rod'],
+            title: 'Record of Discussion',
+            description: 'Use Document Builder to create a record of discussion template with conversation script'
+        },
+        performanceImprovementPlan: {
+            keywords: ['performance improve', 'pip', 'performance plan', 'underperforming', 'performance manage', 'performance issue'],
+            title: 'Performance Improvement Plan',
+            description: 'Use Document Builder to create a structured 12-week performance improvement plan'
+        },
+        letterOfAllegation: {
+            keywords: ['investigate', 'serious misconduct', 'allegation', 'suspend', 'investigation'],
+            title: 'Letter of Allegation',
+            description: 'Use Document Builder for serious misconduct investigation process'
+        },
+        termination: {
+            keywords: ['terminate', 'termination', 'fire', 'dismiss', 'dismissal', 'sack', 'let go', 'end employment'],
+            title: 'Termination Process',
+            description: 'CRITICAL: Senior Consultant guidance required for termination'
+        }
+    };
+    
+    for (const [type, config] of Object.entries(documentTriggers)) {
+        if (config.keywords.some(keyword => lowerMessage.includes(keyword))) {
+            return {
+                type: type,
+                title: config.title,
+                description: config.description,
+                isTermination: type === 'termination'
+            };
+        }
+    }
+    
+    return null;
+}
+
+/**
+ * Creates Document Builder suggestion box for message
+ */
+function createDocumentBuilderSuggestion(detection) {
+    if (detection.isTermination) {
+        return `<div class="mb-4 p-4 bg-red-500/10 border-l-4 border-red-500 rounded-r-lg">
+            <p class="text-red-400 font-bold mb-2 flex items-center gap-2">
+                <span>🚨</span>
+                <span>${detection.title}</span>
+            </p>
+            <p class="text-red-300 text-sm mb-3">
+                Employment termination requires expert guidance to avoid legal risk.
+            </p>
+            <button onclick="showTerminationConsultantRequired()" 
+                    class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2">
+                <span>⚖️</span>
+                <span>View Termination Requirements</span>
+            </button>
+        </div>`;
+    }
+    
+    return `<div class="mb-4 p-4 bg-blue-500/10 border-l-4 border-blue-500 rounded-r-lg">
+        <p class="text-blue-400 font-bold mb-2 flex items-center gap-2">
+            <span>📝</span>
+            <span>${detection.title}</span>
+        </p>
+        <p class="text-blue-300 text-sm mb-3">${detection.description}</p>
+        <button onclick="openDocumentBuilderFor('${detection.type}')" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2">
+            <span>📝</span>
+            <span>Open Document Builder</span>
+        </button>
+    </div>`;
+}
+
+/**
+ * Opens Document Builder pre-selected to specific type
+ */
+function openDocumentBuilderFor(documentType) {
+    // Open modal
+    document.getElementById('documentBuilderModal').classList.remove('hidden');
+    
+    // Auto-select the document type
+    if (documentType && documentType !== 'termination') {
+        setTimeout(() => {
+            selectDocumentType(documentType);
+        }, 100);
+    }
+    
+    trackEvent('document_builder_opened_from_suggestion', {
+        user: currentUser,
+        type: documentType
+    });
+}
+
+// ========================================
 // AWARD RATES - FETCH FROM GITHUB
 // ========================================
 
@@ -5456,7 +5564,10 @@ async function sendMessage() {
     
     if (!message) return;
     
-    // Check for high-risk topics BEFORE sending
+    // ✅ DETECT DOCUMENT BUILDER NEED FIRST
+    const docBuilderNeed = detectDocumentBuilderNeed(message);
+    
+    // Check for high-risk topics
     const risk = detectHighRiskTopic(message);
     
     addMessage('user', message);
@@ -5473,23 +5584,23 @@ async function sendMessage() {
         const response = await callClaudeAPI(message);
         removeThinkingIndicator(thinkingDiv);
         
-        // If high-risk detected, prepend warning box to response
+        // Build final response with injections
         let finalResponse = response;
+        
+        // ✅ INJECT DOCUMENT BUILDER SUGGESTION FIRST (if detected)
+        if (docBuilderNeed) {
+            const docSuggestion = createDocumentBuilderSuggestion(docBuilderNeed);
+            finalResponse = docSuggestion + finalResponse;
+        }
+        
+        // Then add high-risk warning if needed
         if (risk) {
             const warningBox = createHighRiskWarningBox(risk);
-            finalResponse = warningBox + response;
-            
-            // Track the high-risk detection
-            trackEvent('high_risk_warning_shown', {
-                user: currentUser,
-                category: risk.category,
-                title: risk.title,
-                severity: risk.severity
-            });
+            finalResponse = warningBox + finalResponse;
         }
         
         addMessage('assistant', finalResponse);
-	trackConversation(message, response);
+        trackConversation(message, response);
         conversationHistory.push({ role: 'assistant', content: response });
         trackEvent('message_sent', { user: currentUser, messageLength: message.length });
     } catch (error) {
@@ -5622,11 +5733,7 @@ function addMessage(role, content) {
     messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
     
     if (role === 'assistant') {
-        const detectedDocType = detectDocumentType(content);
-        if (detectedDocType) {
-            setTimeout(() => addDocumentDownloadButtons(messageDiv, detectedDocType), 500);
-        }
-        
+        // ❌ OLD DOCUMENT DETECTION REMOVED - Now using Document Builder detection in sendMessage()        
         // Suggest relevant tools based on conversation
         const lastUserMessage = conversationHistory.filter(m => m.role === 'user').slice(-1)[0];
         if (lastUserMessage) {
@@ -8574,3 +8681,6 @@ window.addEventListener('unhandledrejection', function(event) {
 </script>
 </body>
 </html>
+
+
+
