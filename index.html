@@ -327,26 +327,13 @@ input, textarea, select {
                     <span class="sm:hidden">📝</span>
                 </button>
                 
- <!-- Logout Menu (Dropdown) -->
-<div class="relative">
-    <button onclick="toggleLogoutMenu()" id="logoutMenuButton"
-            class="text-slate-400 hover:text-white transition-colors px-2 py-2 touch-manipulation">
-        Logout ▼
-    </button>
-    
-    <!-- Dropdown Menu -->
-    <div id="logoutMenu" class="hidden absolute right-0 top-12 bg-slate-800 border border-slate-700 rounded-lg shadow-xl w-56 z-50">
-        <div class="p-2">
-            <button onclick="logout(); toggleLogoutMenu();" 
-                    class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                <span>🚪</span>
-                <span>Logout</span>
-            </button>
-            <button onclick="logoutAllDevices(); toggleLogoutMenu();" 
-                    class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-red-400 flex items-center gap-3 touch-manipulation">
-                <span>⚠️</span>
-                <span>Logout All Devices</span>
-            </button>
+                <!-- Logout -->
+                <button onclick="logout()" 
+                        class="text-slate-400 hover:text-white transition-colors px-2 py-2 touch-manipulation">
+                    Logout
+                </button>
+                
+            </div>
         </div>
     </div>
 </div>
@@ -5909,112 +5896,6 @@ function startDailyTipRotation() {
  * Shows error message if code is invalid
  * @returns {void}
  */
-
-// ========================================
-// AUTO-LOGIN WITH LOCALSTORAGE
-// ========================================
-
-/**
- * Checks for stored access code on page load
- * Auto-logs user in if valid code exists
- */
-function checkAutoLogin() {
-    console.log('🔐 Checking for stored access code...');
-    
-    const storedCode = localStorage.getItem('fitzgeraldhr_access_code');
-    const lastLogin = localStorage.getItem('fitzgeraldhr_last_login');
-    
-    if (!storedCode) {
-        console.log('❌ No stored access code found');
-        return false;
-    }
-    
-    // Check if code is expired (30 days)
-    if (lastLogin) {
-        const daysSinceLogin = (Date.now() - parseInt(lastLogin)) / (1000 * 60 * 60 * 24);
-        if (daysSinceLogin > 30) {
-            console.log('⚠️ Access code expired (30+ days old)');
-            localStorage.removeItem('fitzgeraldhr_access_code');
-            localStorage.removeItem('fitzgeraldhr_last_login');
-            return false;
-        }
-    }
-    
-    // Validate stored code
-    if (CONFIG.VALID_CODES.includes(storedCode)) {
-        console.log('✅ Valid stored code found:', storedCode);
-        
-        // Auto-login user
-        currentUser = storedCode;
-        
-        // Update UI
-        const accessScreen = document.getElementById('accessScreen');
-        const assistantScreen = document.getElementById('assistantScreen');
-        const userCodeEl = document.getElementById('userCode');
-        
-        if (userCodeEl) userCodeEl.textContent = storedCode;
-        if (accessScreen) accessScreen.classList.add('hidden');
-        if (assistantScreen) assistantScreen.classList.remove('hidden');
-        
-        // Show admin button for admin codes
-        if (['FITZGERALD-TEST', 'DEMO-2025'].includes(storedCode)) {
-            const adminBtn = document.getElementById('adminButton');
-            if (adminBtn) adminBtn.classList.remove('hidden');
-        }
-        
-        // Check onboarding status
-        const hasCompletedOnboarding = checkOnboardingStatus();
-        if (!hasCompletedOnboarding) {
-            setTimeout(() => showOnboarding(), 1000);
-        } else {
-    const userName = venueProfile.userName || '';
-    const venueName = venueProfile.venueName || 'your venue';
-    const city = venueProfile.city || '';
-    const state = venueProfile.location || '';
-    const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
-    const locationText = city ? `${city}, ${state}` : state;
-    
-    // Add welcome message with proper formatting
-    const messagesContainer = document.getElementById('messagesContainer');
-    if (messagesContainer) {
-        const container = messagesContainer.querySelector('.space-y-6');
-        if (container) {
-            // Create welcome message div
-            const welcomeDiv = document.createElement('div');
-            welcomeDiv.className = 'flex justify-start fade-in';
-            welcomeDiv.innerHTML = `
-<div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
-    <p class="text-slate-100 leading-relaxed">
-        ${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?
-    </p>
-</div>
-            `;
-            container.appendChild(welcomeDiv);
-        }
-    }
-}
-        
-        // Initialize daily tips
-        setTimeout(() => {
-            updateDailyTipBanner();
-            startDailyTipRotation();
-        }, 500);
-        
-        // Track auto-login
-        trackEvent('auto_login_success', { 
-            code: storedCode,
-            daysSinceLastLogin: lastLogin ? Math.floor((Date.now() - parseInt(lastLogin)) / (1000 * 60 * 60 * 24)) : 0
-        });
-        
-        return true;
-    } else {
-        console.log('❌ Stored code is invalid:', storedCode);
-        localStorage.removeItem('fitzgeraldhr_access_code');
-        localStorage.removeItem('fitzgeraldhr_last_login');
-        return false;
-    }
-}
-
 function checkAccess() {
     const input = document.getElementById('accessCodeInput').value.trim().toUpperCase();
     const error = document.getElementById('accessError');
@@ -6026,20 +5907,15 @@ function checkAccess() {
     
     if (CONFIG.VALID_CODES.includes(input)) {
         currentUser = input;
-        
-        // ✅ Store access code in localStorage
-        localStorage.setItem('fitzgeraldhr_access_code', input);
-        localStorage.setItem('fitzgeraldhr_last_login', Date.now().toString());
-        console.log('✅ Access code saved to localStorage');
-        
         if (userCodeEl) userCodeEl.textContent = input;
         if (accessScreen) accessScreen.classList.add('hidden');
         if (assistantScreen) assistantScreen.classList.remove('hidden');
         if (error) error.classList.add('hidden');
         
-        // ✅ SHOW LEGAL ACCEPTANCE MODAL ON FIRST USE
+	// ✅ SHOW LEGAL ACCEPTANCE MODAL ON FIRST USE
         setTimeout(() => showLegalAcceptanceModal(), 500);        
-        
+
+
         trackEvent('beta_access', { code: input });
         
         // Show admin button for admin codes
@@ -6063,25 +5939,7 @@ function checkAccess() {
             const state = venueProfile.location || '';
             const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
             const locationText = city ? `${city}, ${state}` : state;
-            
-            // Add welcome message with proper formatting
-            const messagesContainer = document.getElementById('messagesContainer');
-            if (messagesContainer) {
-                const container = messagesContainer.querySelector('.space-y-6');
-                if (container) {
-                    // Create welcome message div
-                    const welcomeDiv = document.createElement('div');
-                    welcomeDiv.className = 'flex justify-start fade-in';
-                    welcomeDiv.innerHTML = `
-<div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
-    <p class="text-slate-100 leading-relaxed">
-        ${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?
-    </p>
-</div>
-                    `;
-                    container.appendChild(welcomeDiv);
-                }
-            }
+            addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
         }
 
         // Initialize and start daily tip rotation
@@ -8691,129 +8549,82 @@ function closeFeedback() {
 function logout() {
     console.log('🚪 Logout initiated');
     
+    // Confirm logout
     if (!confirm('Are you sure you want to logout?')) {
         return;
     }
     
-    // ✅ Clear localStorage access code
-    localStorage.removeItem('fitzgeraldhr_access_code');
-    localStorage.removeItem('fitzgeraldhr_last_login');
-    console.log('✅ Access code removed from localStorage');
-    
     // Reset current user
     currentUser = null;
+    
+    // Clear conversation history
     conversationHistory = [];
     
-    // Clear messages from screen - FIXED FORMATTING
+    // Clear messages from screen
     const messagesContainer = document.getElementById('messagesContainer');
     if (messagesContainer) {
         const container = messagesContainer.querySelector('.space-y-6');
         if (container) {
-            // ✅ PROPERLY FORMATTED WELCOME MESSAGE - EACH LINE ON ITS OWN
+            // Keep only the welcome message
             container.innerHTML = `
-<div class="flex justify-start">
-    <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
-        
-        <p class="text-slate-100 leading-relaxed">
-            👋 G'day! I'm Fitz, your AI-powered HR knowledge companion from Fitzgerald HR, 
-            specializing in hospitality HR for Australian venues.
-        </p>
+                <div class="flex justify-start">
+                    <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
+                        <p class="text-slate-100 leading-relaxed">G'day! I'm Fitz, your AI assistant from Fitzgerald HR, specialised in hospitality HR for Australian venues.</p>
 
-        <p class="text-slate-100 leading-relaxed mt-3">
-            I can help you understand Fair Work compliance, award interpretation, employee relations, 
-            recruitment processes, and more.
-        </p>
+                        <p class="text-slate-100 leading-relaxed mt-3">I can help you with Fair Work compliance, award interpretation, employee relations, recruitment advice, and more.</p>
 
-        <div class="bg-amber-500/10 border-l-4 border-amber-500 rounded-r-lg p-3 mt-4">
-            <p class="text-amber-300 text-sm font-semibold">💡 Try asking:</p>
-            <p class="text-slate-300 text-xs mt-1">
-                "What should I pay a casual waiter?" • "Can I fire someone for being late?" • "How do I write a warning letter?"
-            </p>
-        </div>
+                        <p class="text-slate-100 text-sm mt-4">💡 <strong>Tip:</strong> I have 8 specialised tools (click 🛠️ above). I'll suggest the right ones as we talk, or browse them anytime.</p>
 
-        <p class="text-slate-100 text-sm mt-4">
-            💡 <strong>Tip:</strong> I have 8 specialized tools (click 🛠️ above). 
-            I'll suggest the right ones as we talk, or browse them anytime.
-        </p>
+                        <p class="text-red-400 font-semibold mt-4 mb-2">🚨 Urgent/Critical Situations:</p>
+                        <p class="text-slate-100 text-sm">Use the red URGENT button above for immediate crisis response.</p>
 
-        <p class="text-red-400 font-semibold mt-4 mb-2">🚨 Urgent/Critical Situations:</p>
-        <p class="text-slate-100 text-sm">
-            Use the red URGENT button above for immediate crisis response.
-        </p>
+                        <p class="text-slate-100 leading-relaxed mt-4">What HR challenge can I help you with today?</p>
 
-        <p class="text-slate-100 leading-relaxed mt-4">
-            What HR topic would you like to learn about today?
-        </p>
+                        <p class="text-slate-300 text-sm mt-4">✉️ For personalised support, contact our Senior Consultants at <a href="mailto:info@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">info@fitzgeraldhr.com.au</a></p>
 
-        <p class="text-yellow-400 text-xs mt-4 bg-yellow-500/10 border border-yellow-500/30 rounded p-3">
-            ⚠️ <strong>Award Rates:</strong> Data effective 1 July 2025 - 30 June 2026. 
-            Always verify at <a href="https://www.fairwork.gov.au" target="_blank" class="underline hover:text-yellow-300">fairwork.gov.au</a> 
-            before making payroll decisions.
-        </p>
-    </div>
-</div>
+                        <p class="text-yellow-400 text-xs mt-4 bg-yellow-500/10 border border-yellow-500/30 rounded p-3">
+                            ⚠️ <strong>Award Rates:</strong> Data effective 1 July 2025 - 30 June 2026. 
+                            Always verify at <a href="https://www.fairwork.gov.au" target="_blank" class="underline hover:text-yellow-300">fairwork.gov.au</a> 
+                            before making payroll decisions.
+                        </p>
+                    </div>
+                </div>
             `;
         }
     }
     
     // Hide assistant screen
-    const assistantScreen = document.getElementById('assistantScreen');
-    if (assistantScreen) assistantScreen.classList.add('hidden');
+    if (DOM.assistantScreen) {
+        DOM.assistantScreen.classList.add('hidden');
+    }
     
     // Show access screen
-    const accessScreen = document.getElementById('accessScreen');
-    if (accessScreen) accessScreen.classList.remove('hidden');
+    if (DOM.accessScreen) {
+        DOM.accessScreen.classList.remove('hidden');
+    }
     
     // Clear access code input
     const accessInput = document.getElementById('accessCodeInput');
-    if (accessInput) accessInput.value = '';
+    if (accessInput) {
+        accessInput.value = '';
+    }
     
-    // Clear error
+    // Clear any error messages
     const accessError = document.getElementById('accessError');
-    if (accessError) accessError.classList.add('hidden');
+    if (accessError) {
+        accessError.classList.add('hidden');
+    }
     
     // Hide admin button
     const adminBtn = document.getElementById('adminButton');
-    if (adminBtn) adminBtn.classList.add('hidden');
+    if (adminBtn) {
+        adminBtn.classList.add('hidden');
+    }
     
+    // Track logout event
     trackEvent('user_logout', { user: currentUser });
     
     console.log('✅ Logged out successfully');
-}
-
-/**
- * Logout all devices - clears ALL localStorage data
- */
-function logoutAllDevices() {
-    if (!confirm(
-        '⚠️ LOGOUT ALL DEVICES\n\n' +
-        'This will:\n' +
-        '• Log you out of this device\n' +
-        '• Clear all stored preferences\n' +
-        '• Clear conversation history\n\n' +
-        'You will need to re-enter your access code.\n\n' +
-        'Continue?'
-    )) {
-        return;
-    }
-    
-    // Clear ALL localStorage for this app
-    const keysToRemove = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && (key.startsWith('fitzgeraldhr_') || key.includes('venueProfile_'))) {
-            keysToRemove.push(key);
-        }
-    }
-    
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-    
-    console.log('✅ All local data cleared:', keysToRemove);
-    
-    alert('✅ Successfully logged out of all devices.\n\nAll local data has been cleared.');
-    
-    // Reload page to reset
-    location.reload();
 }
 
 function setRating(rating) {
@@ -9195,23 +9006,14 @@ document.addEventListener('DOMContentLoaded', function() {
     DOM.voiceButton = document.getElementById('voiceButton');
     DOM.voiceIcon = document.getElementById('voiceIcon');
     
-
-    // ✅ NEW: Check for auto-login BEFORE showing access screen
-    const autoLoginSuccess = checkAutoLogin();
-    
-    if (!autoLoginSuccess) {
-        console.log('ℹ️ No auto-login - showing access screen');
-        startTestimonialRotation();
-    } else {
-        console.log('✅ Auto-login successful - user is logged in');
-    }
-
     // Initialize Supabase
     const supabaseInitialized = initializeSupabase();
     if (!supabaseInitialized) {
         console.warn('⚠️ Supabase initialization failed - analytics will only save locally');
     }
-       
+    
+    startTestimonialRotation();
+    
     console.log('✅ DOM cache initialized');
     console.log('Fitzgerald HR Assistant loaded successfully ✓');
     console.log('All JavaScript fixes applied ✓');
@@ -9435,30 +9237,9 @@ function showPrivacyFromAcceptance() {
     privacyModal.style.zIndex = '55'; // Below acceptance modal (z-60)
 }
 
-/**
- * Toggle logout dropdown menu
- */
-function toggleLogoutMenu() {
-    const menu = document.getElementById('logoutMenu');
-    if (menu) {
-        menu.classList.toggle('hidden');
-    }
-}
-
-// Close logout menu when clicking outside
-document.addEventListener('click', function(event) {
-    const menu = document.getElementById('logoutMenu');
-    const button = document.getElementById('logoutMenuButton');
-    
-    if (menu && !menu.contains(event.target) && !button?.contains(event.target)) {
-        menu.classList.add('hidden');
-    }
-});
-
 </script>
 </body>
 </html>
-
 
 
 
