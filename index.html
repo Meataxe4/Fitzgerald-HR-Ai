@@ -5967,14 +5967,32 @@ function checkAutoLogin() {
         if (!hasCompletedOnboarding) {
             setTimeout(() => showOnboarding(), 1000);
         } else {
-            const userName = venueProfile.userName || '';
-            const venueName = venueProfile.venueName || 'your venue';
-            const city = venueProfile.city || '';
-            const state = venueProfile.location || '';
-            const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
-            const locationText = city ? `${city}, ${state}` : state;
-            addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+    const userName = venueProfile.userName || '';
+    const venueName = venueProfile.venueName || 'your venue';
+    const city = venueProfile.city || '';
+    const state = venueProfile.location || '';
+    const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
+    const locationText = city ? `${city}, ${state}` : state;
+    
+    // Add welcome message with proper formatting
+    const messagesContainer = document.getElementById('messagesContainer');
+    if (messagesContainer) {
+        const container = messagesContainer.querySelector('.space-y-6');
+        if (container) {
+            // Create welcome message div
+            const welcomeDiv = document.createElement('div');
+            welcomeDiv.className = 'flex justify-start fade-in';
+            welcomeDiv.innerHTML = `
+<div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
+    <p class="text-slate-100 leading-relaxed">
+        ${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?
+    </p>
+</div>
+            `;
+            container.appendChild(welcomeDiv);
         }
+    }
+}
         
         // Initialize daily tips
         setTimeout(() => {
@@ -6008,21 +6026,20 @@ function checkAccess() {
     
     if (CONFIG.VALID_CODES.includes(input)) {
         currentUser = input;
-
-    // ✅ NEW: Store access code in localStorage
-    localStorage.setItem('fitzgeraldhr_access_code', input);
-    localStorage.setItem('fitzgeraldhr_last_login', Date.now().toString());
-    console.log('✅ Access code saved to localStorage');
-
+        
+        // ✅ Store access code in localStorage
+        localStorage.setItem('fitzgeraldhr_access_code', input);
+        localStorage.setItem('fitzgeraldhr_last_login', Date.now().toString());
+        console.log('✅ Access code saved to localStorage');
+        
         if (userCodeEl) userCodeEl.textContent = input;
         if (accessScreen) accessScreen.classList.add('hidden');
         if (assistantScreen) assistantScreen.classList.remove('hidden');
         if (error) error.classList.add('hidden');
         
-	// ✅ SHOW LEGAL ACCEPTANCE MODAL ON FIRST USE
+        // ✅ SHOW LEGAL ACCEPTANCE MODAL ON FIRST USE
         setTimeout(() => showLegalAcceptanceModal(), 500);        
-
-
+        
         trackEvent('beta_access', { code: input });
         
         // Show admin button for admin codes
@@ -6046,7 +6063,25 @@ function checkAccess() {
             const state = venueProfile.location || '';
             const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
             const locationText = city ? `${city}, ${state}` : state;
-            addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+            
+            // Add welcome message with proper formatting
+            const messagesContainer = document.getElementById('messagesContainer');
+            if (messagesContainer) {
+                const container = messagesContainer.querySelector('.space-y-6');
+                if (container) {
+                    // Create welcome message div
+                    const welcomeDiv = document.createElement('div');
+                    welcomeDiv.className = 'flex justify-start fade-in';
+                    welcomeDiv.innerHTML = `
+<div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
+    <p class="text-slate-100 leading-relaxed">
+        ${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?
+    </p>
+</div>
+                    `;
+                    container.appendChild(welcomeDiv);
+                }
+            }
         }
 
         // Initialize and start daily tip rotation
