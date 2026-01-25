@@ -297,31 +297,16 @@
 <!-- Welcome Message -->
 <div class="flex justify-start">
     <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
-        <!-- CRITICAL DISCLAIMER AT TOP -->
-        <div class="bg-red-500/10 border-2 border-red-500 rounded-lg p-4 mb-4">
-            <p class="text-red-400 font-bold text-sm mb-2 flex items-center gap-2">
-                <span>⚠️</span>
-                <span>IMPORTANT LEGAL NOTICE</span>
-            </p>
-            <p class="text-red-300 text-sm leading-relaxed mb-2">
-                This tool provides <strong>general HR information only</strong> for Australian hospitality venues. 
-                It is <strong>NOT a substitute</strong> for professional HR or legal advice.
-            </p>
-            <p class="text-red-300 text-sm leading-relaxed">
-                <strong>All documents and guidance must be reviewed by a Fitzgerald HR consultant before use.</strong>
-            </p>
-            <div class="mt-3 pt-3 border-t border-red-500/30">
-                <p class="text-red-200 text-xs">
-                    For professional advice: <a href="mailto:info@fitzgeraldhr.com.au" class="underline hover:text-red-100 font-semibold">info@fitzgeraldhr.com.au</a> | 
-                    <a href="tel:+61400211014" class="underline hover:text-red-100 font-semibold">+61 400 211 014</a>
-                </p>
-            </div>
-        </div>
+        
+        <p class="text-slate-100 leading-relaxed">
+            👋 G'day! I'm Fitz, your AI-powered HR knowledge companion from Fitzgerald HR, 
+            specializing in hospitality HR for Australian venues.
+        </p>
 
-        <!-- EXISTING WELCOME CONTENT -->
-        <p class="text-slate-100 leading-relaxed">G'day! I'm Fitz, your AI-powered HR knowledge companion from Fitzgerald HR, specializing in hospitality HR for Australian venues.</p>
-
-        <p class="text-slate-100 leading-relaxed mt-3">I can help you understand Fair Work compliance, award interpretation, employee relations, recruitment processes, and more.</p>
+        <p class="text-slate-100 leading-relaxed mt-3">
+            I can help you understand Fair Work compliance, award interpretation, employee relations, 
+            recruitment processes, and more.
+        </p>
 
         <div class="bg-amber-500/10 border-l-4 border-amber-500 rounded-r-lg p-3 mt-4">
             <p class="text-amber-300 text-sm font-semibold">💡 Try asking:</p>
@@ -330,12 +315,19 @@
             </p>
         </div>
 
-        <p class="text-slate-100 text-sm mt-4">💡 <strong>Tip:</strong> I have 8 specialised tools (click 🛠️ above). I'll suggest the right ones as we talk, or browse them anytime.</p>
+        <p class="text-slate-100 text-sm mt-4">
+            💡 <strong>Tip:</strong> I have 8 specialized tools (click 🛠️ above). 
+            I'll suggest the right ones as we talk, or browse them anytime.
+        </p>
 
         <p class="text-red-400 font-semibold mt-4 mb-2">🚨 Urgent/Critical Situations:</p>
-        <p class="text-slate-100 text-sm">Use the red URGENT button above for immediate crisis response.</p>
+        <p class="text-slate-100 text-sm">
+            Use the red URGENT button above for immediate crisis response.
+        </p>
 
-        <p class="text-slate-100 leading-relaxed mt-4">What HR topic would you like to learn about today?</p>
+        <p class="text-slate-100 leading-relaxed mt-4">
+            What HR topic would you like to learn about today?
+        </p>
 
         <p class="text-yellow-400 text-xs mt-4 bg-yellow-500/10 border border-yellow-500/30 rounded p-3">
             ⚠️ <strong>Award Rates:</strong> Data effective 1 July 2025 - 30 June 2026. 
@@ -345,26 +337,18 @@
     </div>
 </div>
 <!-- Enhanced Persistent Disclaimer -->
-<div class="bg-red-500/10 border-t-2 border-red-500 px-6 py-3">
-    <div class="max-w-5xl mx-auto">
-        <div class="flex items-center justify-center gap-3 mb-2">
-            <span class="text-red-400 text-lg">⚠️</span>
-            <p class="text-red-300 text-sm font-semibold">
-                INFORMATION ONLY - NOT LEGAL OR PROFESSIONAL ADVICE
-            </p>
-        </div>
-        <div class="text-center text-xs text-red-200">
-            <p class="mb-1">
-                All guidance and documents must be reviewed by a Fitzgerald HR consultant before use. 
-                This tool does not replace professional HR or legal advice.
-            </p>
-            <p>
-                <span class="font-semibold">Professional Advice:</span> 
-                <a href="mailto:info@fitzgeraldhr.com.au" class="underline hover:text-red-100 font-semibold">info@fitzgeraldhr.com.au</a> | 
-                <a href="tel:+61400211014" class="underline hover:text-red-100 font-semibold">+61 400 211 014</a> | 
-                <a href="#terms" class="underline hover:text-red-100">Terms of Use</a>
-            </p>
-        </div>
+<div class="bg-slate-800/50 border-t border-slate-700/50 px-6 py-3">
+    <div class="max-w-5xl mx-auto text-center">
+        <p class="text-slate-400 text-xs mb-1">
+            <span class="text-amber-400 font-semibold">ℹ️ Information Only:</span> 
+            This tool provides general guidance. All documents require professional review before use.
+        </p>
+        <p class="text-slate-500 text-xs">
+            Professional Advice: 
+            <a href="mailto:info@fitzgeraldhr.com.au" class="text-slate-400 hover:text-amber-400 underline">info@fitzgeraldhr.com.au</a> | 
+            <a href="tel:+61400211014" class="text-slate-400 hover:text-amber-400 underline">+61 400 211 014</a> | 
+            <a href="#terms" onclick="showTermsOfService(); return false;" class="text-slate-400 hover:text-amber-400 underline">Terms</a>
+        </p>
     </div>
 </div>
         <!-- Input Area -->
@@ -2114,6 +2098,111 @@ html        </div>
         <button onclick="closePrivacyPolicy()" class="w-full mt-6 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
             I Understand
         </button>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- LEGAL ACCEPTANCE MODAL (First Use Only) -->
+<!-- ========================================== -->
+
+<div id="legalAcceptanceModal" class="hidden fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center p-6 z-[60]">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border-2 border-red-500 fade-in max-h-[90vh] overflow-y-auto">
+        
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-red-500/20 rounded-full mb-4">
+                <span class="text-4xl">⚠️</span>
+            </div>
+            <h2 class="text-2xl font-bold text-red-400">Important Legal Notice</h2>
+            <p class="text-slate-400 text-sm mt-2">Please read carefully before using this tool</p>
+        </div>
+
+        <!-- Content -->
+        <div class="bg-slate-900/50 rounded-lg p-6 mb-6 space-y-4 text-slate-300 text-sm border border-slate-700">
+            
+            <div class="pb-4 border-b border-slate-700">
+                <h3 class="text-white font-bold mb-2 flex items-center gap-2">
+                    <span class="text-amber-400">📚</span>
+                    <span>This is an Information Tool</span>
+                </h3>
+                <p>
+                    This tool provides <strong class="text-white">general HR information only</strong> for Australian hospitality venues. 
+                    It is <strong class="text-red-400">NOT a substitute</strong> for professional HR or legal advice.
+                </p>
+            </div>
+
+            <div class="pb-4 border-b border-slate-700">
+                <h3 class="text-white font-bold mb-2 flex items-center gap-2">
+                    <span class="text-amber-400">✅</span>
+                    <span>Mandatory Professional Review</span>
+                </h3>
+                <p class="mb-2">
+                    <strong class="text-white">All documents and guidance MUST be reviewed</strong> by a Fitzgerald HR consultant before:
+                </p>
+                <ul class="list-disc ml-6 space-y-1 text-xs">
+                    <li>Issuing any document to an employee</li>
+                    <li>Taking employment action (warnings, terminations, etc.)</li>
+                    <li>Making compliance or legal decisions</li>
+                </ul>
+            </div>
+
+            <div class="pb-4 border-b border-slate-700">
+                <h3 class="text-white font-bold mb-2 flex items-center gap-2">
+                    <span class="text-red-400">⚖️</span>
+                    <span>Legal Disclaimer</span>
+                </h3>
+                <p>
+                    Fitzgerald HR is <strong class="text-white">not liable</strong> for decisions made based on this tool's information, 
+                    documents used without professional review, or any legal costs/damages arising from use of this tool.
+                </p>
+            </div>
+
+            <div>
+                <h3 class="text-white font-bold mb-2 flex items-center gap-2">
+                    <span class="text-amber-400">📞</span>
+                    <span>Get Professional Advice</span>
+                </h3>
+                <p class="text-amber-300">
+                    Email: <a href="mailto:info@fitzgeraldhr.com.au" class="underline hover:text-amber-200 font-semibold">info@fitzgeraldhr.com.au</a><br>
+                    Phone: <a href="tel:+61400211014" class="underline hover:text-amber-200 font-semibold">+61 400 211 014</a>
+                </p>
+            </div>
+
+        </div>
+
+        <!-- Checkbox Agreement -->
+        <div class="mb-6">
+            <label class="flex items-start gap-3 cursor-pointer group">
+                <input type="checkbox" id="legalAcceptCheckbox" 
+                       class="mt-1 w-5 h-5 rounded border-2 border-slate-600 bg-slate-900 checked:bg-amber-500 checked:border-amber-500 cursor-pointer transition-all">
+                <span class="text-slate-300 text-sm flex-1 group-hover:text-white transition-colors">
+                    I understand and agree that:
+                    <ul class="list-disc ml-5 mt-2 space-y-1 text-xs text-slate-400">
+                        <li>This tool provides information only, not professional advice</li>
+                        <li>All documents must be reviewed by a consultant before use</li>
+                        <li>I will seek professional guidance for specific situations</li>
+                        <li>I accept the <a href="#terms" onclick="showTermsFromAcceptance(); return false;" class="text-amber-400 underline hover:text-amber-300">Terms of Use</a> and <a href="#privacy" onclick="showPrivacyFromAcceptance(); return false;" class="text-amber-400 underline hover:text-amber-300">Privacy Policy</a></li>
+                    </ul>
+                </span>
+            </label>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex gap-4">
+            <button onclick="declineLegalTerms()" 
+                    class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 rounded-lg transition-all">
+                I Do Not Agree
+            </button>
+            <button id="acceptLegalButton" onclick="acceptLegalTerms()" disabled
+                    class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-amber-500">
+                I Understand & Agree
+            </button>
+        </div>
+
+        <p class="text-center text-slate-500 text-xs mt-4">
+            By clicking "I Understand & Agree", you acknowledge you have read and understood this notice.
+        </p>
+
     </div>
 </div>
 
@@ -5754,6 +5843,10 @@ function checkAccess() {
         if (assistantScreen) assistantScreen.classList.remove('hidden');
         if (error) error.classList.add('hidden');
         
+	// ✅ SHOW LEGAL ACCEPTANCE MODAL ON FIRST USE
+        setTimeout(() => showLegalAcceptanceModal(), 500);        
+
+
         trackEvent('beta_access', { code: input });
         
         // Show admin button for admin codes
@@ -8941,6 +9034,141 @@ function closePrivacyPolicy() {
     document.getElementById('privacyModal').classList.add('hidden');
 }
 
+// ========================================
+// LEGAL ACCEPTANCE MODAL FUNCTIONS
+// ========================================
+
+/**
+ * Shows legal acceptance modal on first use
+ */
+function showLegalAcceptanceModal() {
+    const modal = document.getElementById('legalAcceptanceModal');
+    const checkbox = document.getElementById('legalAcceptCheckbox');
+    const acceptBtn = document.getElementById('acceptLegalButton');
+    
+    // Check if user has already accepted
+    const hasAccepted = localStorage.getItem('legalTermsAccepted');
+    
+    if (hasAccepted === 'true') {
+        console.log('✅ User has already accepted legal terms');
+        return false; // Don't show modal
+    }
+    
+    console.log('⚠️ Showing legal acceptance modal (first use)');
+    modal.classList.remove('hidden');
+    
+    // Enable accept button only when checkbox is checked
+    checkbox.addEventListener('change', function() {
+        acceptBtn.disabled = !this.checked;
+    });
+    
+    trackEvent('legal_acceptance_modal_shown', { user: currentUser });
+    return true;
+}
+
+/**
+ * User accepts legal terms
+ */
+function acceptLegalTerms() {
+    const checkbox = document.getElementById('legalAcceptCheckbox');
+    
+    if (!checkbox.checked) {
+        alert('⚠️ Please check the box to confirm you understand and agree to the terms.');
+        return;
+    }
+    
+    // Store acceptance with timestamp
+    const timestamp = new Date().toISOString();
+    localStorage.setItem('legalTermsAccepted', 'true');
+    localStorage.setItem('legalTermsAcceptedAt', timestamp);
+    
+    console.log('✅ User accepted legal terms at:', timestamp);
+    
+    // Close modal
+    document.getElementById('legalAcceptanceModal').classList.add('hidden');
+    
+    // Track acceptance
+    trackEvent('legal_terms_accepted', { 
+        user: currentUser,
+        timestamp: timestamp,
+        version: '1.0' // Version your terms so you can track if they change
+    });
+    
+    // Log to Supabase for audit trail
+    logLegalAcceptance(currentUser, timestamp);
+}
+
+/**
+ * User declines legal terms
+ */
+function declineLegalTerms() {
+    const confirmed = confirm(
+        "⚠️ You must accept the terms to use this tool.\n\n" +
+        "If you don't agree, you will be logged out.\n\n" +
+        "Are you sure you want to decline?"
+    );
+    
+    if (confirmed) {
+        console.log('❌ User declined legal terms');
+        
+        trackEvent('legal_terms_declined', { user: currentUser });
+        
+        // Log them out
+        alert('You have declined the terms. You will now be logged out.');
+        logout();
+    }
+}
+
+/**
+ * Log legal acceptance to database for audit trail
+ */
+async function logLegalAcceptance(user, timestamp) {
+    if (!supabaseClient) {
+        console.warn('⚠️ Supabase not initialized - cannot log legal acceptance');
+        return;
+    }
+    
+    try {
+        const { data, error } = await supabaseClient
+            .from('legal_acceptances')
+            .insert([{
+                user_code: user,
+                accepted_at: timestamp,
+                terms_version: '1.0',
+                ip_address: null, // Could add IP logging if needed
+                user_agent: navigator.userAgent
+            }]);
+        
+        if (error) {
+            console.error('❌ Error logging legal acceptance:', error);
+        } else {
+            console.log('✅ Legal acceptance logged to database');
+        }
+    } catch (err) {
+        console.error('❌ Exception logging legal acceptance:', err);
+    }
+}
+
+/**
+ * Show Terms from acceptance modal (opens in new window context)
+ */
+function showTermsFromAcceptance() {
+    // Open terms in background, keep acceptance modal in front
+    const termsModal = document.getElementById('termsModal');
+    termsModal.classList.remove('hidden');
+    termsModal.style.zIndex = '55'; // Below acceptance modal (z-60)
+}
+
+/**
+ * Show Privacy from acceptance modal
+ */
+function showPrivacyFromAcceptance() {
+    const privacyModal = document.getElementById('privacyModal');
+    privacyModal.classList.remove('hidden');
+    privacyModal.style.zIndex = '55'; // Below acceptance modal (z-60)
+}
+
 </script>
 </body>
 </html>
+
