@@ -248,6 +248,22 @@
     		     <span>⚙️</span>
     		     <span>Settings</span>
 		    </button>
+<!-- Legal Links -->
+		<div class="flex items-center gap-2 text-xs">
+    		   <a href="#terms" onclick="showTermsOfService(); return false;" 
+       			class="text-slate-400 hover:text-amber-400 transition-colors">
+       			 Terms
+    		   </a>
+    		   <span class="text-slate-600">|</span>
+   		   <a href="#privacy" onclick="showPrivacyPolicy(); return false;" 
+     		        class="text-slate-400 hover:text-amber-400 transition-colors">
+       		      Privacy
+   		   </a>
+		</div>
+
+<button onclick="showFeedback()" class="text-amber-500 hover:text-amber-400 text-sm font-medium transition-colors">
+    Give Feedback
+</button>
       
                     <button onclick="showFeedback()" class="text-amber-500 hover:text-amber-400 text-sm font-medium transition-colors">
                         Give Feedback
@@ -278,55 +294,79 @@
         <!-- Messages Container -->
         <div id="messagesContainer" class="flex-1 overflow-y-auto px-6 py-6">
             <div class="max-w-5xl mx-auto space-y-6">
-                <!-- Welcome Message -->
-                <div class="flex justify-start">
-                    <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
-                        <p class="text-slate-100 leading-relaxed">G'day! I'm Fitz, your AI assistant from Fitzgerald HR, specialised in hospitality HR for Australian venues.</p>
+<!-- Welcome Message -->
+<div class="flex justify-start">
+    <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
+        <!-- CRITICAL DISCLAIMER AT TOP -->
+        <div class="bg-red-500/10 border-2 border-red-500 rounded-lg p-4 mb-4">
+            <p class="text-red-400 font-bold text-sm mb-2 flex items-center gap-2">
+                <span>⚠️</span>
+                <span>IMPORTANT LEGAL NOTICE</span>
+            </p>
+            <p class="text-red-300 text-sm leading-relaxed mb-2">
+                This tool provides <strong>general HR information only</strong> for Australian hospitality venues. 
+                It is <strong>NOT a substitute</strong> for professional HR or legal advice.
+            </p>
+            <p class="text-red-300 text-sm leading-relaxed">
+                <strong>All documents and guidance must be reviewed by a Fitzgerald HR consultant before use.</strong>
+            </p>
+            <div class="mt-3 pt-3 border-t border-red-500/30">
+                <p class="text-red-200 text-xs">
+                    For professional advice: <a href="mailto:info@fitzgeraldhr.com.au" class="underline hover:text-red-100 font-semibold">info@fitzgeraldhr.com.au</a> | 
+                    <a href="tel:+61400211014" class="underline hover:text-red-100 font-semibold">+61 400 211 014</a>
+                </p>
+            </div>
+        </div>
 
-<p class="text-slate-100 leading-relaxed mt-3">I can help you with Fair Work compliance, award interpretation, employee relations, recruitment advice, and more.</p>
+        <!-- EXISTING WELCOME CONTENT -->
+        <p class="text-slate-100 leading-relaxed">G'day! I'm Fitz, your AI-powered HR knowledge companion from Fitzgerald HR, specializing in hospitality HR for Australian venues.</p>
 
-<div class="bg-amber-500/10 border-l-4 border-amber-500 rounded-r-lg p-3 mt-4">
+        <p class="text-slate-100 leading-relaxed mt-3">I can help you understand Fair Work compliance, award interpretation, employee relations, recruitment processes, and more.</p>
+
+        <div class="bg-amber-500/10 border-l-4 border-amber-500 rounded-r-lg p-3 mt-4">
             <p class="text-amber-300 text-sm font-semibold">💡 Try asking:</p>
             <p class="text-slate-300 text-xs mt-1">
                 "What should I pay a casual waiter?" • "Can I fire someone for being late?" • "How do I write a warning letter?"
             </p>
         </div>
 
-<p class="text-slate-100 text-sm mt-4">💡 <strong>Tip:</strong> I have 8 specialised tools (click 🛠️ above). I'll suggest the right ones as we talk, or browse them anytime.</p>
+        <p class="text-slate-100 text-sm mt-4">💡 <strong>Tip:</strong> I have 8 specialised tools (click 🛠️ above). I'll suggest the right ones as we talk, or browse them anytime.</p>
 
-<p class="text-red-400 font-semibold mt-4 mb-2">🚨 Urgent/Critical Situations:</p>
-<p class="text-slate-100 text-sm">Use the red URGENT button above for immediate crisis response.</p>
+        <p class="text-red-400 font-semibold mt-4 mb-2">🚨 Urgent/Critical Situations:</p>
+        <p class="text-slate-100 text-sm">Use the red URGENT button above for immediate crisis response.</p>
 
-<p class="text-slate-100 leading-relaxed mt-4">What HR challenge can I help you with today?</p>
+        <p class="text-slate-100 leading-relaxed mt-4">What HR topic would you like to learn about today?</p>
 
-<p class="text-slate-300 text-sm mt-4">✉️ For personalised support, contact our Senior Consultants at <a href="mailto:info@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">info@fitzgeraldhr.com.au</a></p>
-
-<p class="text-yellow-400 text-xs mt-4 bg-yellow-500/10 border border-yellow-500/30 rounded p-3">
-    ⚠️ <strong>Award Rates:</strong> Data effective 1 July 2025 - 30 June 2026. 
-    Always verify at <a href="https://www.fairwork.gov.au" target="_blank" class="underline hover:text-yellow-300">fairwork.gov.au</a> 
-    before making payroll decisions.
-</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <p class="text-yellow-400 text-xs mt-4 bg-yellow-500/10 border border-yellow-500/30 rounded p-3">
+            ⚠️ <strong>Award Rates:</strong> Data effective 1 July 2025 - 30 June 2026. 
+            Always verify at <a href="https://www.fairwork.gov.au" target="_blank" class="underline hover:text-yellow-300">fairwork.gov.au</a> 
+            before making payroll decisions.
+        </p>
+    </div>
 </div>
-
-        <!-- Disclaimer -->
-        <div class="bg-slate-800/30 border-t border-slate-700/50 px-6 py-3">
-            <div class="max-w-5xl mx-auto">
-                <div class="flex items-start gap-2 text-xs text-slate-400 mb-2">
-                    <span class="text-amber-500">⚠️</span>
-                    <p>This AI assistant provides general guidance only. For complex matters or legal advice, consult with a Senior Fitzgerald HR  Consultant.</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-sm text-slate-300">
-                        <span class="text-amber-500 font-semibold">Contact us:</span> info@fitzgeraldhr.com.au
-                    </p>
-                </div>
-            </div>
+<!-- Enhanced Persistent Disclaimer -->
+<div class="bg-red-500/10 border-t-2 border-red-500 px-6 py-3">
+    <div class="max-w-5xl mx-auto">
+        <div class="flex items-center justify-center gap-3 mb-2">
+            <span class="text-red-400 text-lg">⚠️</span>
+            <p class="text-red-300 text-sm font-semibold">
+                INFORMATION ONLY - NOT LEGAL OR PROFESSIONAL ADVICE
+            </p>
         </div>
-
+        <div class="text-center text-xs text-red-200">
+            <p class="mb-1">
+                All guidance and documents must be reviewed by a Fitzgerald HR consultant before use. 
+                This tool does not replace professional HR or legal advice.
+            </p>
+            <p>
+                <span class="font-semibold">Professional Advice:</span> 
+                <a href="mailto:info@fitzgeraldhr.com.au" class="underline hover:text-red-100 font-semibold">info@fitzgeraldhr.com.au</a> | 
+                <a href="tel:+61400211014" class="underline hover:text-red-100 font-semibold">+61 400 211 014</a> | 
+                <a href="#terms" class="underline hover:text-red-100">Terms of Use</a>
+            </p>
+        </div>
+    </div>
+</div>
         <!-- Input Area -->
         <div class="bg-slate-800/80 backdrop-blur-sm border-t border-slate-700 px-6 py-4">
             <div class="max-w-5xl mx-auto flex gap-3">
@@ -1913,6 +1953,167 @@ Be as specific as possible!"></textarea>
                 📞 Urgent? Call us: <a href="tel:+61400211014" class="text-amber-400 hover:underline font-semibold">+61 400 211 014</a>
             </p>
         </div>
+    </div>
+</div>
+
+html        </div>
+    </div>
+</div>
+<!-- ↑ END of terminationConsultantModal -->
+
+<!-- ========================================== -->
+<!-- TERMS OF SERVICE MODAL -->
+<!-- ========================================== -->
+
+<div id="termsModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-4xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-amber-500">Terms of Use</h2>
+            <button onclick="closeTermsOfService()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+        
+        <div class="text-slate-300 text-sm space-y-4">
+            <div class="bg-red-500/10 border-2 border-red-500 rounded-lg p-4 mb-6">
+                <p class="text-red-400 font-bold mb-2">⚠️ CRITICAL NOTICE</p>
+                <p class="text-red-300">
+                    This tool provides <strong>general information only</strong>. It is <strong>NOT legal advice</strong> 
+                    and does not create a client-consultant relationship. All guidance and documents must be 
+                    reviewed by a qualified Fitzgerald HR consultant before use.
+                </p>
+            </div>
+
+            <h3 class="text-white font-bold text-lg">1. Acceptance of Terms</h3>
+            <p>By accessing the Fitzgerald HR Knowledge Hub, you agree to these Terms of Use. If you do not agree, do not use this tool.</p>
+
+            <h3 class="text-white font-bold text-lg">2. Nature of Service</h3>
+            <p>This tool is an <strong>information resource</strong>, not a professional advisory service. It provides:</p>
+            <ul class="list-disc ml-6 space-y-1">
+                <li>General HR information for Australian hospitality venues</li>
+                <li>Educational content about Fair Work compliance</li>
+                <li>Draft document templates requiring professional review</li>
+                <li>Reference materials and process guidance</li>
+            </ul>
+            <p class="font-semibold text-amber-400">This tool does NOT provide legal advice or professional HR consulting services.</p>
+
+            <h3 class="text-white font-bold text-lg">3. Professional Review Requirement</h3>
+            <p class="font-semibold">You MUST have all guidance and documents reviewed by a Fitzgerald HR consultant before:</p>
+            <ul class="list-disc ml-6 space-y-1">
+                <li>Issuing any document to an employee</li>
+                <li>Taking any employment action based on information provided</li>
+                <li>Making legal or compliance decisions</li>
+                <li>Relying on any content for legal proceedings</li>
+            </ul>
+
+            <h3 class="text-white font-bold text-lg">4. Limitation of Liability</h3>
+            <p>Fitzgerald HR is NOT liable for:</p>
+            <ul class="list-disc ml-6 space-y-1">
+                <li>Decisions made based on information from this tool</li>
+                <li>Use of documents without professional review</li>
+                <li>Inaccuracies or outdated information</li>
+                <li>AI-generated content errors or omissions</li>
+                <li>Legal costs, penalties, or damages arising from use of this tool</li>
+            </ul>
+
+            <h3 class="text-white font-bold text-lg">5. Your Responsibilities</h3>
+            <p>You agree to:</p>
+            <ul class="list-disc ml-6 space-y-1">
+                <li>Use this tool for informational purposes only</li>
+                <li>Seek professional advice for specific situations</li>
+                <li>Verify all information with official sources</li>
+                <li>Not rely solely on this tool for legal compliance</li>
+                <li>Have all documents professionally reviewed before use</li>
+            </ul>
+
+            <h3 class="text-white font-bold text-lg">6. Accuracy and Updates</h3>
+            <p>While we strive for accuracy, employment law changes frequently. Award rates, regulations, and requirements may have changed since information was last updated. Always verify current requirements at <a href="https://www.fairwork.gov.au" target="_blank" class="text-amber-400 underline">fairwork.gov.au</a>.</p>
+
+            <h3 class="text-white font-bold text-lg">7. Professional Consultation</h3>
+            <p>For professional HR advice and document review:</p>
+            <p class="font-semibold text-amber-400">
+                Email: <a href="mailto:info@fitzgeraldhr.com.au" class="underline">info@fitzgeraldhr.com.au</a><br>
+                Phone: <a href="tel:+61400211014" class="underline">+61 400 211 014</a>
+            </p>
+
+            <p class="text-xs text-slate-400 mt-6">Last Updated: January 2026</p>
+        </div>
+
+        <button onclick="closeTermsOfService()" class="w-full mt-6 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+            I Understand
+        </button>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- PRIVACY POLICY MODAL -->
+<!-- ========================================== -->
+
+<div id="privacyModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-4xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-amber-500">Privacy Policy</h2>
+            <button onclick="closePrivacyPolicy()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+        
+        <div class="text-slate-300 text-sm space-y-4">
+            <h3 class="text-white font-bold text-lg">1. Information We Collect</h3>
+            <p>When using this tool, we collect:</p>
+            <ul class="list-disc ml-6 space-y-1">
+                <li><strong>Conversation data:</strong> Your questions and our responses</li>
+                <li><strong>Venue information:</strong> Business name, location, staff count (if provided during onboarding)</li>
+                <li><strong>Document data:</strong> Employee names and details entered into document templates</li>
+                <li><strong>Usage analytics:</strong> Tool usage patterns, features accessed, session duration</li>
+                <li><strong>Access codes:</strong> Beta testing access credentials</li>
+            </ul>
+
+            <h3 class="text-white font-bold text-lg">2. How We Use Your Information</h3>
+            <ul class="list-disc ml-6 space-y-1">
+                <li>To provide and improve the tool's functionality</li>
+                <li>To analyze usage patterns and feature effectiveness</li>
+                <li>To provide better recommendations and tool suggestions</li>
+                <li>For beta testing feedback and product development</li>
+            </ul>
+
+            <h3 class="text-white font-bold text-lg">3. Data Storage</h3>
+            <p>Your data is stored securely using:</p>
+            <ul class="list-disc ml-6 space-y-1">
+                <li>Supabase (cloud database provider) - Australian/US servers</li>
+                <li>Browser local storage (for venue profile and preferences)</li>
+                <li>Anthropic Claude API (for AI responses - data not retained by Anthropic)</li>
+            </ul>
+
+            <h3 class="text-white font-bold text-lg">4. Data Sharing</h3>
+            <p>We do NOT sell your data. We may share data with:</p>
+            <ul class="list-disc ml-6 space-y-1">
+                <li>Fitzgerald HR consultants (when you request professional review or advice)</li>
+                <li>Service providers (Anthropic, Supabase) - under strict confidentiality agreements</li>
+                <li>Legal authorities (if required by Australian law)</li>
+            </ul>
+
+            <h3 class="text-white font-bold text-lg">5. Your Rights</h3>
+            <p>Under Australian Privacy Principles, you have the right to:</p>
+            <ul class="list-disc ml-6 space-y-1">
+                <li>Access your personal data</li>
+                <li>Request correction of inaccurate data</li>
+                <li>Request deletion of your data</li>
+                <li>Opt out of analytics collection</li>
+            </ul>
+
+            <h3 class="text-white font-bold text-lg">6. Security</h3>
+            <p>We implement industry-standard security measures including encryption, secure databases, and access controls. However, no system is 100% secure.</p>
+
+            <h3 class="text-white font-bold text-lg">7. Contact Us</h3>
+            <p>For privacy concerns or data requests:</p>
+            <p class="font-semibold text-amber-400">
+                Email: <a href="mailto:info@fitzgeraldhr.com.au" class="underline">info@fitzgeraldhr.com.au</a><br>
+                Phone: <a href="tel:+61400211014" class="underline">+61 400 211 014</a>
+            </p>
+
+            <p class="text-xs text-slate-400 mt-6">Last Updated: January 2026</p>
+        </div>
+
+        <button onclick="closePrivacyPolicy()" class="w-full mt-6 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+            I Understand
+        </button>
     </div>
 </div>
 
@@ -5183,6 +5384,46 @@ function requestDocumentChange() {
 }
 
 async function downloadGeneratedDocument() {
+// ✅ CRITICAL: Confirmation dialog before download
+    const userAccepts = confirm(
+        "⚠️ CRITICAL LEGAL REMINDER\n\n" +
+        "This document is a DRAFT TEMPLATE for review purposes only.\n\n" +
+        "Before issuing this document to any employee, you MUST:\n\n" +
+        "✓ Have it reviewed by a Fitzgerald HR consultant\n" +
+        "✓ Ensure all factual details are accurate\n" +
+        "✓ Verify it meets your specific circumstances\n" +
+        "✓ Confirm it complies with current Fair Work requirements\n\n" +
+        "LEGAL WARNING:\n" +
+        "Using this document without professional review may expose you to:\n" +
+        "• Unfair dismissal claims ($50,000+ in damages)\n" +
+        "• General protections claims\n" +
+        "• Adverse action penalties\n" +
+        "• Legal costs and compensation\n\n" +
+        "Contact: info@fitzgeraldhr.com.au | +61 400 211 014\n\n" +
+        "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
+        "By clicking OK, you acknowledge:\n" +
+        "• This is a draft template requiring professional review\n" +
+        "• You will NOT use it without consultant approval\n" +
+        "• You understand the legal risks of non-compliance\n\n" +
+        "Click OK to download for review, or Cancel to return."
+    );
+    
+    if (!userAccepts) {
+        console.log('❌ User cancelled download - did not accept terms');
+        trackEvent('document_download_cancelled_at_confirmation', {
+            user: currentUser,
+            documentType: documentBuilderState.currentType,
+            reason: 'did_not_accept_legal_terms'
+        });
+        return false; // Exit without downloading
+    }
+    
+    console.log('✅ User accepted legal terms and is downloading for review');
+    trackEvent('document_download_legal_terms_accepted', {
+        user: currentUser,
+        documentType: documentBuilderState.currentType
+    });    
+
     try {
         const type = documentBuilderState.currentType;
         const employeeName = documentBuilderState.data.employeeName || 'Employee';
@@ -8678,9 +8919,28 @@ window.addEventListener('unhandledrejection', function(event) {
     event.preventDefault();
 });
 
+// ========================================
+// TERMS OF SERVICE & PRIVACY POLICY FUNCTIONS
+// ========================================
+
+function showTermsOfService() {
+    document.getElementById('termsModal').classList.remove('hidden');
+    trackEvent('terms_of_service_viewed', { user: currentUser });
+}
+
+function closeTermsOfService() {
+    document.getElementById('termsModal').classList.add('hidden');
+}
+
+function showPrivacyPolicy() {
+    document.getElementById('privacyModal').classList.remove('hidden');
+    trackEvent('privacy_policy_viewed', { user: currentUser });
+}
+
+function closePrivacyPolicy() {
+    document.getElementById('privacyModal').classList.add('hidden');
+}
+
 </script>
 </body>
 </html>
-
-
-
