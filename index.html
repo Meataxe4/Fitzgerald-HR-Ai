@@ -338,19 +338,21 @@
     </div>
 </div>
 
-<!-- Chat Input Area (Fixed at bottom of scrollable area) -->
+<!-- Chat Input Area (Fixed at bottom, centered and narrower) -->
 <div class="bg-slate-800/80 backdrop-blur-sm border-t border-slate-700/50 px-6 py-4">
-    <div class="flex gap-3">
-        <textarea id="messageInput" 
-            placeholder="Ask me anything about hospitality HR in Australia..." 
-            rows="2"
-            class="flex-1 bg-slate-900 text-slate-100 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
-            onkeypress="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }">
-        </textarea>
-        <button id="sendButton" onclick="sendMessage()" 
-                class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-8 py-3 rounded-lg transition-all flex items-center gap-2">
-            <span>Send</span><span>→</span>
-        </button>
+    <div class="max-w-3xl mx-auto">
+        <div class="flex gap-3">
+            <textarea id="messageInput" 
+                placeholder="Ask me anything about hospitality HR in Australia..." 
+                rows="2"
+                class="flex-1 bg-slate-900 text-slate-100 border border-slate-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
+                onkeypress="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }">
+            </textarea>
+            <button id="sendButton" onclick="sendMessage()" 
+                    class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-8 py-3 rounded-lg transition-all flex items-center gap-2">
+                <span>Send</span><span>→</span>
+            </button>
+        </div>
     </div>
 </div>
 
@@ -9170,5 +9172,7 @@ function showPrivacyFromAcceptance() {
 </script>
 </body>
 </html>
+
+
 
 
