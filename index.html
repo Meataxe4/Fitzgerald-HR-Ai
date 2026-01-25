@@ -5906,15 +5906,19 @@ function checkAccess() {
     const userCodeEl = document.getElementById('userCode');
     
     if (CONFIG.VALID_CODES.includes(input)) {
+        // ✅ STORE ACCESS CODE IN LOCALSTORAGE
+        localStorage.setItem('fitzhr_access_code', input);
+        localStorage.setItem('fitzhr_last_login', new Date().toISOString());
+        
+        // Continue with normal login process
         currentUser = input;
         if (userCodeEl) userCodeEl.textContent = input;
         if (accessScreen) accessScreen.classList.add('hidden');
         if (assistantScreen) assistantScreen.classList.remove('hidden');
         if (error) error.classList.add('hidden');
         
-	// ✅ SHOW LEGAL ACCEPTANCE MODAL ON FIRST USE
+        // ✅ SHOW LEGAL ACCEPTANCE MODAL ON FIRST USE
         setTimeout(() => showLegalAcceptanceModal(), 500);        
-
 
         trackEvent('beta_access', { code: input });
         
@@ -5947,10 +5951,110 @@ function checkAccess() {
             updateDailyTipBanner();
             startDailyTipRotation();
         }, 500);
+        
+        console.log('✅ Access code stored in localStorage');
     } else {
         error.textContent = 'Invalid access code. Please check and try again.';
         error.classList.remove('hidden');
+        
+        // ❌ CLEAR ANY STORED CODE IF INVALID ATTEMPT
+        localStorage.removeItem('fitzhr_access_code');
     }
+}
+
+/**
+ * Attempts to auto-login user with stored access code
+ * Called on page load to provide seamless experience
+ * @returns {boolean} True if auto-login successful, false otherwise
+ */
+function attemptAutoLogin() {
+    console.log('🔐 Checking for stored access code...');
+    
+    const storedCode = localStorage.getItem('fitzhr_access_code');
+    const lastLogin = localStorage.getItem('fitzhr_last_login');
+    
+    if (!storedCode) {
+        console.log('❌ No stored access code found');
+        return false;
+    }
+    
+    // Optional: Check if code is still valid (hasn't expired)
+    // For now, codes don't expire, but you could add expiry logic here
+    if (lastLogin) {
+        const lastLoginDate = new Date(lastLogin);
+        const daysSinceLogin = (new Date() - lastLoginDate) / (1000 * 60 * 60 * 24);
+        
+        // Optional: Expire codes after 30 days of inactivity
+        if (daysSinceLogin > 30) {
+            console.log('⚠️ Access code expired (30 days inactive)');
+            localStorage.removeItem('fitzhr_access_code');
+            localStorage.removeItem('fitzhr_last_login');
+            return false;
+        }
+    }
+    
+    // Verify code is still in valid codes list
+    if (!CONFIG.VALID_CODES.includes(storedCode)) {
+        console.log('❌ Stored code no longer valid:', storedCode);
+        localStorage.removeItem('fitzhr_access_code');
+        localStorage.removeItem('fitzhr_last_login');
+        return false;
+    }
+    
+    console.log('✅ Valid stored code found:', storedCode);
+    console.log('📅 Last login:', lastLogin);
+    
+    // Perform automatic login
+    const accessScreen = document.getElementById('accessScreen');
+    const assistantScreen = document.getElementById('assistantScreen');
+    const userCodeEl = document.getElementById('userCode');
+    
+    currentUser = storedCode;
+    if (userCodeEl) userCodeEl.textContent = storedCode;
+    if (accessScreen) accessScreen.classList.add('hidden');
+    if (assistantScreen) assistantScreen.classList.remove('hidden');
+    
+    // Update last login timestamp
+    localStorage.setItem('fitzhr_last_login', new Date().toISOString());
+    
+    // Show admin button for admin codes
+    if (['FITZGERALD-TEST', 'DEMO-2025'].includes(storedCode)) {
+        const adminBtn = document.getElementById('adminButton');
+        if (adminBtn) {
+            adminBtn.classList.remove('hidden');
+        }
+    }
+    
+    // CHECK IF USER NEEDS ONBOARDING
+    const hasCompletedOnboarding = checkOnboardingStatus();
+    if (!hasCompletedOnboarding) {
+        setTimeout(() => {
+            showOnboarding();
+        }, 1000);
+    } else {
+        const userName = venueProfile.userName || '';
+        const venueName = venueProfile.venueName || 'your venue';
+        const city = venueProfile.city || '';
+        const state = venueProfile.location || '';
+        const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
+        const locationText = city ? `${city}, ${state}` : state;
+        addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+    }
+
+    // Initialize and start daily tip rotation
+    setTimeout(() => {
+        updateDailyTipBanner();
+        startDailyTipRotation();
+    }, 500);
+    
+    // Track auto-login
+    trackEvent('auto_login', { 
+        code: storedCode,
+        daysSinceLastLogin: lastLogin ? Math.floor((new Date() - new Date(lastLogin)) / (1000 * 60 * 60 * 24)) : null
+    });
+    
+    console.log('✅ Auto-login successful');
+    return true;
 }
 
 // ========================================
@@ -8554,6 +8658,11 @@ function logout() {
         return;
     }
     
+    // ✅ CLEAR STORED ACCESS CODE
+    localStorage.removeItem('fitzhr_access_code');
+    localStorage.removeItem('fitzhr_last_login');
+    console.log('🗑️ Access code cleared from localStorage');
+    
     // Reset current user
     currentUser = null;
     
@@ -9012,7 +9121,13 @@ document.addEventListener('DOMContentLoaded', function() {
         console.warn('⚠️ Supabase initialization failed - analytics will only save locally');
     }
     
-    startTestimonialRotation();
+    // ✅ ATTEMPT AUTO-LOGIN BEFORE SHOWING ACCESS SCREEN
+    const autoLoginSuccessful = attemptAutoLogin();    
+
+    // Only start testimonial rotation if user is NOT auto-logged in
+    if (!autoLoginSuccessful) {
+        startTestimonialRotation();
+    }
     
     console.log('✅ DOM cache initialized');
     console.log('Fitzgerald HR Assistant loaded successfully ✓');
@@ -9240,6 +9355,4 @@ function showPrivacyFromAcceptance() {
 </script>
 </body>
 </html>
-
-
 
