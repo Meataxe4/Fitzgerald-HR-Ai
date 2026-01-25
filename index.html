@@ -327,13 +327,26 @@ input, textarea, select {
                     <span class="sm:hidden">📝</span>
                 </button>
                 
-                <!-- Logout -->
-                <button onclick="logout()" 
-                        class="text-slate-400 hover:text-white transition-colors px-2 py-2 touch-manipulation">
-                    Logout
-                </button>
-                
-            </div>
+ <!-- Logout Menu (Dropdown) -->
+<div class="relative">
+    <button onclick="toggleLogoutMenu()" id="logoutMenuButton"
+            class="text-slate-400 hover:text-white transition-colors px-2 py-2 touch-manipulation">
+        Logout ▼
+    </button>
+    
+    <!-- Dropdown Menu -->
+    <div id="logoutMenu" class="hidden absolute right-0 top-12 bg-slate-800 border border-slate-700 rounded-lg shadow-xl w-56 z-50">
+        <div class="p-2">
+            <button onclick="logout(); toggleLogoutMenu();" 
+                    class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
+                <span>🚪</span>
+                <span>Logout</span>
+            </button>
+            <button onclick="logoutAllDevices(); toggleLogoutMenu();" 
+                    class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-red-400 flex items-center gap-3 touch-manipulation">
+                <span>⚠️</span>
+                <span>Logout All Devices</span>
+            </button>
         </div>
     </div>
 </div>
@@ -5896,6 +5909,94 @@ function startDailyTipRotation() {
  * Shows error message if code is invalid
  * @returns {void}
  */
+
+// ========================================
+// AUTO-LOGIN WITH LOCALSTORAGE
+// ========================================
+
+/**
+ * Checks for stored access code on page load
+ * Auto-logs user in if valid code exists
+ */
+function checkAutoLogin() {
+    console.log('🔐 Checking for stored access code...');
+    
+    const storedCode = localStorage.getItem('fitzgeraldhr_access_code');
+    const lastLogin = localStorage.getItem('fitzgeraldhr_last_login');
+    
+    if (!storedCode) {
+        console.log('❌ No stored access code found');
+        return false;
+    }
+    
+    // Check if code is expired (30 days)
+    if (lastLogin) {
+        const daysSinceLogin = (Date.now() - parseInt(lastLogin)) / (1000 * 60 * 60 * 24);
+        if (daysSinceLogin > 30) {
+            console.log('⚠️ Access code expired (30+ days old)');
+            localStorage.removeItem('fitzgeraldhr_access_code');
+            localStorage.removeItem('fitzgeraldhr_last_login');
+            return false;
+        }
+    }
+    
+    // Validate stored code
+    if (CONFIG.VALID_CODES.includes(storedCode)) {
+        console.log('✅ Valid stored code found:', storedCode);
+        
+        // Auto-login user
+        currentUser = storedCode;
+        
+        // Update UI
+        const accessScreen = document.getElementById('accessScreen');
+        const assistantScreen = document.getElementById('assistantScreen');
+        const userCodeEl = document.getElementById('userCode');
+        
+        if (userCodeEl) userCodeEl.textContent = storedCode;
+        if (accessScreen) accessScreen.classList.add('hidden');
+        if (assistantScreen) assistantScreen.classList.remove('hidden');
+        
+        // Show admin button for admin codes
+        if (['FITZGERALD-TEST', 'DEMO-2025'].includes(storedCode)) {
+            const adminBtn = document.getElementById('adminButton');
+            if (adminBtn) adminBtn.classList.remove('hidden');
+        }
+        
+        // Check onboarding status
+        const hasCompletedOnboarding = checkOnboardingStatus();
+        if (!hasCompletedOnboarding) {
+            setTimeout(() => showOnboarding(), 1000);
+        } else {
+            const userName = venueProfile.userName || '';
+            const venueName = venueProfile.venueName || 'your venue';
+            const city = venueProfile.city || '';
+            const state = venueProfile.location || '';
+            const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
+            const locationText = city ? `${city}, ${state}` : state;
+            addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+        }
+        
+        // Initialize daily tips
+        setTimeout(() => {
+            updateDailyTipBanner();
+            startDailyTipRotation();
+        }, 500);
+        
+        // Track auto-login
+        trackEvent('auto_login_success', { 
+            code: storedCode,
+            daysSinceLastLogin: lastLogin ? Math.floor((Date.now() - parseInt(lastLogin)) / (1000 * 60 * 60 * 24)) : 0
+        });
+        
+        return true;
+    } else {
+        console.log('❌ Stored code is invalid:', storedCode);
+        localStorage.removeItem('fitzgeraldhr_access_code');
+        localStorage.removeItem('fitzgeraldhr_last_login');
+        return false;
+    }
+}
+
 function checkAccess() {
     const input = document.getElementById('accessCodeInput').value.trim().toUpperCase();
     const error = document.getElementById('accessError');
@@ -5907,6 +6008,12 @@ function checkAccess() {
     
     if (CONFIG.VALID_CODES.includes(input)) {
         currentUser = input;
+
+    // ✅ NEW: Store access code in localStorage
+    localStorage.setItem('fitzgeraldhr_access_code', input);
+    localStorage.setItem('fitzgeraldhr_last_login', Date.now().toString());
+    console.log('✅ Access code saved to localStorage');
+
         if (userCodeEl) userCodeEl.textContent = input;
         if (accessScreen) accessScreen.classList.add('hidden');
         if (assistantScreen) assistantScreen.classList.remove('hidden');
@@ -8549,10 +8656,14 @@ function closeFeedback() {
 function logout() {
     console.log('🚪 Logout initiated');
     
-    // Confirm logout
     if (!confirm('Are you sure you want to logout?')) {
         return;
     }
+    
+    // ✅ NEW: Clear localStorage access code
+    localStorage.removeItem('fitzgeraldhr_access_code');
+    localStorage.removeItem('fitzgeraldhr_last_login');
+    console.log('✅ Access code removed from localStorage');
     
     // Reset current user
     currentUser = null;
@@ -8625,6 +8736,41 @@ function logout() {
     trackEvent('user_logout', { user: currentUser });
     
     console.log('✅ Logged out successfully');
+}
+
+/**
+ * Logout all devices - clears ALL localStorage data
+ */
+function logoutAllDevices() {
+    if (!confirm(
+        '⚠️ LOGOUT ALL DEVICES\n\n' +
+        'This will:\n' +
+        '• Log you out of this device\n' +
+        '• Clear all stored preferences\n' +
+        '• Clear conversation history\n\n' +
+        'You will need to re-enter your access code.\n\n' +
+        'Continue?'
+    )) {
+        return;
+    }
+    
+    // Clear ALL localStorage for this app
+    const keysToRemove = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.startsWith('fitzgeraldhr_') || key.includes('venueProfile_'))) {
+            keysToRemove.push(key);
+        }
+    }
+    
+    keysToRemove.forEach(key => localStorage.removeItem(key));
+    
+    console.log('✅ All local data cleared:', keysToRemove);
+    
+    alert('✅ Successfully logged out of all devices.\n\nAll local data has been cleared.');
+    
+    // Reload page to reset
+    location.reload();
 }
 
 function setRating(rating) {
@@ -9006,14 +9152,23 @@ document.addEventListener('DOMContentLoaded', function() {
     DOM.voiceButton = document.getElementById('voiceButton');
     DOM.voiceIcon = document.getElementById('voiceIcon');
     
+
+    // ✅ NEW: Check for auto-login BEFORE showing access screen
+    const autoLoginSuccess = checkAutoLogin();
+    
+    if (!autoLoginSuccess) {
+        console.log('ℹ️ No auto-login - showing access screen');
+        startTestimonialRotation();
+    } else {
+        console.log('✅ Auto-login successful - user is logged in');
+    }
+
     // Initialize Supabase
     const supabaseInitialized = initializeSupabase();
     if (!supabaseInitialized) {
         console.warn('⚠️ Supabase initialization failed - analytics will only save locally');
     }
-    
-    startTestimonialRotation();
-    
+       
     console.log('✅ DOM cache initialized');
     console.log('Fitzgerald HR Assistant loaded successfully ✓');
     console.log('All JavaScript fixes applied ✓');
@@ -9237,8 +9392,26 @@ function showPrivacyFromAcceptance() {
     privacyModal.style.zIndex = '55'; // Below acceptance modal (z-60)
 }
 
+/**
+ * Toggle logout dropdown menu
+ */
+function toggleLogoutMenu() {
+    const menu = document.getElementById('logoutMenu');
+    if (menu) {
+        menu.classList.toggle('hidden');
+    }
+}
+
+// Close logout menu when clicking outside
+document.addEventListener('click', function(event) {
+    const menu = document.getElementById('logoutMenu');
+    const button = document.getElementById('logoutMenuButton');
+    
+    if (menu && !menu.contains(event.target) && !button?.contains(event.target)) {
+        menu.classList.add('hidden');
+    }
+});
+
 </script>
 </body>
 </html>
-
-
