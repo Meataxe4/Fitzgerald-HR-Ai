@@ -5771,121 +5771,93 @@ async function generateWordDocument(htmlContent, filename, metadata = {}) {
             return false;
         }
         
-        // ✅ CLEAN THE HTML CONTENT
-        const cleanHTML = cleanHTMLForWord(htmlContent);
+        // ✅ STRIP ALL HTML - Convert to plain text with basic formatting
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlContent, 'text/html');
         
-        // Create styled HTML document
-        const styledHTML = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <style>
-                    body { 
-                        font-family: Calibri, Arial, sans-serif; 
-                        font-size: 11pt;
-                        line-height: 1.5;
-                        color: #000000;
-                        margin: 1in;
-                    }
-                    h1 { 
-                        font-size: 18pt; 
-                        font-weight: bold; 
-                        margin-top: 24pt; 
-                        margin-bottom: 12pt;
-                        color: #1F2937;
-                    }
-                    h2 { 
-                        font-size: 14pt; 
-                        font-weight: bold; 
-                        margin-top: 18pt; 
-                        margin-bottom: 10pt;
-                        color: #374151;
-                    }
-                    h3 { 
-                        font-size: 12pt; 
-                        font-weight: bold; 
-                        margin-top: 14pt; 
-                        margin-bottom: 8pt;
-                        color: #4B5563;
-                    }
-                    p { 
-                        margin-bottom: 12pt;
-                        text-align: justify;
-                    }
-                    ul, ol { 
-                        margin-left: 24pt;
-                        margin-bottom: 12pt;
-                    }
-                    li { 
-                        margin-bottom: 6pt;
-                    }
-                    strong, b {
-                        font-weight: bold;
-                    }
-                    em, i {
-                        font-style: italic;
-                    }
-                    hr {
-                        border: none;
-                        border-top: 1px solid #CCCCCC;
-                        margin: 24pt 0;
-                    }
-                    .footer {
-                        margin-top: 48pt;
-                        padding-top: 24pt;
-                        border-top: 2px solid #CCCCCC;
-                        text-align: center;
-                        font-size: 10pt;
-                        color: #6B7280;
-                    }
-                    .footer-title {
-                        font-weight: bold;
-                        font-size: 12pt;
-                        color: #1F2937;
-                        margin-bottom: 8pt;
-                    }
-                    .footer-warning {
-                        font-weight: bold;
-                        color: #DC2626;
-                        margin-top: 12pt;
-                    }
-                </style>
-            </head>
-            <body>
-                ${cleanHTML}
+        let plainText = '';
+        
+        // Process each element to build clean text with line breaks
+        const processNode = (node, level = 0) => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                const text = node.textContent.trim();
+                if (text) {
+                    plainText += text + '\n';
+                }
+            } else if (node.nodeType === Node.ELEMENT_NODE) {
+                const tag = node.tagName.toLowerCase();
                 
-                <div class="footer">
-                    <div class="footer-title">FITZGERALD HR - AI-Powered Hospitality HR Solutions</div>
-                    <p>Email: info@fitzgeraldhr.com.au  |  Phone: +61 400 211 014</p>
-                    <p style="font-style: italic;">
-                        Generated: ${new Date().toLocaleDateString('en-AU', { 
-                            year: 'numeric', 
-                            month: 'long', 
-                            day: 'numeric' 
-                        })} at ${new Date().toLocaleTimeString('en-AU', {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                        })}
-                    </p>
-                    <p>Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}</p>
-                    <p class="footer-warning">WARNING: DRAFT TEMPLATE - Requires professional review before use</p>
-                    <p style="font-style: italic; margin-top: 8pt;">
-                        For personalised advice and document review, contact our Senior Consultants.
-                    </p>
-                </div>
-            </body>
-            </html>
-        `;
+                if (tag === 'h1') {
+                    plainText += '\n' + '='.repeat(60) + '\n';
+                    plainText += node.textContent.trim().toUpperCase() + '\n';
+                    plainText += '='.repeat(60) + '\n\n';
+                } else if (tag === 'h2') {
+                    plainText += '\n' + '-'.repeat(50) + '\n';
+                    plainText += node.textContent.trim() + '\n';
+                    plainText += '-'.repeat(50) + '\n\n';
+                } else if (tag === 'h3') {
+                    plainText += '\n' + node.textContent.trim() + '\n' + '-'.repeat(30) + '\n';
+                } else if (tag === 'p') {
+                    plainText += node.textContent.trim() + '\n\n';
+                } else if (tag === 'li') {
+                    plainText += '  • ' + node.textContent.trim() + '\n';
+                } else if (tag === 'ul' || tag === 'ol') {
+                    // Process list items
+                    for (const child of node.children) {
+                        processNode(child, level + 1);
+                    }
+                    plainText += '\n';
+                } else {
+                    // Process children for other elements
+                    for (const child of node.childNodes) {
+                        processNode(child, level);
+                    }
+                }
+            }
+        };
+        
+        // Process the document
+        processNode(doc.body);
+        
+        // Add footer
+        plainText += '\n\n' + '='.repeat(60) + '\n';
+        plainText += 'FITZGERALD HR - AI-Powered Hospitality HR Solutions\n';
+        plainText += 'Email: info@fitzgeraldhr.com.au  |  Phone: +61 400 211 014\n';
+        plainText += `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}\n`;
+        plainText += `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}\n`;
+        plainText += '='.repeat(60) + '\n\n';
+        plainText += '⚠️ DRAFT TEMPLATE - Requires professional review before use\n';
+        plainText += 'For personalised advice, contact our Senior Consultants.\n';
+        plainText += '='.repeat(60);
+        
+        console.log('✅ Plain text generated, length:', plainText.length);
+        
+        // Create super simple HTML (just pre-formatted text)
+        const simpleHTML = `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { 
+            font-family: 'Courier New', monospace; 
+            font-size: 11pt;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            padding: 1in;
+        }
+    </style>
+</head>
+<body>${plainText}</body>
+</html>`;
         
         console.log('📦 Creating Word blob...');
         
-        // Convert HTML to Word
-        const converted = htmlDocx.asBlob(styledHTML);
+        // Convert to Word
+        const converted = htmlDocx.asBlob(simpleHTML);
         
         console.log('✅ Blob created, size:', converted.size);
         
-        // Download using FileSaver
+        // Download
         saveAs(converted, filename);
         
         console.log('✅ Word document downloaded:', filename);
