@@ -2179,6 +2179,58 @@ html        </div>
     </div>
 </div>
 
+
+<!-- ========================================== -->
+<!-- LOGOUT OPTIONS MODAL -->
+<!-- ========================================== -->
+
+<div id="logoutModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-md w-full border-2 border-slate-700 fade-in">
+        <div class="text-center mb-6">
+            <div class="text-6xl mb-4">🚪</div>
+            <h2 class="text-2xl font-bold text-white mb-2">Logout Options</h2>
+            <p class="text-slate-400">How would you like to logout?</p>
+        </div>
+        
+        <div class="space-y-3 mb-6">
+            <!-- Quick Logout (Soft) -->
+            <button onclick="confirmLogout('soft')" 
+                    class="w-full p-4 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all text-left group">
+                <div class="flex items-center gap-3">
+                    <div class="text-3xl">🔄</div>
+                    <div class="flex-1">
+                        <p class="font-bold text-lg mb-1">Quick Logout</p>
+                        <p class="text-sm opacity-90">Stay logged in on this device - auto-login next time</p>
+                    </div>
+                </div>
+            </button>
+            
+            <!-- Full Logout (Hard) -->
+            <button onclick="confirmLogout('hard')" 
+                    class="w-full p-4 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all text-left group">
+                <div class="flex items-center gap-3">
+                    <div class="text-3xl">🗑️</div>
+                    <div class="flex-1">
+                        <p class="font-bold text-lg mb-1">Full Logout</p>
+                        <p class="text-sm opacity-90">Forget this device - enter access code next time</p>
+                    </div>
+                </div>
+            </button>
+        </div>
+        
+        <div class="bg-slate-700/50 rounded-lg p-3 mb-4">
+            <p class="text-slate-300 text-xs text-center">
+                💡 <strong>Tip:</strong> Use Quick Logout if you're the only one using this device
+            </p>
+        </div>
+        
+        <button onclick="closeLogoutModal()" 
+                class="w-full py-3 text-slate-400 hover:text-white font-semibold transition-colors rounded-lg hover:bg-slate-700/50">
+            Cancel
+        </button>
+    </div>
+</div>
+
 <!-- ========================================== -->
 <!-- LEGAL ACCEPTANCE MODAL (First Use Only) -->
 <!-- ========================================== -->
@@ -8667,17 +8719,72 @@ function closeFeedback() {
 // ========================================
 
 function logout() {
-    console.log('🚪 Logout initiated');
+    console.log('🚪 Logout initiated - showing options modal');
     
-    // Confirm logout
-    if (!confirm('Are you sure you want to logout?')) {
-        return;
+    // Show the logout options modal
+    document.getElementById('logoutModal').classList.remove('hidden');
+    
+    // Track that user opened logout dialog
+    trackEvent('logout_dialog_opened', { user: currentUser });
+}
+
+function setRating(rating) {
+    feedbackRating = rating;
+    document.querySelectorAll('.rating-btn').forEach((btn, idx) => {
+        if (idx < rating) {
+            btn.classList.add('bg-amber-500');
+            btn.classList.remove('bg-slate-700');
+        } else {
+            btn.classList.remove('bg-amber-500');
+            btn.classList.add('bg-slate-700');
+        }
+    });
+}
+
+/**
+ * Closes the logout modal without logging out
+ */
+function closeLogoutModal() {
+    document.getElementById('logoutModal').classList.add('hidden');
+    console.log('ℹ️ Logout cancelled by user');
+    trackEvent('logout_cancelled', { user: currentUser });
+}
+
+/**
+ * Performs logout with specified type (soft or hard)
+ * @param {string} type - 'soft' (keep code) or 'hard' (forget device)
+ */
+function confirmLogout(type) {
+    console.log('🚪 Confirming logout - type:', type);
+    
+    // Close the modal first
+    closeLogoutModal();
+    
+    // Store current user for tracking before clearing
+    const loggedOutUser = currentUser;
+    
+    if (type === 'soft') {
+        // ✅ SOFT LOGOUT - Keep access code stored for auto-login
+        console.log('🔄 Soft logout - keeping access code stored');
+        // localStorage stays intact - user will auto-login next visit
+    } else if (type === 'hard') {
+        // ✅ HARD LOGOUT - Clear everything, forget this device
+        console.log('🗑️ Hard logout - clearing access code and session data');
+        localStorage.removeItem('fitzhr_access_code');
+        localStorage.removeItem('fitzhr_last_login');
     }
     
-    // ✅ CLEAR STORED ACCESS CODE
-    localStorage.removeItem('fitzhr_access_code');
-    localStorage.removeItem('fitzhr_last_login');
-    console.log('🗑️ Access code cleared from localStorage');
+    // Perform the actual logout
+    performLogout(loggedOutUser, type);
+}
+
+/**
+ * Performs the actual logout operations
+ * @param {string} loggedOutUser - User code before logout
+ * @param {string} type - Logout type for analytics
+ */
+function performLogout(loggedOutUser, type) {
+    console.log('🔄 Performing logout cleanup...');
     
     // Reset current user
     currentUser = null;
@@ -8690,22 +8797,40 @@ function logout() {
     if (messagesContainer) {
         const container = messagesContainer.querySelector('.space-y-6');
         if (container) {
-            // Keep only the welcome message
+            // Restore welcome message
             container.innerHTML = `
                 <div class="flex justify-start">
                     <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
-                        <p class="text-slate-100 leading-relaxed">G'day! I'm Fitz, your AI assistant from Fitzgerald HR, specialised in hospitality HR for Australian venues.</p>
+                        <p class="text-slate-100 leading-relaxed">
+                            👋 G'day! I'm Fitz, your AI-powered HR knowledge companion from Fitzgerald HR, 
+                            specializing in hospitality HR for Australian venues.
+                        </p>
 
-                        <p class="text-slate-100 leading-relaxed mt-3">I can help you with Fair Work compliance, award interpretation, employee relations, recruitment advice, and more.</p>
+                        <p class="text-slate-100 leading-relaxed mt-3">
+                            I can help you understand Fair Work compliance, award interpretation, employee relations, 
+                            recruitment processes, and more.
+                        </p>
 
-                        <p class="text-slate-100 text-sm mt-4">💡 <strong>Tip:</strong> I have 8 specialised tools (click 🛠️ above). I'll suggest the right ones as we talk, or browse them anytime.</p>
+                        <div class="bg-amber-500/10 border-l-4 border-amber-500 rounded-r-lg p-3 mt-4">
+                            <p class="text-amber-300 text-sm font-semibold">💡 Try asking:</p>
+                            <p class="text-slate-300 text-xs mt-1">
+                                "What should I pay a casual waiter?" • "Can I fire someone for being late?" • "How do I write a warning letter?"
+                            </p>
+                        </div>
+
+                        <p class="text-slate-100 text-sm mt-4">
+                            💡 <strong>Tip:</strong> I have 8 specialized tools (click 🛠️ above). 
+                            I'll suggest the right ones as we talk, or browse them anytime.
+                        </p>
 
                         <p class="text-red-400 font-semibold mt-4 mb-2">🚨 Urgent/Critical Situations:</p>
-                        <p class="text-slate-100 text-sm">Use the red URGENT button above for immediate crisis response.</p>
+                        <p class="text-slate-100 text-sm">
+                            Use the red URGENT button above for immediate crisis response.
+                        </p>
 
-                        <p class="text-slate-100 leading-relaxed mt-4">What HR challenge can I help you with today?</p>
-
-                        <p class="text-slate-300 text-sm mt-4">✉️ For personalised support, contact our Senior Consultants at <a href="mailto:info@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">info@fitzgeraldhr.com.au</a></p>
+                        <p class="text-slate-100 leading-relaxed mt-4">
+                            What HR topic would you like to learn about today?
+                        </p>
 
                         <p class="text-yellow-400 text-xs mt-4 bg-yellow-500/10 border border-yellow-500/30 rounded p-3">
                             ⚠️ <strong>Award Rates:</strong> Data effective 1 July 2025 - 30 June 2026. 
@@ -8719,16 +8844,18 @@ function logout() {
     }
     
     // Hide assistant screen
-    if (DOM.assistantScreen) {
-        DOM.assistantScreen.classList.add('hidden');
+    const assistantScreen = document.getElementById('assistantScreen');
+    if (assistantScreen) {
+        assistantScreen.classList.add('hidden');
     }
     
     // Show access screen
-    if (DOM.accessScreen) {
-        DOM.accessScreen.classList.remove('hidden');
+    const accessScreen = document.getElementById('accessScreen');
+    if (accessScreen) {
+        accessScreen.classList.remove('hidden');
     }
     
-    // Clear access code input
+    // Clear access code input field
     const accessInput = document.getElementById('accessCodeInput');
     if (accessInput) {
         accessInput.value = '';
@@ -8746,23 +8873,36 @@ function logout() {
         adminBtn.classList.add('hidden');
     }
     
-    // Track logout event
-    trackEvent('user_logout', { user: currentUser });
-    
-    console.log('✅ Logged out successfully');
-}
-
-function setRating(rating) {
-    feedbackRating = rating;
-    document.querySelectorAll('.rating-btn').forEach((btn, idx) => {
-        if (idx < rating) {
-            btn.classList.add('bg-amber-500');
-            btn.classList.remove('bg-slate-700');
-        } else {
-            btn.classList.remove('bg-amber-500');
-            btn.classList.add('bg-slate-700');
-        }
+    // Track logout event with detailed analytics
+    trackEvent('user_logout', { 
+        user: loggedOutUser,
+        type: type,
+        timestamp: new Date().toISOString(),
+        codeRemembered: type === 'soft'
     });
+    
+    // Log to Supabase if available
+    if (supabaseClient) {
+        supabaseClient
+            .from('user_sessions')
+            .insert([{
+                user_code: loggedOutUser,
+                action: 'logout',
+                logout_type: type,
+                timestamp: new Date().toISOString()
+            }])
+            .then(() => console.log('✅ Logout logged to database'))
+            .catch(err => console.warn('⚠️ Failed to log logout:', err));
+    }
+    
+    console.log(`✅ ${type === 'soft' ? 'Soft' : 'Hard'} logout complete`);
+    
+    // Show confirmation message
+    if (type === 'soft') {
+        console.log('💡 User will auto-login next time');
+    } else {
+        console.log('🔒 User must enter access code next time');
+    }
 }
 
 function submitFeedback() {
@@ -9153,7 +9293,8 @@ document.addEventListener('DOMContentLoaded', function() {
     DOM.awardWizardModal = document.getElementById('awardWizardModal');
     DOM.rosterStressTesterModal = document.getElementById('rosterStressTesterModal');
     DOM.complianceCalendarModal = document.getElementById('complianceCalendarModal');
-    
+    DOM.logoutModal = document.getElementById('logoutModal');
+
     DOM.toolsMenu = document.getElementById('toolsMenu');
     DOM.voiceButton = document.getElementById('voiceButton');
     DOM.voiceIcon = document.getElementById('voiceIcon');
