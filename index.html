@@ -24,7 +24,7 @@
     
     <!-- Word Document Generation - ✅ USING JSDELIVR -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://unpkg.com/docx@7.8.2/build/index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
     
     <!-- Excel/Spreadsheet -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -5661,17 +5661,7 @@ async function downloadGeneratedDocument(format = 'pdf') {
         user: currentUser,
         documentType: documentBuilderState.currentType,
         format: format
-    });
-    
-    // ✅ DEBUG: Log HTML for Word documents
-    const previewElement = document.getElementById('documentPreviewContent');
-    if (previewElement && format === 'docx') {
-        console.log('═══════════════════════════════════════');
-        console.log('📄 RAW HTML FOR WORD DOCUMENT:');
-        console.log('Length:', previewElement.innerHTML.length);
-        console.log('First 1000 chars:', previewElement.innerHTML.substring(0, 1000));
-        console.log('═══════════════════════════════════════');
-    }
+    });    
 
     try {
         const type = documentBuilderState.currentType;
@@ -5697,6 +5687,8 @@ async function downloadGeneratedDocument(format = 'pdf') {
         };
         
         // Get the FORMATTED HTML from the preview
+        const previewElement = document.getElementById('documentPreviewContent');
+        
         if (!previewElement) {
             throw new Error('Preview content not found');
         }
@@ -5766,56 +5758,134 @@ async function generateWordDocument(htmlContent, filename, metadata = {}) {
         console.log('📝 Generating Word document...');
         
         if (typeof htmlDocx === 'undefined') {
-            alert('Word library not loaded. Please refresh the page and try again.');
+            console.error('❌ html-docx-js not loaded');
+            alert('Word document library not loaded. Please refresh the page and try again.');
             return false;
         }
         
-        // Create the absolute simplest possible HTML
-        const simpleHTML = `
-<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"></head>
-<body style="font-family: Calibri; font-size: 11pt; line-height: 1.5;">
-<h1>RECORD OF DISCUSSION</h1>
-<p><strong>Employee:</strong> ${metadata.documentType || 'Document'}</p>
-<p><strong>Date:</strong> ${new Date().toLocaleDateString('en-AU')}</p>
-<hr>
-${htmlContent.replace(/<[^>]*>/g, (match) => {
-    // Only keep basic tags
-    if (match.match(/^<\/?[hpul]/i)) return match;
-    return '';
-})}
-<hr>
-<p style="text-align: center;"><strong>FITZGERALD HR</strong></p>
-<p style="text-align: center;">info@fitzgeraldhr.com.au</p>
-<p style="text-align: center;">Generated: ${new Date().toLocaleDateString('en-AU')}</p>
-<p style="text-align: center; color: red;"><strong>DRAFT - Requires Review</strong></p>
-</body>
-</html>
-`;
+        // ✅ CLEAN THE HTML CONTENT
+        const cleanHTML = cleanHTMLForWord(htmlContent);
         
-        console.log('Creating Word blob...');
+        // Create styled HTML document
+        const styledHTML = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <style>
+                    body { 
+                        font-family: Calibri, Arial, sans-serif; 
+                        font-size: 11pt;
+                        line-height: 1.5;
+                        color: #000000;
+                        margin: 1in;
+                    }
+                    h1 { 
+                        font-size: 18pt; 
+                        font-weight: bold; 
+                        margin-top: 24pt; 
+                        margin-bottom: 12pt;
+                        color: #1F2937;
+                    }
+                    h2 { 
+                        font-size: 14pt; 
+                        font-weight: bold; 
+                        margin-top: 18pt; 
+                        margin-bottom: 10pt;
+                        color: #374151;
+                    }
+                    h3 { 
+                        font-size: 12pt; 
+                        font-weight: bold; 
+                        margin-top: 14pt; 
+                        margin-bottom: 8pt;
+                        color: #4B5563;
+                    }
+                    p { 
+                        margin-bottom: 12pt;
+                        text-align: justify;
+                    }
+                    ul, ol { 
+                        margin-left: 24pt;
+                        margin-bottom: 12pt;
+                    }
+                    li { 
+                        margin-bottom: 6pt;
+                    }
+                    strong, b {
+                        font-weight: bold;
+                    }
+                    em, i {
+                        font-style: italic;
+                    }
+                    hr {
+                        border: none;
+                        border-top: 1px solid #CCCCCC;
+                        margin: 24pt 0;
+                    }
+                    .footer {
+                        margin-top: 48pt;
+                        padding-top: 24pt;
+                        border-top: 2px solid #CCCCCC;
+                        text-align: center;
+                        font-size: 10pt;
+                        color: #6B7280;
+                    }
+                    .footer-title {
+                        font-weight: bold;
+                        font-size: 12pt;
+                        color: #1F2937;
+                        margin-bottom: 8pt;
+                    }
+                    .footer-warning {
+                        font-weight: bold;
+                        color: #DC2626;
+                        margin-top: 12pt;
+                    }
+                </style>
+            </head>
+            <body>
+                ${cleanHTML}
+                
+                <div class="footer">
+                    <div class="footer-title">FITZGERALD HR - AI-Powered Hospitality HR Solutions</div>
+                    <p>Email: info@fitzgeraldhr.com.au  |  Phone: +61 400 211 014</p>
+                    <p style="font-style: italic;">
+                        Generated: ${new Date().toLocaleDateString('en-AU', { 
+                            year: 'numeric', 
+                            month: 'long', 
+                            day: 'numeric' 
+                        })} at ${new Date().toLocaleTimeString('en-AU', {
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        })}
+                    </p>
+                    <p>Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}</p>
+                    <p class="footer-warning">WARNING: DRAFT TEMPLATE - Requires professional review before use</p>
+                    <p style="font-style: italic; margin-top: 8pt;">
+                        For personalised advice and document review, contact our Senior Consultants.
+                    </p>
+                </div>
+            </body>
+            </html>
+        `;
+        
+        console.log('📦 Creating Word blob...');
         
         // Convert HTML to Word
-        const converted = htmlDocx.asBlob(simpleHTML);
+        const converted = htmlDocx.asBlob(styledHTML);
         
-        // ✅ CRITICAL FIX: Create a NEW blob with the CORRECT MIME type
-        const properBlob = new Blob([converted], { 
-            type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
-        });
+        console.log('✅ Blob created, size:', converted.size);
         
-        console.log('Original blob type:', converted.type);
-        console.log('New blob type:', properBlob.type);
-        console.log('Blob size:', properBlob.size);
-        
-        // Download with correct blob
-        saveAs(properBlob, filename);
+        // Download using FileSaver
+        saveAs(converted, filename);
         
         console.log('✅ Word document downloaded:', filename);
         return true;
         
     } catch (error) {
         console.error('❌ Word generation error:', error);
+        console.error('❌ Stack:', error.stack);
         alert('Error generating Word document: ' + error.message);
         return false;
     }
@@ -9750,6 +9820,27 @@ function showPrivacyFromAcceptance() {
     privacyModal.classList.remove('hidden');
     privacyModal.style.zIndex = '55'; // Below acceptance modal (z-60)
 }
+
+window.addEventListener('DOMContentLoaded', function() {
+    console.log('🧪 Testing html-docx-js library...');
+    console.log('htmlDocx exists?', typeof htmlDocx);
+    console.log('htmlDocx object:', htmlDocx);
+    
+    if (typeof htmlDocx !== 'undefined') {
+        console.log('htmlDocx.asBlob exists?', typeof htmlDocx.asBlob);
+        
+        // Try the absolute simplest conversion
+        const testHTML = '<html><body><p>Test</p></body></html>';
+        try {
+            const result = htmlDocx.asBlob(testHTML);
+            console.log('✅ Test conversion result:', result);
+            console.log('✅ Result type:', result?.type);
+            console.log('✅ Result size:', result?.size);
+        } catch (e) {
+            console.error('❌ Test conversion failed:', e);
+        }
+    }
+});
 
 </script>
 </body>
