@@ -5763,125 +5763,60 @@ async function downloadGeneratedDocument(format = 'pdf') {
  */
 async function generateWordDocument(htmlContent, filename, metadata = {}) {
     try {
-        console.log('📝 Generating Word document with docx library...');
+        console.log('📝 Generating Word document...');
         
-        // Check if docx library loaded
-        if (typeof docx === 'undefined') {
-            console.error('❌ docx library not loaded');
-            alert('Word library not loaded. Please refresh and try again.');
+        if (typeof htmlDocx === 'undefined') {
+            alert('Word library not loaded. Please refresh the page and try again.');
             return false;
         }
         
-        // Parse HTML
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlContent, 'text/html');
+        // Create the absolute simplest possible HTML
+        const simpleHTML = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="font-family: Calibri; font-size: 11pt; line-height: 1.5;">
+<h1>RECORD OF DISCUSSION</h1>
+<p><strong>Employee:</strong> ${metadata.documentType || 'Document'}</p>
+<p><strong>Date:</strong> ${new Date().toLocaleDateString('en-AU')}</p>
+<hr>
+${htmlContent.replace(/<[^>]*>/g, (match) => {
+    // Only keep basic tags
+    if (match.match(/^<\/?[hpul]/i)) return match;
+    return '';
+})}
+<hr>
+<p style="text-align: center;"><strong>FITZGERALD HR</strong></p>
+<p style="text-align: center;">info@fitzgeraldhr.com.au</p>
+<p style="text-align: center;">Generated: ${new Date().toLocaleDateString('en-AU')}</p>
+<p style="text-align: center; color: red;"><strong>DRAFT - Requires Review</strong></p>
+</body>
+</html>
+`;
         
-        const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
+        console.log('Creating Word blob...');
         
-        // Build paragraphs
-        const paragraphs = [];
+        // Convert HTML to Word
+        const converted = htmlDocx.asBlob(simpleHTML);
         
-        // Process each element
-        const processElement = (element) => {
-            const tag = element.tagName?.toLowerCase();
-            const text = element.textContent?.trim();
-            
-            if (!text) return;
-            
-            if (tag === 'h1') {
-                paragraphs.push(
-                    new Paragraph({
-                        text: text,
-                        heading: HeadingLevel.HEADING_1,
-                        spacing: { before: 400, after: 200 }
-                    })
-                );
-            } else if (tag === 'h2') {
-                paragraphs.push(
-                    new Paragraph({
-                        text: text,
-                        heading: HeadingLevel.HEADING_2,
-                        spacing: { before: 300, after: 150 }
-                    })
-                );
-            } else if (tag === 'h3') {
-                paragraphs.push(
-                    new Paragraph({
-                        text: text,
-                        heading: HeadingLevel.HEADING_3,
-                        spacing: { before: 200, after: 100 }
-                    })
-                );
-            } else if (tag === 'p') {
-                paragraphs.push(
-                    new Paragraph({
-                        children: [new TextRun(text)],
-                        spacing: { after: 200 }
-                    })
-                );
-            } else if (tag === 'li') {
-                paragraphs.push(
-                    new Paragraph({
-                        text: text,
-                        bullet: { level: 0 },
-                        spacing: { after: 100 }
-                    })
-                );
-            }
-        };
-        
-        // Process all elements
-        doc.body.querySelectorAll('h1, h2, h3, p, li').forEach(processElement);
-        
-        // Add footer
-        paragraphs.push(
-            new Paragraph({ text: '', spacing: { before: 400 } }),
-            new Paragraph({
-                children: [new TextRun({ text: 'FITZGERALD HR - AI-Powered Hospitality HR Solutions', bold: true })],
-                spacing: { after: 100 }
-            }),
-            new Paragraph({
-                text: 'Email: info@fitzgeraldhr.com.au  |  Phone: +61 400 211 014',
-                spacing: { after: 100 }
-            }),
-            new Paragraph({
-                text: `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}`,
-                spacing: { after: 100 }
-            }),
-            new Paragraph({
-                text: `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}`,
-                spacing: { after: 200 }
-            }),
-            new Paragraph({
-                children: [new TextRun({ text: '⚠️ DRAFT TEMPLATE - Requires professional review before use', bold: true })],
-                spacing: { after: 100 }
-            })
-        );
-        
-        // Create document
-        const wordDoc = new Document({
-            sections: [{
-                properties: {},
-                children: paragraphs
-            }]
+        // ✅ CRITICAL FIX: Create a NEW blob with the CORRECT MIME type
+        const properBlob = new Blob([converted], { 
+            type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
         });
         
-        console.log('📦 Creating blob...');
+        console.log('Original blob type:', converted.type);
+        console.log('New blob type:', properBlob.type);
+        console.log('Blob size:', properBlob.size);
         
-        // Generate blob
-        const blob = await Packer.toBlob(wordDoc);
+        // Download with correct blob
+        saveAs(properBlob, filename);
         
-        console.log('✅ Blob created, size:', blob.size);
-        
-        // Download
-        saveAs(blob, filename);
-        
-        console.log('✅ Word document downloaded');
+        console.log('✅ Word document downloaded:', filename);
         return true;
         
     } catch (error) {
-        console.error('❌ Error:', error);
-        alert('Error: ' + error.message);
+        console.error('❌ Word generation error:', error);
+        alert('Error generating Word document: ' + error.message);
         return false;
     }
 }
