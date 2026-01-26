@@ -5757,12 +5757,14 @@ async function generateWordDocument(htmlContent, filename, metadata = {}) {
     try {
         console.log('📝 Generating Word document...');
         
-        // Check if library is loaded
         if (typeof htmlDocx === 'undefined') {
             console.error('❌ html-docx-js not loaded');
             alert('Word document library not loaded. Please refresh the page and try again.');
             return false;
         }
+        
+        // ✅ CLEAN THE HTML CONTENT
+        const cleanHTML = cleanHTMLForWord(htmlContent);
         
         // Create styled HTML document
         const styledHTML = `
@@ -5843,11 +5845,11 @@ async function generateWordDocument(htmlContent, filename, metadata = {}) {
                 </style>
             </head>
             <body>
-                ${htmlContent}
+                ${cleanHTML}
                 
                 <div class="footer">
                     <div class="footer-title">FITZGERALD HR - AI-Powered Hospitality HR Solutions</div>
-                    <p>📧 info@fitzgeraldhr.com.au  •  📞 +61 400 211 014</p>
+                    <p>Email: info@fitzgeraldhr.com.au  |  Phone: +61 400 211 014</p>
                     <p style="font-style: italic;">
                         Generated: ${new Date().toLocaleDateString('en-AU', { 
                             year: 'numeric', 
@@ -5858,8 +5860,8 @@ async function generateWordDocument(htmlContent, filename, metadata = {}) {
                             minute: '2-digit'
                         })}
                     </p>
-                    <p>Document ID: ${metadata.documentId || 'N/A'} • User: ${metadata.userName || currentUser}</p>
-                    <p class="footer-warning">⚠️ DRAFT TEMPLATE - Requires professional review before use</p>
+                    <p>Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}</p>
+                    <p class="footer-warning">WARNING: DRAFT TEMPLATE - Requires professional review before use</p>
                     <p style="font-style: italic; margin-top: 8pt;">
                         For personalised advice and document review, contact our Senior Consultants.
                     </p>
@@ -5868,20 +5870,89 @@ async function generateWordDocument(htmlContent, filename, metadata = {}) {
             </html>
         `;
         
+        console.log('📦 Creating Word blob...');
+        
         // Convert HTML to Word
         const converted = htmlDocx.asBlob(styledHTML);
+        
+        console.log('✅ Blob created, size:', converted.size);
         
         // Download using FileSaver
         saveAs(converted, filename);
         
-        console.log('✅ Word document generated successfully:', filename);
+        console.log('✅ Word document downloaded:', filename);
         return true;
         
     } catch (error) {
         console.error('❌ Word generation error:', error);
+        console.error('❌ Stack:', error.stack);
         alert('Error generating Word document: ' + error.message);
         return false;
     }
+}
+
+/**
+ * Cleans HTML content to prevent Word document corruption
+ * Removes problematic elements and attributes
+ */
+function cleanHTMLForWord(html) {
+    console.log('🧹 Cleaning HTML for Word conversion...');
+    
+    // Parse HTML
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, 'text/html');
+    
+    // Remove all class attributes (Tailwind causes issues)
+    doc.querySelectorAll('[class]').forEach(el => {
+        el.removeAttribute('class');
+    });
+    
+    // Remove all style attributes
+    doc.querySelectorAll('[style]').forEach(el => {
+        el.removeAttribute('style');
+    });
+    
+    // Remove data attributes
+    doc.querySelectorAll('[data-*]').forEach(el => {
+        Array.from(el.attributes).forEach(attr => {
+            if (attr.name.startsWith('data-')) {
+                el.removeAttribute(attr.name);
+            }
+        });
+    });
+    
+    // Remove script tags
+    doc.querySelectorAll('script').forEach(el => el.remove());
+    
+    // Remove SVG elements
+    doc.querySelectorAll('svg').forEach(el => el.remove());
+    
+    // Remove problematic divs - replace with semantic tags
+    doc.querySelectorAll('div').forEach(div => {
+        const p = doc.createElement('p');
+        p.innerHTML = div.innerHTML;
+        div.replaceWith(p);
+    });
+    
+    // Remove span tags but keep content
+    doc.querySelectorAll('span').forEach(span => {
+        const text = doc.createTextNode(span.textContent);
+        span.replaceWith(text);
+    });
+    
+    // Remove empty paragraphs
+    doc.querySelectorAll('p').forEach(p => {
+        if (!p.textContent.trim()) {
+            p.remove();
+        }
+    });
+    
+    // Get cleaned body content
+    const cleaned = doc.body.innerHTML;
+    
+    console.log('✅ HTML cleaned. Original length:', html.length, '→ Cleaned length:', cleaned.length);
+    
+    return cleaned;
 }
 
 async function logDocumentGeneration() {
