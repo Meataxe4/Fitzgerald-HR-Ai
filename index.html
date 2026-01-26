@@ -5663,6 +5663,15 @@ async function downloadGeneratedDocument(format = 'pdf') {
         format: format
     });    
 
+// ✅ ADD THIS DEBUG CODE HERE
+const previewElement = document.getElementById('documentPreviewContent');
+if (previewElement && format === 'docx') {
+    console.log('═══════════════════════════════════════');
+    console.log('📄 RAW HTML FOR WORD DOCUMENT:');
+    console.log('Length:', previewElement.innerHTML.length);
+    console.log('First 1000 chars:', previewElement.innerHTML.substring(0, 1000));
+    console.log('═══════════════════════════════════════');
+
     try {
         const type = documentBuilderState.currentType;
         const employeeName = documentBuilderState.data.employeeName || 'Employee';
