@@ -5757,40 +5757,68 @@ async function generateWordDocument(htmlContent, filename, metadata = {}) {
     try {
         console.log('📝 Generating Word document...');
         
-        // Extract pure text from HTML (no formatting, no corruption)
+        // Parse HTML
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlContent, 'text/html');
-        const plainText = doc.body.textContent || doc.body.innerText || '';
         
-        // Create simple HTML wrapper
-        const simpleHTML = `<!DOCTYPE html>
+        // Build plain text with basic formatting
+        let text = '';
+        
+        doc.body.childNodes.forEach(node => {
+            if (node.nodeType === Node.ELEMENT_NODE) {
+                const tag = node.tagName.toLowerCase();
+                const content = node.textContent.trim();
+                
+                if (!content) return;
+                
+                if (tag === 'h1') {
+                    text += '\n\n' + '='.repeat(60) + '\n';
+                    text += content.toUpperCase() + '\n';
+                    text += '='.repeat(60) + '\n\n';
+                } else if (tag === 'h2') {
+                    text += '\n\n' + content + '\n';
+                    text += '-'.repeat(50) + '\n\n';
+                } else if (tag === 'h3') {
+                    text += '\n' + content + '\n' + '-'.repeat(30) + '\n';
+                } else if (tag === 'p') {
+                    text += content + '\n\n';
+                } else if (tag === 'ul' || tag === 'ol') {
+                    node.querySelectorAll('li').forEach(li => {
+                        text += '  • ' + li.textContent.trim() + '\n';
+                    });
+                    text += '\n';
+                }
+            }
+        });
+        
+        // Add footer
+        text += '\n\n' + '='.repeat(60) + '\n';
+        text += 'FITZGERALD HR - AI-Powered Hospitality HR Solutions\n';
+        text += 'Email: info@fitzgeraldhr.com.au | Phone: +61 400 211 014\n';
+        text += `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}\n`;
+        text += `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}\n`;
+        text += '='.repeat(60) + '\n\n';
+        text += 'WARNING: DRAFT TEMPLATE - Requires professional review before use\n';
+        text += 'For personalised advice, contact our Senior Consultants.\n';
+        text += '='.repeat(60);
+        
+        // Create simple HTML
+        const html = `<!DOCTYPE html>
 <html>
 <head><meta charset="UTF-8"></head>
-<body style="font-family: Calibri; font-size: 11pt; white-space: pre-wrap;">
-${plainText}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-FITZGERALD HR - AI-Powered Hospitality HR Solutions
-Email: info@fitzgeraldhr.com.au | Phone: +61 400 211 014
-Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}
-Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}
-
-WARNING: DRAFT TEMPLATE - Requires professional review before use
-For personalised advice, contact our Senior Consultants.
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-</body>
+<body><pre style="font-family: Calibri; font-size: 11pt;">${text}</pre></body>
 </html>`;
         
-        // Create blob with correct MIME type
-        const blob = new Blob(['\ufeff', simpleHTML], { 
+        // Create Word blob
+        const blob = new Blob(['\ufeff', html], { 
             type: 'application/msword' 
         });
         
-        // Download
+        // Download as .doc
         const docFilename = filename.replace('.docx', '.doc');
         saveAs(blob, docFilename);
         
-        console.log('✅ Document downloaded:', docFilename);
+        console.log('✅ Word document downloaded:', docFilename);
         return true;
         
     } catch (error) {
