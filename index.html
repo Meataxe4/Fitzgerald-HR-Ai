@@ -24,7 +24,7 @@
     
     <!-- Word Document Generation - ✅ USING JSDELIVR -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://unpkg.com/html-docx-js@0.3.1/dist/html-docx.js"></script>
+    <script src="https://unpkg.com/docx@7.8.2/build/index.js"></script>
     
     <!-- Excel/Spreadsheet -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -5763,100 +5763,125 @@ async function downloadGeneratedDocument(format = 'pdf') {
  */
 async function generateWordDocument(htmlContent, filename, metadata = {}) {
     try {
-        console.log('📝 Generating RTF document (opens in Word)...');
+        console.log('📝 Generating Word document with docx library...');
         
-        // Parse HTML to extract text
+        // Check if docx library loaded
+        if (typeof docx === 'undefined') {
+            console.error('❌ docx library not loaded');
+            alert('Word library not loaded. Please refresh and try again.');
+            return false;
+        }
+        
+        // Parse HTML
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlContent, 'text/html');
         
-        let rtfContent = '{\\rtf1\\ansi\\deff0\n';
-        rtfContent += '{\\fonttbl{\\f0 Calibri;}{\\f1 Courier New;}}\n';
-        rtfContent += '{\\colortbl;\\red255\\green0\\blue0;\\red0\\green0\\blue255;}\n';
-        rtfContent += '\\viewkind4\\uc1\\pard\\sa200\\sl276\\slmult1\\f0\\fs22\n';
+        const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
         
-        // Process nodes
-        const processNode = (node) => {
-            if (node.nodeType === Node.TEXT_NODE) {
-                const text = node.textContent.trim();
-                if (text) {
-                    // Escape special RTF characters
-                    const escaped = text
-                        .replace(/\\/g, '\\\\')
-                        .replace(/{/g, '\\{')
-                        .replace(/}/g, '\\}')
-                        .replace(/\n/g, '\\par\n');
-                    rtfContent += escaped + '\\par\n';
-                }
-            } else if (node.nodeType === Node.ELEMENT_NODE) {
-                const tag = node.tagName.toLowerCase();
-                
-                if (tag === 'h1') {
-                    rtfContent += '\\pard\\sb240\\sa120\\b\\fs32 ';
-                    rtfContent += node.textContent.trim();
-                    rtfContent += '\\b0\\fs22\\par\n';
-                } else if (tag === 'h2') {
-                    rtfContent += '\\pard\\sb180\\sa90\\b\\fs28 ';
-                    rtfContent += node.textContent.trim();
-                    rtfContent += '\\b0\\fs22\\par\n';
-                } else if (tag === 'h3') {
-                    rtfContent += '\\pard\\sb120\\sa60\\b\\fs24 ';
-                    rtfContent += node.textContent.trim();
-                    rtfContent += '\\b0\\fs22\\par\n';
-                } else if (tag === 'p') {
-                    rtfContent += '\\pard\\sa120 ';
-                    rtfContent += node.textContent.trim();
-                    rtfContent += '\\par\n';
-                } else if (tag === 'li') {
-                    rtfContent += '\\pard\\fi-360\\li720 \\bullet\\tab ';
-                    rtfContent += node.textContent.trim();
-                    rtfContent += '\\par\n';
-                } else {
-                    // Process children
-                    for (const child of node.childNodes) {
-                        processNode(child);
-                    }
-                }
+        // Build paragraphs
+        const paragraphs = [];
+        
+        // Process each element
+        const processElement = (element) => {
+            const tag = element.tagName?.toLowerCase();
+            const text = element.textContent?.trim();
+            
+            if (!text) return;
+            
+            if (tag === 'h1') {
+                paragraphs.push(
+                    new Paragraph({
+                        text: text,
+                        heading: HeadingLevel.HEADING_1,
+                        spacing: { before: 400, after: 200 }
+                    })
+                );
+            } else if (tag === 'h2') {
+                paragraphs.push(
+                    new Paragraph({
+                        text: text,
+                        heading: HeadingLevel.HEADING_2,
+                        spacing: { before: 300, after: 150 }
+                    })
+                );
+            } else if (tag === 'h3') {
+                paragraphs.push(
+                    new Paragraph({
+                        text: text,
+                        heading: HeadingLevel.HEADING_3,
+                        spacing: { before: 200, after: 100 }
+                    })
+                );
+            } else if (tag === 'p') {
+                paragraphs.push(
+                    new Paragraph({
+                        children: [new TextRun(text)],
+                        spacing: { after: 200 }
+                    })
+                );
+            } else if (tag === 'li') {
+                paragraphs.push(
+                    new Paragraph({
+                        text: text,
+                        bullet: { level: 0 },
+                        spacing: { after: 100 }
+                    })
+                );
             }
         };
         
-        // Process the body
-        processNode(doc.body);
+        // Process all elements
+        doc.body.querySelectorAll('h1, h2, h3, p, li').forEach(processElement);
         
         // Add footer
-        rtfContent += '\\pard\\sa240\\qc\\fs20 ';
-        rtfContent += '___________________________________________________________________\\par\n';
-        rtfContent += '\\b FITZGERALD HR\\b0  - AI-Powered Hospitality HR Solutions\\par\n';
-        rtfContent += 'Email: info@fitzgeraldhr.com.au  |  Phone: +61 400 211 014\\par\n';
-        rtfContent += `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}\\par\n`;
-        rtfContent += `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}\\par\n`;
-        rtfContent += '\\par\n';
-        rtfContent += '{\\cf1\\b WARNING: DRAFT TEMPLATE\\b0}\\par\n';
-        rtfContent += 'Requires professional review before use\\par\n';
-        rtfContent += 'For personalised advice, contact our Senior Consultants.\\par\n';
+        paragraphs.push(
+            new Paragraph({ text: '', spacing: { before: 400 } }),
+            new Paragraph({
+                children: [new TextRun({ text: 'FITZGERALD HR - AI-Powered Hospitality HR Solutions', bold: true })],
+                spacing: { after: 100 }
+            }),
+            new Paragraph({
+                text: 'Email: info@fitzgeraldhr.com.au  |  Phone: +61 400 211 014',
+                spacing: { after: 100 }
+            }),
+            new Paragraph({
+                text: `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}`,
+                spacing: { after: 100 }
+            }),
+            new Paragraph({
+                text: `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}`,
+                spacing: { after: 200 }
+            }),
+            new Paragraph({
+                children: [new TextRun({ text: '⚠️ DRAFT TEMPLATE - Requires professional review before use', bold: true })],
+                spacing: { after: 100 }
+            })
+        );
         
-        // Close RTF
-        rtfContent += '}';
+        // Create document
+        const wordDoc = new Document({
+            sections: [{
+                properties: {},
+                children: paragraphs
+            }]
+        });
         
-        console.log('✅ RTF generated, length:', rtfContent.length);
+        console.log('📦 Creating blob...');
         
-        // Create blob
-        const blob = new Blob([rtfContent], { type: 'application/rtf' });
+        // Generate blob
+        const blob = await Packer.toBlob(wordDoc);
         
-        // Change extension to .rtf
-        const rtfFilename = filename.replace('.docx', '.rtf');
+        console.log('✅ Blob created, size:', blob.size);
         
         // Download
-        saveAs(blob, rtfFilename);
+        saveAs(blob, filename);
         
-        console.log('✅ RTF document downloaded:', rtfFilename);
-        
-        alert('✅ Document downloaded as RTF format\n\nThis file will open in Microsoft Word.\n\nRTF format ensures compatibility and readability.');
-        
+        console.log('✅ Word document downloaded');
         return true;
         
     } catch (error) {
-        console.error('❌ RTF generation error:', error);
-        alert('Error generating document: ' + error.message);
+        console.error('❌ Error:', error);
+        alert('Error: ' + error.message);
         return false;
     }
 }
