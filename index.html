@@ -5763,110 +5763,100 @@ async function downloadGeneratedDocument(format = 'pdf') {
  */
 async function generateWordDocument(htmlContent, filename, metadata = {}) {
     try {
-        console.log('📝 Generating Word document...');
+        console.log('📝 Generating RTF document (opens in Word)...');
         
-        if (typeof htmlDocx === 'undefined') {
-            console.error('❌ html-docx-js not loaded');
-            alert('Word document library not loaded. Please refresh the page and try again.');
-            return false;
-        }
-        
-        // ✅ STRIP ALL HTML - Convert to plain text with basic formatting
+        // Parse HTML to extract text
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlContent, 'text/html');
         
-        let plainText = '';
+        let rtfContent = '{\\rtf1\\ansi\\deff0\n';
+        rtfContent += '{\\fonttbl{\\f0 Calibri;}{\\f1 Courier New;}}\n';
+        rtfContent += '{\\colortbl;\\red255\\green0\\blue0;\\red0\\green0\\blue255;}\n';
+        rtfContent += '\\viewkind4\\uc1\\pard\\sa200\\sl276\\slmult1\\f0\\fs22\n';
         
-        // Process each element to build clean text with line breaks
-        const processNode = (node, level = 0) => {
+        // Process nodes
+        const processNode = (node) => {
             if (node.nodeType === Node.TEXT_NODE) {
                 const text = node.textContent.trim();
                 if (text) {
-                    plainText += text + '\n';
+                    // Escape special RTF characters
+                    const escaped = text
+                        .replace(/\\/g, '\\\\')
+                        .replace(/{/g, '\\{')
+                        .replace(/}/g, '\\}')
+                        .replace(/\n/g, '\\par\n');
+                    rtfContent += escaped + '\\par\n';
                 }
             } else if (node.nodeType === Node.ELEMENT_NODE) {
                 const tag = node.tagName.toLowerCase();
                 
                 if (tag === 'h1') {
-                    plainText += '\n' + '='.repeat(60) + '\n';
-                    plainText += node.textContent.trim().toUpperCase() + '\n';
-                    plainText += '='.repeat(60) + '\n\n';
+                    rtfContent += '\\pard\\sb240\\sa120\\b\\fs32 ';
+                    rtfContent += node.textContent.trim();
+                    rtfContent += '\\b0\\fs22\\par\n';
                 } else if (tag === 'h2') {
-                    plainText += '\n' + '-'.repeat(50) + '\n';
-                    plainText += node.textContent.trim() + '\n';
-                    plainText += '-'.repeat(50) + '\n\n';
+                    rtfContent += '\\pard\\sb180\\sa90\\b\\fs28 ';
+                    rtfContent += node.textContent.trim();
+                    rtfContent += '\\b0\\fs22\\par\n';
                 } else if (tag === 'h3') {
-                    plainText += '\n' + node.textContent.trim() + '\n' + '-'.repeat(30) + '\n';
+                    rtfContent += '\\pard\\sb120\\sa60\\b\\fs24 ';
+                    rtfContent += node.textContent.trim();
+                    rtfContent += '\\b0\\fs22\\par\n';
                 } else if (tag === 'p') {
-                    plainText += node.textContent.trim() + '\n\n';
+                    rtfContent += '\\pard\\sa120 ';
+                    rtfContent += node.textContent.trim();
+                    rtfContent += '\\par\n';
                 } else if (tag === 'li') {
-                    plainText += '  • ' + node.textContent.trim() + '\n';
-                } else if (tag === 'ul' || tag === 'ol') {
-                    // Process list items
-                    for (const child of node.children) {
-                        processNode(child, level + 1);
-                    }
-                    plainText += '\n';
+                    rtfContent += '\\pard\\fi-360\\li720 \\bullet\\tab ';
+                    rtfContent += node.textContent.trim();
+                    rtfContent += '\\par\n';
                 } else {
-                    // Process children for other elements
+                    // Process children
                     for (const child of node.childNodes) {
-                        processNode(child, level);
+                        processNode(child);
                     }
                 }
             }
         };
         
-        // Process the document
+        // Process the body
         processNode(doc.body);
         
         // Add footer
-        plainText += '\n\n' + '='.repeat(60) + '\n';
-        plainText += 'FITZGERALD HR - AI-Powered Hospitality HR Solutions\n';
-        plainText += 'Email: info@fitzgeraldhr.com.au  |  Phone: +61 400 211 014\n';
-        plainText += `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}\n`;
-        plainText += `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}\n`;
-        plainText += '='.repeat(60) + '\n\n';
-        plainText += '⚠️ DRAFT TEMPLATE - Requires professional review before use\n';
-        plainText += 'For personalised advice, contact our Senior Consultants.\n';
-        plainText += '='.repeat(60);
+        rtfContent += '\\pard\\sa240\\qc\\fs20 ';
+        rtfContent += '___________________________________________________________________\\par\n';
+        rtfContent += '\\b FITZGERALD HR\\b0  - AI-Powered Hospitality HR Solutions\\par\n';
+        rtfContent += 'Email: info@fitzgeraldhr.com.au  |  Phone: +61 400 211 014\\par\n';
+        rtfContent += `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}\\par\n`;
+        rtfContent += `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}\\par\n`;
+        rtfContent += '\\par\n';
+        rtfContent += '{\\cf1\\b WARNING: DRAFT TEMPLATE\\b0}\\par\n';
+        rtfContent += 'Requires professional review before use\\par\n';
+        rtfContent += 'For personalised advice, contact our Senior Consultants.\\par\n';
         
-        console.log('✅ Plain text generated, length:', plainText.length);
+        // Close RTF
+        rtfContent += '}';
         
-        // Create super simple HTML (just pre-formatted text)
-        const simpleHTML = `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { 
-            font-family: 'Courier New', monospace; 
-            font-size: 11pt;
-            line-height: 1.5;
-            white-space: pre-wrap;
-            padding: 1in;
-        }
-    </style>
-</head>
-<body>${plainText}</body>
-</html>`;
+        console.log('✅ RTF generated, length:', rtfContent.length);
         
-        console.log('📦 Creating Word blob...');
+        // Create blob
+        const blob = new Blob([rtfContent], { type: 'application/rtf' });
         
-        // Convert to Word
-        const converted = htmlDocx.asBlob(simpleHTML);
-        
-        console.log('✅ Blob created, size:', converted.size);
+        // Change extension to .rtf
+        const rtfFilename = filename.replace('.docx', '.rtf');
         
         // Download
-        saveAs(converted, filename);
+        saveAs(blob, rtfFilename);
         
-        console.log('✅ Word document downloaded:', filename);
+        console.log('✅ RTF document downloaded:', rtfFilename);
+        
+        alert('✅ Document downloaded as RTF format\n\nThis file will open in Microsoft Word.\n\nRTF format ensures compatibility and readability.');
+        
         return true;
         
     } catch (error) {
-        console.error('❌ Word generation error:', error);
-        console.error('❌ Stack:', error.stack);
-        alert('Error generating Word document: ' + error.message);
+        console.error('❌ RTF generation error:', error);
+        alert('Error generating document: ' + error.message);
         return false;
     }
 }
