@@ -5755,98 +5755,96 @@ async function downloadGeneratedDocument(format = 'pdf') {
  */
 async function generateWordDocument(htmlContent, filename, metadata = {}) {
     try {
-        console.log('📝 Generating Word document...');
+        console.log('📝 Generating RTF document (opens in Word)...');
         
-        if (typeof htmlDocx === 'undefined') {
-            throw new Error('htmlDocx library not loaded');
+        // Parse HTML to extract text
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlContent, 'text/html');
+        
+        // Start RTF document
+        let rtf = '{\\rtf1\\ansi\\ansicpg1252\\deff0\\nouicompat\\deflang1033';
+        rtf += '{\\fonttbl{\\f0\\fnil\\fcharset0 Calibri;}}';
+        rtf += '{\\colortbl;\\red255\\green0\\blue0;\\red0\\green0\\blue255;}';
+        rtf += '\\viewkind4\\uc1\\pard\\sa200\\sl276\\slmult1\\f0\\fs22\n\n';
+        
+        // Process each element
+        const processNode = (node) => {
+            if (node.nodeType === Node.TEXT_NODE) {
+                const text = node.textContent.trim();
+                if (text) {
+                    // Escape special RTF characters
+                    const escaped = text
+                        .replace(/\\/g, '\\\\')
+                        .replace(/{/g, '\\{')
+                        .replace(/}/g, '\\}');
+                    return escaped;
+                }
+                return '';
+            }
+            
+            if (node.nodeType !== Node.ELEMENT_NODE) return '';
+            
+            const tag = node.tagName.toLowerCase();
+            const text = node.textContent.trim();
+            
+            if (!text) return '';
+            
+            switch (tag) {
+                case 'h1':
+                    return `\\pard\\sb240\\sa120\\b\\fs32 ${text}\\b0\\fs22\\par\n`;
+                case 'h2':
+                    return `\\pard\\sb180\\sa90\\b\\fs28 ${text}\\b0\\fs22\\par\n`;
+                case 'h3':
+                    return `\\pard\\sb120\\sa60\\b\\fs24 ${text}\\b0\\fs22\\par\n`;
+                case 'p':
+                    return `\\pard\\sa120 ${text}\\par\n`;
+                case 'li':
+                    return `\\pard\\fi-360\\li720 \\bullet\\tab ${text}\\par\n`;
+                default:
+                    let result = '';
+                    for (const child of node.childNodes) {
+                        result += processNode(child);
+                    }
+                    return result;
+            }
+        };
+        
+        // Process all body elements
+        for (const child of doc.body.childNodes) {
+            rtf += processNode(child);
         }
         
-        // ✅ CLEAN THE HTML AGGRESSIVELY
-        let cleanHTML = htmlContent;
+        // Add footer
+        rtf += '\\par\\par\n';
+        rtf += '\\pard\\sa240\\qc\\fs20\n';
+        rtf += '\\b FITZGERALD HR\\b0  - AI-Powered Hospitality HR Solutions\\par\n';
+        rtf += 'Email: info@fitzgeraldhr.com.au  |  Phone: +61 400 211 014\\par\n';
+        rtf += `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}\\par\n`;
+        rtf += `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}\\par\n`;
+        rtf += '\\par\n';
+        rtf += '{\\cf1\\b WARNING: DRAFT TEMPLATE\\b0}\\par\n';
+        rtf += 'Requires professional review before use\\par\n';
         
-        // Remove emoji and special unicode characters that break Word
-        cleanHTML = cleanHTML.replace(/[\u{1F300}-\u{1F9FF}]/gu, ''); // Remove all emojis
-        cleanHTML = cleanHTML.replace(/[⚠️✓✗☐☑☒←→↑↓]/g, ''); // Remove specific symbols
+        // Close RTF
+        rtf += '}';
         
-        // Fix HTML entities
-        cleanHTML = cleanHTML.replace(/&amp;/g, '&');
-        cleanHTML = cleanHTML.replace(/&nbsp;/g, ' ');
-        cleanHTML = cleanHTML.replace(/&lt;/g, '<');
-        cleanHTML = cleanHTML.replace(/&gt;/g, '>');
+        console.log('✅ RTF generated, length:', rtf.length);
         
-        // Remove empty paragraphs and list items
-        cleanHTML = cleanHTML.replace(/<p>\s*<\/p>/g, '');
-        cleanHTML = cleanHTML.replace(/<li>\s*<\/li>/g, '');
+        // Create blob
+        const blob = new Blob([rtf], { type: 'application/rtf' });
         
-        // Remove nested <p> tags inside lists (Word doesn't like this)
-        cleanHTML = cleanHTML.replace(/<(ul|ol)>(.*?)<\/\1>/gs, (match, tag, content) => {
-            const cleanedContent = content.replace(/<\/?p>/g, '');
-            return `<${tag}>${cleanedContent}</${tag}>`;
-        });
-        
-        // Remove any remaining problematic nested structures
-        cleanHTML = cleanHTML.replace(/<p>(\s*<ul)/g, '$1');
-        cleanHTML = cleanHTML.replace(/(<\/ul>\s*)<\/p>/g, '$1');
-        
-        // Wrap in proper HTML structure
-        const styledHTML = `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Document</title>
-    <style>
-        body { font-family: Calibri, Arial, sans-serif; font-size: 11pt; line-height: 1.5; margin: 1in; }
-        h1 { font-size: 18pt; font-weight: bold; margin-top: 12pt; margin-bottom: 6pt; }
-        h2 { font-size: 14pt; font-weight: bold; margin-top: 10pt; margin-bottom: 5pt; }
-        h3 { font-size: 12pt; font-weight: bold; margin-top: 8pt; margin-bottom: 4pt; }
-        p { margin-top: 0; margin-bottom: 8pt; }
-        ul, ol { margin-top: 0; margin-bottom: 8pt; }
-        li { margin-bottom: 4pt; }
-        em { font-style: italic; }
-        strong { font-weight: bold; }
-    </style>
-</head>
-<body>
-${cleanHTML}
-<hr>
-<p style="text-align: center; margin-top: 20pt;">
-    <strong>FITZGERALD HR - AI-Powered Hospitality HR Solutions</strong><br>
-    Email: info@fitzgeraldhr.com.au | Phone: +61 400 211 014<br>
-    Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}<br>
-    Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}
-</p>
-<p style="text-align: center; color: red; font-weight: bold; margin-top: 10pt;">
-    WARNING: DRAFT TEMPLATE - Requires professional review before use<br>
-    For personalised advice, contact our Senior Consultants.
-</p>
-</body>
-</html>`;
-
-        console.log('📦 Cleaned HTML length:', cleanHTML.length);
-        console.log('📦 First 500 chars:', styledHTML.substring(0, 500));
-        
-        // Convert to Word
-        console.log('🔄 Converting to Word format...');
-        const converted = htmlDocx.asBlob(styledHTML);
-        
-        if (!converted) {
-            throw new Error('Conversion returned undefined');
-        }
-        
-        console.log('✅ Blob created');
-        console.log('✅ Type:', converted.type);
-        console.log('✅ Size:', converted.size);
+        // Change extension to .doc (Word recognizes RTF with .doc extension)
+        const docFilename = filename.replace('.docx', '.doc');
         
         // Download
-        saveAs(converted, filename);
+        saveAs(blob, docFilename);
         
-        console.log('✅ Word document downloaded:', filename);
+        console.log('✅ Document downloaded:', docFilename);
         return true;
         
     } catch (error) {
-        console.error('❌ Word generation error:', error);
-        console.error('❌ Stack:', error.stack);
-        alert('Error generating Word document: ' + error.message);
+        console.error('❌ Error:', error);
+        alert('Error: ' + error.message);
         return false;
     }
 }
