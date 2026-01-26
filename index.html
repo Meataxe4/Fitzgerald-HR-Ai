@@ -5755,88 +5755,39 @@ async function downloadGeneratedDocument(format = 'pdf') {
  */
 async function generateWordDocument(htmlContent, filename, metadata = {}) {
     try {
-        console.log('📝 Generating RTF document (opens in Word)...');
+        console.log('📝 Generating Word document...');
         
-        // Parse HTML to extract text
+        // Extract pure text from HTML (no formatting, no corruption)
         const parser = new DOMParser();
         const doc = parser.parseFromString(htmlContent, 'text/html');
+        const plainText = doc.body.textContent || doc.body.innerText || '';
         
-        // Start RTF document
-        let rtf = '{\\rtf1\\ansi\\ansicpg1252\\deff0\\nouicompat\\deflang1033';
-        rtf += '{\\fonttbl{\\f0\\fnil\\fcharset0 Calibri;}}';
-        rtf += '{\\colortbl;\\red255\\green0\\blue0;\\red0\\green0\\blue255;}';
-        rtf += '\\viewkind4\\uc1\\pard\\sa200\\sl276\\slmult1\\f0\\fs22\n\n';
+        // Create simple HTML wrapper
+        const simpleHTML = `<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"></head>
+<body style="font-family: Calibri; font-size: 11pt; white-space: pre-wrap;">
+${plainText}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+FITZGERALD HR - AI-Powered Hospitality HR Solutions
+Email: info@fitzgeraldhr.com.au | Phone: +61 400 211 014
+Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}
+Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}
+
+WARNING: DRAFT TEMPLATE - Requires professional review before use
+For personalised advice, contact our Senior Consultants.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+</body>
+</html>`;
         
-        // Process each element
-        const processNode = (node) => {
-            if (node.nodeType === Node.TEXT_NODE) {
-                const text = node.textContent.trim();
-                if (text) {
-                    // Escape special RTF characters
-                    const escaped = text
-                        .replace(/\\/g, '\\\\')
-                        .replace(/{/g, '\\{')
-                        .replace(/}/g, '\\}');
-                    return escaped;
-                }
-                return '';
-            }
-            
-            if (node.nodeType !== Node.ELEMENT_NODE) return '';
-            
-            const tag = node.tagName.toLowerCase();
-            const text = node.textContent.trim();
-            
-            if (!text) return '';
-            
-            switch (tag) {
-                case 'h1':
-                    return `\\pard\\sb240\\sa120\\b\\fs32 ${text}\\b0\\fs22\\par\n`;
-                case 'h2':
-                    return `\\pard\\sb180\\sa90\\b\\fs28 ${text}\\b0\\fs22\\par\n`;
-                case 'h3':
-                    return `\\pard\\sb120\\sa60\\b\\fs24 ${text}\\b0\\fs22\\par\n`;
-                case 'p':
-                    return `\\pard\\sa120 ${text}\\par\n`;
-                case 'li':
-                    return `\\pard\\fi-360\\li720 \\bullet\\tab ${text}\\par\n`;
-                default:
-                    let result = '';
-                    for (const child of node.childNodes) {
-                        result += processNode(child);
-                    }
-                    return result;
-            }
-        };
-        
-        // Process all body elements
-        for (const child of doc.body.childNodes) {
-            rtf += processNode(child);
-        }
-        
-        // Add footer
-        rtf += '\\par\\par\n';
-        rtf += '\\pard\\sa240\\qc\\fs20\n';
-        rtf += '\\b FITZGERALD HR\\b0  - AI-Powered Hospitality HR Solutions\\par\n';
-        rtf += 'Email: info@fitzgeraldhr.com.au  |  Phone: +61 400 211 014\\par\n';
-        rtf += `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}\\par\n`;
-        rtf += `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}\\par\n`;
-        rtf += '\\par\n';
-        rtf += '{\\cf1\\b WARNING: DRAFT TEMPLATE\\b0}\\par\n';
-        rtf += 'Requires professional review before use\\par\n';
-        
-        // Close RTF
-        rtf += '}';
-        
-        console.log('✅ RTF generated, length:', rtf.length);
-        
-        // Create blob
-        const blob = new Blob([rtf], { type: 'application/rtf' });
-        
-        // Change extension to .doc (Word recognizes RTF with .doc extension)
-        const docFilename = filename.replace('.docx', '.doc');
+        // Create blob with correct MIME type
+        const blob = new Blob(['\ufeff', simpleHTML], { 
+            type: 'application/msword' 
+        });
         
         // Download
+        const docFilename = filename.replace('.docx', '.doc');
         saveAs(blob, docFilename);
         
         console.log('✅ Document downloaded:', docFilename);
