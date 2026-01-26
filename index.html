@@ -18,6 +18,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Document Generation Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.2/docx.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
@@ -1901,23 +1902,32 @@ Be as specific as possible!"></textarea>
 
         <!-- Action Buttons -->
         <div class="p-6 border-t border-slate-700 bg-slate-800">
-            <div class="flex gap-3 mb-4">
-                <button onclick="regenerateDocument()" 
-                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all text-sm flex items-center gap-2">
-                    <span>🔄</span>
-                    <span>Regenerate</span>
-                </button>
-                <button onclick="requestDocumentChange()" 
-                        class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all text-sm flex items-center gap-2">
-                    <span>✨</span>
-                    <span>Request Changes</span>
-                </button>
-                <button onclick="downloadGeneratedDocument()" 
-                        class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2">
-                    <span>📥</span>
-                    <span>Download Word Document</span>
-                </button>
-            </div>
+            <div class="flex gap-3 mb-4 flex-wrap">
+    <button onclick="regenerateDocument()" 
+            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all text-sm flex items-center gap-2">
+        <span>🔄</span>
+        <span>Regenerate</span>
+    </button>
+    <button onclick="requestDocumentChange()" 
+            class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all text-sm flex items-center gap-2">
+        <span>✨</span>
+        <span>Request Changes</span>
+    </button>
+    
+    <!-- Download Options -->
+    <div class="flex gap-2 flex-1">
+        <button onclick="downloadGeneratedDocument('pdf')" 
+                class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2">
+            <span>📄</span>
+            <span>Download PDF</span>
+        </button>
+        <button onclick="downloadGeneratedDocument('docx')" 
+                class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2">
+            <span>📝</span>
+            <span>Download Word</span>
+        	</button>
+    	     </div>
+	</div>
             
             <div class="bg-red-500/10 border-2 border-red-500 rounded-lg p-4">
                 <p class="text-red-300 font-bold text-sm flex items-center gap-2 mb-2">
@@ -5602,8 +5612,8 @@ function requestDocumentChange() {
     });
 }
 
-async function downloadGeneratedDocument() {
-// ✅ CRITICAL: Confirmation dialog before download
+async function downloadGeneratedDocument(format = 'pdf') {
+    // ✅ CRITICAL: Confirmation dialog before download
     const userAccepts = confirm(
         "⚠️ CRITICAL LEGAL REMINDER\n\n" +
         "This document is a DRAFT TEMPLATE for review purposes only.\n\n" +
@@ -5632,15 +5642,17 @@ async function downloadGeneratedDocument() {
         trackEvent('document_download_cancelled_at_confirmation', {
             user: currentUser,
             documentType: documentBuilderState.currentType,
+            format: format,
             reason: 'did_not_accept_legal_terms'
         });
-        return false; // Exit without downloading
+        return false;
     }
     
-    console.log('✅ User accepted legal terms and is downloading for review');
+    console.log(`✅ User accepted legal terms and is downloading ${format.toUpperCase()}`);
     trackEvent('document_download_legal_terms_accepted', {
         user: currentUser,
-        documentType: documentBuilderState.currentType
+        documentType: documentBuilderState.currentType,
+        format: format
     });    
 
     try {
@@ -5650,45 +5662,56 @@ async function downloadGeneratedDocument() {
         const typeNames = {
             formalWarning: 'Formal_Warning',
             recordOfDiscussion: 'Record_of_Discussion',
-            letterOfAllegation: 'Letter_of_Allegation'
+            letterOfAllegation: 'Letter_of_Allegation',
+            performanceImprovementPlan: 'Performance_Improvement_Plan'
         };
         
-        const filename = `${typeNames[type]}_${employeeName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.pdf`;
+        const fileExtension = format === 'pdf' ? 'pdf' : 'docx';
+        const filename = `${typeNames[type]}_${employeeName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.${fileExtension}`;
         
         const metadata = {
             documentId: generateDocumentId(),
             userName: currentUser,
             generatedAt: new Date().toISOString(),
             documentType: type,
-            employeeName: employeeName
+            employeeName: employeeName,
+            format: format
         };
         
-        // Get the FORMATTED HTML from the preview (which looks perfect!)
+        // Get the FORMATTED HTML from the preview
         const previewElement = document.getElementById('documentPreviewContent');
         
         if (!previewElement) {
             throw new Error('Preview content not found');
         }
         
-        // Get the innerHTML which is already perfectly formatted
         const formattedHTML = previewElement.innerHTML;
         
-        console.log('📄 Using formatted HTML from preview');
-        console.log('HTML sample:', formattedHTML.substring(0, 200));
+        console.log(`📄 Using formatted HTML from preview for ${format.toUpperCase()}`);
         
-        // Pass the formatted HTML directly to pdfMake converter
-        const docDefinition = convertHTMLToPdfMake(formattedHTML, metadata);
+        let success = false;
         
-        console.log('✅ Document definition created');
-        
-        // Generate PDF
-        if (typeof pdfMake === 'undefined') {
-            throw new Error('pdfMake not loaded');
+        if (format === 'pdf') {
+            // Generate PDF
+            const docDefinition = convertHTMLToPdfMake(formattedHTML, metadata);
+            
+            if (typeof pdfMake === 'undefined') {
+                throw new Error('pdfMake not loaded');
+            }
+            
+            pdfMake.createPdf(docDefinition).download(filename);
+            success = true;
+            
+        } else if (format === 'docx') {
+            // Generate Word document
+            success = await generateWordDocument(formattedHTML, filename, metadata);
         }
         
-        pdfMake.createPdf(docDefinition).download(filename);
+        if (!success) {
+            throw new Error(`Failed to generate ${format.toUpperCase()}`);
+        }
         
-        // Track
+        // Track generation
         trackDocumentGeneration(filename, metadata);
         
         // ✅ CRITICAL: Log the download and update database
@@ -5697,7 +5720,7 @@ async function downloadGeneratedDocument() {
         closeDocumentPreview();
         
         alert(
-            '✅ Document Downloaded!\n\n' +
+            `✅ ${format.toUpperCase()} Document Downloaded!\n\n` +
             'CRITICAL REMINDERS:\n' +
             '1. This is a DRAFT document\n' +
             '2. MUST be reviewed by a consultant\n' +
@@ -5709,7 +5732,198 @@ async function downloadGeneratedDocument() {
         
     } catch (error) {
         console.error('❌ Download error:', error);
-        alert('Download failed: ' + error.message);
+        alert(`Download failed: ${error.message}`);
+        return false;
+    }
+}
+
+/**
+ * Generates a Word document (.docx) from HTML content
+ * Uses docx library to create properly formatted Word files
+ * @param {string} htmlContent - HTML content to convert
+ * @param {string} filename - Output filename
+ * @param {Object} metadata - Document metadata
+ * @returns {Promise<boolean>} True if successful
+ */
+async function generateWordDocument(htmlContent, filename, metadata = {}) {
+    try {
+        console.log('📝 Generating Word document...');
+        
+        // Check if docx library is loaded
+        if (typeof docx === 'undefined') {
+            console.error('❌ docx library not loaded');
+            alert('Word document library not loaded. Please refresh the page and try again.');
+            return false;
+        }
+
+        const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType, BorderStyle } = docx;
+
+        // Parse HTML content
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlContent, 'text/html');
+        
+        const sections = [];
+        
+        // Process each element in the document
+        const processNode = (node) => {
+            const tagName = node.tagName?.toLowerCase();
+            const text = node.textContent?.trim() || '';
+            
+            if (!text && tagName !== 'br') return null;
+            
+            switch (tagName) {
+                case 'h1':
+                    return new Paragraph({
+                        text: text,
+                        heading: HeadingLevel.HEADING_1,
+                        spacing: { before: 400, after: 200 }
+                    });
+                    
+                case 'h2':
+                    return new Paragraph({
+                        text: text,
+                        heading: HeadingLevel.HEADING_2,
+                        spacing: { before: 300, after: 150 }
+                    });
+                    
+                case 'h3':
+                    return new Paragraph({
+                        text: text,
+                        heading: HeadingLevel.HEADING_3,
+                        spacing: { before: 240, after: 120 }
+                    });
+                    
+                case 'p':
+                    const runs = [];
+                    
+                    // Process child nodes for formatting
+                    node.childNodes.forEach(child => {
+                        if (child.nodeType === Node.TEXT_NODE) {
+                            const childText = child.textContent.trim();
+                            if (childText) {
+                                runs.push(new TextRun({ text: childText }));
+                            }
+                        } else if (child.tagName?.toLowerCase() === 'strong' || child.tagName?.toLowerCase() === 'b') {
+                            runs.push(new TextRun({ text: child.textContent, bold: true }));
+                        } else if (child.tagName?.toLowerCase() === 'em' || child.tagName?.toLowerCase() === 'i') {
+                            runs.push(new TextRun({ text: child.textContent, italics: true }));
+                        } else if (child.tagName?.toLowerCase() === 'a') {
+                            runs.push(new TextRun({ text: child.textContent, color: "0000FF", underline: {} }));
+                        } else if (child.tagName?.toLowerCase() === 'br') {
+                            runs.push(new TextRun({ text: '', break: 1 }));
+                        }
+                    });
+                    
+                    if (runs.length === 0 && text) {
+                        runs.push(new TextRun({ text: text }));
+                    }
+                    
+                    return new Paragraph({
+                        children: runs,
+                        spacing: { after: 120 }
+                    });
+                    
+                case 'li':
+                    return new Paragraph({
+                        text: text,
+                        bullet: { level: 0 },
+                        spacing: { after: 80 }
+                    });
+                    
+                case 'br':
+                    return new Paragraph({ text: '' });
+                    
+                default:
+                    if (text) {
+                        return new Paragraph({
+                            text: text,
+                            spacing: { after: 120 }
+                        });
+                    }
+                    return null;
+            }
+        };
+        
+        // Convert all body elements
+        doc.body.childNodes.forEach(node => {
+            const paragraph = processNode(node);
+            if (paragraph) sections.push(paragraph);
+        });
+        
+        // Add footer with metadata
+        sections.push(
+            new Paragraph({ text: '', spacing: { before: 400 } }),
+            new Paragraph({
+                children: [
+                    new TextRun({ text: '─'.repeat(70) })
+                ],
+                spacing: { after: 200 }
+            }),
+            new Paragraph({
+                children: [
+                    new TextRun({ text: 'FITZGERALD HR - AI-Powered Hospitality HR Solutions', bold: true, size: 20 })
+                ],
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 100 }
+            }),
+            new Paragraph({
+                children: [
+                    new TextRun({ text: 'Email: info@fitzgeraldhr.com.au', size: 18 })
+                ],
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 60 }
+            }),
+            new Paragraph({
+                children: [
+                    new TextRun({ 
+                        text: `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}`, 
+                        size: 18 
+                    })
+                ],
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 60 }
+            }),
+            new Paragraph({
+                children: [
+                    new TextRun({ 
+                        text: `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}`, 
+                        size: 18 
+                    })
+                ],
+                alignment: AlignmentType.CENTER,
+                spacing: { after: 100 }
+            }),
+            new Paragraph({
+                children: [
+                    new TextRun({ 
+                        text: 'For personalised advice and document review, contact our Senior Consultants.', 
+                        size: 18,
+                        italics: true,
+                        color: "666666"
+                    })
+                ],
+                alignment: AlignmentType.CENTER
+            })
+        );
+        
+        // Create the document
+        const wordDoc = new Document({
+            sections: [{
+                properties: {},
+                children: sections
+            }]
+        });
+        
+        // Generate and download
+        const blob = await Packer.toBlob(wordDoc);
+        saveAs(blob, filename);
+        
+        console.log('✅ Word document generated successfully:', filename);
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Word generation error:', error);
+        alert('Error generating Word document: ' + error.message);
         return false;
     }
 }
@@ -5733,11 +5947,11 @@ async function logDocumentGeneration() {
         employee_name: documentBuilderState.data.employeeName || 'Unknown',
         generated_at: new Date().toISOString(),
         downloaded: false,
+        format: null, // ✅ Will be set on download
         venue_name: venueProfile.venueName || null,
         venue_location: venueProfile.location || null,
         venue_city: venueProfile.city || null,
-        venue_type: venueProfile.venueType || null,
-        staff_count: venueProfile.staffCount || null
+        venue_type: venueProfile.venueType || null
     };
     
     console.log('📊 Log object to insert:', JSON.stringify(log, null, 2));
@@ -5780,9 +5994,14 @@ async function logDocumentGeneration() {
 }
 
 // Log document download
+/**
+ * Logs document download with format tracking
+ * @param {Object} metadata - Document metadata including format
+ */
 async function logDocumentDownload(metadata) {
     console.log('📥 Logging document download');
     console.log('📥 Stored doc ID:', documentBuilderState.lastGeneratedDocId);
+    console.log('📥 Format:', metadata.format);
     
     if (!supabaseClient) {
         console.warn('⚠️ Supabase not connected - cannot update download status');
@@ -5797,12 +6016,13 @@ async function logDocumentDownload(metadata) {
     try {
         console.log('📥 Updating document ID:', documentBuilderState.lastGeneratedDocId);
         
-        // Update the downloaded status using the stored database ID
+        // ✅ Update with format information
         const { data: updateData, error: updateError } = await supabaseClient
             .from('generated_documents')
             .update({ 
                 downloaded: true, 
-                downloaded_at: new Date().toISOString()
+                downloaded_at: new Date().toISOString(),
+                format: metadata.format || 'pdf' // ✅ Track format (pdf or docx)
             })
             .eq('id', documentBuilderState.lastGeneratedDocId)
             .select();
@@ -5812,6 +6032,7 @@ async function logDocumentDownload(metadata) {
         } else {
             console.log('✅ Download status updated successfully');
             console.log('✅ Updated record:', updateData);
+            console.log(`✅ Format logged: ${metadata.format || 'pdf'}`);
             
             // Clear the stored ID after successful update
             documentBuilderState.lastGeneratedDocId = null;
@@ -5822,9 +6043,11 @@ async function logDocumentDownload(metadata) {
         console.error('❌ Stack:', err.stack);
     }
     
-    // Track event
+    // Track event with format
     trackEvent('document_downloaded', {
-        user: currentUser
+        user: currentUser,
+        format: metadata.format || 'pdf',
+        documentType: metadata.documentType
     });
 }
 
@@ -7370,26 +7593,32 @@ async function loadDocuments() {
         console.log('📊 Documents loaded:', documents.length);
         console.log('📊 Sample document:', documents[0]);
         
-        // ✅ Calculate stats properly
+        // ✅ Calculate stats with FORMAT breakdown
         const totalGenerated = documents.length;
         const totalDownloaded = documents.filter(d => d.downloaded === true).length;
+        const totalPDF = documents.filter(d => d.format === 'pdf').length;
+        const totalWord = documents.filter(d => d.format === 'docx').length;
         const totalWarnings = documents.filter(d => d.document_type === 'formalWarning').length;
         const totalInvestigations = documents.filter(d => d.document_type === 'letterOfAllegation').length;
         const totalRecords = documents.filter(d => d.document_type === 'recordOfDiscussion').length;
+        const totalPIPs = documents.filter(d => d.document_type === 'performanceImprovementPlan').length;
         
         console.log('📊 Stats:', {
             total: totalGenerated,
             downloaded: totalDownloaded,
+            pdf: totalPDF,
+            word: totalWord,
             warnings: totalWarnings,
             investigations: totalInvestigations,
-            records: totalRecords
+            records: totalRecords,
+            pips: totalPIPs
         });
         
         let html = '<div class="space-y-6">';
         
-        // Stats summary with REAL data
+        // ✅ Updated stats summary with FORMAT breakdown
         html += `
-            <div class="grid grid-cols-4 gap-4 mb-6">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
                     <p class="text-slate-400 text-xs mb-1">Total Generated</p>
                     <p class="text-3xl font-bold text-purple-400">${totalGenerated}</p>
@@ -7399,6 +7628,17 @@ async function loadDocuments() {
                     <p class="text-3xl font-bold text-green-400">${totalDownloaded}</p>
                 </div>
                 <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                    <p class="text-slate-400 text-xs mb-1">📄 PDF</p>
+                    <p class="text-3xl font-bold text-red-400">${totalPDF}</p>
+                </div>
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                    <p class="text-slate-400 text-xs mb-1">📝 Word</p>
+                    <p class="text-3xl font-bold text-blue-400">${totalWord}</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
                     <p class="text-slate-400 text-xs mb-1">Warnings</p>
                     <p class="text-3xl font-bold text-yellow-400">${totalWarnings}</p>
                 </div>
@@ -7406,32 +7646,47 @@ async function loadDocuments() {
                     <p class="text-slate-400 text-xs mb-1">Investigations</p>
                     <p class="text-3xl font-bold text-red-400">${totalInvestigations}</p>
                 </div>
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                    <p class="text-slate-400 text-xs mb-1">Records</p>
+                    <p class="text-3xl font-bold text-green-400">${totalRecords}</p>
+                </div>
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                    <p class="text-slate-400 text-xs mb-1">PIPs</p>
+                    <p class="text-3xl font-bold text-blue-400">${totalPIPs}</p>
+                </div>
             </div>
         `;
         
-        // Document type emoji and name mapping
-	const typeEmoji = {
-          formalWarning: '⚠️',
-          recordOfDiscussion: '📋',
-          performanceImprovementPlan: '📊',  // NEW
-          letterOfAllegation: '🔍'
-	};
+        // Document type mapping
+        const typeEmoji = {
+            formalWarning: '⚠️',
+            recordOfDiscussion: '📋',
+            performanceImprovementPlan: '📊',
+            letterOfAllegation: '🔍'
+        };
 
-	const typeName = {
-          formalWarning: 'Formal Warning',
-          recordOfDiscussion: 'Record of Discussion',
-          performanceImprovementPlan: 'Performance Improvement Plan',  // NEW
-          letterOfAllegation: 'Letter of Allegation'
-	};
+        const typeName = {
+            formalWarning: 'Formal Warning',
+            recordOfDiscussion: 'Record of Discussion',
+            performanceImprovementPlan: 'Performance Improvement Plan',
+            letterOfAllegation: 'Letter of Allegation'
+        };
 
-	const typeColor = {
-    	  formalWarning: 'yellow',
-    	  recordOfDiscussion: 'green',
-    	  performanceImprovementPlan: 'blue',  // NEW
-    	  letterOfAllegation: 'red'
-	};
+        const typeColor = {
+            formalWarning: 'yellow',
+            recordOfDiscussion: 'green',
+            performanceImprovementPlan: 'blue',
+            letterOfAllegation: 'red'
+        };
         
-        // Document list
+        // ✅ Format badge mapping
+        const formatBadge = {
+            'pdf': '<span class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded">📄 PDF</span>',
+            'docx': '<span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">📝 Word</span>',
+            null: '<span class="text-xs bg-slate-700 text-slate-400 px-2 py-1 rounded">Not downloaded</span>'
+        };
+        
+        // Document list with FORMAT badges
         documents.forEach(doc => {
             const date = new Date(doc.generated_at).toLocaleString('en-AU');
             const emoji = typeEmoji[doc.document_type] || '📄';
@@ -7451,7 +7706,10 @@ async function loadDocuments() {
                         <div class="flex flex-col items-end gap-2">
                             <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${doc.user_code || 'Unknown User'}</span>
                             ${doc.downloaded ? 
-                                '<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">✓ Downloaded</span>' : 
+                                `<div class="flex gap-1">
+                                    <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">✓ Downloaded</span>
+                                    ${formatBadge[doc.format] || ''}
+                                 </div>` : 
                                 '<span class="text-xs bg-slate-700 text-slate-400 px-2 py-1 rounded">Not downloaded</span>'}
                         </div>
                     </div>
