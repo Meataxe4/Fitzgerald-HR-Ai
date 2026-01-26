@@ -5661,7 +5661,17 @@ async function downloadGeneratedDocument(format = 'pdf') {
         user: currentUser,
         documentType: documentBuilderState.currentType,
         format: format
-    });    
+    });
+    
+    // ✅ DEBUG: Log HTML for Word documents
+    const previewElement = document.getElementById('documentPreviewContent');
+    if (previewElement && format === 'docx') {
+        console.log('═══════════════════════════════════════');
+        console.log('📄 RAW HTML FOR WORD DOCUMENT:');
+        console.log('Length:', previewElement.innerHTML.length);
+        console.log('First 1000 chars:', previewElement.innerHTML.substring(0, 1000));
+        console.log('═══════════════════════════════════════');
+    }
 
     try {
         const type = documentBuilderState.currentType;
@@ -5687,8 +5697,6 @@ async function downloadGeneratedDocument(format = 'pdf') {
         };
         
         // Get the FORMATTED HTML from the preview
-        const previewElement = document.getElementById('documentPreviewContent');
-        
         if (!previewElement) {
             throw new Error('Preview content not found');
         }
