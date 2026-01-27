@@ -5755,75 +5755,85 @@ async function downloadGeneratedDocument(format = 'pdf') {
  */
 async function generateWordDocument(htmlContent, filename, metadata = {}) {
     try {
-        console.log('📝 Generating Word document...');
+        console.log('📝 Generating Word document via server...');
+        console.log('📝 Filename:', filename);
+        console.log('📝 Metadata:', metadata);
         
-        // Parse HTML
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlContent, 'text/html');
+        // Show loading indicator
+        const loadingDiv = document.createElement('div');
+        loadingDiv.id = 'word-loading';
+        loadingDiv.className = 'fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center z-[9999]';
+        loadingDiv.innerHTML = `
+            <div class="bg-slate-800 rounded-2xl border-2 border-amber-500 p-8 text-center max-w-md">
+                <div class="text-6xl mb-4 animate-bounce">📝</div>
+                <p class="text-white font-bold text-xl mb-2">Generating Word Document</p>
+                <p class="text-slate-400 text-sm mb-4">Creating professional .docx file...</p>
+                <div class="flex justify-center gap-2">
+                    <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                    <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                    <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                </div>
+                <p class="text-slate-500 text-xs mt-4">This usually takes 3-5 seconds</p>
+            </div>
+        `;
+        document.body.appendChild(loadingDiv);
         
-        // Build plain text with basic formatting
-        let text = '';
+        // Call Netlify function
+        console.log('📝 Calling /.netlify/functions/generate-word...');
         
-        doc.body.childNodes.forEach(node => {
-            if (node.nodeType === Node.ELEMENT_NODE) {
-                const tag = node.tagName.toLowerCase();
-                const content = node.textContent.trim();
-                
-                if (!content) return;
-                
-                if (tag === 'h1') {
-                    text += '\n\n' + '='.repeat(60) + '\n';
-                    text += content.toUpperCase() + '\n';
-                    text += '='.repeat(60) + '\n\n';
-                } else if (tag === 'h2') {
-                    text += '\n\n' + content + '\n';
-                    text += '-'.repeat(50) + '\n\n';
-                } else if (tag === 'h3') {
-                    text += '\n' + content + '\n' + '-'.repeat(30) + '\n';
-                } else if (tag === 'p') {
-                    text += content + '\n\n';
-                } else if (tag === 'ul' || tag === 'ol') {
-                    node.querySelectorAll('li').forEach(li => {
-                        text += '  • ' + li.textContent.trim() + '\n';
-                    });
-                    text += '\n';
+        const response = await fetch('/.netlify/functions/generate-word', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                html: htmlContent,
+                metadata: {
+                    documentId: metadata.documentId || generateDocumentId(),
+                    userName: metadata.userName || currentUser,
+                    filename: filename,
+                    generatedAt: new Date().toISOString()
                 }
-            }
+            })
         });
         
-        // Add footer
-        text += '\n\n' + '='.repeat(60) + '\n';
-        text += 'FITZGERALD HR - AI-Powered Hospitality HR Solutions\n';
-        text += 'Email: info@fitzgeraldhr.com.au | Phone: +61 400 211 014\n';
-        text += `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}\n`;
-        text += `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}\n`;
-        text += '='.repeat(60) + '\n\n';
-        text += 'WARNING: DRAFT TEMPLATE - Requires professional review before use\n';
-        text += 'For personalised advice, contact our Senior Consultants.\n';
-        text += '='.repeat(60);
+        console.log('📝 Response status:', response.status);
         
-        // Create simple HTML
-        const html = `<!DOCTYPE html>
-<html>
-<head><meta charset="UTF-8"></head>
-<body><pre style="font-family: Calibri; font-size: 11pt;">${text}</pre></body>
-</html>`;
+        // Remove loading indicator
+        loadingDiv.remove();
         
-        // Create Word blob
-        const blob = new Blob(['\ufeff', html], { 
-            type: 'application/msword' 
-        });
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('❌ Server error:', errorData);
+            throw new Error(errorData.error || `Server error: ${response.status}`);
+        }
         
-        // Download as .doc
-        const docFilename = filename.replace('.docx', '.doc');
-        saveAs(blob, docFilename);
+        // Get the Word document as a blob
+        const blob = await response.blob();
+        console.log('✅ Blob received, size:', blob.size);
         
-        console.log('✅ Word document downloaded:', docFilename);
+        if (blob.size === 0) {
+            throw new Error('Received empty document from server');
+        }
+        
+        // Download it
+        saveAs(blob, filename);
+        
+        console.log('✅ Word document downloaded:', filename);
+        
         return true;
         
     } catch (error) {
-        console.error('❌ Error:', error);
-        alert('Error: ' + error.message);
+        console.error('❌ Word generation error:', error);
+        console.error('❌ Stack:', error.stack);
+        
+        alert(
+            '⚠️ Error Generating Word Document\n\n' +
+            error.message + '\n\n' +
+            'Please try again or download as PDF instead.\n' +
+            'Contact support if this persists: info@fitzgeraldhr.com.au'
+        );
+        
         return false;
     }
 }
