@@ -6666,19 +6666,6 @@ function downloadDocument(documentType, format) {
     generateWordDocument(content, filename);
 }
 
-function generateWordDocument(content, filename) {
-    const htmlContent = `<!DOCTYPE html>
-<html><head><meta charset="utf-8"><style>
-body { font-family: Arial; padding: 40px; }
-h1 { color: #E2A14A; }
-.warning { background: #fff3cd; border-left: 4px solid #ff6b6b; padding: 20px; }
-</style></head><body>${content}</body></html>`;
-    
-    const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
-    saveAs(blob, filename);
-    return true;
-}
-
 function generateExcelSpreadsheet(data, filename, sheetName = 'Data') {
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.json_to_sheet(data);
