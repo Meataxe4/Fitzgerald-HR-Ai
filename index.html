@@ -34,6 +34,100 @@
  
  <style>
 
+/* ========================================
+   DARK MODE SYSTEM
+   ======================================== */
+
+/* CSS Variables for Theme Colors */
+:root {
+    /* Dark Mode (Default) */
+    --bg-primary: #0f172a;      /* slate-900 */
+    --bg-secondary: #1e293b;    /* slate-800 */
+    --bg-tertiary: #334155;     /* slate-700 */
+    --text-primary: #ffffff;
+    --text-secondary: #cbd5e1;  /* slate-300 */
+    --text-tertiary: #94a3b8;   /* slate-400 */
+    --border-color: #475569;    /* slate-600 */
+    --accent-color: #f59e0b;    /* amber-500 */
+    --accent-hover: #d97706;    /* amber-600 */
+}
+
+/* Light Mode Variables */
+.light-mode {
+    --bg-primary: #f8fafc;      /* slate-50 */
+    --bg-secondary: #f1f5f9;    /* slate-100 */
+    --bg-tertiary: #e2e8f0;     /* slate-200 */
+    --text-primary: #0f172a;    /* slate-900 */
+    --text-secondary: #334155;  /* slate-700 */
+    --text-tertiary: #64748b;   /* slate-500 */
+    --border-color: #cbd5e1;    /* slate-300 */
+    --accent-color: #f59e0b;    /* amber-500 */
+    --accent-hover: #d97706;    /* amber-600 */
+}
+
+/* Smooth transitions for theme changes */
+body, 
+.bg-slate-900, .bg-slate-800, .bg-slate-700,
+.text-white, .text-slate-300, .text-slate-400,
+.border-slate-700, .border-slate-600 {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Light mode overrides for body */
+body.light-mode {
+    background: linear-gradient(to bottom right, #f8fafc, #f1f5f9, #f8fafc) !important;
+}
+
+/* Light mode text adjustments */
+.light-mode .text-white { color: #0f172a !important; }
+.light-mode .text-slate-300 { color: #334155 !important; }
+.light-mode .text-slate-400 { color: #64748b !important; }
+.light-mode .text-slate-500 { color: #64748b !important; }
+
+/* Light mode backgrounds */
+.light-mode .bg-slate-900 { background-color: #f8fafc !important; }
+.light-mode .bg-slate-800 { background-color: #ffffff !important; border: 1px solid #e2e8f0; }
+.light-mode .bg-slate-700 { background-color: #f1f5f9 !important; }
+.light-mode .bg-slate-600 { background-color: #e2e8f0 !important; }
+
+/* Light mode borders */
+.light-mode .border-slate-700 { border-color: #cbd5e1 !important; }
+.light-mode .border-slate-600 { border-color: #e2e8f0 !important; }
+
+/* Light mode for chat messages */
+.light-mode #messagesContainer .bg-slate-700 {
+    background-color: #ffffff !important;
+    border: 1px solid #e2e8f0;
+}
+
+.light-mode #messagesContainer .bg-amber-500\/10 {
+    background-color: #fef3c7 !important;
+}
+
+/* Light mode for modals */
+.light-mode .bg-black\/90 {
+    background-color: rgba(15, 23, 42, 0.7) !important;
+}
+
+/* Light mode for inputs */
+.light-mode input,
+.light-mode textarea,
+.light-mode select {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+}
+
+.light-mode input::placeholder,
+.light-mode textarea::placeholder {
+    color: #94a3b8 !important;
+}
+
+/* Light mode for buttons - keep original colors but adjust hover states */
+.light-mode button:not(.bg-red-600):not(.bg-blue-600):not(.bg-purple-600):not(.bg-green-600):not(.bg-amber-500) {
+    filter: brightness(0.95);
+}
+
 /* Improve mobile touch targets */
 @media (max-width: 768px) {
     /* Make all buttons at least 44px tall (Apple's recommended touch target) */
@@ -318,6 +412,15 @@ input, textarea, select {
                     <span class="hidden sm:inline">Admin</span>
                 </button>
                 
+		<!-- Dark Mode Toggle -->
+		<button onclick="toggleDarkMode()" 
+        		id="darkModeToggle"
+        		class="text-slate-400 hover:text-amber-400 font-medium transition-colors flex items-center gap-1 px-2 py-2 touch-manipulation"
+        		title="Toggle Dark Mode">
+    		  <span id="darkModeIcon">🌙</span>
+    		  <span class="hidden sm:inline" id="darkModeText">Dark</span>
+		</button>
+
                 <!-- Settings Button -->
                 <button onclick="showVenueSettings()" 
                         class="text-slate-400 hover:text-amber-400 font-medium transition-colors flex items-center gap-1 px-2 py-2 touch-manipulation">
@@ -2449,6 +2552,66 @@ let wizardData = {};
 let currentWizardStep = 1;
 let recognition = null;
 let isListening = false;
+
+// ========================================
+// DARK MODE SYSTEM
+// ========================================
+
+/**
+ * Initialize dark mode from localStorage
+ * Called on page load
+ */
+function initDarkMode() {
+    // Check localStorage for saved preference (default is dark mode)
+    const isDarkMode = localStorage.getItem('darkMode') !== 'false';
+    
+    if (!isDarkMode) {
+        // User prefers light mode
+        document.body.classList.add('light-mode');
+        updateDarkModeButton(false);
+    } else {
+        // User prefers dark mode (default)
+        document.body.classList.remove('light-mode');
+        updateDarkModeButton(true);
+    }
+}
+
+/**
+ * Toggle between light and dark mode
+ */
+function toggleDarkMode() {
+    const isCurrentlyDark = !document.body.classList.contains('light-mode');
+    
+    if (isCurrentlyDark) {
+        // Switch to light mode
+        document.body.classList.add('light-mode');
+        localStorage.setItem('darkMode', 'false');
+        updateDarkModeButton(false);
+    } else {
+        // Switch to dark mode
+        document.body.classList.remove('light-mode');
+        localStorage.setItem('darkMode', 'true');
+        updateDarkModeButton(true);
+    }
+}
+
+/**
+ * Update the dark mode button appearance
+ */
+function updateDarkModeButton(isDark) {
+    const icon = document.getElementById('darkModeIcon');
+    const text = document.getElementById('darkModeText');
+    
+    if (icon && text) {
+        if (isDark) {
+            icon.textContent = '🌙';
+            text.textContent = 'Dark';
+        } else {
+            icon.textContent = '☀️';
+            text.textContent = 'Light';
+        }
+    }
+}
 
 
 // ========================================
@@ -9465,6 +9628,9 @@ document.addEventListener('DOMContentLoaded', function() {
     DOM.voiceButton = document.getElementById('voiceButton');
     DOM.voiceIcon = document.getElementById('voiceIcon');
     
+    // Initialize dark mode from localStorage
+    initDarkMode();
+
     // Initialize Supabase
     const supabaseInitialized = initializeSupabase();
     if (!supabaseInitialized) {
