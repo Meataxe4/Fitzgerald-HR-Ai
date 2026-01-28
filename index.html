@@ -78,97 +78,109 @@ body.light-mode {
     background: linear-gradient(to bottom right, #f8fafc, #f1f5f9, #f8fafc) !important;
 }
 
-/* Light mode text adjustments - PROFESSIONAL GRADE */
-.light-mode .text-white { color: #111827 !important; }
-.light-mode .text-slate-100 { color: #111827 !important; }
-.light-mode .text-slate-200 { color: #111827 !important; }
-.light-mode .text-slate-300 { color: #111827 !important; }
-.light-mode .text-slate-400 { color: #374151 !important; }
-.light-mode .text-slate-500 { color: #6b7280 !important; }
-.light-mode .text-slate-600 { color: #4b5563 !important; }
+/* Light mode text adjustments - ULTRA BOLD & CLEAR */
+.light-mode .text-white { color: #000000 !important; font-weight: 500; }
+.light-mode .text-slate-100 { color: #000000 !important; font-weight: 500; }
+.light-mode .text-slate-200 { color: #000000 !important; font-weight: 500; }
+.light-mode .text-slate-300 { color: #000000 !important; font-weight: 500; }
+.light-mode .text-slate-400 { color: #1f2937 !important; font-weight: 500; }
+.light-mode .text-slate-500 { color: #374151 !important; }
+.light-mode .text-slate-600 { color: #1f2937 !important; }
 
-/* Light mode backgrounds - CLEAN & MODERN */
+/* Light mode backgrounds - CRISP WHITE */
 .light-mode .bg-slate-900 { 
-    background-color: #f9fafb !important;
+    background-color: #ffffff !important;
 }
 .light-mode .bg-slate-800 { 
     background-color: #ffffff !important; 
-    border: 1px solid #e5e7eb !important;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    border: 2px solid #d1d5db !important;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
 }
 .light-mode .bg-slate-700 { 
-    background-color: #f3f4f6 !important;
-    border: 1px solid #e5e7eb !important;
+    background-color: #f9fafb !important;
+    border: 2px solid #e5e7eb !important;
 }
 .light-mode .bg-slate-600 { background-color: #e5e7eb !important; }
 
-/* Light mode borders - CRISP & DEFINED */
-.light-mode .border-slate-700 { border-color: #d1d5db !important; }
-.light-mode .border-slate-600 { border-color: #e5e7eb !important; }
+/* Light mode borders - STRONG & VISIBLE */
+.light-mode .border-slate-700 { border-color: #9ca3af !important; border-width: 2px !important; }
+.light-mode .border-slate-600 { border-color: #d1d5db !important; border-width: 2px !important; }
 
-/* Chat messages - PROFESSIONAL CARDS */
+/* Chat messages - CRYSTAL CLEAR */
 .light-mode #messagesContainer .bg-slate-700 {
     background-color: #ffffff !important;
-    border: 1px solid #e5e7eb !important;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    border: 2px solid #d1d5db !important;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
 }
 
 .light-mode #messagesContainer .bg-slate-800 {
     background-color: #f9fafb !important;
-    border: 1px solid #e5e7eb !important;
+    border: 2px solid #e5e7eb !important;
 }
 
-/* Force ALL text to be professional black */
+/* Force ALL text to be BOLD BLACK */
 .light-mode #messagesContainer,
 .light-mode #messagesContainer p,
 .light-mode #messagesContainer span,
 .light-mode #messagesContainer div,
 .light-mode #messagesContainer li,
 .light-mode #messagesContainer strong {
-    color: #111827 !important;
+    color: #000000 !important;
+    font-weight: 500 !important;
 }
 
-/* REDESIGNED: Professional suggestion boxes - NO MORE YELLOW */
+/* REDESIGNED: VIBRANT suggestion boxes - CLEAR & BOLD */
 .light-mode .bg-amber-500\/10,
 .light-mode .bg-yellow-500\/10,
 .light-mode .bg-amber-100 {
-    background: linear-gradient(to right, #f0f9ff, #e0f2fe) !important;
-    border-left: 3px solid #0ea5e9 !important;
-    border-top: 1px solid #bae6fd !important;
-    border-right: 1px solid #bae6fd !important;
-    border-bottom: 1px solid #bae6fd !important;
-    box-shadow: 0 1px 2px 0 rgba(14, 165, 233, 0.05);
+    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
+    border: 2px solid #3b82f6 !important;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1), 0 2px 4px 0 rgba(0, 0, 0, 0.05);
+    padding: 16px !important;
 }
 
-/* Professional blue text in suggestion boxes */
+/* BOLD blue text in suggestion boxes */
 .light-mode .bg-amber-500\/10 *,
 .light-mode .bg-yellow-500\/10 * {
-    color: #075985 !important;
-    font-weight: 500;
+    color: #1e3a8a !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
 }
 
-/* Professional alert boxes */
+/* VIBRANT Daily Tip Bar - IMPOSSIBLE TO MISS */
+.light-mode .bg-blue-500\/10 {
+    background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%) !important;
+    border: 2px solid #2563eb !important;
+    border-left: 6px solid #2563eb !important;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Daily Tip text - BOLD & CLEAR */
+.light-mode .bg-blue-500\/10 * {
+    color: #1e3a8a !important;
+    font-weight: 600 !important;
+}
+
+/* Professional alert boxes - VIBRANT */
 .light-mode .bg-red-500\/10 {
-    background: linear-gradient(to right, #fef2f2, #fee2e2) !important;
-    border-left: 3px solid #ef4444 !important;
-    border-top: 1px solid #fecaca !important;
-    border-right: 1px solid #fecaca !important;
-    border-bottom: 1px solid #fecaca !important;
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%) !important;
+    border: 2px solid #ef4444 !important;
+    border-left: 6px solid #ef4444 !important;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
 }
 
 .light-mode .bg-green-500\/10 {
-    background: linear-gradient(to right, #f0fdf4, #dcfce7) !important;
-    border-left: 3px solid #22c55e !important;
-    border-top: 1px solid #bbf7d0 !important;
-    border-right: 1px solid #bbf7d0 !important;
-    border-bottom: 1px solid #bbf7d0 !important;
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%) !important;
+    border: 2px solid #10b981 !important;
+    border-left: 6px solid #10b981 !important;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
 }
 
-/* Professional colored text */
+/* VIBRANT colored text - BOLD & CLEAR */
 .light-mode .text-red-300,
 .light-mode .text-red-400 {
     color: #dc2626 !important;
-    font-weight: 600;
+    font-weight: 700 !important;
 }
 
 .light-mode .text-amber-400,
@@ -176,117 +188,129 @@ body.light-mode {
 .light-mode .text-orange-400,
 .light-mode .text-orange-500 {
     color: #ea580c !important;
-    font-weight: 600;
+    font-weight: 700 !important;
 }
 
 .light-mode .text-green-300,
 .light-mode .text-green-400,
 .light-mode .text-green-500 {
     color: #16a34a !important;
-    font-weight: 600;
+    font-weight: 700 !important;
 }
 
 .light-mode .text-blue-300,
 .light-mode .text-blue-400,
 .light-mode .text-blue-500 {
     color: #2563eb !important;
-    font-weight: 500;
+    font-weight: 600 !important;
 }
 
-/* Professional links */
+/* BOLD links */
 .light-mode a {
     color: #2563eb !important;
     text-decoration: none;
-    font-weight: 500;
-    border-bottom: 1px solid transparent;
-    transition: border-color 0.2s;
+    font-weight: 600 !important;
+    border-bottom: 2px solid #2563eb;
 }
 
 .light-mode a:hover {
-    border-bottom-color: #2563eb;
+    color: #1d4ed8 !important;
+    border-bottom-color: #1d4ed8;
 }
 
-/* Modal overlay - subtle */
+/* Modal overlay - CLEAR */
 .light-mode .bg-black\/90 {
-    background-color: rgba(17, 24, 39, 0.75) !important;
-    backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.75) !important;
+    backdrop-filter: blur(8px);
 }
 
-/* Professional input fields */
+/* PROFESSIONAL input fields - THICK BORDERS */
 .light-mode input,
 .light-mode textarea,
 .light-mode select {
     background-color: #ffffff !important;
-    color: #111827 !important;
-    border: 1.5px solid #d1d5db !important;
-    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    color: #000000 !important;
+    border: 2px solid #9ca3af !important;
+    box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     transition: all 0.2s;
+    font-weight: 500 !important;
 }
 
 .light-mode input:focus,
 .light-mode textarea:focus,
 .light-mode select:focus {
     border-color: #f59e0b !important;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+    border-width: 3px !important;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2), inset 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     outline: none;
 }
 
 .light-mode input::placeholder,
 .light-mode textarea::placeholder {
-    color: #9ca3af !important;
+    color: #6b7280 !important;
+    font-weight: 400 !important;
 }
 
-/* Button styling - keep vibrant */
+/* Button styling - CLEAR HIERARCHY */
 .light-mode button:not(.bg-red-600):not(.bg-blue-600):not(.bg-purple-600):not(.bg-green-600):not(.bg-amber-500):not(.bg-orange-600) {
     background-color: #f3f4f6 !important;
-    color: #374151 !important;
-    border: 1px solid #e5e7eb !important;
+    color: #1f2937 !important;
+    border: 2px solid #d1d5db !important;
+    font-weight: 600 !important;
 }
 
 .light-mode button:not(.bg-red-600):not(.bg-blue-600):not(.bg-purple-600):not(.bg-green-600):not(.bg-amber-500):not(.bg-orange-600):hover {
     background-color: #e5e7eb !important;
-    border-color: #d1d5db !important;
+    border-color: #9ca3af !important;
 }
 
-/* Professional header */
+/* BOLD header */
 .light-mode .bg-slate-800\/80 {
-    background-color: rgba(255, 255, 255, 0.98) !important;
-    border-bottom: 1px solid #e5e7eb !important;
+    background-color: #ffffff !important;
+    border-bottom: 3px solid #d1d5db !important;
     backdrop-filter: blur(12px);
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
 }
 
-/* Daily tip banner */
-.light-mode .bg-blue-500\/10 {
-    background: linear-gradient(to right, #eff6ff, #dbeafe) !important;
-    border-left: 3px solid #3b82f6 !important;
-    border-top: 1px solid #bfdbfe !important;
-    border-right: 1px solid #bfdbfe !important;
-    border-bottom: 1px solid #bfdbfe !important;
-}
-
-/* Message input box - PROFESSIONAL */
+/* Message input box - ULTRA CLEAR */
 .light-mode #messageInput {
     background-color: #ffffff !important;
-    border: 1.5px solid #d1d5db !important;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    color: #111827 !important;
+    border: 2px solid #9ca3af !important;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+    color: #000000 !important;
+    font-weight: 500 !important;
 }
 
 .light-mode #messageInput:focus {
     border-color: #f59e0b !important;
-    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1), 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    border-width: 3px !important;
+    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.08);
 }
 
-/* Send button enhancement */
+/* Send button - VIBRANT */
 .light-mode .bg-amber-500,
 .light-mode .bg-orange-600 {
-    box-shadow: 0 1px 3px 0 rgba(245, 158, 11, 0.3) !important;
+    box-shadow: 0 2px 8px 0 rgba(245, 158, 11, 0.4) !important;
+    font-weight: 700 !important;
 }
 
 .light-mode .bg-amber-500:hover,
 .light-mode .bg-orange-600:hover {
-    box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.3) !important;
+    box-shadow: 0 4px 12px 0 rgba(245, 158, 11, 0.5) !important;
+    transform: translateY(-1px);
+}
+
+/* Icon improvements */
+.light-mode .bg-amber-500\/10 span,
+.light-mode .bg-blue-500\/10 span {
+    font-size: 1.1em !important;
+}
+
+/* Warning icon */
+.light-mode .text-amber-500 {
+    color: #f59e0b !important;
+    font-size: 1.2em !important;
+    font-weight: 700 !important;
 }
 
 /* Improve mobile touch targets */
@@ -10021,7 +10045,7 @@ function showTermsFromAcceptance() {
 }
 
 /**
-* Show Privacy from acceptance modal
+ * Show Privacy from acceptance modal
  */
 function showPrivacyFromAcceptance() {
     const privacyModal = document.getElementById('privacyModal');
