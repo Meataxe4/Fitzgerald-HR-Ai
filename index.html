@@ -1307,116 +1307,132 @@ input, textarea, select {
             <!-- Right: Buttons (wrap on mobile) -->
             <div class="flex flex-wrap items-center gap-2 text-sm">
                 
-                <!-- Crisis Mode Button -->
-                <button onclick="activateCrisisMode()" 
-                        class="px-3 py-2 md:px-4 md:py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold rounded-lg transition-all flex items-center gap-2 touch-manipulation">
-                    <span class="text-lg md:text-xl">🚨</span>
-                    <span class="hidden sm:inline">URGENT</span>
-                </button>
-                
-                <!-- Voice Input Button -->
-                <button onclick="toggleVoiceInput()" 
-                        id="voiceButton"
-                        class="p-2 bg-slate-700 hover:bg-slate-600 active:bg-slate-500 text-white rounded-lg transition-colors touch-manipulation min-w-[44px] min-h-[44px]">
-                    <span id="voiceIcon">🎤</span>
-                </button>
-                
-                <!-- Tools Menu -->
-                <div class="relative">
-                    <button onclick="toggleToolsMenu()" 
-                            class="p-2 bg-slate-700 hover:bg-slate-600 active:bg-slate-500 text-white rounded-lg transition-colors touch-manipulation min-w-[44px] min-h-[44px]">
-                        <span>🛠️</span>
+                <!-- Main Action Buttons -->
+                <div class="flex items-center gap-2">
+                    <!-- Crisis Mode Button -->
+                    <button onclick="activateCrisisMode()" 
+                            class="px-3 py-2 md:px-4 md:py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold rounded-lg transition-all flex items-center gap-2 touch-manipulation">
+                        <span class="text-lg md:text-xl">🚨</span>
+                        <span class="hidden sm:inline">URGENT</span>
                     </button>
-                    <div id="toolsMenu" class="hidden bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 overflow-y-auto">
-                        <div class="p-2">
-                            <button onclick="openTool('awardWizard')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                <span>🧙</span>
-                                <span>Award Wizard</span>
-                            </button>
-                            <button onclick="openTool('rosterStressTester')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                <span>🔍</span>
-                                <span>Roster Stress Test</span>
-                            </button>
-                            <button onclick="openTool('complianceCalendar')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                <span>📅</span>
-                                <span>Compliance Calendar</span>
-                            </button>
-                            <button onclick="openTool('awardCalculator')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                <span>💰</span>
-                                <span>Award Calculator</span>
-                            </button>
-                            <button onclick="openTool('documentBuilder')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                <span>📝</span>
-                                <span>Document Builder</span>
-                            </button>
-                            <button onclick="openTool('rosterOptimizer')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                <span>📋</span>
-                                <span>Roster Optimiser</span>
-                            </button>
-                            <button onclick="openTool('terminationRisk')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                <span>⚖️</span>
-                                <span>Termination Risk</span>
-                            </button>
-                            <button onclick="openTool('scenarioAnalysis')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                <span>🎯</span>
-                                <span>Scenario Analysis</span>
-                            </button>
-                            <button onclick="openTool('xeroIntegration')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                <span>🔗</span>
-                                <span>Xero Integration</span>
-                            </button>
+                    
+                    <!-- Voice Input Button -->
+                    <button onclick="toggleVoiceInput()" 
+                            id="voiceButton"
+                            class="p-2 bg-slate-700 hover:bg-slate-600 active:bg-slate-500 text-white rounded-lg transition-colors touch-manipulation min-w-[44px] min-h-[44px]">
+                        <span id="voiceIcon">🎤</span>
+                    </button>
+                    
+                    <!-- Tools Menu -->
+                    <div class="relative">
+                        <button onclick="toggleToolsMenu()" 
+                                class="p-2 bg-slate-700 hover:bg-slate-600 active:bg-slate-500 text-white rounded-lg transition-colors touch-manipulation min-w-[44px] min-h-[44px]">
+                            <span>🛠️</span>
+                        </button>
+                        <div id="toolsMenu" class="hidden bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 overflow-y-auto">
+                            <div class="p-2">
+                                <button onclick="openTool('awardWizard')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
+                                    <span>🧙</span>
+                                    <span>Award Wizard</span>
+                                </button>
+                                <button onclick="openTool('rosterStressTester')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
+                                    <span>🔍</span>
+                                    <span>Roster Stress Test</span>
+                                </button>
+                                <button onclick="openTool('complianceCalendar')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
+                                    <span>📅</span>
+                                    <span>Compliance Calendar</span>
+                                </button>
+                                <button onclick="openTool('awardCalculator')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
+                                    <span>💰</span>
+                                    <span>Award Calculator</span>
+                                </button>
+                                <button onclick="openTool('documentBuilder')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
+                                    <span>📝</span>
+                                    <span>Document Builder</span>
+                                </button>
+                                <button onclick="openTool('rosterOptimizer')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
+                                    <span>📋</span>
+                                    <span>Roster Optimiser</span>
+                                </button>
+                                <button onclick="openTool('terminationRisk')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
+                                    <span>⚖️</span>
+                                    <span>Termination Risk</span>
+                                </button>
+                                <button onclick="openTool('scenarioAnalysis')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
+                                    <span>🎯</span>
+                                    <span>Scenario Analysis</span>
+                                </button>
+                                <button onclick="openTool('xeroIntegration')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
+                                    <span>🔗</span>
+                                    <span>Xero Integration</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Admin Button (hidden by default) -->
-                <button id="adminButton" onclick="showAdminDashboard()" 
-                        class="hidden text-purple-400 hover:text-purple-300 font-medium transition-colors flex items-center gap-1 px-2 py-2 touch-manipulation">
-                    <span>📊</span>
-                    <span class="hidden sm:inline">Admin</span>
-                </button>
+                <!-- Divider (hidden on mobile) -->
+                <div class="hidden md:block h-6 w-px bg-slate-600"></div>
                 
-		<!-- Dark Mode Toggle -->
-		<button onclick="toggleDarkMode()" 
-        		id="darkModeToggle"
-        		class="text-slate-400 hover:text-amber-400 font-medium transition-colors flex items-center gap-1 px-2 py-2 touch-manipulation"
-        		title="Toggle Dark Mode">
-    		  <span id="darkModeIcon">🌙</span>
-    		  <span class="hidden sm:inline" id="darkModeText">Dark</span>
-		</button>
+                <!-- Secondary Buttons -->
+                <div class="flex items-center gap-2">
+                    <!-- Admin Button (hidden by default) -->
+                    <button id="adminButton" onclick="showAdminDashboard()" 
+                            class="hidden text-purple-400 hover:text-purple-300 font-medium transition-colors flex items-center gap-1 px-2 py-2 touch-manipulation">
+                        <span>📊</span>
+                        <span class="hidden sm:inline">Admin</span>
+                    </button>
+                    
+                    <!-- Dark Mode Toggle -->
+                    <button onclick="toggleDarkMode()" 
+                            id="darkModeToggle"
+                            class="text-slate-400 hover:text-amber-400 font-medium transition-colors flex items-center gap-1 px-2 py-2 touch-manipulation"
+                            title="Toggle Dark Mode">
+                        <span id="darkModeIcon">🌙</span>
+                        <span class="hidden sm:inline" id="darkModeText">Dark</span>
+                    </button>
 
-                <!-- Settings Button -->
-                <button onclick="showVenueSettings()" 
-                        class="text-slate-400 hover:text-amber-400 font-medium transition-colors flex items-center gap-1 px-2 py-2 touch-manipulation">
-                    <span>⚙️</span>
-                    <span class="hidden sm:inline">Settings</span>
-                </button>
-                
-                <!-- Legal Links (hidden on mobile) -->
-                <div class="hidden md:flex items-center gap-2 text-xs">
-                    <a href="#terms" onclick="showTermsOfService(); return false;" 
-                       class="text-slate-400 hover:text-amber-400 transition-colors px-2 py-1">
-                        Terms
-                    </a>
-                    <span class="text-slate-600">|</span>
-                    <a href="#privacy" onclick="showPrivacyPolicy(); return false;" 
-                       class="text-slate-400 hover:text-amber-400 transition-colors px-2 py-1">
-                        Privacy
-                    </a>
+                    <!-- Settings Button -->
+                    <button onclick="showVenueSettings()" 
+                            class="text-slate-400 hover:text-amber-400 font-medium transition-colors flex items-center gap-1 px-2 py-2 touch-manipulation">
+                        <span>⚙️</span>
+                        <span class="hidden sm:inline">Settings</span>
+                    </button>
+                    
+                    <!-- Give Feedback -->
+                    <button onclick="showFeedback()" 
+                            class="text-amber-500 hover:text-amber-400 font-medium transition-colors px-2 py-2 touch-manipulation">
+                        <span class="hidden sm:inline">Give Feedback</span>
+                        <span class="sm:hidden">📝</span>
+                    </button>
                 </div>
                 
-                <!-- Give Feedback -->
-                <button onclick="showFeedback()" 
-                        class="text-amber-500 hover:text-amber-400 font-medium transition-colors px-2 py-2 touch-manipulation">
-                    <span class="hidden sm:inline">Give Feedback</span>
-                    <span class="sm:hidden">📝</span>
-                </button>
+                <!-- Divider (hidden on mobile) -->
+                <div class="hidden md:block h-6 w-px bg-slate-600"></div>
                 
-                <!-- Logout -->
-                <button onclick="logout()" 
-                        class="text-slate-400 hover:text-white transition-colors px-2 py-2 touch-manipulation">
-                    Logout
-                </button>
+                <!-- Account Actions -->
+                <div class="flex items-center gap-2">
+                    <!-- Legal Links (hidden on mobile) -->
+                    <div class="hidden lg:flex items-center gap-2 text-xs">
+                        <a href="#terms" onclick="showTermsOfService(); return false;" 
+                           class="text-slate-400 hover:text-amber-400 transition-colors px-2 py-1">
+                            Terms
+                        </a>
+                        <span class="text-slate-600">|</span>
+                        <a href="#privacy" onclick="showPrivacyPolicy(); return false;" 
+                           class="text-slate-400 hover:text-amber-400 transition-colors px-2 py-1">
+                            Privacy
+                        </a>
+                    </div>
+                    
+                    <!-- Logout - Now prominently placed -->
+                    <button onclick="logout()" 
+                            class="bg-slate-700 hover:bg-slate-600 text-white font-medium px-4 py-2 rounded-lg transition-colors touch-manipulation flex items-center gap-2">
+                        <span>🚪</span>
+                        <span>Logout</span>
+                    </button>
+                </div>
                 
             </div>
         </div>
@@ -11775,3 +11791,5 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
+
+
