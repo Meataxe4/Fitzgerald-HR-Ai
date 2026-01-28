@@ -78,54 +78,132 @@ body.light-mode {
     background: linear-gradient(to bottom right, #f8fafc, #f1f5f9, #f8fafc) !important;
 }
 
-/* Light mode text adjustments */
+/* Light mode text adjustments - HIGH CONTRAST FOR READABILITY */
 .light-mode .text-white { color: #0f172a !important; }
-.light-mode .text-slate-300 { color: #334155 !important; }
-.light-mode .text-slate-400 { color: #64748b !important; }
-.light-mode .text-slate-500 { color: #64748b !important; }
+.light-mode .text-slate-100 { color: #1e293b !important; }
+.light-mode .text-slate-200 { color: #1e293b !important; }
+.light-mode .text-slate-300 { color: #1e293b !important; }
+.light-mode .text-slate-400 { color: #475569 !important; }
+.light-mode .text-slate-500 { color: #475569 !important; }
+.light-mode .text-slate-600 { color: #334155 !important; }
 
 /* Light mode backgrounds */
 .light-mode .bg-slate-900 { background-color: #f8fafc !important; }
-.light-mode .bg-slate-800 { background-color: #ffffff !important; border: 1px solid #e2e8f0; }
+.light-mode .bg-slate-800 { 
+    background-color: #ffffff !important; 
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
 .light-mode .bg-slate-700 { background-color: #f1f5f9 !important; }
 .light-mode .bg-slate-600 { background-color: #e2e8f0 !important; }
 
-/* Light mode borders */
-.light-mode .border-slate-700 { border-color: #cbd5e1 !important; }
-.light-mode .border-slate-600 { border-color: #e2e8f0 !important; }
+/* Light mode borders - stronger visibility */
+.light-mode .border-slate-700 { border-color: #94a3b8 !important; }
+.light-mode .border-slate-600 { border-color: #cbd5e1 !important; }
 
-/* Light mode for chat messages */
+/* Light mode for chat messages - CRITICAL FOR READABILITY */
 .light-mode #messagesContainer .bg-slate-700 {
     background-color: #ffffff !important;
-    border: 1px solid #e2e8f0;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.light-mode #messagesContainer .bg-amber-500\/10 {
+.light-mode #messagesContainer .bg-slate-800 {
+    background-color: #f8fafc !important;
+    border: 1px solid #cbd5e1 !important;
+}
+
+/* Force ALL chat message text to be dark - THIS IS KEY */
+.light-mode #messagesContainer,
+.light-mode #messagesContainer *:not(.bg-red-600):not(.bg-blue-600):not(.bg-green-600):not(.bg-amber-500) {
+    color: #0f172a !important;
+}
+
+/* Fix yellow "Try asking" suggestion boxes */
+.light-mode .bg-amber-500\/10,
+.light-mode .bg-yellow-500\/10,
+.light-mode .bg-amber-100 {
     background-color: #fef3c7 !important;
+    border: 1px solid #f59e0b !important;
 }
 
-/* Light mode for modals */
+/* Override any light text in amber boxes */
+.light-mode .bg-amber-500\/10 *,
+.light-mode .bg-yellow-500\/10 * {
+    color: #78350f !important;
+}
+
+/* Fix colored text in light mode */
+.light-mode .text-red-300,
+.light-mode .text-red-400 {
+    color: #dc2626 !important;
+    font-weight: 600;
+}
+
+.light-mode .text-amber-400,
+.light-mode .text-amber-500,
+.light-mode .text-orange-400,
+.light-mode .text-orange-500 {
+    color: #d97706 !important;
+    font-weight: 600;
+}
+
+.light-mode .text-green-300,
+.light-mode .text-green-400,
+.light-mode .text-green-500 {
+    color: #059669 !important;
+    font-weight: 600;
+}
+
+.light-mode .text-blue-300,
+.light-mode .text-blue-400,
+.light-mode .text-blue-500 {
+    color: #2563eb !important;
+}
+
+/* Keep links visible and clearly styled */
+.light-mode a {
+    color: #2563eb !important;
+    text-decoration: underline;
+    font-weight: 500;
+}
+
+/* Light mode for modals - darker overlay */
 .light-mode .bg-black\/90 {
-    background-color: rgba(15, 23, 42, 0.7) !important;
+    background-color: rgba(15, 23, 42, 0.85) !important;
 }
 
-/* Light mode for inputs */
+/* Light mode for inputs with strong borders */
 .light-mode input,
 .light-mode textarea,
 .light-mode select {
     background-color: #ffffff !important;
     color: #0f172a !important;
-    border-color: #cbd5e1 !important;
+    border: 2px solid #cbd5e1 !important;
+}
+
+.light-mode input:focus,
+.light-mode textarea:focus,
+.light-mode select:focus {
+    border-color: #f59e0b !important;
+    outline: none;
 }
 
 .light-mode input::placeholder,
 .light-mode textarea::placeholder {
-    color: #94a3b8 !important;
+    color: #64748b !important;
 }
 
-/* Light mode for buttons - keep original colors but adjust hover states */
-.light-mode button:not(.bg-red-600):not(.bg-blue-600):not(.bg-purple-600):not(.bg-green-600):not(.bg-amber-500) {
+/* Light mode for buttons - keep original accent colors */
+.light-mode button:not(.bg-red-600):not(.bg-blue-600):not(.bg-purple-600):not(.bg-green-600):not(.bg-amber-500):not(.bg-orange-600) {
     filter: brightness(0.95);
+}
+
+/* Fix header in light mode */
+.light-mode .bg-slate-800\/80 {
+    background-color: rgba(255, 255, 255, 0.95) !important;
+    border-bottom: 2px solid #cbd5e1 !important;
+    backdrop-filter: blur(8px);
 }
 
 /* Improve mobile touch targets */
@@ -229,7 +307,7 @@ input, textarea, select {
                 <div class="mt-6 pt-6 border-t border-slate-700">
                     <p class="text-slate-500 text-xs text-center">
                         Don't have an access code? Contact us at<br/>
-                        <a href="mailto:beta@fitzgeraldhr.com.au" class="text-amber-500 hover:underline">beta@fitzgeraldhr.com.au</a>
+                        <a href="/cdn-cgi/l/email-protection#90f2f5e4f1d0f6f9e4eaf7f5e2f1fcf4f8e2bef3fffdbef1e5" class="text-amber-500 hover:underline"><span class="__cf_email__" data-cfemail="93f1f6e7f2d3f5fae7e9f4f6e1f2fff7fbe1bdf0fcfebdf2e6">[email&#160;protected]</span></a>
                     </p>
                 </div>
             </div>
@@ -554,7 +632,7 @@ input, textarea, select {
         </p>
         <p class="text-slate-500 text-xs">
             Professional Advice: 
-            <a href="mailto:info@fitzgeraldhr.com.au" class="text-slate-400 hover:text-amber-400 underline">info@fitzgeraldhr.com.au</a> | 
+            <a href="/cdn-cgi/l/email-protection#f29b9c949db2949b8688959780939e969a80dc919d9fdc9387" class="text-slate-400 hover:text-amber-400 underline"><span class="__cf_email__" data-cfemail="96fff8f0f9d6f0ffe2ecf1f3e4f7faf2fee4b8f5f9fbb8f7e3">[email&#160;protected]</span></a> | 
             <a href="tel:+61400211014" class="text-slate-400 hover:text-amber-400 underline">+61 400 211 014</a> | 
             <a href="#terms" onclick="showTermsOfService(); return false;" class="text-slate-400 hover:text-amber-400 underline">Terms</a>
         </p>
@@ -2036,7 +2114,7 @@ Be as specific as possible!"></textarea>
                     <span>CRITICAL: This document MUST be reviewed by a consultant before use</span>
                 </p>
                 <p class="text-red-200 text-xs">
-                    Contact: <a href="mailto:info@fitzgeraldhr.com.au" class="underline hover:text-red-100">info@fitzgeraldhr.com.au</a> | +61 400 211 014
+                    Contact: <a href="/cdn-cgi/l/email-protection#f39a9d959cb3959a8789949681929f979b81dd909c9edd9286" class="underline hover:text-red-100"><span class="__cf_email__" data-cfemail="2f464149406f49465b55484a5d4e434b475d014c4042014e5a">[email&#160;protected]</span></a> | +61 400 211 014
                 </p>
             </div>
         </div>
@@ -2203,7 +2281,7 @@ html        </div>
             <h3 class="text-white font-bold text-lg">7. Professional Consultation</h3>
             <p>For professional HR advice and document review:</p>
             <p class="font-semibold text-amber-400">
-                Email: <a href="mailto:info@fitzgeraldhr.com.au" class="underline">info@fitzgeraldhr.com.au</a><br>
+                Email: <a href="/cdn-cgi/l/email-protection#d1b8bfb7be91b7b8a5abb6b4a3b0bdb5b9a3ffb2bebcffb0a4" class="underline"><span class="__cf_email__" data-cfemail="bfd6d1d9d0ffd9d6cbc5d8dacdded3dbd7cd91dcd0d291deca">[email&#160;protected]</span></a><br>
                 Phone: <a href="tel:+61400211014" class="underline">+61 400 211 014</a>
             </p>
 
@@ -2277,7 +2355,7 @@ html        </div>
             <h3 class="text-white font-bold text-lg">7. Contact Us</h3>
             <p>For privacy concerns or data requests:</p>
             <p class="font-semibold text-amber-400">
-                Email: <a href="mailto:info@fitzgeraldhr.com.au" class="underline">info@fitzgeraldhr.com.au</a><br>
+                Email: <a href="/cdn-cgi/l/email-protection#5c35323a331c3a3528263b392e3d3038342e723f3331723d29" class="underline"><span class="__cf_email__" data-cfemail="a0c9cec6cfe0c6c9d4dac7c5d2c1ccc4c8d28ec3cfcd8ec1d5">[email&#160;protected]</span></a><br>
                 Phone: <a href="tel:+61400211014" class="underline">+61 400 211 014</a>
             </p>
 
@@ -2404,7 +2482,7 @@ html        </div>
                     <span>Get Professional Advice</span>
                 </h3>
                 <p class="text-amber-300">
-                    Email: <a href="mailto:info@fitzgeraldhr.com.au" class="underline hover:text-amber-200 font-semibold">info@fitzgeraldhr.com.au</a><br>
+                    Email: <a href="/cdn-cgi/l/email-protection#11787f777e517778656b767463707d7579633f727e7c3f7064" class="underline hover:text-amber-200 font-semibold"><span class="__cf_email__" data-cfemail="e28b8c848da2848b9698858790838e868a90cc818d8fcc8397">[email&#160;protected]</span></a><br>
                     Phone: <a href="tel:+61400211014" class="underline hover:text-amber-200 font-semibold">+61 400 211 014</a>
                 </p>
             </div>
@@ -2447,7 +2525,7 @@ html        </div>
     </div>
 </div>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ========================================
 // CONFIGURATION & GLOBALS
 // ========================================
@@ -9860,7 +9938,7 @@ function showTermsFromAcceptance() {
 }
 
 /**
- * Show Privacy from acceptance modal
+  * Show Privacy from acceptance modal
  */
 function showPrivacyFromAcceptance() {
     const privacyModal = document.getElementById('privacyModal');
@@ -9892,5 +9970,3 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
-
-
