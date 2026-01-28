@@ -1156,11 +1156,11 @@ input, textarea, select {
                     <div class="text-xs opacity-75">Process multiple files</div>
                 </div>
             </div>
-            <div class="quick-action-item" onclick="showAnalyticsDashboard()">
+            <div id="analyticsQuickAction" class="quick-action-item" onclick="showAnalyticsDashboard()" style="display: none;">
                 <span class="text-xl">📊</span>
                 <div>
                     <div class="font-semibold">Analytics</div>
-                    <div class="text-xs opacity-75">View insights</div>
+                    <div class="text-xs opacity-75">View insights (Admin Only)</div>
                 </div>
             </div>
         </div>
@@ -7592,6 +7592,12 @@ function attemptAutoLogin() {
         if (adminBtn) {
             adminBtn.classList.remove('hidden');
         }
+        
+        // Also show analytics in quick actions for admin
+        const analyticsQuickAction = document.getElementById('analyticsQuickAction');
+        if (analyticsQuickAction) {
+            analyticsQuickAction.style.display = 'flex';
+        }
     }
     
     // CHECK IF USER NEEDS ONBOARDING
@@ -8785,6 +8791,12 @@ async function processMultipleFiles() {
 // ===================
 
 function showAnalyticsDashboard() {
+    // ADMIN ONLY: Check if user has admin access
+    if (!isAdmin) {
+        showToast('Analytics are only available for admins', 'warning', 3000);
+        return;
+    }
+    
     document.getElementById('analyticsModal').classList.remove('hidden');
     renderUsageChart();
     toggleQuickActions();
@@ -8817,13 +8829,16 @@ function renderUsageChart() {
     
     if (currentChart) currentChart.destroy();
     
+    // REAL DATA: Calculate messages per day from conversations
+    const messagesPerDay = calculateMessagesPerDay();
+    
     currentChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            labels: messagesPerDay.labels,
             datasets: [{
                 label: 'Messages',
-                data: [12, 19, 15, 25, 22, 30, 28],
+                data: messagesPerDay.data,
                 borderColor: '#f59e0b',
                 backgroundColor: 'rgba(245, 158, 11, 0.1)',
                 tension: 0.4,
@@ -8838,12 +8853,17 @@ function renderUsageChart() {
                     labels: {
                         color: '#cbd5e1'
                     }
+                },
+                title: {
+                    display: true,
+                    text: 'Messages Over Last 7 Days (Real Data)',
+                    color: '#cbd5e1'
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: { color: '#cbd5e1' },
+                    ticks: { color: '#cbd5e1', precision: 0 },
                     grid: { color: '#475569' }
                 },
                 x: {
@@ -8861,19 +8881,26 @@ function renderToolsChart() {
     
     if (currentChart) currentChart.destroy();
     
+    // REAL DATA: Get tool usage from analytics events
+    const toolUsage = calculateToolUsage();
+    
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: ['Award Wizard', 'Document Builder', 'Calculator', 'Roster', 'Compliance'],
+            labels: toolUsage.labels,
             datasets: [{
-                label: 'Uses',
-                data: [45, 38, 32, 28, 22],
+                label: 'Times Used',
+                data: toolUsage.data,
                 backgroundColor: [
                     '#f59e0b',
                     '#3b82f6',
                     '#10b981',
                     '#8b5cf6',
-                    '#ef4444'
+                    '#ef4444',
+                    '#f97316',
+                    '#06b6d4',
+                    '#ec4899',
+                    '#84cc16'
                 ]
             }]
         },
@@ -8885,12 +8912,17 @@ function renderToolsChart() {
                     labels: {
                         color: '#cbd5e1'
                     }
+                },
+                title: {
+                    display: true,
+                    text: 'Tool Usage (Real Data)',
+                    color: '#cbd5e1'
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: { color: '#cbd5e1' },
+                    ticks: { color: '#cbd5e1', precision: 0 },
                     grid: { color: '#475569' }
                 },
                 x: {
@@ -8908,10 +8940,140 @@ function renderEngagementChart() {
     
     if (currentChart) currentChart.destroy();
     
+    // REAL DATA: Calculate user engagement metrics
+    const engagement = calculateEngagementMetrics();
+    
     currentChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: ['Active Users', 'New Users', 'Returning Users'],
+            labels: engagement.labels,
+            datasets: [{
+                data: engagement.data,
+                backgroundColor: ['#f59e0b', '#3b82f6', '#10b981']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#cbd5e1'
+                    }
+                },
+                title: {
+                    display: true,
+                    text: 'Engagement Metrics (Real Data)',
+                    color: '#cbd5e1'
+                }
+            }
+        }
+    });
+}
+
+// Helper function: Calculate messages per day
+function calculateMessagesPerDay() {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const messageCounts = [0, 0, 0, 0, 0, 0, 0];
+    const today = new Date();
+    
+    // Count messages from all conversations in last 7 days
+    conversations.forEach(conv => {
+        conv.messages?.forEach(msg => {
+            const msgDate = new Date(msg.timestamp || conv.updated);
+            const daysDiff = Math.floor((today - msgDate) / (1000 * 60 * 60 * 24));
+            
+            if (daysDiff < 7) {
+                const dayIndex = msgDate.getDay();
+                messageCounts[dayIndex]++;
+            }
+        });
+    });
+    
+    // Reorder to show last 7 days
+    const todayIndex = today.getDay();
+    const labels = [];
+    const data = [];
+    
+    for (let i = 0; i < 7; i++) {
+        const index = (todayIndex - 6 + i + 7) % 7;
+        labels.push(days[index]);
+        data.push(messageCounts[index]);
+    }
+    
+    return { labels, data };
+}
+
+// Helper function: Calculate tool usage
+function calculateToolUsage() {
+    const toolNames = {
+        'awardWizard': 'Award Wizard',
+        'documentBuilder': 'Document Builder',
+        'awardCalculator': 'Calculator',
+        'rosterOptimizer': 'Roster Optimizer',
+        'complianceCalendar': 'Compliance',
+        'terminationRisk': 'Termination',
+        'scenarioAnalysis': 'Scenarios',
+        'rosterStressTester': 'Stress Test',
+        'xeroIntegration': 'Xero'
+    };
+    
+    // Get real usage from localStorage analytics
+    const analytics = JSON.parse(localStorage.getItem('analytics') || '{"events":[]}');
+    const toolCounts = {};
+    
+    // Count tool_opened events
+    analytics.events?.forEach(event => {
+        if (event.event === 'tool_opened' && event.data?.tool) {
+            const toolKey = event.data.tool;
+            toolCounts[toolKey] = (toolCounts[toolKey] || 0) + 1;
+        }
+    });
+    
+    // Sort by usage
+    const sorted = Object.entries(toolCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 9); // Top 9
+    
+    // If no data yet, show placeholder
+    if (sorted.length === 0) {
+        return {
+            labels: ['No tools used yet'],
+            data: [0]
+        };
+    }
+    
+    return {
+        labels: sorted.map(([key]) => toolNames[key] || key),
+        data: sorted.map(([, count]) => count)
+    };
+}
+
+// Helper function: Calculate engagement metrics
+function calculateEngagementMetrics() {
+    const totalConversations = conversations.length;
+    const activeConversations = conversations.filter(c => {
+        const lastUpdate = new Date(c.updated);
+        const daysSince = (new Date() - lastUpdate) / (1000 * 60 * 60 * 24);
+        return daysSince < 7;
+    }).length;
+    
+    const totalMessages = conversations.reduce((sum, conv) => 
+        sum + (conv.messages?.length || 0), 0
+    );
+    
+    const archivedCount = archivedConversations.length;
+    
+    return {
+        labels: [
+            `Active (${activeConversations})`,
+            `Total Convos (${totalConversations})`,
+            `Archived (${archivedCount})`
+        ],
+        data: [activeConversations, totalConversations, archivedCount]
+    };
+}
             datasets: [{
                 data: [45, 30, 25],
                 backgroundColor: ['#f59e0b', '#3b82f6', '#10b981']
