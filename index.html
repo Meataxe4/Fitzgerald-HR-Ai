@@ -3643,6 +3643,124 @@ html        </div>
 
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ========================================
+// EARLY FUNCTION DEFINITIONS (for onclick handlers)
+// ========================================
+
+// Define checkAccess early so it's available for onclick
+window.checkAccess = function() {
+    const input = document.getElementById('accessCodeInput')?.value.trim().toUpperCase();
+    const error = document.getElementById('accessError');
+    
+    if (!input) {
+        if (error) {
+            error.textContent = 'Please enter an access code.';
+            error.classList.remove('hidden');
+        }
+        return;
+    }
+    
+    const validCodes = [
+        'BETA-VENUE-001', 'BETA-VENUE-002', 'BETA-VENUE-003',
+        'BETA-VENUE-004', 'BETA-VENUE-005',
+        'FITZGERALD-TEST', 'DEMO-2025'
+    ];
+    
+    if (validCodes.includes(input)) {
+        // Store code if Remember Me is checked
+        const rememberMe = document.getElementById('rememberMe')?.checked ?? true;
+        if (rememberMe) {
+            localStorage.setItem('fitzhr_access_code', input);
+            localStorage.setItem('fitzhr_last_login', new Date().toISOString());
+        }
+        
+        // Hide access screen, show assistant
+        const accessScreen = document.getElementById('accessScreen');
+        const assistantScreen = document.getElementById('assistantScreen');
+        const userCodeEl = document.getElementById('userCode');
+        
+        if (accessScreen) accessScreen.classList.add('hidden');
+        if (assistantScreen) assistantScreen.classList.remove('hidden');
+        if (userCodeEl) userCodeEl.textContent = input;
+        if (error) error.classList.add('hidden');
+        
+        // Store current user globally
+        window.currentUser = input;
+        
+        // Show admin features for admin codes
+        if (['FITZGERALD-TEST', 'DEMO-2025'].includes(input)) {
+            setTimeout(() => {
+                const adminBtn = document.getElementById('adminButton');
+                if (adminBtn) adminBtn.classList.remove('hidden');
+                
+                const analyticsQuickAction = document.getElementById('analyticsQuickAction');
+                if (analyticsQuickAction) analyticsQuickAction.style.display = 'flex';
+            }, 100);
+        }
+        
+        // Trigger initialization after DOM is ready
+        setTimeout(() => {
+            if (typeof initializeApp === 'function') {
+                initializeApp();
+            }
+        }, 500);
+    } else {
+        if (error) {
+            error.textContent = 'Invalid access code. Please check and try again.';
+            error.classList.remove('hidden');
+        }
+        localStorage.removeItem('fitzhr_access_code');
+        localStorage.removeItem('fitzhr_last_login');
+    }
+};
+
+// Initialize app after successful login
+window.initializeApp = function() {
+    // Show legal acceptance modal
+    if (typeof showLegalAcceptanceModal === 'function') {
+        showLegalAcceptanceModal();
+    }
+    
+    // Track beta access
+    if (typeof trackEvent === 'function' && window.currentUser) {
+        trackEvent('beta_access', { code: window.currentUser });
+    }
+    
+    // Check onboarding
+    setTimeout(() => {
+        if (typeof checkOnboardingStatus === 'function') {
+            const hasCompletedOnboarding = checkOnboardingStatus();
+            if (!hasCompletedOnboarding) {
+                if (typeof showOnboarding === 'function') {
+                    showOnboarding();
+                }
+            } else {
+                // Show welcome back message
+                if (typeof addMessage === 'function' && typeof venueProfile !== 'undefined') {
+                    const userName = venueProfile.userName || '';
+                    const venueName = venueProfile.venueName || 'your venue';
+                    const city = venueProfile.city || '';
+                    const state = venueProfile.location || '';
+                    const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
+                    const locationText = city ? `${city}, ${state}` : state;
+                    addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+                }
+            }
+        }
+        
+        // Start daily tip rotation
+        if (typeof updateDailyTipBanner === 'function' && typeof startDailyTipRotation === 'function') {
+            updateDailyTipBanner();
+            startDailyTipRotation();
+        }
+    }, 1000);
+    
+    // Initialize conversation system
+    if (typeof initConversationSystem === 'function') {
+        initConversationSystem();
+    }
+};
+
+// ========================================
 // CONFIGURATION & GLOBALS
 // ========================================
 
