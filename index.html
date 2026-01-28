@@ -375,26 +375,9 @@ body.light-mode {
         padding-bottom: 8px !important;
     }
     
-    /* Tools menu - BOTTOM SHEET on mobile */
+    /* Tools menu - HIDE on mobile (use modal instead) */
     #toolsMenu {
-        position: fixed !important;
-        left: 0 !important;
-        right: 0 !important;
-        bottom: 0 !important;
-        top: auto !important;
-        width: 100vw !important;
-        max-width: 100vw !important;
-        border-radius: 16px 16px 0 0 !important;
-        max-height: 70vh !important;
-        z-index: 9999 !important;
-    }
-    
-    /* Tools menu buttons - full text visible */
-    #toolsMenu button {
-        white-space: nowrap !important;
-        overflow: visible !important;
-        padding: 14px 20px !important;
-        font-size: 16px !important;
+        display: none !important;
     }
     
     /* Admin dashboard - FULL SCREEN mobile with proper scrolling */
@@ -545,6 +528,7 @@ body.light-mode {
 /* Desktop: Tools menu positioned normally */
 @media (min-width: 769px) {
     #toolsMenu {
+        display: block !important;
         position: absolute !important;
         right: 0 !important;
         top: 3rem !important;
@@ -762,7 +746,7 @@ input, textarea, select {
                             class="p-2 bg-slate-700 hover:bg-slate-600 active:bg-slate-500 text-white rounded-lg transition-colors touch-manipulation min-w-[44px] min-h-[44px]">
                         <span>🛠️</span>
                     </button>
-                    <div id="toolsMenu" class="hidden bg-slate-800 border border-slate-700 rounded-lg shadow-xl overflow-y-auto">
+                    <div id="toolsMenu" class="hidden bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 overflow-y-auto">
                         <div class="p-2">
                             <button onclick="openTool('awardWizard')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
                                 <span>🧙</span>
@@ -1756,6 +1740,100 @@ input, textarea, select {
                     class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
                 Close
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- MOBILE TOOLS MENU MODAL -->
+<!-- ========================================== -->
+<div id="mobileToolsModal" class="hidden fixed inset-0 bg-slate-900/95 backdrop-blur-sm flex items-center justify-center z-50">
+    <div class="w-full h-full flex flex-col">
+        <!-- Header -->
+        <div class="bg-slate-800 border-b border-slate-700 p-4 flex items-center justify-between">
+            <h2 class="text-xl font-bold text-amber-500 flex items-center gap-2">
+                <span>🛠️</span> Tools
+            </h2>
+            <button onclick="closeMobileTools()" class="text-slate-400 hover:text-white text-2xl p-2">
+                ×
+            </button>
+        </div>
+        
+        <!-- Tools List -->
+        <div class="flex-1 overflow-y-auto p-4">
+            <div class="space-y-2 max-w-2xl mx-auto">
+                <button onclick="openToolFromMobile('awardWizard')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
+                    <span class="text-2xl">🧙</span>
+                    <div>
+                        <div class="font-semibold">Award Wizard</div>
+                        <div class="text-sm text-slate-400">Interactive award classification</div>
+                    </div>
+                </button>
+                
+                <button onclick="openToolFromMobile('rosterStressTester')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
+                    <span class="text-2xl">🔍</span>
+                    <div>
+                        <div class="font-semibold">Roster Stress Test</div>
+                        <div class="text-sm text-slate-400">Test roster for compliance issues</div>
+                    </div>
+                </button>
+                
+                <button onclick="openToolFromMobile('complianceCalendar')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
+                    <span class="text-2xl">📅</span>
+                    <div>
+                        <div class="font-semibold">Compliance Calendar</div>
+                        <div class="text-sm text-slate-400">Track important HR dates</div>
+                    </div>
+                </button>
+                
+                <button onclick="openToolFromMobile('awardCalculator')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
+                    <span class="text-2xl">💰</span>
+                    <div>
+                        <div class="font-semibold">Award Calculator</div>
+                        <div class="text-sm text-slate-400">Calculate award rates instantly</div>
+                    </div>
+                </button>
+                
+                <button onclick="openToolFromMobile('documentBuilder')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
+                    <span class="text-2xl">📝</span>
+                    <div>
+                        <div class="font-semibold">Document Builder</div>
+                        <div class="text-sm text-slate-400">Create HR documents</div>
+                    </div>
+                </button>
+                
+                <button onclick="openToolFromMobile('rosterOptimizer')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
+                    <span class="text-2xl">📋</span>
+                    <div>
+                        <div class="font-semibold">Roster Optimiser</div>
+                        <div class="text-sm text-slate-400">Optimize staff scheduling</div>
+                    </div>
+                </button>
+                
+                <button onclick="openToolFromMobile('terminationRisk')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
+                    <span class="text-2xl">⚖️</span>
+                    <div>
+                        <div class="font-semibold">Termination Risk</div>
+                        <div class="text-sm text-slate-400">Assess termination risks</div>
+                    </div>
+                </button>
+                
+                <button onclick="openToolFromMobile('scenarioAnalysis')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
+                    <span class="text-2xl">🎯</span>
+                    <div>
+                        <div class="font-semibold">Scenario Analysis</div>
+                        <div class="text-sm text-slate-400">Analyze HR scenarios</div>
+                    </div>
+                </button>
+                
+                <button onclick="openToolFromMobile('xeroIntegration')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
+                    <span class="text-2xl">🔗</span>
+                    <div>
+                        <div class="font-semibold">Xero Integration</div>
+                        <div class="text-sm text-slate-400">Connect with Xero</div>
+                    </div>
+                </button>
+            </div>
         </div>
     </div>
 </div>
@@ -7292,11 +7370,36 @@ function stopListening() {
 // TOOLS MENU
 // ========================================
 /**
- * Toggles visibility of the tools menu dropdown
+ * Toggles visibility of the tools menu dropdown (desktop) or modal (mobile)
  * @returns {void}
  */
 function toggleToolsMenu() {
-    DOM.toolsMenu.classList.toggle('hidden');
+    // Check if mobile (768px or less)
+    if (window.innerWidth <= 768) {
+        // Show mobile modal instead
+        document.getElementById('mobileToolsModal').classList.remove('hidden');
+    } else {
+        // Show desktop dropdown
+        DOM.toolsMenu.classList.toggle('hidden');
+    }
+}
+
+/**
+ * Closes the mobile tools modal
+ * @returns {void}
+ */
+function closeMobileTools() {
+    document.getElementById('mobileToolsModal').classList.add('hidden');
+}
+
+/**
+ * Opens a tool from the mobile modal
+ * @param {string} toolName - Name of tool to open
+ * @returns {void}
+ */
+function openToolFromMobile(toolName) {
+    closeMobileTools();
+    openTool(toolName);
 }
 
 /**
@@ -7305,7 +7408,11 @@ function toggleToolsMenu() {
  * @returns {void}
  */
 function openTool(toolName) {
-    toggleToolsMenu();
+    // Close desktop dropdown only if on desktop
+    if (window.innerWidth > 768) {
+        DOM.toolsMenu.classList.add('hidden');
+    }
+    
     const modalMap = {
         'awardCalculator': 'awardCalculatorModal',
         'rosterOptimizer': 'rosterOptimizerModal',
