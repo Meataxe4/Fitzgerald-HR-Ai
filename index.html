@@ -375,42 +375,26 @@ body.light-mode {
         padding-bottom: 8px !important;
     }
     
-    /* Tools menu - full width on mobile with ULTRA STRONG overrides */
-    #toolsMenu.hidden,
+    /* Tools menu - BOTTOM SHEET on mobile */
     #toolsMenu {
         position: fixed !important;
         left: 0 !important;
         right: 0 !important;
-        top: auto !important;
         bottom: 0 !important;
+        top: auto !important;
         width: 100vw !important;
         max-width: 100vw !important;
         border-radius: 16px 16px 0 0 !important;
         max-height: 70vh !important;
         z-index: 100 !important;
-        transform: translateY(0) !important;
     }
     
-    /* Ensure it shows at bottom when visible */
-    #toolsMenu:not(.hidden) {
-        display: block !important;
-        position: fixed !important;
-        bottom: 0 !important;
-        top: auto !important;
-    }
-    
-    /* Tools menu buttons - prevent text cutoff */
+    /* Tools menu buttons - full text visible */
     #toolsMenu button {
         white-space: nowrap !important;
         overflow: visible !important;
-        text-overflow: clip !important;
         padding: 14px 20px !important;
         font-size: 16px !important;
-    }
-    
-    #toolsMenu button span:last-child {
-        flex: 1 !important;
-        overflow: visible !important;
     }
     
     /* Admin dashboard - FULL SCREEN mobile with proper scrolling */
@@ -555,6 +539,21 @@ body.light-mode {
     /* Better modal sizing on tablets */
     .modal > div {
         max-width: 85vw !important;
+    }
+}
+
+/* Desktop: Tools menu positioned normally */
+@media (min-width: 769px) {
+    #toolsMenu {
+        position: absolute !important;
+        right: 0 !important;
+        top: 3rem !important;
+        bottom: auto !important;
+        left: auto !important;
+        width: 16rem !important;
+        max-width: 16rem !important;
+        border-radius: 0.5rem !important;
+        max-height: 70vh !important;
     }
 }
 
@@ -763,7 +762,7 @@ input, textarea, select {
                             class="p-2 bg-slate-700 hover:bg-slate-600 active:bg-slate-500 text-white rounded-lg transition-colors touch-manipulation min-w-[44px] min-h-[44px]">
                         <span>🛠️</span>
                     </button>
-                    <div id="toolsMenu" class="hidden absolute right-0 top-12 bg-slate-800 border border-slate-700 rounded-lg shadow-xl w-64 z-50 max-h-[70vh] overflow-y-auto">
+                    <div id="toolsMenu" class="hidden bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 overflow-y-auto">
                         <div class="p-2">
                             <button onclick="openTool('awardWizard')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
                                 <span>🧙</span>
