@@ -1080,6 +1080,84 @@ input, textarea, select {
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
     
+    <!-- CRITICAL: Define checkAccess early for onclick handlers -->
+    <script>
+    window.checkAccess = function() {
+        var inputEl = document.getElementById('accessCodeInput');
+        var input = inputEl ? inputEl.value.trim().toUpperCase() : '';
+        var error = document.getElementById('accessError');
+        
+        if (!input) {
+            if (error) {
+                error.textContent = 'Please enter an access code.';
+                error.classList.remove('hidden');
+            }
+            return;
+        }
+        
+        var validCodes = [
+            'BETA-VENUE-001', 'BETA-VENUE-002', 'BETA-VENUE-003',
+            'BETA-VENUE-004', 'BETA-VENUE-005',
+            'FITZGERALD-TEST', 'DEMO-2025'
+        ];
+        
+        if (validCodes.includes(input)) {
+            var rememberMeEl = document.getElementById('rememberMe');
+            var rememberMe = rememberMeEl ? rememberMeEl.checked : true;
+            
+            if (rememberMe) {
+                localStorage.setItem('fitzhr_access_code', input);
+                localStorage.setItem('fitzhr_last_login', new Date().toISOString());
+            }
+            
+            window.currentUser = input;
+            
+            var accessScreen = document.getElementById('accessScreen');
+            var assistantScreen = document.getElementById('assistantScreen');
+            var userCodeEl = document.getElementById('userCode');
+            
+            if (accessScreen) accessScreen.classList.add('hidden');
+            if (assistantScreen) assistantScreen.classList.remove('hidden');
+            if (userCodeEl) userCodeEl.textContent = input;
+            if (error) error.classList.add('hidden');
+            
+            if (input === 'FITZGERALD-TEST' || input === 'DEMO-2025') {
+                setTimeout(function() {
+                    var adminBtn = document.getElementById('adminButton');
+                    if (adminBtn) adminBtn.classList.remove('hidden');
+                    
+                    var analyticsQuickAction = document.getElementById('analyticsQuickAction');
+                    if (analyticsQuickAction) analyticsQuickAction.style.display = 'flex';
+                }, 100);
+            }
+            
+            setTimeout(function() {
+                if (typeof initializeApp === 'function') {
+                    initializeApp();
+                } else {
+                    setTimeout(function() {
+                        if (typeof showLegalAcceptanceModal === 'function') showLegalAcceptanceModal();
+                        if (typeof initConversationSystem === 'function') initConversationSystem();
+                        if (typeof checkOnboardingStatus === 'function') {
+                            var hasOnboarding = checkOnboardingStatus();
+                            if (!hasOnboarding && typeof showOnboarding === 'function') {
+                                showOnboarding();
+                            }
+                        }
+                    }, 500);
+                }
+            }, 500);
+        } else {
+            if (error) {
+                error.textContent = 'Invalid access code. Please check and try again.';
+                error.classList.remove('hidden');
+            }
+            localStorage.removeItem('fitzhr_access_code');
+            localStorage.removeItem('fitzhr_last_login');
+        }
+    };
+    </script>
+    
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="toast-container"></div>
     
