@@ -375,7 +375,8 @@ body.light-mode {
         padding-bottom: 8px !important;
     }
     
-    /* Tools menu - full width on mobile with STRONGER overrides */
+    /* Tools menu - full width on mobile with ULTRA STRONG overrides */
+    #toolsMenu.hidden,
     #toolsMenu {
         position: fixed !important;
         left: 0 !important;
@@ -387,6 +388,15 @@ body.light-mode {
         border-radius: 16px 16px 0 0 !important;
         max-height: 70vh !important;
         z-index: 100 !important;
+        transform: translateY(0) !important;
+    }
+    
+    /* Ensure it shows at bottom when visible */
+    #toolsMenu:not(.hidden) {
+        display: block !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        top: auto !important;
     }
     
     /* Tools menu buttons - prevent text cutoff */
@@ -10282,3 +10292,4 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
+
