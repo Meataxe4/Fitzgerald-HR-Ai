@@ -318,6 +318,7 @@ body.light-mode {
     /* Make all buttons at least 44px tall (Apple's recommended touch target) */
     button {
         min-height: 44px;
+        min-width: 44px;
     }
     
     /* Prevent text selection on buttons */
@@ -340,6 +341,120 @@ body.light-mode {
     /* Smooth scrolling on mobile */
     #messagesContainer {
         -webkit-overflow-scrolling: touch;
+    }
+    
+    /* MOBILE ENHANCEMENTS - DAY 4-5 */
+    
+    /* Reduce padding on mobile for more space */
+    #messagesContainer {
+        padding: 12px !important;
+    }
+    
+    /* Chat message bubbles - better spacing on mobile */
+    #messagesContainer > div {
+        margin-bottom: 16px !important;
+        padding: 16px !important;
+    }
+    
+    /* Make Daily Tip bar more compact on mobile */
+    .bg-blue-500\/10 {
+        padding: 12px !important;
+        font-size: 14px !important;
+    }
+    
+    /* Suggestion boxes - more compact */
+    .bg-amber-500\/10,
+    .bg-yellow-500\/10 {
+        padding: 12px !important;
+        font-size: 14px !important;
+    }
+    
+    /* Header adjustments */
+    header {
+        padding-top: 8px !important;
+        padding-bottom: 8px !important;
+    }
+    
+    /* Tools menu - full width on mobile */
+    #toolsMenu {
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        border-radius: 0 !important;
+        max-height: 60vh !important;
+    }
+    
+    /* Modals - full screen on mobile */
+    .modal > div {
+        max-height: 95vh !important;
+        margin: 8px !important;
+        max-width: calc(100vw - 16px) !important;
+    }
+    
+    /* Input field - larger on mobile */
+    #messageInput {
+        font-size: 16px !important;
+        padding: 14px !important;
+    }
+    
+    /* Send button - bigger touch target */
+    button:has(span:contains('Send')) {
+        min-height: 48px !important;
+        padding-left: 24px !important;
+        padding-right: 24px !important;
+    }
+    
+    /* Document preview modal - better mobile fit */
+    #documentPreviewModal .max-w-5xl {
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+    
+    /* Award calculator - stack vertically on mobile */
+    #awardCalculatorModal select,
+    #awardCalculatorModal input {
+        width: 100% !important;
+        margin-bottom: 12px !important;
+    }
+    
+    /* Navigation buttons - wrap better */
+    header button {
+        font-size: 13px !important;
+        padding: 8px 12px !important;
+    }
+    
+    /* Hide secondary text on very small screens */
+    @media (max-width: 380px) {
+        .hidden.sm\\:inline {
+            display: none !important;
+        }
+    }
+    
+    /* Landscape mode optimizations */
+    @media (orientation: landscape) and (max-height: 500px) {
+        #messagesContainer {
+            max-height: 50vh !important;
+        }
+        
+        header {
+            position: sticky !important;
+            top: 0 !important;
+            z-index: 50 !important;
+        }
+    }
+}
+
+/* Tablet optimizations (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* Slightly reduce padding for tablets */
+    .max-w-5xl {
+        max-width: 90% !important;
+    }
+    
+    /* Better modal sizing on tablets */
+    .modal > div {
+        max-width: 85vw !important;
     }
 }
 
