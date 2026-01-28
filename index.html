@@ -375,14 +375,18 @@ body.light-mode {
         padding-bottom: 8px !important;
     }
     
-    /* Tools menu - full width on mobile */
+    /* Tools menu - full width on mobile with STRONGER overrides */
     #toolsMenu {
+        position: fixed !important;
         left: 0 !important;
         right: 0 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        border-radius: 0 !important;
-        max-height: 60vh !important;
+        top: auto !important;
+        bottom: 0 !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        border-radius: 16px 16px 0 0 !important;
+        max-height: 70vh !important;
+        z-index: 100 !important;
     }
     
     /* Tools menu buttons - prevent text cutoff */
@@ -390,15 +394,39 @@ body.light-mode {
         white-space: nowrap !important;
         overflow: visible !important;
         text-overflow: clip !important;
-        padding: 12px 16px !important;
-        font-size: 15px !important;
+        padding: 14px 20px !important;
+        font-size: 16px !important;
     }
     
-    /* Admin dashboard - mobile optimization */
-    #adminDashboardModal .max-w-6xl {
+    #toolsMenu button span:last-child {
+        flex: 1 !important;
+        overflow: visible !important;
+    }
+    
+    /* Admin dashboard - FULL SCREEN mobile with proper scrolling */
+    #adminDashboardModal {
+        padding: 0 !important;
+        align-items: flex-start !important;
+        overflow-y: auto !important;
+    }
+    
+    #adminDashboardModal > div {
         max-width: 100% !important;
+        width: 100% !important;
         padding: 16px !important;
-        margin: 8px !important;
+        margin: 0 !important;
+        min-height: 100vh !important;
+        border-radius: 0 !important;
+        border: none !important;
+    }
+    
+    /* Admin header - compact */
+    #adminDashboardModal h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    #adminDashboardModal .mb-6 {
+        margin-bottom: 16px !important;
     }
     
     /* Admin stats - stack on mobile */
@@ -434,7 +462,7 @@ body.light-mode {
     
     /* Admin tab content - better height */
     #adminTabContent {
-        max-height: 400px !important;
+        max-height: 50vh !important;
     }
     
     /* Admin buttons - stack on mobile */
