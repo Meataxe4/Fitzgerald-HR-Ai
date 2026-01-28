@@ -1080,84 +1080,6 @@ input, textarea, select {
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
     
-    <!-- CRITICAL: Define checkAccess early for onclick handlers -->
-    <script>
-    window.checkAccess = function() {
-        var inputEl = document.getElementById('accessCodeInput');
-        var input = inputEl ? inputEl.value.trim().toUpperCase() : '';
-        var error = document.getElementById('accessError');
-        
-        if (!input) {
-            if (error) {
-                error.textContent = 'Please enter an access code.';
-                error.classList.remove('hidden');
-            }
-            return;
-        }
-        
-        var validCodes = [
-            'BETA-VENUE-001', 'BETA-VENUE-002', 'BETA-VENUE-003',
-            'BETA-VENUE-004', 'BETA-VENUE-005',
-            'FITZGERALD-TEST', 'DEMO-2025'
-        ];
-        
-        if (validCodes.includes(input)) {
-            var rememberMeEl = document.getElementById('rememberMe');
-            var rememberMe = rememberMeEl ? rememberMeEl.checked : true;
-            
-            if (rememberMe) {
-                localStorage.setItem('fitzhr_access_code', input);
-                localStorage.setItem('fitzhr_last_login', new Date().toISOString());
-            }
-            
-            window.currentUser = input;
-            
-            var accessScreen = document.getElementById('accessScreen');
-            var assistantScreen = document.getElementById('assistantScreen');
-            var userCodeEl = document.getElementById('userCode');
-            
-            if (accessScreen) accessScreen.classList.add('hidden');
-            if (assistantScreen) assistantScreen.classList.remove('hidden');
-            if (userCodeEl) userCodeEl.textContent = input;
-            if (error) error.classList.add('hidden');
-            
-            if (input === 'FITZGERALD-TEST' || input === 'DEMO-2025') {
-                setTimeout(function() {
-                    var adminBtn = document.getElementById('adminButton');
-                    if (adminBtn) adminBtn.classList.remove('hidden');
-                    
-                    var analyticsQuickAction = document.getElementById('analyticsQuickAction');
-                    if (analyticsQuickAction) analyticsQuickAction.style.display = 'flex';
-                }, 100);
-            }
-            
-            setTimeout(function() {
-                if (typeof initializeApp === 'function') {
-                    initializeApp();
-                } else {
-                    setTimeout(function() {
-                        if (typeof showLegalAcceptanceModal === 'function') showLegalAcceptanceModal();
-                        if (typeof initConversationSystem === 'function') initConversationSystem();
-                        if (typeof checkOnboardingStatus === 'function') {
-                            var hasOnboarding = checkOnboardingStatus();
-                            if (!hasOnboarding && typeof showOnboarding === 'function') {
-                                showOnboarding();
-                            }
-                        }
-                    }, 500);
-                }
-            }, 500);
-        } else {
-            if (error) {
-                error.textContent = 'Invalid access code. Please check and try again.';
-                error.classList.remove('hidden');
-            }
-            localStorage.removeItem('fitzhr_access_code');
-            localStorage.removeItem('fitzhr_last_login');
-        }
-    };
-    </script>
-    
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="toast-container"></div>
     
@@ -1234,11 +1156,11 @@ input, textarea, select {
                     <div class="text-xs opacity-75">Process multiple files</div>
                 </div>
             </div>
-            <div id="analyticsQuickAction" class="quick-action-item" onclick="showAnalyticsDashboard()" style="display: none;">
+            <div class="quick-action-item" onclick="showAnalyticsDashboard()">
                 <span class="text-xl">📊</span>
                 <div>
                     <div class="font-semibold">Analytics</div>
-                    <div class="text-xs opacity-75">View insights (Admin Only)</div>
+                    <div class="text-xs opacity-75">View insights</div>
                 </div>
             </div>
         </div>
@@ -3720,124 +3642,6 @@ html        </div>
 </div>
 
     <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-// ========================================
-// EARLY FUNCTION DEFINITIONS (for onclick handlers)
-// ========================================
-
-// Define checkAccess early so it's available for onclick
-window.checkAccess = function() {
-    const input = document.getElementById('accessCodeInput')?.value.trim().toUpperCase();
-    const error = document.getElementById('accessError');
-    
-    if (!input) {
-        if (error) {
-            error.textContent = 'Please enter an access code.';
-            error.classList.remove('hidden');
-        }
-        return;
-    }
-    
-    const validCodes = [
-        'BETA-VENUE-001', 'BETA-VENUE-002', 'BETA-VENUE-003',
-        'BETA-VENUE-004', 'BETA-VENUE-005',
-        'FITZGERALD-TEST', 'DEMO-2025'
-    ];
-    
-    if (validCodes.includes(input)) {
-        // Store code if Remember Me is checked
-        const rememberMe = document.getElementById('rememberMe')?.checked ?? true;
-        if (rememberMe) {
-            localStorage.setItem('fitzhr_access_code', input);
-            localStorage.setItem('fitzhr_last_login', new Date().toISOString());
-        }
-        
-        // Hide access screen, show assistant
-        const accessScreen = document.getElementById('accessScreen');
-        const assistantScreen = document.getElementById('assistantScreen');
-        const userCodeEl = document.getElementById('userCode');
-        
-        if (accessScreen) accessScreen.classList.add('hidden');
-        if (assistantScreen) assistantScreen.classList.remove('hidden');
-        if (userCodeEl) userCodeEl.textContent = input;
-        if (error) error.classList.add('hidden');
-        
-        // Store current user globally
-        window.currentUser = input;
-        
-        // Show admin features for admin codes
-        if (['FITZGERALD-TEST', 'DEMO-2025'].includes(input)) {
-            setTimeout(() => {
-                const adminBtn = document.getElementById('adminButton');
-                if (adminBtn) adminBtn.classList.remove('hidden');
-                
-                const analyticsQuickAction = document.getElementById('analyticsQuickAction');
-                if (analyticsQuickAction) analyticsQuickAction.style.display = 'flex';
-            }, 100);
-        }
-        
-        // Trigger initialization after DOM is ready
-        setTimeout(() => {
-            if (typeof initializeApp === 'function') {
-                initializeApp();
-            }
-        }, 500);
-    } else {
-        if (error) {
-            error.textContent = 'Invalid access code. Please check and try again.';
-            error.classList.remove('hidden');
-        }
-        localStorage.removeItem('fitzhr_access_code');
-        localStorage.removeItem('fitzhr_last_login');
-    }
-};
-
-// Initialize app after successful login
-window.initializeApp = function() {
-    // Show legal acceptance modal
-    if (typeof showLegalAcceptanceModal === 'function') {
-        showLegalAcceptanceModal();
-    }
-    
-    // Track beta access
-    if (typeof trackEvent === 'function' && window.currentUser) {
-        trackEvent('beta_access', { code: window.currentUser });
-    }
-    
-    // Check onboarding
-    setTimeout(() => {
-        if (typeof checkOnboardingStatus === 'function') {
-            const hasCompletedOnboarding = checkOnboardingStatus();
-            if (!hasCompletedOnboarding) {
-                if (typeof showOnboarding === 'function') {
-                    showOnboarding();
-                }
-            } else {
-                // Show welcome back message
-                if (typeof addMessage === 'function' && typeof venueProfile !== 'undefined') {
-                    const userName = venueProfile.userName || '';
-                    const venueName = venueProfile.venueName || 'your venue';
-                    const city = venueProfile.city || '';
-                    const state = venueProfile.location || '';
-                    const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
-                    const locationText = city ? `${city}, ${state}` : state;
-                    addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
-                }
-            }
-        }
-        
-        // Start daily tip rotation
-        if (typeof updateDailyTipBanner === 'function' && typeof startDailyTipRotation === 'function') {
-            updateDailyTipBanner();
-            startDailyTipRotation();
-        }
-    }, 1000);
-    
-    // Initialize conversation system
-    if (typeof initConversationSystem === 'function') {
-        initConversationSystem();
-    }
-};
-
 // ========================================
 // CONFIGURATION & GLOBALS
 // ========================================
@@ -7788,12 +7592,6 @@ function attemptAutoLogin() {
         if (adminBtn) {
             adminBtn.classList.remove('hidden');
         }
-        
-        // Also show analytics in quick actions for admin
-        const analyticsQuickAction = document.getElementById('analyticsQuickAction');
-        if (analyticsQuickAction) {
-            analyticsQuickAction.style.display = 'flex';
-        }
     }
     
     // CHECK IF USER NEEDS ONBOARDING
@@ -8987,12 +8785,6 @@ async function processMultipleFiles() {
 // ===================
 
 function showAnalyticsDashboard() {
-    // ADMIN ONLY: Check if user has admin access
-    if (!isAdmin) {
-        showToast('Analytics are only available for admins', 'warning', 3000);
-        return;
-    }
-    
     document.getElementById('analyticsModal').classList.remove('hidden');
     renderUsageChart();
     toggleQuickActions();
@@ -9025,16 +8817,13 @@ function renderUsageChart() {
     
     if (currentChart) currentChart.destroy();
     
-    // REAL DATA: Calculate messages per day from conversations
-    const messagesPerDay = calculateMessagesPerDay();
-    
     currentChart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: messagesPerDay.labels,
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
             datasets: [{
                 label: 'Messages',
-                data: messagesPerDay.data,
+                data: [12, 19, 15, 25, 22, 30, 28],
                 borderColor: '#f59e0b',
                 backgroundColor: 'rgba(245, 158, 11, 0.1)',
                 tension: 0.4,
@@ -9049,17 +8838,12 @@ function renderUsageChart() {
                     labels: {
                         color: '#cbd5e1'
                     }
-                },
-                title: {
-                    display: true,
-                    text: 'Messages Over Last 7 Days (Real Data)',
-                    color: '#cbd5e1'
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: { color: '#cbd5e1', precision: 0 },
+                    ticks: { color: '#cbd5e1' },
                     grid: { color: '#475569' }
                 },
                 x: {
@@ -9077,26 +8861,19 @@ function renderToolsChart() {
     
     if (currentChart) currentChart.destroy();
     
-    // REAL DATA: Get tool usage from analytics events
-    const toolUsage = calculateToolUsage();
-    
     currentChart = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: toolUsage.labels,
+            labels: ['Award Wizard', 'Document Builder', 'Calculator', 'Roster', 'Compliance'],
             datasets: [{
-                label: 'Times Used',
-                data: toolUsage.data,
+                label: 'Uses',
+                data: [45, 38, 32, 28, 22],
                 backgroundColor: [
                     '#f59e0b',
                     '#3b82f6',
                     '#10b981',
                     '#8b5cf6',
-                    '#ef4444',
-                    '#f97316',
-                    '#06b6d4',
-                    '#ec4899',
-                    '#84cc16'
+                    '#ef4444'
                 ]
             }]
         },
@@ -9108,17 +8885,12 @@ function renderToolsChart() {
                     labels: {
                         color: '#cbd5e1'
                     }
-                },
-                title: {
-                    display: true,
-                    text: 'Tool Usage (Real Data)',
-                    color: '#cbd5e1'
                 }
             },
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: { color: '#cbd5e1', precision: 0 },
+                    ticks: { color: '#cbd5e1' },
                     grid: { color: '#475569' }
                 },
                 x: {
@@ -9136,140 +8908,10 @@ function renderEngagementChart() {
     
     if (currentChart) currentChart.destroy();
     
-    // REAL DATA: Calculate user engagement metrics
-    const engagement = calculateEngagementMetrics();
-    
     currentChart = new Chart(ctx, {
         type: 'doughnut',
         data: {
-            labels: engagement.labels,
-            datasets: [{
-                data: engagement.data,
-                backgroundColor: ['#f59e0b', '#3b82f6', '#10b981']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        color: '#cbd5e1'
-                    }
-                },
-                title: {
-                    display: true,
-                    text: 'Engagement Metrics (Real Data)',
-                    color: '#cbd5e1'
-                }
-            }
-        }
-    });
-}
-
-// Helper function: Calculate messages per day
-function calculateMessagesPerDay() {
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const messageCounts = [0, 0, 0, 0, 0, 0, 0];
-    const today = new Date();
-    
-    // Count messages from all conversations in last 7 days
-    conversations.forEach(conv => {
-        conv.messages?.forEach(msg => {
-            const msgDate = new Date(msg.timestamp || conv.updated);
-            const daysDiff = Math.floor((today - msgDate) / (1000 * 60 * 60 * 24));
-            
-            if (daysDiff < 7) {
-                const dayIndex = msgDate.getDay();
-                messageCounts[dayIndex]++;
-            }
-        });
-    });
-    
-    // Reorder to show last 7 days
-    const todayIndex = today.getDay();
-    const labels = [];
-    const data = [];
-    
-    for (let i = 0; i < 7; i++) {
-        const index = (todayIndex - 6 + i + 7) % 7;
-        labels.push(days[index]);
-        data.push(messageCounts[index]);
-    }
-    
-    return { labels, data };
-}
-
-// Helper function: Calculate tool usage
-function calculateToolUsage() {
-    const toolNames = {
-        'awardWizard': 'Award Wizard',
-        'documentBuilder': 'Document Builder',
-        'awardCalculator': 'Calculator',
-        'rosterOptimizer': 'Roster Optimizer',
-        'complianceCalendar': 'Compliance',
-        'terminationRisk': 'Termination',
-        'scenarioAnalysis': 'Scenarios',
-        'rosterStressTester': 'Stress Test',
-        'xeroIntegration': 'Xero'
-    };
-    
-    // Get real usage from localStorage analytics
-    const analytics = JSON.parse(localStorage.getItem('analytics') || '{"events":[]}');
-    const toolCounts = {};
-    
-    // Count tool_opened events
-    analytics.events?.forEach(event => {
-        if (event.event === 'tool_opened' && event.data?.tool) {
-            const toolKey = event.data.tool;
-            toolCounts[toolKey] = (toolCounts[toolKey] || 0) + 1;
-        }
-    });
-    
-    // Sort by usage
-    const sorted = Object.entries(toolCounts)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 9); // Top 9
-    
-    // If no data yet, show placeholder
-    if (sorted.length === 0) {
-        return {
-            labels: ['No tools used yet'],
-            data: [0]
-        };
-    }
-    
-    return {
-        labels: sorted.map(([key]) => toolNames[key] || key),
-        data: sorted.map(([, count]) => count)
-    };
-}
-
-// Helper function: Calculate engagement metrics
-function calculateEngagementMetrics() {
-    const totalConversations = conversations.length;
-    const activeConversations = conversations.filter(c => {
-        const lastUpdate = new Date(c.updated);
-        const daysSince = (new Date() - lastUpdate) / (1000 * 60 * 60 * 24);
-        return daysSince < 7;
-    }).length;
-    
-    const totalMessages = conversations.reduce((sum, conv) => 
-        sum + (conv.messages?.length || 0), 0
-    );
-    
-    const archivedCount = archivedConversations.length;
-    
-    return {
-        labels: [
-            `Active (${activeConversations})`,
-            `Total Convos (${totalConversations})`,
-            `Archived (${archivedCount})`
-        ],
-        data: [activeConversations, totalConversations, archivedCount]
-    };
-}
+            labels: ['Active Users', 'New Users', 'Returning Users'],
             datasets: [{
                 data: [45, 30, 25],
                 backgroundColor: ['#f59e0b', '#3b82f6', '#10b981']
