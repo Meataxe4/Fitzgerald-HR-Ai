@@ -1911,16 +1911,6 @@ Be as specific as possible!"></textarea>
         <!-- Action Buttons -->
         <div class="p-6 border-t border-slate-700 bg-slate-800">
             <div class="flex gap-3 mb-4 flex-wrap">
-    <button onclick="regenerateDocument()" 
-            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all text-sm flex items-center gap-2">
-        <span>🔄</span>
-        <span>Regenerate</span>
-    </button>
-    <button onclick="requestDocumentChange()" 
-            class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all text-sm flex items-center gap-2">
-        <span>✨</span>
-        <span>Request Changes</span>
-    </button>
     
     <!-- Download Options -->
     <div class="flex gap-2 flex-1">
@@ -5576,49 +5566,6 @@ function resetDocumentBuilder() {
     resetDocumentBuilderSilent();
 }
 
-async function regenerateDocument() {
-    if (!confirm('Regenerate the document? This will create a new version.')) return;
-    
-    closeDocumentPreview();
-    
-    // Reopen document builder modal
-    document.getElementById('documentBuilderModal').classList.remove('hidden');
-    
-    // Show generating state
-    document.getElementById('documentTemplateSelection').classList.add('hidden');
-    document.getElementById('documentWizardSteps').classList.add('hidden');
-    document.getElementById('documentGenerating').classList.remove('hidden');
-    
-    await generateDocumentWithAI();
-}
-
-function requestDocumentChange() {
-    const change = prompt(
-        "What would you like to change?\n\n" +
-        "Examples:\n" +
-        "- Make the tone more supportive\n" +
-        "- Add more detail about the impact\n" +
-        "- Soften the consequences section\n" +
-        "- Make it firmer\n\n" +
-        "Your request:"
-    );
-    
-    if (!change) return;
-    
-    closeDocumentPreview();
-    document.getElementById('documentBuilderModal').classList.remove('hidden');
-    document.getElementById('documentGenerating').classList.remove('hidden');
-    
-    // Regenerate with additional instruction
-    const originalPrompt = buildDocumentPrompt();
-    const modifiedPrompt = originalPrompt + `\n\nADDITIONAL INSTRUCTION FROM USER:\n${change}`;
-    
-    callClaudeAPI(modifiedPrompt).then(response => {
-        documentBuilderState.generatedDocument = response;
-        closeToolModal('documentBuilderModal');
-        showDocumentPreview(response);
-    });
-}
 
 async function downloadGeneratedDocument(format = 'pdf') {
     // ✅ CRITICAL: Confirmation dialog before download
@@ -9779,4 +9726,5 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
+
 
