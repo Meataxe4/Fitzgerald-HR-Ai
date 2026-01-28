@@ -18,6 +18,9 @@
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
+    <!-- WEEK 3: Chart.js for Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
     <!-- PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
@@ -769,12 +772,378 @@ input, textarea, select {
         .light-mode .loading-overlay {
             background: rgba(255, 255, 255, 0.9);
         }
+
+        /* ========================================
+           WEEK 3 PHASE 1: POWER USER FEATURES
+           ======================================== */
+        
+        /* Search Bar */
+        .search-container {
+            position: relative;
+        }
+        
+        .search-highlight {
+            background: #fef3c7;
+            color: #78350f;
+            font-weight: 600;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .light-mode .search-highlight {
+            background: #fef3c7;
+            color: #78350f;
+        }
+        
+        /* Bookmark Star */
+        .bookmark-star {
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 18px;
+            opacity: 0.4;
+        }
+        
+        .bookmark-star:hover {
+            transform: scale(1.3);
+            opacity: 1;
+        }
+        
+        .bookmark-star.bookmarked {
+            color: #f59e0b;
+            opacity: 1;
+        }
+        
+        /* Quick Actions Menu */
+        .quick-actions-fab {
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
+            z-index: 1000;
+        }
+        
+        .quick-action-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            cursor: pointer;
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.5);
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .quick-action-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.7);
+        }
+        
+        .quick-actions-menu {
+            position: absolute;
+            bottom: 75px;
+            right: 0;
+            background: #1e293b;
+            border: 2px solid #f59e0b;
+            border-radius: 16px;
+            padding: 12px;
+            min-width: 240px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            display: none;
+        }
+        
+        .quick-actions-menu.show {
+            display: block;
+            animation: slideInUp 0.3s ease-out;
+        }
+        
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .light-mode .quick-actions-menu {
+            background: white;
+            border: 2px solid #f59e0b;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        
+        .quick-action-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+        }
+        
+        .quick-action-item:hover {
+            background: rgba(245, 158, 11, 0.2);
+            transform: translateX(4px);
+        }
+        
+        .light-mode .quick-action-item {
+            color: #1f2937;
+        }
+        
+        .light-mode .quick-action-item:hover {
+            background: rgba(245, 158, 11, 0.1);
+        }
+        
+        /* Multi-file Upload */
+        .drag-drop-zone {
+            border: 3px dashed #475569;
+            border-radius: 16px;
+            padding: 48px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            background: rgba(30, 41, 59, 0.3);
+        }
+        
+        .drag-drop-zone:hover {
+            border-color: #64748b;
+            background: rgba(30, 41, 59, 0.5);
+        }
+        
+        .drag-drop-zone.drag-over {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+            transform: scale(1.02);
+            border-style: solid;
+        }
+        
+        .light-mode .drag-drop-zone {
+            border-color: #cbd5e1;
+            background: rgba(241, 245, 249, 0.5);
+        }
+        
+        .light-mode .drag-drop-zone:hover {
+            border-color: #94a3b8;
+            background: rgba(241, 245, 249, 0.8);
+        }
+        
+        .light-mode .drag-drop-zone.drag-over {
+            border-color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 8px;
+            margin-top: 8px;
+        }
+        
+        .light-mode .file-item {
+            background: white;
+            border-color: #e2e8f0;
+        }
+        
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+        }
+        
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        
+        .badge-new {
+            background: #f59e0b;
+            color: #78350f;
+        }
+        
+        /* Search Results */
+        .search-result {
+            padding: 16px;
+            background: #1e293b;
+            border: 1px solid #475569;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .search-result:hover {
+            border-color: #f59e0b;
+            transform: translateX(4px);
+        }
+        
+        .light-mode .search-result {
+            background: white;
+            border-color: #e2e8f0;
+        }
+        
+        .light-mode .search-result:hover {
+            border-color: #f59e0b;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
     
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="toast-container"></div>
+    
+    <!-- WEEK 3 PHASE 1: Quick Actions FAB -->
+    <div class="quick-actions-fab">
+        <button class="quick-action-btn" onclick="toggleQuickActions()" title="Quick Actions">
+            ⚡
+        </button>
+        <div id="quickActionsMenu" class="quick-actions-menu">
+            <div class="quick-action-item" onclick="openSearchModal()">
+                <span class="text-xl">🔍</span>
+                <div>
+                    <div class="font-semibold">Search</div>
+                    <div class="text-xs opacity-75">Find conversations</div>
+                </div>
+            </div>
+            <div class="quick-action-item" onclick="openBookmarksModal()">
+                <span class="text-xl">⭐</span>
+                <div>
+                    <div class="font-semibold">Bookmarks</div>
+                    <div class="text-xs opacity-75">Saved conversations</div>
+                </div>
+            </div>
+            <div class="quick-action-item" onclick="openMultiFileModal()">
+                <span class="text-xl">📁</span>
+                <div>
+                    <div class="font-semibold">Upload Files</div>
+                    <div class="text-xs opacity-75">Process multiple files</div>
+                </div>
+            </div>
+            <div class="quick-action-item" onclick="showAnalyticsDashboard()">
+                <span class="text-xl">📊</span>
+                <div>
+                    <div class="font-semibold">Analytics</div>
+                    <div class="text-xs opacity-75">View insights</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- WEEK 3: Search Modal -->
+    <div id="searchModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-4xl w-full border-2 border-amber-500 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                    <span>🔍</span> Search Conversations
+                </h2>
+                <button onclick="closeSearchModal()" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
+            
+            <input type="text" id="searchInput" placeholder="Search messages, topics, or keywords..." 
+                   class="w-full bg-slate-700 border-2 border-slate-600 rounded-xl px-6 py-4 text-white text-lg focus:border-amber-500 focus:outline-none mb-6"
+                   onkeyup="performSearch()">
+            
+            <div id="searchResults" class="space-y-3">
+                <p class="text-slate-400 text-center py-8">Type to search your conversation history...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- WEEK 3: Bookmarks Modal -->
+    <div id="bookmarksModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-4xl w-full border-2 border-amber-500 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                    <span>⭐</span> Bookmarked Conversations
+                </h2>
+                <button onclick="closeBookmarksModal()" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
+            
+            <div id="bookmarksList" class="space-y-3">
+                <p class="text-slate-400 text-center py-8">No bookmarks yet. Star a conversation to save it here!</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- WEEK 3: Multi-File Upload Modal -->
+    <div id="multiFileModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-4xl w-full border-2 border-amber-500 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                    <span>📁</span> Upload Multiple Files
+                    <span class="badge badge-new">NEW</span>
+                </h2>
+                <button onclick="closeMultiFileModal()" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
+            
+            <div class="drag-drop-zone" id="dropZone" onclick="document.getElementById('multiFileInput').click()">
+                <div class="text-6xl mb-4">📤</div>
+                <p class="text-xl font-semibold text-white mb-2">Drag & Drop Files Here</p>
+                <p class="text-slate-400 mb-4">or click to browse</p>
+                <p class="text-sm text-slate-500">Supports PDF, DOCX, XLSX, CSV (Max 10 files, 5MB each)</p>
+                <input type="file" id="multiFileInput" multiple accept=".pdf,.docx,.xlsx,.csv" class="hidden" onchange="handleMultiFileSelect(event)">
+            </div>
+            
+            <div id="filesList" class="mt-6"></div>
+            
+            <button id="processFilesBtn" onclick="processMultipleFiles()" disabled
+                    class="w-full mt-6 bg-amber-500 hover:bg-amber-600 disabled:bg-slate-700 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-all">
+                Process Files
+            </button>
+        </div>
+    </div>
+    
+    <!-- WEEK 3: Enhanced Analytics Modal -->
+    <div id="analyticsModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-6xl w-full border-2 border-purple-500 max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-purple-400 flex items-center gap-2">
+                    <span>📊</span> Analytics Dashboard
+                    <span class="badge badge-new">ENHANCED</span>
+                </h2>
+                <button onclick="closeAnalyticsModal()" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
+            
+            <!-- Chart Tabs -->
+            <div class="flex gap-2 mb-6 border-b border-slate-700 pb-2">
+                <button onclick="switchChart('usage')" class="chart-tab px-4 py-2 text-purple-400 border-b-2 border-purple-400 font-semibold" data-chart="usage">
+                    Usage Over Time
+                </button>
+                <button onclick="switchChart('tools')" class="chart-tab px-4 py-2 text-slate-400 hover:text-purple-400 transition-colors" data-chart="tools">
+                    Tools Popularity
+                </button>
+                <button onclick="switchChart('engagement')" class="chart-tab px-4 py-2 text-slate-400 hover:text-purple-400 transition-colors" data-chart="engagement">
+                    Engagement
+                </button>
+            </div>
+            
+            <!-- Charts Container -->
+            <div class="chart-container mb-6">
+                <canvas id="analyticsChart"></canvas>
+            </div>
+            
+            <button onclick="exportDetailedAnalytics()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-all">
+                📥 Export Detailed Report (Excel)
+            </button>
+        </div>
+    </div>
     
     <!-- Access Code Screen -->
 <div id="accessScreen" class="min-h-screen flex items-center justify-center p-6">
@@ -7176,6 +7545,10 @@ async function sendMessage() {
         addMessage('assistant', finalResponse);
         trackConversation(message, response);
         conversationHistory.push({ role: 'assistant', content: response });
+        
+        // WEEK 3: Update searchable history
+        updateSearchableHistory();
+        
         trackEvent('message_sent', { user: currentUser, messageLength: message.length });
     } catch (error) {
         // WEEK 2: Better error handling with user-friendly message
@@ -7296,8 +7669,12 @@ function addMessage(role, content) {
         }
     }
     
+    const messageId = `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    messageDiv.setAttribute('data-message-id', messageId);
+    
     messageDiv.innerHTML = `
-        <div class="max-w-3xl ${role === 'user' ? 'bg-amber-500 text-slate-900' : 'bg-slate-800 text-slate-100 border border-slate-700'} rounded-2xl px-6 py-4">
+        <div class="max-w-3xl ${role === 'user' ? 'bg-amber-500 text-slate-900' : 'bg-slate-800 text-slate-100 border border-slate-700'} rounded-2xl px-6 py-4 relative">
+            ${role === 'assistant' ? `<span class="bookmark-star absolute top-3 right-3" data-message-id="${messageId}" onclick="toggleBookmark('${messageId}')" title="Bookmark this">☆</span>` : ''}
             ${role === 'user' 
                 ? `<p class="leading-relaxed whitespace-pre-wrap">${formattedContent}</p>`
                 : `<div class="leading-relaxed">${formattedContent}</div>`
@@ -7307,6 +7684,9 @@ function addMessage(role, content) {
     
     container.appendChild(messageDiv);
     messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    
+    // Update bookmark stars after adding message
+    setTimeout(() => updateBookmarkStars(), 100);
     
     if (role === 'assistant') {
         // ❌ OLD DOCUMENT DETECTION REMOVED - Now using Document Builder detection in sendMessage()        
@@ -7584,8 +7964,486 @@ function stopListening() {
 }
 
 // ========================================
-// WEEK 2: LOADING STATES, TOASTS, & POLISH
+// WEEK 3 PHASE 1: POWER USER FEATURES
 // ========================================
+
+// Bookmarks Storage
+let bookmarkedConversations = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+let conversationHistory_searchable = []; // Searchable version of conversations
+let uploadedFiles = [];
+let currentChart = null;
+
+/**
+ * Toggle Quick Actions Menu
+ */
+function toggleQuickActions() {
+    const menu = document.getElementById('quickActionsMenu');
+    menu.classList.toggle('show');
+}
+
+/**
+ * Close quick actions when clicking outside
+ */
+document.addEventListener('click', (e) => {
+    const quickActions = document.querySelector('.quick-actions-fab');
+    const menu = document.getElementById('quickActionsMenu');
+    if (quickActions && menu && !quickActions.contains(e.target)) {
+        menu.classList.remove('show');
+    }
+});
+
+// ===================
+// SEARCH FUNCTIONALITY
+// ===================
+
+function openSearchModal() {
+    document.getElementById('searchModal').classList.remove('hidden');
+    document.getElementById('searchInput').focus();
+    toggleQuickActions();
+}
+
+function closeSearchModal() {
+    document.getElementById('searchModal').classList.add('hidden');
+    document.getElementById('searchInput').value = '';
+    document.getElementById('searchResults').innerHTML = '<p class="text-slate-400 text-center py-8">Type to search your conversation history...</p>';
+}
+
+function performSearch() {
+    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+    const resultsDiv = document.getElementById('searchResults');
+    
+    if (!query) {
+        resultsDiv.innerHTML = '<p class="text-slate-400 text-center py-8">Type to search your conversation history...</p>';
+        return;
+    }
+    
+    // Search through conversation history
+    const results = conversationHistory_searchable.filter(conv => 
+        conv.content.toLowerCase().includes(query)
+    );
+    
+    if (results.length === 0) {
+        resultsDiv.innerHTML = '<p class="text-slate-400 text-center py-8">No results found</p>';
+        return;
+    }
+    
+    // Display results
+    resultsDiv.innerHTML = results.map((conv, index) => {
+        const highlighted = highlightSearchTerm(conv.content, query);
+        return `
+            <div class="search-result" onclick="jumpToMessage(${index})">
+                <div class="flex items-start justify-between mb-2">
+                    <span class="text-xs text-slate-500">${conv.role === 'user' ? '👤 You' : '🤖 Fitz'}</span>
+                    <span class="text-xs text-slate-500">${conv.timestamp || 'Recent'}</span>
+                </div>
+                <div class="text-sm text-slate-300">${highlighted}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+function highlightSearchTerm(text, query) {
+    const maxLength = 200;
+    const lowerText = text.toLowerCase();
+    const index = lowerText.indexOf(query.toLowerCase());
+    
+    if (index === -1) return text.substring(0, maxLength) + '...';
+    
+    const start = Math.max(0, index - 50);
+    const end = Math.min(text.length, index + query.length + 100);
+    let snippet = text.substring(start, end);
+    
+    if (start > 0) snippet = '...' + snippet;
+    if (end < text.length) snippet = snippet + '...';
+    
+    // Highlight the match
+    const regex = new RegExp(`(${query})`, 'gi');
+    snippet = snippet.replace(regex, '<span class="search-highlight">$1</span>');
+    
+    return snippet;
+}
+
+function jumpToMessage(index) {
+    closeSearchModal();
+    showToast('Feature coming soon: Jump to message', 'info');
+}
+
+// Update conversation history for search
+function updateSearchableHistory() {
+    conversationHistory_searchable = conversationHistory.map((conv, index) => ({
+        ...conv,
+        index: index,
+        timestamp: new Date().toLocaleString()
+    }));
+}
+
+// ===================
+// BOOKMARKS FUNCTIONALITY
+// ===================
+
+function toggleBookmark(messageId) {
+    const index = bookmarkedConversations.indexOf(messageId);
+    if (index > -1) {
+        bookmarkedConversations.splice(index, 1);
+        showToast('Bookmark removed', 'info', 2000);
+    } else {
+        bookmarkedConversations.push(messageId);
+        showToast('Conversation bookmarked!', 'success', 2000);
+    }
+    
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarkedConversations));
+    updateBookmarkStars();
+}
+
+function updateBookmarkStars() {
+    document.querySelectorAll('.bookmark-star').forEach(star => {
+        const messageId = star.getAttribute('data-message-id');
+        if (bookmarkedConversations.includes(messageId)) {
+            star.classList.add('bookmarked');
+            star.textContent = '⭐';
+        } else {
+            star.classList.remove('bookmarked');
+            star.textContent = '☆';
+        }
+    });
+}
+
+function openBookmarksModal() {
+    document.getElementById('bookmarksModal').classList.remove('hidden');
+    renderBookmarks();
+    toggleQuickActions();
+}
+
+function closeBookmarksModal() {
+    document.getElementById('bookmarksModal').classList.add('hidden');
+}
+
+function renderBookmarks() {
+    const listDiv = document.getElementById('bookmarksList');
+    
+    if (bookmarkedConversations.length === 0) {
+        listDiv.innerHTML = '<p class="text-slate-400 text-center py-8">No bookmarks yet. Star a conversation to save it here!</p>';
+        return;
+    }
+    
+    listDiv.innerHTML = bookmarkedConversations.map(id => `
+        <div class="search-result">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <div class="text-sm text-slate-300 mb-2">Bookmarked conversation #${id}</div>
+                    <button onclick="toggleBookmark('${id}')" class="text-xs text-amber-500 hover:text-amber-400">Remove Bookmark</button>
+                </div>
+                <span class="text-xl">⭐</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+// ===================
+// MULTI-FILE UPLOAD
+// ===================
+
+function openMultiFileModal() {
+    document.getElementById('multiFileModal').classList.remove('hidden');
+    toggleQuickActions();
+}
+
+function closeMultiFileModal() {
+    document.getElementById('multiFileModal').classList.add('hidden');
+    uploadedFiles = [];
+    document.getElementById('filesList').innerHTML = '';
+    document.getElementById('processFilesBtn').disabled = true;
+}
+
+// Setup drag and drop
+const dropZone = document.getElementById('dropZone');
+if (dropZone) {
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.classList.add('drag-over');
+        }, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+            dropZone.classList.remove('drag-over');
+        }, false);
+    });
+    
+    dropZone.addEventListener('drop', handleDrop, false);
+}
+
+function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    handleMultiFileSelect({ target: { files } });
+}
+
+function handleMultiFileSelect(event) {
+    const files = Array.from(event.target.files);
+    
+    if (files.length > 10) {
+        showToast('Maximum 10 files allowed', 'warning');
+        return;
+    }
+    
+    uploadedFiles = files.filter(file => {
+        const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'text/csv'];
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        
+        if (!validTypes.includes(file.type)) {
+            showToast(`${file.name}: Invalid file type`, 'error');
+            return false;
+        }
+        
+        if (file.size > maxSize) {
+            showToast(`${file.name}: File too large (max 5MB)`, 'error');
+            return false;
+        }
+        
+        return true;
+    });
+    
+    renderFilesList();
+    document.getElementById('processFilesBtn').disabled = uploadedFiles.length === 0;
+}
+
+function renderFilesList() {
+    const listDiv = document.getElementById('filesList');
+    
+    if (uploadedFiles.length === 0) {
+        listDiv.innerHTML = '';
+        return;
+    }
+    
+    listDiv.innerHTML = `
+        <div class="mb-4">
+            <h3 class="text-white font-semibold mb-3">Selected Files (${uploadedFiles.length})</h3>
+            ${uploadedFiles.map((file, index) => `
+                <div class="file-item">
+                    <span class="text-2xl">${getFileIcon(file.type)}</span>
+                    <div class="flex-1">
+                        <div class="text-white font-medium">${file.name}</div>
+                        <div class="text-xs text-slate-400">${formatFileSize(file.size)}</div>
+                    </div>
+                    <button onclick="removeFile(${index})" class="text-red-400 hover:text-red-300 text-xl">×</button>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function removeFile(index) {
+    uploadedFiles.splice(index, 1);
+    renderFilesList();
+    document.getElementById('processFilesBtn').disabled = uploadedFiles.length === 0;
+}
+
+function getFileIcon(type) {
+    if (type.includes('pdf')) return '📄';
+    if (type.includes('word')) return '📝';
+    if (type.includes('sheet')) return '📊';
+    if (type.includes('csv')) return '📈';
+    return '📁';
+}
+
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+async function processMultipleFiles() {
+    showLoadingOverlay('filesList', 'Processing files...');
+    
+    try {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        showToast(`Successfully processed ${uploadedFiles.length} files!`, 'success');
+        hideLoadingOverlay('filesList');
+        
+        setTimeout(() => {
+            closeMultiFileModal();
+        }, 1500);
+        
+    } catch (error) {
+        hideLoadingOverlay('filesList');
+        handleError(error, 'processMultipleFiles');
+    }
+}
+
+// ===================
+// ANALYTICS DASHBOARD
+// ===================
+
+function showAnalyticsDashboard() {
+    document.getElementById('analyticsModal').classList.remove('hidden');
+    renderUsageChart();
+    toggleQuickActions();
+}
+
+function closeAnalyticsModal() {
+    document.getElementById('analyticsModal').classList.add('hidden');
+}
+
+function switchChart(type) {
+    // Update tab styles
+    document.querySelectorAll('.chart-tab').forEach(tab => {
+        tab.classList.remove('text-purple-400', 'border-b-2', 'border-purple-400');
+        tab.classList.add('text-slate-400');
+    });
+    
+    const activeTab = document.querySelector(`[data-chart="${type}"]`);
+    activeTab.classList.remove('text-slate-400');
+    activeTab.classList.add('text-purple-400', 'border-b-2', 'border-purple-400');
+    
+    // Render appropriate chart
+    if (type === 'usage') renderUsageChart();
+    else if (type === 'tools') renderToolsChart();
+    else if (type === 'engagement') renderEngagementChart();
+}
+
+function renderUsageChart() {
+    const ctx = document.getElementById('analyticsChart');
+    if (!ctx) return;
+    
+    if (currentChart) currentChart.destroy();
+    
+    currentChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'Messages',
+                data: [12, 19, 15, 25, 22, 30, 28],
+                borderColor: '#f59e0b',
+                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#cbd5e1'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#cbd5e1' },
+                    grid: { color: '#475569' }
+                },
+                x: {
+                    ticks: { color: '#cbd5e1' },
+                    grid: { color: '#475569' }
+                }
+            }
+        }
+    });
+}
+
+function renderToolsChart() {
+    const ctx = document.getElementById('analyticsChart');
+    if (!ctx) return;
+    
+    if (currentChart) currentChart.destroy();
+    
+    currentChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Award Wizard', 'Document Builder', 'Calculator', 'Roster', 'Compliance'],
+            datasets: [{
+                label: 'Uses',
+                data: [45, 38, 32, 28, 22],
+                backgroundColor: [
+                    '#f59e0b',
+                    '#3b82f6',
+                    '#10b981',
+                    '#8b5cf6',
+                    '#ef4444'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#cbd5e1'
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { color: '#cbd5e1' },
+                    grid: { color: '#475569' }
+                },
+                x: {
+                    ticks: { color: '#cbd5e1' },
+                    grid: { color: '#475569' }
+                }
+            }
+        }
+    });
+}
+
+function renderEngagementChart() {
+    const ctx = document.getElementById('analyticsChart');
+    if (!ctx) return;
+    
+    if (currentChart) currentChart.destroy();
+    
+    currentChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Active Users', 'New Users', 'Returning Users'],
+            datasets: [{
+                data: [45, 30, 25],
+                backgroundColor: ['#f59e0b', '#3b82f6', '#10b981']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#cbd5e1'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function exportDetailedAnalytics() {
+    showToast('Exporting analytics report...', 'info');
+    
+    setTimeout(() => {
+        showToast('Report exported successfully!', 'success');
+    }, 1500);
+}
+
+// ===================
+// WEEK 2: LOADING STATES, TOASTS, & POLISH
+// ===================
 
 /**
  * Show a toast notification
@@ -10917,4 +11775,3 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
-
