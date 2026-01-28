@@ -1002,132 +1002,12 @@ input, textarea, select {
         .light-mode .search-result:hover {
             border-color: #f59e0b;
         }
-        
-        /* Conversation Sidebar */
-        .conversations-sidebar {
-            position: fixed;
-            left: -320px;
-            top: 0;
-            bottom: 0;
-            width: 320px;
-            background: #1e293b;
-            border-right: 2px solid #475569;
-            transition: left 0.3s;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-        
-        .conversations-sidebar.open {
-            left: 0;
-        }
-        
-        .light-mode .conversations-sidebar {
-            background: white;
-            border-right-color: #cbd5e1;
-        }
-        
-        .conversation-item {
-            padding: 12px 16px;
-            border-bottom: 1px solid #475569;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .conversation-item:hover {
-            background: rgba(245, 158, 11, 0.1);
-        }
-        
-        .conversation-item.active {
-            background: rgba(245, 158, 11, 0.2);
-            border-left: 4px solid #f59e0b;
-        }
-        
-        .light-mode .conversation-item {
-            border-bottom-color: #e2e8f0;
-        }
-        
-        .light-mode .conversation-item:hover {
-            background: rgba(245, 158, 11, 0.1);
-        }
-        
-        /* Conversation Toggle Button */
-        .conversations-toggle {
-            position: fixed;
-            left: 0;
-            top: 80px;
-            background: #1e293b;
-            border: 2px solid #f59e0b;
-            border-left: none;
-            border-radius: 0 8px 8px 0;
-            padding: 12px 8px;
-            cursor: pointer;
-            z-index: 999;
-            transition: all 0.3s;
-        }
-        
-        .conversations-toggle:hover {
-            padding-left: 12px;
-        }
-        
-        .conversations-sidebar.open ~ .conversations-toggle {
-            left: 320px;
-        }
-        
-        .light-mode .conversations-toggle {
-            background: white;
-        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
     
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="toast-container"></div>
-    
-    <!-- Conversations Sidebar -->
-    <div id="conversationsSidebar" class="conversations-sidebar">
-        <div class="p-4 border-b border-slate-700">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-bold text-amber-500">Conversations</h2>
-                <button onclick="toggleConversationsSidebar()" class="text-slate-400 hover:text-white text-xl">×</button>
-            </div>
-            <button onclick="createNewConversation()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 px-4 rounded-lg transition-all flex items-center justify-center gap-2">
-                <span>➕</span>
-                <span>New Chat</span>
-            </button>
-        </div>
-        
-        <div id="conversationsList" class="p-2">
-            <!-- Conversations will be populated here -->
-        </div>
-        
-        <div class="p-4 border-t border-slate-700">
-            <button onclick="showArchivedConversations()" class="w-full text-slate-400 hover:text-amber-400 text-sm py-2 transition-colors flex items-center justify-center gap-2">
-                <span>📦</span>
-                <span>View Archived (<span id="archivedCount">0</span>)</span>
-            </button>
-        </div>
-    </div>
-    
-    <!-- Conversations Toggle Button -->
-    <button class="conversations-toggle" onclick="toggleConversationsSidebar()" title="Show Conversations">
-        <span class="text-xl">💬</span>
-    </button>
-    
-    <!-- Archive Modal -->
-    <div id="archiveModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-        <div class="bg-slate-800 rounded-2xl p-8 max-w-4xl w-full border-2 border-amber-500 max-h-[90vh] overflow-y-auto">
-            <div class="flex items-center justify-between mb-6">
-                <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
-                    <span>📦</span> Archived Conversations
-                </h2>
-                <button onclick="closeArchiveModal()" class="text-slate-400 hover:text-white text-2xl">×</button>
-            </div>
-            
-            <div id="archivedList" class="space-y-3">
-                <p class="text-slate-400 text-center py-8">No archived conversations</p>
-            </div>
-        </div>
-    </div>
     
     <!-- WEEK 3 PHASE 1: Quick Actions FAB -->
     <div class="quick-actions-fab">
@@ -7682,9 +7562,6 @@ async function sendMessage() {
         trackConversation(message, response);
         conversationHistory.push({ role: 'assistant', content: response });
         
-        // CONVERSATION SYSTEM: Save current conversation
-        saveCurrentConversation();
-        
         // WEEK 3: Update searchable history
         updateSearchableHistory();
         
@@ -8103,396 +7980,6 @@ function stopListening() {
 }
 
 // ========================================
-// CONVERSATION MANAGEMENT SYSTEM
-// ========================================
-
-// Conversation Storage
-let conversations = JSON.parse(localStorage.getItem('conversations') || '[]');
-let archivedConversations = JSON.parse(localStorage.getItem('archivedConversations') || '[]');
-let currentConversationId = localStorage.getItem('currentConversationId') || null;
-
-// Initialize conversation system
-function initConversationSystem() {
-    // If no conversations exist, create a default one
-    if (conversations.length === 0) {
-        createNewConversation(true);
-    } else {
-        // Load the most recent conversation
-        if (!currentConversationId || !conversations.find(c => c.id === currentConversationId)) {
-            currentConversationId = conversations[conversations.length - 1].id;
-        }
-        loadConversation(currentConversationId);
-    }
-    
-    renderConversationsList();
-    updateArchivedCount();
-}
-
-// Create new conversation
-function createNewConversation(isDefault = false) {
-    const conversation = {
-        id: 'conv-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
-        title: 'New Conversation',
-        messages: [],
-        created: new Date().toISOString(),
-        updated: new Date().toISOString()
-    };
-    
-    conversations.push(conversation);
-    saveConversations();
-    
-    if (!isDefault) {
-        switchToConversation(conversation.id);
-        showToast('New conversation started', 'success', 2000);
-    }
-    
-    return conversation.id;
-}
-
-// Switch to a conversation
-function switchToConversation(conversationId) {
-    // Save current conversation first
-    saveCurrentConversation();
-    
-    // Switch to new conversation
-    currentConversationId = conversationId;
-    localStorage.setItem('currentConversationId', conversationId);
-    
-    // Load conversation
-    loadConversation(conversationId);
-    
-    // Update UI
-    renderConversationsList();
-    
-    showToast('Switched conversation', 'info', 1500);
-}
-
-// Load conversation
-function loadConversation(conversationId) {
-    const conversation = conversations.find(c => c.id === conversationId);
-    if (!conversation) return;
-    
-    // Clear current chat
-    const container = DOM.messagesContainer.querySelector('.space-y-6');
-    container.innerHTML = '';
-    
-    // Load messages
-    conversationHistory = conversation.messages || [];
-    
-    // Render messages
-    conversationHistory.forEach(msg => {
-        addMessage(msg.role, msg.content);
-    });
-    
-    // Update searchable history
-    updateSearchableHistory();
-    
-    // Update title if available
-    if (conversation.title && conversation.title !== 'New Conversation') {
-        // Could update header here if needed
-    }
-}
-
-// Save current conversation
-function saveCurrentConversation() {
-    if (!currentConversationId) return;
-    
-    const conversation = conversations.find(c => c.id === currentConversationId);
-    if (!conversation) return;
-    
-    conversation.messages = conversationHistory;
-    conversation.updated = new Date().toISOString();
-    
-    // Auto-generate title from first user message if still "New Conversation"
-    if (conversation.title === 'New Conversation' && conversationHistory.length > 0) {
-        const firstUserMessage = conversationHistory.find(m => m.role === 'user');
-        if (firstUserMessage) {
-            conversation.title = firstUserMessage.content.substring(0, 50) + 
-                               (firstUserMessage.content.length > 50 ? '...' : '');
-        }
-    }
-    
-    saveConversations();
-    renderConversationsList();
-}
-
-// Save conversations to localStorage
-function saveConversations() {
-    localStorage.setItem('conversations', JSON.stringify(conversations));
-}
-
-// Render conversations list
-function renderConversationsList() {
-    const listDiv = document.getElementById('conversationsList');
-    
-    if (conversations.length === 0) {
-        listDiv.innerHTML = '<p class="text-slate-400 text-center text-sm py-4">No conversations yet</p>';
-        return;
-    }
-    
-    listDiv.innerHTML = conversations.slice().reverse().map(conv => {
-        const isActive = conv.id === currentConversationId;
-        const messageCount = conv.messages?.length || 0;
-        const date = new Date(conv.updated).toLocaleDateString();
-        
-        return `
-            <div class="conversation-item ${isActive ? 'active' : ''}" onclick="switchToConversation('${conv.id}')">
-                <div class="flex items-start justify-between mb-1">
-                    <div class="flex-1 min-w-0">
-                        <div class="text-sm font-semibold text-white truncate">${conv.title}</div>
-                        <div class="text-xs text-slate-400">${messageCount} messages • ${date}</div>
-                    </div>
-                    <div class="flex gap-1 ml-2">
-                        <button onclick="event.stopPropagation(); renameConversation('${conv.id}')" 
-                                class="text-slate-400 hover:text-amber-400 text-sm p-1" title="Rename">
-                            ✏️
-                        </button>
-                        <button onclick="event.stopPropagation(); archiveConversation('${conv.id}')" 
-                                class="text-slate-400 hover:text-amber-400 text-sm p-1" title="Archive">
-                            📦
-                        </button>
-                        <button onclick="event.stopPropagation(); deleteConversation('${conv.id}')" 
-                                class="text-slate-400 hover:text-red-400 text-sm p-1" title="Delete">
-                            🗑️
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-// Toggle conversations sidebar
-function toggleConversationsSidebar() {
-    const sidebar = document.getElementById('conversationsSidebar');
-    sidebar.classList.toggle('open');
-}
-
-// Rename conversation
-function renameConversation(conversationId) {
-    const conversation = conversations.find(c => c.id === conversationId);
-    if (!conversation) return;
-    
-    const newTitle = prompt('Enter new conversation name:', conversation.title);
-    if (newTitle && newTitle.trim()) {
-        conversation.title = newTitle.trim();
-        conversation.updated = new Date().toISOString();
-        saveConversations();
-        renderConversationsList();
-        showToast('Conversation renamed', 'success', 2000);
-    }
-}
-
-// Archive conversation
-function archiveConversation(conversationId) {
-    const index = conversations.findIndex(c => c.id === conversationId);
-    if (index === -1) return;
-    
-    const conversation = conversations[index];
-    conversations.splice(index, 1);
-    
-    archivedConversations.push({
-        ...conversation,
-        archivedAt: new Date().toISOString()
-    });
-    
-    localStorage.setItem('archivedConversations', JSON.stringify(archivedConversations));
-    saveConversations();
-    
-    // If this was the current conversation, switch to another
-    if (conversationId === currentConversationId) {
-        if (conversations.length > 0) {
-            switchToConversation(conversations[conversations.length - 1].id);
-        } else {
-            createNewConversation(true);
-        }
-    }
-    
-    renderConversationsList();
-    updateArchivedCount();
-    showToast('Conversation archived', 'success', 2000);
-}
-
-// Delete conversation
-function deleteConversation(conversationId) {
-    if (!confirm('Are you sure you want to delete this conversation? This cannot be undone.')) {
-        return;
-    }
-    
-    const index = conversations.findIndex(c => c.id === conversationId);
-    if (index === -1) return;
-    
-    conversations.splice(index, 1);
-    saveConversations();
-    
-    // If this was the current conversation, switch to another
-    if (conversationId === currentConversationId) {
-        if (conversations.length > 0) {
-            switchToConversation(conversations[conversations.length - 1].id);
-        } else {
-            createNewConversation(true);
-        }
-    }
-    
-    renderConversationsList();
-    showToast('Conversation deleted', 'info', 2000);
-}
-
-// Show archived conversations
-function showArchivedConversations() {
-    document.getElementById('archiveModal').classList.remove('hidden');
-    renderArchivedList();
-}
-
-// Close archive modal
-function closeArchiveModal() {
-    document.getElementById('archiveModal').classList.add('hidden');
-}
-
-// Render archived conversations
-function renderArchivedList() {
-    const listDiv = document.getElementById('archivedList');
-    
-    if (archivedConversations.length === 0) {
-        listDiv.innerHTML = '<p class="text-slate-400 text-center py-8">No archived conversations</p>';
-        return;
-    }
-    
-    listDiv.innerHTML = archivedConversations.slice().reverse().map(conv => {
-        const messageCount = conv.messages?.length || 0;
-        const archivedDate = new Date(conv.archivedAt).toLocaleDateString();
-        
-        return `
-            <div class="search-result">
-                <div class="flex items-start justify-between">
-                    <div class="flex-1">
-                        <div class="text-white font-semibold mb-1">${conv.title}</div>
-                        <div class="text-sm text-slate-400 mb-2">${messageCount} messages • Archived ${archivedDate}</div>
-                        <div class="flex gap-2">
-                            <button onclick="unarchiveConversation('${conv.id}')" 
-                                    class="text-xs bg-amber-500 hover:bg-amber-600 text-white px-3 py-1 rounded transition-all">
-                                Restore
-                            </button>
-                            <button onclick="deleteArchivedConversation('${conv.id}')" 
-                                    class="text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded transition-all">
-                                Delete Forever
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-// Unarchive conversation
-function unarchiveConversation(conversationId) {
-    const index = archivedConversations.findIndex(c => c.id === conversationId);
-    if (index === -1) return;
-    
-    const conversation = archivedConversations[index];
-    archivedConversations.splice(index, 1);
-    
-    // Remove archivedAt property
-    delete conversation.archivedAt;
-    conversation.updated = new Date().toISOString();
-    
-    conversations.push(conversation);
-    
-    localStorage.setItem('archivedConversations', JSON.stringify(archivedConversations));
-    saveConversations();
-    
-    renderConversationsList();
-    renderArchivedList();
-    updateArchivedCount();
-    showToast('Conversation restored', 'success', 2000);
-}
-
-// Delete archived conversation permanently
-function deleteArchivedConversation(conversationId) {
-    if (!confirm('Permanently delete this conversation? This cannot be undone.')) {
-        return;
-    }
-    
-    const index = archivedConversations.findIndex(c => c.id === conversationId);
-    if (index === -1) return;
-    
-    archivedConversations.splice(index, 1);
-    localStorage.setItem('archivedConversations', JSON.stringify(archivedConversations));
-    
-    renderArchivedList();
-    updateArchivedCount();
-    showToast('Conversation deleted permanently', 'info', 2000);
-}
-
-// Update archived count
-function updateArchivedCount() {
-    const countEl = document.getElementById('archivedCount');
-    if (countEl) {
-        countEl.textContent = archivedConversations.length;
-    }
-}
-
-// Enhanced search to search ALL conversations
-function performSearchAllConversations() {
-    const query = document.getElementById('searchInput').value.toLowerCase().trim();
-    const resultsDiv = document.getElementById('searchResults');
-    
-    if (!query) {
-        resultsDiv.innerHTML = '<p class="text-slate-400 text-center py-8">Type to search across ALL conversations...</p>';
-        return;
-    }
-    
-    // Search through ALL conversations
-    let allResults = [];
-    conversations.forEach(conv => {
-        conv.messages?.forEach((msg, msgIndex) => {
-            if (msg.content.toLowerCase().includes(query)) {
-                allResults.push({
-                    conversationId: conv.id,
-                    conversationTitle: conv.title,
-                    content: msg.content,
-                    role: msg.role,
-                    messageIndex: msgIndex
-                });
-            }
-        });
-    });
-    
-    if (allResults.length === 0) {
-        resultsDiv.innerHTML = '<p class="text-slate-400 text-center py-8">No results found</p>';
-        return;
-    }
-    
-    // Display results
-    resultsDiv.innerHTML = allResults.map(result => {
-        const highlighted = highlightSearchTerm(result.content, query);
-        return `
-            <div class="search-result" onclick="openConversationFromSearch('${result.conversationId}')">
-                <div class="flex items-start justify-between mb-2">
-                    <div class="flex-1">
-                        <div class="text-xs font-semibold text-amber-400 mb-1">${result.conversationTitle}</div>
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="text-xs text-slate-500">${result.role === 'user' ? '👤 You' : '🤖 Fitz'}</span>
-                        </div>
-                        <div class="text-sm text-slate-300">${highlighted}</div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-// Open conversation from search
-function openConversationFromSearch(conversationId) {
-    closeSearchModal();
-    toggleConversationsSidebar(); // Open sidebar
-    setTimeout(() => {
-        switchToConversation(conversationId);
-    }, 100);
-}
-
-// ========================================
 // WEEK 3 PHASE 1: POWER USER FEATURES
 // ========================================
 
@@ -8538,7 +8025,37 @@ function closeSearchModal() {
 }
 
 function performSearch() {
-    performSearchAllConversations(); // Use the enhanced version that searches ALL conversations
+    const query = document.getElementById('searchInput').value.toLowerCase().trim();
+    const resultsDiv = document.getElementById('searchResults');
+    
+    if (!query) {
+        resultsDiv.innerHTML = '<p class="text-slate-400 text-center py-8">Type to search your conversation history...</p>';
+        return;
+    }
+    
+    // Search through conversation history
+    const results = conversationHistory_searchable.filter(conv => 
+        conv.content.toLowerCase().includes(query)
+    );
+    
+    if (results.length === 0) {
+        resultsDiv.innerHTML = '<p class="text-slate-400 text-center py-8">No results found</p>';
+        return;
+    }
+    
+    // Display results
+    resultsDiv.innerHTML = results.map((conv, index) => {
+        const highlighted = highlightSearchTerm(conv.content, query);
+        return `
+            <div class="search-result" onclick="jumpToMessage(${index})">
+                <div class="flex items-start justify-between mb-2">
+                    <span class="text-xs text-slate-500">${conv.role === 'user' ? '👤 You' : '🤖 Fitz'}</span>
+                    <span class="text-xs text-slate-500">${conv.timestamp || 'Recent'}</span>
+                </div>
+                <div class="text-sm text-slate-300">${highlighted}</div>
+            </div>
+        `;
+    }).join('');
 }
 
 function highlightSearchTerm(text, query) {
@@ -12243,13 +11760,6 @@ window.addEventListener('DOMContentLoaded', function() {
     // ========================================
     // WEEK 2: INITIALIZE NEW FEATURES
     // ========================================
-    
-    // ========================================
-    // CONVERSATION SYSTEM: INITIALIZE
-    // ========================================
-    
-    // Initialize conversation management
-    initConversationSystem();
     
     // Initialize keyboard navigation
     initKeyboardNavigation();
