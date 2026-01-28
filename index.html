@@ -7144,19 +7144,19 @@ async function sendMessage() {
     addMessage('user', message);
     input.value = '';
     
-    // WEEK 2: Show skeleton instead of simple thinking indicator
-    const skeleton = showChatSkeleton();
+    // Show "Fitz is thinking..." indicator
+    const thinkingDiv = showThinkingIndicator();
     const sendBtn = DOM.sendButton;
     sendBtn.disabled = true;
-    sendBtn.innerHTML = '<span class="spinner inline-block w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full"></span>';
+    sendBtn.innerHTML = '<span class="pulse">●●●</span>';
     
     conversationHistory.push({ role: 'user', content: message });
     
     try {
         const response = await callClaudeAPI(message);
         
-        // WEEK 2: Remove skeleton with fade out
-        removeChatSkeleton(skeleton);
+        // Remove thinking indicator
+        removeThinkingIndicator(thinkingDiv);
         
         // Build final response with injections
         let finalResponse = response;
@@ -7179,7 +7179,7 @@ async function sendMessage() {
         trackEvent('message_sent', { user: currentUser, messageLength: message.length });
     } catch (error) {
         // WEEK 2: Better error handling with user-friendly message
-        removeChatSkeleton(skeleton);
+        removeThinkingIndicator(thinkingDiv);
         handleError(error, 'sendMessage');
         addMessage('assistant', '⚠️ I encountered an issue processing your message. Please try again. If the problem persists, try refreshing the page.');
         console.error('Error:', error);
