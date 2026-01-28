@@ -560,9 +560,221 @@ input, textarea, select {
             50% { opacity: 0.5; }
         }
         .pulse { animation: pulse 2s ease-in-out infinite; }
+
+        /* ========================================
+           WEEK 2: LOADING STATES & SKELETONS
+           ======================================== */
+        
+        /* Skeleton loader animation */
+        @keyframes shimmer {
+            0% { background-position: -1000px 0; }
+            100% { background-position: 1000px 0; }
+        }
+        
+        .skeleton {
+            background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+            background-size: 1000px 100%;
+            animation: shimmer 2s infinite;
+            border-radius: 0.5rem;
+        }
+        
+        .light-mode .skeleton {
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 1000px 100%;
+        }
+        
+        /* Spinner animation */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .spinner {
+            animation: spin 1s linear infinite;
+        }
+        
+        /* Fade-in animation for content */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .fade-in-up {
+            animation: fadeInUp 0.3s ease-out;
+        }
+        
+        /* Progress bar animation */
+        @keyframes progress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+        
+        .progress-bar {
+            animation: progress 2s ease-out;
+        }
+        
+        /* Toast notification slide-in */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        .toast-enter {
+            animation: slideInRight 0.3s ease-out;
+        }
+        
+        .toast-exit {
+            animation: slideOutRight 0.3s ease-in;
+        }
+        
+        /* Toast container */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+        
+        .toast {
+            pointer-events: auto;
+            min-width: 300px;
+            max-width: 400px;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: start;
+            gap: 12px;
+        }
+        
+        .toast-success {
+            background: #064e3b;
+            border: 1px solid #10b981;
+            color: #d1fae5;
+        }
+        
+        .toast-error {
+            background: #7f1d1d;
+            border: 1px solid #ef4444;
+            color: #fee2e2;
+        }
+        
+        .toast-warning {
+            background: #78350f;
+            border: 1px solid #f59e0b;
+            color: #fef3c7;
+        }
+        
+        .toast-info {
+            background: #1e3a8a;
+            border: 1px solid #3b82f6;
+            color: #dbeafe;
+        }
+        
+        .light-mode .toast-success {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            color: #064e3b;
+        }
+        
+        .light-mode .toast-error {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #7f1d1d;
+        }
+        
+        .light-mode .toast-warning {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #78350f;
+        }
+        
+        .light-mode .toast-info {
+            background: #dbeafe;
+            border: 1px solid #3b82f6;
+            color: #1e3a8a;
+        }
+        
+        /* Smooth focus indicators (accessibility) */
+        *:focus-visible {
+            outline: 2px solid #f59e0b;
+            outline-offset: 2px;
+            border-radius: 4px;
+        }
+        
+        /* Better hover states */
+        button:not(:disabled):hover {
+            transform: translateY(-1px);
+            transition: transform 0.2s ease;
+        }
+        
+        button:not(:disabled):active {
+            transform: translateY(0);
+        }
+        
+        /* Disabled state styling */
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* Smooth modal transitions */
+        .modal-enter {
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        .modal-backdrop {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        /* Loading overlay */
+        .loading-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
+        
+        .light-mode .loading-overlay {
+            background: rgba(255, 255, 255, 0.9);
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
+    
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
     
     <!-- Access Code Screen -->
 <div id="accessScreen" class="min-h-screen flex items-center justify-center p-6">
@@ -6932,16 +7144,19 @@ async function sendMessage() {
     addMessage('user', message);
     input.value = '';
     
-    const thinkingDiv = showThinkingIndicator();
+    // WEEK 2: Show skeleton instead of simple thinking indicator
+    const skeleton = showChatSkeleton();
     const sendBtn = DOM.sendButton;
     sendBtn.disabled = true;
-    sendBtn.innerHTML = '<span class="pulse">●●●</span>';
+    sendBtn.innerHTML = '<span class="spinner inline-block w-4 h-4 border-2 border-amber-500 border-t-transparent rounded-full"></span>';
     
     conversationHistory.push({ role: 'user', content: message });
     
     try {
         const response = await callClaudeAPI(message);
-        removeThinkingIndicator(thinkingDiv);
+        
+        // WEEK 2: Remove skeleton with fade out
+        removeChatSkeleton(skeleton);
         
         // Build final response with injections
         let finalResponse = response;
@@ -6963,8 +7178,10 @@ async function sendMessage() {
         conversationHistory.push({ role: 'assistant', content: response });
         trackEvent('message_sent', { user: currentUser, messageLength: message.length });
     } catch (error) {
-        removeThinkingIndicator(thinkingDiv);
-        addMessage('assistant', 'Sorry, I encountered an error. Please try again or contact support.');
+        // WEEK 2: Better error handling with user-friendly message
+        removeChatSkeleton(skeleton);
+        handleError(error, 'sendMessage');
+        addMessage('assistant', '⚠️ I encountered an issue processing your message. Please try again. If the problem persists, try refreshing the page.');
         console.error('Error:', error);
     }
     
@@ -7364,6 +7581,278 @@ function stopListening() {
     isListening = false;
     DOM.voiceIcon.textContent = '🎤';
     DOM.voiceButton.classList.remove('bg-red-600');
+}
+
+// ========================================
+// WEEK 2: LOADING STATES, TOASTS, & POLISH
+// ========================================
+
+/**
+ * Show a toast notification
+ * @param {string} message - Message to display
+ * @param {string} type - 'success', 'error', 'warning', or 'info'
+ * @param {number} duration - How long to show (ms), default 4000
+ */
+function showToast(message, type = 'info', duration = 4000) {
+    const container = document.getElementById('toastContainer');
+    const toast = document.createElement('div');
+    
+    const icons = {
+        success: '✓',
+        error: '✕',
+        warning: '⚠',
+        info: 'ℹ'
+    };
+    
+    toast.className = `toast toast-${type} toast-enter`;
+    toast.innerHTML = `
+        <span style="font-size: 20px; flex-shrink: 0;">${icons[type]}</span>
+        <div style="flex: 1;">
+            <div style="font-weight: 600; margin-bottom: 4px;">${type.charAt(0).toUpperCase() + type.slice(1)}</div>
+            <div style="font-size: 14px; opacity: 0.9;">${message}</div>
+        </div>
+        <button onclick="this.parentElement.remove()" style="font-size: 20px; opacity: 0.6; hover:opacity: 1; background: none; border: none; padding: 0; cursor: pointer;">×</button>
+    `;
+    
+    container.appendChild(toast);
+    
+    // Auto-remove after duration
+    setTimeout(() => {
+        toast.classList.remove('toast-enter');
+        toast.classList.add('toast-exit');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
+
+/**
+ * Show loading skeleton for chat message
+ * @returns {HTMLElement} - The skeleton element
+ */
+function showChatSkeleton() {
+    const container = document.getElementById('messagesContainer');
+    const skeleton = document.createElement('div');
+    skeleton.className = 'bg-slate-700 rounded-xl p-6 mb-4 fade-in skeleton-message';
+    skeleton.innerHTML = `
+        <div class="flex items-start gap-3">
+            <div class="skeleton w-8 h-8 rounded-full"></div>
+            <div class="flex-1 space-y-2">
+                <div class="skeleton h-4 w-3/4"></div>
+                <div class="skeleton h-4 w-full"></div>
+                <div class="skeleton h-4 w-5/6"></div>
+            </div>
+        </div>
+    `;
+    container.appendChild(skeleton);
+    container.scrollTop = container.scrollHeight;
+    return skeleton;
+}
+
+/**
+ * Remove chat skeleton
+ * @param {HTMLElement} skeleton - The skeleton element to remove
+ */
+function removeChatSkeleton(skeleton) {
+    if (skeleton && skeleton.parentNode) {
+        skeleton.style.opacity = '0';
+        skeleton.style.transition = 'opacity 0.3s';
+        setTimeout(() => skeleton.remove(), 300);
+    }
+}
+
+/**
+ * Show loading overlay on an element
+ * @param {string} elementId - ID of element to show overlay on
+ * @param {string} message - Loading message
+ */
+function showLoadingOverlay(elementId, message = 'Loading...') {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'loading-overlay';
+    overlay.id = `${elementId}-overlay`;
+    overlay.innerHTML = `
+        <div class="text-center">
+            <div class="spinner inline-block w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full mb-4"></div>
+            <div class="text-white font-medium">${message}</div>
+        </div>
+    `;
+    element.style.position = 'relative';
+    element.appendChild(overlay);
+}
+
+/**
+ * Hide loading overlay
+ * @param {string} elementId - ID of element with overlay
+ */
+function hideLoadingOverlay(elementId) {
+    const overlay = document.getElementById(`${elementId}-overlay`);
+    if (overlay) {
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.remove(), 300);
+    }
+}
+
+/**
+ * Enhanced error handler with user-friendly messages
+ * @param {Error} error - The error object
+ * @param {string} context - Context of where error occurred
+ */
+function handleError(error, context = '') {
+    console.error(`Error in ${context}:`, error);
+    
+    let userMessage = 'Something went wrong. Please try again.';
+    
+    // Provide specific messages for common errors
+    if (error.message.includes('network') || error.message.includes('fetch')) {
+        userMessage = 'Network error. Please check your internet connection.';
+    } else if (error.message.includes('timeout')) {
+        userMessage = 'Request timed out. Please try again.';
+    } else if (error.message.includes('401') || error.message.includes('unauthorized')) {
+        userMessage = 'Session expired. Please refresh the page and log in again.';
+    } else if (error.message.includes('404')) {
+        userMessage = 'Resource not found. Please refresh the page.';
+    } else if (error.message.includes('500')) {
+        userMessage = 'Server error. Our team has been notified. Please try again later.';
+    }
+    
+    showToast(userMessage, 'error', 6000);
+    
+    // Track error for analytics
+    trackEvent('error_occurred', {
+        context: context,
+        error: error.message,
+        user: currentUser
+    });
+}
+
+/**
+ * Add smooth scroll to element
+ * @param {string} elementId - ID of element to scroll to
+ */
+function smoothScrollTo(elementId) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+}
+
+/**
+ * Debounce function for performance
+ * @param {Function} func - Function to debounce
+ * @param {number} wait - Wait time in ms
+ */
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+/**
+ * Check if element is in viewport (for lazy loading)
+ * @param {HTMLElement} element - Element to check
+ */
+function isInViewport(element) {
+    const rect = element.getBoundingClientRect();
+    return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+    );
+}
+
+/**
+ * Add keyboard navigation support
+ */
+function initKeyboardNavigation() {
+    document.addEventListener('keydown', (e) => {
+        // Escape to close modals
+        if (e.key === 'Escape') {
+            // Close tools modal if open
+            const mobileToolsModal = document.getElementById('mobileToolsModal');
+            if (mobileToolsModal && !mobileToolsModal.classList.contains('hidden')) {
+                closeMobileTools();
+            }
+            
+            // Close admin dashboard if open
+            const adminModal = document.getElementById('adminDashboardModal');
+            if (adminModal && !adminModal.classList.contains('hidden')) {
+                closeAdminDashboard();
+            }
+        }
+        
+        // Ctrl/Cmd + K to focus search/input
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            const messageInput = document.getElementById('messageInput');
+            if (messageInput) {
+                messageInput.focus();
+            }
+        }
+    });
+}
+
+/**
+ * Preload critical modals for better performance
+ */
+function preloadModals() {
+    // Preload modal content that might be used frequently
+    const criticalModals = ['documentBuilderModal', 'awardCalculatorModal'];
+    criticalModals.forEach(modalId => {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+            // Force browser to parse the modal HTML
+            modal.offsetHeight;
+        }
+    });
+}
+
+/**
+ * Add visual feedback when copying text
+ * @param {string} text - Text that was copied
+ */
+function showCopyFeedback(text) {
+    showToast('Copied to clipboard!', 'success', 2000);
+}
+
+/**
+ * Validate form with visual feedback
+ * @param {string} formId - ID of form to validate
+ * @returns {boolean} - Whether form is valid
+ */
+function validateForm(formId) {
+    const form = document.getElementById(formId);
+    if (!form) return false;
+    
+    let isValid = true;
+    const inputs = form.querySelectorAll('input[required], textarea[required], select[required]');
+    
+    inputs.forEach(input => {
+        if (!input.value.trim()) {
+            input.classList.add('border-red-500');
+            input.classList.remove('border-slate-600');
+            isValid = false;
+            
+            // Remove error state on input
+            input.addEventListener('input', function() {
+                this.classList.remove('border-red-500');
+                this.classList.add('border-slate-600');
+            }, { once: true });
+        }
+    });
+    
+    if (!isValid) {
+        showToast('Please fill in all required fields', 'warning');
+    }
+    
+    return isValid;
 }
 
 // ========================================
@@ -10392,6 +10881,36 @@ window.addEventListener('DOMContentLoaded', function() {
         } catch (e) {
             console.error('❌ Test conversion failed:', e);
         }
+    }
+    
+    // ========================================
+    // WEEK 2: INITIALIZE NEW FEATURES
+    // ========================================
+    
+    // Initialize keyboard navigation
+    initKeyboardNavigation();
+    
+    // Preload critical modals for better performance
+    setTimeout(() => {
+        preloadModals();
+    }, 2000);
+    
+    // Show welcome toast (only once per session)
+    if (!sessionStorage.getItem('welcomeShown')) {
+        setTimeout(() => {
+            showToast('Welcome! Press Ctrl+K to focus the message input anytime.', 'info', 5000);
+            sessionStorage.setItem('welcomeShown', 'true');
+        }, 1000);
+    }
+    
+    // Add smooth fade-in to messages container
+    const messagesContainer = document.getElementById('messagesContainer');
+    if (messagesContainer) {
+        messagesContainer.style.opacity = '0';
+        setTimeout(() => {
+            messagesContainer.style.transition = 'opacity 0.5s';
+            messagesContainer.style.opacity = '1';
+        }, 100);
     }
 });
 
