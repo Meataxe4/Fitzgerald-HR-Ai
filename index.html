@@ -1602,6 +1602,13 @@ input, textarea, select {
                         <span class="hidden sm:inline">Admin</span>
                     </button>
                     
+                    <!-- Document Builder Button -->
+                    <button onclick="openDocumentBuilder()" 
+                            class="text-amber-400 hover:text-amber-300 font-medium transition-colors flex items-center gap-1 px-2 py-2 touch-manipulation">
+                        <span>📝</span>
+                        <span class="hidden sm:inline">Document Builder</span>
+                    </button>
+                    
                     <!-- Dark Mode Toggle -->
                     <button onclick="toggleDarkMode()" 
                             id="darkModeToggle"
@@ -4038,6 +4045,23 @@ function createDocumentBuilderSuggestion(detection) {
 /**
  * Opens Document Builder pre-selected to specific type
  */
+function openDocumentBuilder() {
+    // Open Document Builder modal without pre-selecting a type
+    var modal = document.getElementById('documentBuilderModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        
+        // Reset to step 1 (document type selection)
+        resetDocumentBuilderSilent();
+        
+        trackEvent('document_builder_opened_from_header', {
+            user: currentUser
+        });
+    } else {
+        console.error('Document Builder modal not found');
+    }
+}
+
 function openDocumentBuilderFor(documentType) {
     // Open modal
     document.getElementById('documentBuilderModal').classList.remove('hidden');
@@ -12833,3 +12857,5 @@ window.addEventListener('DOMContentLoaded', function() {
 </script>
 </body>
 </html>
+
+
