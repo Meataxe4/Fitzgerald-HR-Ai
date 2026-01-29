@@ -1002,6 +1002,195 @@ input, textarea, select {
         .light-mode .search-result:hover {
             border-color: #f59e0b;
         }
+        
+        /* ==========================================
+           CHATGPT-STYLE SIDEBAR
+           ========================================== */
+        
+        .chat-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 260px;
+            height: 100vh;
+            background: #171717;
+            border-right: 1px solid #2d2d2d;
+            display: flex;
+            flex-direction: column;
+            z-index: 40;
+            transition: transform 0.3s ease;
+        }
+        
+        .chat-sidebar.closed {
+            transform: translateX(-100%);
+        }
+        
+        .sidebar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px;
+            border-bottom: 1px solid #2d2d2d;
+        }
+        
+        .sidebar-close-btn {
+            color: #94a3b8;
+            padding: 4px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .sidebar-close-btn:hover {
+            background: #2d2d2d;
+            color: white;
+        }
+        
+        .sidebar-new-chat-btn {
+            margin: 12px;
+            padding: 12px;
+            background: transparent;
+            border: 1px solid #2d2d2d;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            transition: all 0.2s;
+            width: calc(100% - 24px);
+        }
+        
+        .sidebar-new-chat-btn:hover {
+            background: #2d2d2d;
+        }
+        
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 20px;
+        }
+        
+        .sidebar-section {
+            margin-top: 20px;
+        }
+        
+        .sidebar-section-title {
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        
+        .sidebar-items-list {
+            padding: 0 8px;
+        }
+        
+        .sidebar-chat-item {
+            padding: 10px 12px;
+            margin-bottom: 4px;
+            border-radius: 8px;
+            color: #cbd5e1;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        
+        .sidebar-chat-item:hover {
+            background: #2d2d2d;
+        }
+        
+        .sidebar-chat-item.active {
+            background: #2d2d2d;
+            color: white;
+        }
+        
+        .sidebar-chat-title {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        .sidebar-chat-delete {
+            opacity: 0;
+            color: #64748b;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .sidebar-chat-item:hover .sidebar-chat-delete {
+            opacity: 1;
+        }
+        
+        .sidebar-chat-delete:hover {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 39;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+        }
+        
+        .sidebar-toggle-btn {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            z-index: 50;
+            background: #2d2d2d;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #3d3d3d;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .sidebar-toggle-btn:hover {
+            background: #3d3d3d;
+        }
+        
+        @media (max-width: 768px) {
+            .chat-sidebar {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+        
+        .light-mode .chat-sidebar {
+            background: white;
+            border-right-color: #e2e8f0;
+        }
+        
+        .light-mode .sidebar-new-chat-btn {
+            border-color: #e2e8f0;
+            color: #0f172a;
+        }
+        
+        .light-mode .sidebar-chat-item {
+            color: #475569;
+        }
+        
+        .light-mode .sidebar-chat-item.active {
+            background: #f1f5f9;
+            color: #0f172a;
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
@@ -1009,42 +1198,62 @@ input, textarea, select {
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="toast-container"></div>
     
-    <!-- WEEK 3 PHASE 1: Quick Actions FAB -->
-    <div class="quick-actions-fab">
-        <button class="quick-action-btn" onclick="toggleQuickActions()" title="Quick Actions">
-            ⚡
+    <!-- CHATGPT-STYLE SIDEBAR -->
+    <div id="chatSidebar" class="chat-sidebar">
+        <!-- Header -->
+        <div class="sidebar-header">
+            <h2 class="text-lg font-bold text-white">Fitz</h2>
+            <button onclick="toggleSidebar()" class="sidebar-close-btn">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- New Chat Button -->
+        <button onclick="createNewChatFromSidebar()" class="sidebar-new-chat-btn">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+            </svg>
+            <span>New Chat</span>
         </button>
-        <div id="quickActionsMenu" class="quick-actions-menu">
-            <div class="quick-action-item" onclick="openSearchModal()">
-                <span class="text-xl">🔍</span>
-                <div>
-                    <div class="font-semibold">Search</div>
-                    <div class="text-xs opacity-75">Find conversations</div>
+        
+        <!-- Sidebar Content -->
+        <div class="sidebar-content">
+            <!-- Previous Chats Section -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Previous Chats</h3>
+                <div id="sidebarChatsList" class="sidebar-items-list">
+                    <p class="text-slate-500 text-sm py-4 text-center">No chats yet</p>
                 </div>
             </div>
-            <div class="quick-action-item" onclick="openBookmarksModal()">
-                <span class="text-xl">⭐</span>
-                <div>
-                    <div class="font-semibold">Bookmarks</div>
-                    <div class="text-xs opacity-75">Saved conversations</div>
+            
+            <!-- Bookmarks Section -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Bookmarks</h3>
+                <div id="sidebarBookmarksList" class="sidebar-items-list">
+                    <p class="text-slate-500 text-sm py-4 text-center">No bookmarks yet</p>
                 </div>
             </div>
-            <div class="quick-action-item" onclick="openMultiFileModal()">
-                <span class="text-xl">📁</span>
-                <div>
-                    <div class="font-semibold">Upload Files</div>
-                    <div class="text-xs opacity-75">Process multiple files</div>
-                </div>
-            </div>
-            <div class="quick-action-item" onclick="showAnalyticsDashboard()">
-                <span class="text-xl">📊</span>
-                <div>
-                    <div class="font-semibold">Analytics</div>
-                    <div class="text-xs opacity-75">View insights</div>
+            
+            <!-- Search Section -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Search</h3>
+                <div class="px-3 py-2">
+                    <input type="text" 
+                           id="sidebarSearchInput" 
+                           placeholder="Search conversations..."
+                           class="w-full bg-slate-700 text-slate-100 border border-slate-600 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+                           onkeyup="performSidebarSearch()">
+                    <div id="sidebarSearchResults" class="mt-2"></div>
                 </div>
             </div>
         </div>
     </div>
+    
+    <!-- Sidebar Overlay (for mobile) -->
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    
     
     <!-- WEEK 3: Search Modal -->
     <div id="searchModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
@@ -1293,84 +1502,33 @@ input, textarea, select {
         <!-- Mobile: Stacked Layout, Desktop: Side-by-side -->
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
             
-            <!-- Left: Logo & Title -->
+            <!-- Left: Sidebar Toggle + Logo & Title -->
             <div class="flex items-center gap-3">
+                <!-- Sidebar Toggle Button -->
+                <button onclick="toggleSidebar()" class="sidebar-toggle-btn-header p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                
                 <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
                     <span class="text-xl">🏨</span>
                 </div>
                 <div>
-                    <h1 class="text-lg md:text-xl font-bold text-white">Fitz - Your HR Assistant</h1>
-                    <p class="text-xs text-slate-400">Beta Testing - <span id="userCode"></span></p>
+                    <h1 class="text-lg md:text-xl font-bold text-white">Fitz</h1>
+                    <p class="text-xs text-slate-400">Beta - <span id="userCode"></span></p>
                 </div>
             </div>
 
-            <!-- Right: Buttons (wrap on mobile) -->
-            <div class="flex flex-wrap items-center gap-2 text-sm">
+            <!-- Right: Simplified Buttons -->
+            <div class="flex items-center gap-2 text-sm">
                 
-                <!-- Main Action Buttons -->
-                <div class="flex items-center gap-2">
-                    <!-- Crisis Mode Button -->
-                    <button onclick="activateCrisisMode()" 
-                            class="px-3 py-2 md:px-4 md:py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold rounded-lg transition-all flex items-center gap-2 touch-manipulation">
-                        <span class="text-lg md:text-xl">🚨</span>
-                        <span class="hidden sm:inline">URGENT</span>
-                    </button>
-                    
-                    <!-- Voice Input Button -->
-                    <button onclick="toggleVoiceInput()" 
-                            id="voiceButton"
-                            class="p-2 bg-slate-700 hover:bg-slate-600 active:bg-slate-500 text-white rounded-lg transition-colors touch-manipulation min-w-[44px] min-h-[44px]">
-                        <span id="voiceIcon">🎤</span>
-                    </button>
-                    
-                    <!-- Tools Menu -->
-                    <div class="relative">
-                        <button onclick="toggleToolsMenu()" 
-                                class="p-2 bg-slate-700 hover:bg-slate-600 active:bg-slate-500 text-white rounded-lg transition-colors touch-manipulation min-w-[44px] min-h-[44px]">
-                            <span>🛠️</span>
-                        </button>
-                        <div id="toolsMenu" class="hidden bg-slate-800 border border-slate-700 rounded-lg shadow-xl z-50 overflow-y-auto">
-                            <div class="p-2">
-                                <button onclick="openTool('awardWizard')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                    <span>🧙</span>
-                                    <span>Award Wizard</span>
-                                </button>
-                                <button onclick="openTool('rosterStressTester')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                    <span>🔍</span>
-                                    <span>Roster Stress Test</span>
-                                </button>
-                                <button onclick="openTool('complianceCalendar')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                    <span>📅</span>
-                                    <span>Compliance Calendar</span>
-                                </button>
-                                <button onclick="openTool('awardCalculator')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                    <span>💰</span>
-                                    <span>Award Calculator</span>
-                                </button>
-                                <button onclick="openTool('documentBuilder')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                    <span>📝</span>
-                                    <span>Document Builder</span>
-                                </button>
-                                <button onclick="openTool('rosterOptimizer')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                    <span>📋</span>
-                                    <span>Roster Optimiser</span>
-                                </button>
-                                <button onclick="openTool('terminationRisk')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                    <span>⚖️</span>
-                                    <span>Termination Risk</span>
-                                </button>
-                                <button onclick="openTool('scenarioAnalysis')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                    <span>🎯</span>
-                                    <span>Scenario Analysis</span>
-                                </button>
-                                <button onclick="openTool('xeroIntegration')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 touch-manipulation">
-                                    <span>🔗</span>
-                                    <span>Xero Integration</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Crisis Mode Button -->
+                <button onclick="activateCrisisMode()" 
+                        class="px-3 py-2 md:px-4 md:py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold rounded-lg transition-all flex items-center gap-2 touch-manipulation">
+                    <span class="text-lg md:text-xl">🚨</span>
+                    <span class="hidden sm:inline">URGENT</span>
+                </button>
                 
                 <!-- Divider (hidden on mobile) -->
                 <div class="hidden md:block h-6 w-px bg-slate-600"></div>
@@ -1464,25 +1622,13 @@ input, textarea, select {
             <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
                 
                 <p class="text-slate-100 leading-relaxed">
-                    👋 G'day! I'm Fitz, your AI-powered HR knowledge companion from Fitzgerald HR, 
-                    specializing in hospitality HR for Australian venues.
+                    👋 G'day! I'm Fitz, your hospitality HR assistant.
                 </p>
 
                 <p class="text-slate-100 leading-relaxed mt-3">
-                    I can help you understand Fair Work compliance, award interpretation, employee relations, 
-                    recruitment processes, and more.
+                    Ask me anything about awards, compliance, or employment law.
                 </p>
 
-                <div class="bg-amber-500/10 border-l-4 border-amber-500 rounded-r-lg p-3 mt-4">
-                    <p class="text-amber-300 text-sm font-semibold">💡 Try asking:</p>
-                    <p class="text-slate-300 text-xs mt-1">
-                        "What should I pay a casual waiter?" • "Can I fire someone for being late?" • "How do I write a warning letter?"
-                    </p>
-                </div>
-
-                <p class="text-slate-100 text-sm mt-4">
-                    💡 <strong>Tip:</strong> I have 8 specialized tools (click 🛠️ above). 
-                    I'll suggest the right ones as we talk, or browse them anytime.
                 </p>
 
                 <p class="text-red-400 font-semibold mt-4 mb-2">🚨 Urgent/Critical Situations:</p>
@@ -1507,20 +1653,80 @@ input, textarea, select {
     </div>
 </div>
 
-<!-- Chat Input Area (Fixed at bottom, centered and narrower) -->
+<!-- Chat Input Area (ChatGPT Style) -->
 <div class="bg-slate-800/80 backdrop-blur-sm border-t border-slate-700/50 px-6 py-4">
     <div class="max-w-3xl mx-auto">
-        <div class="flex gap-3">
+        <div class="flex gap-2 items-end">
+            <!-- Upload Button (+) -->
+            <div class="relative">
+                <button onclick="toggleUploadMenu()" 
+                        id="uploadButton"
+                        class="p-3 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-all touch-manipulation">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                </button>
+                
+                <!-- Upload Menu Popup -->
+                <div id="uploadMenu" class="hidden absolute bottom-full left-0 mb-2 bg-slate-800 border border-slate-700 rounded-lg shadow-xl min-w-[200px] z-50">
+                    <div class="p-2">
+                        <button onclick="triggerFileUpload('pdf')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3">
+                            <span>📄</span>
+                            <span>Upload PDF</span>
+                        </button>
+                        <button onclick="triggerFileUpload('excel')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3">
+                            <span>📊</span>
+                            <span>Upload Excel</span>
+                        </button>
+                        <button onclick="triggerFileUpload('word')" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3">
+                            <span>📝</span>
+                            <span>Upload Word</span>
+                        </button>
+                        <button onclick="openMultiFileModal()" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3">
+                            <span>📁</span>
+                            <span>Multiple Files</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Text Input -->
             <textarea id="messageInput" 
                 placeholder="Ask me anything about hospitality HR in Australia..." 
-                rows="2"
-                class="flex-1 bg-slate-900 text-slate-100 border border-slate-700 rounded-lg px-4 py-3 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none"
-                onkeypress="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }">
+                rows="1"
+                class="flex-1 bg-slate-900 text-slate-100 border border-slate-700 rounded-xl px-4 py-3 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none max-h-32"
+                onkeypress="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
+                oninput="autoResizeTextarea(this)">
             </textarea>
-            <button id="sendButton" onclick="sendMessage()" 
-                    class="bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-900 font-bold px-6 py-3 md:px-8 md:py-3 rounded-lg transition-all flex items-center gap-2 min-w-[80px] touch-manipulation">
-                <span>Send</span><span>→</span>
+            
+            <!-- Microphone Button (Right) -->
+            <button onclick="toggleVoiceInput()" 
+                    id="voiceButton"
+                    title="Voice input"
+                    class="p-3 text-slate-400 hover:text-amber-500 hover:bg-slate-700 rounded-lg transition-all touch-manipulation">
+                <svg id="voiceIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                </svg>
             </button>
+            
+            <!-- Send Button -->
+            <button id="sendButton" onclick="sendMessage()" 
+                    class="p-3 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-900 rounded-lg transition-all touch-manipulation">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Voice Recording Indicator -->
+        <div id="voiceRecordingIndicator" class="hidden mt-3 flex items-center gap-2 text-sm text-amber-500">
+            <div class="flex gap-1">
+                <span class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
+                <span class="w-2 h-2 bg-amber-500 rounded-full animate-pulse" style="animation-delay: 0.2s"></span>
+                <span class="w-2 h-2 bg-amber-500 rounded-full animate-pulse" style="animation-delay: 0.4s"></span>
+            </div>
+            <span>Listening...</span>
+            <button onclick="toggleVoiceInput()" class="ml-auto text-slate-400 hover:text-white text-xs underline">Stop</button>
         </div>
     </div>
 </div>
@@ -7938,7 +8144,7 @@ async function submitCrisis() {
 
 function toggleVoiceInput() {
     if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert('Voice input not supported in your browser. Try Chrome or Edge.');
+        showToast('Voice input not supported in your browser. Try Chrome or Edge.', 'warning', 3000);
         return;
     }
     isListening ? stopListening() : startListening();
@@ -7952,20 +8158,36 @@ function startListening() {
     recognition.lang = 'en-AU';
 
     recognition.onstart = () => {
-    isListening = true;
-    DOM.voiceIcon.textContent = '🔴';
-    DOM.voiceButton.classList.add('bg-red-600');
-};
+        isListening = true;
+        
+        // Update button style
+        const voiceBtn = document.getElementById('voiceButton');
+        const voiceIcon = document.getElementById('voiceIcon');
+        if (voiceBtn) {
+            voiceBtn.classList.add('bg-red-500', 'text-white');
+            voiceBtn.classList.remove('text-slate-400');
+        }
+        if (voiceIcon) {
+            voiceIcon.classList.add('animate-pulse');
+        }
+        
+        // Show recording indicator
+        const indicator = document.getElementById('voiceRecordingIndicator');
+        if (indicator) {
+            indicator.classList.remove('hidden');
+        }
+    };
 
     // Debounce transcript updates for better performance
-const updateTranscript = debounce((transcript) => {
-    DOM.messageInput.value = transcript;
-}, CONFIG.DEBOUNCE_DELAY);
+    const updateTranscript = debounce((transcript) => {
+        DOM.messageInput.value = transcript;
+        autoResizeTextarea(DOM.messageInput);
+    }, CONFIG.DEBOUNCE_DELAY);
 
-recognition.onresult = (event) => {
-    const transcript = Array.from(event.results).map(r => r[0].transcript).join('');
-    updateTranscript(transcript);
-};
+    recognition.onresult = (event) => {
+        const transcript = Array.from(event.results).map(r => r[0].transcript).join('');
+        updateTranscript(transcript);
+    };
 
     recognition.onerror = () => stopListening();
     recognition.onend = () => stopListening();
@@ -7975,8 +8197,162 @@ recognition.onresult = (event) => {
 function stopListening() {
     if (recognition) recognition.stop();
     isListening = false;
-    DOM.voiceIcon.textContent = '🎤';
-    DOM.voiceButton.classList.remove('bg-red-600');
+    
+    // Reset button style
+    const voiceBtn = document.getElementById('voiceButton');
+    const voiceIcon = document.getElementById('voiceIcon');
+    if (voiceBtn) {
+        voiceBtn.classList.remove('bg-red-500', 'text-white');
+        voiceBtn.classList.add('text-slate-400');
+    }
+    if (voiceIcon) {
+        voiceIcon.classList.remove('animate-pulse');
+    }
+    
+    // Hide recording indicator
+    const indicator = document.getElementById('voiceRecordingIndicator');
+    if (indicator) {
+        indicator.classList.add('hidden');
+    }
+}
+
+// ========================================
+// CHATGPT-STYLE SIDEBAR & NEW FEATURES
+// ========================================
+
+// Sidebar state
+let sidebarOpen = window.innerWidth >= 768; // Open on desktop by default
+
+// Toggle sidebar
+function toggleSidebar() {
+    const sidebar = document.getElementById('chatSidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+    
+    sidebarOpen = !sidebarOpen;
+    
+    if (sidebarOpen) {
+        sidebar.classList.remove('closed');
+        if (window.innerWidth < 768) {
+            overlay.classList.add('active');
+        }
+    } else {
+        sidebar.classList.add('closed');
+        overlay.classList.remove('active');
+    }
+}
+
+// Initialize sidebar on load
+function initSidebar() {
+    const sidebar = document.getElementById('chatSidebar');
+    if (window.innerWidth < 768) {
+        sidebar.classList.add('closed');
+        sidebarOpen = false;
+    }
+}
+
+// Upload menu toggle
+function toggleUploadMenu() {
+    const menu = document.getElementById('uploadMenu');
+    menu.classList.toggle('hidden');
+}
+
+// Close upload menu when clicking outside
+document.addEventListener('click', function(e) {
+    const uploadBtn = document.getElementById('uploadButton');
+    const uploadMenu = document.getElementById('uploadMenu');
+    
+    if (uploadMenu && !uploadMenu.classList.contains('hidden')) {
+        if (!uploadBtn.contains(e.target) && !uploadMenu.contains(e.target)) {
+            uploadMenu.classList.add('hidden');
+        }
+    }
+});
+
+// Trigger file upload by type
+function triggerFileUpload(type) {
+    // Close menu
+    document.getElementById('uploadMenu').classList.add('hidden');
+    
+    // Show appropriate upload interface
+    if (type === 'pdf' || type === 'excel' || type === 'word') {
+        openMultiFileModal();
+    }
+}
+
+// Auto-resize textarea
+function autoResizeTextarea(textarea) {
+    textarea.style.height = 'auto';
+    textarea.style.height = textarea.scrollHeight + 'px';
+}
+
+// Create new chat from sidebar
+function createNewChatFromSidebar() {
+    // Clear current conversation
+    conversationHistory = [];
+    
+    // Clear messages
+    const container = DOM.messagesContainer.querySelector('.space-y-6');
+    if (container) {
+        container.innerHTML = '';
+    }
+    
+    // Add welcome message
+    addMessage('assistant', '👋 G\'day! I\'m Fitz, your hospitality HR assistant.\n\nAsk me anything about awards, compliance, or employment law.');
+    
+    // Close sidebar on mobile
+    if (window.innerWidth < 768) {
+        toggleSidebar();
+    }
+    
+    showToast('New chat started!', 'success', 2000);
+}
+
+// Sidebar search
+function performSidebarSearch() {
+    const query = document.getElementById('sidebarSearchInput').value.toLowerCase().trim();
+    const resultsDiv = document.getElementById('sidebarSearchResults');
+    
+    if (!query) {
+        resultsDiv.innerHTML = '';
+        return;
+    }
+    
+    // Search through conversation history
+    const results = conversationHistory_searchable.filter(conv => 
+        conv.content.toLowerCase().includes(query)
+    );
+    
+    if (results.length === 0) {
+        resultsDiv.innerHTML = '<p class="text-slate-500 text-xs py-2">No results</p>';
+        return;
+    }
+    
+    resultsDiv.innerHTML = results.slice(0, 5).map(conv => {
+        const preview = conv.content.substring(0, 60) + '...';
+        return `<div class="text-xs text-slate-300 py-2 px-2 hover:bg-slate-700 rounded cursor-pointer">${preview}</div>`;
+    }).join('');
+}
+
+// Update sidebar lists
+function updateSidebarLists() {
+    // Update chats list (placeholder for now)
+    const chatsList = document.getElementById('sidebarChatsList');
+    if (conversationHistory.length > 0) {
+        chatsList.innerHTML = '<div class="sidebar-chat-item active"><div class="sidebar-chat-title">Current Chat</div></div>';
+    }
+    
+    // Update bookmarks list
+    const bookmarksList = document.getElementById('sidebarBookmarksList');
+    const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
+    
+    if (bookmarks.length > 0) {
+        bookmarksList.innerHTML = bookmarks.slice(0, 5).map(b => {
+            const preview = b.content.substring(0, 40) + '...';
+            return `<div class="text-xs text-slate-300 py-2 px-2 hover:bg-slate-700 rounded cursor-pointer">${preview}</div>`;
+        }).join('');
+    } else {
+        bookmarksList.innerHTML = '<p class="text-slate-500 text-sm py-4 text-center">No bookmarks yet</p>';
+    }
 }
 
 // ========================================
@@ -11499,6 +11875,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize dark mode from localStorage
     initDarkMode();
+    
+    // Initialize ChatGPT-style sidebar
+    initSidebar();
 
     // Initialize Supabase
     const supabaseInitialized = initializeSupabase();
