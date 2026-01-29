@@ -8333,11 +8333,6 @@ function createNewConversation() {
         <p class="text-slate-100 leading-relaxed mt-4">
             What HR topic would you like to learn about today?
         </p>
-        <p class="text-yellow-400 text-xs mt-4 bg-yellow-500/10 border border-yellow-500/30 rounded p-3">
-            ⚠️ <strong>Award Rates:</strong> Data effective 1 July 2025 - 30 June 2026. 
-            Always verify at <a href="https://www.fairwork.gov.au" target="_blank" class="underline hover:text-yellow-300">fairwork.gov.au</a> 
-            before making payroll decisions.
-        </p>
     `;
     
     // For display - reuse container already declared above
@@ -8360,7 +8355,7 @@ function createNewConversation() {
     }
     
     // For storage - save plain text version
-    var plainWelcome = '👋 G\'day! I\'m Fitz, your hospitality HR assistant.\n\nAsk me anything about awards, compliance, or employment law.\n\n🚨 Urgent/Critical Situations:\nUse the red URGENT button above for immediate crisis response.\n\nWhat HR topic would you like to learn about today?\n\n⚠️ Award Rates: Data effective 1 July 2025 - 30 June 2026. Always verify at fairwork.gov.au before making payroll decisions.';
+    var plainWelcome = '👋 G\'day! I\'m Fitz, your hospitality HR assistant.\n\nAsk me anything about awards, compliance, or employment law.\n\n🚨 Urgent/Critical Situations:\nUse the red URGENT button above for immediate crisis response.\n\nWhat HR topic would you like to learn about today?';
     conversationHistory.push({ role: 'assistant', content: plainWelcome });
     
     // Save and update UI - FIXED: Use saveCurrentConversation to update messages
@@ -11880,6 +11875,17 @@ function performLogout(loggedOutUser, type) {
             `;
         }
     }
+    
+    // Close sidebar before logout
+    var sidebar = document.getElementById('chatSidebar');
+    if (sidebar) {
+        sidebar.classList.add('closed');
+    }
+    var sidebarOverlay = document.getElementById('sidebarOverlay');
+    if (sidebarOverlay) {
+        sidebarOverlay.classList.remove('active');
+    }
+    sidebarOpen = false;
     
     // Hide assistant screen
     const assistantScreen = document.getElementById('assistantScreen');
