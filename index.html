@@ -316,8 +316,9 @@ body.light-mode {
     font-weight: 700 !important;
 }
 
-/* HIDE LOGOUT BUTTON FROM HEADER - It's in sidebar now */
-button[onclick*="logout"]:not(.sidebar-logout) {
+/* HIDE LOGOUT BUTTON FROM HEADER ONLY - It's in sidebar now */
+header button[onclick*="logout"],
+.bg-slate-800\/80 button[onclick*="logout"] {
     display: none !important;
 }
 
@@ -1521,7 +1522,14 @@ input, textarea, select {
     <div id="chatSidebar" class="chat-sidebar closed">
         <!-- Header -->
         <div class="sidebar-header">
-            <h2 class="text-lg font-bold text-white">Fitz</h2>
+            <div class="flex items-center gap-2">
+                <h2 class="text-lg font-bold text-white" id="sidebarVenueName">Fitz</h2>
+                <button onclick="openProfileMenu()" class="text-slate-400 hover:text-amber-400 transition-colors" title="Profile">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                </button>
+            </div>
             <button onclick="toggleSidebar()" class="sidebar-close-btn">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -1579,7 +1587,7 @@ input, textarea, select {
             <!-- Logout Button - Bottom of Sidebar -->
             <div class="mt-auto pt-4 px-3 pb-3 border-t border-slate-700">
                 <button onclick="logout()" 
-                        class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2">
+                        class="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2">
                     <span>🚪</span>
                     <span>Logout</span>
                 </button>
@@ -9408,6 +9416,37 @@ function closeMoreMenu() {
     }
 }
 
+// Profile Menu Functions
+function openProfileMenu() {
+    var menu = document.getElementById('profileMenu');
+    if (menu) {
+        menu.classList.remove('hidden');
+        
+        // Update venue name and code in profile
+        var venueName = localStorage.getItem('venueName') || 'Your Venue';
+        var userCode = localStorage.getItem('userCode') || 'N/A';
+        
+        document.getElementById('profileVenueName').textContent = venueName;
+        document.getElementById('profileUserCode').textContent = 'Code: ' + userCode;
+    }
+}
+
+function closeProfileMenu() {
+    var menu = document.getElementById('profileMenu');
+    if (menu) {
+        menu.classList.add('hidden');
+    }
+}
+
+// Update sidebar venue name on load
+function updateSidebarVenueName() {
+    var venueName = localStorage.getItem('venueName') || 'Fitz';
+    var sidebarName = document.getElementById('sidebarVenueName');
+    if (sidebarName) {
+        sidebarName.textContent = venueName;
+    }
+}
+
 // Tool Opening Functions
 function openAwardCalculator() {
     trackToolUsage('awardCalculatorModal');
@@ -13198,6 +13237,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize recent tools
     loadRecentTools();
     updateSidebarRecentTools();
+    updateSidebarVenueName();
 
     // Initialize Supabase
     const supabaseInitialized = initializeSupabase();
@@ -13533,6 +13573,57 @@ window.addEventListener('DOMContentLoaded', function() {
             </button>
             
             <button onclick="showPrivacyPolicy(); closeMoreMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
+                <span class="text-xl">🔒</span>
+                <div>
+                    <div class="font-semibold">Privacy Policy</div>
+                    <div class="text-xs text-slate-400">How we protect your data</div>
+                </div>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Profile Modal -->
+<div id="profileMenu" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50" onclick="if(event.target === this) closeProfileMenu();">
+    <div class="bg-slate-800 rounded-2xl p-6 max-w-sm w-full border border-amber-500 fade-in">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-amber-500">Profile</h2>
+            <button onclick="closeProfileMenu()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+        
+        <!-- Venue Info -->
+        <div class="mb-4 p-4 bg-slate-700/50 rounded-lg">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
+                    <span class="text-2xl">🏨</span>
+                </div>
+                <div>
+                    <div class="font-semibold text-white" id="profileVenueName">Loading...</div>
+                    <div class="text-xs text-slate-400" id="profileUserCode">Code: ...</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="space-y-2">
+            <button onclick="showVenueSettings(); closeProfileMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
+                <span class="text-xl">⚙️</span>
+                <div>
+                    <div class="font-semibold">Settings</div>
+                    <div class="text-xs text-slate-400">Update venue information</div>
+                </div>
+            </button>
+            
+            <div class="border-t border-slate-700 my-2"></div>
+            
+            <button onclick="showTermsOfService(); closeProfileMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
+                <span class="text-xl">📄</span>
+                <div>
+                    <div class="font-semibold">Terms of Service</div>
+                    <div class="text-xs text-slate-400">View legal terms</div>
+                </div>
+            </button>
+            
+            <button onclick="showPrivacyPolicy(); closeProfileMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
                 <span class="text-xl">🔒</span>
                 <div>
                     <div class="font-semibold">Privacy Policy</div>
