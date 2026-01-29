@@ -8878,7 +8878,6 @@ function performSidebarSearch() {
 // ========================================
 
 // Bookmarks Storage
-let bookmarkedConversations = JSON.parse(localStorage.getItem('bookmarks') || '[]');
 let conversationHistory_searchable = []; // Searchable version of conversations
 let uploadedFiles = [];
 let currentChart = null;
@@ -8985,68 +8984,6 @@ function updateSearchableHistory() {
         index: index,
         timestamp: new Date().toLocaleString()
     }));
-}
-
-// ===================
-// BOOKMARKS FUNCTIONALITY
-// ===================
-
-function toggleBookmark(messageId) {
-    const index = bookmarkedConversations.indexOf(messageId);
-    if (index > -1) {
-        bookmarkedConversations.splice(index, 1);
-        showToast('Bookmark removed', 'info', 2000);
-    } else {
-        bookmarkedConversations.push(messageId);
-        showToast('Conversation bookmarked!', 'success', 2000);
-    }
-    
-    localStorage.setItem('bookmarks', JSON.stringify(bookmarkedConversations));
-    updateBookmarkStars();
-}
-
-function updateBookmarkStars() {
-    document.querySelectorAll('.bookmark-star').forEach(star => {
-        const messageId = star.getAttribute('data-message-id');
-        if (bookmarkedConversations.includes(messageId)) {
-            star.classList.add('bookmarked');
-            star.textContent = '⭐';
-        } else {
-            star.classList.remove('bookmarked');
-            star.textContent = '☆';
-        }
-    });
-}
-
-function openBookmarksModal() {
-    document.getElementById('bookmarksModal').classList.remove('hidden');
-    renderBookmarks();
-    toggleQuickActions();
-}
-
-function closeBookmarksModal() {
-    document.getElementById('bookmarksModal').classList.add('hidden');
-}
-
-function renderBookmarks() {
-    const listDiv = document.getElementById('bookmarksList');
-    
-    if (bookmarkedConversations.length === 0) {
-        listDiv.innerHTML = '<p class="text-slate-400 text-center py-8">No bookmarks yet. Star a conversation to save it here!</p>';
-        return;
-    }
-    
-    listDiv.innerHTML = bookmarkedConversations.map(id => `
-        <div class="search-result">
-            <div class="flex items-start justify-between">
-                <div class="flex-1">
-                    <div class="text-sm text-slate-300 mb-2">Bookmarked conversation #${id}</div>
-                    <button onclick="toggleBookmark('${id}')" class="text-xs text-amber-500 hover:text-amber-400">Remove Bookmark</button>
-                </div>
-                <span class="text-xl">⭐</span>
-            </div>
-        </div>
-    `).join('');
 }
 
 // ===================
