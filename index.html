@@ -316,6 +316,11 @@ body.light-mode {
     font-weight: 700 !important;
 }
 
+/* HIDE LOGOUT BUTTON FROM HEADER - It's in sidebar now */
+button[onclick*="logout"]:not(.sidebar-logout) {
+    display: none !important;
+}
+
 /* Improve mobile touch targets */
 @media (max-width: 768px) {
     /* Make all buttons at least 44px tall (Apple's recommended touch target) */
@@ -560,31 +565,26 @@ body.light-mode {
         align-items: center !important;
     }
     
-    /* URGENT button - prominent */
+    /* URGENT button - FIRST (order -1 to come before others) */
     button[onclick*="activateCrisisMode"] {
         padding: 8px 12px !important;
         min-height: 44px !important;
         font-size: 13px !important;
         font-weight: 700 !important;
-        order: 1 !important;
+        order: -1 !important;  /* Negative to come first */
     }
     
-    /* Tools button */
+    /* Tools button - SECOND */
     button[onclick*="toggleToolsMenu"] {
         min-width: 44px !important;
         min-height: 44px !important;
         padding: 10px !important;
-        order: 2 !important;
+        order: 1 !important;
     }
     
-    /* Logout button */
-    button[onclick*="logout"] {
-        padding: 8px 12px !important;
-        min-height: 44px !important;
-        font-size: 13px !important;
-        font-weight: 600 !important;
-        background-color: rgb(51 65 85) !important;
-        order: 3 !important;
+    /* More button - THIRD now */
+    #moreMenuButton {
+        order: 2 !important;  /* Now third in order */
     }
     
     /* Hide these buttons - put in More menu */
@@ -615,7 +615,7 @@ body.light-mode {
         min-width: 44px !important;
         min-height: 44px !important;
         padding: 10px !important;
-        order: 4 !important;
+        order: 3 !important;  /* FOURTH in order */
         font-size: 24px !important;
     }
     
@@ -1574,6 +1574,15 @@ input, textarea, select {
                            onkeyup="performSidebarSearch()">
                     <div id="sidebarSearchResults" class="mt-2"></div>
                 </div>
+            </div>
+            
+            <!-- Logout Button - Bottom of Sidebar -->
+            <div class="mt-auto pt-4 px-3 pb-3 border-t border-slate-700">
+                <button onclick="logout()" 
+                        class="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 px-4 rounded-lg transition-all flex items-center justify-center gap-2">
+                    <span>🚪</span>
+                    <span>Logout</span>
+                </button>
             </div>
         </div>
     </div>
