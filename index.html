@@ -8363,9 +8363,8 @@ function createNewConversation() {
     var plainWelcome = '👋 G\'day! I\'m Fitz, your hospitality HR assistant.\n\nAsk me anything about awards, compliance, or employment law.\n\n🚨 Urgent/Critical Situations:\nUse the red URGENT button above for immediate crisis response.\n\nWhat HR topic would you like to learn about today?\n\n⚠️ Award Rates: Data effective 1 July 2025 - 30 June 2026. Always verify at fairwork.gov.au before making payroll decisions.';
     conversationHistory.push({ role: 'assistant', content: plainWelcome });
     
-    // Save and update UI
-    saveConversations();
-    updateSidebarChats();
+    // Save and update UI - FIXED: Use saveCurrentConversation to update messages
+    saveCurrentConversation();
     
     showToast('New chat started', 'success', 2000);
     
