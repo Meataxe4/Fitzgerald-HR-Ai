@@ -11878,11 +11878,20 @@ function confirmLogout(type) {
 function performLogout(loggedOutUser, type) {
     console.log('🔄 Performing logout cleanup...');
     
+    // IMPORTANT: Save current conversation BEFORE clearing!
+    if (currentConversationId && typeof saveCurrentConversation === 'function') {
+        console.log('💾 Saving conversation before logout');
+        saveCurrentConversation();
+    }
+    
     // Reset current user
     currentUser = null;
     
     // Clear conversation history
     conversationHistory = [];
+    
+    // Clear current conversation ID
+    currentConversationId = null;
     
     // Clear messages from screen
     const messagesContainer = document.getElementById('messagesContainer');
