@@ -505,13 +505,13 @@ body.light-mode {
     }
     
     /* ==========================================
-       PHASE 5: MOBILE OPTIMIZATIONS - UX FOCUSED
+       PHASE 5: MOBILE UX - SINGLE ROW HEADER
        ========================================== */
     
-    /* FIX 1: PROFESSIONAL MOBILE HEADER */
-    /* Clean 2-row layout with proper spacing */
+    /* FIX 1: CLEAN SINGLE ROW HEADER */
+    /* [☰] [Fitz] [🚨 URGENT] [Tools] [Logout] [⋯ More] */
     
-    /* Main header container - stack vertically */
+    /* Header container - single row */
     .bg-slate-800\/80.backdrop-blur-sm {
         padding: 12px 16px !important;
     }
@@ -522,92 +522,101 @@ body.light-mode {
     }
     
     .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div {
-        flex-direction: column !important;
-        gap: 12px !important;
-    }
-    
-    /* TOP ROW: Logo + URGENT */
-    .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div > div:first-child {
-        width: 100% !important;
-        display: flex !important;
+        flex-direction: row !important;
         justify-content: space-between !important;
         align-items: center !important;
+        gap: 8px !important;
     }
     
-    /* Sidebar button larger */
+    /* Left side: Sidebar + Logo */
+    .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div > div:first-child {
+        flex: 0 0 auto !important;
+        gap: 8px !important;
+    }
+    
+    /* Sidebar button */
     .sidebar-toggle-btn-header {
         padding: 10px !important;
         min-width: 44px !important;
         min-height: 44px !important;
     }
     
-    /* URGENT button - prominent */
-    button[onclick*="activateCrisisMode"] {
-        padding: 10px 16px !important;
-        min-height: 44px !important;
-        font-size: 14px !important;
-        font-weight: 700 !important;
+    /* Logo and text container */
+    .bg-slate-800\/80.backdrop-blur-sm .w-10.h-10 {
+        width: 36px !important;
+        height: 36px !important;
     }
     
-    /* BOTTOM ROW: Logout + Secondary buttons */
-    .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div > div:last-child {
-        width: 100% !important;
-        display: flex !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        gap: 8px !important;
-    }
-    
-    /* Logout button - prominent on left */
-    button[onclick*="logout"] {
-        order: 1 !important;
-        padding: 10px 20px !important;
-        min-height: 44px !important;
-        font-size: 14px !important;
-        font-weight: 600 !important;
-        background-color: rgb(51 65 85) !important;
-        border-radius: 8px !important;
-    }
-    
-    /* Secondary buttons container - right side */
-    .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div > div:last-child > div {
-        order: 2 !important;
-        display: flex !important;
-        gap: 8px !important;
-        margin-left: auto !important;
-    }
-    
-    /* All secondary buttons - larger touch targets */
-    .bg-slate-800\/80.backdrop-blur-sm button[onclick*="toggleToolsMenu"],
-    .bg-slate-800\/80.backdrop-blur-sm button[onclick*="toggleDarkMode"],
-    .bg-slate-800\/80.backdrop-blur-sm button[onclick*="showVenueSettings"],
-    .bg-slate-800\/80.backdrop-blur-sm button[onclick*="showFeedback"] {
-        min-width: 44px !important;
-        min-height: 44px !important;
-        padding: 10px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    }
-    
-    /* Icon sizes */
-    .bg-slate-800\/80.backdrop-blur-sm button span:first-child {
-        font-size: 20px !important;
-    }
-    
-    /* Hide all dividers */
-    .bg-slate-800\/80.backdrop-blur-sm .hidden.md\\:block {
+    /* Hide "Beta" text on mobile */
+    .bg-slate-800\/80.backdrop-blur-sm .text-xs.text-slate-400 {
         display: none !important;
     }
     
-    /* Hide "Give Feedback" on mobile - too many buttons */
+    /* Right side: URGENT + Tools + Logout + More */
+    .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div > div:last-child {
+        flex: 0 0 auto !important;
+        display: flex !important;
+        gap: 6px !important;
+        align-items: center !important;
+    }
+    
+    /* URGENT button - prominent */
+    button[onclick*="activateCrisisMode"] {
+        padding: 8px 12px !important;
+        min-height: 44px !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        order: 1 !important;
+    }
+    
+    /* Tools button */
+    button[onclick*="toggleToolsMenu"] {
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 10px !important;
+        order: 2 !important;
+    }
+    
+    /* Logout button */
+    button[onclick*="logout"] {
+        padding: 8px 12px !important;
+        min-height: 44px !important;
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        background-color: rgb(51 65 85) !important;
+        order: 3 !important;
+    }
+    
+    /* Hide these buttons - put in More menu */
+    button[onclick*="toggleDarkMode"],
+    button[onclick*="showVenueSettings"],
     button[onclick*="showFeedback"] {
         display: none !important;
     }
     
-    /* Hide admin if not shown */
+    /* Hide dividers */
+    .bg-slate-800\/80.backdrop-blur-sm .hidden.md\\:block {
+        display: none !important;
+    }
+    
+    /* Hide admin */
     #adminButton {
         display: none !important;
+    }
+    
+    /* Icon sizes */
+    .bg-slate-800\/80.backdrop-blur-sm button span:first-child {
+        font-size: 18px !important;
+    }
+    
+    /* More menu button - show on mobile */
+    #moreMenuButton {
+        display: flex !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 10px !important;
+        order: 4 !important;
+        font-size: 24px !important;
     }
     
     /* FIX 2: STACK TOOL NAVIGATION BUTTONS */
@@ -648,32 +657,46 @@ body.light-mode {
     #docBackBtn { order: 2 !important; }
     #docStartOverBtn { order: 3 !important; }
     
-    /* FIX 3: PROMINENT MESSAGE INPUT */
-    /* Make textarea 3 lines, larger, more inviting */
+    /* FIX 3: MUCH BIGGER MESSAGE INPUT */
+    /* 4 lines visible, very prominent and inviting */
     #messageInput {
-        min-height: 80px !important;      /* 3 lines visible, not 1 or 2 */
-        max-height: 200px !important;     /* Can expand even more */
-        padding: 16px !important;         /* More padding, feels spacious */
+        min-height: 100px !important;     /* 4 lines visible! */
+        max-height: 220px !important;     /* Can expand even more */
+        padding: 18px !important;         /* Extra spacious */
         font-size: 16px !important;       /* Prevent iOS zoom, readable */
-        line-height: 1.5 !important;      /* Better readability */
-        border-width: 2px !important;     /* More visible border */
+        line-height: 1.6 !important;      /* Extra readability */
+        border-width: 2px !important;     /* Visible border */
+    }
+    
+    /* Make focused state more obvious */
+    #messageInput:focus {
+        border-color: rgb(245 158 11) !important;  /* Amber on focus */
     }
     
     /* Input container - more padding */
-    .bg-slate-900.border.border-slate-700:has(#messageInput) {
-        padding: 12px !important;
+    .flex.items-center.gap-3.bg-slate-900:has(#messageInput) {
+        padding: 14px !important;
+        border-radius: 16px !important;
     }
     
-    /* Send button - larger */
+    /* Send button - larger and prominent */
     button:has(#sendButton),
     button[onclick*="sendMessage"] {
         min-height: 56px !important;
         min-width: 56px !important;
         padding: 16px !important;
+        border-radius: 12px !important;
     }
     
     /* Voice button - larger */
     button[onclick*="toggleVoiceInput"] {
+        min-height: 56px !important;
+        min-width: 56px !important;
+        padding: 16px !important;
+    }
+    
+    /* File upload button - larger */
+    button[onclick*="openUploadMenu"] {
         min-height: 56px !important;
         min-width: 56px !important;
         padding: 16px !important;
@@ -1903,6 +1926,15 @@ input, textarea, select {
                             class="bg-slate-700 hover:bg-slate-600 text-white font-medium px-4 py-2 rounded-lg transition-colors touch-manipulation flex items-center gap-2">
                         <span>🚪</span>
                         <span>Logout</span>
+                    </button>
+                    
+                    <!-- More Menu Button (Mobile Only) -->
+                    <button onclick="toggleMoreMenu()" 
+                            id="moreMenuButton"
+                            class="hidden md:hidden text-slate-400 hover:text-amber-400 font-medium transition-colors flex items-center gap-1 px-2 py-2 touch-manipulation"
+                            style="display: none;">
+                        <span>⋯</span>
+                        <span class="sr-only">More</span>
                     </button>
                 </div>
                 
@@ -9352,6 +9384,21 @@ function closeToolsMenu() {
     }
 }
 
+// More Menu Functions
+function toggleMoreMenu() {
+    var menu = document.getElementById('moreMenu');
+    if (menu) {
+        menu.classList.toggle('hidden');
+    }
+}
+
+function closeMoreMenu() {
+    var menu = document.getElementById('moreMenu');
+    if (menu) {
+        menu.classList.add('hidden');
+    }
+}
+
 // Tool Opening Functions
 function openAwardCalculator() {
     trackToolUsage('awardCalculatorModal');
@@ -13432,6 +13479,60 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
+
+<!-- More Menu Modal (Mobile Only) -->
+<div id="moreMenu" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50" onclick="if(event.target === this) closeMoreMenu();">
+    <div class="bg-slate-800 rounded-2xl p-6 max-w-sm w-full border border-amber-500 fade-in">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold text-amber-500">More Options</h2>
+            <button onclick="closeMoreMenu()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+        
+        <div class="space-y-2">
+            <button onclick="showVenueSettings(); closeMoreMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
+                <span class="text-xl">⚙️</span>
+                <div>
+                    <div class="font-semibold">Settings</div>
+                    <div class="text-xs text-slate-400">Update venue information</div>
+                </div>
+            </button>
+            
+            <button onclick="toggleDarkMode(); closeMoreMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
+                <span class="text-xl" id="moreMenuDarkIcon">🌙</span>
+                <div>
+                    <div class="font-semibold" id="moreMenuDarkText">Dark Mode</div>
+                    <div class="text-xs text-slate-400">Toggle light/dark theme</div>
+                </div>
+            </button>
+            
+            <button onclick="showFeedback(); closeMoreMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
+                <span class="text-xl">📝</span>
+                <div>
+                    <div class="font-semibold">Give Feedback</div>
+                    <div class="text-xs text-slate-400">Help us improve</div>
+                </div>
+            </button>
+            
+            <div class="border-t border-slate-700 my-2"></div>
+            
+            <button onclick="showTermsOfService(); closeMoreMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
+                <span class="text-xl">📄</span>
+                <div>
+                    <div class="font-semibold">Terms of Service</div>
+                    <div class="text-xs text-slate-400">View legal terms</div>
+                </div>
+            </button>
+            
+            <button onclick="showPrivacyPolicy(); closeMoreMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
+                <span class="text-xl">🔒</span>
+                <div>
+                    <div class="font-semibold">Privacy Policy</div>
+                    <div class="text-xs text-slate-400">How we protect your data</div>
+                </div>
+            </button>
+        </div>
+    </div>
+</div>
 
 <!-- Tools Modal - Same Structure as Settings Modal -->
 <div id="toolsMenu" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
