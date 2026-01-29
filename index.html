@@ -8373,27 +8373,47 @@ function createNewConversation() {
 
 // Save current conversation
 function saveCurrentConversation() {
-    if (!currentConversationId) return;
+    console.log('💾 saveCurrentConversation called');
+    console.log('💾 currentConversationId:', currentConversationId);
+    console.log('💾 conversationHistory length:', conversationHistory.length);
+    console.log('💾 conversationHistory:', conversationHistory);
     
-    const conv = getCurrentConversation();
-    if (!conv) return;
+    if (!currentConversationId) {
+        console.error('❌ No currentConversationId - exiting');
+        return;
+    }
+    
+    var conv = getCurrentConversation();
+    console.log('💾 Found conversation:', conv);
+    
+    if (!conv) {
+        console.error('❌ Conversation not found in array - exiting');
+        return;
+    }
+    
+    console.log('💾 BEFORE update - conv.messages:', conv.messages);
     
     // Update messages
     conv.messages = conversationHistory;
     conv.updated = new Date().toISOString();
     
+    console.log('💾 AFTER update - conv.messages:', conv.messages);
+    console.log('💾 conv.messages length:', conv.messages.length);
+    
     // Update title from first user message if still "New Chat"
     if (conv.title === 'New Chat' && conversationHistory.length > 0) {
-        const firstUserMsg = conversationHistory.find(m => m.role === 'user');
+        var firstUserMsg = conversationHistory.find(function(m) { return m.role === 'user'; });
         if (firstUserMsg) {
             conv.title = firstUserMsg.content.substring(0, 50) + (firstUserMsg.content.length > 50 ? '...' : '');
+            console.log('💾 Updated title to:', conv.title);
         }
     }
     
+    console.log('💾 About to save to localStorage');
     saveConversations();
     updateSidebarChats();
     
-    console.log('💾 Saved conversation:', conv.title);
+    console.log('✅ Saved conversation:', conv.title);
 }
 
 // Load conversation by ID
