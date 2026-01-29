@@ -610,16 +610,6 @@ header button[onclick*="logout"],
         font-size: 18px !important;
     }
     
-    /* More menu button - show on mobile */
-    #moreMenuButton {
-        display: flex !important;
-        min-width: 44px !important;
-        min-height: 44px !important;
-        padding: 10px !important;
-        order: 3 !important;  /* FOURTH in order */
-        font-size: 24px !important;
-    }
-    
     /* FIX 2: STACK TOOL NAVIGATION BUTTONS */
     /* All Document Builder and tool modal navigation buttons */
     #documentBuilderModal .flex.gap-3.mt-6,
@@ -1903,14 +1893,6 @@ input, textarea, select {
                 <!-- Account Actions -->
                 <div class="flex items-center gap-2">
                     
-                    <!-- More Menu Button (Mobile Only) -->
-                    <button onclick="toggleMoreMenu()" 
-                            id="moreMenuButton"
-                            class="hidden md:hidden text-slate-400 hover:text-amber-400 font-medium transition-colors flex items-center gap-1 px-2 py-2 touch-manipulation"
-                            style="display: none;">
-                        <span>⋯</span>
-                        <span class="sr-only">More</span>
-                    </button>
                 </div>
                 
             </div>
@@ -9398,10 +9380,21 @@ function closeProfileMenu() {
 
 // Update sidebar venue name on load
 function updateSidebarVenueName() {
+    console.log('🏨 updateSidebarVenueName called');
+    console.log('🏨 venueProfile:', venueProfile);
+    console.log('🏨 venueProfile.venueName:', venueProfile.venueName);
+    
     var venueName = venueProfile.venueName || 'Fitz';
+    console.log('🏨 Using venueName:', venueName);
+    
     var sidebarName = document.getElementById('sidebarVenueName');
+    console.log('🏨 sidebarName element:', sidebarName);
+    
     if (sidebarName) {
         sidebarName.textContent = venueName;
+        console.log('✅ Sidebar name updated to:', venueName);
+    } else {
+        console.error('❌ sidebarVenueName element not found!');
     }
     
     // Also store in localStorage for easy access
@@ -13207,6 +13200,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize recent tools
     loadRecentTools();
     updateSidebarRecentTools();
+    
+    // Load venueProfile from localStorage FIRST
+    if (currentUser) {
+        const saved = localStorage.getItem('venueProfile_' + currentUser);
+        if (saved) {
+            venueProfile = JSON.parse(saved);
+        }
+    }
+    
+    // THEN update sidebar venue name
     updateSidebarVenueName();
 
     // Initialize Supabase
@@ -13499,33 +13502,6 @@ window.addEventListener('DOMContentLoaded', function() {
 
 </script>
 
-<!-- More Menu Modal (Mobile Only) -->
-<div id="moreMenu" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50" onclick="if(event.target === this) closeMoreMenu();">
-    <div class="bg-slate-800 rounded-2xl p-6 max-w-sm w-full border border-amber-500 fade-in">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-bold text-amber-500">More Options</h2>
-            <button onclick="closeMoreMenu()" class="text-slate-400 hover:text-white text-2xl">×</button>
-        </div>
-        
-        <div class="space-y-2">
-            <button onclick="toggleDarkMode(); closeMoreMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
-                <span class="text-xl" id="moreMenuDarkIcon">🌙</span>
-                <div>
-                    <div class="font-semibold" id="moreMenuDarkText">Dark Mode</div>
-                    <div class="text-xs text-slate-400">Toggle light/dark theme</div>
-                </div>
-            </button>
-            
-            <button onclick="showFeedback(); closeMoreMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
-                <span class="text-xl">📝</span>
-                <div>
-                    <div class="font-semibold">Give Feedback</div>
-                    <div class="text-xs text-slate-400">Help us improve</div>
-                </div>
-            </button>
-        </div>
-    </div>
-</div>
 
 <!-- Profile Modal -->
 <div id="profileMenu" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50" onclick="if(event.target === this) closeProfileMenu();">
