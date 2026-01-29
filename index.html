@@ -1191,15 +1191,75 @@ input, textarea, select {
             background: #f1f5f9;
             color: #0f172a;
         }
+        
+        /* Highlight flash for bookmarks */
+        .highlight-flash {
+            animation: flash 2s ease-in-out;
+        }
+        
+        @keyframes flash {
+            0%, 100% { background: transparent; }
+            50% { background: rgba(245, 158, 11, 0.2); }
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
+    
+    <!-- Inline checkAccess to avoid undefined error -->
+    <script>
+    function checkAccess() {
+        var code = document.getElementById('accessCode').value.trim().toUpperCase();
+        var rememberMe = document.getElementById('rememberMe') ? document.getElementById('rememberMe').checked : false;
+        var errorEl = document.getElementById('accessError');
+        var validCodes = ['BETA-VENUE-001', 'BETA-VENUE-002', 'BETA-VENUE-003', 'BETA-VENUE-004', 'BETA-VENUE-005', 'FITZGERALD-TEST', 'DEMO-2025'];
+        
+        if (!code) {
+            if (errorEl) {
+                errorEl.textContent = 'Please enter an access code';
+                errorEl.classList.remove('hidden');
+            }
+            return;
+        }
+        
+        if (validCodes.includes(code)) {
+            localStorage.setItem('fitzhr_access_code', code);
+            if (rememberMe) {
+                localStorage.setItem('fitzhr_remember_me', 'true');
+            }
+            localStorage.setItem('fitzhr_last_login', new Date().toISOString());
+            
+            var accessScreen = document.getElementById('accessScreen');
+            var assistantScreen = document.getElementById('assistantScreen');
+            if (accessScreen) accessScreen.classList.add('hidden');
+            if (assistantScreen) assistantScreen.classList.remove('hidden');
+            
+            var userCodeEl = document.getElementById('userCode');
+            if (userCodeEl) userCodeEl.textContent = code;
+            
+            window.currentUser = code;
+            
+            if (code === 'FITZGERALD-TEST' || code === 'DEMO-2025') {
+                var adminBtn = document.getElementById('adminButton');
+                if (adminBtn) adminBtn.classList.remove('hidden');
+            }
+            
+            if (typeof initConversationSystem === 'function') {
+                initConversationSystem();
+            }
+        } else {
+            if (errorEl) {
+                errorEl.textContent = 'Invalid access code. Please check and try again.';
+                errorEl.classList.remove('hidden');
+            }
+        }
+    }
+    </script>
     
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="toast-container"></div>
     
     <!-- CHATGPT-STYLE SIDEBAR -->
-    <div id="chatSidebar" class="chat-sidebar">
+    <div id="chatSidebar" class="chat-sidebar closed">
         <!-- Header -->
         <div class="sidebar-header">
             <h2 class="text-lg font-bold text-white">Fitz</h2>
@@ -1616,40 +1676,7 @@ input, textarea, select {
         <!-- Messages Container (Scrollable Area) -->
 <div id="messagesContainer" class="flex-1 overflow-y-auto px-6 py-6">
     <div class="max-w-5xl mx-auto space-y-6">
-        
-        <!-- Welcome Message -->
-        <div class="flex justify-start">
-            <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
-                
-                <p class="text-slate-100 leading-relaxed">
-                    👋 G'day! I'm Fitz, your hospitality HR assistant.
-                </p>
-
-                <p class="text-slate-100 leading-relaxed mt-3">
-                    Ask me anything about awards, compliance, or employment law.
-                </p>
-
-                </p>
-
-                <p class="text-red-400 font-semibold mt-4 mb-2">🚨 Urgent/Critical Situations:</p>
-                <p class="text-slate-100 text-sm">
-                    Use the red URGENT button above for immediate crisis response.
-                </p>
-
-                <p class="text-slate-100 leading-relaxed mt-4">
-                    What HR topic would you like to learn about today?
-                </p>
-
-                <p class="text-yellow-400 text-xs mt-4 bg-yellow-500/10 border border-yellow-500/30 rounded p-3">
-                    ⚠️ <strong>Award Rates:</strong> Data effective 1 July 2025 - 30 June 2026. 
-                    Always verify at <a href="https://www.fairwork.gov.au" target="_blank" class="underline hover:text-yellow-300">fairwork.gov.au</a> 
-                    before making payroll decisions.
-                </p>
-            </div>
-        </div>
-
-        <!-- Chat messages will appear here dynamically -->
-        
+        <!-- Messages will be added here dynamically -->
     </div>
 </div>
 
@@ -1696,8 +1723,7 @@ input, textarea, select {
                 rows="1"
                 class="flex-1 bg-slate-900 text-slate-100 border border-slate-700 rounded-xl px-4 py-3 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none max-h-32"
                 onkeypress="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
-                oninput="autoResizeTextarea(this)">
-            </textarea>
+                oninput="autoResizeTextarea(this)"></textarea>
             
             <!-- Microphone Button (Right) -->
             <button onclick="toggleVoiceInput()" 
@@ -7680,20 +7706,15 @@ function attemptAutoLogin() {
         }
     }
     
+    // Initialize conversation system
+    initConversationSystem();
+    
     // CHECK IF USER NEEDS ONBOARDING
     const hasCompletedOnboarding = checkOnboardingStatus();
     if (!hasCompletedOnboarding) {
         setTimeout(() => {
             showOnboarding();
         }, 1000);
-    } else {
-        const userName = venueProfile.userName || '';
-        const venueName = venueProfile.venueName || 'your venue';
-        const city = venueProfile.city || '';
-        const state = venueProfile.location || '';
-        const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
-        const locationText = city ? `${city}, ${state}` : state;
-        addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
     }
 
     // Initialize and start daily tip rotation
@@ -7768,6 +7789,9 @@ async function sendMessage() {
         trackConversation(message, response);
         conversationHistory.push({ role: 'assistant', content: response });
         
+        // Auto-save conversation
+        saveCurrentConversation();
+        
         // WEEK 3: Update searchable history
         updateSearchableHistory();
         
@@ -7813,7 +7837,14 @@ function removeThinkingIndicator(thinkingDiv) {
 }
 
 function addMessage(role, content) {
-    const container = DOM.messagesContainer.querySelector('.space-y-6');
+    let container = DOM.messagesContainer.querySelector('.space-y-6');
+    
+    // If container doesn't exist, create it
+    if (!container) {
+        DOM.messagesContainer.innerHTML = '<div class="max-w-5xl mx-auto space-y-6"></div>';
+        container = DOM.messagesContainer.querySelector('.space-y-6');
+    }
+    
     const messageDiv = document.createElement('div');
     messageDiv.className = `flex ${role === 'user' ? 'justify-end' : 'justify-start'} fade-in`;
     
@@ -8220,8 +8251,486 @@ function stopListening() {
 // CHATGPT-STYLE SIDEBAR & NEW FEATURES
 // ========================================
 
+// ========================================
+// CONVERSATION MANAGEMENT SYSTEM
+// ========================================
+
+// Conversation storage
+var conversations = [];
+var currentConversationId = null;
+
+// Load conversations from localStorage
+function loadConversations() {
+    const stored = localStorage.getItem('fitz_conversations');
+    if (stored) {
+        try {
+            conversations = JSON.parse(stored);
+            console.log('✅ Loaded', conversations.length, 'conversations');
+        } catch (e) {
+            console.error('Error loading conversations:', e);
+            conversations = [];
+        }
+    }
+}
+
+// Save conversations to localStorage
+function saveConversations() {
+    try {
+        localStorage.setItem('fitz_conversations', JSON.stringify(conversations));
+        console.log('💾 Saved', conversations.length, 'conversations');
+    } catch (e) {
+        console.error('Error saving conversations:', e);
+    }
+}
+
+// Get current conversation
+function getCurrentConversation() {
+    return conversations.find(c => c.id === currentConversationId);
+}
+
+// Create new conversation
+function createNewConversation() {
+    // Save current conversation first
+    if (currentConversationId) {
+        saveCurrentConversation();
+    }
+    
+    // Create new conversation
+    const newConv = {
+        id: 'conv-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+        title: 'New Chat',
+        messages: [],
+        created: new Date().toISOString(),
+        updated: new Date().toISOString()
+    };
+    
+    conversations.push(newConv);
+    currentConversationId = newConv.id;
+    
+    // Clear UI
+    const container = DOM.messagesContainer.querySelector('.space-y-6');
+    if (container) {
+        container.innerHTML = '';
+    } else {
+        DOM.messagesContainer.innerHTML = '<div class="max-w-5xl mx-auto space-y-6"></div>';
+    }
+    
+    // Reset conversation history
+    conversationHistory = [];
+    
+    // Add FULL welcome message with HTML formatting (matching Image 1)
+    const welcomeMessage = `
+        <p class="text-slate-100 leading-relaxed">
+            👋 G'day! I'm Fitz, your hospitality HR assistant.
+        </p>
+        <p class="text-slate-100 leading-relaxed mt-3">
+            Ask me anything about awards, compliance, or employment law.
+        </p>
+        <p class="text-red-400 font-semibold mt-4 mb-2">🚨 Urgent/Critical Situations:</p>
+        <p class="text-slate-100 text-sm">
+            Use the red URGENT button above for immediate crisis response.
+        </p>
+        <p class="text-slate-100 leading-relaxed mt-4">
+            What HR topic would you like to learn about today?
+        </p>
+        <p class="text-yellow-400 text-xs mt-4 bg-yellow-500/10 border border-yellow-500/30 rounded p-3">
+            ⚠️ <strong>Award Rates:</strong> Data effective 1 July 2025 - 30 June 2026. 
+            Always verify at <a href="https://www.fairwork.gov.au" target="_blank" class="underline hover:text-yellow-300">fairwork.gov.au</a> 
+            before making payroll decisions.
+        </p>
+    `;
+    
+    // For display - reuse container already declared above
+    var displayContainer = DOM.messagesContainer.querySelector('.space-y-6');
+    if (!displayContainer) {
+        DOM.messagesContainer.innerHTML = '<div class="max-w-5xl mx-auto space-y-6"></div>';
+        displayContainer = DOM.messagesContainer.querySelector('.space-y-6');
+    }
+    
+    if (displayContainer) {
+        var messageDiv = document.createElement('div');
+        messageDiv.className = 'flex justify-start fade-in';
+        var messageId = 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        messageDiv.setAttribute('data-message-id', messageId);
+        messageDiv.innerHTML = '<div class="max-w-3xl bg-slate-800 text-slate-100 border border-slate-700 rounded-2xl px-6 py-4 relative">' +
+            '<span class="bookmark-star absolute top-3 right-3" data-message-id="' + messageId + '" onclick="toggleBookmark(\'' + messageId + '\')" title="Bookmark this">☆</span>' +
+            '<div class="leading-relaxed">' + welcomeMessage + '</div>' +
+            '</div>';
+        displayContainer.appendChild(messageDiv);
+    }
+    
+    // For storage - save plain text version
+    var plainWelcome = '👋 G\'day! I\'m Fitz, your hospitality HR assistant.\n\nAsk me anything about awards, compliance, or employment law.\n\n🚨 Urgent/Critical Situations:\nUse the red URGENT button above for immediate crisis response.\n\nWhat HR topic would you like to learn about today?\n\n⚠️ Award Rates: Data effective 1 July 2025 - 30 June 2026. Always verify at fairwork.gov.au before making payroll decisions.';
+    conversationHistory.push({ role: 'assistant', content: plainWelcome });
+    
+    // Save and update UI
+    saveConversations();
+    updateSidebarChats();
+    
+    showToast('New chat started', 'success', 2000);
+    
+    console.log('✅ Created new conversation:', newConv.id);
+}
+
+// Save current conversation
+function saveCurrentConversation() {
+    if (!currentConversationId) return;
+    
+    const conv = getCurrentConversation();
+    if (!conv) return;
+    
+    // Update messages
+    conv.messages = conversationHistory;
+    conv.updated = new Date().toISOString();
+    
+    // Update title from first user message if still "New Chat"
+    if (conv.title === 'New Chat' && conversationHistory.length > 0) {
+        const firstUserMsg = conversationHistory.find(m => m.role === 'user');
+        if (firstUserMsg) {
+            conv.title = firstUserMsg.content.substring(0, 50) + (firstUserMsg.content.length > 50 ? '...' : '');
+        }
+    }
+    
+    saveConversations();
+    updateSidebarChats();
+    
+    console.log('💾 Saved conversation:', conv.title);
+}
+
+// Load conversation by ID
+function loadConversation(convId) {
+    // Save current first
+    if (currentConversationId && currentConversationId !== convId) {
+        saveCurrentConversation();
+    }
+    
+    const conv = conversations.find(c => c.id === convId);
+    if (!conv) {
+        console.error('Conversation not found:', convId);
+        return;
+    }
+    
+    currentConversationId = convId;
+    
+    // Clear UI
+    const container = DOM.messagesContainer.querySelector('.space-y-6');
+    if (container) {
+        container.innerHTML = '';
+    } else {
+        DOM.messagesContainer.innerHTML = '<div class="max-w-5xl mx-auto space-y-6"></div>';
+    }
+    
+    // Load messages
+    conversationHistory = conv.messages || [];
+    
+    // Render messages
+    conversationHistory.forEach(msg => {
+        addMessage(msg.role, msg.content);
+    });
+    
+    // Update UI
+    updateSidebarChats();
+    
+    console.log('✅ Loaded conversation:', conv.title);
+}
+
+// Delete conversation
+function deleteConversation(convId) {
+    const conv = conversations.find(c => c.id === convId);
+    if (!conv) return;
+    
+    if (!confirm('Delete "' + conv.title + '"? This cannot be undone.')) {
+        return;
+    }
+    
+    // Remove from array
+    conversations = conversations.filter(c => c.id !== convId);
+    
+    // If deleting current conversation
+    if (convId === currentConversationId) {
+        if (conversations.length > 0) {
+            // Load the most recent conversation
+            loadConversation(conversations[conversations.length - 1].id);
+        } else {
+            // Create new conversation
+            createNewConversation();
+        }
+    }
+    
+    saveConversations();
+    updateSidebarChats();
+    
+    showToast('Conversation deleted', 'info', 2000);
+}
+
+// Update sidebar chats list
+function updateSidebarChats() {
+    const chatsList = document.getElementById('sidebarChatsList');
+    if (!chatsList) return;
+    
+    if (conversations.length === 0) {
+        chatsList.innerHTML = '<p class="text-slate-500 text-sm py-4 text-center">No chats yet</p>';
+        return;
+    }
+    
+    // Sort by updated date (most recent first)
+    const sortedConvs = [...conversations].sort((a, b) => 
+        new Date(b.updated) - new Date(a.updated)
+    );
+    
+    chatsList.innerHTML = sortedConvs.map(conv => {
+        const isActive = conv.id === currentConversationId;
+        const date = new Date(conv.updated);
+        const dateStr = formatRelativeDate(date);
+        
+        return `
+            <div class="sidebar-chat-item ${isActive ? 'active' : ''}" onclick="loadConversation('${conv.id}')">
+                <div class="sidebar-chat-title">${escapeHtml(conv.title)}</div>
+                <button class="sidebar-chat-delete" onclick="event.stopPropagation(); deleteConversation('${conv.id}')" title="Delete">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                    </svg>
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+// Format relative date
+function formatRelativeDate(date) {
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return diffMins + ' min ago';
+    if (diffHours < 24) return diffHours + 'h ago';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return diffDays + 'd ago';
+    return date.toLocaleDateString();
+}
+
+// Escape HTML
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+// Initialize conversation system
+function initConversationSystem() {
+    loadConversations();
+    
+    if (conversations.length === 0) {
+        // Create first conversation
+        createNewConversation();
+    } else {
+        // Load most recent conversation
+        const mostRecent = conversations.sort((a, b) => 
+            new Date(b.updated) - new Date(a.updated)
+        )[0];
+        loadConversation(mostRecent.id);
+    }
+}
+
+// ========================================
+// BOOKMARKS SYSTEM
+// ========================================
+
+var bookmarks = [];
+
+// Load bookmarks
+function loadBookmarks() {
+    const stored = localStorage.getItem('fitz_bookmarks');
+    if (stored) {
+        try {
+            bookmarks = JSON.parse(stored);
+        } catch (e) {
+            bookmarks = [];
+        }
+    }
+}
+
+// Save bookmarks
+function saveBookmarks() {
+    localStorage.setItem('fitz_bookmarks', JSON.stringify(bookmarks));
+}
+
+// Toggle bookmark
+function toggleBookmark(messageId) {
+    const existingIndex = bookmarks.findIndex(b => b.id === messageId);
+    
+    if (existingIndex >= 0) {
+        // Remove bookmark
+        bookmarks.splice(existingIndex, 1);
+        showToast('Bookmark removed', 'info', 1500);
+    } else {
+        // Add bookmark
+        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+        if (messageElement) {
+            const content = messageElement.textContent;
+            bookmarks.push({
+                id: messageId,
+                content: content,
+                conversationId: currentConversationId,
+                created: new Date().toISOString()
+            });
+            showToast('Bookmarked', 'success', 1500);
+        }
+    }
+    
+    saveBookmarks();
+    updateBookmarkStars();
+    updateSidebarBookmarks();
+}
+
+// Update bookmark stars
+function updateBookmarkStars() {
+    document.querySelectorAll('.bookmark-star').forEach(star => {
+        const messageId = star.getAttribute('data-message-id');
+        const isBookmarked = bookmarks.some(b => b.id === messageId);
+        star.textContent = isBookmarked ? '⭐' : '☆';
+    });
+}
+
+// Update sidebar bookmarks
+function updateSidebarBookmarks() {
+    const bookmarksList = document.getElementById('sidebarBookmarksList');
+    if (!bookmarksList) return;
+    
+    if (bookmarks.length === 0) {
+        bookmarksList.innerHTML = '<p class="text-slate-500 text-sm py-4 text-center">No bookmarks yet</p>';
+        return;
+    }
+    
+    bookmarksList.innerHTML = bookmarks.slice(0, 10).map(b => {
+        const preview = b.content.substring(0, 60) + (b.content.length > 60 ? '...' : '');
+        return `
+            <div class="sidebar-chat-item" onclick="jumpToBookmark('${b.id}')">
+                <div class="sidebar-chat-title text-xs">${escapeHtml(preview)}</div>
+                <button class="sidebar-chat-delete" onclick="event.stopPropagation(); removeBookmark('${b.id}')" title="Remove">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        `;
+    }).join('');
+}
+
+// Jump to bookmark
+function jumpToBookmark(messageId) {
+    const bookmark = bookmarks.find(b => b.id === messageId);
+    if (!bookmark) return;
+    
+    // If bookmark is in different conversation, load it
+    if (bookmark.conversationId !== currentConversationId) {
+        loadConversation(bookmark.conversationId);
+    }
+    
+    // Scroll to message
+    setTimeout(() => {
+        const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+        if (messageElement) {
+            messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            messageElement.classList.add('highlight-flash');
+            setTimeout(() => messageElement.classList.remove('highlight-flash'), 2000);
+        }
+    }, 500);
+    
+    // Close sidebar on mobile
+    if (window.innerWidth < 768) {
+        toggleSidebar();
+    }
+}
+
+// Remove bookmark
+function removeBookmark(messageId) {
+    bookmarks = bookmarks.filter(b => b.id !== messageId);
+    saveBookmarks();
+    updateBookmarkStars();
+    updateSidebarBookmarks();
+    showToast('Bookmark removed', 'info', 1500);
+}
+
+// ========================================
+// SEARCH SYSTEM
+// ========================================
+
+// Perform sidebar search
+function performSidebarSearch() {
+    const query = document.getElementById('sidebarSearchInput').value.toLowerCase().trim();
+    const resultsDiv = document.getElementById('sidebarSearchResults');
+    
+    if (!query) {
+        resultsDiv.innerHTML = '';
+        return;
+    }
+    
+    // Search across all conversations
+    let results = [];
+    conversations.forEach(conv => {
+        (conv.messages || []).forEach(msg => {
+            if (msg.content.toLowerCase().includes(query)) {
+                results.push({
+                    conversationId: conv.id,
+                    conversationTitle: conv.title,
+                    content: msg.content,
+                    role: msg.role
+                });
+            }
+        });
+    });
+    
+    if (results.length === 0) {
+        resultsDiv.innerHTML = '<p class="text-slate-500 text-xs py-2">No results</p>';
+        return;
+    }
+    
+    // Limit to first 10 results
+    results = results.slice(0, 10);
+    
+    resultsDiv.innerHTML = results.map(r => {
+        const preview = r.content.substring(0, 80) + (r.content.length > 80 ? '...' : '');
+        // Highlight search term
+        const highlighted = preview.replace(
+            new RegExp(query, 'gi'),
+            match => `<mark class="bg-amber-500/30 text-amber-300">${match}</mark>`
+        );
+        
+        return `
+            <div class="text-xs text-slate-300 py-2 px-2 hover:bg-slate-700 rounded cursor-pointer border-b border-slate-700/50" 
+                 onclick="openSearchResult('${r.conversationId}')">
+                <div class="text-slate-400 text-xs mb-1">${escapeHtml(r.conversationTitle)}</div>
+                <div>${highlighted}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Open search result
+function openSearchResult(convId) {
+    loadConversation(convId);
+    
+    // Close sidebar on mobile
+    if (window.innerWidth < 768) {
+        toggleSidebar();
+    }
+    
+    // Clear search
+    const searchInput = document.getElementById('sidebarSearchInput');
+    if (searchInput) {
+        searchInput.value = '';
+        performSidebarSearch();
+    }
+}
+
+// ========================================
+
 // Sidebar state
-let sidebarOpen = window.innerWidth >= 768; // Open on desktop by default
+let sidebarOpen = false; // Closed by default on all devices
 
 // Toggle sidebar
 function toggleSidebar() {
@@ -8243,8 +8752,9 @@ function toggleSidebar() {
 
 // Initialize sidebar on load
 function initSidebar() {
-    const sidebar = document.getElementById('chatSidebar');
-    if (window.innerWidth < 768) {
+    var sidebar = document.getElementById('chatSidebar');
+    // Always start closed on all devices
+    if (sidebar) {
         sidebar.classList.add('closed');
         sidebarOpen = false;
     }
@@ -8287,24 +8797,12 @@ function autoResizeTextarea(textarea) {
 
 // Create new chat from sidebar
 function createNewChatFromSidebar() {
-    // Clear current conversation
-    conversationHistory = [];
-    
-    // Clear messages
-    const container = DOM.messagesContainer.querySelector('.space-y-6');
-    if (container) {
-        container.innerHTML = '';
-    }
-    
-    // Add welcome message
-    addMessage('assistant', '👋 G\'day! I\'m Fitz, your hospitality HR assistant.\n\nAsk me anything about awards, compliance, or employment law.');
+    createNewConversation();
     
     // Close sidebar on mobile
     if (window.innerWidth < 768) {
         toggleSidebar();
     }
-    
-    showToast('New chat started!', 'success', 2000);
 }
 
 // Sidebar search
@@ -8331,28 +8829,6 @@ function performSidebarSearch() {
         const preview = conv.content.substring(0, 60) + '...';
         return `<div class="text-xs text-slate-300 py-2 px-2 hover:bg-slate-700 rounded cursor-pointer">${preview}</div>`;
     }).join('');
-}
-
-// Update sidebar lists
-function updateSidebarLists() {
-    // Update chats list (placeholder for now)
-    const chatsList = document.getElementById('sidebarChatsList');
-    if (conversationHistory.length > 0) {
-        chatsList.innerHTML = '<div class="sidebar-chat-item active"><div class="sidebar-chat-title">Current Chat</div></div>';
-    }
-    
-    // Update bookmarks list
-    const bookmarksList = document.getElementById('sidebarBookmarksList');
-    const bookmarks = JSON.parse(localStorage.getItem('bookmarks') || '[]');
-    
-    if (bookmarks.length > 0) {
-        bookmarksList.innerHTML = bookmarks.slice(0, 5).map(b => {
-            const preview = b.content.substring(0, 40) + '...';
-            return `<div class="text-xs text-slate-300 py-2 px-2 hover:bg-slate-700 rounded cursor-pointer">${preview}</div>`;
-        }).join('');
-    } else {
-        bookmarksList.innerHTML = '<p class="text-slate-500 text-sm py-4 text-center">No bookmarks yet</p>';
-    }
 }
 
 // ========================================
@@ -11861,6 +12337,11 @@ document.addEventListener('DOMContentLoaded', function() {
     DOM.messageInput = document.getElementById('messageInput');
     DOM.sendButton = document.getElementById('sendButton');
     
+    // Ensure message input is completely empty on load
+    if (DOM.messageInput) {
+        DOM.messageInput.value = '';
+    }
+    
     DOM.feedbackModal = document.getElementById('feedbackModal');
     DOM.crisisModal = document.getElementById('crisisModal');
     DOM.awardCalculatorModal = document.getElementById('awardCalculatorModal');
@@ -11878,6 +12359,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize ChatGPT-style sidebar
     initSidebar();
+    
+    // Initialize conversation and bookmark systems
+    loadBookmarks();
+    updateBookmarkStars();
+    updateSidebarBookmarks();
 
     // Initialize Supabase
     const supabaseInitialized = initializeSupabase();
