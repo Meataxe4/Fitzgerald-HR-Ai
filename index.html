@@ -1276,6 +1276,14 @@ input, textarea, select {
                 </div>
             </div>
             
+            <!-- Recent Tools Section -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-section-title">Recent Tools</h3>
+                <div id="sidebarRecentTools" class="sidebar-items-list">
+                    <p class="text-slate-500 text-sm py-4 text-center">No tools used yet</p>
+                </div>
+            </div>
+            
             <!-- Search Section -->
             <div class="sidebar-section">
                 <h3 class="sidebar-section-title">Search</h3>
@@ -4029,6 +4037,9 @@ function createDocumentBuilderSuggestion(detection) {
  * Opens Document Builder pre-selected to specific type
  */
 function openDocumentBuilder() {
+    // Track usage
+    trackToolUsage('documentBuilderModal');
+    
     // Open Document Builder modal without pre-selecting a type
     var modal = document.getElementById('documentBuilderModal');
     if (modal) {
@@ -8738,6 +8749,20 @@ function initConversationSystem() {
 // ========================================
 
 var bookmarks = [];
+var recentTools = []; // Track recently used tools
+
+// Tool metadata
+const toolMetadata = {
+    'documentBuilderModal': { name: 'Document Builder', icon: '📝' },
+    'awardCalculatorModal': { name: 'Award Calculator', icon: '💰' },
+    'scenarioAnalysisModal': { name: 'Scenario Analysis', icon: '🎯' },
+    'rosterStressTesterModal': { name: 'Roster Stress Test', icon: '🔍' },
+    'awardWizardModal': { name: 'Award Wizard', icon: '🧙' },
+    'rosterOptimizerModal': { name: 'Roster Optimizer', icon: '📅' },
+    'complianceCalendarModal': { name: 'Compliance Calendar', icon: '📆' },
+    'terminationRiskModal': { name: 'Termination Risk', icon: '⚠️' }
+};
+
 
 // Load bookmarks
 function loadBookmarks() {
@@ -8862,6 +8887,87 @@ function removeBookmark(messageId) {
     updateBookmarkStars();
     updateSidebarBookmarks();
     showToast('Bookmark removed', 'info', 1500);
+}
+
+// ========================================
+// RECENT TOOLS TRACKING
+// ========================================
+
+function loadRecentTools() {
+    try {
+        const stored = localStorage.getItem('fitz_recent_tools');
+        recentTools = stored ? JSON.parse(stored) : [];
+        console.log('📋 Loaded recent tools:', recentTools.length);
+    } catch (e) {
+        console.error('Error loading recent tools:', e);
+        recentTools = [];
+    }
+}
+
+function saveRecentTools() {
+    try {
+        localStorage.setItem('fitz_recent_tools', JSON.stringify(recentTools));
+    } catch (e) {
+        console.error('Error saving recent tools:', e);
+    }
+}
+
+function trackToolUsage(toolId) {
+    console.log('🛠️ Tracking tool usage:', toolId);
+    
+    const tool = toolMetadata[toolId];
+    if (!tool) return;
+    
+    // Remove if exists (to move to front)
+    recentTools = recentTools.filter(t => t.id !== toolId);
+    
+    // Add to front
+    recentTools.unshift({
+        id: toolId,
+        name: tool.name,
+        icon: tool.icon,
+        timestamp: new Date().toISOString()
+    });
+    
+    // Keep only last 5
+    recentTools = recentTools.slice(0, 5);
+    
+    saveRecentTools();
+    updateSidebarRecentTools();
+    
+    trackEvent('tool_used', {
+        user: currentUser,
+        tool: tool.name
+    });
+}
+
+function updateSidebarRecentTools() {
+    var toolsList = document.getElementById('sidebarRecentTools');
+    if (!toolsList) return;
+    
+    if (recentTools.length === 0) {
+        toolsList.innerHTML = '<p class="text-slate-500 text-sm py-4 text-center">No tools used yet</p>';
+        return;
+    }
+    
+    toolsList.innerHTML = recentTools.map(function(tool) {
+        return '<div class="sidebar-chat-item hover:bg-slate-700" onclick="openToolById(\'' + tool.id + '\')" style="cursor: pointer;">' +
+            '<div class="flex items-center gap-2">' +
+                '<span class="text-xl">' + tool.icon + '</span>' +
+                '<div class="sidebar-chat-title text-sm">' + tool.name + '</div>' +
+            '</div>' +
+        '</div>';
+    }).join('');
+}
+
+function openToolById(toolId) {
+    trackToolUsage(toolId);
+    
+    var modal = document.getElementById(toolId);
+    if (modal) {
+        modal.classList.remove('hidden');
+        closeToolsMenu();
+    }
 }
 
 // ========================================
@@ -8992,36 +9098,43 @@ function closeToolsMenu() {
 
 // Tool Opening Functions
 function openAwardCalculator() {
+    trackToolUsage('awardCalculatorModal');
     var modal = document.getElementById('awardCalculatorModal');
     if (modal) modal.classList.remove('hidden');
 }
 
 function openScenarioAnalysis() {
+    trackToolUsage('scenarioAnalysisModal');
     var modal = document.getElementById('scenarioAnalysisModal');
     if (modal) modal.classList.remove('hidden');
 }
 
 function openRosterStressTester() {
+    trackToolUsage('rosterStressTesterModal');
     var modal = document.getElementById('rosterStressTesterModal');
     if (modal) modal.classList.remove('hidden');
 }
 
 function openAwardWizard() {
+    trackToolUsage('awardWizardModal');
     var modal = document.getElementById('awardWizardModal');
     if (modal) modal.classList.remove('hidden');
 }
 
 function openRosterOptimizer() {
+    trackToolUsage('rosterOptimizerModal');
     var modal = document.getElementById('rosterOptimizerModal');
     if (modal) modal.classList.remove('hidden');
 }
 
 function openComplianceCalendar() {
+    trackToolUsage('complianceCalendarModal');
     var modal = document.getElementById('complianceCalendarModal');
     if (modal) modal.classList.remove('hidden');
 }
 
 function openTerminationRisk() {
+    trackToolUsage('terminationRiskModal');
     var modal = document.getElementById('terminationRiskModal');
     if (modal) modal.classList.remove('hidden');
 }
@@ -12769,6 +12882,10 @@ document.addEventListener('DOMContentLoaded', function() {
     loadBookmarks();
     updateBookmarkStars();
     updateSidebarBookmarks();
+    
+    // Initialize recent tools
+    loadRecentTools();
+    updateSidebarRecentTools();
 
     // Initialize Supabase
     const supabaseInitialized = initializeSupabase();
