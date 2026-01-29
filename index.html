@@ -1895,29 +1895,6 @@ input, textarea, select {
                             <span class="hidden sm:inline">Tools</span>
                         </button>
                     </div>
-                    
-                    <!-- Dark Mode Toggle -->
-                    <button onclick="toggleDarkMode()" 
-                            id="darkModeToggle"
-                            class="text-slate-400 hover:text-amber-400 font-medium transition-colors flex items-center gap-1 px-2 py-2 touch-manipulation"
-                            title="Toggle Dark Mode">
-                        <span id="darkModeIcon">🌙</span>
-                        <span class="hidden sm:inline" id="darkModeText">Dark</span>
-                    </button>
-
-                    <!-- Settings Button -->
-                    <button onclick="showVenueSettings()" 
-                            class="text-slate-400 hover:text-amber-400 font-medium transition-colors flex items-center gap-1 px-2 py-2 touch-manipulation">
-                        <span>⚙️</span>
-                        <span class="hidden sm:inline">Settings</span>
-                    </button>
-                    
-                    <!-- Give Feedback -->
-                    <button onclick="showFeedback()" 
-                            class="text-amber-500 hover:text-amber-400 font-medium transition-colors px-2 py-2 touch-manipulation">
-                        <span class="hidden sm:inline">Give Feedback</span>
-                        <span class="sm:hidden">📝</span>
-                    </button>
                 </div>
                 
                 <!-- Divider (hidden on mobile) -->
@@ -1925,25 +1902,6 @@ input, textarea, select {
                 
                 <!-- Account Actions -->
                 <div class="flex items-center gap-2">
-                    <!-- Legal Links (hidden on mobile) -->
-                    <div class="hidden lg:flex items-center gap-2 text-xs">
-                        <a href="#terms" onclick="showTermsOfService(); return false;" 
-                           class="text-slate-400 hover:text-amber-400 transition-colors px-2 py-1">
-                            Terms
-                        </a>
-                        <span class="text-slate-600">|</span>
-                        <a href="#privacy" onclick="showPrivacyPolicy(); return false;" 
-                           class="text-slate-400 hover:text-amber-400 transition-colors px-2 py-1">
-                            Privacy
-                        </a>
-                    </div>
-                    
-                    <!-- Logout - Now prominently placed -->
-                    <button onclick="logout()" 
-                            class="bg-slate-700 hover:bg-slate-600 text-white font-medium px-4 py-2 rounded-lg transition-colors touch-manipulation flex items-center gap-2">
-                        <span>🚪</span>
-                        <span>Logout</span>
-                    </button>
                     
                     <!-- More Menu Button (Mobile Only) -->
                     <button onclick="toggleMoreMenu()" 
@@ -9422,9 +9380,9 @@ function openProfileMenu() {
     if (menu) {
         menu.classList.remove('hidden');
         
-        // Update venue name and code in profile
-        var venueName = localStorage.getItem('venueName') || 'Your Venue';
-        var userCode = localStorage.getItem('userCode') || 'N/A';
+        // Update venue name and code in profile from venueProfile
+        var venueName = venueProfile.venueName || 'Your Venue';
+        var userCode = currentUser || 'N/A';
         
         document.getElementById('profileVenueName').textContent = venueName;
         document.getElementById('profileUserCode').textContent = 'Code: ' + userCode;
@@ -9440,11 +9398,19 @@ function closeProfileMenu() {
 
 // Update sidebar venue name on load
 function updateSidebarVenueName() {
-    var venueName = localStorage.getItem('venueName') || 'Fitz';
+    var venueName = venueProfile.venueName || 'Fitz';
     var sidebarName = document.getElementById('sidebarVenueName');
     if (sidebarName) {
         sidebarName.textContent = venueName;
     }
+    
+    // Also store in localStorage for easy access
+    if (venueProfile.venueName) {
+        localStorage.setItem('venueName', venueProfile.venueName);
+    }
+    
+    // Update userCode display
+    localStorage.setItem('userCode', currentUser);
 }
 
 // Tool Opening Functions
@@ -10689,6 +10655,10 @@ function saveVenueSettings() {
     venueProfile.staffCount = document.getElementById('settingsStaffCount').value;
     
     localStorage.setItem('venueProfile_' + currentUser, JSON.stringify(venueProfile));
+    
+    // Update sidebar venue name
+    updateSidebarVenueName();
+    
     closeVenueSettings();
     alert('✅ Venue settings saved!');
 }
@@ -13538,14 +13508,6 @@ window.addEventListener('DOMContentLoaded', function() {
         </div>
         
         <div class="space-y-2">
-            <button onclick="showVenueSettings(); closeMoreMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
-                <span class="text-xl">⚙️</span>
-                <div>
-                    <div class="font-semibold">Settings</div>
-                    <div class="text-xs text-slate-400">Update venue information</div>
-                </div>
-            </button>
-            
             <button onclick="toggleDarkMode(); closeMoreMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
                 <span class="text-xl" id="moreMenuDarkIcon">🌙</span>
                 <div>
@@ -13559,24 +13521,6 @@ window.addEventListener('DOMContentLoaded', function() {
                 <div>
                     <div class="font-semibold">Give Feedback</div>
                     <div class="text-xs text-slate-400">Help us improve</div>
-                </div>
-            </button>
-            
-            <div class="border-t border-slate-700 my-2"></div>
-            
-            <button onclick="showTermsOfService(); closeMoreMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
-                <span class="text-xl">📄</span>
-                <div>
-                    <div class="font-semibold">Terms of Service</div>
-                    <div class="text-xs text-slate-400">View legal terms</div>
-                </div>
-            </button>
-            
-            <button onclick="showPrivacyPolicy(); closeMoreMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
-                <span class="text-xl">🔒</span>
-                <div>
-                    <div class="font-semibold">Privacy Policy</div>
-                    <div class="text-xs text-slate-400">How we protect your data</div>
                 </div>
             </button>
         </div>
@@ -13610,6 +13554,22 @@ window.addEventListener('DOMContentLoaded', function() {
                 <div>
                     <div class="font-semibold">Settings</div>
                     <div class="text-xs text-slate-400">Update venue information</div>
+                </div>
+            </button>
+            
+            <button onclick="toggleDarkMode(); closeProfileMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
+                <span class="text-xl">🌙</span>
+                <div>
+                    <div class="font-semibold">Dark Mode</div>
+                    <div class="text-xs text-slate-400">Toggle light/dark theme</div>
+                </div>
+            </button>
+            
+            <button onclick="showFeedback(); closeProfileMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
+                <span class="text-xl">📝</span>
+                <div>
+                    <div class="font-semibold">Give Feedback</div>
+                    <div class="text-xs text-slate-400">Help us improve</div>
                 </div>
             </button>
             
