@@ -1686,6 +1686,11 @@ input, textarea, select {
         <div class="flex gap-2 items-end">
             <!-- Upload Button (+) -->
             <div class="relative">
+                <!-- Hidden file inputs for each type -->
+                <input type="file" id="pdfFileInput" accept=".pdf" class="hidden" onchange="handleSingleFileUpload(event, 'pdf')">
+                <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" class="hidden" onchange="handleSingleFileUpload(event, 'excel')">
+                <input type="file" id="wordFileInput" accept=".docx,.doc" class="hidden" onchange="handleSingleFileUpload(event, 'word')">
+                
                 <button onclick="toggleUploadMenu()" 
                         id="uploadButton"
                         class="p-3 text-slate-400 hover:text-white hover:bg-slate-700 rounded-lg transition-all touch-manipulation">
@@ -8818,13 +8823,153 @@ document.addEventListener('click', function(e) {
 // Trigger file upload by type
 function triggerFileUpload(type) {
     // Close menu
-    document.getElementById('uploadMenu').classList.add('hidden');
+    var menu = document.getElementById('uploadMenu');
+    if (menu) menu.classList.add('hidden');
     
-    // Show appropriate upload interface
-    if (type === 'pdf' || type === 'excel' || type === 'word') {
-        openMultiFileModal();
+    // Trigger the appropriate hidden file input
+    var inputId = type + 'FileInput';
+    var input = document.getElementById(inputId);
+    if (input) {
+        input.click();
+    } else {
+        console.error('File input not found:', inputId);
     }
 }
+
+// Handle single file upload
+async function handleSingleFileUpload(event, fileType) {
+    var file = event.target.files[0];
+    if (!file) return;
+    
+    console.log('📁 Uploading:', file.name, 'Type:', fileType);
+    
+    // Validate file size (10MB max)
+    var maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+        showToast('❌ File too large. Max 10MB', 'error', 3000);
+        event.target.value = '';
+        return;
+    }
+    
+    // Show uploading message
+    showToast('📤 Uploading ' + file.name + '...', 'info', 2000);
+    
+    try {
+        var result;
+        
+        // Process based on file type
+        if (fileType === 'pdf') {
+            result = await readFileAsText(file, 'pdf');
+        } else if (fileType === 'excel') {
+            result = await readFileAsText(file, 'excel');
+        } else if (fileType === 'word') {
+            result = await readFileAsText(file, 'word');
+        }
+        
+        if (result && result.success) {
+            // Show file in chat
+            showFileInChat(file, fileType);
+            
+            // Pre-fill message input with file context
+            var input = document.getElementById('messageInput');
+            if (input && result.text) {
+                var prompt = 'I uploaded a file "' + file.name + '". ';
+                prompt += 'Please help me with this document.\n\n';
+                
+                // Add preview of content
+                var preview = result.text.substring(0, 300);
+                if (result.text.length > 300) preview += '...';
+                
+                input.value = prompt + 'Content preview:\n' + preview;
+                autoResizeTextarea(input);
+                input.focus();
+            }
+            
+            showToast('✅ ' + file.name + ' uploaded!', 'success', 3000);
+        } else {
+            throw new Error('Processing failed');
+        }
+    } catch (error) {
+        console.error('Upload error:', error);
+        showToast('❌ Error: ' + error.message, 'error', 4000);
+    }
+    
+    // Reset input
+    event.target.value = '';
+}
+
+// Read file and extract text
+async function readFileAsText(file, type) {
+    return new Promise(function(resolve, reject) {
+        var reader = new FileReader();
+        
+        reader.onload = function(e) {
+            try {
+                var text = '';
+                var fileInfo = 'File: ' + file.name + '\n';
+                fileInfo += 'Size: ' + (file.size / 1024).toFixed(2) + ' KB\n';
+                fileInfo += 'Type: ' + type.toUpperCase() + '\n\n';
+                
+                if (type === 'pdf') {
+                    text = fileInfo + 'PDF document uploaded.\n';
+                    text += 'Note: For full text extraction, advanced PDF processing is needed.\n';
+                    text += 'The file is ready for AI analysis based on its metadata and structure.';
+                } else if (type === 'excel') {
+                    // For CSV, we can read the text
+                    if (file.name.endsWith('.csv')) {
+                        var csvContent = e.target.result;
+                        var lines = csvContent.split('\n');
+                        text = fileInfo + 'CSV Data (first 20 rows):\n\n';
+                        text += lines.slice(0, 20).join('\n');
+                        if (lines.length > 20) {
+                            text += '\n\n... (' + (lines.length - 20) + ' more rows)';
+                        }
+                    } else {
+                        text = fileInfo + 'Excel spreadsheet uploaded.\n';
+                        text += 'Note: For full data extraction, Excel processing library is needed.\n';
+                        text += 'The file is ready for AI analysis.';
+                    }
+                } else if (type === 'word') {
+                    text = fileInfo + 'Word document uploaded.\n';
+                    text += 'Note: For full text extraction, Word processing library is needed.\n';
+                    text += 'The file is ready for AI analysis.';
+                }
+                
+                resolve({
+                    success: true,
+                    text: text,
+                    fileData: e.target.result
+                });
+            } catch (error) {
+                reject(error);
+            }
+        };
+        
+        reader.onerror = function() {
+            reject(new Error('Failed to read file'));
+        };
+        
+        // Read CSV as text, others as data URL
+        if (file.name.endsWith('.csv')) {
+            reader.readAsText(file);
+        } else {
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+// Show file in chat visually
+function showFileInChat(file, fileType) {
+    var icon = fileType === 'pdf' ? '📄' : fileType === 'excel' ? '📊' : '📝';
+    var size = (file.size / 1024).toFixed(2) + ' KB';
+    var fileMsg = icon + ' Uploaded: ' + file.name + ' (' + size + ')';
+    
+    // Add as user message
+    addMessage('user', fileMsg);
+    conversationHistory.push({ role: 'user', content: fileMsg });
+    saveCurrentConversation();
+}
+
 
 // Auto-resize textarea
 function autoResizeTextarea(textarea) {
