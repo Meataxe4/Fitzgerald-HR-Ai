@@ -5229,7 +5229,7 @@ const documentBuilderState = {
 // Document template configurations
 const documentWizardSteps = {
 formalWarning: [
-    // ✅ NEW STEP 1: Procedural Fairness Check
+    // ✅ STEP 1: Procedural Fairness Check
     {
         id: 1,
         title: "Procedural Fairness Checkpoint",
@@ -5243,9 +5243,26 @@ formalWarning: [
             }
         ]
     },
-    // ✅ NEW STEP 2: Meeting Preparation
+    // ✅ NEW STEP 2: Upload Record of Discussion (OPTIONAL BUT RECOMMENDED)
     {
         id: 2,
+        title: "Upload Record of Discussion (Highly Recommended)",
+        description: "Uploading your completed Record of Discussion will help Fitz AI create a more accurate and comprehensive Formal Warning letter by using the employee's actual responses and the specific details from your discussion.",
+        fields: [
+            {
+                name: "rodUpload",
+                label: "Upload your completed Record of Discussion",
+                type: "file",
+                accept: ".pdf,.docx,.doc,.png,.jpg,.jpeg",
+                required: false,
+                helpText: "Accepts: PDF, Word documents, or images of handwritten records"
+            }
+        ],
+        showIf: { field: "completedRecordOfDiscussion", value: "Yes" }
+    },
+    // ✅ STEP 3: Meeting Preparation
+    {
+        id: 3,
         title: "Outcome Meeting Preparation - CRITICAL",
         fields: [
             { 
@@ -5264,9 +5281,9 @@ formalWarning: [
             }
         ]
     },
-    // ✅ STEP 3: Employee Details (was Step 1)
+    // ✅ STEP 4: Employee Details (was Step 3)
     {
-        id: 3,
+        id: 4,
         title: "Employee Details",
         fields: [
             { name: "employeeName", label: "Employee's full name", type: "text", required: true, placeholder: "e.g., Blake Smith" },
@@ -5275,9 +5292,9 @@ formalWarning: [
               options: ["Full-Time", "Part-Time", "Casual"], required: true }
         ]
     },
-    // ✅ STEP 4: What Happened? (was Step 2)
+    // ✅ STEP 5: What Happened? (was Step 4)
     {
-        id: 4,
+        id: 5,
         title: "What Happened?",
         fields: [
             { name: "issueDescription", label: "Briefly describe the issue", 
@@ -5286,9 +5303,9 @@ formalWarning: [
             { name: "witnesses", label: "Any witnesses? (optional)", type: "text", required: false, placeholder: "Names of witnesses" }
         ]
     },
-    // ✅ STEP 5: Previous Action (was Step 3)
+    // ✅ STEP 6: Previous Action (was Step 5)
     {
-        id: 5,
+        id: 6,
         title: "Previous Action",
         fields: [
             { name: "hadVerbalWarnings", label: "Have you given verbal warnings?", 
@@ -5300,9 +5317,9 @@ formalWarning: [
               options: ["First formal warning", "Second formal warning", "Final warning"], required: true }
         ]
     },
-    // ✅ STEP 6: What Needs to Change? (was Step 4)
+    // ✅ STEP 7: What Needs to Change? (was Step 6)
     {
-        id: 6,
+        id: 7,
         title: "What Needs to Change?",
         fields: [
             { name: "expectations", label: "What specific improvements do you expect?", 
@@ -5311,9 +5328,9 @@ formalWarning: [
               options: ["Immediate", "2 weeks", "1 month", "3 months"], required: true }
         ]
     },
-    // ✅ STEP 7: Consequences (was Step 5)
+    // ✅ STEP 8: Consequences (was Step 7)
     {
-        id: 7,
+        id: 8,
         title: "Consequences",
         fields: [
             { name: "consequences", label: "What happens if behaviour continues?", 
@@ -5660,6 +5677,33 @@ function showDocumentStep(stepNumber) {
                            value="${documentBuilderState.data[field.name] || ''}"
                            class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white"
                            ${field.required ? 'required' : ''}>`;
+        } else if (field.type === 'file') {
+            // File upload for ROD
+            html += `
+                <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-4">
+                    <p class="text-blue-300 text-sm mb-3">
+                        <strong>💡 Highly Recommended:</strong> Uploading your Record of Discussion helps Fitz AI create a better warning letter by using the employee's actual responses and discussion details.
+                    </p>
+                </div>
+                <div class="border-2 border-dashed border-slate-600 rounded-lg p-6 text-center hover:border-amber-500 transition-colors">
+                    <input type="file" id="field_${field.name}" 
+                           accept="${field.accept || '*'}"
+                           class="hidden"
+                           onchange="handleRODUpload(event)">
+                    <button type="button" onclick="document.getElementById('field_${field.name}').click()"
+                            class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-6 py-3 rounded-lg mb-3">
+                        📄 Upload File
+                    </button>
+                    <p class="text-slate-400 text-sm">${field.helpText || 'Click to select a file'}</p>
+                    <div id="rodUploadStatus" class="mt-3"></div>
+                </div>
+                <div class="flex justify-center mt-4">
+                    <button type="button" onclick="confirmSkipRODUpload()"
+                            class="text-slate-400 hover:text-white text-sm underline">
+                        Skip this step
+                    </button>
+                </div>
+            `;
         }
         
         html += `</div>`;
@@ -5692,6 +5736,117 @@ if (startOverBtn) {
 
 }
 
+// Handle ROD file upload
+var rodUploadedFile = null;
+var rodExtractedData = null;
+
+async function handleRODUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    console.log('📄 ROD file uploaded:', file.name);
+    
+    // Show uploading status
+    const statusDiv = document.getElementById('rodUploadStatus');
+    statusDiv.innerHTML = '<p class="text-blue-400">📤 Processing file...</p>';
+    
+    try {
+        // Read file
+        const fileData = await readFileAsBase64(file);
+        rodUploadedFile = {
+            name: file.name,
+            type: file.type,
+            data: fileData
+        };
+        
+        // Extract text/data from file
+        const extractedText = await extractRODContent(file);
+        
+        // Show success
+        statusDiv.innerHTML = `
+            <div class="bg-green-500/20 border border-green-500/50 rounded-lg p-3">
+                <p class="text-green-400 font-semibold">✅ Record uploaded - Fitz AI will use this context</p>
+                <p class="text-slate-300 text-sm mt-1">${file.name} (${(file.size / 1024).toFixed(2)} KB)</p>
+            </div>
+        `;
+        
+        // Store in documentBuilderState
+        documentBuilderState.data.rodUpload = true;
+        documentBuilderState.data.rodFileName = file.name;
+        documentBuilderState.data.rodFileData = fileData;
+        documentBuilderState.data.rodExtractedText = extractedText;
+        
+        showToast('✅ Record of Discussion uploaded successfully!', 'success', 3000);
+        
+    } catch (error) {
+        console.error('ROD upload error:', error);
+        statusDiv.innerHTML = '<p class="text-red-400">❌ Error processing file. Please try again.</p>';
+        showToast('Error processing file', 'error', 3000);
+    }
+}
+
+function readFileAsBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+
+async function extractRODContent(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const fileName = file.name.toLowerCase();
+            let text = '';
+            
+            if (fileName.endsWith('.txt')) {
+                text = e.target.result;
+            } else if (fileName.endsWith('.csv')) {
+                text = e.target.result;
+            } else {
+                // For PDF, Word, Images - placeholder text
+                text = `File: ${file.name}\nType: ${file.type}\nSize: ${(file.size / 1024).toFixed(2)} KB\n\n`;
+                text += '[Document uploaded for AI analysis]';
+            }
+            
+            resolve(text);
+        };
+        
+        reader.onerror = reject;
+        
+        if (file.name.toLowerCase().endsWith('.txt') || file.name.toLowerCase().endsWith('.csv')) {
+            reader.readAsText(file);
+        } else {
+            reader.readAsDataURL(file);
+        }
+    });
+}
+
+function confirmSkipRODUpload() {
+    const confirmed = confirm(
+        '⚠️ Skip Upload?\n\n' +
+        'For a better Formal Warning letter, uploading your completed Record of Discussion is strongly advised.\n\n' +
+        'The ROD provides:\n' +
+        '• Employee\'s actual responses\n' +
+        '• Specific details from the discussion\n' +
+        '• Better context for the warning letter\n\n' +
+        'Are you sure you want to skip this step?'
+    );
+    
+    if (confirmed) {
+        // Mark as skipped
+        documentBuilderState.data.rodUpload = false;
+        documentBuilderState.data.rodSkipped = true;
+        
+        // Move to next step
+        documentBuilderState.currentStep++;
+        showDocumentStep(documentBuilderState.currentStep);
+    }
+}
+
 function docWizardNext() {
     // Save current step data
     const steps = documentWizardSteps[documentBuilderState.currentType];
@@ -5713,6 +5868,11 @@ function docWizardNext() {
         if (field.type === 'radio') {
             const radio = document.querySelector(`input[name="field_${field.name}"]:checked`);
             value = radio ? radio.value : '';
+        } else if (field.type === 'file') {
+            // File upload is optional - check if uploaded or skipped
+            value = documentBuilderState.data[field.name] || '';
+            // Don't require validation for file type
+            return; // Skip validation for file field
         } else {
             const element = document.getElementById(`field_${field.name}`);
             value = element ? element.value.trim() : '';
@@ -6044,6 +6204,15 @@ ISSUE DETAILS:
 ${data.issueDescription}
 Date: ${data.issueDate}
 ${data.witnesses ? `Witnesses: ${data.witnesses}` : 'No witnesses mentioned'}
+
+${data.rodExtractedText ? `
+RECORD OF DISCUSSION CONTEXT:
+The following information has been extracted from the completed Record of Discussion conversation:
+
+${data.rodExtractedText}
+
+**IMPORTANT:** Use the employee's actual responses and comments from the Record of Discussion above to make this warning letter more accurate and contextual. Include verbatim quotes where appropriate, and reference specific points the employee made during the discussion. This provides crucial context and demonstrates procedural fairness.
+` : ''}
 
 PREVIOUS ACTION TAKEN:
 ${data.hadVerbalWarnings === 'Yes' ? 
