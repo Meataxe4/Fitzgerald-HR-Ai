@@ -505,18 +505,28 @@ body.light-mode {
     }
     
     /* ==========================================
-       PHASE 5: MOBILE OPTIMIZATIONS
+       PHASE 5: MOBILE OPTIMIZATIONS - UX FOCUSED
        ========================================== */
     
-    /* FIX 1: TWO-ROW HEADER LAYOUT */
-    /* Target the main header container */
+    /* FIX 1: PROFESSIONAL MOBILE HEADER */
+    /* Clean 2-row layout with proper spacing */
+    
+    /* Main header container - stack vertically */
+    .bg-slate-800\/80.backdrop-blur-sm {
+        padding: 12px 16px !important;
+    }
+    
+    .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl {
+        max-width: 100% !important;
+        padding: 0 !important;
+    }
+    
     .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div {
         flex-direction: column !important;
-        align-items: stretch !important;
         gap: 12px !important;
     }
     
-    /* Left side (sidebar + logo) - full width on mobile */
+    /* TOP ROW: Logo + URGENT */
     .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div > div:first-child {
         width: 100% !important;
         display: flex !important;
@@ -524,37 +534,79 @@ body.light-mode {
         align-items: center !important;
     }
     
-    /* Move URGENT button to be next to logo */
-    .bg-slate-800\/80.backdrop-blur-sm button[onclick*="activateCrisisMode"] {
-        order: -1 !important;
-        margin-left: auto !important;
+    /* Sidebar button larger */
+    .sidebar-toggle-btn-header {
+        padding: 10px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
     }
     
-    /* Right side buttons container - full width, wrap into row */
+    /* URGENT button - prominent */
+    button[onclick*="activateCrisisMode"] {
+        padding: 10px 16px !important;
+        min-height: 44px !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+    }
+    
+    /* BOTTOM ROW: Logout + Secondary buttons */
     .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div > div:last-child {
         width: 100% !important;
         display: flex !important;
         justify-content: space-between !important;
-        flex-wrap: wrap !important;
+        align-items: center !important;
         gap: 8px !important;
     }
     
-    /* Secondary buttons group - left side of bottom row */
-    .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div > div:last-child > div:first-of-type {
+    /* Logout button - prominent on left */
+    button[onclick*="logout"] {
+        order: 1 !important;
+        padding: 10px 20px !important;
+        min-height: 44px !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+        background-color: rgb(51 65 85) !important;
+        border-radius: 8px !important;
+    }
+    
+    /* Secondary buttons container - right side */
+    .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div > div:last-child > div {
+        order: 2 !important;
         display: flex !important;
         gap: 8px !important;
-        order: 1 !important;
-    }
-    
-    /* Logout button - right side of bottom row */
-    .bg-slate-800\/80.backdrop-blur-sm button[onclick*="logout"] {
-        order: 3 !important;
         margin-left: auto !important;
-        background-color: rgb(51 65 85) !important;
     }
     
-    /* Hide dividers on mobile */
+    /* All secondary buttons - larger touch targets */
+    .bg-slate-800\/80.backdrop-blur-sm button[onclick*="toggleToolsMenu"],
+    .bg-slate-800\/80.backdrop-blur-sm button[onclick*="toggleDarkMode"],
+    .bg-slate-800\/80.backdrop-blur-sm button[onclick*="showVenueSettings"],
+    .bg-slate-800\/80.backdrop-blur-sm button[onclick*="showFeedback"] {
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 10px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    
+    /* Icon sizes */
+    .bg-slate-800\/80.backdrop-blur-sm button span:first-child {
+        font-size: 20px !important;
+    }
+    
+    /* Hide all dividers */
     .bg-slate-800\/80.backdrop-blur-sm .hidden.md\\:block {
+        display: none !important;
+    }
+    
+    /* Hide "Give Feedback" on mobile - too many buttons */
+    button[onclick*="showFeedback"] {
+        display: none !important;
+    }
+    
+    /* Hide admin if not shown */
+    #adminButton {
         display: none !important;
     }
     
@@ -596,13 +648,35 @@ body.light-mode {
     #docBackBtn { order: 2 !important; }
     #docStartOverBtn { order: 3 !important; }
     
-    /* FIX 3: BIGGER MESSAGE INPUT TEXTAREA */
+    /* FIX 3: PROMINENT MESSAGE INPUT */
+    /* Make textarea 3 lines, larger, more inviting */
     #messageInput {
-        min-height: 56px !important;      /* 2 lines visible instead of 1 */
-        max-height: 180px !important;     /* Can expand more */
-        padding: 14px 16px !important;    /* Better padding */
-        font-size: 16px !important;       /* Prevent iOS zoom */
+        min-height: 80px !important;      /* 3 lines visible, not 1 or 2 */
+        max-height: 200px !important;     /* Can expand even more */
+        padding: 16px !important;         /* More padding, feels spacious */
+        font-size: 16px !important;       /* Prevent iOS zoom, readable */
         line-height: 1.5 !important;      /* Better readability */
+        border-width: 2px !important;     /* More visible border */
+    }
+    
+    /* Input container - more padding */
+    .bg-slate-900.border.border-slate-700:has(#messageInput) {
+        padding: 12px !important;
+    }
+    
+    /* Send button - larger */
+    button:has(#sendButton),
+    button[onclick*="sendMessage"] {
+        min-height: 56px !important;
+        min-width: 56px !important;
+        padding: 16px !important;
+    }
+    
+    /* Voice button - larger */
+    button[onclick*="toggleVoiceInput"] {
+        min-height: 56px !important;
+        min-width: 56px !important;
+        padding: 16px !important;
     }
     
     /* FIX 4: CRISIS MODE MOBILE-RESPONSIVE */
