@@ -379,10 +379,6 @@ body.light-mode {
     }
     
     /* Tools menu - HIDE on mobile (use modal instead) */
-    #toolsMenu {
-        display: none !important;
-    }
-    
     /* Admin dashboard - FULL SCREEN mobile with proper scrolling */
     #adminDashboardModal {
         padding: 0 !important;
@@ -525,22 +521,6 @@ body.light-mode {
     /* Better modal sizing on tablets */
     .modal > div {
         max-width: 85vw !important;
-    }
-}
-
-/* Desktop: Tools menu positioned normally */
-@media (min-width: 769px) {
-    #toolsMenu:not(.hidden) {
-        display: block !important;
-        position: absolute !important;
-        right: 0 !important;
-        top: 3rem !important;
-        bottom: auto !important;
-        left: auto !important;
-        width: 16rem !important;
-        max-width: 16rem !important;
-        border-radius: 0.5rem !important;
-        max-height: 70vh !important;
     }
 }
 
@@ -1602,12 +1582,15 @@ input, textarea, select {
                         <span class="hidden sm:inline">Admin</span>
                     </button>
                     
-                    <!-- Document Builder Button -->
-                    <button onclick="openDocumentBuilder()" 
-                            class="text-amber-400 hover:text-amber-300 font-medium transition-colors flex items-center gap-1 px-2 py-2 touch-manipulation">
-                        <span>📝</span>
-                        <span class="hidden sm:inline">Document Builder</span>
-                    </button>
+                    <!-- Tools Dropdown -->
+                    <div class="relative">
+                        <button onclick="toggleToolsMenu()" 
+                                id="toolsButton"
+                                class="text-amber-400 hover:text-amber-300 font-medium transition-colors flex items-center gap-1 px-2 py-2 touch-manipulation">
+                            <span>🛠️</span>
+                            <span class="hidden sm:inline">Tools</span>
+                        </button>
+                    </div>
                     
                     <!-- Dark Mode Toggle -->
                     <button onclick="toggleDarkMode()" 
@@ -8823,6 +8806,58 @@ function toggleUploadMenu() {
     menu.classList.toggle('hidden');
 }
 
+// Toggle Tools Menu
+function toggleToolsMenu() {
+    var menu = document.getElementById('toolsMenu');
+    if (menu) {
+        menu.classList.toggle('hidden');
+    }
+}
+
+function closeToolsMenu() {
+    var menu = document.getElementById('toolsMenu');
+    if (menu) {
+        menu.classList.add('hidden');
+    }
+}
+
+// Tool Opening Functions
+function openAwardCalculator() {
+    var modal = document.getElementById('awardCalculatorModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function openScenarioAnalysis() {
+    var modal = document.getElementById('scenarioAnalysisModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function openRosterStressTester() {
+    var modal = document.getElementById('rosterStressTesterModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function openAwardWizard() {
+    var modal = document.getElementById('awardWizardModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function openRosterOptimizer() {
+    var modal = document.getElementById('rosterOptimizerModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function openComplianceCalendar() {
+    var modal = document.getElementById('complianceCalendarModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function openTerminationRisk() {
+    var modal = document.getElementById('terminationRiskModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+
 // Close upload menu when clicking outside
 document.addEventListener('click', function(e) {
     const uploadBtn = document.getElementById('uploadButton');
@@ -12855,6 +12890,105 @@ window.addEventListener('DOMContentLoaded', function() {
 });
 
 </script>
+
+<!-- Tools Modal - Same Structure as Settings Modal -->
+<div id="toolsMenu" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                    <span>🛠️</span> Tools
+                </h2>
+                <p class="text-slate-400 text-sm">Choose a tool to help with your HR tasks</p>
+            </div>
+            <button onclick="closeToolsMenu()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+
+        <!-- Tools Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <button onclick="openDocumentBuilder(); closeToolsMenu();" class="text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl">📝</span>
+                    <div>
+                        <div class="font-semibold text-white mb-1">Document Builder</div>
+                        <div class="text-sm text-slate-400">Create professional HR documents</div>
+                    </div>
+                </div>
+            </button>
+            
+            <button onclick="openAwardCalculator(); closeToolsMenu();" class="text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl">💰</span>
+                    <div>
+                        <div class="font-semibold text-white mb-1">Award Calculator</div>
+                        <div class="text-sm text-slate-400">Calculate award rates & penalties</div>
+                    </div>
+                </div>
+            </button>
+            
+            <button onclick="openScenarioAnalysis(); closeToolsMenu();" class="text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl">🎯</span>
+                    <div>
+                        <div class="font-semibold text-white mb-1">Scenario Analysis</div>
+                        <div class="text-sm text-slate-400">Analyze complex HR scenarios</div>
+                    </div>
+                </div>
+            </button>
+            
+            <button onclick="openRosterStressTester(); closeToolsMenu();" class="text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl">🔍</span>
+                    <div>
+                        <div class="font-semibold text-white mb-1">Roster Stress Test</div>
+                        <div class="text-sm text-slate-400">Check roster compliance</div>
+                    </div>
+                </div>
+            </button>
+            
+            <button onclick="openAwardWizard(); closeToolsMenu();" class="text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl">🧙</span>
+                    <div>
+                        <div class="font-semibold text-white mb-1">Award Wizard</div>
+                        <div class="text-sm text-slate-400">Find the right award</div>
+                    </div>
+                </div>
+            </button>
+            
+            <button onclick="openRosterOptimizer(); closeToolsMenu();" class="text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl">📅</span>
+                    <div>
+                        <div class="font-semibold text-white mb-1">Roster Optimizer</div>
+                        <div class="text-sm text-slate-400">Optimize staff scheduling</div>
+                    </div>
+                </div>
+            </button>
+            
+            <button onclick="openComplianceCalendar(); closeToolsMenu();" class="text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl">📆</span>
+                    <div>
+                        <div class="font-semibold text-white mb-1">Compliance Calendar</div>
+                        <div class="text-sm text-slate-400">Track important dates</div>
+                    </div>
+                </div>
+            </button>
+            
+            <button onclick="openTerminationRisk(); closeToolsMenu();" class="text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl">⚠️</span>
+                    <div>
+                        <div class="font-semibold text-white mb-1">Termination Risk</div>
+                        <div class="text-sm text-slate-400">Assess termination risks</div>
+                    </div>
+                </div>
+            </button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
 
