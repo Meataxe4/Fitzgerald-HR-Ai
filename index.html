@@ -458,12 +458,6 @@ body.light-mode {
         max-width: calc(100vw - 16px) !important;
     }
     
-    /* Input field - larger on mobile */
-    #messageInput {
-        font-size: 16px !important;
-        padding: 14px !important;
-    }
-    
     /* Send button - bigger touch target */
     button:has(span:contains('Send')) {
         min-height: 48px !important;
@@ -515,34 +509,53 @@ body.light-mode {
        ========================================== */
     
     /* FIX 1: TWO-ROW HEADER LAYOUT */
-    /* Stack header buttons into 2 rows for better visibility */
-    .bg-slate-800\/80.backdrop-blur-sm > div > div {
+    /* Target the main header container */
+    .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div {
         flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+    }
+    
+    /* Left side (sidebar + logo) - full width on mobile */
+    .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div > div:first-child {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+    }
+    
+    /* Move URGENT button to be next to logo */
+    .bg-slate-800\/80.backdrop-blur-sm button[onclick*="activateCrisisMode"] {
+        order: -1 !important;
+        margin-left: auto !important;
+    }
+    
+    /* Right side buttons container - full width, wrap into row */
+    .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div > div:last-child {
+        width: 100% !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        flex-wrap: wrap !important;
         gap: 8px !important;
     }
     
-    /* Top row: Left side + URGENT */
-    .bg-slate-800\/80.backdrop-blur-sm > div > div > div:first-child {
-        width: 100% !important;
-        justify-content: space-between !important;
+    /* Secondary buttons group - left side of bottom row */
+    .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div > div:last-child > div:first-of-type {
+        display: flex !important;
+        gap: 8px !important;
+        order: 1 !important;
     }
     
-    /* Bottom row: Secondary buttons + Logout */
-    .bg-slate-800\/80.backdrop-blur-sm > div > div > div:last-child {
-        width: 100% !important;
-        justify-content: space-between !important;
-    }
-    
-    /* Make URGENT button stand out in top row */
-    .bg-slate-800\/80.backdrop-blur-sm button[onclick*="activateCrisisMode"] {
-        order: 2 !important;
-        flex-shrink: 0 !important;
-    }
-    
-    /* Keep Logout visible and prominent */
+    /* Logout button - right side of bottom row */
     .bg-slate-800\/80.backdrop-blur-sm button[onclick*="logout"] {
+        order: 3 !important;
+        margin-left: auto !important;
         background-color: rgb(51 65 85) !important;
-        flex-shrink: 0 !important;
+    }
+    
+    /* Hide dividers on mobile */
+    .bg-slate-800\/80.backdrop-blur-sm .hidden.md\\:block {
+        display: none !important;
     }
     
     /* FIX 2: STACK TOOL NAVIGATION BUTTONS */
@@ -555,7 +568,7 @@ body.light-mode {
     #rosterOptimizerModal .flex.gap-3.mt-6,
     #complianceCalendarModal .flex.gap-3.mt-6,
     #terminationRiskModal .flex.gap-3.mt-6 {
-        flex-direction: column-reverse !important;
+        flex-direction: column !important;
         gap: 12px !important;
     }
     
@@ -578,7 +591,7 @@ body.light-mode {
         min-height: 56px !important;
     }
     
-    /* Order: Primary action first, Back second, Cancel/Reset third */
+    /* Order: Next first (top), Back second (middle), Start Over last (bottom) */
     #docNextBtn { order: 1 !important; }
     #docBackBtn { order: 2 !important; }
     #docStartOverBtn { order: 3 !important; }
