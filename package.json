@@ -1,10 +1,40 @@
 {
-  "name": "fitzgerald-hr-chatbot",
+  "name": "fitzgerald-hr-ai",
   "version": "1.0.0",
-  "description": "Fitzgerald HR Assistant with Crisis Mode",
+  "description": "AI-powered HR assistant for Australian hospitality venues with Deputy integration",
+  "main": "index.html",
+  "scripts": {
+    "dev": "netlify dev",
+    "deploy": "netlify deploy --prod",
+    "test": "echo \"No tests yet\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Meataxe4/Fitzgerald-HR-Ai"
+  },
+  "keywords": [
+    "hr",
+    "hospitality",
+    "australia",
+    "awards",
+    "compliance",
+    "deputy",
+    "rostering"
+  ],
+  "author": "Fitzgerald HR",
+  "license": "MIT",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.1",
+    "@supabase/supabase-js": "^2.39.0",
     "docx": "^9.5.1",
+    "node-fetch": "^2.7.0",
     "twilio": "^4.19.0"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.10.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
+
