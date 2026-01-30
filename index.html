@@ -9490,8 +9490,13 @@ function openJobDescriptionBuilder() {
 }
 
 function closeJobDescriptionBuilder() {
+    // Hide the modal
     var modal = document.getElementById('jobDescriptionBuilderModal');
     if (modal) modal.classList.add('hidden');
+    
+    // Reset loading screen state
+    document.getElementById('jdGenerating').classList.add('hidden');
+    document.getElementById('jdBuilderSteps').classList.remove('hidden');
 }
 
 function updateJDStep() {
@@ -9702,6 +9707,10 @@ Format as a complete, professional job description with sections for: Position O
 
 function closeJobDescriptionPreview() {
     document.getElementById('jobDescriptionPreviewModal').classList.add('hidden');
+    
+    // Reset builder state when closing preview
+    document.getElementById('jdGenerating').classList.add('hidden');
+    document.getElementById('jdBuilderSteps').classList.remove('hidden');
 }
 
 async function downloadJobDescription(format) {
@@ -9807,8 +9816,13 @@ function openInterviewQuestionsGenerator() {
 }
 
 function closeInterviewQuestions() {
+    // Hide the modal
     var modal = document.getElementById('interviewQuestionsModal');
     if (modal) modal.classList.add('hidden');
+    
+    // Reset loading screen state
+    document.getElementById('iqGenerating').classList.add('hidden');
+    document.getElementById('iqBuilderSteps').classList.remove('hidden');
 }
 
 function updateIQStep() {
@@ -9958,6 +9972,10 @@ Format clearly with headers and bullet points.`;
 
 function closeInterviewQuestionsPreview() {
     document.getElementById('interviewQuestionsPreviewModal').classList.add('hidden');
+    
+    // Reset builder state when closing preview
+    document.getElementById('iqGenerating').classList.add('hidden');
+    document.getElementById('iqBuilderSteps').classList.remove('hidden');
 }
 
 async function downloadInterviewQuestions(format) {
@@ -14671,15 +14689,15 @@ window.addEventListener('DOMContentLoaded', function() {
         </div><!-- End iqBuilderSteps -->
 
         <!-- Navigation -->
-        <div class="flex gap-3 mt-6">
-            <button onclick="iqPreviousStep()" id="iqBackBtn" class="hidden px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
-                ← Back
-            </button>
-            <button onclick="iqNextStep()" id="iqNextBtn" class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-colors">
+        <div class="mt-6 space-y-3">
+            <button onclick="iqNextStep()" id="iqNextBtn" class="w-full px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-colors">
                 Next Step →
             </button>
-            <button onclick="generateInterviewQuestions()" id="iqGenerateBtn" class="hidden px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
+            <button onclick="generateInterviewQuestions()" id="iqGenerateBtn" class="hidden w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
                 ✨ Generate Questions
+            </button>
+            <button onclick="iqPreviousStep()" id="iqBackBtn" class="hidden w-full px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
+                ← Back
             </button>
         </div>
     </div>
@@ -14796,15 +14814,15 @@ window.addEventListener('DOMContentLoaded', function() {
         </div><!-- End jdBuilderSteps -->
 
         <!-- Navigation Buttons -->
-        <div class="flex gap-3 mt-6">
-            <button onclick="jdPreviousStep()" id="jdBackBtn" class="hidden px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
-                ← Back
-            </button>
-            <button onclick="jdNextStep()" id="jdNextBtn" class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-colors">
+        <div class="mt-6 space-y-3">
+            <button onclick="jdNextStep()" id="jdNextBtn" class="w-full px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-colors">
                 Next Step →
             </button>
-            <button onclick="generateJobDescription()" id="jdGenerateBtn" class="hidden px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
+            <button onclick="generateJobDescription()" id="jdGenerateBtn" class="hidden w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
                 ✨ Generate Job Description
+            </button>
+            <button onclick="jdPreviousStep()" id="jdBackBtn" class="hidden w-full px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
+                ← Back
             </button>
         </div>
     </div>
