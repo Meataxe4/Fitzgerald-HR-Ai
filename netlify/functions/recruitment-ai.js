@@ -44,60 +44,39 @@ exports.handler = async (event, context) => {
 
     // Create system prompts based on task type
     const systemPrompts = {
-      responsibilities: `You are an expert HR professional specializing in job descriptions. Generate 5-8 clear, specific, and measurable key responsibilities for the given role. Format as a JSON array of strings. Each responsibility should:
+      responsibilities: `You are an expert HR professional specializing in job descriptions. Generate 5-8 clear, specific, and measurable key responsibilities for the given role. Format as a bulleted list with bullet points. Each responsibility should:
 - Start with an action verb
 - Be specific and measurable where possible
 - Reflect realistic day-to-day duties
-- Be appropriate for the seniority level
+- Be appropriate for the seniority level`,
 
-Return ONLY valid JSON array format: ["Responsibility 1", "Responsibility 2", ...]`,
+      jobDescription: `You are an expert HR professional specializing in job descriptions. Create a professional, engaging job description with clear sections and formatting. Use markdown formatting for headers and bullet points.`,
 
-      requirements: `You are an expert HR professional specializing in job requirements. Generate 6-10 essential requirements for the given role. Format as a JSON array of strings. Include a mix of:
+      interviewQuestions: `You are an expert HR professional specializing in recruitment interviews. Generate interview questions with detailed guidance. Format clearly with headers and bullet points for readability.`,
+
+      requirements: `You are an expert HR professional specializing in job requirements. Generate 6-10 essential requirements for the given role. Format as a bulleted list. Include a mix of:
 - Educational qualifications
 - Years of experience
 - Technical skills
 - Soft skills
-- Certifications (if relevant)
+- Certifications (if relevant)`,
 
-Return ONLY valid JSON array format: ["Requirement 1", "Requirement 2", ...]`,
-
-      benefits: `You are an expert HR professional specializing in employee benefits. Generate 5-8 attractive benefits for the given role and company context. Format as a JSON array of strings. Include a mix of:
+      benefits: `You are an expert HR professional specializing in employee benefits. Generate 5-8 attractive benefits for the given role and company context. Format as a bulleted list. Include a mix of:
 - Compensation-related benefits
 - Work-life balance benefits
 - Professional development
 - Health and wellness
-- Unique perks
+- Unique perks`,
 
-Return ONLY valid JSON array format: ["Benefit 1", "Benefit 2", ...]`,
+      scoringCriteria: `You are an expert HR professional specializing in candidate evaluation. Generate 5-7 scoring criteria for the given role. Format clearly with criteria names and weights.`,
 
-      interviewQuestions: `You are an expert HR professional specializing in recruitment interviews. Generate 8-12 behavioral and technical interview questions for the given role. Format as a JSON array of objects with 'question' and 'purpose' fields.
-
-Each question should:
-- Be open-ended
-- Assess key competencies for the role
-- Follow STAR methodology where appropriate
-- Include both behavioral and technical questions
-
-Return ONLY valid JSON array format: [{"question": "Question text?", "purpose": "What this assesses"}, ...]`,
-
-      scoringCriteria: `You are an expert HR professional specializing in candidate evaluation. Generate 5-7 scoring criteria for the given role. Format as a JSON array of objects with 'criterion' and 'weight' fields.
-
-Criteria should:
-- Cover key competencies for the role
-- Be measurable
-- Total weight should equal 100
-
-Return ONLY valid JSON array format: [{"criterion": "Criterion name", "weight": 20}, ...]`,
-
-      referenceQuestions: `You are an expert HR professional specializing in reference checks. Generate 6-10 reference check questions for the given role. Format as a JSON array of strings.
+      referenceQuestions: `You are an expert HR professional specializing in reference checks. Generate 6-10 reference check questions for the given role. Format as a numbered list.
 
 Questions should:
 - Verify key competencies
 - Assess work style and culture fit
 - Be open-ended
-- Probe for specific examples
-
-Return ONLY valid JSON array format: ["Question 1?", "Question 2?", ...]`
+- Probe for specific examples`
     };
 
     const systemPrompt = systemPrompts[taskType] || systemPrompts.responsibilities;
@@ -115,21 +94,7 @@ Return ONLY valid JSON array format: ["Question 1?", "Question 2?", ...]`
 
     const responseText = message.content[0].text;
     
-    // Try to parse as JSON, if it fails, return the raw text
-    let parsedResponse;
-    try {
-      parsedResponse = JSON.parse(responseText);
-    } catch (parseError) {
-      // If response has markdown code blocks, try to extract JSON
-      const jsonMatch = responseText.match(/```(?:json)?\s*(\[[\s\S]*\])\s*```/);
-      if (jsonMatch) {
-        parsedResponse = JSON.parse(jsonMatch[1]);
-      } else {
-        // Try to parse without code blocks
-        parsedResponse = JSON.parse(responseText.trim());
-      }
-    }
-
+    // Return the text response directly
     return {
       statusCode: 200,
       headers: {
@@ -138,8 +103,8 @@ Return ONLY valid JSON array format: ["Question 1?", "Question 2?", ...]`
       },
       body: JSON.stringify({
         success: true,
-        data: parsedResponse,
-        rawResponse: responseText
+        content: responseText,
+        taskType: taskType
       })
     };
 
