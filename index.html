@@ -2842,7 +2842,7 @@ input, textarea, select {
                 </button>
                 
                 <button onclick="openToolFromMobile('rosterStressTester')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
-                    <span class="text-2xl">🔍</span>
+                    <span class="text-2xl">💥</span>
                     <div>
                         <div class="font-semibold">Roster Stress Test</div>
                         <div class="text-sm text-slate-400">Test roster for compliance issues</div>
@@ -3202,7 +3202,7 @@ input, textarea, select {
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
-                    <span>🔍</span> Roster Stress Test
+                    <span>💥</span> Roster Stress Test
                 </h2>
                 <p class="text-slate-400 text-sm">Upload or describe your roster - we'll find compliance risks</p>
             </div>
@@ -3238,7 +3238,7 @@ input, textarea, select {
 Be as specific as possible!"></textarea>
                 <button onclick="analyzeRosterDescription()" 
                         class="w-full mt-4 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
-                    🔍 Run Stress Test
+                    💥 Run Stress Test
                 </button>
             </div>
 
@@ -9004,7 +9004,7 @@ const toolMetadata = {
     'documentBuilderModal': { name: 'Document Builder', icon: '📝' },
     'awardCalculatorModal': { name: 'Award Calculator', icon: '💰' },
     'scenarioAnalysisModal': { name: 'Scenario Analysis', icon: '🎯' },
-    'rosterStressTesterModal': { name: 'Roster Stress Test', icon: '🔍' },
+    'rosterStressTesterModal': { name: 'Roster Stress Test', icon: '💥' },
     'awardWizardModal': { name: 'Award Wizard', icon: '🧙' },
     'rosterOptimizerModal': { name: 'Roster Optimizer', icon: '📅' },
     'complianceCalendarModal': { name: 'Compliance Calendar', icon: '📆' },
@@ -9510,8 +9510,8 @@ function updateJDStep() {
     
     // Update buttons
     document.getElementById('jdBackBtn').classList.toggle('hidden', jdCurrentStep === 1);
-    document.getElementById('jdNextBtn').classList.toggle('hidden', jdCurrentStep === 5);
-    document.getElementById('jdGenerateBtn').classList.toggle('hidden', jdCurrentStep !== 5);
+    document.getElementById('jdNextBtn').classList.toggle('hidden', jdCurrentStep === 4);
+    document.getElementById('jdGenerateBtn').classList.toggle('hidden', jdCurrentStep !== 4);
 }
 
 function jdNextStep() {
@@ -9531,18 +9531,13 @@ function jdNextStep() {
     }
     
     // Move to next step
-    if (jdCurrentStep < 5) {
+    if (jdCurrentStep < 4) {
         jdCurrentStep++;
         updateJDStep();
         
         // If moving to step 3, generate responsibilities with AI
         if (jdCurrentStep === 3) {
             generateResponsibilities();
-        }
-        
-        // If moving to step 5, calculate salary
-        if (jdCurrentStep === 5) {
-            setupSalaryCalculation();
         }
     }
 }
@@ -9645,13 +9640,6 @@ async function generateJobDescription() {
     // Collect all data
     jdData.responsibilities = document.getElementById('jdResponsibilities').value;
     jdData.qualifications = document.getElementById('jdQualifications').value;
-    jdData.award = document.getElementById('jdAward').value;
-    jdData.classification = document.getElementById('jdClassification').value;
-    
-    if (!jdData.salaryRange) {
-        alert('Please select award and classification to calculate salary');
-        return;
-    }
     
     // Hide wizard steps, show loading
     document.getElementById('jdBuilderSteps').classList.add('hidden');
@@ -9669,9 +9657,7 @@ ${jdData.responsibilities}
 Required Qualifications:
 ${jdData.qualifications}
 
-Salary Range: ${jdData.salaryRange}
-
-Format as a complete, professional job description with sections for: Position Overview, Key Responsibilities, Required Qualifications, Desired Skills, Salary & Benefits. Make it engaging and specific to Australian hospitality.`;
+Format as a complete, professional job description with sections for: Position Overview, Key Responsibilities, Required Qualifications, Desired Skills, and Benefits. Make it engaging and specific to Australian hospitality.`;
 
         const response = await fetch('/.netlify/functions/recruitment-ai', {
             method: 'POST',
@@ -9757,6 +9743,49 @@ async function downloadJobDescription(format) {
             showToast('Error generating PDF document', 'error');
         }
     }
+}
+
+function resetJobDescription() {
+    // Close preview modal
+    closeJobDescriptionPreview();
+    
+    // Reset all data
+    jdCurrentStep = 1;
+    jdData = {
+        jobTitle: '',
+        experienceLevel: '',
+        responsibilities: '',
+        qualifications: '',
+        generatedContent: ''
+    };
+    
+    // Clear all inputs
+    document.getElementById('jdJobTitle').value = '';
+    document.getElementById('jdResponsibilities').value = '';
+    document.getElementById('jdQualifications').value = '';
+    
+    // Reset loading/textarea visibility
+    document.getElementById('jdResponsibilitiesLoading').classList.add('hidden');
+    document.getElementById('jdResponsibilities').classList.remove('hidden');
+    document.getElementById('jdResponsibilitiesHelp').classList.remove('hidden');
+    
+    // Show steps, hide loading
+    document.getElementById('jdBuilderSteps').classList.remove('hidden');
+    document.getElementById('jdGenerating').classList.add('hidden');
+    
+    // Reset step highlighting
+    document.querySelectorAll('.jd-experience-btn').forEach(btn => {
+        btn.classList.remove('border-amber-500');
+        btn.classList.add('border-slate-600');
+    });
+    
+    // Update step display
+    updateJDStep();
+    
+    // Open builder
+    openJobDescriptionBuilder();
+    
+    showToast('Ready to create a new job description!', 'success');
 }
 
 // Interview Questions Generator
@@ -9970,6 +9999,59 @@ async function downloadInterviewQuestions(format) {
             showToast('Error generating PDF document', 'error');
         }
     }
+}
+
+function resetInterviewQuestions() {
+    // Close preview modal
+    closeInterviewQuestionsPreview();
+    
+    // Reset all data
+    iqCurrentStep = 1;
+    iqData = {
+        jobTitle: '',
+        experienceLevel: '',
+        categories: [],
+        questionCount: 15,
+        generatedContent: ''
+    };
+    
+    // Clear inputs
+    document.getElementById('iqJobTitle').value = '';
+    
+    // Reset checkboxes
+    document.getElementById('iqTechnical').checked = true;
+    document.getElementById('iqBehavioral').checked = true;
+    document.getElementById('iqSituational').checked = true;
+    
+    // Show steps, hide loading
+    document.getElementById('iqBuilderSteps').classList.remove('hidden');
+    document.getElementById('iqGenerating').classList.add('hidden');
+    
+    // Reset button highlighting
+    document.querySelectorAll('.iq-experience-btn').forEach(btn => {
+        btn.classList.remove('border-amber-500');
+        btn.classList.add('border-slate-600');
+    });
+    
+    document.querySelectorAll('.iq-count-btn').forEach(btn => {
+        btn.classList.remove('border-amber-500');
+        btn.classList.add('border-slate-600');
+    });
+    
+    // Highlight default (15 questions)
+    const defaultBtn = document.querySelector('[onclick="selectIQCount(15)"]');
+    if (defaultBtn) {
+        defaultBtn.classList.remove('border-slate-600');
+        defaultBtn.classList.add('border-amber-500');
+    }
+    
+    // Update step display
+    updateIQStep();
+    
+    // Open generator
+    openInterviewQuestionsGenerator();
+    
+    showToast('Ready to create new interview questions!', 'success');
 }
 
 // Reference Check Form
@@ -14305,7 +14387,7 @@ window.addEventListener('DOMContentLoaded', function() {
             
             <button onclick="openRosterStressTester(); closeToolsMenu();" class="text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
                 <div class="flex items-start gap-3">
-                    <span class="text-3xl">🔍</span>
+                    <span class="text-3xl">💥</span>
                     <div>
                         <div class="font-semibold text-white mb-1">Roster Stress Test</div>
                         <div class="text-sm text-slate-400">Check roster compliance</div>
@@ -14355,7 +14437,7 @@ window.addEventListener('DOMContentLoaded', function() {
             
             <button onclick="openRecruitmentToolkit(); closeToolsMenu();" class="text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
                 <div class="flex items-start gap-3">
-                    <span class="text-3xl">🎯</span>
+                    <span class="text-3xl">🔍</span>
                     <div>
                         <div class="font-semibold text-white mb-1">Recruitment Toolkit</div>
                         <div class="text-sm text-slate-400">Job descriptions, interviews & reference checks</div>
@@ -14622,6 +14704,12 @@ window.addEventListener('DOMContentLoaded', function() {
             <button onclick="downloadInterviewQuestions('pdf')" class="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
                 📕 Download PDF
             </button>
+        </div>
+        
+        <div class="flex gap-3 mt-3">
+            <button onclick="resetInterviewQuestions()" class="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
+                ➕ Create New Interview Questions
+            </button>
             <button onclick="closeInterviewQuestionsPreview(); openInterviewQuestionsGenerator();" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
                 ← Back to Edit
             </button>
@@ -14637,7 +14725,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
                     <span>📝</span> Job Description Builder
                 </h2>
-                <p class="text-slate-400 text-sm">Step <span id="jdStep">1</span> of 5</p>
+                <p class="text-slate-400 text-sm">Step <span id="jdStep">1</span> of 4</p>
             </div>
             <button onclick="closeJobDescriptionBuilder()" class="text-slate-400 hover:text-white text-2xl">×</button>
         </div>
@@ -14704,36 +14792,6 @@ window.addEventListener('DOMContentLoaded', function() {
             <p class="text-slate-400 text-sm mt-2">💡 List essential qualifications, certifications, and licenses</p>
         </div>
 
-        <!-- Step 5: Salary Range (Award Calculator Integration) -->
-        <div id="jdStep5" class="step-content hidden">
-            <h3 class="text-xl font-semibold text-white mb-4">Salary Range</h3>
-            <p class="text-slate-400 text-sm mb-4">Select the award and classification:</p>
-            
-            <div class="mb-4">
-                <label class="block text-slate-300 text-sm mb-2">Award</label>
-                <select id="jdAward" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
-                    <option value="">Select Award...</option>
-                    <option value="restaurant">Restaurant Industry Award</option>
-                    <option value="hospitality">Hospitality Industry (General) Award</option>
-                    <option value="fast-food">Fast Food Industry Award</option>
-                </select>
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-slate-300 text-sm mb-2">Classification Level</label>
-                <select id="jdClassification" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
-                    <option value="">Select Classification...</option>
-                    <option value="1">Level 1 - Introductory</option>
-                    <option value="2">Level 2 - Tradesperson/Supervisor</option>
-                    <option value="3">Level 3 - Manager/Senior</option>
-                </select>
-            </div>
-            
-            <div id="jdSalaryDisplay" class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 hidden">
-                <div class="text-amber-400 font-semibold mb-2">Calculated Salary Range:</div>
-                <div class="text-white text-2xl font-bold" id="jdSalaryRange">$XX,XXX - $XX,XXX per year</div>
-                <div class="text-slate-400 text-sm mt-2">Based on current award rates + penalties</div>
-            </div>
         </div>
         </div><!-- End jdBuilderSteps -->
 
@@ -14771,6 +14829,12 @@ window.addEventListener('DOMContentLoaded', function() {
             <button onclick="downloadJobDescription('pdf')" class="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
                 📕 Download PDF
             </button>
+        </div>
+        
+        <div class="flex gap-3 mt-3">
+            <button onclick="resetJobDescription()" class="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
+                ➕ Create New Job Description
+            </button>
             <button onclick="closeJobDescriptionPreview(); openJobDescriptionBuilder();" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
                 ← Back to Edit
             </button>
@@ -14784,7 +14848,7 @@ window.addEventListener('DOMContentLoaded', function() {
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
-                    <span>🎯</span> Recruitment Toolkit
+                    <span>🔍</span> Recruitment Toolkit
                 </h2>
                 <p class="text-slate-400 text-sm">Choose a recruitment tool to help with hiring</p>
             </div>
@@ -14843,5 +14907,3 @@ window.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
-
-
