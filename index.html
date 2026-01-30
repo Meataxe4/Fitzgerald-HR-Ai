@@ -9917,17 +9917,12 @@ async function generateInterviewQuestions() {
     document.getElementById('iqGenerating').classList.remove('hidden');
     
     try {
-        const prompt = `Generate ${iqData.questionCount} interview questions for a ${iqData.experienceLevel} level ${iqData.jobTitle} in Australian hospitality.
+        // Simplified prompt for faster generation
+        const prompt = `Generate ${iqData.questionCount} interview questions for a ${iqData.experienceLevel} level ${iqData.jobTitle} position in Australian hospitality.
 
-Categories to include: ${iqData.categories.join(', ')}
+Categories: ${iqData.categories.join(', ')}
 
-For each question provide:
-1. The question
-2. What to look for in the answer
-3. STAR method example (for behavioral)
-4. Red flags to watch for
-
-Format clearly with headers and bullet points.`;
+Keep it concise - just list the questions with brief context.`;
 
         const response = await fetch('/.netlify/functions/recruitment-ai', {
             method: 'POST',
@@ -10213,9 +10208,41 @@ function closeReferenceCheckPreview() {
     document.getElementById('referenceCheckPreviewModal').classList.add('hidden');
 }
 
-function downloadReferenceCheck(format) {
-    showToast('Preparing PDF download...', 'info');
-    trackEvent('reference_check_downloaded', { format: format });
+async function downloadReferenceCheck(format) {
+    // Get the content from preview
+    const content = document.getElementById('rcPreviewContent').innerHTML;
+    const candidateName = document.getElementById('rcCandidateName').value.trim();
+    const filename = `Reference_Check_${candidateName.replace(/\s+/g, '_')}`;
+    
+    if (format === 'docx') {
+        try {
+            // Generate Word document using existing function
+            await generateWordDocument(content, `${filename}.docx`, {
+                documentId: generateDocumentId(),
+                userName: currentUser,
+                documentType: 'Reference Check'
+            });
+            
+            trackEvent('reference_check_downloaded', { format: 'docx', candidateName: candidateName });
+        } catch (error) {
+            console.error('Error downloading DOCX:', error);
+            showToast('Error generating Word document', 'error');
+        }
+    } else if (format === 'pdf') {
+        try {
+            // Generate PDF using existing function
+            await generatePDFDocument(content, `${filename}.pdf`, {
+                documentId: generateDocumentId(),
+                userName: currentUser,
+                documentType: 'Reference Check'
+            });
+            
+            trackEvent('reference_check_downloaded', { format: 'pdf', candidateName: candidateName });
+        } catch (error) {
+            console.error('Error downloading PDF:', error);
+            showToast('Error generating PDF document', 'error');
+        }
+    }
 }
 
 
