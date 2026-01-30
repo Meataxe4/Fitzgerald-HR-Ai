@@ -30,13 +30,12 @@ exports.handler = async (event) => {
             throw new Error('Missing required parameters');
         }
 
-        const { createClient } = require('@supabase/supabase-js');
-        const supabase = createClient(supabase_url, supabase_key);
+        const supabase = require('@supabase/supabase-js');
+        const supabaseClient = supabase.createClient(supabase_url, supabase_key);
 
         console.log('Fetching Deputy integration for user:', user_id);
 
-        // Get Deputy integration details
-        const { data: integration, error: intError } = await supabase
+        const { data: integration, error: intError } = await supabaseClient
             .from('integrations')
             .select('*')
             .eq('user_id', user_id)
@@ -48,25 +47,22 @@ exports.handler = async (event) => {
             throw new Error('Deputy not connected. Please connect Deputy first.');
         }
 
-        // Check if token needs refresh
         const tokenExpiry = new Date(integration.token_expires_at);
         const now = new Date();
         
         if (tokenExpiry < now) {
             console.log('Token expired, refreshing...');
-            integration.access_token = await refreshDeputyToken(integration, supabase);
+            integration.access_token = await refreshDeputyToken(integration, supabaseClient);
         }
 
         const domain = integration.settings?.domain || 'once';
         const accessToken = integration.access_token;
 
-        // Define date range (next 30 days)
         const startDate = formatDate(new Date());
         const endDate = formatDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
 
         console.log(`Fetching rosters from ${startDate} to ${endDate}`);
 
-        // Fetch rosters from Deputy
         const rostersResponse = await fetch(
             `https://${domain}.deputy.com/api/v1/resource/Roster/QUERY?` + 
             `search[Date][from]=${startDate}&` +
@@ -104,14 +100,11 @@ exports.handler = async (event) => {
             };
         }
 
-        // Get unique employee IDs
         const employeeIds = [...new Set(rosters.map(r => r.Employee))];
         console.log(`Fetching ${employeeIds.length} employee details`);
 
-        // Fetch employee details
         const employees = await fetchDeputyEmployees(domain, accessToken, employeeIds);
 
-        // Process each roster for compliance
         const processedRosters = await Promise.all(
             rosters.map(async (roster) => {
                 const employee = employees.find(e => e.Id === roster.Employee);
@@ -119,7 +112,6 @@ exports.handler = async (event) => {
                 const shiftDate = new Date(roster.Date * 1000);
                 const totalHours = calculateHours(roster.StartTime, roster.EndTime, roster.TotalBreak || 0);
                 
-                // Analyze compliance
                 const compliance = await analyzeRosterCompliance({
                     startTime: roster.StartTime,
                     endTime: roster.EndTime,
@@ -142,14 +134,13 @@ exports.handler = async (event) => {
                     startTime: formatTime(roster.StartTime),
                     endTime: formatTime(roster.EndTime),
                     totalHours: totalHours,
-                    baseRate: 25.00, // Default rate - should be fetched from pay rules
+                    baseRate: 25.00,
                     compliance: compliance,
                     raw: roster
                 };
             })
         );
 
-        // Save to Supabase
         const rostersToSave = processedRosters.map(r => ({
             user_id: user_id,
             external_id: r.id,
@@ -169,7 +160,7 @@ exports.handler = async (event) => {
             last_synced: new Date().toISOString()
         }));
 
-        const { error: saveError } = await supabase
+        const { error: saveError } = await supabaseClient
             .from('rosters')
             .upsert(rostersToSave, { onConflict: 'user_id,platform,external_id' });
 
@@ -177,8 +168,7 @@ exports.handler = async (event) => {
             console.error('Supabase save error:', saveError);
         }
 
-        // Log successful sync
-        await supabase.from('sync_logs').insert({
+        await supabaseClient.from('sync_logs').insert({
             integration_id: integration.id,
             user_id: user_id,
             sync_type: 'roster',
@@ -190,8 +180,7 @@ exports.handler = async (event) => {
             }
         });
 
-        // Update last_synced timestamp
-        await supabase
+        await supabaseClient
             .from('integrations')
             .update({ last_synced: new Date().toISOString() })
             .eq('id', integration.id);
@@ -224,12 +213,10 @@ exports.handler = async (event) => {
     }
 };
 
-// Helper: Fetch employee details from Deputy
 async function fetchDeputyEmployees(domain, accessToken, employeeIds) {
     const employees = [];
-    
-    // Fetch in batches to avoid rate limiting
     const batchSize = 10;
+    
     for (let i = 0; i < employeeIds.length; i += batchSize) {
         const batch = employeeIds.slice(i, i + batchSize);
         
@@ -257,7 +244,6 @@ async function fetchDeputyEmployees(domain, accessToken, employeeIds) {
         const results = await Promise.all(promises);
         employees.push(...results.filter(e => e !== null));
         
-        // Rate limiting pause
         if (i + batchSize < employeeIds.length) {
             await new Promise(resolve => setTimeout(resolve, 100));
         }
@@ -266,42 +252,38 @@ async function fetchDeputyEmployees(domain, accessToken, employeeIds) {
     return employees;
 }
 
-// Helper: Analyze roster compliance with Australian Modern Awards
 async function analyzeRosterCompliance(shift) {
     const warnings = [];
     let penaltyMultiplier = 1.0;
-    const baseRate = 25.00; // Simplified - should be fetched from classification
+    const baseRate = 25.00;
 
     const shiftDate = shift.date;
     const dayOfWeek = shiftDate.getDay();
 
-    // Sunday penalty (175% - Restaurant Industry Award)
     if (dayOfWeek === 0) {
         penaltyMultiplier = 1.75;
         warnings.push({
             type: 'Sunday Penalty Rate',
             severity: 'info',
-            message: 'Sunday work requires 175% penalty rate (Restaurant Award)',
+            message: 'Sunday work requires 175% penalty rate',
             multiplier: 1.75,
             suggestion: 'Ensure payroll reflects Sunday penalty rates',
             reference: 'Restaurant Industry Award 2020 - Clause 30.3'
         });
     }
 
-    // Saturday penalty (150%)
     if (dayOfWeek === 6) {
         penaltyMultiplier = 1.5;
         warnings.push({
             type: 'Saturday Penalty Rate',
             severity: 'info',
-            message: 'Saturday work requires 150% penalty rate (Restaurant Award)',
+            message: 'Saturday work requires 150% penalty rate',
             multiplier: 1.5,
             suggestion: 'Ensure payroll reflects Saturday penalty rates',
             reference: 'Restaurant Industry Award 2020 - Clause 30.2'
         });
     }
 
-    // Public holiday penalty (250%)
     if (shift.isPublicHoliday) {
         penaltyMultiplier = 2.5;
         warnings.push({
@@ -309,60 +291,21 @@ async function analyzeRosterCompliance(shift) {
             severity: 'high',
             message: 'Public holiday work requires 250% penalty rate',
             multiplier: 2.5,
-            suggestion: 'Employee may also be entitled to day-in-lieu if normally rostered',
+            suggestion: 'Employee may also be entitled to day-in-lieu',
             reference: 'Restaurant Industry Award 2020 - Clause 37'
         });
     }
 
-    // Minimum 3-hour engagement
     if (shift.totalHours < 3) {
         warnings.push({
             type: 'Minimum Engagement Breach',
             severity: 'high',
-            message: `Shift is ${shift.totalHours.toFixed(1)}h but minimum engagement is 3 hours`,
-            suggestion: 'Must pay employee for minimum 3 hours or extend shift',
+            message: `Shift is ${shift.totalHours.toFixed(1)}h but minimum is 3 hours`,
+            suggestion: 'Must pay for minimum 3 hours or extend shift',
             reference: 'Restaurant Industry Award 2020 - Clause 25.2'
         });
     }
 
-    // Split shift (unpaid break > 2 hours)
-    const breakHours = shift.breakMinutes / 60;
-    if (breakHours > 2) {
-        warnings.push({
-            type: 'Split Shift',
-            severity: 'medium',
-            message: `Break of ${breakHours.toFixed(1)}h exceeds 2 hours - this is a split shift`,
-            suggestion: 'Additional allowance of $4.31 applies for split shifts',
-            reference: 'Restaurant Industry Award 2020 - Clause 25.6'
-        });
-    }
-
-    // Evening work (after 7pm)
-    const startHour = parseInt(shift.startTime);
-    const endHour = parseInt(shift.endTime);
-    
-    if (endHour >= 19 || endHour < startHour) { // endHour < startHour means overnight
-        warnings.push({
-            type: 'Evening/Night Work',
-            severity: 'info',
-            message: 'Shift extends into evening - check if additional penalties apply',
-            suggestion: 'Work after midnight may attract overnight penalty rates',
-            reference: 'Restaurant Industry Award 2020 - Clause 30'
-        });
-    }
-
-    // Overnight work (spans midnight)
-    if (endHour < startHour || startHour <= 6) {
-        warnings.push({
-            type: 'Overnight Work',
-            severity: 'medium',
-            message: 'Overnight work detected - additional penalties apply',
-            suggestion: 'Hours between midnight and 7am attract overnight penalty (175%+)',
-            reference: 'Restaurant Industry Award 2020 - Clause 30.4'
-        });
-    }
-
-    // Calculate total cost
     const totalCost = shift.totalHours * baseRate * penaltyMultiplier;
 
     return {
@@ -379,26 +322,23 @@ async function analyzeRosterCompliance(shift) {
     };
 }
 
-// Helper: Check if date is Australian public holiday
 async function isAustralianPublicHoliday(date) {
-    // Simplified check - in production, use a proper holiday API
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
     
     const holidays = [
-        { m: 1, d: 1 },   // New Year's Day
-        { m: 1, d: 26 },  // Australia Day
-        { m: 4, d: 25 },  // ANZAC Day
-        { m: 12, d: 25 }, // Christmas Day
-        { m: 12, d: 26 }  // Boxing Day
+        { m: 1, d: 1 },
+        { m: 1, d: 26 },
+        { m: 4, d: 25 },
+        { m: 12, d: 25 },
+        { m: 12, d: 26 }
     ];
     
     return holidays.some(h => h.m === month && h.d === day);
 }
 
-// Helper: Refresh Deputy token
-async function refreshDeputyToken(integration, supabase) {
+async function refreshDeputyToken(integration, supabaseClient) {
     const response = await fetch('https://once.deputy.com/oauth/access_token', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -413,8 +353,7 @@ async function refreshDeputyToken(integration, supabase) {
     const tokens = await response.json();
     const expiresAt = new Date(Date.now() + (tokens.expires_in || 3600) * 1000).toISOString();
     
-    // Update in database
-    await supabase
+    await supabaseClient
         .from('integrations')
         .update({
             access_token: tokens.access_token,
@@ -426,19 +365,16 @@ async function refreshDeputyToken(integration, supabase) {
     return tokens.access_token;
 }
 
-// Helper: Format date as YYYY-MM-DD
 function formatDate(date) {
     return date.toISOString().split('T')[0];
 }
 
-// Helper: Format Unix timestamp to HH:MM
 function formatTime(timestamp) {
     if (!timestamp) return '00:00';
     const date = new Date(timestamp * 1000);
     return date.toTimeString().slice(0, 5);
 }
 
-// Helper: Calculate hours between timestamps
 function calculateHours(startTimestamp, endTimestamp, breakMinutes = 0) {
     const startTime = new Date(startTimestamp * 1000);
     const endTime = new Date(endTimestamp * 1000);
