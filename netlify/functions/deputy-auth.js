@@ -4,7 +4,6 @@
 const fetch = require('node-fetch');
 
 exports.handler = async (event) => {
-    // CORS headers
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
@@ -12,16 +11,10 @@ exports.handler = async (event) => {
         'Content-Type': 'application/json'
     };
 
-    // Handle preflight requests
     if (event.httpMethod === 'OPTIONS') {
-        return {
-            statusCode: 200,
-            headers,
-            body: ''
-        };
+        return { statusCode: 200, headers, body: '' };
     }
 
-    // Only allow POST requests
     if (event.httpMethod !== 'POST') {
         return {
             statusCode: 405,
@@ -39,7 +32,6 @@ exports.handler = async (event) => {
 
         console.log('Exchanging Deputy authorization code for tokens...');
 
-        // Exchange authorization code for access token
         const tokenResponse = await fetch('https://once.deputy.com/oauth/access_token', {
             method: 'POST',
             headers: {
@@ -62,10 +54,8 @@ exports.handler = async (event) => {
         }
 
         const tokens = await tokenResponse.json();
-
         console.log('Deputy tokens received successfully');
 
-        // Get Deputy installation info to get the subdomain
         const meResponse = await fetch('https://once.deputy.com/api/v1/me', {
             headers: {
                 'Authorization': `Bearer ${tokens.access_token}`,
@@ -73,26 +63,23 @@ exports.handler = async (event) => {
             }
         });
 
-        let deputyDomain = 'once'; // Default
+        let deputyDomain = 'once';
         if (meResponse.ok) {
             const meData = await meResponse.json();
-            // Extract subdomain from the installation
             if (meData && meData._DPMetaData && meData._DPMetaData.System) {
                 const systemData = JSON.parse(meData._DPMetaData.System);
                 deputyDomain = systemData.Subdomain || 'once';
             }
         }
 
-        // Calculate token expiry (Deputy tokens typically expire in 1 hour = 3600 seconds)
         const expiresIn = tokens.expires_in || 3600;
         const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString();
 
-        // Save tokens to Supabase if credentials provided
         if (user_id && supabase_url && supabase_key) {
-            const { createClient } = require('@supabase/supabase-js');
-            const supabase = createClient(supabase_url, supabase_key);
+            const supabase = require('@supabase/supabase-js');
+            const supabaseClient = supabase.createClient(supabase_url, supabase_key);
 
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('integrations')
                 .upsert({
                     user_id: user_id,
@@ -116,8 +103,7 @@ exports.handler = async (event) => {
                 throw new Error(`Failed to save tokens: ${error.message}`);
             }
 
-            // Log successful connection
-            await supabase.from('sync_logs').insert({
+            await supabaseClient.from('sync_logs').insert({
                 integration_id: data?.id,
                 user_id: user_id,
                 sync_type: 'connection',
