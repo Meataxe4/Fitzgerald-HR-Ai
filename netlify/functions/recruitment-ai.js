@@ -56,7 +56,7 @@ exports.handler = async (event, context) => {
 
       jobDescription: `You are an expert HR professional specializing in job descriptions. Create a professional, engaging job description with clear sections and formatting. Use markdown formatting for headers and bullet points.`,
 
-      interviewQuestions: `You are an expert HR professional specializing in recruitment interviews. Generate interview questions with detailed guidance. Format clearly with headers and bullet points for readability.`,
+      interviewQuestions: `You are an expert HR professional. Generate concise interview questions for the role. Format as a simple numbered list. Keep each question brief and clear. Focus on behavioral and technical competencies.`,
 
       requirements: `You are an expert HR professional specializing in job requirements. Generate 6-10 essential requirements for the given role. Format as a bulleted list. Include a mix of:
 - Educational qualifications
@@ -85,8 +85,8 @@ Questions should:
 
     const systemPrompt = systemPrompts[taskType] || systemPrompts.responsibilities;
 
-    // Adjust max_tokens based on task type
-    const maxTokens = taskType === 'interviewQuestions' ? 4000 : 2000;
+    // Adjust max_tokens based on task type - keep it lower for faster response
+    const maxTokens = taskType === 'interviewQuestions' ? 1500 : 2000;
 
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
