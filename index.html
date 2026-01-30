@@ -588,10 +588,13 @@ header button[onclick*="logout"],
         order: 2 !important;  /* Now third in order */
     }
     
-    /* Hide these buttons - put in More menu */
-    button[onclick*="toggleDarkMode"],
-    button[onclick*="showVenueSettings"],
-    button[onclick*="showFeedback"] {
+    /* Hide these buttons ONLY in header - NOT in Profile menu */
+    header button[onclick*="toggleDarkMode"],
+    header button[onclick*="showVenueSettings"],
+    header button[onclick*="showFeedback"],
+    .bg-slate-800\/80 button[onclick*="toggleDarkMode"],
+    .bg-slate-800\/80 button[onclick*="showVenueSettings"],
+    .bg-slate-800\/80 button[onclick*="showFeedback"] {
         display: none !important;
     }
     
