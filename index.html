@@ -9595,13 +9595,8 @@ async function generateResponsibilities() {
             throw new Error(result.error || 'Failed to generate responsibilities');
         }
         
-        // Handle the response - it could be array or text
-        let content;
-        if (Array.isArray(result.data)) {
-            content = result.data.map(item => `• ${item}`).join('\n');
-        } else {
-            content = result.rawResponse || result.data;
-        }
+        // Get the content directly from the response
+        const content = result.content;
         
         textarea.value = content;
         loading.classList.add('hidden');
@@ -9695,7 +9690,8 @@ Format as a complete, professional job description with sections for: Position O
             throw new Error(result.error || 'Failed to generate job description');
         }
         
-        const content = result.rawResponse || result.data;
+        // Get the content directly from the response
+        const content = result.content;
         
         // Show preview
         document.getElementById('jdPreviewContent').innerHTML = '<pre class="whitespace-pre-wrap text-slate-200">' + content + '</pre>';
@@ -9872,7 +9868,8 @@ Format clearly with headers and bullet points.`;
             throw new Error(result.error || 'Failed to generate interview questions');
         }
         
-        const content = result.rawResponse || result.data;
+        // Get the content directly from the response
+        const content = result.content;
         
         document.getElementById('iqPreviewContent').innerHTML = '<pre class="whitespace-pre-wrap text-slate-200">' + content + '</pre>';
         document.getElementById('interviewQuestionsPreviewModal').classList.remove('hidden');
@@ -14705,3 +14702,5 @@ window.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
+
+
