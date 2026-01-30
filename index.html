@@ -14420,30 +14420,52 @@ function closeDeputyConnection() {
 
 async function initiateDeputyOAuth() {
     try {
+        console.log('🔵 Starting Deputy OAuth flow...');
+        
         if (!window.supabase) {
+            console.error('❌ Supabase not initialized');
             alert('❌ System not ready. Please refresh the page.');
             return;
         }
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) { alert('⚠️ Please log in to connect Deputy'); return; }
+        console.log('✅ Supabase is ready');
+        
+        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        console.log('User check:', user ? 'Logged in' : 'Not logged in', userError);
+        
+        if (!user) { 
+            alert('⚠️ Please log in to connect Deputy'); 
+            return; 
+        }
+        console.log('✅ User authenticated:', user.id);
+        
         // Check Pro plan (skip if subscriptions table doesn't exist yet)
         try {
-            const { data: subscription } = await supabase.from('subscriptions').select('plan').eq('user_id', user.id).single();
+            const { data: subscription, error: subError } = await supabase.from('subscriptions').select('plan').eq('user_id', user.id).single();
+            console.log('Subscription check:', subscription, subError);
             if (subscription && subscription.plan !== 'pro') { 
                 alert('⚠️ Deputy integration requires the Pro plan ($149/month). Please upgrade to continue.');
                 return;
             }
         } catch (error) {
-            // Subscriptions table doesn't exist yet - allow connection for testing
             console.log('Note: Skipping Pro plan check (subscriptions table not found)');
         }
+        
         const clientId = 'd4dc4f6ad1df8becf939538f5dd48ba724536a7';
         const redirectUri = `${window.location.origin}/auth/deputy/callback`;
         const scope = 'longlife_refresh_token roster.read employee.read timesheet.read';
         const state = generateRandomString(32);
+        
+        console.log('🔵 OAuth URL:', `https://once.deputy.com/my/oauth/login?client_id=${clientId}&redirect_uri=${redirectUri}`);
+        
         sessionStorage.setItem('deputy_oauth_state', state);
+        console.log('✅ Redirecting to Deputy...');
+        
         window.location.href = `https://once.deputy.com/my/oauth/login?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}`;
-    } catch (error) { alert('❌ Failed to connect Deputy'); }
+    } catch (error) { 
+        console.error('❌ Deputy OAuth Error:', error);
+        console.error('Error details:', error.message, error.stack);
+        alert(`❌ Failed to connect Deputy: ${error.message}`); 
+    }
 }
 
 async function handleDeputyCallback() {
