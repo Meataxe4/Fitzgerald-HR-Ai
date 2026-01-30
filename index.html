@@ -14337,6 +14337,190 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+
+// ========================================
+// INTEGRATION HUB FUNCTIONS
+// ========================================
+
+function openIntegrationHub() {
+    document.getElementById('integrationHubModal').classList.remove('hidden');
+    checkDeputyConnection();
+}
+
+function closeIntegrationHub() {
+    document.getElementById('integrationHubModal').classList.add('hidden');
+}
+
+async function checkDeputyConnection() {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        
+        const { data: integration } = await supabase
+            .from('integrations')
+            .select('*')
+            .eq('user_id', user.id)
+            .eq('platform', 'deputy')
+            .eq('is_active', true)
+            .single();
+        
+        if (integration) {
+            document.getElementById('deputyStatus').textContent = 'Connected';
+            document.getElementById('deputyStatusBadge').textContent = 'Connected';
+            document.getElementById('deputyStatusBadge').className = 'px-3 py-1 bg-green-500/20 text-green-400 text-xs font-semibold rounded-full';
+            document.getElementById('deputyLastSync').style.display = 'flex';
+            if (integration.last_synced) {
+                const lastSync = new Date(integration.last_synced);
+                const now = new Date();
+                const diffMins = Math.floor((now - lastSync) / (1000 * 60));
+                const diffHours = Math.floor(diffMins / 60);
+                document.getElementById('deputyLastSyncTime').textContent = diffHours > 0 ? `${diffHours}h ago` : diffMins > 0 ? `${diffMins}m ago` : 'Just now';
+            }
+            document.getElementById('deputyConnectBtn').classList.add('hidden');
+            document.getElementById('deputyDashboardBtn').classList.remove('hidden');
+            document.getElementById('connectedCount').textContent = '1';
+        }
+    } catch (error) {
+        console.error('Error checking Deputy:', error);
+    }
+}
+
+async function syncAllIntegrations() {
+    showNotification('🔄 Syncing...', 'info');
+    try {
+        await syncDeputyRosters();
+    } catch (error) {
+        console.error('Sync error:', error);
+    }
+}
+
+
+
+// ========================================
+// DEPUTY INTEGRATION - FRONTEND CODE
+// ========================================
+
+let deputyAccessToken = null;
+let deputyRefreshToken = null;
+let rosterData = [];
+
+function openDeputyConnection() {
+    document.getElementById('deputyConnectionModal').classList.remove('hidden');
+}
+
+function closeDeputyConnection() {
+    document.getElementById('deputyConnectionModal').classList.add('hidden');
+}
+
+async function initiateDeputyOAuth() {
+    try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { alert('⚠️ Please log in to connect Deputy'); return; }
+        const { data: subscription } = await supabase.from('subscriptions').select('plan').eq('user_id', user.id).single();
+        if (subscription?.plan !== 'pro') { alert('⚠️ Deputy requires Pro plan'); return; }
+        const clientId = 'd4dc4f6ad1df8becf939538f5dd48ba724536a7';
+        const redirectUri = `${window.location.origin}/auth/deputy/callback`;
+        const scope = 'longlife_refresh_token roster.read employee.read timesheet.read';
+        const state = generateRandomString(32);
+        sessionStorage.setItem('deputy_oauth_state', state);
+        window.location.href = `https://once.deputy.com/my/oauth/login?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}`;
+    } catch (error) { alert('❌ Failed to connect Deputy'); }
+}
+
+async function handleDeputyCallback() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        if (!code) return;
+        const state = urlParams.get('state');
+        if (state !== sessionStorage.getItem('deputy_oauth_state')) throw new Error('Invalid state');
+        showNotification('🔄 Connecting...', 'info');
+        const { data: { user } } = await supabase.auth.getUser();
+        const response = await fetch('/.netlify/functions/deputy-auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code, user_id: user.id, supabase_url: supabase.supabaseUrl, supabase_key: supabase.supabaseKey })
+        });
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error);
+        sessionStorage.removeItem('deputy_oauth_state');
+        window.history.replaceState({}, document.title, window.location.pathname);
+        showNotification('✅ Connected!', 'success');
+        await syncDeputyRosters();
+        closeDeputyConnection();
+        openRosterCompliance();
+    } catch (error) {
+        showNotification(`❌ ${error.message}`, 'error');
+        sessionStorage.removeItem('deputy_oauth_state');
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+}
+
+async function syncDeputyRosters() {
+    try {
+        showNotification('🔄 Syncing...', 'info');
+        const { data: { user } } = await supabase.auth.getUser();
+        const response = await fetch('/.netlify/functions/deputy-sync-rosters', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: user.id, supabase_url: supabase.supabaseUrl, supabase_key: supabase.supabaseKey })
+        });
+        const data = await response.json();
+        if (!data.success) throw new Error(data.error);
+        rosterData = data.rosters || [];
+        if (document.getElementById('lastSyncTime')) document.getElementById('lastSyncTime').textContent = 'Just now';
+        if (!document.getElementById('rosterComplianceModal').classList.contains('hidden')) updateRosterDashboard(rosterData);
+        showNotification(`✅ Synced ${data.total} shifts${data.issues ? `. ⚠️ ${data.issues} issue(s)` : ''}`, data.issues ? 'warning' : 'success');
+    } catch (error) {
+        showNotification(`❌ ${error.message}`, 'error');
+    }
+}
+
+function updateRosterDashboard(rosters) {
+    if (!rosters || !rosters.length) { document.getElementById('rosterList').innerHTML = '<div class="text-center py-12"><div class="text-6xl mb-4">📅</div><div class="text-xl text-slate-400">No rosters found</div></div>'; return; }
+    const total = rosters.length;
+    const compliant = rosters.filter(r => r.compliance.isCompliant).length;
+    const cost = rosters.reduce((sum, r) => sum + (r.compliance.totalCost || 0), 0);
+    document.getElementById('totalShifts').textContent = total;
+    document.getElementById('compliantShifts').textContent = compliant;
+    document.getElementById('issueShifts').textContent = total - compliant;
+    document.getElementById('totalCost').textContent = `$${cost.toFixed(2)}`;
+    document.getElementById('rosterList').innerHTML = rosters.map(r => `<div class="bg-slate-700 rounded-lg p-4 ${r.compliance.warnings.length ? 'border-2 border-red-500' : 'border border-slate-600'}"><div class="flex justify-between mb-3"><div class="flex gap-3"><div class="w-12 h-12 bg-slate-600 rounded-full flex items-center justify-center text-white font-bold">${r.employee.name[0]}</div><div><div class="font-semibold text-white">${r.employee.name}</div><div class="text-sm text-slate-400">${r.position}</div></div></div><div class="text-right"><div class="font-semibold text-white">${r.date}</div><div class="text-sm text-slate-400">${r.startTime}-${r.endTime}</div></div></div>${r.compliance.warnings.length ? `<div class="bg-red-900/30 border border-red-500/30 rounded p-3"><div class="font-semibold text-red-400">⚠️ ${r.compliance.warnings.length} Issue(s)</div>${r.compliance.warnings.map(w => `<div class="text-sm text-red-300 mt-1">${w.type}: ${w.message}</div>`).join('')}</div>` : '<div class="bg-green-900/30 border border-green-500/30 rounded p-3 text-green-400">✅ Compliant</div>'}</div>`).join('');
+}
+
+function openRosterCompliance() {
+    document.getElementById('rosterComplianceModal').classList.remove('hidden');
+    if (!rosterData.length) syncDeputyRosters(); else updateRosterDashboard(rosterData);
+}
+
+function closeRosterCompliance() {
+    document.getElementById('rosterComplianceModal').classList.add('hidden');
+}
+
+async function exportRosterReport(format) {
+    try {
+        showNotification(`📄 Generating...`, 'info');
+        if (format === 'pdf') {
+            pdfMake.createPdf({ content: [{ text: 'Roster Report', fontSize: 18, bold: true }, { text: new Date().toLocaleString('en-AU'), fontSize: 12, margin: [0,0,0,10] }, { table: { headerRows: 1, widths: ['*','*','auto','auto','auto'], body: [['Employee','Date','Hours','Cost','Status'], ...rosterData.map(r => [r.employee.name, r.date, `${r.totalHours}h`, `$${r.compliance.totalCost.toFixed(2)}`, r.compliance.isCompliant?'OK':'Issues'])] } }] }).download(`roster_${Date.now()}.pdf`);
+        } else {
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rosterData.map(r => ({ Employee:r.employee.name, Date:r.date, Hours:r.totalHours, Cost:r.compliance.totalCost, Status:r.compliance.isCompliant?'OK':'Issues' }))), 'Rosters');
+            XLSX.writeFile(wb, `roster_${Date.now()}.xlsx`);
+        }
+        showNotification('✅ Downloaded!', 'success');
+    } catch (error) { showNotification(`❌ ${error.message}`, 'error'); }
+}
+
+function generateRandomString(length) {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    return Array.from({length}, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    if (window.location.search.includes('code=')) handleDeputyCallback();
+});
+
+
 </script>
 
 
@@ -14981,6 +15165,406 @@ window.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 </div>
+
+
+
+
+<!-- ========================================
+     INTEGRATION HUB MODAL
+     ======================================== -->
+
+<div id="integrationHubModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-5xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                    <span>🔗</span> Integration Hub
+                </h2>
+                <p class="text-slate-400 text-sm">Connect your existing software to automate HR workflows</p>
+            </div>
+            <button onclick="closeIntegrationHub()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+
+        <!-- Integration Stats -->
+        <div class="bg-slate-900 rounded-lg p-4 mb-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="text-sm text-slate-400">Connected Integrations</div>
+                    <div class="text-2xl font-bold text-white" id="connectedCount">0</div>
+                </div>
+                <button onclick="syncAllIntegrations()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-colors">
+                    🔄 Sync All
+                </button>
+            </div>
+        </div>
+
+        <!-- Integrations Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- Deputy Integration Card -->
+            <div class="p-6 bg-slate-700 rounded-xl border-2 border-slate-600 hover:border-amber-500 transition-all">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center text-2xl">
+                            📅
+                        </div>
+                        <div>
+                            <div class="font-semibold text-white text-lg">Deputy</div>
+                            <div class="text-sm text-slate-400">Rostering & Time Tracking</div>
+                        </div>
+                    </div>
+                    <span id="deputyStatusBadge" class="px-3 py-1 bg-slate-600 text-slate-300 text-xs font-semibold rounded-full">
+                        PRO
+                    </span>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="text-sm text-slate-300 mb-2" id="deputyStatus">Not Connected</div>
+                    <div class="flex items-center gap-2 text-xs text-slate-400" id="deputyLastSync" style="display:none;">
+                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                        <span>Last synced: <span id="deputyLastSyncTime">Never</span></span>
+                    </div>
+                </div>
+                
+                <div class="space-y-2 mb-4 text-sm">
+                    <div class="flex items-center gap-2 text-slate-300">
+                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        Auto-import rosters
+                    </div>
+                    <div class="flex items-center gap-2 text-slate-300">
+                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        Award compliance checking
+                    </div>
+                    <div class="flex items-center gap-2 text-slate-300">
+                        <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        Real-time cost forecasting
+                    </div>
+                </div>
+                
+                <div class="flex gap-2">
+                    <button onclick="openDeputyConnection()" id="deputyConnectBtn" class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors">
+                        Connect
+                    </button>
+                    <button onclick="openRosterCompliance()" id="deputyDashboardBtn" class="hidden flex-1 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-colors">
+                        View Dashboard
+                    </button>
+                </div>
+            </div>
+
+            <!-- Xero Integration Card -->
+            <div class="p-6 bg-slate-700 rounded-xl border-2 border-slate-600 opacity-60">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-cyan-600 rounded-lg flex items-center justify-center text-2xl">
+                            💼
+                        </div>
+                        <div>
+                            <div class="font-semibold text-white text-lg">Xero</div>
+                            <div class="text-sm text-slate-400">Payroll & Accounting</div>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 bg-green-500/20 text-green-400 text-xs font-semibold rounded-full">
+                        PRO
+                    </span>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="text-sm text-slate-400">Coming Soon</div>
+                    <div class="text-xs text-slate-500 mt-1">Employee sync & payroll validation</div>
+                </div>
+                
+                <button disabled class="w-full px-4 py-2 bg-slate-600 text-slate-400 rounded-lg cursor-not-allowed">
+                    Coming Soon
+                </button>
+            </div>
+
+            <!-- Square Integration Card -->
+            <div class="p-6 bg-slate-700 rounded-xl border-2 border-slate-600 opacity-60">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-orange-600 rounded-lg flex items-center justify-center text-2xl">
+                            💳
+                        </div>
+                        <div>
+                            <div class="font-semibold text-white text-lg">Square POS</div>
+                            <div class="text-sm text-slate-400">Sales & Labor Forecasting</div>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 bg-amber-500/20 text-amber-400 text-xs font-semibold rounded-full">
+                        BASIC
+                    </span>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="text-sm text-slate-400">Coming Soon</div>
+                    <div class="text-xs text-slate-500 mt-1">Optimize staffing based on sales data</div>
+                </div>
+                
+                <button disabled class="w-full px-4 py-2 bg-slate-600 text-slate-400 rounded-lg cursor-not-allowed">
+                    Coming Soon
+                </button>
+            </div>
+
+            <!-- Employment Hero Card -->
+            <div class="p-6 bg-slate-700 rounded-xl border-2 border-slate-600 opacity-60">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center text-2xl">
+                            👥
+                        </div>
+                        <div>
+                            <div class="font-semibold text-white text-lg">Employment Hero</div>
+                            <div class="text-sm text-slate-400">HR Platform & Onboarding</div>
+                        </div>
+                    </div>
+                    <span class="px-3 py-1 bg-green-500/20 text-green-400 text-xs font-semibold rounded-full">
+                        PRO
+                    </span>
+                </div>
+                
+                <div class="mb-4">
+                    <div class="text-sm text-slate-400">Coming Soon</div>
+                    <div class="text-xs text-slate-500 mt-1">Sync documents & employee records</div>
+                </div>
+                
+                <button disabled class="w-full px-4 py-2 bg-slate-600 text-slate-400 rounded-lg cursor-not-allowed">
+                    Coming Soon
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Help Link -->
+        <div class="mt-6 text-center">
+            <a href="https://docs.fitzgeraldhraichatbot.com/integrations" target="_blank" class="text-sm text-slate-400 hover:text-amber-500 transition-colors">
+                Need help connecting integrations? View setup guide →
+            </a>
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================================
+     DEPUTY INTEGRATION - HTML MODALS
+     Add these before the closing </body> tag in index.html
+     ======================================== -->
+
+<!-- Deputy Connection Modal -->
+<div id="deputyConnectionModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border border-amber-500 fade-in">
+        <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center">
+                    <span class="text-3xl">📅</span>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-white">Connect Deputy</h2>
+                    <p class="text-slate-400 text-sm">Rostering & Time Tracking Integration</p>
+                </div>
+            </div>
+            <button onclick="closeDeputyConnection()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+
+        <div class="space-y-4 mb-6">
+            <div class="bg-slate-900 rounded-lg p-4">
+                <h3 class="font-semibold text-white mb-3">What you'll get:</h3>
+                <ul class="space-y-2">
+                    <li class="flex items-start gap-2 text-slate-300">
+                        <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <div class="font-medium">Auto-import rosters from Deputy</div>
+                            <div class="text-sm text-slate-400">Pull rosters directly into Fitzgerald HR</div>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-2 text-slate-300">
+                        <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <div class="font-medium">Instant compliance checking</div>
+                            <div class="text-sm text-slate-400">Detect Modern Award breaches before you publish</div>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-2 text-slate-300">
+                        <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <div class="font-medium">Real-time cost forecasting</div>
+                            <div class="text-sm text-slate-400">See true labor costs with penalty rates</div>
+                        </div>
+                    </li>
+                    <li class="flex items-start gap-2 text-slate-300">
+                        <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <div class="font-medium">Automated compliance alerts</div>
+                            <div class="text-sm text-slate-400">Get notified instantly of roster issues</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4">
+                <div class="flex items-start gap-2">
+                    <svg class="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                    </svg>
+                    <div class="text-sm text-amber-300">
+                        <div class="font-semibold mb-1">Requires Pro Plan</div>
+                        <div>Deputy integration is available on the Pro plan ($149/month).</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex gap-3">
+            <button onclick="initiateDeputyOAuth()" class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                Connect Deputy
+            </button>
+            <button onclick="closeDeputyConnection()" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
+                Cancel
+            </button>
+        </div>
+
+        <div class="mt-4 text-center">
+            <a href="https://docs.deputy.com" target="_blank" class="text-sm text-slate-400 hover:text-amber-500 transition-colors">
+                Need help? View Deputy integration guide →
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Roster Compliance Dashboard Modal -->
+<div id="rosterComplianceModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-6xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-amber-500">📊 Roster Compliance Dashboard</h2>
+                <p class="text-slate-400 text-sm">Deputy rosters analyzed for Australian Modern Award compliance</p>
+            </div>
+            <button onclick="closeRosterCompliance()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+
+        <!-- Sync Status Bar -->
+        <div class="bg-slate-900 rounded-lg p-4 mb-6">
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+                    <div>
+                        <div class="font-semibold text-white">Connected to Deputy</div>
+                        <div class="text-sm text-slate-400">Last synced: <span id="lastSyncTime">Never</span></div>
+                    </div>
+                </div>
+                <button onclick="syncDeputyRosters()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    Sync Now
+                </button>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+            <div class="bg-slate-700 rounded-lg p-4">
+                <div class="text-slate-400 text-sm mb-1">Total Shifts</div>
+                <div class="text-3xl font-bold text-white" id="totalShifts">0</div>
+            </div>
+            <div class="bg-green-900/30 border border-green-500/30 rounded-lg p-4">
+                <div class="text-green-400 text-sm mb-1">✅ Compliant</div>
+                <div class="text-3xl font-bold text-green-500" id="compliantShifts">0</div>
+            </div>
+            <div class="bg-red-900/30 border border-red-500/30 rounded-lg p-4">
+                <div class="text-red-400 text-sm mb-1">⚠️ Issues Found</div>
+                <div class="text-3xl font-bold text-red-500" id="issueShifts">0</div>
+            </div>
+            <div class="bg-amber-900/30 border border-amber-500/30 rounded-lg p-4">
+                <div class="text-amber-400 text-sm mb-1">💰 Total Cost</div>
+                <div class="text-3xl font-bold text-amber-500" id="totalCost">$0</div>
+            </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="flex gap-3 mb-4">
+            <select id="filterPeriod" class="bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                <option>Next 7 Days</option>
+                <option>Next 14 Days</option>
+                <option selected>Next 30 Days</option>
+            </select>
+            <select id="filterStatus" class="bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                <option value="all">All Shifts</option>
+                <option value="compliant">✅ Compliant Only</option>
+                <option value="issues">⚠️ Issues Only</option>
+            </select>
+            <input type="text" id="searchEmployee" placeholder="Search employee..." class="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500">
+        </div>
+
+        <!-- Roster List -->
+        <div id="rosterList" class="space-y-3 mb-6">
+            <!-- Roster cards will be inserted here dynamically -->
+            <div class="text-center py-12">
+                <div class="text-6xl mb-4">📅</div>
+                <div class="text-xl text-slate-400">Loading rosters...</div>
+                <div class="text-sm text-slate-500 mt-2">Please wait while we sync your Deputy data</div>
+            </div>
+        </div>
+
+        <!-- Export Options -->
+        <div class="flex gap-3">
+            <button onclick="exportRosterReport('pdf')" class="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v3.586l-1.293-1.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V8z" clip-rule="evenodd"/>
+                </svg>
+                Export PDF
+            </button>
+            <button onclick="exportRosterReport('excel')" class="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                </svg>
+                Export Excel
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Add Deputy Button to Sidebar (Add this where appropriate in your sidebar) -->
+<button onclick="openDeputyConnection()" class="flex items-center gap-3 w-full px-4 py-3 text-left text-slate-300 hover:bg-slate-700 hover:text-amber-500 transition-colors rounded-lg">
+    <span class="text-xl">📅</span>
+    <div>
+        <div class="font-medium">Deputy Integration</div>
+        <div class="text-xs text-slate-500">Connect rostering system</div>
+    </div>
+</button>
+
+<!-- OR Add to Tools Menu (Alternative placement) -->
+<div class="p-6 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500 cursor-pointer" onclick="openDeputyConnection()">
+    <div class="flex items-start gap-4">
+        <span class="text-4xl">📅</span>
+        <div>
+            <div class="font-semibold text-white text-lg mb-2">Deputy Integration</div>
+            <div class="text-sm text-slate-400 mb-3">Connect your Deputy account to automatically import rosters and check Modern Award compliance</div>
+            <div class="flex flex-wrap gap-2">
+                <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Auto-Sync</span>
+                <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">Compliance Check</span>
+                <span class="text-xs bg-amber-500/20 text-amber-400 px-2 py-1 rounded">Pro Feature</span>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 </body>
 </html>
