@@ -1,6 +1,10 @@
 const Anthropic = require('@anthropic-ai/sdk');
 
+// Increase function timeout to 26 seconds (Netlify max for background functions)
 exports.handler = async (event, context) => {
+  // Set function timeout
+  context.callbackWaitsForEmptyEventLoop = false;
+  
   // Handle CORS preflight
   if (event.httpMethod === 'OPTIONS') {
     return {
@@ -81,9 +85,12 @@ Questions should:
 
     const systemPrompt = systemPrompts[taskType] || systemPrompts.responsibilities;
 
+    // Adjust max_tokens based on task type
+    const maxTokens = taskType === 'interviewQuestions' ? 4000 : 2000;
+
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 2000,
+      max_tokens: maxTokens,
       temperature: 0.7,
       system: systemPrompt,
       messages: [{
