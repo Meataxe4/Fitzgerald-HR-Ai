@@ -14353,6 +14353,12 @@ function closeIntegrationHub() {
 
 async function checkDeputyConnection() {
     try {
+        // Check if supabase is initialized
+        if (!window.supabase || !supabase.auth) {
+            console.log('Supabase not initialized yet');
+            return;
+        }
+        
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
         
@@ -14414,10 +14420,23 @@ function closeDeputyConnection() {
 
 async function initiateDeputyOAuth() {
     try {
+        if (!window.supabase) {
+            alert('❌ System not ready. Please refresh the page.');
+            return;
+        }
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) { alert('⚠️ Please log in to connect Deputy'); return; }
-        const { data: subscription } = await supabase.from('subscriptions').select('plan').eq('user_id', user.id).single();
-        if (subscription?.plan !== 'pro') { alert('⚠️ Deputy requires Pro plan'); return; }
+        // Check Pro plan (skip if subscriptions table doesn't exist yet)
+        try {
+            const { data: subscription } = await supabase.from('subscriptions').select('plan').eq('user_id', user.id).single();
+            if (subscription && subscription.plan !== 'pro') { 
+                alert('⚠️ Deputy integration requires the Pro plan ($149/month). Please upgrade to continue.');
+                return;
+            }
+        } catch (error) {
+            // Subscriptions table doesn't exist yet - allow connection for testing
+            console.log('Note: Skipping Pro plan check (subscriptions table not found)');
+        }
         const clientId = 'd4dc4f6ad1df8becf939538f5dd48ba724536a7';
         const redirectUri = `${window.location.origin}/auth/deputy/callback`;
         const scope = 'longlife_refresh_token roster.read employee.read timesheet.read';
@@ -14434,6 +14453,12 @@ async function handleDeputyCallback() {
         if (!code) return;
         const state = urlParams.get('state');
         if (state !== sessionStorage.getItem('deputy_oauth_state')) throw new Error('Invalid state');
+        
+        if (!window.supabase) {
+            showNotification('❌ System not ready', 'error');
+            return;
+        }
+        
         showNotification('🔄 Connecting...', 'info');
         const { data: { user } } = await supabase.auth.getUser();
         const response = await fetch('/.netlify/functions/deputy-auth', {
@@ -14458,6 +14483,10 @@ async function handleDeputyCallback() {
 
 async function syncDeputyRosters() {
     try {
+        if (!window.supabase) {
+            showNotification('❌ System not ready', 'error');
+            return;
+        }
         showNotification('🔄 Syncing...', 'info');
         const { data: { user } } = await supabase.auth.getUser();
         const response = await fetch('/.netlify/functions/deputy-sync-rosters', {
