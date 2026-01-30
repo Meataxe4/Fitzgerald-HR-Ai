@@ -9940,6 +9940,12 @@ Format clearly with headers and bullet points.`;
             })
         });
         
+        // Check if response is HTML (error page) instead of JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+            throw new Error('Server returned an error. This may be due to a timeout. Try requesting fewer questions (10 instead of 20).');
+        }
+        
         const result = await response.json();
         
         if (!response.ok || !result.success) {
@@ -9962,7 +9968,14 @@ Format clearly with headers and bullet points.`;
         trackEvent('interview_questions_generated', { jobTitle: iqData.jobTitle, count: iqData.questionCount });
     } catch (error) {
         console.error('Error generating questions:', error);
-        showToast('Error generating questions', 'error');
+        
+        // Show user-friendly error message
+        let errorMessage = 'Error generating questions';
+        if (error.message.includes('timeout') || error.message.includes('fewer questions')) {
+            errorMessage = 'Generation took too long. Try selecting fewer questions (10 or 15 instead of 20).';
+        }
+        
+        showToast(errorMessage, 'error');
         
         // Show wizard steps again on error
         document.getElementById('iqGenerating').classList.add('hidden');
