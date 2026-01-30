@@ -9653,9 +9653,9 @@ async function generateJobDescription() {
         return;
     }
     
-    // Show loading
-    closeJobDescriptionBuilder();
-    showToast('Generating job description...', 'info');
+    // Hide wizard steps, show loading
+    document.getElementById('jdBuilderSteps').classList.add('hidden');
+    document.getElementById('jdGenerating').classList.remove('hidden');
     
     try {
         const prompt = `Create a professional job description for:
@@ -9693,6 +9693,12 @@ Format as a complete, professional job description with sections for: Position O
         // Get the content directly from the response
         const content = result.content;
         
+        // Store for download
+        jdData.generatedContent = content;
+        
+        // Close job description builder modal
+        closeJobDescriptionBuilder();
+        
         // Show preview
         document.getElementById('jdPreviewContent').innerHTML = '<pre class="whitespace-pre-wrap text-slate-200">' + content + '</pre>';
         document.getElementById('jobDescriptionPreviewModal').classList.remove('hidden');
@@ -9701,6 +9707,10 @@ Format as a complete, professional job description with sections for: Position O
     } catch (error) {
         console.error('Error generating job description:', error);
         showToast('Error generating job description', 'error');
+        
+        // Show wizard steps again on error
+        document.getElementById('jdGenerating').classList.add('hidden');
+        document.getElementById('jdBuilderSteps').classList.remove('hidden');
     }
 }
 
@@ -9708,21 +9718,45 @@ function closeJobDescriptionPreview() {
     document.getElementById('jobDescriptionPreviewModal').classList.add('hidden');
 }
 
-function downloadJobDescription(format) {
-    const content = document.getElementById('jdPreviewContent').innerText;
-    const filename = `Job_Description_${jdData.jobTitle.replace(/\s+/g, '_')}.${format}`;
+async function downloadJobDescription(format) {
+    const content = jdData.generatedContent || document.getElementById('jdPreviewContent').innerText;
+    const filename = `Job_Description_${jdData.jobTitle.replace(/\s+/g, '_')}`;
     
     if (format === 'docx') {
-        // Use existing DOCX skill
-        showToast('Preparing DOCX download...', 'info');
-        // Implementation would use docx skill
+        try {
+            // Convert markdown-style content to HTML
+            const htmlContent = convertMarkdownToHTML(content);
+            
+            // Generate Word document using existing function
+            await generateWordDocument(htmlContent, `${filename}.docx`, {
+                documentId: generateDocumentId(),
+                userName: currentUser,
+                documentType: 'Job Description'
+            });
+            
+            trackEvent('job_description_downloaded', { format: 'docx', jobTitle: jdData.jobTitle });
+        } catch (error) {
+            console.error('Error downloading DOCX:', error);
+            showToast('Error generating Word document', 'error');
+        }
     } else if (format === 'pdf') {
-        // Use existing PDF skill
-        showToast('Preparing PDF download...', 'info');
-        // Implementation would use pdf skill
+        try {
+            // Convert markdown-style content to HTML
+            const htmlContent = convertMarkdownToHTML(content);
+            
+            // Generate PDF using existing function
+            await generatePDFDocument(htmlContent, `${filename}.pdf`, {
+                documentId: generateDocumentId(),
+                userName: currentUser,
+                documentType: 'Job Description'
+            });
+            
+            trackEvent('job_description_downloaded', { format: 'pdf', jobTitle: jdData.jobTitle });
+        } catch (error) {
+            console.error('Error downloading PDF:', error);
+            showToast('Error generating PDF document', 'error');
+        }
     }
-    
-    trackEvent('job_description_downloaded', { format: format, jobTitle: jdData.jobTitle });
 }
 
 // Interview Questions Generator
@@ -9835,8 +9869,9 @@ async function generateInterviewQuestions() {
         return;
     }
     
-    closeInterviewQuestions();
-    showToast('Generating interview questions...', 'info');
+    // Hide wizard steps, show loading
+    document.getElementById('iqBuilderSteps').classList.add('hidden');
+    document.getElementById('iqGenerating').classList.remove('hidden');
     
     try {
         const prompt = `Generate ${iqData.questionCount} interview questions for a ${iqData.experienceLevel} level ${iqData.jobTitle} in Australian hospitality.
@@ -9871,6 +9906,13 @@ Format clearly with headers and bullet points.`;
         // Get the content directly from the response
         const content = result.content;
         
+        // Store for download
+        iqData.generatedContent = content;
+        
+        // Close interview questions modal
+        closeInterviewQuestions();
+        
+        // Show preview
         document.getElementById('iqPreviewContent').innerHTML = '<pre class="whitespace-pre-wrap text-slate-200">' + content + '</pre>';
         document.getElementById('interviewQuestionsPreviewModal').classList.remove('hidden');
         
@@ -9878,6 +9920,10 @@ Format clearly with headers and bullet points.`;
     } catch (error) {
         console.error('Error generating questions:', error);
         showToast('Error generating questions', 'error');
+        
+        // Show wizard steps again on error
+        document.getElementById('iqGenerating').classList.add('hidden');
+        document.getElementById('iqBuilderSteps').classList.remove('hidden');
     }
 }
 
@@ -9885,12 +9931,45 @@ function closeInterviewQuestionsPreview() {
     document.getElementById('interviewQuestionsPreviewModal').classList.add('hidden');
 }
 
-function downloadInterviewQuestions(format) {
-    const content = document.getElementById('iqPreviewContent').innerText;
-    const filename = `Interview_Questions_${iqData.jobTitle.replace(/\s+/g, '_')}.${format}`;
+async function downloadInterviewQuestions(format) {
+    const content = iqData.generatedContent || document.getElementById('iqPreviewContent').innerText;
+    const filename = `Interview_Questions_${iqData.jobTitle.replace(/\s+/g, '_')}`;
     
-    showToast(`Preparing ${format.toUpperCase()} download...`, 'info');
-    trackEvent('interview_questions_downloaded', { format: format, jobTitle: iqData.jobTitle });
+    if (format === 'docx') {
+        try {
+            // Convert markdown-style content to HTML
+            const htmlContent = convertMarkdownToHTML(content);
+            
+            // Generate Word document using existing function
+            await generateWordDocument(htmlContent, `${filename}.docx`, {
+                documentId: generateDocumentId(),
+                userName: currentUser,
+                documentType: 'Interview Questions'
+            });
+            
+            trackEvent('interview_questions_downloaded', { format: 'docx', jobTitle: iqData.jobTitle });
+        } catch (error) {
+            console.error('Error downloading DOCX:', error);
+            showToast('Error generating Word document', 'error');
+        }
+    } else if (format === 'pdf') {
+        try {
+            // Convert markdown-style content to HTML
+            const htmlContent = convertMarkdownToHTML(content);
+            
+            // Generate PDF using existing function
+            await generatePDFDocument(htmlContent, `${filename}.pdf`, {
+                documentId: generateDocumentId(),
+                userName: currentUser,
+                documentType: 'Interview Questions'
+            });
+            
+            trackEvent('interview_questions_downloaded', { format: 'pdf', jobTitle: iqData.jobTitle });
+        } catch (error) {
+            console.error('Error downloading PDF:', error);
+            showToast('Error generating PDF document', 'error');
+        }
+    }
 }
 
 // Reference Check Form
@@ -13448,6 +13527,38 @@ function generateDocumentId() {
     return 'DOC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9).toUpperCase();
 }
 
+// Convert markdown-style content to HTML for PDF/Word export
+function convertMarkdownToHTML(markdown) {
+    let html = markdown;
+    
+    // Convert headers (## Header -> <h2>Header</h2>)
+    html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+    html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+    
+    // Convert bold (**text** -> <strong>text</strong>)
+    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    
+    // Convert bullet points (• text or - text -> <li>text</li>)
+    html = html.replace(/^[•\-] (.+)$/gm, '<li>$1</li>');
+    
+    // Wrap consecutive <li> items in <ul>
+    html = html.replace(/(<li>.*<\/li>\n?)+/g, (match) => {
+        return '<ul>' + match + '</ul>';
+    });
+    
+    // Convert line breaks to paragraphs
+    html = html.split('\n\n').map(para => {
+        // Don't wrap if it's already wrapped in a tag
+        if (para.trim().startsWith('<')) {
+            return para;
+        }
+        return '<p>' + para.replace(/\n/g, '<br>') + '</p>';
+    }).join('\n');
+    
+    return html;
+}
+
+
 // ========================================
 // TESTIMONIAL ROTATION SYSTEM
 // ========================================
@@ -14388,6 +14499,20 @@ window.addEventListener('DOMContentLoaded', function() {
             <button onclick="closeInterviewQuestions()" class="text-slate-400 hover:text-white text-2xl">×</button>
         </div>
 
+        <!-- Loading Screen -->
+        <div id="iqGenerating" class="hidden text-center py-12">
+            <div class="text-6xl mb-4 animate-bounce">🤖</div>
+            <h3 class="text-amber-400 font-bold text-xl mb-2">Fitz is generating your interview questions...</h3>
+            <p class="text-slate-400 text-sm">This may take 10-20 seconds</p>
+            <div class="mt-6 flex justify-center gap-2">
+                <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+            </div>
+        </div>
+
+        <!-- Steps Container -->
+        <div id="iqBuilderSteps">
         <!-- Step 1: Job Title -->
         <div id="iqStep1" class="step-content">
             <h3 class="text-xl font-semibold text-white mb-4">What position are you interviewing for?</h3>
@@ -14461,6 +14586,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 </button>
             </div>
         </div>
+        </div><!-- End iqBuilderSteps -->
 
         <!-- Navigation -->
         <div class="flex gap-3 mt-6">
@@ -14516,6 +14642,20 @@ window.addEventListener('DOMContentLoaded', function() {
             <button onclick="closeJobDescriptionBuilder()" class="text-slate-400 hover:text-white text-2xl">×</button>
         </div>
 
+        <!-- Loading Screen -->
+        <div id="jdGenerating" class="hidden text-center py-12">
+            <div class="text-6xl mb-4 animate-bounce">🤖</div>
+            <h3 class="text-amber-400 font-bold text-xl mb-2">Fitz is generating your job description...</h3>
+            <p class="text-slate-400 text-sm">This may take 10-20 seconds</p>
+            <div class="mt-6 flex justify-center gap-2">
+                <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+            </div>
+        </div>
+
+        <!-- Steps Container -->
+        <div id="jdBuilderSteps">
         <!-- Step 1: Job Title -->
         <div id="jdStep1" class="step-content">
             <h3 class="text-xl font-semibold text-white mb-4">What's the job title?</h3>
@@ -14595,6 +14735,7 @@ window.addEventListener('DOMContentLoaded', function() {
                 <div class="text-slate-400 text-sm mt-2">Based on current award rates + penalties</div>
             </div>
         </div>
+        </div><!-- End jdBuilderSteps -->
 
         <!-- Navigation Buttons -->
         <div class="flex gap-3 mt-6">
