@@ -9576,21 +9576,32 @@ async function generateResponsibilities() {
     help.classList.add('hidden');
     
     try {
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+        const prompt = `Generate 5-7 key responsibilities for a ${jdData.experienceLevel} level ${jdData.jobTitle} position in the Australian hospitality industry. Format as a bulleted list. Be specific and professional.`;
+        
+        const response = await fetch('/.netlify/functions/recruitment-ai', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
-                model: "claude-sonnet-4-20250514",
-                max_tokens: 1000,
-                messages: [{
-                    role: "user",
-                    content: `Generate 5-7 key responsibilities for a ${jdData.experienceLevel} level ${jdData.jobTitle} position in the Australian hospitality industry. Format as a bulleted list. Be specific and professional.`
-                }]
+                prompt: prompt,
+                taskType: 'responsibilities'
             })
         });
         
-        const data = await response.json();
-        const content = data.content[0].text;
+        const result = await response.json();
+        
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || 'Failed to generate responsibilities');
+        }
+        
+        // Handle the response - it could be array or text
+        let content;
+        if (Array.isArray(result.data)) {
+            content = result.data.map(item => `• ${item}`).join('\n');
+        } else {
+            content = result.rawResponse || result.data;
+        }
         
         textarea.value = content;
         loading.classList.add('hidden');
@@ -9652,15 +9663,7 @@ async function generateJobDescription() {
     showToast('Generating job description...', 'info');
     
     try {
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                model: "claude-sonnet-4-20250514",
-                max_tokens: 2000,
-                messages: [{
-                    role: "user",
-                    content: `Create a professional job description for:
+        const prompt = `Create a professional job description for:
                     
 Job Title: ${jdData.jobTitle}
 Experience Level: ${jdData.experienceLevel}
@@ -9673,13 +9676,26 @@ ${jdData.qualifications}
 
 Salary Range: ${jdData.salaryRange}
 
-Format as a complete, professional job description with sections for: Position Overview, Key Responsibilities, Required Qualifications, Desired Skills, Salary & Benefits. Make it engaging and specific to Australian hospitality.`
-                }]
+Format as a complete, professional job description with sections for: Position Overview, Key Responsibilities, Required Qualifications, Desired Skills, Salary & Benefits. Make it engaging and specific to Australian hospitality.`;
+
+        const response = await fetch('/.netlify/functions/recruitment-ai', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                prompt: prompt,
+                taskType: 'jobDescription'
             })
         });
         
-        const data = await response.json();
-        const content = data.content[0].text;
+        const result = await response.json();
+        
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || 'Failed to generate job description');
+        }
+        
+        const content = result.rawResponse || result.data;
         
         // Show preview
         document.getElementById('jdPreviewContent').innerHTML = '<pre class="whitespace-pre-wrap text-slate-200">' + content + '</pre>';
@@ -9827,15 +9843,7 @@ async function generateInterviewQuestions() {
     showToast('Generating interview questions...', 'info');
     
     try {
-        const response = await fetch("https://api.anthropic.com/v1/messages", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                model: "claude-sonnet-4-20250514",
-                max_tokens: 3000,
-                messages: [{
-                    role: "user",
-                    content: `Generate ${iqData.questionCount} interview questions for a ${iqData.experienceLevel} level ${iqData.jobTitle} in Australian hospitality.
+        const prompt = `Generate ${iqData.questionCount} interview questions for a ${iqData.experienceLevel} level ${iqData.jobTitle} in Australian hospitality.
 
 Categories to include: ${iqData.categories.join(', ')}
 
@@ -9845,13 +9853,26 @@ For each question provide:
 3. STAR method example (for behavioral)
 4. Red flags to watch for
 
-Format clearly with headers and bullet points.`
-                }]
+Format clearly with headers and bullet points.`;
+
+        const response = await fetch('/.netlify/functions/recruitment-ai', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                prompt: prompt,
+                taskType: 'interviewQuestions'
             })
         });
         
-        const data = await response.json();
-        const content = data.content[0].text;
+        const result = await response.json();
+        
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || 'Failed to generate interview questions');
+        }
+        
+        const content = result.rawResponse || result.data;
         
         document.getElementById('iqPreviewContent').innerHTML = '<pre class="whitespace-pre-wrap text-slate-200">' + content + '</pre>';
         document.getElementById('interviewQuestionsPreviewModal').classList.remove('hidden');
@@ -14684,5 +14705,3 @@ window.addEventListener('DOMContentLoaded', function() {
 
 </body>
 </html>
-
-
