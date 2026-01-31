@@ -22,30 +22,44 @@ exports.handler = async (event) => {
     try {
         const { user_id, access_token, supabase_url, supabase_key } = JSON.parse(event.body);
 
+        console.log('Sync request received for user:', user_id);
+
         if (!user_id) {
             throw new Error('User ID is required');
         }
 
         let deputyToken = access_token;
 
-        // If no token provided, get it from Supabase
+        // If no token provided, try to get it from Supabase
         if (!deputyToken && supabase_url && supabase_key) {
-            const supabase = require('@supabase/supabase-js');
-            const supabaseClient = supabase.createClient(supabase_url, supabase_key);
+            console.log('No token provided, fetching from Supabase...');
+            
+            try {
+                const supabase = require('@supabase/supabase-js');
+                const supabaseClient = supabase.createClient(supabase_url, supabase_key);
 
-            const { data: integration } = await supabaseClient
-                .from('integrations')
-                .select('*')
-                .eq('user_id', user_id)
-                .eq('platform', 'deputy')
-                .eq('is_active', true)
-                .single();
+                const { data: integration, error: dbError } = await supabaseClient
+                    .from('integrations')
+                    .select('*')
+                    .eq('user_id', user_id)
+                    .eq('platform', 'deputy')
+                    .eq('is_active', true)
+                    .single();
 
-            if (!integration) {
-                throw new Error('Deputy not connected');
+                if (dbError) {
+                    console.error('Supabase error:', dbError);
+                }
+
+                if (!integration) {
+                    throw new Error('Deputy not connected for this user');
+                }
+
+                deputyToken = integration.access_token;
+                console.log('Token retrieved from Supabase');
+            } catch (supabaseError) {
+                console.error('Error accessing Supabase:', supabaseError);
+                // Continue without Supabase if it fails
             }
-
-            deputyToken = integration.access_token;
         }
 
         if (!deputyToken) {
@@ -57,25 +71,31 @@ exports.handler = async (event) => {
         const startDate = formatDate(new Date());
         const endDate = formatDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
 
+        console.log(`Date range: ${startDate} to ${endDate}`);
+
         const rostersResponse = await fetch(
             `https://once.deputy.com/api/v1/resource/Roster/QUERY?search[Date][from]=${startDate}&search[Date][to]=${endDate}`,
             {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${deputyToken}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
                 },
                 body: JSON.stringify({})
             }
         );
 
+        console.log('Deputy API response status:', rostersResponse.status);
+
         if (!rostersResponse.ok) {
             const errorText = await rostersResponse.text();
+            console.error('Deputy API error:', errorText);
             throw new Error(`Deputy API error: ${rostersResponse.status} - ${errorText}`);
         }
 
         const rosters = await rostersResponse.json();
-        console.log(`Fetched ${rosters.length} rosters`);
+        console.log(`Fetched ${rosters.length} rosters from Deputy`);
 
         // Process rosters with compliance checking
         const processedRosters = rosters.map(roster => {
@@ -101,6 +121,10 @@ exports.handler = async (event) => {
             };
         });
 
+        const issueCount = processedRosters.filter(r => !r.compliance.isCompliant).length;
+
+        console.log(`Processed ${processedRosters.length} rosters, ${issueCount} with issues`);
+
         return {
             statusCode: 200,
             headers,
@@ -108,18 +132,21 @@ exports.handler = async (event) => {
                 success: true,
                 rosters: processedRosters,
                 total: processedRosters.length,
-                issues: processedRosters.filter(r => !r.compliance.isCompliant).length
+                issues: issueCount
             })
         };
 
     } catch (error) {
         console.error('Roster sync error:', error);
+        console.error('Error stack:', error.stack);
+        
         return {
             statusCode: 500,
             headers,
             body: JSON.stringify({
                 success: false,
-                error: error.message
+                error: error.message,
+                details: error.stack
             })
         };
     }
@@ -150,31 +177,37 @@ function analyzeCompliance(shiftDate, totalHours) {
     const baseRate = 25.00;
     const dayOfWeek = shiftDate.getDay();
 
+    // Sunday penalty
     if (dayOfWeek === 0) {
         penaltyMultiplier = 1.75;
         warnings.push({
             type: 'Sunday Penalty Rate',
             severity: 'info',
-            message: 'Sunday work requires 175% penalty rate',
-            multiplier: 1.75
+            message: 'Sunday work requires 175% penalty rate (Restaurant Industry Award)',
+            multiplier: 1.75,
+            clause: 'Clause 28.3'
         });
     }
 
+    // Saturday penalty
     if (dayOfWeek === 6) {
         penaltyMultiplier = 1.5;
         warnings.push({
             type: 'Saturday Penalty Rate',
             severity: 'info',
-            message: 'Saturday work requires 150% penalty rate',
-            multiplier: 1.5
+            message: 'Saturday work requires 150% penalty rate (Restaurant Industry Award)',
+            multiplier: 1.5,
+            clause: 'Clause 28.2'
         });
     }
 
+    // Minimum engagement
     if (totalHours < 3) {
         warnings.push({
             type: 'Minimum Engagement Breach',
             severity: 'high',
-            message: `Shift is ${totalHours.toFixed(1)}h but minimum is 3 hours`
+            message: `Shift is ${totalHours.toFixed(1)}h but minimum engagement is 3 hours`,
+            clause: 'Clause 10.4'
         });
     }
 
@@ -184,6 +217,6 @@ function analyzeCompliance(shiftDate, totalHours) {
         isCompliant: warnings.filter(w => w.severity === 'high').length === 0,
         warnings: warnings,
         penaltyMultiplier: penaltyMultiplier,
-        totalCost: totalCost
+        totalCost: Math.round(totalCost * 100) / 100
     };
 }
