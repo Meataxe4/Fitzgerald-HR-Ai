@@ -14822,8 +14822,7 @@ async function initiateDeputyOAuth() {
         sessionStorage.setItem('deputy_oauth_state', state);
         console.log('✅ Redirecting to Deputy...');
         
-        // Use the correct Deputy OAuth endpoint format
-        window.location.href = `https://e1849e30081029.au.deputy.com/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}`;
+        window.location.href = `https://e1849e30081029.au.deputy.com/my/oauth/login?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}`;
     } catch (error) { 
         console.error('❌ Deputy OAuth Error:', error);
         console.error('Error details:', error.message, error.stack);
