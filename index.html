@@ -14321,6 +14321,110 @@ function showPrivacyFromAcceptance() {
     privacyModal.style.zIndex = '55'; // Below acceptance modal (z-60)
 }
 
+
+
+// Handle OAuth callback in popup window
+async function handleDeputyCallbackInPopup() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+        
+        if (!code) {
+            console.error('No code in callback');
+            alert('❌ No authorization code received');
+            window.close();
+            return;
+        }
+        
+        // Verify state
+        const savedState = sessionStorage.getItem('deputy_oauth_state');
+        if (state !== savedState) {
+            console.error('State mismatch!');
+            alert('❌ Security check failed');
+            window.close();
+            return;
+        }
+        
+        console.log('✅ OAuth code received, exchanging for token...');
+        
+        const userId = sessionStorage.getItem('deputy_oauth_user_id') || 'test-user-' + Date.now();
+        
+        // Exchange code for token
+        const response = await fetch('/.netlify/functions/deputy-auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                code,
+                user_id: userId,
+                supabase_url: SUPABASE_CONFIG.url,
+                supabase_key: SUPABASE_CONFIG.anonKey
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.error || 'Failed to connect');
+        }
+        
+        console.log('✅ Deputy connected successfully!');
+        
+        // Notify parent window
+        if (window.opener && !window.opener.closed) {
+            window.opener.postMessage({ 
+                type: 'deputy_oauth_success',
+                userId: userId
+            }, window.location.origin);
+        }
+        
+        // Clean up and close
+        sessionStorage.removeItem('deputy_oauth_state');
+        sessionStorage.removeItem('deputy_oauth_user_id');
+        
+        alert('✅ Deputy connected! You can close this window.');
+        window.close();
+        
+    } catch (error) {
+        console.error('OAuth callback error:', error);
+        alert(`❌ Connection failed: ${error.message}`);
+        if (window.opener && !window.opener.closed) {
+            window.opener.postMessage({ 
+                type: 'deputy_oauth_error',
+                error: error.message
+            }, window.location.origin);
+        }
+        window.close();
+    }
+}
+
+// Listen for messages from popup window
+window.addEventListener('message', (event) => {
+    if (event.origin !== window.location.origin) return;
+    
+    if (event.data.type === 'deputy_oauth_success') {
+        console.log('✅ Received success message from OAuth popup');
+        showNotification('✅ Deputy connected successfully!', 'success');
+        closeDeputyConnection();
+        
+        // Refresh Integration Hub if open
+        if (!document.getElementById('integrationHubModal').classList.contains('hidden')) {
+            checkDeputyConnection();
+        }
+        
+        // Auto-open dashboard and sync
+        setTimeout(() => {
+            openRosterCompliance();
+        }, 500);
+    }
+    
+    if (event.data.type === 'deputy_oauth_error') {
+        console.error('❌ OAuth error from popup:', event.data.error);
+        showNotification(`❌ Connection failed: ${event.data.error}`, 'error');
+    }
+});
+
+
 window.addEventListener('DOMContentLoaded', function() {
     console.log('🧪 Testing html-docx-js library...');
     console.log('htmlDocx exists?', typeof htmlDocx);
@@ -14792,10 +14896,8 @@ async function initiateDeputyOAuth() {
         }
         
         // For testing: Allow connection even if not logged in
-        // REMOVE THIS IN PRODUCTION
         if (!user) { 
             console.log('⚠️ Not logged in, but allowing Deputy connection for testing');
-            // Create a temporary user ID for testing
             user = { id: 'test-user-' + Date.now() };
         }
         console.log('✅ User ID for Deputy connection:', user.id);
@@ -14817,12 +14919,25 @@ async function initiateDeputyOAuth() {
         const scope = 'longlife_refresh_token roster.read employee.read timesheet.read';
         const state = generateRandomString(32);
         
-        console.log('🔵 OAuth URL:', `https://e1849e30081029.au.deputy.com/my/oauth/login?client_id=${clientId}&redirect_uri=${redirectUri}`);
+        console.log('🔵 Opening Deputy OAuth in new window...');
         
+        // Save state and user ID for callback
         sessionStorage.setItem('deputy_oauth_state', state);
-        console.log('✅ Redirecting to Deputy...');
+        sessionStorage.setItem('deputy_oauth_user_id', user.id);
         
-        window.location.href = `https://e1849e30081029.au.deputy.com/my/oauth/login?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}`;
+        const oauthUrl = `https://e1849e30081029.au.deputy.com/my/oauth/login?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}`;
+        
+        // Open OAuth in NEW TAB - this keeps the main page alive!
+        const oauthWindow = window.open(oauthUrl, 'deputyOAuth', 'width=600,height=700');
+        
+        if (!oauthWindow) {
+            alert('Please allow popups for this site to connect Deputy');
+            return;
+        }
+        
+        showNotification('🔵 Authorize Deputy in the popup window...', 'info');
+        console.log('✅ OAuth window opened');
+        
     } catch (error) { 
         console.error('❌ Deputy OAuth Error:', error);
         console.error('Error details:', error.message, error.stack);
@@ -14976,24 +15091,133 @@ function generateRandomString(length) {
 // Check for Deputy OAuth callback IMMEDIATELY
 if (window.location.search.includes('code=') && window.location.search.includes('state=')) {
     console.log('🔵 Deputy OAuth callback detected in URL');
-    // Wait for Supabase to initialize, then handle callback
-    const checkAndHandleCallback = setInterval(() => {
-        if (typeof supabaseClient !== 'undefined' && supabaseClient) {
-            clearInterval(checkAndHandleCallback);
-            console.log('✅ Supabase ready, handling Deputy callback...');
-            handleDeputyCallback();
-        }
-    }, 100); // Check every 100ms
     
-    // Timeout after 10 seconds
-    setTimeout(() => {
-        clearInterval(checkAndHandleCallback);
-        if (typeof supabaseClient === 'undefined' || !supabaseClient) {
-            console.error('❌ Timeout: Supabase never initialized');
-            alert('Connection timeout. Please try again.');
-        }
-    }, 10000);
+    // If we're in the popup window, handle callback and close
+    if (window.opener && !window.opener.closed) {
+        console.log('✅ Running in popup window, will handle callback');
+        
+        // Wait for Supabase to initialize, then handle callback
+        const checkAndHandleCallback = setInterval(() => {
+            if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+                clearInterval(checkAndHandleCallback);
+                console.log('✅ Supabase ready, handling Deputy callback...');
+                handleDeputyCallbackInPopup();
+            }
+        }, 100);
+        
+        setTimeout(() => {
+            clearInterval(checkAndHandleCallback);
+            if (typeof supabaseClient === 'undefined' || !supabaseClient) {
+                console.error('❌ Timeout: Supabase never initialized');
+                alert('Connection timeout. Please try again.');
+            }
+        }, 10000);
+    }
 }
+
+
+
+// Handle OAuth callback in popup window
+async function handleDeputyCallbackInPopup() {
+    try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+        const state = urlParams.get('state');
+        
+        if (!code) {
+            console.error('No code in callback');
+            alert('❌ No authorization code received');
+            window.close();
+            return;
+        }
+        
+        // Verify state
+        const savedState = sessionStorage.getItem('deputy_oauth_state');
+        if (state !== savedState) {
+            console.error('State mismatch!');
+            alert('❌ Security check failed');
+            window.close();
+            return;
+        }
+        
+        console.log('✅ OAuth code received, exchanging for token...');
+        
+        const userId = sessionStorage.getItem('deputy_oauth_user_id') || 'test-user-' + Date.now();
+        
+        // Exchange code for token
+        const response = await fetch('/.netlify/functions/deputy-auth', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                code,
+                user_id: userId,
+                supabase_url: SUPABASE_CONFIG.url,
+                supabase_key: SUPABASE_CONFIG.anonKey
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (!data.success) {
+            throw new Error(data.error || 'Failed to connect');
+        }
+        
+        console.log('✅ Deputy connected successfully!');
+        
+        // Notify parent window
+        if (window.opener && !window.opener.closed) {
+            window.opener.postMessage({ 
+                type: 'deputy_oauth_success',
+                userId: userId
+            }, window.location.origin);
+        }
+        
+        // Clean up and close
+        sessionStorage.removeItem('deputy_oauth_state');
+        sessionStorage.removeItem('deputy_oauth_user_id');
+        
+        alert('✅ Deputy connected! You can close this window.');
+        window.close();
+        
+    } catch (error) {
+        console.error('OAuth callback error:', error);
+        alert(`❌ Connection failed: ${error.message}`);
+        if (window.opener && !window.opener.closed) {
+            window.opener.postMessage({ 
+                type: 'deputy_oauth_error',
+                error: error.message
+            }, window.location.origin);
+        }
+        window.close();
+    }
+}
+
+// Listen for messages from popup window
+window.addEventListener('message', (event) => {
+    if (event.origin !== window.location.origin) return;
+    
+    if (event.data.type === 'deputy_oauth_success') {
+        console.log('✅ Received success message from OAuth popup');
+        showNotification('✅ Deputy connected successfully!', 'success');
+        closeDeputyConnection();
+        
+        // Refresh Integration Hub if open
+        if (!document.getElementById('integrationHubModal').classList.contains('hidden')) {
+            checkDeputyConnection();
+        }
+        
+        // Auto-open dashboard and sync
+        setTimeout(() => {
+            openRosterCompliance();
+        }, 500);
+    }
+    
+    if (event.data.type === 'deputy_oauth_error') {
+        console.error('❌ OAuth error from popup:', event.data.error);
+        showNotification(`❌ Connection failed: ${event.data.error}`, 'error');
+    }
+});
+
 
 window.addEventListener('DOMContentLoaded', () => {
     console.log('Page loaded');
