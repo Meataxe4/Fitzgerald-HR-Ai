@@ -14467,6 +14467,181 @@ async function syncAllIntegrations() {
 
 
 // ========================================
+
+
+// Manual Deputy token connection (bypass OAuth)
+function openDeputyTokenEntry() {
+    const modal = document.createElement('div');
+    modal.id = 'deputyTokenModal';
+    modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50';
+    modal.innerHTML = `
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-md w-full border border-amber-500">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-2xl font-bold text-amber-500">Enter Deputy Token</h2>
+                <button onclick="closeDeputyTokenEntry()" class="text-slate-400 hover:text-white text-2xl">×</button>
+            </div>
+            
+            <p class="text-slate-300 text-sm mb-4">
+                Enter your Deputy Permanent Access Token. You can generate one in Deputy:
+                <br><br>
+                Settings → System Setup → API & OAuth → My Apps → Generate Token
+            </p>
+            
+            <input type="text" id="deputyTokenInput" placeholder="Paste your token here..." 
+                   class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white mb-4">
+            
+            <div class="flex gap-3">
+                <button onclick="saveDeputyToken()" class="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg">
+                    Connect with Token
+                </button>
+                <button onclick="closeDeputyTokenEntry()" class="px-4 py-2 bg-slate-600 hover:bg-slate-700 text-white rounded-lg">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+}
+
+function closeDeputyTokenEntry() {
+    const modal = document.getElementById('deputyTokenModal');
+    if (modal) modal.remove();
+}
+
+async function saveDeputyToken() {
+    const token = document.getElementById('deputyTokenInput').value.trim();
+    
+    if (!token) {
+        alert('Please enter a token');
+        return;
+    }
+    
+    try {
+        showNotification('🔄 Testing Deputy token...', 'info');
+        
+        // Test the token by calling Deputy API
+        const testResponse = await fetch('https://once.deputy.com/api/v1/me', {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!testResponse.ok) {
+            throw new Error('Invalid token - could not connect to Deputy');
+        }
+        
+        const meData = await testResponse.json();
+        console.log('Deputy user info:', meData);
+        
+        // Save token to Supabase
+        if (typeof supabaseClient !== 'undefined' && supabaseClient) {
+            let userId;
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                userId = user?.id || 'test-user-' + Date.now();
+            } catch (error) {
+                userId = 'test-user-' + Date.now();
+            }
+            
+            const { error } = await supabaseClient
+                .from('integrations')
+                .upsert({
+                    user_id: userId,
+                    platform: 'deputy',
+                    access_token: token,
+                    refresh_token: null,
+                    token_expires_at: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(), // 1 year
+                    is_active: true,
+                    settings: {
+                        domain: 'once',
+                        token_type: 'permanent'
+                    },
+                    updated_at: new Date().toISOString()
+                }, {
+                    onConflict: 'user_id,platform'
+                });
+            
+            if (error) {
+                console.error('Supabase error:', error);
+            }
+        }
+        
+        showNotification('✅ Deputy connected successfully!', 'success');
+        closeDeputyTokenEntry();
+        closeDeputyConnection();
+        
+        // Sync rosters
+        await syncDeputyRostersWithToken(token);
+        openRosterCompliance();
+        
+    } catch (error) {
+        console.error('Token save error:', error);
+        showNotification(`❌ ${error.message}`, 'error');
+    }
+}
+
+async function syncDeputyRostersWithToken(token) {
+    try {
+        showNotification('🔄 Syncing rosters from Deputy...', 'info');
+        
+        const startDate = formatDateForDeputy(new Date());
+        const endDate = formatDateForDeputy(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
+        
+        const rostersResponse = await fetch(
+            `https://once.deputy.com/api/v1/resource/Roster/QUERY?search[Date][from]=${startDate}&search[Date][to]=${endDate}`,
+            {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({})
+            }
+        );
+        
+        if (!rostersResponse.ok) {
+            throw new Error('Failed to fetch rosters');
+        }
+        
+        const rosters = await rostersResponse.json();
+        
+        showNotification(`✅ Found ${rosters.length} rosters from Deputy!`, 'success');
+        
+        // Store in global variable for display
+        rosterData = rosters.map(r => ({
+            id: r.Id.toString(),
+            employee: { name: 'Employee ' + r.Employee, id: r.Employee },
+            position: 'Staff Member',
+            date: new Date(r.Date * 1000).toLocaleDateString('en-AU'),
+            startTime: formatTimeFromTimestamp(r.StartTime),
+            endTime: formatTimeFromTimestamp(r.EndTime),
+            totalHours: calculateHoursSimple(r.StartTime, r.EndTime),
+            baseRate: 25.00,
+            compliance: { isCompliant: true, warnings: [], totalCost: 0 }
+        }));
+        
+    } catch (error) {
+        console.error('Roster sync error:', error);
+        showNotification(`❌ ${error.message}`, 'error');
+    }
+}
+
+function formatDateForDeputy(date) {
+    return date.toISOString().split('T')[0];
+}
+
+function formatTimeFromTimestamp(timestamp) {
+    if (!timestamp) return '00:00';
+    const date = new Date(timestamp * 1000);
+    return date.toTimeString().slice(0, 5);
+}
+
+function calculateHoursSimple(startTs, endTs) {
+    return Math.round(((endTs - startTs) / 3600) * 100) / 100;
+}
+
+
 // DEPUTY INTEGRATION - FRONTEND CODE
 // ========================================
 
