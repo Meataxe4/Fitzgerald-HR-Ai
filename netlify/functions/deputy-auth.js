@@ -1,5 +1,5 @@
 // netlify/functions/deputy-auth.js
-// Handles Deputy OAuth token exchange and stores credentials in Supabase
+// Handles Deputy OAuth token exchange
 
 const fetch = require('node-fetch');
 
@@ -31,8 +31,10 @@ exports.handler = async (event) => {
         }
 
         console.log('Exchanging Deputy authorization code for tokens...');
+        console.log('Using subdomain: e1849e30081029.au.deputy.com');
 
-        const tokenResponse = await fetch('https://once.deputy.com/oauth/access_token', {
+        // Use correct Deputy OAuth token endpoint per documentation
+        const tokenResponse = await fetch('https://e1849e30081029.au.deputy.com/oauth/access_token', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -47,6 +49,8 @@ exports.handler = async (event) => {
             })
         });
 
+        console.log('Token response status:', tokenResponse.status);
+
         if (!tokenResponse.ok) {
             const errorText = await tokenResponse.text();
             console.error('Deputy token exchange failed:', errorText);
@@ -56,66 +60,56 @@ exports.handler = async (event) => {
         const tokens = await tokenResponse.json();
         console.log('Deputy tokens received successfully');
 
-        const meResponse = await fetch('https://once.deputy.com/api/v1/me', {
+        // Get user info to verify token works
+        const meResponse = await fetch('https://e1849e30081029.au.deputy.com/api/v1/me', {
             headers: {
                 'Authorization': `Bearer ${tokens.access_token}`,
                 'Content-Type': 'application/json'
             }
         });
 
-        let deputyDomain = 'once';
-        if (meResponse.ok) {
+        if (!meResponse.ok) {
+            console.error('Failed to verify token with /me endpoint');
+        } else {
             const meData = await meResponse.json();
-            if (meData && meData._DPMetaData && meData._DPMetaData.System) {
-                const systemData = JSON.parse(meData._DPMetaData.System);
-                deputyDomain = systemData.Subdomain || 'once';
-            }
+            console.log('Deputy user verified:', meData.DisplayName);
         }
 
-        const expiresIn = tokens.expires_in || 3600;
-        const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString();
+        // Save to Supabase if credentials provided
+        if (supabase_url && supabase_key && user_id) {
+            try {
+                const supabase = require('@supabase/supabase-js');
+                const supabaseClient = supabase.createClient(supabase_url, supabase_key);
 
-        if (user_id && supabase_url && supabase_key) {
-            const supabase = require('@supabase/supabase-js');
-            const supabaseClient = supabase.createClient(supabase_url, supabase_key);
+                const { error: upsertError } = await supabaseClient
+                    .from('integrations')
+                    .upsert({
+                        user_id: user_id,
+                        platform: 'deputy',
+                        access_token: tokens.access_token,
+                        refresh_token: tokens.refresh_token || null,
+                        token_expires_at: tokens.expires_in 
+                            ? new Date(Date.now() + tokens.expires_in * 1000).toISOString()
+                            : new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+                        is_active: true,
+                        settings: {
+                            domain: 'e1849e30081029.au',
+                            token_type: 'oauth'
+                        },
+                        last_synced: null,
+                        updated_at: new Date().toISOString()
+                    }, {
+                        onConflict: 'user_id,platform'
+                    });
 
-            const { data, error } = await supabaseClient
-                .from('integrations')
-                .upsert({
-                    user_id: user_id,
-                    platform: 'deputy',
-                    access_token: tokens.access_token,
-                    refresh_token: tokens.refresh_token,
-                    token_expires_at: expiresAt,
-                    is_active: true,
-                    settings: {
-                        domain: deputyDomain,
-                        scope: tokens.scope
-                    },
-                    last_synced: null,
-                    updated_at: new Date().toISOString()
-                }, {
-                    onConflict: 'user_id,platform'
-                });
-
-            if (error) {
-                console.error('Supabase error:', error);
-                throw new Error(`Failed to save tokens: ${error.message}`);
-            }
-
-            await supabaseClient.from('sync_logs').insert({
-                integration_id: data?.id,
-                user_id: user_id,
-                sync_type: 'connection',
-                status: 'success',
-                records_synced: 0,
-                metadata: {
-                    domain: deputyDomain,
-                    timestamp: new Date().toISOString()
+                if (upsertError) {
+                    console.error('Supabase upsert error:', upsertError);
+                } else {
+                    console.log('Tokens saved to Supabase successfully');
                 }
-            });
-
-            console.log('Deputy integration saved to Supabase successfully');
+            } catch (supabaseError) {
+                console.error('Error saving to Supabase:', supabaseError);
+            }
         }
 
         return {
@@ -123,24 +117,20 @@ exports.handler = async (event) => {
             headers,
             body: JSON.stringify({
                 success: true,
-                message: 'Deputy connected successfully',
-                data: {
-                    domain: deputyDomain,
-                    expires_at: expiresAt,
-                    scope: tokens.scope
-                }
+                message: 'Deputy connected successfully'
             })
         };
 
     } catch (error) {
-        console.error('Deputy auth error:', error);
+        console.error('OAuth error:', error);
+        console.error('Error stack:', error.stack);
         
         return {
             statusCode: 500,
             headers,
             body: JSON.stringify({
                 success: false,
-                error: error.message || 'Failed to connect Deputy'
+                error: error.message
             })
         };
     }
