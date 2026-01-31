@@ -58,7 +58,6 @@ exports.handler = async (event) => {
                 console.log('Token retrieved from Supabase');
             } catch (supabaseError) {
                 console.error('Error accessing Supabase:', supabaseError);
-                // Continue without Supabase if it fails
             }
         }
 
@@ -73,8 +72,9 @@ exports.handler = async (event) => {
 
         console.log(`Date range: ${startDate} to ${endDate}`);
 
+        // Use the correct Deputy subdomain
         const rostersResponse = await fetch(
-            `https://once.deputy.com/api/v1/resource/Roster/QUERY?search[Date][from]=${startDate}&search[Date][to]=${endDate}`,
+            `https://e1849e30081029.au.deputy.com/api/v1/resource/Roster/QUERY?search[Date][from]=${startDate}&search[Date][to]=${endDate}`,
             {
                 method: 'POST',
                 headers: {
@@ -177,7 +177,6 @@ function analyzeCompliance(shiftDate, totalHours) {
     const baseRate = 25.00;
     const dayOfWeek = shiftDate.getDay();
 
-    // Sunday penalty
     if (dayOfWeek === 0) {
         penaltyMultiplier = 1.75;
         warnings.push({
@@ -189,7 +188,6 @@ function analyzeCompliance(shiftDate, totalHours) {
         });
     }
 
-    // Saturday penalty
     if (dayOfWeek === 6) {
         penaltyMultiplier = 1.5;
         warnings.push({
@@ -201,7 +199,6 @@ function analyzeCompliance(shiftDate, totalHours) {
         });
     }
 
-    // Minimum engagement
     if (totalHours < 3) {
         warnings.push({
             type: 'Minimum Engagement Breach',
