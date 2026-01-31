@@ -1460,6 +1460,41 @@ input, textarea, select {
     
     <!-- Inline checkAccess to avoid undefined error -->
     <script>
+// ========================================
+// CAPTURE OAUTH CALLBACK IMMEDIATELY
+// ========================================
+(function() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const code = urlParams.get('code');
+    const state = urlParams.get('state');
+    const error = urlParams.get('error');
+    
+    if (code && state) {
+        console.log('🔵 [IMMEDIATE] Deputy OAuth callback detected!');
+        console.log('Code:', code.substring(0, 20) + '...');
+        console.log('State:', state);
+        
+        // Store in sessionStorage so it survives any refresh
+        sessionStorage.setItem('deputy_oauth_code', code);
+        sessionStorage.setItem('deputy_oauth_state', state);
+        sessionStorage.setItem('deputy_oauth_timestamp', Date.now().toString());
+        
+        console.log('✅ [IMMEDIATE] OAuth params saved to sessionStorage');
+    } else if (error) {
+        console.error('❌ [IMMEDIATE] Deputy OAuth error:', error);
+        sessionStorage.setItem('deputy_oauth_error', error);
+    }
+    
+    // Check if we have stored OAuth data from a previous page load
+    const storedCode = sessionStorage.getItem('deputy_oauth_code');
+    if (storedCode) {
+        const timestamp = sessionStorage.getItem('deputy_oauth_timestamp');
+        const age = Date.now() - parseInt(timestamp);
+        console.log(`🔍 [IMMEDIATE] Found stored OAuth code (${Math.floor(age/1000)}s old)`);
+    }
+})();
+
+
     function checkAccess() {
         var code = document.getElementById('accessCode').value.trim().toUpperCase();
         var rememberMe = document.getElementById('rememberMe') ? document.getElementById('rememberMe').checked : false;
@@ -14509,10 +14544,29 @@ async function initiateDeputyOAuth() {
 
 async function handleDeputyCallback() {
     try {
+        console.log('🔵 handleDeputyCallback() called');
+        
+        // Try to get code from URL first, then sessionStorage
         const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
+        let code = urlParams.get('code');
+        let state = urlParams.get('state');
+        
+        if (!code) {
+            // Check sessionStorage for stored OAuth data
+            code = sessionStorage.getItem('deputy_oauth_code');
+            state = sessionStorage.getItem('deputy_oauth_state');
+            
+            if (code) {
+                console.log('✅ Retrieved OAuth code from sessionStorage');
+            } else {
+                console.log('❌ No OAuth code in URL or sessionStorage');
+                return;
+            }
+        } else {
+            console.log('✅ OAuth code found in URL');
+        }
+        
         if (!code) return;
-        const state = urlParams.get('state');
         if (state !== sessionStorage.getItem('deputy_oauth_state')) throw new Error('Invalid state');
         
         if (typeof supabaseClient === 'undefined' || !supabaseClient) {
@@ -14530,6 +14584,9 @@ async function handleDeputyCallback() {
         const data = await response.json();
         if (!data.success) throw new Error(data.error);
         sessionStorage.removeItem('deputy_oauth_state');
+        sessionStorage.removeItem('deputy_oauth_code');
+        sessionStorage.removeItem('deputy_oauth_timestamp');
+        console.log('✅ Cleared OAuth data from sessionStorage');
         window.history.replaceState({}, document.title, window.location.pathname);
         showNotification('✅ Connected!', 'success');
         await syncDeputyRosters();
@@ -14538,6 +14595,9 @@ async function handleDeputyCallback() {
     } catch (error) {
         showNotification(`❌ ${error.message}`, 'error');
         sessionStorage.removeItem('deputy_oauth_state');
+        sessionStorage.removeItem('deputy_oauth_code');
+        sessionStorage.removeItem('deputy_oauth_timestamp');
+        console.log('✅ Cleared OAuth data from sessionStorage');
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 }
