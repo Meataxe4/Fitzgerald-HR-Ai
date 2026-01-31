@@ -14354,15 +14354,15 @@ function closeIntegrationHub() {
 async function checkDeputyConnection() {
     try {
         // Check if supabase is initialized
-        if (!window.supabase || !supabase.auth) {
+        if (!window.supabaseClient || !supabaseClient.auth) {
             console.log('Supabase not initialized yet');
             return;
         }
         
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabaseClient.auth.getUser();
         if (!user) return;
         
-        const { data: integration } = await supabase
+        const { data: integration } = await supabaseClient
             .from('integrations')
             .select('*')
             .eq('user_id', user.id)
@@ -14422,14 +14422,14 @@ async function initiateDeputyOAuth() {
     try {
         console.log('🔵 Starting Deputy OAuth flow...');
         
-        if (!window.supabase) {
+        if (!window.supabaseClient) {
             console.error('❌ Supabase not initialized');
             alert('❌ System not ready. Please refresh the page.');
             return;
         }
         console.log('✅ Supabase is ready');
         
-        const { data: { user }, error: userError } = await supabase.auth.getUser();
+        const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
         console.log('User check:', user ? 'Logged in' : 'Not logged in', userError);
         
         if (!user) { 
@@ -14440,7 +14440,7 @@ async function initiateDeputyOAuth() {
         
         // Check Pro plan (skip if subscriptions table doesn't exist yet)
         try {
-            const { data: subscription, error: subError } = await supabase.from('subscriptions').select('plan').eq('user_id', user.id).single();
+            const { data: subscription, error: subError } = await supabaseClient.from('subscriptions').select('plan').eq('user_id', user.id).single();
             console.log('Subscription check:', subscription, subError);
             if (subscription && subscription.plan !== 'pro') { 
                 alert('⚠️ Deputy integration requires the Pro plan ($149/month). Please upgrade to continue.');
@@ -14476,13 +14476,13 @@ async function handleDeputyCallback() {
         const state = urlParams.get('state');
         if (state !== sessionStorage.getItem('deputy_oauth_state')) throw new Error('Invalid state');
         
-        if (!window.supabase) {
+        if (!window.supabaseClient) {
             showNotification('❌ System not ready', 'error');
             return;
         }
         
         showNotification('🔄 Connecting...', 'info');
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabaseClient.auth.getUser();
         const response = await fetch('/.netlify/functions/deputy-auth', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -14505,16 +14505,16 @@ async function handleDeputyCallback() {
 
 async function syncDeputyRosters() {
     try {
-        if (!window.supabase) {
+        if (!window.supabaseClient) {
             showNotification('❌ System not ready', 'error');
             return;
         }
         showNotification('🔄 Syncing...', 'info');
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabaseClient.auth.getUser();
         const response = await fetch('/.netlify/functions/deputy-sync-rosters', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: user.id, supabase_url: supabase.supabaseUrl, supabase_key: supabase.supabaseKey })
+            body: JSON.stringify({ user_id: user.id, supabase_url: supabaseClient.supabaseUrl, supabase_key: supabaseClient.supabaseKey })
         });
         const data = await response.json();
         if (!data.success) throw new Error(data.error);
