@@ -14456,11 +14456,42 @@ async function checkDeputyConnection() {
 }
 
 async function syncAllIntegrations() {
-    showNotification('🔄 Syncing...', 'info');
+    showNotification('🔄 Syncing all integrations...', 'info');
     try {
-        await syncDeputyRosters();
+        // Check if Deputy is connected and get token
+        if (typeof supabaseClient === 'undefined' || !supabaseClient) {
+            showNotification('❌ System not ready', 'error');
+            return;
+        }
+        
+        let userId;
+        try {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            userId = user?.id || 'test-user-' + Date.now();
+        } catch (error) {
+            userId = 'test-user-' + Date.now();
+        }
+        
+        // Get Deputy integration from Supabase
+        const { data: integration } = await supabaseClient
+            .from('integrations')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('platform', 'deputy')
+            .eq('is_active', true)
+            .single();
+        
+        if (!integration || !integration.access_token) {
+            showNotification('⚠️ Deputy not connected', 'warning');
+            return;
+        }
+        
+        // Sync using the stored token
+        await syncDeputyRostersWithToken(integration.access_token);
+        
     } catch (error) {
         console.error('Sync error:', error);
+        showNotification(`❌ Sync failed: ${error.message}`, 'error');
     }
 }
 
@@ -14481,11 +14512,18 @@ function openDeputyTokenEntry() {
                 <button onclick="closeDeputyTokenEntry()" class="text-slate-400 hover:text-white text-2xl">×</button>
             </div>
             
-            <p class="text-slate-300 text-sm mb-4">
-                Enter your Deputy Permanent Access Token. You can generate one in Deputy:
-                <br><br>
-                Settings → System Setup → API & OAuth → My Apps → Generate Token
-            </p>
+            <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-4 text-sm">
+                <div class="font-semibold text-blue-300 mb-2">📝 How to generate your token:</div>
+                <ol class="text-slate-300 space-y-1 list-decimal list-inside text-xs">
+                    <li>Open Deputy and go to Settings</li>
+                    <li>Navigate to: System Setup → API & OAuth</li>
+                    <li>Click "New OAuth Client"</li>
+                    <li>Fill in Name: "Fitzgerald HR"</li>
+                    <li>Redirect URI: "http://localhost" (required but not used)</li>
+                    <li>Click "Save", then "Get an Access Token"</li>
+                    <li>Copy the token and paste below</li>
+                </ol>
+            </div>
             
             <input type="text" id="deputyTokenInput" placeholder="Paste your token here..." 
                    class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white mb-4">
@@ -15766,25 +15804,31 @@ window.addEventListener('DOMContentLoaded', () => {
         </div>
 
         <div class="space-y-3">
-            <button onclick="initiateDeputyOAuth()" class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
-                </svg>
-                Connect with OAuth
-            </button>
-            
-            <div class="text-center text-slate-400 text-sm">— OR —</div>
-            
-            <button onclick="openDeputyTokenEntry()" class="w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+            <button onclick="openDeputyTokenEntry()" class="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
                 </svg>
-                Use Access Token
+                Connect with Access Token
             </button>
             
-            <p class="text-xs text-slate-400 text-center mt-2">
-                💡 Having OAuth issues? Use a permanent access token from Deputy instead
-            </p>
+            <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 text-sm text-blue-300">
+                <div class="font-semibold mb-1">📝 How to get your token:</div>
+                <div class="text-xs space-y-1">
+                    <div>1. Go to Deputy → Settings → System Setup → API & OAuth</div>
+                    <div>2. Click "New OAuth Client"</div>
+                    <div>3. Fill in details and click "Get an Access Token"</div>
+                    <div>4. Copy and paste the token above</div>
+                </div>
+            </div>
+            
+            <div class="text-center text-slate-400 text-sm">— OR —</div>
+            
+            <button onclick="initiateDeputyOAuth()" class="w-full px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+                Use OAuth Instead
+            </button>
             
             <button onclick="closeDeputyConnection()" class="w-full px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors mt-3">
                 Cancel
