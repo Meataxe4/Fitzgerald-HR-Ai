@@ -14460,11 +14460,15 @@ async function checkDeputyConnection() {
 // Universal roster sync function (works with both OAuth and token)
 async function syncRosterData() {
     try {
+        console.log('🔵 syncRosterData() called');
         showNotification('🔄 Syncing rosters...', 'info');
         
         // Get token from sessionStorage first (for token users)
         let deputyToken = sessionStorage.getItem('deputy_token');
         let userId = sessionStorage.getItem('deputy_user_id') || 'test-user-' + Date.now();
+        
+        console.log('Token from sessionStorage:', deputyToken ? '✅ Found' : '❌ Not found');
+        console.log('User ID:', userId);
         
         // If no token in sessionStorage, try Supabase (for OAuth users)
         if (!deputyToken && typeof supabaseClient !== 'undefined' && supabaseClient) {
@@ -14924,7 +14928,26 @@ function updateRosterDashboard(rosters) {
 
 function openRosterCompliance() {
     document.getElementById('rosterComplianceModal').classList.remove('hidden');
-    if (!rosterData.length) syncDeputyRosters(); else updateRosterDashboard(rosterData);
+    
+    // Check if Deputy is connected
+    const hasToken = sessionStorage.getItem('deputy_token');
+    console.log('Opening roster dashboard, token present:', !!hasToken);
+    
+    if (hasToken) {
+        // Show connected status
+        document.getElementById('lastSyncTime').textContent = 'Just connected';
+        
+        // Auto-sync if no data
+        if (!rosterData || !rosterData.length) {
+            console.log('No roster data, triggering auto-sync...');
+            syncRosterData();
+        } else {
+            updateRosterDashboard(rosterData);
+        }
+    } else {
+        console.warn('No Deputy token found!');
+        showNotification('⚠️ Deputy not connected', 'warning');
+    }
 }
 
 function closeRosterCompliance() {
