@@ -14517,22 +14517,10 @@ async function saveDeputyToken() {
     }
     
     try {
-        showNotification('🔄 Testing Deputy token...', 'info');
+        showNotification('🔄 Connecting with token...', 'info');
         
-        // Test the token by calling Deputy API
-        const testResponse = await fetch('https://once.deputy.com/api/v1/me', {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        if (!testResponse.ok) {
-            throw new Error('Invalid token - could not connect to Deputy');
-        }
-        
-        const meData = await testResponse.json();
-        console.log('Deputy user info:', meData);
+        // Save token directly to Supabase (skip API test due to CORS)
+        console.log('Saving Deputy token...');
         
         // Save token to Supabase
         if (typeof supabaseClient !== 'undefined' && supabaseClient) {
@@ -14585,41 +14573,44 @@ async function syncDeputyRostersWithToken(token) {
     try {
         showNotification('🔄 Syncing rosters from Deputy...', 'info');
         
-        const startDate = formatDateForDeputy(new Date());
-        const endDate = formatDateForDeputy(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
+        let userId;
+        try {
+            const { data: { user } } = await supabaseClient.auth.getUser();
+            userId = user?.id || 'test-user-' + Date.now();
+        } catch (error) {
+            userId = 'test-user-' + Date.now();
+        }
         
-        const rostersResponse = await fetch(
-            `https://once.deputy.com/api/v1/resource/Roster/QUERY?search[Date][from]=${startDate}&search[Date][to]=${endDate}`,
-            {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({})
-            }
-        );
+        // Call Netlify function to sync rosters (avoids CORS)
+        const rostersResponse = await fetch('/.netlify/functions/deputy-sync-rosters', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: userId,
+                access_token: token,
+                supabase_url: SUPABASE_CONFIG.url,
+                supabase_key: SUPABASE_CONFIG.anonKey
+            })
+        });
         
         if (!rostersResponse.ok) {
             throw new Error('Failed to fetch rosters');
         }
         
-        const rosters = await rostersResponse.json();
+        const data = await rostersResponse.json();
         
-        showNotification(`✅ Found ${rosters.length} rosters from Deputy!`, 'success');
+        if (!data.success) {
+            throw new Error(data.error || 'Failed to sync rosters');
+        }
         
-        // Store in global variable for display
-        rosterData = rosters.map(r => ({
-            id: r.Id.toString(),
-            employee: { name: 'Employee ' + r.Employee, id: r.Employee },
-            position: 'Staff Member',
-            date: new Date(r.Date * 1000).toLocaleDateString('en-AU'),
-            startTime: formatTimeFromTimestamp(r.StartTime),
-            endTime: formatTimeFromTimestamp(r.EndTime),
-            totalHours: calculateHoursSimple(r.StartTime, r.EndTime),
-            baseRate: 25.00,
-            compliance: { isCompliant: true, warnings: [], totalCost: 0 }
-        }));
+        rosterData = data.rosters || [];
+        
+        const issueCount = data.issues || 0;
+        if (issueCount > 0) {
+            showNotification(`✅ Synced ${data.total} shifts. ⚠️ Found ${issueCount} issue(s).`, 'warning');
+        } else {
+            showNotification(`✅ Synced ${data.total} shifts. All compliant!`, 'success');
+        }
         
     } catch (error) {
         console.error('Roster sync error:', error);
