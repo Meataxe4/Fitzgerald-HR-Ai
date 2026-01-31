@@ -14472,22 +14472,41 @@ async function syncAllIntegrations() {
             userId = 'test-user-' + Date.now();
         }
         
-        // Get Deputy integration from Supabase
-        const { data: integration } = await supabaseClient
-            .from('integrations')
-            .select('*')
-            .eq('user_id', userId)
-            .eq('platform', 'deputy')
-            .eq('is_active', true)
-            .single();
+        // Try to get token from Supabase, fall back to sessionStorage
+        let deputyToken = null;
         
-        if (!integration || !integration.access_token) {
+        try {
+            const { data: integration } = await supabaseClient
+                .from('integrations')
+                .select('*')
+                .eq('user_id', userId)
+                .eq('platform', 'deputy')
+                .eq('is_active', true)
+                .single();
+            
+            if (integration && integration.access_token) {
+                deputyToken = integration.access_token;
+                console.log('Token retrieved from Supabase');
+            }
+        } catch (error) {
+            console.log('Could not get token from Supabase, checking sessionStorage...');
+        }
+        
+        // Fall back to sessionStorage
+        if (!deputyToken) {
+            deputyToken = sessionStorage.getItem('deputy_token');
+            if (deputyToken) {
+                console.log('Token retrieved from sessionStorage');
+            }
+        }
+        
+        if (!deputyToken) {
             showNotification('⚠️ Deputy not connected', 'warning');
             return;
         }
         
         // Sync using the stored token
-        await syncDeputyRostersWithToken(integration.access_token);
+        await syncDeputyRostersWithToken(deputyToken);
         
     } catch (error) {
         console.error('Sync error:', error);
