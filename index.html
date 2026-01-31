@@ -14513,16 +14513,29 @@ function openDeputyTokenEntry() {
             </div>
             
             <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-4 mb-4 text-sm">
-                <div class="font-semibold text-blue-300 mb-2">📝 How to generate your token:</div>
-                <ol class="text-slate-300 space-y-1 list-decimal list-inside text-xs">
-                    <li>Open Deputy and go to Settings</li>
-                    <li>Navigate to: System Setup → API & OAuth</li>
-                    <li>Click "New OAuth Client"</li>
-                    <li>Fill in Name: "Fitzgerald HR"</li>
-                    <li>Redirect URI: "http://localhost" (required but not used)</li>
-                    <li>Click "Save", then "Get an Access Token"</li>
-                    <li>Copy the token and paste below</li>
+                <div class="font-semibold text-blue-300 mb-2">📝 Get your Deputy access token:</div>
+                <ol class="text-slate-300 space-y-2 list-decimal list-inside text-xs">
+                    <li>
+                        <a href="#" onclick="event.preventDefault(); window.open('https://e1849e30081029.au.deputy.com/exec/devapp/oauth_clients', '_blank')" class="text-amber-400 hover:text-amber-300 underline font-semibold">
+                            Click here to open Deputy OAuth settings →
+                        </a>
+                    </li>
+                    <li>Click the "New OAuth Client" button</li>
+                    <li>Fill in the form:
+                        <div class="ml-6 mt-1 space-y-0.5 text-slate-400">
+                            • Name: <span class="text-white">Fitzgerald HR</span><br>
+                            • Description: <span class="text-white">HR compliance chatbot</span><br>
+                            • Redirect URI: <span class="text-white">http://localhost</span>
+                        </div>
+                    </li>
+                    <li>Click "Save this OAuth Client"</li>
+                    <li>Click "Get an Access Token" button</li>
+                    <li>Copy the token from the modal (it only shows once!)</li>
+                    <li>Paste it below and click "Connect with Token"</li>
                 </ol>
+                <div class="mt-3 p-2 bg-amber-500/10 border border-amber-500/30 rounded text-xs text-amber-300">
+                    ⚠️ <strong>Important:</strong> If your Deputy URL is not "e1849e30081029.au.deputy.com", replace "once" in the link above with your subdomain.
+                </div>
             </div>
             
             <input type="text" id="deputyTokenInput" placeholder="Paste your token here..." 
@@ -14733,12 +14746,12 @@ async function initiateDeputyOAuth() {
         const scope = 'longlife_refresh_token roster.read employee.read timesheet.read';
         const state = generateRandomString(32);
         
-        console.log('🔵 OAuth URL:', `https://once.deputy.com/my/oauth/login?client_id=${clientId}&redirect_uri=${redirectUri}`);
+        console.log('🔵 OAuth URL:', `https://e1849e30081029.au.deputy.com/my/oauth/login?client_id=${clientId}&redirect_uri=${redirectUri}`);
         
         sessionStorage.setItem('deputy_oauth_state', state);
         console.log('✅ Redirecting to Deputy...');
         
-        window.location.href = `https://once.deputy.com/my/oauth/login?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}`;
+        window.location.href = `https://e1849e30081029.au.deputy.com/my/oauth/login?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=${state}`;
     } catch (error) { 
         console.error('❌ Deputy OAuth Error:', error);
         console.error('Error details:', error.message, error.stack);
@@ -15812,12 +15825,12 @@ window.addEventListener('DOMContentLoaded', () => {
             </button>
             
             <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3 text-sm text-blue-300">
-                <div class="font-semibold mb-1">📝 How to get your token:</div>
+                <div class="font-semibold mb-1">📝 Quick Setup (2 minutes):</div>
                 <div class="text-xs space-y-1">
-                    <div>1. Go to Deputy → Settings → System Setup → API & OAuth</div>
+                    <div>1. <a href="#" onclick="event.preventDefault(); window.open('https://e1849e30081029.au.deputy.com/exec/devapp/oauth_clients', '_blank')" class="text-amber-400 hover:text-amber-300 underline">Open Deputy OAuth Settings →</a></div>
                     <div>2. Click "New OAuth Client"</div>
-                    <div>3. Fill in details and click "Get an Access Token"</div>
-                    <div>4. Copy and paste the token above</div>
+                    <div>3. Name: "Fitzgerald HR", Redirect: "http://localhost"</div>
+                    <div>4. Click "Get an Access Token" and copy it</div>
                 </div>
             </div>
             
