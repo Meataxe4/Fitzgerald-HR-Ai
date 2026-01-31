@@ -14455,6 +14455,54 @@ async function checkDeputyConnection() {
     }
 }
 
+
+
+// Universal roster sync function (works with both OAuth and token)
+async function syncRosterData() {
+    try {
+        showNotification('🔄 Syncing rosters...', 'info');
+        
+        // Get token from sessionStorage first (for token users)
+        let deputyToken = sessionStorage.getItem('deputy_token');
+        let userId = sessionStorage.getItem('deputy_user_id') || 'test-user-' + Date.now();
+        
+        // If no token in sessionStorage, try Supabase (for OAuth users)
+        if (!deputyToken && typeof supabaseClient !== 'undefined' && supabaseClient) {
+            try {
+                const { data: { user } } = await supabaseClient.auth.getUser();
+                if (user) {
+                    userId = user.id;
+                    const { data: integration } = await supabaseClient
+                        .from('integrations')
+                        .select('access_token')
+                        .eq('user_id', userId)
+                        .eq('platform', 'deputy')
+                        .eq('is_active', true)
+                        .single();
+                    
+                    if (integration) {
+                        deputyToken = integration.access_token;
+                    }
+                }
+            } catch (error) {
+                console.log('Could not get token from Supabase');
+            }
+        }
+        
+        if (!deputyToken) {
+            showNotification('❌ Deputy not connected', 'error');
+            return;
+        }
+        
+        // Call sync function with token
+        await syncDeputyRostersWithToken(deputyToken);
+        
+    } catch (error) {
+        console.error('Sync error:', error);
+        showNotification(`❌ Sync failed: ${error.message}`, 'error');
+    }
+}
+
 async function syncAllIntegrations() {
     showNotification('🔄 Syncing all integrations...', 'info');
     try {
@@ -15896,7 +15944,7 @@ window.addEventListener('DOMContentLoaded', () => {
                         <div class="text-sm text-slate-400">Last synced: <span id="lastSyncTime">Never</span></div>
                     </div>
                 </div>
-                <button onclick="syncDeputyRosters()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-colors flex items-center gap-2">
+                <button onclick="syncRosterData()" class="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-colors flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                     </svg>
