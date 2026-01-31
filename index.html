@@ -14514,7 +14514,7 @@ async function syncDeputyRosters() {
         const response = await fetch('/.netlify/functions/deputy-sync-rosters', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: user.id, supabase_url: supabaseClient.supabaseUrl, supabase_key: supabaseClient.supabaseKey })
+            body: JSON.stringify({ user_id: user.id, supabase_url: SUPABASE_CONFIG.url, supabase_key: SUPABASE_CONFIG.anonKey })
         });
         const data = await response.json();
         if (!data.success) throw new Error(data.error);
