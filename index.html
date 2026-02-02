@@ -22844,24 +22844,33 @@ if (auth) {
             
             // Check if this is a new login (access screen was visible)
             if (accessScreen && accessScreen.classList.contains('hidden')) {
-                // Check if user needs onboarding
-                const hasCompletedOnboarding = checkOnboardingStatus();
-                if (!hasCompletedOnboarding) {
-                    setTimeout(() => showOnboarding(), 1000);
-                } else if (venueProfile.venueName) {
-                    // Create new conversation with welcome message for returning users
-                    setTimeout(() => {
-                        const userName = venueProfile.userName || '';
-                        const venueName = venueProfile.venueName || 'your venue';
-                        const city = venueProfile.city || '';
-                        const state = venueProfile.location || '';
-                        const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
-                        const locationText = city ? `${city}, ${state}` : state;
-                        const personalizedWelcome = `<p class="text-slate-100 leading-relaxed">${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?</p>`;
+                // Wait for main script to load before calling functions
+                const waitForFunctions = setInterval(() => {
+                    if (typeof checkOnboardingStatus === 'function' && 
+                        typeof showOnboarding === 'function' && 
+                        typeof createNewConversation === 'function') {
+                        clearInterval(waitForFunctions);
                         
-                        createNewConversation(personalizedWelcome);
-                    }, 1000);
-                }
+                        // Check if user needs onboarding
+                        const hasCompletedOnboarding = checkOnboardingStatus();
+                        if (!hasCompletedOnboarding) {
+                            setTimeout(() => showOnboarding(), 1000);
+                        } else if (venueProfile.venueName) {
+                            // Create new conversation with welcome message for returning users
+                            setTimeout(() => {
+                                const userName = venueProfile.userName || '';
+                                const venueName = venueProfile.venueName || 'your venue';
+                                const city = venueProfile.city || '';
+                                const state = venueProfile.location || '';
+                                const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
+                                const locationText = city ? `${city}, ${state}` : state;
+                                const personalizedWelcome = `<p class="text-slate-100 leading-relaxed">${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?</p>`;
+                                
+                                createNewConversation(personalizedWelcome);
+                            }, 1000);
+                        }
+                    }
+                }, 100);
             }
             
             setupRealtimeSync(user.uid);
