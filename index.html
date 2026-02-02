@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10936,10 +10935,11 @@ function openProfileMenu() {
         
         // Update venue name and code in profile from venueProfile
         var venueName = venueProfile.venueName || 'Your Venue';
-        var userCode = currentUser || 'N/A';
+        // For Firebase users, show email; for access code users, show the code
+        var userDisplay = currentUser && currentUser.email ? currentUser.email : (currentUser || 'N/A');
         
         document.getElementById('profileVenueName').textContent = venueName;
-        document.getElementById('profileUserCode').textContent = 'Code: ' + userCode;
+        document.getElementById('profileUserCode').textContent = userDisplay;
     }
 }
 
@@ -10975,7 +10975,8 @@ function updateSidebarVenueName() {
     }
     
     // Update userCode display
-    localStorage.setItem('userCode', currentUser);
+    var userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
+    localStorage.setItem('userCode', userKey);
 }
 
 // Tool Opening Functions
@@ -13015,8 +13016,22 @@ function saveVenueSettings() {
     venueProfile.location = document.getElementById('settingsLocation').value;
     venueProfile.city = document.getElementById('settingsCity').value.trim();
     venueProfile.staffCount = document.getElementById('settingsStaffCount').value;
+    venueProfile.setupComplete = true;
     
-    localStorage.setItem('venueProfile_' + currentUser, JSON.stringify(venueProfile));
+    // Use currentUser.uid for Firebase users, or currentUser as string for access code users
+    const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
+    localStorage.setItem('venueProfile_' + userKey, JSON.stringify(venueProfile));
+    
+    // Also save to Firebase for cross-device sync
+    if (currentUser && currentUser.uid && db) {
+        db.collection('users').doc(currentUser.uid).set({
+            venueProfile: venueProfile
+        }, { merge: true }).then(() => {
+            console.log('✅ Venue profile synced to Firebase');
+        }).catch(err => {
+            console.error('❌ Failed to sync venue profile:', err);
+        });
+    }
     
     // Update sidebar venue name
     updateSidebarVenueName();
@@ -23032,9 +23047,27 @@ if (auth) {
             await loadAllDataFromFirebase(); // Use new Firebase-first system with retry
             
             // Load and update venue name after data is loaded
-            const savedVenueProfile = localStorage.getItem('venueProfile_' + user.uid);
+            // First try localStorage, then Firebase for cross-device sync
+            let savedVenueProfile = localStorage.getItem('venueProfile_' + user.uid);
             console.log('🏨 Loading venue profile for:', user.uid);
-            console.log('🏨 Saved venue profile:', savedVenueProfile);
+            console.log('🏨 Saved venue profile (localStorage):', savedVenueProfile);
+            
+            // If not in localStorage, try to load from Firebase
+            if (!savedVenueProfile && db) {
+                try {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists && userDoc.data().venueProfile) {
+                        const firebaseVenueProfile = userDoc.data().venueProfile;
+                        console.log('🏨 Loaded venue profile from Firebase:', firebaseVenueProfile);
+                        // Save to localStorage for future use
+                        localStorage.setItem('venueProfile_' + user.uid, JSON.stringify(firebaseVenueProfile));
+                        savedVenueProfile = JSON.stringify(firebaseVenueProfile);
+                    }
+                } catch (e) {
+                    console.error('❌ Error loading venue profile from Firebase:', e);
+                }
+            }
+            
             if (savedVenueProfile) {
                 try {
                     venueProfile = JSON.parse(savedVenueProfile);
@@ -23695,4 +23728,3 @@ console.log('🔥 Firebase ready!');
 </script>
 </body>
 </html>
-
