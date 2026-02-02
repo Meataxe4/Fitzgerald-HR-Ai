@@ -9982,6 +9982,89 @@ function saveConversations() {
         console.error('Error saving conversations:', e);
     }
 }
+function saveConversations() {
+    try {
+        localStorage.setItem('fitz_conversations', JSON.stringify(conversations));
+        console.log('💾 Saved', conversations.length, 'conversations');
+        
+        // Sync to cloud
+        syncConversationsToCloud();
+    } catch (e) {
+        console.error('Error saving conversations:', e);
+    }
+}
+
+// Sync all conversations to cloud
+async function syncConversationsToCloud() {
+    if (!currentUser || !db) {
+        console.log('⚠️ Conversations saved locally only (not signed in)');
+        return;
+    }
+    
+    try {
+        // Save each conversation to Firestore
+        for (const conversation of conversations) {
+            await db.collection('users').doc(currentUser.uid)
+                    .collection('conversations').doc(conversation.id)
+                    .set({
+                        ...conversation,
+                        userId: currentUser.uid,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+        }
+        console.log('✅ Synced', conversations.length, 'conversations to cloud');
+    } catch (error) {
+        console.error('❌ Failed to sync conversations:', error);
+    }
+}
+
+// Load conversations from cloud
+async function loadConversationsFromCloud() {
+    if (!currentUser || !db) {
+        console.log('⚠️ Loading conversations from localStorage only');
+        return;
+    }
+    
+    try {
+        const snapshot = await db.collection('users').doc(currentUser.uid)
+                                  .collection('conversations').get();
+        
+        if (snapshot.empty) {
+            console.log('📭 No conversations in cloud yet');
+            return;
+        }
+        
+        const cloudConversations = [];
+        snapshot.forEach(doc => {
+            cloudConversations.push(doc.data());
+        });
+        
+        // Merge with local conversations (cloud takes priority)
+        conversations = cloudConversations;
+        
+        // Save to localStorage
+        localStorage.setItem('fitz_conversations', JSON.stringify(conversations));
+        
+        console.log('✅ Loaded', conversations.length, 'conversations from cloud');
+        
+        // Refresh the conversation list UI
+        refreshConversationListUI();
+        
+    } catch (error) {
+        console.error('❌ Failed to load conversations from cloud:', error);
+    }
+}
+
+// Refresh the conversation list in the UI
+function refreshConversationListUI() {
+    // Update recent chats sidebar if it exists
+    const recentChatsContainer = document.querySelector('.recent-chats');
+    if (recentChatsContainer && typeof displayRecentConversations === 'function') {
+        displayRecentConversations();
+    }
+    console.log('🔄 Conversation UI refreshed');
+}
+
 
 // Get current conversation
 function getCurrentConversation() {
