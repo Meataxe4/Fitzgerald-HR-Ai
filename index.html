@@ -21733,7 +21733,7 @@ const contractBuilderState = {
     contractId: null,
     userId: null,
     data: {
-        step0: { businessState: '', knowMyAward: false, termsAccepted: false, termsAcceptedAt: null, timestamp: null },
+        step0: { businessState: '', knowMyAward: false, understandTemplate: false, detailedTermsAccepted: false, detailedTermsAcceptedAt: null, timestamp: null },
         step1: { positionTitle: '', dutiesOption: 'attach', duties: '', awardName: '', businessStructure: '', workplaceAddress: '', employmentType: '', isPermanent: true, startDate: '', endDate: '', hasProbation: false, probationLength: '6' },
         step2: { hoursPerWeek: '', workPattern: '', overtimeApplies: true, shiftWork: false },
         step3: { payRate: '', payFrequency: 'weekly', payMethod: 'bank', superannuation: true },
@@ -21787,8 +21787,8 @@ function nextContractStep() {
     contractBuilderState.unsavedChanges = true;
     
     // ✅ CHECK: If moving from Step 0 (Setup) to Step 1 (Position Details)
-    // Show Terms of Use modal if not already accepted
-    if (contractBuilderState.currentStep === 0 && !contractBuilderState.data.step0.termsAccepted) {
+    // Show detailed Terms of Use modal if not already accepted
+    if (contractBuilderState.currentStep === 0 && !contractBuilderState.data.step0.detailedTermsAccepted) {
         showContractBuilderTermsModal();
         return; // Don't proceed until terms are accepted
     }
@@ -21843,10 +21843,10 @@ function acceptContractTerms() {
     }
     
     // Save acceptance to contract builder state
-    contractBuilderState.data.step0.termsAccepted = true;
-    contractBuilderState.data.step0.termsAcceptedAt = new Date().toISOString();
+    contractBuilderState.data.step0.detailedTermsAccepted = true;
+    contractBuilderState.data.step0.detailedTermsAcceptedAt = new Date().toISOString();
     
-    console.log('✅ Contract Builder Terms accepted');
+    console.log('✅ Contract Builder Detailed Terms accepted');
     
     // Close modal
     const modal = document.getElementById('contractBuilderTermsModal');
@@ -21856,7 +21856,7 @@ function acceptContractTerms() {
     if (typeof trackEvent === 'function') {
         trackEvent('contract_builder_terms_accepted', { 
             user: currentUser?.uid || currentUser,
-            timestamp: contractBuilderState.data.step0.termsAcceptedAt
+            timestamp: contractBuilderState.data.step0.detailedTermsAcceptedAt
         });
     }
     
@@ -21919,8 +21919,8 @@ function validateContractStep(stepNumber) {
                 alert('Please select your business state/territory.');
                 return false;
             }
-            if (!stepData.termsAccepted) {
-                alert('Please accept the terms of use to continue.');
+            if (!stepData.understandTemplate) {
+                alert('Please acknowledge that this is a template tool.');
                 return false;
             }
             return true;
@@ -22190,10 +22190,10 @@ function getStep0Template() {
         
         <div class="form-group">
             <label class="checkbox-label">
-                <input type="checkbox" class="checkbox-input" id="termsAccepted" name="termsAccepted" ${data.termsAccepted ? 'checked' : ''} required onchange="checkStep0Validation()">
+                <input type="checkbox" class="checkbox-input" id="understandTemplate" name="understandTemplate" ${data.understandTemplate ? 'checked' : ''} required onchange="checkStep0Validation()">
                 <span class="checkbox-text">
                     <strong>I understand this is a template tool and not legal advice.</strong> 
-                    I will review any contract with a legal professional before use.
+                    I will review any contract with a qualified professional before use.
                 </span>
             </label>
         </div>
@@ -22223,12 +22223,12 @@ function initializeStep0Listeners() {
 // Validation function for Step 0
 function checkStep0Validation() {
     const businessState = document.getElementById('businessState')?.value;
-    const termsAccepted = document.getElementById('termsAccepted')?.checked;
+    const understandTemplate = document.getElementById('understandTemplate')?.checked;
     const nextBtn = document.getElementById('step0NextBtn');
     
     if (nextBtn) {
-        // Enable button only if state is selected AND terms are accepted
-        if (businessState && termsAccepted) {
+        // Enable button only if state is selected AND user acknowledges template nature
+        if (businessState && understandTemplate) {
             nextBtn.disabled = false;
             nextBtn.style.opacity = '1';
             nextBtn.style.cursor = 'pointer';
