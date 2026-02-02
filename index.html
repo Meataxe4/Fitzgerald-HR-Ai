@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2018,7 +2019,171 @@ input, textarea, select {
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
 <!-- SYNC DEBUG PANEL - ADD THIS TO THE HEADER -->
 
+<script>
+// Simple manual sync functions for testing
+async function manualSyncToCloud() {
+    const status = document.getElementById('syncStatus');
+    status.innerHTML = '⏳ Saving to cloud...';
+    
+    if (!currentUser || !db) {
+        status.innerHTML = '❌ Error: Not signed in!';
+        return;
+    }
+    
+    try {
+        // Get ALL data from localStorage
+        const allData = {
+            conversations: JSON.parse(localStorage.getItem('fitz_conversations') || '[]'),
+            contracts: [],
+            checklists: [],
+            trainingPlans: [],
+            timestamp: new Date().toISOString()
+        };
+        
+        // Get all contracts
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('contract_')) {
+                try {
+                    allData.contracts.push(JSON.parse(localStorage.getItem(key)));
+                } catch (e) {}
+            }
+            if (key && key.startsWith('checklist_')) {
+                try {
+                    allData.checklists.push(JSON.parse(localStorage.getItem(key)));
+                } catch (e) {}
+            }
+            if (key && key.startsWith('training_plan_')) {
+                try {
+                    allData.trainingPlans.push(JSON.parse(localStorage.getItem(key)));
+                } catch (e) {}
+            }
+        }
+        
+        // Save to Firestore
+        await db.collection('users').doc(currentUser.uid).set({
+            syncedData: allData,
+            lastSync: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        
+        status.innerHTML = `✅ Synced to cloud!<br>
+        📝 ${allData.conversations.length} conversations<br>
+        📄 ${allData.contracts.length} contracts<br>
+        ✔️ ${allData.checklists.length} checklists<br>
+        📚 ${allData.trainingPlans.length} training plans`;
+        
+        console.log('✅ Manual sync complete:', allData);
+        
+    } catch (error) {
+        status.innerHTML = '❌ Error: ' + error.message;
+        console.error('Sync error:', error);
+    }
+}
 
+async function manualLoadFromCloud() {
+    const status = document.getElementById('syncStatus');
+    status.innerHTML = '⏳ Loading from cloud...';
+    
+    if (!currentUser || !db) {
+        status.innerHTML = '❌ Error: Not signed in!';
+        return;
+    }
+    
+    try {
+        const doc = await db.collection('users').doc(currentUser.uid).get();
+        
+        if (!doc.exists || !doc.data().syncedData) {
+            status.innerHTML = '📭 No cloud data found';
+            return;
+        }
+        
+        const cloudData = doc.data().syncedData;
+        
+        // Restore conversations
+        if (cloudData.conversations && cloudData.conversations.length > 0) {
+            localStorage.setItem('fitz_conversations', JSON.stringify(cloudData.conversations));
+            if (typeof window.conversations !== 'undefined') {
+                window.conversations = cloudData.conversations;
+            }
+        }
+        
+        // Restore contracts
+        if (cloudData.contracts && cloudData.contracts.length > 0) {
+            cloudData.contracts.forEach(contract => {
+                localStorage.setItem('contract_' + contract.contractId, JSON.stringify(contract));
+            });
+        }
+        
+        // Restore checklists
+        if (cloudData.checklists && cloudData.checklists.length > 0) {
+            cloudData.checklists.forEach(checklist => {
+                localStorage.setItem('checklist_' + checklist.checklistId, JSON.stringify(checklist));
+            });
+        }
+        
+        // Restore training plans
+        if (cloudData.trainingPlans && cloudData.trainingPlans.length > 0) {
+            cloudData.trainingPlans.forEach(plan => {
+                localStorage.setItem('training_plan_' + plan.planId, JSON.stringify(plan));
+            });
+        }
+        
+        status.innerHTML = `✅ Loaded from cloud!<br>
+        📝 ${cloudData.conversations?.length || 0} conversations<br>
+        📄 ${cloudData.contracts?.length || 0} contracts<br>
+        ✔️ ${cloudData.checklists?.length || 0} checklists<br>
+        📚 ${cloudData.trainingPlans?.length || 0} training plans<br><br>
+        🔄 Refresh page to see changes`;
+        
+        console.log('✅ Manual load complete:', cloudData);
+        
+        // Show notification
+        alert('✅ Data loaded! Refresh the page to see everything.');
+        
+    } catch (error) {
+        status.innerHTML = '❌ Error: ' + error.message;
+        console.error('Load error:', error);
+    }
+}
+
+async function checkFirestoreData() {
+    const status = document.getElementById('syncStatus');
+    status.innerHTML = '⏳ Checking Firestore...';
+    
+    if (!currentUser || !db) {
+        status.innerHTML = '❌ Error: Not signed in!';
+        return;
+    }
+    
+    try {
+        const doc = await db.collection('users').doc(currentUser.uid).get();
+        
+        if (!doc.exists) {
+            status.innerHTML = '📭 No user document found';
+            return;
+        }
+        
+        const data = doc.data();
+        const syncedData = data.syncedData || {};
+        
+        status.innerHTML = `📊 Firestore Data:<br>
+        User ID: ${currentUser.uid}<br>
+        Email: ${currentUser.email}<br>
+        Last Sync: ${data.lastSync ? new Date(data.lastSync.toDate()).toLocaleString() : 'Never'}<br><br>
+        📝 ${syncedData.conversations?.length || 0} conversations<br>
+        📄 ${syncedData.contracts?.length || 0} contracts<br>
+        ✔️ ${syncedData.checklists?.length || 0} checklists<br>
+        📚 ${syncedData.trainingPlans?.length || 0} training plans`;
+        
+        console.log('Firestore data:', data);
+        
+    } catch (error) {
+        status.innerHTML = '❌ Error: ' + error.message;
+        console.error('Check error:', error);
+    }
+}
+
+</script>
 
     
     <!-- Inline checkAccess to avoid undefined error -->
@@ -9324,15 +9489,21 @@ function checkAccess() {
         } else {
             // Always start a new conversation to capture welcome in Recent Chats
             setTimeout(() => {
+                createNewConversation();
+                
+                // Clear the default welcome and add personalized one
+                const container = DOM.messagesContainer.querySelector('.space-y-6');
+                if (container) {
+                    container.innerHTML = '';
+                }
+                
                 const userName = venueProfile.userName || '';
                 const venueName = venueProfile.venueName || 'your venue';
                 const city = venueProfile.city || '';
                 const state = venueProfile.location || '';
                 const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
                 const locationText = city ? `${city}, ${state}` : state;
-                const personalizedWelcome = `<p class="text-slate-100 leading-relaxed">${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?</p>`;
-                
-                createNewConversation(personalizedWelcome);
+                addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
             }, 500);
         }
 
@@ -9427,15 +9598,21 @@ function attemptAutoLogin() {
     } else {
         // Always create new conversation for returning users
         setTimeout(() => {
+            createNewConversation();
+            
+            // Add personalized welcome message
+            const container = DOM.messagesContainer.querySelector('.space-y-6');
+            if (container) {
+                container.innerHTML = '';
+            }
+            
             const userName = venueProfile.userName || '';
             const venueName = venueProfile.venueName || 'your venue';
             const city = venueProfile.city || '';
             const state = venueProfile.location || '';
             const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
             const locationText = city ? `${city}, ${state}` : state;
-            const personalizedWelcome = `<p class="text-slate-100 leading-relaxed">${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?</p>`;
-            
-            createNewConversation(personalizedWelcome);
+            addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
         }, 500);
     }
 
@@ -10093,7 +10270,7 @@ function getCurrentConversation() {
 }
 
 // Create new conversation
-function createNewConversation(customWelcome = null) {
+function createNewConversation() {
     // Save current conversation first
     if (currentConversationId) {
         saveCurrentConversation();
@@ -10122,8 +10299,8 @@ function createNewConversation(customWelcome = null) {
     // Reset conversation history
     conversationHistory = [];
     
-    // Use custom welcome if provided, otherwise use default
-    const welcomeMessage = customWelcome || `
+    // Add FULL welcome message with HTML formatting (matching Image 1)
+    const welcomeMessage = `
         <p class="text-slate-100 leading-relaxed">
             👋 G'day! I'm Fitz, your hospitality HR assistant.
         </p>
@@ -10158,9 +10335,8 @@ function createNewConversation(customWelcome = null) {
         displayContainer.appendChild(messageDiv);
     }
     
-    // For storage - save plain text version (extract from HTML or use custom)
-    var plainWelcome = customWelcome ? customWelcome.replace(/<[^>]*>/g, '').replace(/\n\s+/g, '\n').trim() : 
-        '👋 G\'day! I\'m Fitz, your hospitality HR assistant.\n\nAsk me anything about awards, compliance, or employment law.\n\n🚨 Urgent/Critical Situations:\nUse the red URGENT button above for immediate crisis response.\n\nWhat HR topic would you like to learn about today?';
+    // For storage - save plain text version
+    var plainWelcome = '👋 G\'day! I\'m Fitz, your hospitality HR assistant.\n\nAsk me anything about awards, compliance, or employment law.\n\n🚨 Urgent/Critical Situations:\nUse the red URGENT button above for immediate crisis response.\n\nWhat HR topic would you like to learn about today?';
     conversationHistory.push({ role: 'assistant', content: plainWelcome });
     
     // Save and update UI - FIXED: Use saveCurrentConversation to update messages
@@ -13075,41 +13251,27 @@ function closeAdminDashboard() {
 }
 
 async function loadAnalytics() {
-    if (!db) {
-        alert('⚠️ Firebase not connected. Check console for errors.');
+    if (!supabaseClient) {
+        alert('⚠️ Database not connected. Check console for errors.');
         return;
     }
     
     try {
-        // Load total counts from Firebase
-        const usersSnapshot = await db.collection('users').get();
-        const userCount = usersSnapshot.size;
+        // Load total counts from Supabase
+        const { count: convCount } = await supabaseClient
+            .from('conversations')
+            .select('*', { count: 'exact', head: true });
         
-        // Count total conversations across all users
-        let convCount = 0;
-        let todayCount = 0;
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
+        const { count: userCount } = await supabaseClient
+            .from('user_profiles')
+            .select('*', { count: 'exact', head: true });
         
-        for (const userDoc of usersSnapshot.docs) {
-            const conversationsSnapshot = await db.collection('users')
-                .doc(userDoc.id)
-                .collection('conversations')
-                .get();
-            
-            convCount += conversationsSnapshot.size;
-            
-            // Count today's conversations
-            conversationsSnapshot.docs.forEach(doc => {
-                const data = doc.data();
-                if (data.created) {
-                    const createdDate = new Date(data.created);
-                    if (createdDate >= today) {
-                        todayCount++;
-                    }
-                }
-            });
-        }
+        // Get today's activity
+        const today = new Date().toISOString().split('T')[0];
+        const { count: todayCount } = await supabaseClient
+            .from('conversations')
+            .select('*', { count: 'exact', head: true })
+            .gte('timestamp', today);
         
         // Update stats
         document.getElementById('statTotalUsers').textContent = userCount || 0;
@@ -13121,7 +13283,7 @@ async function loadAnalytics() {
         switchAdminTab('conversations');
     } catch (error) {
         console.error('Error loading analytics:', error);
-        alert('Error loading analytics. Check console: ' + error.message);
+        alert('Error loading analytics. Check console.');
     }
 }
 
@@ -13167,75 +13329,44 @@ async function loadConversations() {
     // Show loading state
     list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading conversations...</div>';
     
-    if (!db) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
+    if (!supabaseClient) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Database not connected</div>';
         return;
     }
     
     try {
-        // Fetch conversations from all users
-        const usersSnapshot = await db.collection('users').get();
-        const allConversations = [];
+        // Fetch from Supabase
+        const { data: conversations, error } = await supabaseClient
+            .from('conversations')
+            .select('*')
+            .order('timestamp', { ascending: false })
+            .limit(50);
         
-        for (const userDoc of usersSnapshot.docs) {
-            const conversationsSnapshot = await db.collection('users')
-                .doc(userDoc.id)
-                .collection('conversations')
-                .get();
-            
-            conversationsSnapshot.docs.forEach(doc => {
-                const data = doc.data();
-                allConversations.push({
-                    ...data,
-                    userId: userDoc.id,
-                    docId: doc.id
-                });
-            });
-        }
+        if (error) throw error;
         
-        // Sort by created date (most recent first)
-        allConversations.sort((a, b) => {
-            const dateA = new Date(a.created || a.updated || 0);
-            const dateB = new Date(b.created || b.updated || 0);
-            return dateB - dateA;
-        });
-        
-        // Limit to 50 most recent
-        const conversations = allConversations.slice(0, 50);
-        
-        if (conversations.length === 0) {
+        if (!conversations || conversations.length === 0) {
             list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No conversations yet</div>';
             return;
         }
         
         let html = '';
         conversations.forEach(conv => {
-            const date = new Date(conv.created || conv.updated).toLocaleString('en-AU');
+            const date = new Date(conv.timestamp).toLocaleString('en-AU');
             const riskBadge = conv.is_high_risk ? '<span class="text-xs bg-red-500 text-white px-2 py-1 rounded">HIGH RISK</span>' : '';
-            
-            // Get first user message if available
-            const firstUserMessage = conv.messages && conv.messages.length > 0 
-                ? conv.messages.find(m => m.role === 'user')?.content || 'No message'
-                : 'No message';
-            
-            // Get first assistant response if available
-            const firstResponse = conv.messages && conv.messages.length > 0
-                ? conv.messages.find(m => m.role === 'assistant')?.content || 'No response'
-                : 'No response';
             
             html += `
                 <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 hover:border-purple-500 transition-all">
                     <div class="flex items-start justify-between mb-2">
                         <div>
-                            <span class="text-purple-400 font-semibold">${conv.userId.substring(0, 8)}...</span>
+                            <span class="text-purple-400 font-semibold">${conv.user_code}</span>
                             <span class="text-slate-500 text-xs ml-2">${date}</span>
                             ${riskBadge}
                         </div>
-                        <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${conv.title || 'N/A'}</span>
+                        <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${conv.theme || 'N/A'}</span>
                     </div>
                     <div class="text-sm">
-                        <p class="text-slate-300 mb-2"><strong>User:</strong> ${firstUserMessage.substring(0, 100)}${firstUserMessage.length > 100 ? '...' : ''}</p>
-                        <p class="text-slate-400 text-xs"><strong>Response:</strong> ${firstResponse.substring(0, 150)}...</p>
+                        <p class="text-slate-300 mb-2"><strong>User:</strong> ${conv.user_message}</p>
+                        <p class="text-slate-400 text-xs"><strong>Response:</strong> ${conv.assistant_response.substring(0, 150)}...</p>
                     </div>
                 </div>
             `;
@@ -13244,7 +13375,7 @@ async function loadConversations() {
         list.innerHTML = html;
     } catch (error) {
         console.error('Error loading conversations:', error);
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data</div>';
     }
 }
 
@@ -13253,15 +13384,44 @@ async function loadThemes() {
     
     list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading themes...</div>';
     
-    if (!db) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
+    if (!supabaseClient) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Database not connected</div>';
         return;
     }
     
     try {
-        // Note: Firebase doesn't have pre-aggregated theme data like Supabase
-        // You would need to process conversations to extract themes
-        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Theme tracking coming soon<br><small>Firebase migration in progress</small></div>';
+        const { data: themes, error } = await supabaseClient
+            .from('themes')
+            .select('*')
+            .order('count', { ascending: false });
+        
+        if (error) throw error;
+        
+        if (!themes || themes.length === 0) {
+            list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No themes tracked yet</div>';
+            return;
+        }
+        
+        const totalCount = themes.reduce((sum, t) => sum + t.count, 0);
+        
+        let html = '';
+        themes.forEach(themeData => {
+            const percentage = ((themeData.count / totalCount) * 100).toFixed(1);
+            html += `
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-purple-400 font-semibold">${themeData.theme}</span>
+                        <span class="text-2xl font-bold text-purple-400">${themeData.count}</span>
+                    </div>
+                    <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
+                        <div class="h-full bg-purple-500" style="width: ${percentage}%"></div>
+                    </div>
+                    <p class="text-xs text-slate-400 mt-1">${percentage}% of all queries</p>
+                </div>
+            `;
+        });
+        
+        list.innerHTML = html;
     } catch (error) {
         console.error('Error loading themes:', error);
         list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data</div>';
@@ -13273,50 +13433,38 @@ async function loadUsers() {
     
     list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading users...</div>';
     
-    if (!db) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
+    if (!supabaseClient) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Database not connected</div>';
         return;
     }
     
     try {
-        const usersSnapshot = await db.collection('users').get();
+        const { data: users, error } = await supabaseClient
+            .from('user_profiles')
+            .select('*')
+            .order('last_active', { ascending: false });
         
-        if (usersSnapshot.empty) {
+        if (error) throw error;
+        
+        if (!users || users.length === 0) {
             list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No users yet</div>';
             return;
         }
         
         let html = '';
-        for (const userDoc of usersSnapshot.docs) {
-            const userId = userDoc.id;
-            
-            // Get conversation count for this user
-            const conversationsSnapshot = await db.collection('users')
-                .doc(userId)
-                .collection('conversations')
-                .get();
-            
-            const messageCount = conversationsSnapshot.size;
+        users.forEach(profile => {
+            const venueInfo = profile.venue_type 
+                ? `${profile.venue_type} in ${profile.venue_location}` 
+                : 'No venue info';
             
             html += `
                 <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
                     <div class="flex items-start justify-between mb-3">
                         <div>
-                            <p class="text-purple-400 font-semibold">${userId.substring(0, 12)}...</p>
-                            <p class="text-xs text-slate-400">Firebase User</p>
+                            <p class="text-purple-400 font-semibold">${profile.user_code}</p>
+                            <p class="text-xs text-slate-400">${venueInfo}</p>
                         </div>
-                        <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${messageCount} conversations</span>
-                    </div>
-                </div>
-            `;
-        }
-        
-        list.innerHTML = html;
-    } catch (error) {
-        console.error('Error loading users:', error);
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
-    }
-}
+                        <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${profile.message_count} messages</span>
                     </div>
                     <div class="grid grid-cols-2 gap-2 text-xs">
                         <div>
@@ -13344,14 +13492,47 @@ async function loadHighRisk() {
     
     list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading high-risk topics...</div>';
     
-    if (!db) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
+    if (!supabaseClient) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Database not connected</div>';
         return;
     }
     
     try {
-        // Firebase doesn't have pre-tracked high-risk topics
-        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">High-risk tracking coming soon<br><small>Firebase migration in progress</small></div>';
+        const { data: highRisk, error } = await supabaseClient
+            .from('high_risk_topics')
+            .select('*')
+            .order('timestamp', { ascending: false })
+            .limit(50);
+        
+        if (error) throw error;
+        
+        if (!highRisk || highRisk.length === 0) {
+            list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No high-risk topics detected</div>';
+            return;
+        }
+        
+        let html = '';
+        highRisk.forEach(risk => {
+            const date = new Date(risk.timestamp).toLocaleString('en-AU');
+            const colorMap = { critical: 'red', high: 'yellow', medium: 'blue' };
+            const color = colorMap[risk.severity] || 'gray';
+            
+            html += `
+                <div class="bg-slate-900 border-2 border-${color}-500 rounded-lg p-4">
+                    <div class="flex items-start justify-between mb-2">
+                        <div>
+                            <span class="text-${color}-400 font-semibold">${risk.title}</span>
+                            <span class="text-slate-500 text-xs ml-2">${date}</span>
+                        </div>
+                        <span class="text-xs bg-${color}-500 text-white px-2 py-1 rounded uppercase">${risk.severity}</span>
+                    </div>
+                    <p class="text-slate-400 text-xs mb-2"><strong>User:</strong> ${risk.user_code}</p>
+                    <p class="text-slate-300 text-sm">${risk.message_preview}</p>
+                </div>
+            `;
+        });
+        
+        list.innerHTML = html;
     } catch (error) {
         console.error('Error loading high-risk topics:', error);
         list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data</div>';
@@ -13363,19 +13544,56 @@ async function loadDocuments() {
     
     list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading documents...</div>';
     
-    if (!db) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
+    if (!supabaseClient) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Database not connected</div>';
         return;
     }
     
     try {
-        // Firebase doesn't have generated_documents collection yet
-        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Document tracking coming soon<br><small>Firebase migration in progress</small></div>';
-    } catch (error) {
-        console.error('Error loading documents:', error);
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data</div>';
-    }
-}
+        const { data: documents, error } = await supabaseClient
+            .from('generated_documents')
+            .select('*')
+            .order('generated_at', { ascending: false })
+            .limit(100);
+        
+        if (error) throw error;
+        
+        if (!documents || documents.length === 0) {
+            list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No documents generated yet</div>';
+            return;
+        }
+        
+        console.log('📊 Documents loaded:', documents.length);
+        console.log('📊 Sample document:', documents[0]);
+        
+        // ✅ Calculate stats with FORMAT breakdown
+        const totalGenerated = documents.length;
+        const totalDownloaded = documents.filter(d => d.downloaded === true).length;
+        const totalPDF = documents.filter(d => d.format === 'pdf').length;
+        const totalWord = documents.filter(d => d.format === 'docx').length;
+        const totalWarnings = documents.filter(d => d.document_type === 'formalWarning').length;
+        const totalInvestigations = documents.filter(d => d.document_type === 'letterOfAllegation').length;
+        const totalRecords = documents.filter(d => d.document_type === 'recordOfDiscussion').length;
+        const totalPIPs = documents.filter(d => d.document_type === 'performanceImprovementPlan').length;
+        
+        console.log('📊 Stats:', {
+            total: totalGenerated,
+            downloaded: totalDownloaded,
+            pdf: totalPDF,
+            word: totalWord,
+            warnings: totalWarnings,
+            investigations: totalInvestigations,
+            records: totalRecords,
+            pips: totalPIPs
+        });
+        
+        let html = '<div class="space-y-6">';
+        
+        // ✅ Updated stats summary with FORMAT breakdown
+        html += `
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                    <p class="text-slate-400 text-xs mb-1">Total Generated</p>
                     <p class="text-3xl font-bold text-purple-400">${totalGenerated}</p>
                 </div>
                 <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
@@ -15384,23 +15602,15 @@ document.addEventListener('DOMContentLoaded', function() {
     loadRecentTools();
     updateSidebarRecentTools();
     
-    // Load venueProfile from localStorage - check both Firebase user and access code
-    const firebaseUser = auth && auth.currentUser;
-    const accessCode = localStorage.getItem('fitzhr_access_code');
-    const userId = firebaseUser ? firebaseUser.uid : (accessCode || currentUser);
-    
-    console.log('🏨 Initial venue profile load - userId:', userId);
-    
-    if (userId) {
-        const saved = localStorage.getItem('venueProfile_' + userId);
-        console.log('🏨 Saved venue profile:', saved);
+    // Load venueProfile from localStorage FIRST
+    if (currentUser) {
+        const saved = localStorage.getItem('venueProfile_' + currentUser);
         if (saved) {
             venueProfile = JSON.parse(saved);
-            console.log('🏨 Loaded venueProfile:', venueProfile);
         }
     }
     
-    // Update sidebar venue name
+    // THEN update sidebar venue name
     updateSidebarVenueName();
 
     // Initialize Supabase
@@ -22844,33 +23054,27 @@ if (auth) {
             
             // Check if this is a new login (access screen was visible)
             if (accessScreen && accessScreen.classList.contains('hidden')) {
-                // Wait for main script to load before calling functions
-                const waitForFunctions = setInterval(() => {
-                    if (typeof checkOnboardingStatus === 'function' && 
-                        typeof showOnboarding === 'function' && 
-                        typeof createNewConversation === 'function') {
-                        clearInterval(waitForFunctions);
+                // Check if user needs onboarding
+                const hasCompletedOnboarding = checkOnboardingStatus();
+                if (!hasCompletedOnboarding) {
+                    setTimeout(() => showOnboarding(), 1000);
+                } else if (venueProfile.venueName) {
+                    // Create new conversation with welcome message for returning users
+                    setTimeout(() => {
+                        createNewConversation();
                         
-                        // Check if user needs onboarding
-                        const hasCompletedOnboarding = checkOnboardingStatus();
-                        if (!hasCompletedOnboarding) {
-                            setTimeout(() => showOnboarding(), 1000);
-                        } else if (venueProfile.venueName) {
-                            // Create new conversation with welcome message for returning users
-                            setTimeout(() => {
-                                const userName = venueProfile.userName || '';
-                                const venueName = venueProfile.venueName || 'your venue';
-                                const city = venueProfile.city || '';
-                                const state = venueProfile.location || '';
-                                const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
-                                const locationText = city ? `${city}, ${state}` : state;
-                                const personalizedWelcome = `<p class="text-slate-100 leading-relaxed">${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?</p>`;
-                                
-                                createNewConversation(personalizedWelcome);
-                            }, 1000);
-                        }
-                    }
-                }, 100);
+                        const container = DOM.messagesContainer.querySelector('.space-y-6');
+                        if (container) container.innerHTML = '';
+                        
+                        const userName = venueProfile.userName || '';
+                        const venueName = venueProfile.venueName || 'your venue';
+                        const city = venueProfile.city || '';
+                        const state = venueProfile.location || '';
+                        const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
+                        const locationText = city ? `${city}, ${state}` : state;
+                        addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+                    }, 1000);
+                }
             }
             
             setupRealtimeSync(user.uid);
