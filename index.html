@@ -17843,18 +17843,21 @@ function resetAIImport() {
             </button>
             
             <!-- Future tools can be added here -->
-            <div class="text-left p-6 bg-slate-700/30 rounded-xl border border-slate-600 opacity-50">
+            
+            <button onclick="openOnboardingChecklist(); closeNewEmployeeToolkit();" class="text-left p-6 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
                 <div class="flex items-start gap-4">
                     <span class="text-4xl">📋</span>
                     <div>
-                        <div class="font-semibold text-white text-lg mb-2">Onboarding Checklist</div>
-                        <div class="text-sm text-slate-400 mb-3">Coming soon - Comprehensive checklist to ensure nothing is forgotten during onboarding</div>
+                        <div class="font-semibold text-white text-lg mb-2">AI-Enhanced Onboarding Checklist</div>
+                        <div class="text-sm text-slate-400 mb-3">Smart, adaptive checklist that guides you through every onboarding task with AI assistance</div>
                         <div class="flex flex-wrap gap-2">
-                            <span class="text-xs bg-slate-600 text-slate-400 px-2 py-1 rounded">Coming Soon</span>
+                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">AI-Powered</span>
+                            <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Role-Adaptive</span>
+                            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">Auto-Save</span>
                         </div>
                     </div>
                 </div>
-            </div>
+            </button>
             
             <div class="text-left p-6 bg-slate-700/30 rounded-xl border border-slate-600 opacity-50">
                 <div class="flex items-start gap-4">
@@ -17871,6 +17874,283 @@ function resetAIImport() {
         </div>
     </div>
 </div>
+
+
+<!-- Onboarding Checklist Modal -->
+<div id="onboardingChecklistModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-5xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                    <span>📋</span> AI-Enhanced Onboarding Checklist
+                </h2>
+                <p class="text-slate-400 text-sm">Smart checklist that adapts to your employee's role and circumstances</p>
+            </div>
+            <button onclick="closeOnboardingChecklist()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+
+        <!-- Employee Setup -->
+        <div class="bg-slate-700/50 rounded-xl p-6 mb-6">
+            <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <span>👤</span> New Employee Details
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">Employee Name *</label>
+                    <input type="text" id="onboardingEmployeeName" 
+                           class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
+                           placeholder="Full name">
+                </div>
+                
+                <div>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">Position/Role *</label>
+                    <input type="text" id="onboardingPosition" 
+                           class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
+                           placeholder="e.g., Head Chef, Waiter, Barista">
+                </div>
+                
+                <div>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">Employment Type *</label>
+                    <select id="onboardingEmploymentType" 
+                            class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none">
+                        <option value="">Select type...</option>
+                        <option value="full-time">Full-time</option>
+                        <option value="part-time">Part-time</option>
+                        <option value="casual">Casual</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">Start Date *</label>
+                    <input type="date" id="onboardingStartDate" 
+                           class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none">
+                </div>
+            </div>
+            
+            <button onclick="generateSmartChecklist()" 
+                    class="mt-4 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-black font-semibold rounded-lg transition-all flex items-center gap-2">
+                <span>✨</span> Generate Smart Checklist
+            </button>
+        </div>
+
+        <!-- AI Insights Box -->
+        <div id="aiInsightsBox" class="hidden bg-gradient-to-r from-purple-900/50 to-blue-900/50 border border-purple-500 rounded-xl p-6 mb-6">
+            <div class="flex items-start gap-3">
+                <span class="text-3xl">🤖</span>
+                <div>
+                    <h4 class="text-lg font-bold text-white mb-2">AI Insights</h4>
+                    <div id="aiInsightsContent" class="text-slate-300 text-sm leading-relaxed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Checklist Progress -->
+        <div id="checklistProgressBar" class="hidden mb-6">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-slate-300 font-semibold">Onboarding Progress</span>
+                <span id="progressPercentage" class="text-amber-500 font-bold">0%</span>
+            </div>
+            <div class="w-full bg-slate-700 rounded-full h-3">
+                <div id="progressBarFill" class="bg-gradient-to-r from-amber-500 to-green-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <p class="text-slate-400 text-sm mt-2">
+                <span id="completedTasks">0</span> of <span id="totalTasks">0</span> tasks completed
+            </p>
+        </div>
+
+        <!-- Checklist Sections -->
+        <div id="checklistSections" class="space-y-4">
+            <!-- Will be populated dynamically -->
+        </div>
+
+        <!-- AI Assistant -->
+        <div class="mt-6 bg-slate-700/30 rounded-xl p-4 border border-slate-600">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="text-2xl">💬</span>
+                <h4 class="font-semibold text-white">Ask AI Assistant</h4>
+            </div>
+            <textarea id="aiQuestionInput" 
+                      class="w-full px-4 py-3 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none mb-3"
+                      placeholder="Ask me anything about onboarding, compliance, or Fair Work requirements..."
+                      rows="2"></textarea>
+            <button onclick="askAIAssistant()" 
+                    class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-all flex items-center gap-2">
+                <span>🤖</span> Ask AI
+            </button>
+            <div id="aiResponseBox" class="hidden mt-4 p-4 bg-slate-800 rounded-lg border border-purple-500">
+                <div id="aiResponseContent" class="text-slate-300 text-sm leading-relaxed"></div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="mt-6 flex gap-3">
+            <button onclick="saveOnboardingProgress()" 
+                    class="flex-1 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-all">
+                💾 Save Progress
+            </button>
+            <button onclick="exportChecklistPDF()" 
+                    class="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all">
+                📥 Export PDF
+            </button>
+            <button onclick="closeOnboardingChecklist()" 
+                    class="px-6 py-3 bg-slate-600 hover:bg-slate-500 text-white font-semibold rounded-lg transition-all">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Onboarding Checklist Specific Styles */
+#onboardingChecklistModal .checklist-section {
+    background: rgba(51, 65, 85, 0.5);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+#onboardingChecklistModal .checklist-section:hover {
+    border-color: rgba(251, 191, 36, 0.5);
+    background: rgba(51, 65, 85, 0.7);
+}
+
+#onboardingChecklistModal .checklist-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+#onboardingChecklistModal .checklist-item:hover {
+    background: rgba(71, 85, 105, 0.5);
+}
+
+#onboardingChecklistModal .checklist-item.completed {
+    opacity: 0.7;
+}
+
+#onboardingChecklistModal .checklist-item.completed .item-text {
+    text-decoration: line-through;
+    color: #94a3b8;
+}
+
+#onboardingChecklistModal .checkbox-custom {
+    width: 24px;
+    height: 24px;
+    border: 2px solid #64748b;
+    border-radius: 6px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s;
+    cursor: pointer;
+}
+
+#onboardingChecklistModal .checkbox-custom:hover {
+    border-color: #fbbf24;
+}
+
+#onboardingChecklistModal .checkbox-custom.checked {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border-color: #10b981;
+}
+
+#onboardingChecklistModal .checkbox-custom.checked::after {
+    content: "✓";
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+#onboardingChecklistModal .item-content {
+    flex: 1;
+}
+
+#onboardingChecklistModal .item-text {
+    color: white;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+#onboardingChecklistModal .item-hint {
+    color: #94a3b8;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+#onboardingChecklistModal .item-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+#onboardingChecklistModal .action-btn {
+    padding: 4px 12px;
+    background: rgba(100, 116, 139, 0.5);
+    border: 1px solid #475569;
+    border-radius: 6px;
+    color: #cbd5e1;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#onboardingChecklistModal .action-btn:hover {
+    background: rgba(100, 116, 139, 0.8);
+    border-color: #fbbf24;
+    color: #fbbf24;
+}
+
+#onboardingChecklistModal .priority-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+#onboardingChecklistModal .priority-high {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+}
+
+#onboardingChecklistModal .priority-medium {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fcd34d;
+}
+
+#onboardingChecklistModal .priority-low {
+    background: rgba(34, 197, 94, 0.2);
+    color: #86efac;
+}
+
+#onboardingChecklistModal .ai-thinking {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #a78bfa;
+    font-size: 14px;
+}
+
+#onboardingChecklistModal .ai-thinking::after {
+    content: "...";
+    animation: thinking 1.5s infinite;
+}
+
+@keyframes thinking {
+    0%, 20% { content: "."; }
+    40% { content: ".."; }
+    60%, 100% { content: "..."; }
+}
+</style>
 
 
 <div id="employmentContractBuilder">
@@ -17966,6 +18246,557 @@ function openEmploymentContractFromMenu() {
 }
 
 // Rename the contract builder function for clarity
+// ========================================
+// AI-ENHANCED ONBOARDING CHECKLIST
+// ========================================
+
+let onboardingState = {
+    employeeName: '',
+    position: '',
+    employmentType: '',
+    startDate: '',
+    checklist: [],
+    completedTasks: [],
+    checklistId: null
+};
+
+// Main Functions
+function openOnboardingChecklist() {
+    console.log('📋 Opening Onboarding Checklist');
+    const modal = document.getElementById('onboardingChecklistModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+    
+    // Try to load saved progress
+    loadOnboardingProgress();
+    
+    if (typeof trackToolUsage === 'function') {
+        trackToolUsage('onboardingChecklist');
+    }
+}
+
+function closeOnboardingChecklist() {
+    const modal = document.getElementById('onboardingChecklistModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+// Generate Smart Checklist with AI
+async function generateSmartChecklist() {
+    const employeeName = document.getElementById('onboardingEmployeeName').value.trim();
+    const position = document.getElementById('onboardingPosition').value.trim();
+    const employmentType = document.getElementById('onboardingEmploymentType').value;
+    const startDate = document.getElementById('onboardingStartDate').value;
+    
+    // Validation
+    if (!employeeName || !position || !employmentType || !startDate) {
+        alert('Please fill in all required fields (Name, Position, Employment Type, Start Date)');
+        return;
+    }
+    
+    // Save to state
+    onboardingState.employeeName = employeeName;
+    onboardingState.position = position;
+    onboardingState.employmentType = employmentType;
+    onboardingState.startDate = startDate;
+    onboardingState.checklistId = 'onboarding_' + Date.now();
+    
+    // Show loading
+    showAIThinking('Analyzing role and generating personalized checklist...');
+    
+    try {
+        // Get AI insights
+        const insights = await getAIInsights(position, employmentType);
+        
+        // Generate checklist based on employment type
+        const checklist = generateChecklistItems(employmentType, position);
+        onboardingState.checklist = checklist;
+        
+        // Display AI insights
+        displayAIInsights(insights);
+        
+        // Render checklist
+        renderChecklist();
+        
+        // Show progress bar
+        document.getElementById('checklistProgressBar').classList.remove('hidden');
+        updateProgress();
+        
+    } catch (error) {
+        console.error('Error generating checklist:', error);
+        alert('Failed to generate checklist. Please try again.');
+    }
+}
+
+// Get AI Insights using Claude API
+async function getAIInsights(position, employmentType) {
+    const prompt = `As an Australian HR expert, provide 3 key insights for onboarding a new ${employmentType} ${position} in the hospitality industry. Focus on:
+1. Critical first-week priorities
+2. Common compliance issues to avoid
+3. Role-specific considerations
+
+Keep it concise, actionable, and specific to Australian hospitality.`;
+    
+    try {
+        const response = await callClaudeAPI(prompt);
+        return response;
+    } catch (error) {
+        console.error('AI Insights error:', error);
+        return getFallbackInsights(position, employmentType);
+    }
+}
+
+function getFallbackInsights(position, employmentType) {
+    const insights = {
+        'full-time': `For full-time ${position} roles:
+• Ensure Fair Work Information Statement is provided on day 1
+• Set up regular check-ins during the 6-month probation period
+• ${position.toLowerCase().includes('chef') ? 'Verify food safety certifications and arrange any required training' : 'Schedule comprehensive role training in first 2 weeks'}`,
+        
+        'part-time': `For part-time ${position} roles:
+• Clarify guaranteed minimum hours and roster patterns from the start
+• Ensure pro-rata leave entitlements are clearly explained
+• ${position.toLowerCase().includes('front') ? 'Focus on customer service standards training' : 'Provide clear availability requirements and flexibility expectations'}`,
+        
+        'casual': `For casual ${position} roles:
+• Emphasize the 25% casual loading and explain what it covers
+• Make it clear that hours are not guaranteed but shifts will be offered
+• ${position.toLowerCase().includes('kitchen') ? 'Ensure immediate induction on food safety and kitchen procedures' : 'Fast-track customer service and POS system training'}`
+    };
+    
+    return insights[employmentType] || 'Focus on comprehensive induction, clear communication, and regular feedback.';
+}
+
+function displayAIInsights(insights) {
+    const insightsBox = document.getElementById('aiInsightsBox');
+    const content = document.getElementById('aiInsightsContent');
+    
+    content.innerHTML = insights.replace(/\n/g, '<br>');
+    insightsBox.classList.remove('hidden');
+}
+
+function showAIThinking(message) {
+    const insightsBox = document.getElementById('aiInsightsBox');
+    const content = document.getElementById('aiInsightsContent');
+    
+    content.innerHTML = `<div class="ai-thinking">${message}</div>`;
+    insightsBox.classList.remove('hidden');
+}
+
+// Generate Checklist Items
+function generateChecklistItems(employmentType, position) {
+    const baseItems = [
+        {
+            id: 1,
+            category: 'Legal & Compliance',
+            title: 'Provide Fair Work Information Statement',
+            hint: 'Must be given before or on the first day of work. Download from Fair Work website.',
+            priority: 'high',
+            daysUntil: 0,
+            actions: ['Download Template', 'Mark as Given']
+        },
+        {
+            id: 2,
+            category: 'Legal & Compliance',
+            title: 'Signed Employment Contract',
+            hint: 'Ensure both parties have signed the contract and each has a copy.',
+            priority: 'high',
+            daysUntil: 0,
+            actions: ['View Contract', 'Confirm Signed']
+        },
+        {
+            id: 3,
+            category: 'Payroll Setup',
+            title: 'Collect Tax File Number (TFN) Declaration',
+            hint: 'Required for tax purposes. Use ATO TFN declaration form.',
+            priority: 'high',
+            daysUntil: 1,
+            actions: ['Download Form', 'Mark Received']
+        },
+        {
+            id: 4,
+            category: 'Payroll Setup',
+            title: 'Super Fund Choice Form',
+            hint: 'Employee must choose superannuation fund or use your default fund.',
+            priority: 'high',
+            daysUntil: 1,
+            actions: ['Download Form', 'Mark Completed']
+        },
+        {
+            id: 5,
+            category: 'Payroll Setup',
+            title: 'Bank Account Details',
+            hint: 'For salary/wage payments via direct deposit.',
+            priority: 'high',
+            daysUntil: 1,
+            actions: ['Collect Details', 'Verify']
+        },
+        {
+            id: 6,
+            category: 'Payroll Setup',
+            title: 'Add to Payroll System',
+            hint: 'Set up in Deputy, Xero, or your payroll system with correct pay rate and Award.',
+            priority: 'high',
+            daysUntil: 2,
+            actions: ['Add to System', 'Test Pay Run']
+        },
+        {
+            id: 7,
+            category: 'Documentation',
+            title: 'Emergency Contact Information',
+            hint: 'Collect details of who to contact in case of emergency.',
+            priority: 'medium',
+            daysUntil: 1,
+            actions: ['Collect Info', 'Store Securely']
+        },
+        {
+            id: 8,
+            category: 'Documentation',
+            title: 'Proof of Working Rights',
+            hint: 'Check passport, visa, or citizenship documents to verify right to work in Australia.',
+            priority: 'high',
+            daysUntil: 0,
+            actions: ['Check Documents', 'Keep Copies']
+        }
+    ];
+    
+    // Add role-specific items
+    if (position.toLowerCase().includes('chef') || position.toLowerCase().includes('kitchen') || position.toLowerCase().includes('cook')) {
+        baseItems.push({
+            id: 9,
+            category: 'Training & Compliance',
+            title: 'Food Safety Certificate Verification',
+            hint: 'Ensure valid Food Handler certificate (or arrange training within first week).',
+            priority: 'high',
+            daysUntil: 0,
+            actions: ['Check Certificate', 'Arrange Training']
+        });
+    }
+    
+    if (employmentType === 'full-time' || employmentType === 'part-time') {
+        baseItems.push({
+            id: 10,
+            category: 'Onboarding',
+            title: 'Explain Leave Entitlements',
+            hint: 'Annual leave, personal/carer\'s leave, and how to request time off.',
+            priority: 'medium',
+            daysUntil: 1,
+            actions: ['Provide Leave Policy', 'Explain Process']
+        });
+    }
+    
+    baseItems.push(
+        {
+            id: 11,
+            category: 'Onboarding',
+            title: 'Workplace Induction',
+            hint: 'Tour of facilities, introduction to team, key contacts, emergency procedures.',
+            priority: 'high',
+            daysUntil: 0,
+            actions: ['Schedule Tour', 'Complete Checklist']
+        },
+        {
+            id: 12,
+            category: 'Onboarding',
+            title: 'WHS & Safety Training',
+            hint: 'Workplace health and safety procedures, emergency exits, fire drills.',
+            priority: 'high',
+            daysUntil: 0,
+            actions: ['Conduct Training', 'Sign-off']
+        },
+        {
+            id: 13,
+            category: 'Training & Compliance',
+            title: 'Responsible Service of Alcohol (RSA)',
+            hint: 'Required for anyone serving alcohol in Australia.',
+            priority: position.toLowerCase().includes('bar') || position.toLowerCase().includes('front') ? 'high' : 'medium',
+            daysUntil: position.toLowerCase().includes('bar') ? 0 : 7,
+            actions: ['Check Certificate', 'Arrange Training']
+        },
+        {
+            id: 14,
+            category: 'Systems & Access',
+            title: 'POS System Training',
+            hint: 'Show how to use point of sale system for orders and payments.',
+            priority: 'high',
+            daysUntil: 1,
+            actions: ['Book Training', 'Create Login']
+        },
+        {
+            id: 15,
+            category: 'Systems & Access',
+            title: 'Roster Access',
+            hint: 'Add to Deputy or rostering system so they can view shifts.',
+            priority: 'medium',
+            daysUntil: 2,
+            actions: ['Add to System', 'Send Invite']
+        },
+        {
+            id: 16,
+            category: 'Onboarding',
+            title: 'Uniform & Equipment',
+            hint: 'Provide required uniform items and any necessary equipment.',
+            priority: 'medium',
+            daysUntil: 0,
+            actions: ['Issue Uniform', 'Record in System']
+        },
+        {
+            id: 17,
+            category: 'Follow-up',
+            title: '1-Week Check-in',
+            hint: 'Catch up to see how they\'re settling in, answer questions, address concerns.',
+            priority: 'medium',
+            daysUntil: 7,
+            actions: ['Schedule Meeting', 'Complete']
+        },
+        {
+            id: 18,
+            category: 'Follow-up',
+            title: '1-Month Review',
+            hint: 'Formal review of performance, provide feedback, set goals.',
+            priority: 'medium',
+            daysUntil: 30,
+            actions: ['Schedule Review', 'Complete']
+        }
+    );
+    
+    if (employmentType === 'full-time' || employmentType === 'part-time') {
+        baseItems.push({
+            id: 19,
+            category: 'Follow-up',
+            title: 'End of Probation Review',
+            hint: 'Formal review at end of probation period (typically 6 months).',
+            priority: 'low',
+            daysUntil: 180,
+            actions: ['Schedule Review', 'Confirm Continuation']
+        });
+    }
+    
+    return baseItems;
+}
+
+// Render Checklist
+function renderChecklist() {
+    const container = document.getElementById('checklistSections');
+    
+    // Group by category
+    const grouped = onboardingState.checklist.reduce((acc, item) => {
+        if (!acc[item.category]) acc[item.category] = [];
+        acc[item.category].push(item);
+        return acc;
+    }, {});
+    
+    let html = '';
+    
+    Object.keys(grouped).forEach(category => {
+        const items = grouped[category];
+        const categoryId = category.replace(/\s+/g, '-').toLowerCase();
+        
+        html += `
+            <div class="checklist-section">
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    ${getCategoryIcon(category)}
+                    <span>${category}</span>
+                    <span class="text-slate-400 text-sm font-normal ml-auto">${items.filter(i => onboardingState.completedTasks.includes(i.id)).length}/${items.length} completed</span>
+                </h3>
+                <div class="space-y-2">
+                    ${items.map(item => renderChecklistItem(item)).join('')}
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function renderChecklistItem(item) {
+    const isCompleted = onboardingState.completedTasks.includes(item.id);
+    
+    return `
+        <div class="checklist-item ${isCompleted ? 'completed' : ''}" data-item-id="${item.id}">
+            <div class="checkbox-custom ${isCompleted ? 'checked' : ''}" 
+                 onclick="toggleTaskCompletion(${item.id})"></div>
+            <div class="item-content">
+                <div class="flex items-start justify-between">
+                    <div class="item-text">${item.title}</div>
+                    <span class="priority-badge priority-${item.priority}">${item.priority}</span>
+                </div>
+                <div class="item-hint">${item.hint}</div>
+                ${item.daysUntil !== undefined ? `
+                    <div class="text-xs text-slate-400 mt-2">
+                        ${item.daysUntil === 0 ? '⚡ Due today' : item.daysUntil === 1 ? '📅 Due tomorrow' : `📅 Due in ${item.daysUntil} days`}
+                    </div>
+                ` : ''}
+                <div class="item-actions">
+                    ${item.actions.map(action => `
+                        <button class="action-btn" onclick="handleItemAction(${item.id}, '${action}')">${action}</button>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function getCategoryIcon(category) {
+    const icons = {
+        'Legal & Compliance': '⚖️',
+        'Payroll Setup': '💰',
+        'Documentation': '📄',
+        'Onboarding': '👋',
+        'Training & Compliance': '🎓',
+        'Systems & Access': '🔐',
+        'Follow-up': '📅'
+    };
+    return icons[category] || '📋';
+}
+
+// Toggle Task Completion
+function toggleTaskCompletion(itemId) {
+    const index = onboardingState.completedTasks.indexOf(itemId);
+    
+    if (index > -1) {
+        onboardingState.completedTasks.splice(index, 1);
+    } else {
+        onboardingState.completedTasks.push(itemId);
+    }
+    
+    // Re-render
+    renderChecklist();
+    updateProgress();
+    
+    // Auto-save
+    saveOnboardingProgress();
+}
+
+// Update Progress
+function updateProgress() {
+    const total = onboardingState.checklist.length;
+    const completed = onboardingState.completedTasks.length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    
+    document.getElementById('progressPercentage').textContent = percentage + '%';
+    document.getElementById('progressBarFill').style.width = percentage + '%';
+    document.getElementById('completedTasks').textContent = completed;
+    document.getElementById('totalTasks').textContent = total;
+}
+
+// Handle Item Actions
+function handleItemAction(itemId, action) {
+    const item = onboardingState.checklist.find(i => i.id === itemId);
+    
+    if (action.includes('Download')) {
+        // Open Fair Work or ATO website
+        if (action.includes('TFN') || action.includes('Form')) {
+            window.open('https://www.ato.gov.au/forms-and-instructions/tfn-declaration', '_blank');
+        } else if (action.includes('Template') || action.includes('Statement')) {
+            window.open('https://www.fairwork.gov.au/employment-conditions/starter-pack', '_blank');
+        }
+    } else if (action.includes('Mark') || action.includes('Confirm') || action.includes('Complete')) {
+        // Mark as completed
+        toggleTaskCompletion(itemId);
+    } else if (action.includes('Schedule')) {
+        // Could integrate with calendar
+        alert(`Action "${action}" - Would integrate with calendar system`);
+    } else {
+        alert(`Action "${action}" for item: ${item.title}`);
+    }
+}
+
+// AI Assistant
+async function askAIAssistant() {
+    const question = document.getElementById('aiQuestionInput').value.trim();
+    
+    if (!question) {
+        alert('Please enter a question');
+        return;
+    }
+    
+    const responseBox = document.getElementById('aiResponseBox');
+    const responseContent = document.getElementById('aiResponseContent');
+    
+    responseBox.classList.remove('hidden');
+    responseContent.innerHTML = '<div class="ai-thinking">Thinking</div>';
+    
+    try {
+        const context = `Employee: ${onboardingState.employeeName}, Position: ${onboardingState.position}, Type: ${onboardingState.employmentType}`;
+        const prompt = `As an Australian HR expert, answer this onboarding question:\n\nContext: ${context}\n\nQuestion: ${question}\n\nProvide a clear, actionable answer focused on Australian hospitality compliance.`;
+        
+        const answer = await callClaudeAPI(prompt);
+        responseContent.innerHTML = answer.replace(/\n/g, '<br>');
+        
+        // Clear input
+        document.getElementById('aiQuestionInput').value = '';
+    } catch (error) {
+        console.error('AI Assistant error:', error);
+        responseContent.innerHTML = 'Sorry, I encountered an error. Please try again or contact support.';
+    }
+}
+
+// Save/Load Progress
+function saveOnboardingProgress() {
+    if (!onboardingState.checklistId) return;
+    
+    try {
+        const data = {
+            ...onboardingState,
+            lastSaved: new Date().toISOString()
+        };
+        
+        localStorage.setItem('onboarding_' + onboardingState.checklistId, JSON.stringify(data));
+        
+        if (typeof showNotification === 'function') {
+            showNotification('✅ Progress saved', 'success');
+        } else {
+            alert('✅ Progress saved');
+        }
+    } catch (error) {
+        console.error('Error saving:', error);
+        alert('Failed to save progress');
+    }
+}
+
+function loadOnboardingProgress() {
+    // Try to load the most recent onboarding
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('onboarding_'));
+    if (keys.length === 0) return;
+    
+    try {
+        const latestKey = keys[keys.length - 1];
+        const data = JSON.parse(localStorage.getItem(latestKey));
+        
+        if (data) {
+            onboardingState = data;
+            
+            // Populate form
+            document.getElementById('onboardingEmployeeName').value = data.employeeName || '';
+            document.getElementById('onboardingPosition').value = data.position || '';
+            document.getElementById('onboardingEmploymentType').value = data.employmentType || '';
+            document.getElementById('onboardingStartDate').value = data.startDate || '';
+            
+            if (data.checklist && data.checklist.length > 0) {
+                renderChecklist();
+                document.getElementById('checklistProgressBar').classList.remove('hidden');
+                updateProgress();
+                
+                if (typeof showNotification === 'function') {
+                    showNotification('✅ Previous progress loaded', 'success');
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error loading progress:', error);
+    }
+}
+
+// Export to PDF
+function exportChecklistPDF() {
+    alert('PDF export coming soon! For now, you can print this page or take screenshots.');
+    // TODO: Integrate with PDF generation
+}
+
+
 function openEmploymentContractBuilder() {
     console.log('📄 Opening Employment Contract Builder');
     const builder = document.getElementById('employmentContractBuilder');
