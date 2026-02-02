@@ -10594,23 +10594,19 @@ function toggleBookmark(messageId) {
         if (messageElement) {
             const content = messageElement.textContent;
             
-            // Find the user's question that preceded this assistant response
-            const currentConv = conversations.find(c => c.id === currentConversationId);
+            // Find the user's question by looking at previous messages in DOM
             let userQuestion = 'Bookmarked response';
             
-            if (currentConv && currentConv.messages) {
-                // Find the index of the assistant message and get the user message before it
-                const messages = currentConv.messages;
-                for (let i = messages.length - 1; i >= 0; i--) {
-                    if (messages[i].role === 'assistant') {
-                        // Check if this is our message by comparing timestamps (rough match)
-                        // If there's a user message before this, use it
-                        if (i > 0 && messages[i - 1].role === 'user') {
-                            userQuestion = messages[i - 1].content;
-                            break;
-                        }
-                    }
+            // Walk backwards through DOM siblings to find the previous user message
+            let currentEl = messageElement.previousElementSibling;
+            while (currentEl) {
+                // Check if this is a user message (has amber background)
+                const messageContent = currentEl.querySelector('.bg-amber-500');
+                if (messageContent) {
+                    userQuestion = messageContent.textContent.trim();
+                    break;
                 }
+                currentEl = currentEl.previousElementSibling;
             }
             
             bookmarks.push({
@@ -12910,6 +12906,9 @@ function completeOnboarding() {
     venueProfile.setupComplete = true;
     venueProfile.setupDate = new Date().toISOString();
     localStorage.setItem('venueProfile_' + currentUser, JSON.stringify(venueProfile));
+    
+    // Update sidebar with new venue name
+    updateSidebarVenueName();
     
     document.getElementById('venueOnboardingModal').classList.add('hidden');
     
@@ -23035,9 +23034,23 @@ if (auth) {
             
             // Load and update venue name after data is loaded
             const savedVenueProfile = localStorage.getItem('venueProfile_' + user.uid);
+            console.log('🏨 Loading venue profile for:', user.uid);
+            console.log('🏨 Saved venue profile:', savedVenueProfile);
             if (savedVenueProfile) {
-                venueProfile = JSON.parse(savedVenueProfile);
-                updateSidebarVenueName();
+                try {
+                    venueProfile = JSON.parse(savedVenueProfile);
+                    console.log('🏨 Parsed venueProfile:', venueProfile);
+                    console.log('🏨 venueName:', venueProfile.venueName);
+                    
+                    // Wait a moment for DOM to be ready
+                    setTimeout(() => {
+                        updateSidebarVenueName();
+                    }, 500);
+                } catch (e) {
+                    console.error('❌ Error parsing venue profile:', e);
+                }
+            } else {
+                console.log('⚠️ No saved venue profile found');
             }
             
             setupRealtimeSync(user.uid);
