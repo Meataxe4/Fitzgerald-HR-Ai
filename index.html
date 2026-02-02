@@ -2287,79 +2287,132 @@ input, textarea, select {
     
     <!-- Access Code Screen -->
 <div id="accessScreen" class="min-h-screen flex items-center justify-center p-6">
-    <div class="max-w-4xl w-full">
+    <div class="max-w-6xl w-full">
         <!-- Logo/Branding -->
         <div class="text-center mb-8 fade-in">
             <div class="inline-block bg-gradient-to-r from-amber-500 to-orange-600 p-1 rounded-2xl mb-4">
                 <div class="bg-slate-900 px-8 py-4 rounded-xl">
-                    <h1 class="text-3xl font-bold text-amber-500">FITZGERALD HR</h1>
-                    <p class="text-slate-400 text-sm mt-1">AI-Powered Hospitality HR</p>
+                    <h1 class="text-4xl font-bold text-amber-500">FITZ</h1>
+                    <p class="text-slate-400 text-sm mt-1">AI-Powered Hospitality HR Assistant</p>
                 </div>
             </div>
-            <h2 class="text-2xl font-bold text-white mb-2">Beta Testing Programme</h2>
-            <p class="text-slate-400">Thank you for helping us test Australia's first AI-powered hospitality HR assistant</p>
+            <h2 class="text-3xl font-bold text-white mb-2">HR Compliance. Simplified.</h2>
+            <p class="text-slate-400 text-lg">Automated contracts, onboarding, and award compliance for Australian hospitality</p>
         </div>
 
-        <!-- Main Content Grid -->
-        <div class="grid md:grid-cols-2 gap-6 mb-8">
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
             
-            <!-- Left Column: Access Code Form -->
+            <!-- Left Column: Sign In -->
             <div class="bg-slate-800 rounded-2xl p-8 shadow-2xl border border-slate-700 fade-in">
-                <label class="block text-slate-300 font-medium mb-3">Enter Your Access Code</label>
-                <input 
-                    type="text" 
-                    id="accessCodeInput"
-                    placeholder="e.g., BETA-VENUE-001"
-                    class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all"
-                    onkeypress="if(event.key==='Enter') checkAccess()"
-                />
-
-		<div class="mt-3">
-    		   <label class="flex items-center gap-2 text-slate-300 text-sm cursor-pointer">
-        		<input type="checkbox" id="rememberMe" checked 
-               			class="w-4 h-4 text-amber-500 rounded border-slate-600 bg-slate-900 focus:ring-2 focus:ring-amber-500/20">
-        		   <span>Remember me on this device</span>
-    		   </label>
-		</div>
-
-                <button 
-                    onclick="checkAccess()"
-                    class="w-full mt-4 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all transform hover:scale-105"
-                >
-                    Access Beta
-                </button>
-                <p id="accessError" class="text-red-400 text-sm mt-3 hidden"></p>
+                <h3 class="text-xl font-bold text-white mb-6 text-center">Sign In to Continue</h3>
                 
+                <!-- Google Sign-In -->
+                <button 
+                    onclick="signInWithGoogleFromAccess()"
+                    class="w-full bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center gap-3 shadow-lg mb-4"
+                >
+                    <svg width="20" height="20" viewBox="0 0 20 20">
+                        <path fill="#4285F4" d="M19.6 10.2c0-.7-.1-1.4-.2-2H10v3.8h5.4c-.2 1.2-1 2.2-2.1 2.9v2.5h3.4c2-1.8 3.1-4.5 3.1-7.2z"/>
+                        <path fill="#34A853" d="M10 20c2.9 0 5.3-1 7.1-2.6l-3.4-2.5c-1 .7-2.2 1.1-3.7 1.1-2.8 0-5.2-1.9-6.1-4.5H.3v2.6C2.1 17.9 5.8 20 10 20z"/>
+                        <path fill="#FBBC05" d="M3.9 11.5c-.4-1.2-.4-2.5 0-3.7V5.2H.3C-1 7.4-1 12.6.3 14.8l3.6-2.6z"/>
+                        <path fill="#EA4335" d="M10 4c1.6 0 3 .5 4.1 1.6l3.1-3.1C15.3.9 12.9 0 10 0 5.8 0 2.1 2.1.3 5.2l3.6 2.6C4.8 5.9 7.2 4 10 4z"/>
+                    </svg>
+                    <span>Continue with Google</span>
+                </button>
+
+                <!-- Divider -->
+                <div class="relative my-6">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-slate-700"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-4 bg-slate-800 text-slate-400">OR</span>
+                    </div>
+                </div>
+
+                <!-- Email Sign-In -->
+                <div id="emailSignInSection">
+                    <input 
+                        type="email" 
+                        id="emailInput"
+                        placeholder="Enter your email"
+                        class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all mb-3"
+                    />
+                    <button 
+                        onclick="continueWithEmail()"
+                        class="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-6 rounded-lg transition-all"
+                    >
+                        Continue with email
+                    </button>
+                    <p class="text-slate-500 text-xs mt-3 text-center">
+                        We'll send you a magic link to sign in
+                    </p>
+                </div>
+
                 <div class="mt-6 pt-6 border-t border-slate-700">
-                    <p class="text-slate-500 text-xs text-center">
-                        Don't have an access code? Contact us at<br/>
-                        <a href="/cdn-cgi/l/email-protection#90f2f5e4f1d0f6f9e4eaf7f5e2f1fcf4f8e2bef3fffdbef1e5" class="text-amber-500 hover:underline"><span class="__cf_email__" data-cfemail="93f1f6e7f2d3f5fae7e9f4f6e1f2fff7fbe1bdf0fcfebdf2e6">[email&#160;protected]</span></a>
+                    <p class="text-slate-400 text-xs text-center">
+                        By continuing, you acknowledge our 
+                        <a href="#" class="text-amber-500 hover:underline">Privacy Policy</a>
                     </p>
                 </div>
             </div>
 
-            <!-- Right Column: Key Features -->
+            <!-- Right Column: Meet Fitz -->
             <div class="space-y-4 fade-in">
-                <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-amber-500/50 transition-all">
-                    <div class="flex items-center gap-4 mb-3">
-                        <div class="w-12 h-12 bg-amber-500/20 rounded-lg flex items-center justify-center text-2xl">
-                            🤖
+                <!-- Meet Fitz Dropdown -->
+                <div class="bg-slate-800 rounded-xl border border-slate-700">
+                    <button onclick="toggleMeetFitz()" class="w-full p-6 flex items-center justify-between text-left hover:bg-slate-700/50 transition-all rounded-xl">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-amber-500/20 rounded-lg flex items-center justify-center text-2xl">
+                                🤖
+                            </div>
+                            <div>
+                                <h3 class="text-white font-bold text-lg">Meet Fitz</h3>
+                                <p class="text-slate-400 text-sm">Your AI-powered HR assistant</p>
+                            </div>
                         </div>
-                        <div>
-                            <h3 class="text-white font-bold">AI-Powered Guidance</h3>
-                            <p class="text-slate-400 text-sm">Instant answers 24/7</p>
+                        <svg id="meetFitzChevron" class="w-6 h-6 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="meetFitzContent" class="hidden px-6 pb-6 space-y-3">
+                        <div class="pl-4 border-l-2 border-amber-500">
+                            <p class="text-slate-300 text-sm mb-3">Fitz is powered by advanced AI to help Australian hospitality venues with:</p>
+                            <ul class="space-y-2 text-sm text-slate-400">
+                                <li class="flex items-start gap-2">
+                                    <span class="text-amber-500 mt-0.5">✓</span>
+                                    <span><strong class="text-white">Smart Employment Contracts</strong> - Generate compliant contracts in minutes</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-amber-500 mt-0.5">✓</span>
+                                    <span><strong class="text-white">Onboarding Automation</strong> - AI-powered checklists for new hires</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-amber-500 mt-0.5">✓</span>
+                                    <span><strong class="text-white">Training Plans</strong> - Role-specific training adapted to experience levels</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-amber-500 mt-0.5">✓</span>
+                                    <span><strong class="text-white">24/7 HR Guidance</strong> - Instant answers to workplace questions</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="text-amber-500 mt-0.5">✓</span>
+                                    <span><strong class="text-white">Award Compliance</strong> - Stay compliant with Australian hospitality awards</span>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
+                <!-- Features -->
                 <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-amber-500/50 transition-all">
                     <div class="flex items-center gap-4 mb-3">
                         <div class="w-12 h-12 bg-amber-500/20 rounded-lg flex items-center justify-center text-2xl">
                             🇦🇺
                         </div>
                         <div>
-                            <h3 class="text-white font-bold">Australian Hospitality</h3>
-                            <p class="text-slate-400 text-sm">Built for local venues</p>
+                            <h3 class="text-white font-bold">Built for Australia</h3>
+                            <p class="text-slate-400 text-sm">Hospitality awards & compliance</p>
                         </div>
                     </div>
                 </div>
@@ -2370,24 +2423,32 @@ input, textarea, select {
                             ⚡
                         </div>
                         <div>
-                            <h3 class="text-white font-bold">24/7 Available</h3>
-                            <p class="text-slate-400 text-sm">Always ready to help</p>
+                            <h3 class="text-white font-bold">Always Available</h3>
+                            <p class="text-slate-400 text-sm">24/7 instant HR support</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-amber-500/50 transition-all">
+                    <div class="flex items-center gap-4 mb-3">
+                        <div class="w-12 h-12 bg-amber-500/20 rounded-lg flex items-center justify-center text-2xl">
+                            🔒
+                        </div>
+                        <div>
+                            <h3 class="text-white font-bold">Secure & Private</h3>
+                            <p class="text-slate-400 text-sm">Your data synced across devices</p>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
 
-        <!-- Social Proof Section - Streamlined -->
+        <!-- Trust Indicators -->
         <div class="bg-gradient-to-br from-amber-500/5 to-orange-600/5 border border-amber-500/30 rounded-2xl p-6 fade-in">
             <div class="text-center mb-4">
                 <p class="text-amber-400 font-bold text-lg">Trusted by Australian Hospitality Venues</p>
-                <p class="text-slate-400 text-sm mt-1">Real results from beta testers</p>
             </div>
-            
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="grid grid-cols-3 gap-4">
                 <div class="text-center">
                     <div class="bg-slate-800/50 backdrop-blur-sm rounded-lg p-4 border border-slate-700">
                         <p class="text-3xl font-bold text-amber-500">$12k</p>
@@ -2408,18 +2469,57 @@ input, textarea, select {
                 </div>
             </div>
             
-            <!-- Testimonial Carousel - Compact -->
-            <div id="testimonialCarousel" class="bg-slate-800/30 backdrop-blur-sm rounded-lg p-4 border border-slate-700/50">
-                <div class="testimonial-slide flex items-center gap-4">
+            <!-- Testimonial -->
+            <div class="mt-6 bg-slate-800/30 backdrop-blur-sm rounded-lg p-6 border border-slate-700/50">
+                <div class="flex items-start gap-4">
                     <div class="text-3xl flex-shrink-0">⭐⭐⭐⭐⭐</div>
                     <div class="flex-1">
-                        <p class="text-slate-200 text-sm italic">
+                        <p class="text-slate-200 text-base italic leading-relaxed">
                             "Saved me $300 on a consultant call. Got my answer in 2 minutes instead of waiting days for a callback."
                         </p>
-                        <p class="text-slate-500 text-xs mt-2">— Sarah M., Restaurant Owner, Melbourne</p>
+                        <p class="text-slate-500 text-sm mt-3">— Sarah M., Restaurant Owner, Melbourne</p>
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleMeetFitz() {
+    const content = document.getElementById('meetFitzContent');
+    const chevron = document.getElementById('meetFitzChevron');
+    
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        chevron.style.transform = 'rotate(180deg)';
+    } else {
+        content.classList.add('hidden');
+        chevron.style.transform = 'rotate(0deg)';
+    }
+}
+
+function continueWithEmail() {
+    const email = document.getElementById('emailInput').value.trim();
+    
+    if (!email) {
+        alert('Please enter your email address');
+        return;
+    }
+    
+    if (!email.includes('@')) {
+        alert('Please enter a valid email address');
+        return;
+    }
+    
+    // For now, show a message (you can implement magic link later)
+    alert('Email sign-in coming soon! Please use "Continue with Google" for now.');
+    
+    // TODO: Implement Firebase email link authentication
+    // firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings)
+}
+</script>
+
         </div>
     </div>
 </div>
@@ -22416,6 +22516,274 @@ function hideContractLoading() {
     if (overlay) overlay.remove();
 }
 
+</script>
+
+<!-- ============================================ -->
+<!-- FIREBASE AUTHENTICATION & SYNC -->
+<!-- ============================================ -->
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyDQyZhlcK84ltrk8hdRs8GGAr2RnhHAs28",
+  authDomain: "fitzgerald-hr.firebaseapp.com",
+  projectId: "fitzgerald-hr",
+  storageBucket: "fitzgerald-hr.firebasestorage.app",
+  messagingSenderId: "60315816365",
+  appId: "1:60315816365:web:0ac2a300f3c46e46ddd124",
+  measurementId: "G-NT7FEHKWHV"
+};
+
+// Use existing currentUser from line 4714
+let auth, db, currentSubscription = null;
+
+try {
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  db = firebase.firestore();
+  console.log('✅ Firebase initialized - Fitzgerald HR');
+} catch (error) {
+  console.error('❌ Firebase error:', error);
+}
+
+async function signInWithGoogle() {
+    if (!auth) { alert('Firebase not ready'); return; }
+    try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        const result = await auth.signInWithPopup(provider);
+        console.log('✅ Signed in:', result.user.displayName);
+        await createOrUpdateUserProfile(result.user);
+        if (typeof showNotification === 'function') showNotification('Welcome ' + result.user.displayName + '!', 'success');
+        return result.user;
+    } catch (error) {
+        console.error('Sign in error:', error);
+        if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+            alert(error.code === 'auth/popup-blocked' ? 'Please allow popups' : 'Sign in failed: ' + error.message);
+        }
+    }
+}
+
+async function signInWithGoogleFromAccess() {
+    if (!auth) { alert('Firebase not ready'); return; }
+    try {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        const result = await auth.signInWithPopup(provider);
+        const user = result.user;
+        console.log('✅ Access page sign in:', user.displayName);
+        await createOrUpdateUserProfile(user);
+        localStorage.setItem('fitzhr_google_auth', 'true');
+        localStorage.setItem('fitzhr_last_login', new Date().toISOString());
+        const accessScreen = document.getElementById('accessScreen');
+        const assistantScreen = document.getElementById('assistantScreen');
+        if (accessScreen) accessScreen.classList.add('hidden');
+        if (assistantScreen) assistantScreen.classList.remove('hidden');
+        const userCodeEl = document.getElementById('userCode');
+        if (userCodeEl) userCodeEl.textContent = 'Google Account';
+        console.log('✅ Access granted via Google');
+        return user;
+    } catch (error) {
+        console.error('Sign in error:', error);
+        if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
+            alert(error.code === 'auth/popup-blocked' ? 'Please allow popups' : 'Sign in failed: ' + error.message);
+        }
+    }
+}
+
+async function signOut() {
+    if (!auth) return;
+    try {
+        await auth.signOut();
+        console.log('✅ Signed out');
+        if (typeof showNotification === 'function') showNotification('Signed out', 'success');
+    } catch (error) { console.error('Sign out error:', error); }
+}
+
+// Beta Tester Whitelist - Easy to add more emails here!
+const BETA_TESTERS = [
+    'blakefitzgerald4@gmail.com',
+    'phalan.chilli@gmail.com',
+    'fitzgeraldilona@gmail.com',
+    'ellyse.saunderson@hotmail.com'
+    // Add more emails here as needed - just copy the line format above
+];
+
+async function createOrUpdateUserProfile(user) {
+    if (!db) return;
+    try {
+        const userRef = db.collection('users').doc(user.uid);
+        const doc = await userRef.get();
+        
+        // Check if user is a beta tester
+        const isBetaTester = BETA_TESTERS.includes(user.email.toLowerCase());
+        const subscriptionTier = isBetaTester ? 'professional' : 'free';
+        
+        if (!doc.exists) {
+            await userRef.set({
+                uid: user.uid, 
+                email: user.email, 
+                displayName: user.displayName, 
+                photoURL: user.photoURL,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
+                subscriptionTier: subscriptionTier,
+                subscriptionStatus: 'active',
+                betaTester: isBetaTester
+            });
+            console.log(isBetaTester ? '✅ Beta tester profile created (Professional tier)' : '✅ User profile created (Free tier)');
+        } else {
+            await userRef.update({ 
+                lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(), 
+                displayName: user.displayName, 
+                photoURL: user.photoURL 
+            });
+            console.log('✅ User profile updated');
+        }
+    } catch (error) { console.error('Profile error:', error); }
+}
+
+async function saveToCloud(collection, docId, data) {
+    const cacheKey = collection + '_' + docId;
+    try { localStorage.setItem(cacheKey, JSON.stringify(data)); } catch (e) { console.error('LocalStorage error:', e); }
+    if (!currentUser || !db) { console.log('⚠️ ' + collection + '/' + docId + ' local only'); return { success: true, synced: false }; }
+    try {
+        await db.collection('users').doc(currentUser.uid).collection(collection).doc(docId).set({...data, userId: currentUser.uid, updatedAt: firebase.firestore.FieldValue.serverTimestamp()}, { merge: true });
+        console.log('✅ ' + collection + '/' + docId + ' synced');
+        return { success: true, synced: true };
+    } catch (error) {
+        console.error('❌ Sync failed ' + collection + '/' + docId + ':', error);
+        return { success: true, synced: false, error };
+    }
+}
+
+async function loadFromCloud(collection) {
+    if (!currentUser || !db) return [];
+    try {
+        const snapshot = await db.collection('users').doc(currentUser.uid).collection(collection).get();
+        const items = [];
+        snapshot.forEach(function(doc) {
+            const data = doc.data();
+            items.push(data);
+            localStorage.setItem(collection + '_' + doc.id, JSON.stringify(data));
+        });
+        console.log('✅ Loaded ' + items.length + ' ' + collection);
+        return items;
+    } catch (error) { console.error('Load error ' + collection + ':', error); return []; }
+}
+
+async function loadAllUserData(userId) {
+    console.log('📥 Loading data...');
+    try {
+        await Promise.all([loadFromCloud('contracts'), loadFromCloud('checklists'), loadFromCloud('trainingPlans'), loadFromCloud('conversations')]);
+        console.log('✅ Data loaded');
+        if (typeof showNotification === 'function') showNotification('✅ Synced', 'success');
+    } catch (error) { console.error('Load error:', error); }
+}
+
+let unsubscribeListeners = [];
+function setupRealtimeSync(userId) {
+    if (!db) return;
+    console.log('🔄 Setting up sync...');
+    ['contracts', 'checklists', 'trainingPlans', 'conversations'].forEach(function(collection) {
+        const unsub = db.collection('users').doc(userId).collection(collection).onSnapshot(function(snapshot) {
+            snapshot.docChanges().forEach(function(change) {
+                const docId = change.doc.id;
+                const data = change.doc.data();
+                if (change.type === 'added' || change.type === 'modified') {
+                    localStorage.setItem(collection + '_' + docId, JSON.stringify(data));
+                    console.log('🔄 ' + collection + '/' + docId + ' synced');
+                } else if (change.type === 'removed') {
+                    localStorage.removeItem(collection + '_' + docId);
+                }
+            });
+        });
+        unsubscribeListeners.push(unsub);
+    });
+    console.log('✅ Real-time sync active');
+}
+
+function stopRealtimeSync() {
+    unsubscribeListeners.forEach(function(u) { if (u) u(); });
+    unsubscribeListeners = [];
+}
+
+if (auth) {
+    auth.onAuthStateChanged(async function(user) {
+        if (user) {
+            console.log('👤 Signed in:', user.displayName);
+            currentUser = user;
+            const accessScreen = document.getElementById('accessScreen');
+            const assistantScreen = document.getElementById('assistantScreen');
+            if (accessScreen && !accessScreen.classList.contains('hidden')) {
+                localStorage.setItem('fitzhr_google_auth', 'true');
+                localStorage.setItem('fitzhr_last_login', new Date().toISOString());
+                accessScreen.classList.add('hidden');
+                if (assistantScreen) assistantScreen.classList.remove('hidden');
+                const userCodeEl = document.getElementById('userCode');
+                if (userCodeEl) userCodeEl.textContent = 'Google Account';
+                console.log('✅ Auto-granted access');
+            }
+            updateUIForAuthenticatedUser(user);
+            await loadAllUserData(user.uid);
+            setupRealtimeSync(user.uid);
+        } else {
+            console.log('👤 No user');
+            currentUser = null;
+            stopRealtimeSync();
+            updateUIForUnauthenticatedUser();
+        }
+    });
+}
+
+function updateUIForAuthenticatedUser(user) {
+    const btn = document.getElementById('signInButton');
+    if (btn) btn.style.display = 'none';
+    const profile = document.getElementById('userProfile');
+    if (profile) {
+        profile.style.display = 'flex';
+        const photo = document.getElementById('userPhoto');
+        if (photo) photo.src = user.photoURL || 'https://via.placeholder.com/40';
+        const name = document.getElementById('userName');
+        if (name) name.textContent = user.displayName || 'User';
+        const email = document.getElementById('userEmail');
+        if (email) email.textContent = user.email;
+    }
+}
+
+function updateUIForUnauthenticatedUser() {
+    const btn = document.getElementById('signInButton');
+    if (btn) btn.style.display = 'flex';
+    const profile = document.getElementById('userProfile');
+    if (profile) profile.style.display = 'none';
+}
+
+if (typeof window !== 'undefined') {
+    const origContract = window.saveContractProgress;
+    window.saveContractProgress = function() {
+        if (origContract) origContract();
+        if (typeof contractBuilderState !== 'undefined' && contractBuilderState.contractId) {
+            saveToCloud('contracts', contractBuilderState.contractId, contractBuilderState);
+        }
+    };
+    const origChecklist = window.saveOnboardingProgress;
+    window.saveOnboardingProgress = function() {
+        if (origChecklist) origChecklist();
+        if (typeof onboardingState !== 'undefined' && onboardingState.checklistId) {
+            saveToCloud('checklists', onboardingState.checklistId, onboardingState);
+        }
+    };
+    const origTraining = window.saveTrainingPlan;
+    window.saveTrainingPlan = function() {
+        if (origTraining) origTraining();
+        if (typeof trainingPlanState !== 'undefined' && trainingPlanState.planId) {
+            saveToCloud('trainingPlans', trainingPlanState.planId, trainingPlanState);
+        }
+    };
+}
+
+console.log('🔥 Firebase ready!');
 </script>
 </body>
 </html>
