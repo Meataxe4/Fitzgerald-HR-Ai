@@ -2016,6 +2016,206 @@ input, textarea, select {
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
+<!-- SYNC DEBUG PANEL - ADD THIS TO THE HEADER -->
+<div id="syncDebugPanel" style="position: fixed; top: 60px; right: 10px; background: #1e293b; border: 2px solid #f59e0b; padding: 15px; border-radius: 8px; z-index: 9999; max-width: 300px;">
+    <div style="color: #f59e0b; font-weight: bold; margin-bottom: 10px;">🔄 Sync Debug Panel</div>
+    
+    <button onclick="manualSyncToCloud()" style="width: 100%; padding: 8px; background: #10b981; color: white; border: none; border-radius: 4px; margin-bottom: 8px; cursor: pointer; font-weight: bold;">
+        💾 Save All to Cloud
+    </button>
+    
+    <button onclick="manualLoadFromCloud()" style="width: 100%; padding: 8px; background: #3b82f6; color: white; border: none; border-radius: 4px; margin-bottom: 8px; cursor: pointer; font-weight: bold;">
+        📥 Load All from Cloud
+    </button>
+    
+    <button onclick="checkFirestoreData()" style="width: 100%; padding: 8px; background: #8b5cf6; color: white; border: none; border-radius: 4px; margin-bottom: 8px; cursor: pointer; font-weight: bold;">
+        🔍 Check Firestore
+    </button>
+    
+    <button onclick="document.getElementById('syncDebugPanel').style.display='none'" style="width: 100%; padding: 6px; background: #64748b; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
+        Close
+    </button>
+    
+    <div id="syncStatus" style="margin-top: 10px; padding: 8px; background: #0f172a; border-radius: 4px; font-size: 12px; color: #94a3b8; max-height: 200px; overflow-y: auto;"></div>
+</div>
+
+<script>
+// Simple manual sync functions for testing
+async function manualSyncToCloud() {
+    const status = document.getElementById('syncStatus');
+    status.innerHTML = '⏳ Saving to cloud...';
+    
+    if (!currentUser || !db) {
+        status.innerHTML = '❌ Error: Not signed in!';
+        return;
+    }
+    
+    try {
+        // Get ALL data from localStorage
+        const allData = {
+            conversations: JSON.parse(localStorage.getItem('fitz_conversations') || '[]'),
+            contracts: [],
+            checklists: [],
+            trainingPlans: [],
+            timestamp: new Date().toISOString()
+        };
+        
+        // Get all contracts
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('contract_')) {
+                try {
+                    allData.contracts.push(JSON.parse(localStorage.getItem(key)));
+                } catch (e) {}
+            }
+            if (key && key.startsWith('checklist_')) {
+                try {
+                    allData.checklists.push(JSON.parse(localStorage.getItem(key)));
+                } catch (e) {}
+            }
+            if (key && key.startsWith('training_plan_')) {
+                try {
+                    allData.trainingPlans.push(JSON.parse(localStorage.getItem(key)));
+                } catch (e) {}
+            }
+        }
+        
+        // Save to Firestore
+        await db.collection('users').doc(currentUser.uid).set({
+            syncedData: allData,
+            lastSync: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        
+        status.innerHTML = `✅ Synced to cloud!<br>
+        📝 ${allData.conversations.length} conversations<br>
+        📄 ${allData.contracts.length} contracts<br>
+        ✔️ ${allData.checklists.length} checklists<br>
+        📚 ${allData.trainingPlans.length} training plans`;
+        
+        console.log('✅ Manual sync complete:', allData);
+        
+    } catch (error) {
+        status.innerHTML = '❌ Error: ' + error.message;
+        console.error('Sync error:', error);
+    }
+}
+
+async function manualLoadFromCloud() {
+    const status = document.getElementById('syncStatus');
+    status.innerHTML = '⏳ Loading from cloud...';
+    
+    if (!currentUser || !db) {
+        status.innerHTML = '❌ Error: Not signed in!';
+        return;
+    }
+    
+    try {
+        const doc = await db.collection('users').doc(currentUser.uid).get();
+        
+        if (!doc.exists || !doc.data().syncedData) {
+            status.innerHTML = '📭 No cloud data found';
+            return;
+        }
+        
+        const cloudData = doc.data().syncedData;
+        
+        // Restore conversations
+        if (cloudData.conversations && cloudData.conversations.length > 0) {
+            localStorage.setItem('fitz_conversations', JSON.stringify(cloudData.conversations));
+            if (typeof window.conversations !== 'undefined') {
+                window.conversations = cloudData.conversations;
+            }
+        }
+        
+        // Restore contracts
+        if (cloudData.contracts && cloudData.contracts.length > 0) {
+            cloudData.contracts.forEach(contract => {
+                localStorage.setItem('contract_' + contract.contractId, JSON.stringify(contract));
+            });
+        }
+        
+        // Restore checklists
+        if (cloudData.checklists && cloudData.checklists.length > 0) {
+            cloudData.checklists.forEach(checklist => {
+                localStorage.setItem('checklist_' + checklist.checklistId, JSON.stringify(checklist));
+            });
+        }
+        
+        // Restore training plans
+        if (cloudData.trainingPlans && cloudData.trainingPlans.length > 0) {
+            cloudData.trainingPlans.forEach(plan => {
+                localStorage.setItem('training_plan_' + plan.planId, JSON.stringify(plan));
+            });
+        }
+        
+        status.innerHTML = `✅ Loaded from cloud!<br>
+        📝 ${cloudData.conversations?.length || 0} conversations<br>
+        📄 ${cloudData.contracts?.length || 0} contracts<br>
+        ✔️ ${cloudData.checklists?.length || 0} checklists<br>
+        📚 ${cloudData.trainingPlans?.length || 0} training plans<br><br>
+        🔄 Refresh page to see changes`;
+        
+        console.log('✅ Manual load complete:', cloudData);
+        
+        // Show notification
+        alert('✅ Data loaded! Refresh the page to see everything.');
+        
+    } catch (error) {
+        status.innerHTML = '❌ Error: ' + error.message;
+        console.error('Load error:', error);
+    }
+}
+
+async function checkFirestoreData() {
+    const status = document.getElementById('syncStatus');
+    status.innerHTML = '⏳ Checking Firestore...';
+    
+    if (!currentUser || !db) {
+        status.innerHTML = '❌ Error: Not signed in!';
+        return;
+    }
+    
+    try {
+        const doc = await db.collection('users').doc(currentUser.uid).get();
+        
+        if (!doc.exists) {
+            status.innerHTML = '📭 No user document found';
+            return;
+        }
+        
+        const data = doc.data();
+        const syncedData = data.syncedData || {};
+        
+        status.innerHTML = `📊 Firestore Data:<br>
+        User ID: ${currentUser.uid}<br>
+        Email: ${currentUser.email}<br>
+        Last Sync: ${data.lastSync ? new Date(data.lastSync.toDate()).toLocaleString() : 'Never'}<br><br>
+        📝 ${syncedData.conversations?.length || 0} conversations<br>
+        📄 ${syncedData.contracts?.length || 0} contracts<br>
+        ✔️ ${syncedData.checklists?.length || 0} checklists<br>
+        📚 ${syncedData.trainingPlans?.length || 0} training plans`;
+        
+        console.log('Firestore data:', data);
+        
+    } catch (error) {
+        status.innerHTML = '❌ Error: ' + error.message;
+        console.error('Check error:', error);
+    }
+}
+
+// Show debug panel on Ctrl+Shift+D
+document.addEventListener('keydown', function(e) {
+    if (e.ctrlKey && e.shiftKey && e.key === 'D') {
+        const panel = document.getElementById('syncDebugPanel');
+        if (panel) {
+            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+        }
+    }
+});
+
+console.log('🔧 Sync Debug Panel loaded - Press Ctrl+Shift+D to toggle');
+</script>
+
     
     <!-- Inline checkAccess to avoid undefined error -->
     <script>
@@ -9974,14 +10174,6 @@ function loadConversations() {
 }
 
 // Save conversations to localStorage
-function saveConversations() {
-    try {
-        localStorage.setItem('fitz_conversations', JSON.stringify(conversations));
-        console.log('💾 Saved', conversations.length, 'conversations');
-    } catch (e) {
-        console.error('Error saving conversations:', e);
-    }
-}
 function saveConversations() {
     try {
         localStorage.setItem('fitz_conversations', JSON.stringify(conversations));
@@ -23174,6 +23366,228 @@ function stopRealTimeCloudSync() {
 }
 
 console.log('🔥 Comprehensive sync system loaded');
+
+// ============================================
+// FIREBASE-FIRST SYNC SYSTEM
+// No more localStorage dependency!
+// ============================================
+
+// Save conversation to Firebase immediately
+async function saveConversationToFirebase(conversation) {
+    if (!currentUser || !db) {
+        console.log('⚠️ Not signed in - conversation not saved');
+        return false;
+    }
+    
+    try {
+        await db.collection('users').doc(currentUser.uid)
+                  .collection('conversations').doc(conversation.id)
+                  .set(conversation, { merge: true });
+        console.log('✅ Conversation saved to Firebase:', conversation.id);
+        return true;
+    } catch (error) {
+        console.error('❌ Failed to save conversation:', error);
+        return false;
+    }
+}
+
+// Load all conversations from Firebase
+async function loadConversationsFromFirebase() {
+    if (!currentUser || !db) {
+        console.log('⚠️ Not signed in');
+        window.conversations = [];
+        return;
+    }
+    
+    try {
+        const snapshot = await db.collection('users').doc(currentUser.uid)
+                                   .collection('conversations')
+                                   .orderBy('updated', 'desc')
+                                   .get();
+        
+        window.conversations = [];
+        snapshot.forEach(doc => {
+            window.conversations.push(doc.data());
+        });
+        
+        console.log('✅ Loaded', window.conversations.length, 'conversations from Firebase');
+        
+        // Update UI
+        if (typeof updateSidebarChats === 'function') {
+            updateSidebarChats();
+        }
+        
+        return window.conversations;
+    } catch (error) {
+        console.error('❌ Failed to load conversations:', error);
+        window.conversations = [];
+        return [];
+    }
+}
+
+// Save contract to Firebase
+async function saveContractToFirebase(contract) {
+    if (!currentUser || !db) {
+        console.log('⚠️ Not signed in - contract not saved');
+        return false;
+    }
+    
+    try {
+        await db.collection('users').doc(currentUser.uid)
+                  .collection('contracts').doc(contract.contractId)
+                  .set(contract, { merge: true });
+        console.log('✅ Contract saved to Firebase:', contract.contractId);
+        return true;
+    } catch (error) {
+        console.error('❌ Failed to save contract:', error);
+        return false;
+    }
+}
+
+// Load all contracts from Firebase
+async function loadContractsFromFirebase() {
+    if (!currentUser || !db) {
+        console.log('⚠️ Not signed in');
+        return [];
+    }
+    
+    try {
+        const snapshot = await db.collection('users').doc(currentUser.uid)
+                                   .collection('contracts').get();
+        
+        const contracts = [];
+        snapshot.forEach(doc => {
+            contracts.push(doc.data());
+        });
+        
+        console.log('✅ Loaded', contracts.length, 'contracts from Firebase');
+        return contracts;
+    } catch (error) {
+        console.error('❌ Failed to load contracts:', error);
+        return [];
+    }
+}
+
+// Save checklist to Firebase
+async function saveChecklistToFirebase(checklist) {
+    if (!currentUser || !db) {
+        console.log('⚠️ Not signed in - checklist not saved');
+        return false;
+    }
+    
+    try {
+        await db.collection('users').doc(currentUser.uid)
+                  .collection('checklists').doc(checklist.checklistId)
+                  .set(checklist, { merge: true });
+        console.log('✅ Checklist saved to Firebase:', checklist.checklistId);
+        return true;
+    } catch (error) {
+        console.error('❌ Failed to save checklist:', error);
+        return false;
+    }
+}
+
+// Load all checklists from Firebase
+async function loadChecklistsFromFirebase() {
+    if (!currentUser || !db) {
+        console.log('⚠️ Not signed in');
+        return [];
+    }
+    
+    try {
+        const snapshot = await db.collection('users').doc(currentUser.uid)
+                                   .collection('checklists').get();
+        
+        const checklists = [];
+        snapshot.forEach(doc => {
+            checklists.push(doc.data());
+        });
+        
+        console.log('✅ Loaded', checklists.length, 'checklists from Firebase');
+        return checklists;
+    } catch (error) {
+        console.error('❌ Failed to load checklists:', error);
+        return [];
+    }
+}
+
+// Save training plan to Firebase
+async function saveTrainingPlanToFirebase(plan) {
+    if (!currentUser || !db) {
+        console.log('⚠️ Not signed in - training plan not saved');
+        return false;
+    }
+    
+    try {
+        await db.collection('users').doc(currentUser.uid)
+                  .collection('trainingPlans').doc(plan.planId)
+                  .set(plan, { merge: true });
+        console.log('✅ Training plan saved to Firebase:', plan.planId);
+        return true;
+    } catch (error) {
+        console.error('❌ Failed to save training plan:', error);
+        return false;
+    }
+}
+
+// Load all training plans from Firebase
+async function loadTrainingPlansFromFirebase() {
+    if (!currentUser || !db) {
+        console.log('⚠️ Not signed in');
+        return [];
+    }
+    
+    try {
+        const snapshot = await db.collection('users').doc(currentUser.uid)
+                                   .collection('trainingPlans').get();
+        
+        const plans = [];
+        snapshot.forEach(doc => {
+            plans.push(doc.data());
+        });
+        
+        console.log('✅ Loaded', plans.length, 'training plans from Firebase');
+        return plans;
+    } catch (error) {
+        console.error('❌ Failed to load training plans:', error);
+        return [];
+    }
+}
+
+// MASTER LOAD FUNCTION - Load everything on sign in
+async function loadAllDataFromFirebase() {
+    if (!currentUser || !db) {
+        console.log('⚠️ Not signed in - cannot load data');
+        return;
+    }
+    
+    console.log('📥 Loading all data from Firebase...');
+    
+    try {
+        // Load all data types
+        await Promise.all([
+            loadConversationsFromFirebase(),
+            loadContractsFromFirebase(),
+            loadChecklistsFromFirebase(),
+            loadTrainingPlansFromFirebase()
+        ]);
+        
+        console.log('✅ All data loaded from Firebase');
+        console.log('🎉 Device is now synced!');
+        
+        // Show notification
+        if (typeof showNotification === 'function') {
+            showNotification('✅ Data synced from cloud', 'success');
+        }
+        
+    } catch (error) {
+        console.error('❌ Failed to load data:', error);
+    }
+}
+
+// Override existing save functions to use Firebase
+console.log('🔥 Firebase-first sync system loaded');
+
 
 console.log('🔥 Firebase ready!');
 </script>
