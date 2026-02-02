@@ -23425,15 +23425,20 @@ async function loadConversationsFromFirebase() {
         
         console.log('✅ Loaded', window.conversations.length, 'conversations from Firebase');
         
-        // Update UI with delay to ensure function is loaded
-        setTimeout(() => {
+        // Update UI with multiple retry attempts
+        const tryUpdateUI = (attempts = 0) => {
             if (typeof updateSidebarChats === 'function') {
                 updateSidebarChats();
                 console.log('✅ Updated sidebar with conversations');
+            } else if (attempts < 5) {
+                console.log('⚠️ updateSidebarChats not ready, retry', attempts + 1);
+                setTimeout(() => tryUpdateUI(attempts + 1), 500);
             } else {
-                console.log('⚠️ updateSidebarChats not available yet');
+                console.log('❌ updateSidebarChats never loaded');
             }
-        }, 500);
+        };
+        
+        setTimeout(() => tryUpdateUI(), 1000);
         
         return window.conversations;
     } catch (error) {
@@ -23593,13 +23598,16 @@ async function loadAllDataFromFirebase() {
         console.log('✅ All data loaded from Firebase');
         console.log('🎉 Device is now synced!');
         
-        // Force UI refresh after a short delay
-        setTimeout(() => {
+        // Force UI refresh with retry
+        const tryUpdateMasterUI = (attempts = 0) => {
             if (typeof updateSidebarChats === 'function') {
                 updateSidebarChats();
                 console.log('✅ UI refreshed - conversations should appear!');
+            } else if (attempts < 5) {
+                setTimeout(() => tryUpdateMasterUI(attempts + 1), 500);
             }
-        }, 1000);
+        };
+        setTimeout(() => tryUpdateMasterUI(), 1500);
         
         // Show notification
         if (typeof showNotification === 'function') {
