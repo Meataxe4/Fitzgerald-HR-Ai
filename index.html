@@ -18800,48 +18800,6 @@ function loadOnboardingProgress() {
 // ========================================
 
 // Updated generateEmploymentContract function with onboarding prompt
-async function generateEmploymentContractEnhanced() {
-    const format = document.querySelector('input[name="deliveryMethod"]:checked')?.value || 'docx';
-    
-    // Show loading overlay
-    showContractLoading('Generating your employment contract...');
-    
-    try {
-        // Build the contract content
-        const contractHTML = buildContractHTML();
-        
-        if (format === 'docx') {
-            // Generate Word document using html-docx-js
-            await generateWordDocument(contractHTML);
-        } else {
-            // Generate PDF
-            await generatePDFDocument(contractHTML);
-        }
-        
-        // Mark as saved
-        contractBuilderState.unsavedChanges = false;
-        
-        // Hide loading
-        hideContractLoading();
-        
-        // Show success notification
-        if (typeof showNotification === 'function') {
-            showNotification('✅ Contract generated successfully!', 'success');
-        }
-        
-        // IMPORTANT: Prompt for onboarding checklist after successful download
-        setTimeout(() => {
-            promptForOnboardingChecklist();
-            promptForOnboardingChecklist();
-        }, 1000);
-        
-    } catch (error) {
-        console.error('Error generating contract:', error);
-        hideContractLoading();
-        alert('Failed to generate contract. Please try again.');
-    }
-}
-
 // Prompt user to create onboarding checklist
 function promptForOnboardingChecklist() {
     // Create modal HTML
@@ -18895,7 +18853,9 @@ function promptForOnboardingChecklist() {
 
 // Create onboarding checklist with pre-filled data from contract
 function createOnboardingFromContract() {
-    // Close the prompt modal
+    console.log('📋 Creating onboarding checklist from contract data');
+    
+    // Close the prompt modal first
     closeOnboardingPrompt();
     
     // Close the contract builder
@@ -18904,6 +18864,8 @@ function createOnboardingFromContract() {
     // Extract data from contract builder
     const contractData = contractBuilderState.data.step1;
     
+    console.log('Contract data:', contractData);
+    
     // Pre-fill onboarding state
     onboardingState.employeeName = contractData.positionTitle ? `New ${contractData.positionTitle}` : 'New Employee';
     onboardingState.position = contractData.positionTitle || '';
@@ -18911,37 +18873,47 @@ function createOnboardingFromContract() {
     onboardingState.startDate = contractData.startDate || '';
     
     // Open onboarding checklist
-    openOnboardingChecklist();
-    
-    // Pre-fill the form
     setTimeout(() => {
-            promptForOnboardingChecklist();
-        document.getElementById('onboardingEmployeeName').value = onboardingState.employeeName;
-        document.getElementById('onboardingPosition').value = onboardingState.position;
-        document.getElementById('onboardingEmploymentType').value = onboardingState.employmentType;
-        document.getElementById('onboardingStartDate').value = onboardingState.startDate;
+        openOnboardingChecklist();
         
-        // Auto-generate the checklist
+        // Pre-fill the form after modal is open
         setTimeout(() => {
-            promptForOnboardingChecklist();
-            generateSmartChecklist();
-        }, 500);
+            const nameField = document.getElementById('onboardingEmployeeName');
+            const positionField = document.getElementById('onboardingPosition');
+            const typeField = document.getElementById('onboardingEmploymentType');
+            const dateField = document.getElementById('onboardingStartDate');
+            
+            if (nameField) nameField.value = onboardingState.employeeName;
+            if (positionField) positionField.value = onboardingState.position;
+            if (typeField) typeField.value = onboardingState.employmentType;
+            if (dateField) dateField.value = onboardingState.startDate;
+            
+            console.log('Form pre-filled with:', {
+                name: onboardingState.employeeName,
+                position: onboardingState.position,
+                type: onboardingState.employmentType,
+                date: onboardingState.startDate
+            });
+            
+            // Auto-generate the checklist after a moment
+            setTimeout(() => {
+                generateSmartChecklist();
+            }, 500);
+        }, 300);
     }, 300);
 }
 
-// Close onboarding prompt
 function closeOnboardingPrompt() {
+    console.log('Closing onboarding prompt');
     const modal = document.getElementById('onboardingPromptModal');
     if (modal) {
         modal.remove();
+        console.log('Prompt modal removed');
+    } else {
+        console.log('Prompt modal not found');
     }
-    
-    // Close contract builder after prompt is dismissed
-    setTimeout(() => {
-            promptForOnboardingChecklist();
-        closeEmploymentContract();
-    }, 300);
 }
+
 
 // ========================================
 // ENHANCED CHECKLIST EXPORT FUNCTIONS
