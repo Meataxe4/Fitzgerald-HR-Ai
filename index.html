@@ -10481,10 +10481,10 @@ function updateSidebarChats() {
         return;
     }
     
-    // Sort by updated date (most recent first)
-    const sortedConvs = [...conversations].sort((a, b) => 
-        new Date(b.updated) - new Date(a.updated)
-    );
+    // Sort by updated date (most recent first) and take only the 5 most recent
+    const sortedConvs = [...conversations]
+        .sort((a, b) => new Date(b.updated) - new Date(a.updated))
+        .slice(0, 5); // Only show the 5 most recent
     
     chatsList.innerHTML = sortedConvs.map(conv => {
         const isActive = conv.id === currentConversationId;
