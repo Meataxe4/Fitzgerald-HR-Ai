@@ -16414,59 +16414,75 @@ async function showLegalAcceptanceModal() {
     // Get user key for per-user storage
     const userKey = currentUser && currentUser.uid ? currentUser.uid : (currentUser || null);
     
-    console.log('📋 Legal check - currentUser:', currentUser);
-    console.log('📋 Legal check - userKey:', userKey);
+    console.log('📋 showLegalAcceptanceModal called');
+    console.log('📋 currentUser:', currentUser);
+    console.log('📋 userKey:', userKey);
     
     // If no valid user key, don't show modal (shouldn't happen but safety check)
     if (!userKey) {
-        console.warn('⚠️ No valid user key for legal check, skipping');
+        console.warn('⚠️ No valid user key for legal check, skipping modal');
         return false;
     }
     
-    // Check if user has already accepted in localStorage
+    // STEP 1: Check localStorage first (fast)
     let hasAccepted = localStorage.getItem('legalTermsAccepted_' + userKey) === 'true';
-    console.log('📋 Legal check - localStorage hasAccepted:', hasAccepted);
+    console.log('📋 localStorage check - legalTermsAccepted_' + userKey + ':', hasAccepted);
     
-    // If not in localStorage but user is Firebase user, check Firebase
+    // STEP 2: If not in localStorage, check Firebase (for cross-device sync)
     if (!hasAccepted && currentUser && currentUser.uid && db) {
+        console.log('📋 Not in localStorage, checking Firebase...');
         try {
-            console.log('📋 Legal check - checking Firebase for user:', currentUser.uid);
             const userDoc = await db.collection('users').doc(currentUser.uid).get();
-            console.log('📋 Legal check - Firebase doc exists:', userDoc.exists);
+            console.log('📋 Firebase doc exists:', userDoc.exists);
             
             if (userDoc.exists) {
                 const userData = userDoc.data();
-                console.log('📋 Legal check - Firebase legalTermsAccepted:', userData.legalTermsAccepted);
+                const firebaseValue = userData.legalTermsAccepted;
+                console.log('📋 Firebase legalTermsAccepted:', firebaseValue, '(type:', typeof firebaseValue, ')');
                 
-                if (userData.legalTermsAccepted === true) {
+                // Accept both boolean true and string 'true'
+                if (firebaseValue === true || firebaseValue === 'true') {
                     hasAccepted = true;
-                    // Cache to localStorage for faster future checks
+                    // Cache to localStorage for future fast checks
                     localStorage.setItem('legalTermsAccepted_' + userKey, 'true');
-                    localStorage.setItem('legalTermsAcceptedAt_' + userKey, userData.legalTermsAcceptedAt || '');
-                    console.log('✅ Legal acceptance found in Firebase, cached to localStorage');
+                    localStorage.setItem('legalTermsAcceptedAt_' + userKey, userData.legalTermsAcceptedAt || new Date().toISOString());
+                    console.log('✅ Found in Firebase, cached to localStorage');
                 }
             }
         } catch (e) {
             console.error('❌ Error checking Firebase for legal acceptance:', e);
+            // Continue - will show modal if not in localStorage
         }
     }
     
+    // STEP 3: Final decision
+    console.log('📋 Final hasAccepted:', hasAccepted);
+    
     if (hasAccepted) {
-        console.log('✅ User has already accepted legal terms, not showing modal');
+        console.log('✅ User has already accepted legal terms - NOT showing modal');
         return false; // Don't show modal
     }
     
-    console.log('⚠️ Showing legal acceptance modal (first use)');
+    // STEP 4: Show modal (user hasn't accepted)
+    console.log('⚠️ User has NOT accepted legal terms - showing modal');
+    
+    if (!modal) {
+        console.error('❌ Legal acceptance modal element not found!');
+        return false;
+    }
+    
     modal.classList.remove('hidden');
     
     // Reset checkbox state
-    checkbox.checked = false;
-    acceptBtn.disabled = true;
+    if (checkbox) checkbox.checked = false;
+    if (acceptBtn) acceptBtn.disabled = true;
     
     // Enable accept button only when checkbox is checked
-    checkbox.onchange = function() {
-        acceptBtn.disabled = !this.checked;
-    };
+    if (checkbox) {
+        checkbox.onchange = function() {
+            if (acceptBtn) acceptBtn.disabled = !this.checked;
+        };
+    }
     
     trackEvent('legal_acceptance_modal_shown', { user: userKey });
     return true;
@@ -23788,57 +23804,56 @@ if (auth) {
             updateUIForAuthenticatedUser(user);
             await loadAllDataFromFirebase(); // Use new Firebase-first system with retry
             
-            // Load and update venue name after data is loaded
-            // First try localStorage, then Firebase for cross-device sync
-            let savedVenueProfile = localStorage.getItem('venueProfile_' + user.uid);
-            console.log('🏨 Loading venue profile for:', user.uid);
-            console.log('🏨 Saved venue profile (localStorage):', savedVenueProfile);
+            // ============================================================
+            // CRITICAL: ALWAYS CHECK FIREBASE FOR LEGAL ACCEPTANCE FIRST
+            // This must run EVERY time, regardless of localStorage state
+            // ============================================================
+            console.log('📋 Starting legal acceptance check for user:', user.uid);
             
-            // If not in localStorage, try to load from Firebase
-            if (!savedVenueProfile && db) {
+            if (db) {
                 try {
                     const userDoc = await db.collection('users').doc(user.uid).get();
-                    if (userDoc.exists && userDoc.data().venueProfile) {
-                        const firebaseVenueProfile = userDoc.data().venueProfile;
-                        console.log('🏨 Loaded venue profile from Firebase:', firebaseVenueProfile);
-                        // Save to localStorage for future use
-                        localStorage.setItem('venueProfile_' + user.uid, JSON.stringify(firebaseVenueProfile));
-                        savedVenueProfile = JSON.stringify(firebaseVenueProfile);
-                    }
+                    console.log('📋 Firebase user document exists:', userDoc.exists);
                     
-                    // ALSO load and cache legal acceptance status while we have the document
-                    if (userDoc.exists && userDoc.data().legalTermsAccepted === true) {
-                        console.log('📋 Found legal acceptance in Firebase, caching to localStorage');
-                        localStorage.setItem('legalTermsAccepted_' + user.uid, 'true');
-                        localStorage.setItem('legalTermsAcceptedAt_' + user.uid, userDoc.data().legalTermsAcceptedAt || '');
+                    if (userDoc.exists) {
+                        const userData = userDoc.data();
+                        console.log('📋 Firebase legalTermsAccepted value:', userData.legalTermsAccepted);
+                        console.log('📋 Firebase legalTermsAccepted type:', typeof userData.legalTermsAccepted);
+                        
+                        // Check for truthy value (handles boolean true, string "true", etc.)
+                        if (userData.legalTermsAccepted === true || userData.legalTermsAccepted === 'true') {
+                            console.log('✅ Legal acceptance FOUND in Firebase - caching to localStorage');
+                            localStorage.setItem('legalTermsAccepted_' + user.uid, 'true');
+                            localStorage.setItem('legalTermsAcceptedAt_' + user.uid, userData.legalTermsAcceptedAt || new Date().toISOString());
+                        } else {
+                            console.log('⚠️ Legal acceptance NOT found in Firebase (value was:', userData.legalTermsAccepted, ')');
+                        }
+                        
+                        // Also load venue profile if present
+                        if (userData.venueProfile) {
+                            console.log('🏨 Loaded venue profile from Firebase');
+                            localStorage.setItem('venueProfile_' + user.uid, JSON.stringify(userData.venueProfile));
+                        }
+                    } else {
+                        console.log('⚠️ User document does not exist in Firebase yet');
                     }
                 } catch (e) {
-                    console.error('❌ Error loading venue profile from Firebase:', e);
+                    console.error('❌ Error checking Firebase for user data:', e);
                 }
+            } else {
+                console.warn('⚠️ Firebase db not available');
             }
             
-            // Also check if legal acceptance is in Firebase but not localStorage (separate check)
-            const hasLocalLegalAcceptance = localStorage.getItem('legalTermsAccepted_' + user.uid) === 'true';
-            if (!hasLocalLegalAcceptance && db) {
-                try {
-                    const userDoc = await db.collection('users').doc(user.uid).get();
-                    if (userDoc.exists && userDoc.data().legalTermsAccepted === true) {
-                        console.log('📋 Legal acceptance found in Firebase (secondary check), caching...');
-                        localStorage.setItem('legalTermsAccepted_' + user.uid, 'true');
-                        localStorage.setItem('legalTermsAcceptedAt_' + user.uid, userDoc.data().legalTermsAcceptedAt || '');
-                    }
-                } catch (e) {
-                    console.error('❌ Error checking legal acceptance in Firebase:', e);
-                }
-            }
+            // Now verify what's in localStorage after Firebase check
+            const localLegalAccepted = localStorage.getItem('legalTermsAccepted_' + user.uid);
+            console.log('📋 localStorage legalTermsAccepted_' + user.uid + ':', localLegalAccepted);
             
+            // Load venue profile from localStorage
+            let savedVenueProfile = localStorage.getItem('venueProfile_' + user.uid);
             if (savedVenueProfile) {
                 try {
                     venueProfile = JSON.parse(savedVenueProfile);
                     console.log('🏨 Parsed venueProfile:', venueProfile);
-                    console.log('🏨 venueName:', venueProfile.venueName);
-                    
-                    // Wait a moment for DOM to be ready
                     setTimeout(() => {
                         updateSidebarVenueName();
                     }, 500);
@@ -23849,18 +23864,40 @@ if (auth) {
                 console.log('⚠️ No saved venue profile found');
             }
             
-            // Check if this is a new login (access screen was visible)
+            // ============================================================
+            // NOW CHECK IF WE NEED TO SHOW LEGAL MODAL
+            // Only show if user has NOT accepted (based on localStorage which
+            // was just populated from Firebase above)
+            // ============================================================
             if (accessScreen && accessScreen.classList.contains('hidden')) {
-                // FIRST: Check if user needs to accept legal terms
-                const legalModalShown = await showLegalAcceptanceModal();
+                const hasAcceptedLegal = localStorage.getItem('legalTermsAccepted_' + user.uid) === 'true';
+                console.log('📋 Final hasAcceptedLegal check:', hasAcceptedLegal);
                 
-                // If legal modal was NOT shown (already accepted), check onboarding
-                if (!legalModalShown) {
-                    // Check if user needs onboarding
+                if (!hasAcceptedLegal) {
+                    // Show legal modal
+                    console.log('⚠️ Showing legal acceptance modal (not accepted yet)');
+                    const modal = document.getElementById('legalAcceptanceModal');
+                    const checkbox = document.getElementById('legalAcceptCheckbox');
+                    const acceptBtn = document.getElementById('acceptLegalButton');
+                    
+                    if (modal) {
+                        modal.classList.remove('hidden');
+                        if (checkbox) checkbox.checked = false;
+                        if (acceptBtn) acceptBtn.disabled = true;
+                        if (checkbox) {
+                            checkbox.onchange = function() {
+                                if (acceptBtn) acceptBtn.disabled = !this.checked;
+                            };
+                        }
+                        trackEvent('legal_acceptance_modal_shown', { user: user.uid });
+                    }
+                } else {
+                    // Legal already accepted - check onboarding
+                    console.log('✅ Legal terms already accepted - checking onboarding');
                     const hasCompletedOnboarding = checkOnboardingStatus();
                     if (!hasCompletedOnboarding) {
                         setTimeout(() => showOnboarding(), 1000);
-                    } else if (venueProfile.venueName) {
+                    } else if (venueProfile && venueProfile.venueName) {
                         // Create new conversation with welcome message for returning users
                         setTimeout(() => {
                             createNewConversation();
@@ -23878,7 +23915,6 @@ if (auth) {
                         }, 1000);
                     }
                 }
-                // If legal modal WAS shown, the acceptLegalTerms() function will handle showing onboarding after acceptance
             }
             
             setupRealtimeSync(user.uid);
