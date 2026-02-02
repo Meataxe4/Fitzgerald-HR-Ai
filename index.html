@@ -5125,9 +5125,32 @@ function detectToolNeeds(message) {
     const detectedTools = [];
     
     const toolTriggers = {
-        // Employment Contract / New Employee Toolkit
+        // ============================================================
+        // EMPLOYMENT CONTRACT / NEW EMPLOYEE TOOLKIT
+        // ============================================================
         employmentContract: {
-            keywords: ['employment contract', 'employee contract', 'new hire contract', 'contract template', 'employment agreement', 'hiring contract', 'offer letter', 'letter of offer', 'new employee paperwork', 'employment paperwork', 'contract of employment', 'full time contract', 'part time contract', 'casual contract', 'fixed term contract'],
+            keywords: [
+                // Direct terms
+                'employment contract', 'employee contract', 'work contract', 'job contract',
+                'contract template', 'employment agreement', 'hiring contract', 'staff contract',
+                // Offer letters
+                'offer letter', 'letter of offer', 'job offer letter', 'employment offer',
+                // Contract types
+                'full time contract', 'part time contract', 'casual contract', 'fixed term contract',
+                'permanent contract', 'temporary contract', 'probation contract',
+                // New hire related
+                'new employee paperwork', 'employment paperwork', 'hiring paperwork',
+                'new starter paperwork', 'new hire documents', 'employment documents',
+                // Actions
+                'create contract', 'draft contract', 'write contract', 'make contract',
+                'need a contract', 'prepare contract', 'generate contract',
+                // Situations
+                'hiring someone', 'taking on staff', 'employing someone', 'new staff member',
+                'bringing on', 'onboard new', 'starting new employee', 'new team member',
+                // Questions
+                'contract for new', 'what should contract include', 'contract requirements',
+                'fair work contract', 'compliant contract', 'legal contract'
+            ],
             title: '📄 Employment Contract',
             description: 'Create Fair Work compliant employment contracts with our New Employee Toolkit',
             action: 'openNewEmployeeToolkit()',
@@ -5135,9 +5158,33 @@ function detectToolNeeds(message) {
             color: 'emerald'
         },
         
-        // Job Description
+        // ============================================================
+        // JOB DESCRIPTION / RECRUITMENT
+        // ============================================================
         jobDescription: {
-            keywords: ['job description', 'job ad', 'job advertisement', 'job posting', 'position description', 'role description', 'write a job', 'create a job ad', 'hiring for', 'recruiting for', 'need to hire', 'looking to hire', 'advertise position', 'advertise role', 'job listing'],
+            keywords: [
+                // Direct terms
+                'job description', 'job ad', 'job advertisement', 'job posting', 'job listing',
+                'position description', 'role description', 'pd', 'jd',
+                // Writing/Creating
+                'write job ad', 'create job ad', 'draft job ad', 'make job ad',
+                'write job description', 'create job description', 'write position description',
+                // Hiring intent
+                'hiring for', 'recruiting for', 'need to hire', 'looking to hire', 'want to hire',
+                'looking for staff', 'need staff', 'need employees', 'hiring staff',
+                'recruit a', 'recruit an', 'recruiting a', 'recruiting an',
+                // Advertising
+                'advertise position', 'advertise role', 'advertise job', 'post job',
+                'seek ad', 'indeed ad', 'linkedin job', 'job board',
+                // Specific roles (hospitality)
+                'hire a chef', 'hire a cook', 'hire a waiter', 'hire a waitress',
+                'hire a bartender', 'hire a barista', 'hire kitchen hand', 'hire dishwasher',
+                'hire a manager', 'hire supervisor', 'hire front of house', 'hire foh',
+                'hire back of house', 'hire boh', 'hire hospo staff',
+                // Questions
+                'how to write job ad', 'job ad template', 'what to include in job ad',
+                'attract candidates', 'find staff', 'find employees'
+            ],
             title: '📝 Job Description Generator',
             description: 'Create professional, compliant job descriptions with our Recruitment Toolkit',
             action: 'openRecruitmentToolkit()',
@@ -5145,9 +5192,34 @@ function detectToolNeeds(message) {
             color: 'purple'
         },
         
-        // Interview Questions
+        // ============================================================
+        // INTERVIEW QUESTIONS
+        // ============================================================
         interviewQuestions: {
-            keywords: ['interview question', 'interview questions', 'interviewing candidate', 'how to interview', 'interview guide', 'interview template', 'what to ask in interview', 'behavioural interview', 'behavioral interview', 'interview prep', 'conducting interview', 'interview process'],
+            keywords: [
+                // Direct terms
+                'interview question', 'interview questions', 'interview guide', 'interview template',
+                'interview script', 'interview form', 'interview sheet',
+                // Actions
+                'interviewing candidate', 'interviewing applicant', 'conduct interview',
+                'conducting interview', 'run interview', 'running interviews', 'do interview',
+                // Questions about interviewing
+                'how to interview', 'what to ask in interview', 'what to ask candidate',
+                'questions to ask', 'good interview questions', 'best questions to ask',
+                'interview tips', 'interview advice',
+                // Types
+                'behavioural interview', 'behavioral interview', 'competency interview',
+                'structured interview', 'phone interview', 'phone screen',
+                // Preparation
+                'interview prep', 'prepare for interview', 'interview preparation',
+                'ready for interview', 'before interview',
+                // Specific roles
+                'interview chef', 'interview waiter', 'interview bartender', 'interview barista',
+                'interview manager', 'interview cook', 'interview kitchen',
+                // Compliance
+                'legal interview questions', 'compliant interview', 'what can i ask',
+                'what cant i ask', 'illegal interview questions', 'discriminatory questions'
+            ],
             title: '🎤 Interview Questions Generator',
             description: 'Generate role-specific, legally compliant interview questions',
             action: 'openRecruitmentToolkit()',
@@ -5155,9 +5227,29 @@ function detectToolNeeds(message) {
             color: 'purple'
         },
         
-        // Reference Check
+        // ============================================================
+        // REFERENCE CHECK
+        // ============================================================
         referenceCheck: {
-            keywords: ['reference check', 'check reference', 'reference call', 'reference form', 'calling referee', 'contact referee', 'previous employer', 'employment verification', 'verify employment', 'reference questions'],
+            keywords: [
+                // Direct terms
+                'reference check', 'reference checking', 'ref check', 'check reference',
+                'reference call', 'reference form', 'reference template',
+                // People
+                'calling referee', 'contact referee', 'speak to referee', 'referee questions',
+                'previous employer', 'former employer', 'past employer', 'old boss',
+                // Verification
+                'employment verification', 'verify employment', 'check employment history',
+                'background check', 'employment history', 'work history',
+                // Actions
+                'do reference check', 'conduct reference check', 'get references',
+                'call references', 'check references', 'contact references',
+                // Questions
+                'reference questions', 'what to ask referee', 'what to ask reference',
+                'how to check references', 'reference check questions',
+                // After interview
+                'after interview', 'before hiring', 'before offering job'
+            ],
             title: '📋 Reference Check Form',
             description: 'Generate a professional reference check form with key questions',
             action: 'openReferenceCheckForm()',
@@ -5165,9 +5257,38 @@ function detectToolNeeds(message) {
             color: 'blue'
         },
         
-        // Onboarding Checklist
+        // ============================================================
+        // ONBOARDING CHECKLIST
+        // ============================================================
         onboardingChecklist: {
-            keywords: ['onboarding checklist', 'onboarding list', 'new starter checklist', 'induction checklist', 'new employee checklist', 'first day checklist', 'onboarding process', 'new hire onboarding', 'employee onboarding', 'induction process', 'orientation checklist', 'staff induction'],
+            keywords: [
+                // Direct terms
+                'onboarding checklist', 'onboarding list', 'onboarding template',
+                'induction checklist', 'induction list', 'induction template',
+                'orientation checklist', 'orientation list',
+                // New starter
+                'new starter checklist', 'new starter induction', 'new starter orientation',
+                'new employee checklist', 'new employee induction', 'new employee orientation',
+                'new hire checklist', 'new hire induction', 'new hire onboarding',
+                // First day/week
+                'first day checklist', 'first day list', 'first week checklist',
+                'day one checklist', 'week one checklist', 'first shift checklist',
+                // Process
+                'onboarding process', 'induction process', 'orientation process',
+                'onboarding program', 'induction program', 'orientation program',
+                // Staff
+                'staff induction', 'staff orientation', 'staff onboarding',
+                'employee induction', 'employee orientation', 'employee onboarding',
+                // Actions
+                'onboard new employee', 'induct new employee', 'orient new employee',
+                'onboard new staff', 'induct new staff', 'starting new employee',
+                // Questions
+                'how to onboard', 'what to include in induction', 'onboarding requirements',
+                'induction requirements', 'new employee needs', 'new starter needs',
+                // Documents needed
+                'tfn declaration', 'super choice', 'tax file', 'superannuation form',
+                'bank details', 'emergency contact'
+            ],
             title: '✅ Onboarding Checklist Builder',
             description: 'Create a comprehensive onboarding checklist for new employees',
             action: 'openOnboardingChecklist()',
@@ -5175,9 +5296,32 @@ function detectToolNeeds(message) {
             color: 'amber'
         },
         
-        // Training Plan
+        // ============================================================
+        // TRAINING PLAN
+        // ============================================================
         trainingPlan: {
-            keywords: ['training plan', 'training program', 'development plan', 'learning plan', 'upskill', 'skill development', 'training schedule', 'employee training', 'staff training', 'train new employee', 'training checklist', 'competency training', 'training matrix'],
+            keywords: [
+                // Direct terms
+                'training plan', 'training program', 'training schedule', 'training template',
+                'development plan', 'learning plan', 'training matrix', 'skills matrix',
+                // Types
+                'employee training', 'staff training', 'team training', 'new employee training',
+                'competency training', 'skills training', 'job training', 'role training',
+                // Actions
+                'train new employee', 'train new staff', 'train team', 'upskill',
+                'skill development', 'develop skills', 'develop employee', 'develop staff',
+                'create training', 'design training', 'build training',
+                // Hospitality specific
+                'train chef', 'train cook', 'train waiter', 'train bartender', 'train barista',
+                'kitchen training', 'front of house training', 'foh training', 'boh training',
+                'food safety training', 'rsa training', 'customer service training',
+                // Compliance
+                'training requirements', 'mandatory training', 'required training',
+                'training records', 'training log', 'training documentation',
+                // Questions
+                'how to train', 'what training needed', 'training checklist',
+                'how long to train', 'training timeline', 'training duration'
+            ],
             title: '📚 Training Plan Generator',
             description: 'Create structured training plans for employee development',
             action: 'openTrainingPlan()',
@@ -5185,9 +5329,37 @@ function detectToolNeeds(message) {
             color: 'cyan'
         },
         
-        // Award Wizard / Pay Rates
+        // ============================================================
+        // AWARD WIZARD / PAY RATES
+        // ============================================================
         awardRates: {
-            keywords: ['award rate', 'pay rate', 'minimum wage', 'hourly rate', 'what should i pay', 'how much to pay', 'casual rate', 'penalty rate', 'weekend rate', 'public holiday rate', 'overtime rate', 'classification', 'award classification', 'hospitality award', 'level 1', 'level 2', 'level 3', 'level 4', 'level 5', 'level 6'],
+            keywords: [
+                // Direct terms
+                'award rate', 'award rates', 'pay rate', 'pay rates', 'wage rate', 'wage rates',
+                'minimum wage', 'minimum pay', 'base rate', 'base pay',
+                // Specific rates
+                'hourly rate', 'hourly pay', 'casual rate', 'casual loading',
+                'penalty rate', 'penalty rates', 'weekend rate', 'weekend rates',
+                'saturday rate', 'sunday rate', 'public holiday rate', 'holiday rate',
+                'overtime rate', 'overtime pay', 'night rate', 'evening rate',
+                // Questions
+                'what should i pay', 'how much to pay', 'how much should i pay',
+                'what is the rate', 'what are the rates', 'current rates',
+                'correct pay', 'right pay', 'legal pay', 'fair pay',
+                // Classification
+                'classification', 'award classification', 'employee classification',
+                'level 1', 'level 2', 'level 3', 'level 4', 'level 5', 'level 6',
+                'food and beverage', 'kitchen employee', 'front of house attendant',
+                // Award
+                'hospitality award', 'restaurant award', 'cafe award', 'hotel award',
+                'higa', 'hospitality industry general award', 'modern award',
+                // Specific roles
+                'pay chef', 'pay cook', 'pay waiter', 'pay bartender', 'pay barista',
+                'pay kitchen hand', 'pay dishwasher', 'pay manager', 'pay supervisor',
+                // Underpayment concerns
+                'underpaying', 'underpayment', 'paying enough', 'paying correctly',
+                'am i paying right', 'paying too little', 'paying correctly'
+            ],
             title: '🧙 Award Wizard',
             description: 'Find the correct pay rates and classifications under the Hospitality Award',
             action: 'openAwardWizard()',
@@ -5195,9 +5367,30 @@ function detectToolNeeds(message) {
             color: 'amber'
         },
         
-        // Award Calculator
+        // ============================================================
+        // AWARD CALCULATOR
+        // ============================================================
         awardCalculator: {
-            keywords: ['calculate pay', 'calculate wage', 'work out pay', 'shift calculator', 'pay calculator', 'wage calculator', 'calculate shift', 'how much for shift', 'calculate overtime', 'calculate penalty'],
+            keywords: [
+                // Direct calculations
+                'calculate pay', 'calculate wage', 'calculate wages', 'calculate shift',
+                'work out pay', 'work out wage', 'work out shift',
+                // Calculator terms
+                'pay calculator', 'wage calculator', 'shift calculator', 'payroll calculator',
+                'hours calculator', 'overtime calculator', 'penalty calculator',
+                // Specific calculations
+                'how much for shift', 'how much is shift', 'shift cost', 'shift pay',
+                'calculate overtime', 'calculate penalty', 'calculate penalties',
+                'calculate public holiday', 'calculate weekend', 'calculate saturday', 'calculate sunday',
+                // Questions
+                'what will shift cost', 'cost of shift', 'shift total',
+                'how much do i owe', 'how much to pay for', 'total pay for',
+                // Specific scenarios
+                '8 hour shift', '10 hour shift', 'double shift', 'split shift',
+                'morning shift', 'afternoon shift', 'night shift', 'overnight shift',
+                // Payroll
+                'weekly pay', 'fortnightly pay', 'payslip', 'pay run'
+            ],
             title: '💰 Award Calculator',
             description: 'Calculate exact pay for shifts including penalties and overtime',
             action: 'openAwardCalculator()',
@@ -5205,9 +5398,32 @@ function detectToolNeeds(message) {
             color: 'green'
         },
         
-        // Roster Compliance / Stress Tester
+        // ============================================================
+        // ROSTER STRESS TESTER / COMPLIANCE
+        // ============================================================
         rosterCompliance: {
-            keywords: ['roster compliance', 'check roster', 'roster legal', 'break compliance', 'minimum hours', 'maximum hours', 'roster check', 'compliant roster', 'roster rules', 'rostering rules', 'shift compliance', 'break requirement'],
+            keywords: [
+                // Direct terms
+                'roster compliance', 'roster check', 'check roster', 'roster legal',
+                'compliant roster', 'roster rules', 'rostering rules', 'roster requirements',
+                // Stress test
+                'roster stress', 'stress test', 'stress tester', 'test roster',
+                // Breaks
+                'break compliance', 'break requirements', 'break rules', 'meal break',
+                'rest break', 'minimum break', 'break between shifts',
+                // Hours
+                'minimum hours', 'maximum hours', 'minimum shift', 'maximum shift',
+                'hours between shifts', '10 hour break', '11 hour break', 'rest period',
+                'consecutive days', 'days off', 'overtime hours',
+                // Shift issues
+                'shift compliance', 'shift legal', 'shift rules', 'shift requirements',
+                'split shift', 'clopening', 'close open', 'back to back',
+                // Questions
+                'is my roster legal', 'is roster compliant', 'roster okay',
+                'roster problem', 'roster issue', 'roster violation',
+                // Before publishing
+                'before publishing roster', 'check before publish', 'review roster'
+            ],
             title: '💥 Roster Stress Tester',
             description: 'Check your roster for compliance issues before publishing',
             action: 'openRosterStressTester()',
@@ -5215,9 +5431,24 @@ function detectToolNeeds(message) {
             color: 'red'
         },
         
-        // Deputy Integration
+        // ============================================================
+        // DEPUTY INTEGRATION
+        // ============================================================
         deputyImport: {
-            keywords: ['import deputy', 'deputy roster', 'deputy data', 'connect deputy', 'sync deputy', 'deputy integration', 'deputy csv', 'export from deputy', 'deputy timesheet'],
+            keywords: [
+                // Direct terms
+                'deputy', 'import deputy', 'deputy import', 'connect deputy',
+                'deputy integration', 'sync deputy', 'link deputy',
+                // Data
+                'deputy roster', 'deputy rosters', 'deputy timesheet', 'deputy timesheets',
+                'deputy data', 'deputy export', 'export from deputy', 'deputy csv',
+                'deputy employees', 'deputy staff', 'deputy schedule',
+                // Actions
+                'get deputy data', 'pull from deputy', 'import from deputy',
+                'connect to deputy', 'link to deputy', 'sync with deputy',
+                // Questions
+                'use deputy', 'using deputy', 'have deputy', 'deputy account'
+            ],
             title: '🔗 Deputy Integration',
             description: 'Import rosters and timesheets from Deputy for compliance checking',
             action: 'openIntegrationHub()',
@@ -5225,9 +5456,23 @@ function detectToolNeeds(message) {
             color: 'blue'
         },
         
-        // Xero Integration
+        // ============================================================
+        // XERO INTEGRATION
+        // ============================================================
         xeroImport: {
-            keywords: ['import xero', 'xero data', 'connect xero', 'sync xero', 'xero integration', 'xero payroll', 'xero employees', 'export from xero'],
+            keywords: [
+                // Direct terms
+                'xero', 'import xero', 'xero import', 'connect xero',
+                'xero integration', 'sync xero', 'link xero',
+                // Data
+                'xero payroll', 'xero employees', 'xero staff', 'xero data',
+                'xero export', 'export from xero', 'xero csv',
+                // Actions
+                'get xero data', 'pull from xero', 'import from xero',
+                'connect to xero', 'link to xero', 'sync with xero',
+                // Questions
+                'use xero', 'using xero', 'have xero', 'xero account'
+            ],
             title: '🔗 Xero Integration',
             description: 'Import employee and payroll data from Xero',
             action: 'openIntegrationHub()',
@@ -5235,9 +5480,33 @@ function detectToolNeeds(message) {
             color: 'green'
         },
         
-        // Termination Risk Assessor
+        // ============================================================
+        // TERMINATION RISK ASSESSOR
+        // ============================================================
         terminationRisk: {
-            keywords: ['termination risk', 'unfair dismissal', 'unfair dismissal risk', 'dismissal risk', 'can i fire', 'can i terminate', 'safe to terminate', 'risk of termination', 'termination assessment'],
+            keywords: [
+                // Direct termination terms
+                'terminate', 'termination', 'terminating', 'fire', 'firing', 'fired',
+                'dismiss', 'dismissal', 'dismissing', 'sack', 'sacking', 'sacked',
+                'let go', 'letting go', 'end employment', 'ending employment',
+                // Redundancy
+                'redundancy', 'redundant', 'make redundant', 'making redundant',
+                'restructure', 'restructuring', 'downsizing', 'downsize',
+                // Risk assessment
+                'termination risk', 'dismissal risk', 'unfair dismissal',
+                'unfair dismissal risk', 'risk of termination', 'termination assessment',
+                // Questions/Intent
+                'can i fire', 'can i terminate', 'can i dismiss', 'can i sack',
+                'should i fire', 'should i terminate', 'want to fire', 'want to terminate',
+                'need to fire', 'need to terminate', 'going to fire', 'going to terminate',
+                'thinking of firing', 'considering termination', 'planning to fire',
+                // Safe to proceed
+                'safe to terminate', 'safe to fire', 'safe to dismiss',
+                'okay to fire', 'okay to terminate', 'legal to fire', 'legal to terminate',
+                // Getting rid of
+                'get rid of employee', 'get rid of staff', 'remove employee',
+                'exit employee', 'move on employee', 'part ways'
+            ],
             title: '⚖️ Termination Risk Assessor',
             description: 'Assess the legal risks before proceeding with termination',
             action: 'openTerminationRisk()',
@@ -5245,9 +5514,30 @@ function detectToolNeeds(message) {
             color: 'red'
         },
         
-        // Compliance Calendar
+        // ============================================================
+        // COMPLIANCE CALENDAR
+        // ============================================================
         complianceCalendar: {
-            keywords: ['compliance calendar', 'compliance deadline', 'compliance reminder', 'award update', 'rate change', 'annual leave', 'leave accrual', 'casual conversion', 'compliance date'],
+            keywords: [
+                // Direct terms
+                'compliance calendar', 'compliance dates', 'compliance deadlines',
+                'compliance reminder', 'compliance reminders', 'compliance schedule',
+                // Award updates
+                'award update', 'award updates', 'rate change', 'rate changes',
+                'pay increase', 'wage increase', 'minimum wage increase',
+                'annual wage review', '1 july', 'july rate increase',
+                // Leave
+                'annual leave', 'leave accrual', 'leave balance', 'leave entitlements',
+                'personal leave', 'sick leave', 'long service leave',
+                // Casual conversion
+                'casual conversion', 'casual to permanent', 'casual to part time',
+                'conversion offer', '12 month casual', 'regular casual',
+                // Deadlines
+                'compliance deadline', 'deadline', 'due date', 'when is',
+                'important dates', 'key dates', 'hr calendar', 'payroll calendar',
+                // Questions
+                'what compliance', 'upcoming compliance', 'compliance requirements'
+            ],
             title: '📅 Compliance Calendar',
             description: 'Track important compliance deadlines and get reminders',
             action: 'openComplianceCalendar()',
@@ -5255,11 +5545,27 @@ function detectToolNeeds(message) {
             color: 'indigo'
         },
         
-        // === DOCUMENT BUILDER TOOLS ===
-        
-        // Formal Warning
+        // ============================================================
+        // DOCUMENT BUILDER - FORMAL WARNING
+        // ============================================================
         formalWarning: {
-            keywords: ['formal warning', 'written warning', 'issue a warning', 'give a warning', 'write a warning', 'warning letter', 'first warning', 'second warning'],
+            keywords: [
+                // Direct terms
+                'formal warning', 'written warning', 'official warning', 'warning letter',
+                'first warning', 'second warning', 'final warning', '1st warning', '2nd warning',
+                'first written warning', 'second written warning', 'final written warning',
+                // Actions
+                'issue warning', 'issue a warning', 'give warning', 'give a warning',
+                'write warning', 'write a warning', 'send warning', 'send a warning',
+                'create warning', 'draft warning', 'prepare warning',
+                // Situations
+                'need to warn', 'want to warn', 'going to warn',
+                'warning for lateness', 'warning for absence', 'warning for conduct',
+                'warning for behaviour', 'warning for behavior', 'warning for performance',
+                // Discipline
+                'disciplinary warning', 'disciplinary letter', 'disciplinary action',
+                'discipline employee', 'disciplining staff'
+            ],
             title: '📝 Formal Warning Letter',
             description: 'Create a legally compliant formal warning letter with our Document Builder',
             action: "openDocumentBuilderFor('formalWarning')",
@@ -5267,9 +5573,28 @@ function detectToolNeeds(message) {
             color: 'blue'
         },
         
-        // Record of Discussion
+        // ============================================================
+        // DOCUMENT BUILDER - RECORD OF DISCUSSION
+        // ============================================================
         recordOfDiscussion: {
-            keywords: ['record of discussion', 'document conversation', 'discussion meeting', 'talk to employee about', 'verbal warning', 'informal warning', 'counselling session'],
+            keywords: [
+                // Direct terms
+                'record of discussion', 'rod', 'discussion record', 'meeting record',
+                'record of conversation', 'conversation record', 'documented discussion',
+                // Informal actions
+                'verbal warning', 'informal warning', 'informal chat', 'quick chat',
+                'counselling session', 'counseling session', 'coaching session',
+                // Actions
+                'document conversation', 'document discussion', 'record meeting',
+                'talk to employee about', 'speak to employee about', 'chat with employee',
+                'have a conversation with', 'discuss with employee', 'address with employee',
+                // Situations
+                'talk about performance', 'talk about behaviour', 'talk about behavior',
+                'talk about lateness', 'talk about attendance', 'talk about attitude',
+                'address issue', 'address concern', 'raise concern',
+                // Before formal action
+                'before formal warning', 'instead of warning', 'informal first'
+            ],
             title: '📝 Record of Discussion',
             description: 'Create a record of discussion template with conversation script',
             action: "openDocumentBuilderFor('recordOfDiscussion')",
@@ -5277,9 +5602,29 @@ function detectToolNeeds(message) {
             color: 'blue'
         },
         
-        // Performance Improvement Plan
+        // ============================================================
+        // DOCUMENT BUILDER - PERFORMANCE IMPROVEMENT PLAN
+        // ============================================================
         performanceImprovementPlan: {
-            keywords: ['performance improve', 'pip', 'performance plan', 'underperforming', 'performance manage', 'performance issue', 'not meeting expectations', 'poor performance'],
+            keywords: [
+                // Direct terms
+                'performance improvement plan', 'pip', 'performance plan',
+                'improvement plan', 'performance action plan', 'performance management plan',
+                // Performance issues
+                'performance issue', 'performance issues', 'performance problem',
+                'performance concern', 'performance concerns', 'performance gap',
+                'underperforming', 'under performing', 'not performing',
+                'poor performance', 'bad performance', 'below expectations',
+                'not meeting expectations', 'not meeting standards', 'not up to standard',
+                // Performance management
+                'performance manage', 'performance managing', 'manage performance',
+                'managing performance', 'manage out', 'managing out',
+                // Situations
+                'employee not performing', 'staff not performing', 'struggling employee',
+                'employee struggling', 'help employee improve', 'improve performance',
+                // Actions
+                'put on pip', 'place on pip', 'create pip', 'draft pip', 'need pip'
+            ],
             title: '📝 Performance Improvement Plan',
             description: 'Create a structured 12-week performance improvement plan',
             action: "openDocumentBuilderFor('performanceImprovementPlan')",
@@ -5287,14 +5632,36 @@ function detectToolNeeds(message) {
             color: 'blue'
         },
         
-        // Letter of Allegation
+        // ============================================================
+        // DOCUMENT BUILDER - LETTER OF ALLEGATION
+        // ============================================================
         letterOfAllegation: {
-            keywords: ['letter of allegation', 'show cause', 'show cause letter', 'respond to allegation'],
+            keywords: [
+                // Direct terms
+                'letter of allegation', 'allegation letter', 'allegations letter',
+                'show cause', 'show cause letter', 'please explain', 'please explain letter',
+                // Investigation
+                'investigate', 'investigation', 'investigating', 'workplace investigation',
+                'conduct investigation', 'internal investigation', 'formal investigation',
+                // Misconduct
+                'serious misconduct', 'gross misconduct', 'misconduct', 'wilful misconduct',
+                'breach of policy', 'policy breach', 'code of conduct breach',
+                // Specific misconduct
+                'theft', 'stealing', 'stole', 'stolen', 'fraud', 'fraudulent',
+                'dishonesty', 'dishonest', 'lying', 'lied', 'falsified',
+                'harassment', 'bullying', 'bullied', 'discrimination',
+                'violence', 'violent', 'assault', 'threatened', 'threatening',
+                'intoxicated', 'drunk', 'drugs', 'drug use', 'substance abuse',
+                'insubordination', 'refused direction', 'disobeyed',
+                // Response
+                'respond to allegation', 'respond to allegations', 'right to respond',
+                'opportunity to respond', 'employee response'
+            ],
             title: '📝 Letter of Allegation',
             description: 'Create a letter of allegation for serious misconduct investigation',
             action: "openDocumentBuilderFor('letterOfAllegation')",
             buttonText: 'Open Document Builder',
-            color: 'blue'
+            color: 'orange'
         }
     };
     
@@ -5326,6 +5693,7 @@ function createToolSuggestions(detectedTools) {
         cyan: { bg: 'bg-cyan-500/10', border: 'border-cyan-500', text: 'text-cyan-400', textLight: 'text-cyan-300', btn: 'bg-cyan-600 hover:bg-cyan-700' },
         green: { bg: 'bg-green-500/10', border: 'border-green-500', text: 'text-green-400', textLight: 'text-green-300', btn: 'bg-green-600 hover:bg-green-700' },
         red: { bg: 'bg-red-500/10', border: 'border-red-500', text: 'text-red-400', textLight: 'text-red-300', btn: 'bg-red-600 hover:bg-red-700' },
+        orange: { bg: 'bg-orange-500/10', border: 'border-orange-500', text: 'text-orange-400', textLight: 'text-orange-300', btn: 'bg-orange-600 hover:bg-orange-700' },
         indigo: { bg: 'bg-indigo-500/10', border: 'border-indigo-500', text: 'text-indigo-400', textLight: 'text-indigo-300', btn: 'bg-indigo-600 hover:bg-indigo-700' }
     };
     
@@ -5580,25 +5948,43 @@ function detectHighRiskTopic(message) {
     // Define high-risk keywords - ONLY for critical legal/termination matters
     const riskCategories = {
         termination: {
-            keywords: ['terminate', 'termination', 'fire', 'firing', 'dismiss', 'dismissal', 
-                      'sack', 'sacking', 'let go', 'end employment', 'redundancy', 'redundant'],
+            keywords: [
+                'terminate', 'termination', 'terminating', 'fire', 'firing', 'fired',
+                'dismiss', 'dismissal', 'dismissing', 'sack', 'sacking', 'sacked',
+                'let go', 'letting go', 'end employment', 'ending employment',
+                'redundancy', 'redundant', 'make redundant', 'restructure',
+                'get rid of employee', 'get rid of staff', 'exit employee'
+            ],
             title: 'Employment Termination',
             severity: 'critical'
         },
         investigation: {
-            keywords: ['investigate', 'investigation', 'allegation', 'serious misconduct', 'theft'],
+            keywords: [
+                'investigate', 'investigation', 'investigating', 'allegation', 'allegations',
+                'serious misconduct', 'gross misconduct', 'misconduct',
+                'theft', 'stealing', 'stole', 'stolen', 'fraud', 'fraudulent',
+                'dishonesty', 'dishonest', 'falsified'
+            ],
             title: 'Workplace Investigation',
             severity: 'critical'
         },
         legal: {
-            keywords: ['legal action', 'lawsuit', 'sue', 'suing', 'unfair dismissal', 
-                      'workers comp claim', 'discrimination claim', 'adverse action', 
-                      'general protections', 'fair work complaint', 'fair work commission'],
+            keywords: [
+                'legal action', 'lawsuit', 'sue', 'suing', 'lawyer', 'solicitor',
+                'unfair dismissal', 'unfair dismissal claim', 'general protections',
+                'adverse action', 'discrimination claim', 'workers comp claim',
+                'fair work complaint', 'fair work commission', 'fwc',
+                'lodged complaint', 'filed complaint', 'taking legal'
+            ],
             title: 'Legal Matter',
             severity: 'critical'
         },
         harassment: {
-            keywords: ['sexual harassment', 'assault', 'threatening', 'violence'],
+            keywords: [
+                'sexual harassment', 'sexually harassed', 'assault', 'assaulted',
+                'violence', 'violent', 'threatened', 'threatening', 'threats',
+                'physical altercation', 'hit', 'punched', 'attacked'
+            ],
             title: 'Harassment/Safety Issue',
             severity: 'critical'
         }
