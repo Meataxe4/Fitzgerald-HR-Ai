@@ -10104,20 +10104,10 @@ function checkAccess() {
                 if (!hasCompletedOnboarding) {
                     setTimeout(() => showOnboarding(), 500);
                 } else {
-                    // Start new conversation with welcome for returning users
+                    // RESTORE LAST CONVERSATION (like Claude.ai)
                     setTimeout(() => {
-                        createNewConversation();
-                        
-                        const container = DOM.messagesContainer.querySelector('.space-y-6');
-                        if (container) container.innerHTML = '';
-                        
-                        const userName = venueProfile.userName || '';
-                        const venueName = venueProfile.venueName || 'your venue';
-                        const city = venueProfile.city || '';
-                        const state = venueProfile.location || '';
-                        const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
-                        const locationText = city ? `${city}, ${state}` : state;
-                        addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+                        restoreLastConversation();
+                        updateSidebarChats();
                     }, 300);
                 }
             }
@@ -10216,20 +10206,10 @@ function attemptAutoLogin() {
             if (!hasCompletedOnboarding) {
                 setTimeout(() => showOnboarding(), 500);
             } else {
-                // Create new conversation for returning users
+                // RESTORE LAST CONVERSATION (like Claude.ai)
                 setTimeout(() => {
-                    createNewConversation();
-                    
-                    const container = DOM.messagesContainer.querySelector('.space-y-6');
-                    if (container) container.innerHTML = '';
-                    
-                    const userName = venueProfile.userName || '';
-                    const venueName = venueProfile.venueName || 'your venue';
-                    const city = venueProfile.city || '';
-                    const state = venueProfile.location || '';
-                    const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
-                    const locationText = city ? `${city}, ${state}` : state;
-                    addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+                    restoreLastConversation();
+                    updateSidebarChats();
                 }, 300);
             }
         }
@@ -10998,6 +10978,9 @@ function saveCurrentConversation() {
         return;
     }
     
+    // Save current conversation ID to localStorage for persistence
+    localStorage.setItem('fitz_currentConversationId', currentConversationId);
+    
     var conv = getCurrentConversation();
     console.log('💾 Found conversation:', conv);
     
@@ -11078,6 +11061,65 @@ function loadConversation(convId) {
     updateSidebarChats();
     
     console.log('✅ Loaded conversation:', conv.title);
+}
+
+/**
+ * Restore the last active conversation on app load
+ * Similar to how Claude.ai works - shows previous chat instead of blank
+ */
+function restoreLastConversation() {
+    console.log('🔄 restoreLastConversation called');
+    console.log('🔄 conversations:', conversations.length);
+    
+    // First, load conversations from localStorage if not already loaded
+    if (conversations.length === 0) {
+        loadConversations();
+    }
+    
+    console.log('🔄 After load, conversations:', conversations.length);
+    
+    // Try to get the last active conversation ID
+    const lastConvId = localStorage.getItem('fitz_currentConversationId');
+    console.log('🔄 Last conversation ID from localStorage:', lastConvId);
+    
+    // Check if that conversation still exists
+    let targetConv = null;
+    if (lastConvId) {
+        targetConv = conversations.find(c => c.id === lastConvId);
+        console.log('🔄 Found last conversation:', targetConv ? 'yes' : 'no');
+    }
+    
+    // If last conversation doesn't exist, get the most recent one
+    if (!targetConv && conversations.length > 0) {
+        // Sort by updated date (most recent first)
+        const sorted = [...conversations].sort((a, b) => {
+            return new Date(b.updated || b.created) - new Date(a.updated || a.created);
+        });
+        targetConv = sorted[0];
+        console.log('🔄 Using most recent conversation:', targetConv.id);
+    }
+    
+    // If we have a conversation to restore
+    if (targetConv) {
+        // Check if it has meaningful messages (more than just welcome message)
+        const hasMeaningfulMessages = targetConv.messages && targetConv.messages.length > 1;
+        console.log('🔄 Has meaningful messages:', hasMeaningfulMessages, '(count:', targetConv.messages?.length || 0, ')');
+        
+        // Load the conversation
+        loadConversation(targetConv.id);
+        
+        // Show appropriate toast
+        if (hasMeaningfulMessages) {
+            showToast('Restored previous chat', 'info', 2000);
+        }
+        
+        return true; // Conversation restored
+    }
+    
+    // No conversations exist - create a new one
+    console.log('🔄 No conversations to restore, creating new');
+    createNewConversation();
+    return false; // New conversation created
 }
 
 // Delete conversation
@@ -23897,22 +23939,12 @@ if (auth) {
                     const hasCompletedOnboarding = checkOnboardingStatus();
                     if (!hasCompletedOnboarding) {
                         setTimeout(() => showOnboarding(), 1000);
-                    } else if (venueProfile && venueProfile.venueName) {
-                        // Create new conversation with welcome message for returning users
+                    } else {
+                        // RESTORE LAST CONVERSATION (like Claude.ai)
                         setTimeout(() => {
-                            createNewConversation();
-                            
-                            const container = DOM.messagesContainer.querySelector('.space-y-6');
-                            if (container) container.innerHTML = '';
-                            
-                            const userName = venueProfile.userName || '';
-                            const venueName = venueProfile.venueName || 'your venue';
-                            const city = venueProfile.city || '';
-                            const state = venueProfile.location || '';
-                            const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
-                            const locationText = city ? `${city}, ${state}` : state;
-                            addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
-                        }, 1000);
+                            restoreLastConversation();
+                            updateSidebarChats();
+                        }, 500);
                     }
                 }
             }
