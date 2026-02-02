@@ -2336,7 +2336,7 @@ console.log('🔧 Sync Debug Panel loaded - Press Ctrl+Shift+D to toggle');
         <div class="sidebar-content">
             <!-- Previous Chats Section -->
             <div class="sidebar-section">
-                <h3 class="sidebar-section-title">Previous Chats</h3>
+                <h3 class="sidebar-section-title">Recent Chats (Last 5)</h3>
                 <div id="sidebarChatsList" class="sidebar-items-list">
                     <p class="text-slate-500 text-sm py-4 text-center">No chats yet</p>
                 </div>
@@ -10593,9 +10593,30 @@ function toggleBookmark(messageId) {
         const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
         if (messageElement) {
             const content = messageElement.textContent;
+            
+            // Find the user's question that preceded this assistant response
+            const currentConv = conversations.find(c => c.id === currentConversationId);
+            let userQuestion = 'Bookmarked response';
+            
+            if (currentConv && currentConv.messages) {
+                // Find the index of the assistant message and get the user message before it
+                const messages = currentConv.messages;
+                for (let i = messages.length - 1; i >= 0; i--) {
+                    if (messages[i].role === 'assistant') {
+                        // Check if this is our message by comparing timestamps (rough match)
+                        // If there's a user message before this, use it
+                        if (i > 0 && messages[i - 1].role === 'user') {
+                            userQuestion = messages[i - 1].content;
+                            break;
+                        }
+                    }
+                }
+            }
+            
             bookmarks.push({
                 id: messageId,
                 content: content,
+                preview: userQuestion, // Store the user's question as preview
                 conversationId: currentConversationId,
                 created: new Date().toISOString()
             });
@@ -10639,7 +10660,9 @@ function updateSidebarBookmarks() {
     console.log('✅ Rendering', bookmarks.length, 'bookmarks');
     
     bookmarksList.innerHTML = bookmarks.slice(0, 10).map(function(b) {
-        var preview = b.content.substring(0, 60) + (b.content.length > 60 ? '...' : '');
+        // Use the stored preview (user's question) or fallback to content
+        var displayText = b.preview || b.content;
+        var preview = displayText.substring(0, 60) + (displayText.length > 60 ? '...' : '');
         return '<div class="sidebar-chat-item" onclick="jumpToBookmark(\'' + b.id + '\')">' +
             '<div class="sidebar-chat-title text-xs">' + escapeHtml(preview) + '</div>' +
             '<button class="sidebar-chat-delete" onclick="event.stopPropagation(); removeBookmark(\'' + b.id + '\')" title="Remove">' +
@@ -23009,6 +23032,14 @@ if (auth) {
             }
             updateUIForAuthenticatedUser(user);
             await loadAllDataFromFirebase(); // Use new Firebase-first system with retry
+            
+            // Load and update venue name after data is loaded
+            const savedVenueProfile = localStorage.getItem('venueProfile_' + user.uid);
+            if (savedVenueProfile) {
+                venueProfile = JSON.parse(savedVenueProfile);
+                updateSidebarVenueName();
+            }
+            
             setupRealtimeSync(user.uid);
         } else {
             console.log('👤 No user');
