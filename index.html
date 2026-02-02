@@ -9215,9 +9215,10 @@ async function logDocumentGeneration() {
     console.log('📊 Log object to insert:', JSON.stringify(log, null, 2));
     
     // Store in localStorage as backup
-    const logs = JSON.parse(localStorage.getItem('documentLogs_' + currentUser) || '[]');
+    const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
+    const logs = JSON.parse(localStorage.getItem('documentLogs_' + userKey) || '[]');
     logs.push(log);
-    localStorage.setItem('documentLogs_' + currentUser, JSON.stringify(logs));
+    localStorage.setItem('documentLogs_' + userKey, JSON.stringify(logs));
     console.log('✅ Saved to localStorage');
     
     // Store in Supabase
@@ -12835,12 +12836,19 @@ function closeToolModal(modalId) {
 // ========================================
 
 function checkOnboardingStatus() {
-    const saved = localStorage.getItem('venueProfile_' + currentUser);
+    // Use currentUser.uid for Firebase users, or currentUser as string for access code users
+    const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
+    const saved = localStorage.getItem('venueProfile_' + userKey);
     if (saved) {
-        venueProfile = JSON.parse(saved);
-        return venueProfile.setupComplete;
+        try {
+            const profile = JSON.parse(saved);
+            return profile.setupComplete === true;
+        } catch (e) {
+            return false;
+        }
     }
-    return false;
+    // Also check if venueProfile is already loaded (from Firebase sync)
+    return venueProfile && venueProfile.setupComplete === true;
 }
 
 function showOnboarding() {
@@ -12905,7 +12913,21 @@ function updateOnboardingStep() {
 function completeOnboarding() {
     venueProfile.setupComplete = true;
     venueProfile.setupDate = new Date().toISOString();
-    localStorage.setItem('venueProfile_' + currentUser, JSON.stringify(venueProfile));
+    
+    // Use currentUser.uid for Firebase users, or currentUser as string for access code users
+    const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
+    localStorage.setItem('venueProfile_' + userKey, JSON.stringify(venueProfile));
+    
+    // Sync to Firebase for cross-device access
+    if (currentUser && currentUser.uid && db) {
+        db.collection('users').doc(currentUser.uid).set({
+            venueProfile: venueProfile
+        }, { merge: true }).then(() => {
+            console.log('✅ Onboarding profile synced to Firebase');
+        }).catch(err => {
+            console.error('❌ Failed to sync onboarding profile:', err);
+        });
+    }
     
     // Update sidebar with new venue name
     updateSidebarVenueName();
@@ -14941,9 +14963,10 @@ function saveComplianceSettings() {
         savedAt: new Date().toISOString()
     };
     
-    localStorage.setItem('complianceSettings_' + currentUser, JSON.stringify(settings));
+    const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
+    localStorage.setItem('complianceSettings_' + userKey, JSON.stringify(settings));
     
-    trackEvent('compliance_settings_saved', { user: currentUser });
+    trackEvent('compliance_settings_saved', { user: userKey });
     
     alert('✓ Settings Saved!\n\nYou will receive reminders for selected items.\n\n(Email notifications require backend integration)');
 }
@@ -15619,9 +15642,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load venueProfile from localStorage FIRST
     if (currentUser) {
-        const saved = localStorage.getItem('venueProfile_' + currentUser);
+        // Use currentUser.uid for Firebase users, or currentUser as string for access code users
+        const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
+        const saved = localStorage.getItem('venueProfile_' + userKey);
         if (saved) {
-            venueProfile = JSON.parse(saved);
+            try {
+                venueProfile = JSON.parse(saved);
+            } catch (e) {
+                console.error('Error parsing venueProfile:', e);
+            }
         }
     }
     
