@@ -9467,9 +9467,6 @@ function checkAccess() {
         if (assistantScreen) assistantScreen.classList.remove('hidden');
         if (error) error.classList.add('hidden');
         
-        // ✅ SHOW LEGAL ACCEPTANCE MODAL ON FIRST USE
-        setTimeout(() => showLegalAcceptanceModal(), 500);        
-
         trackEvent('beta_access', { code: input });
         
         // Show admin button for admin codes
@@ -9480,32 +9477,36 @@ function checkAccess() {
             }
         }
         
-        // CHECK IF USER NEEDS ONBOARDING
-        const hasCompletedOnboarding = checkOnboardingStatus();
-        if (!hasCompletedOnboarding) {
-            setTimeout(() => {
-                showOnboarding();
-            }, 1000);
-        } else {
-            // Always start a new conversation to capture welcome in Recent Chats
-            setTimeout(() => {
-                createNewConversation();
-                
-                // Clear the default welcome and add personalized one
-                const container = DOM.messagesContainer.querySelector('.space-y-6');
-                if (container) {
-                    container.innerHTML = '';
+        // ✅ SHOW LEGAL ACCEPTANCE MODAL FIRST
+        // The modal function will check if already accepted and handle the flow
+        setTimeout(async () => {
+            const legalModalShown = await showLegalAcceptanceModal();
+            
+            // If legal modal was NOT shown (already accepted), check onboarding
+            if (!legalModalShown) {
+                const hasCompletedOnboarding = checkOnboardingStatus();
+                if (!hasCompletedOnboarding) {
+                    setTimeout(() => showOnboarding(), 500);
+                } else {
+                    // Start new conversation with welcome for returning users
+                    setTimeout(() => {
+                        createNewConversation();
+                        
+                        const container = DOM.messagesContainer.querySelector('.space-y-6');
+                        if (container) container.innerHTML = '';
+                        
+                        const userName = venueProfile.userName || '';
+                        const venueName = venueProfile.venueName || 'your venue';
+                        const city = venueProfile.city || '';
+                        const state = venueProfile.location || '';
+                        const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
+                        const locationText = city ? `${city}, ${state}` : state;
+                        addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+                    }, 300);
                 }
-                
-                const userName = venueProfile.userName || '';
-                const venueName = venueProfile.venueName || 'your venue';
-                const city = venueProfile.city || '';
-                const state = venueProfile.location || '';
-                const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
-                const locationText = city ? `${city}, ${state}` : state;
-                addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
-            }, 500);
-        }
+            }
+            // If legal modal WAS shown, acceptLegalTerms() will handle onboarding after acceptance
+        }, 500);
 
         // Initialize and start daily tip rotation
         setTimeout(() => {
@@ -9589,32 +9590,35 @@ function attemptAutoLogin() {
     // Load conversations first
     loadConversations();
     
-    // CHECK IF USER NEEDS ONBOARDING
-    const hasCompletedOnboarding = checkOnboardingStatus();
-    if (!hasCompletedOnboarding) {
-        setTimeout(() => {
-            showOnboarding();
-        }, 1000);
-    } else {
-        // Always create new conversation for returning users
-        setTimeout(() => {
-            createNewConversation();
-            
-            // Add personalized welcome message
-            const container = DOM.messagesContainer.querySelector('.space-y-6');
-            if (container) {
-                container.innerHTML = '';
+    // ✅ CHECK LEGAL ACCEPTANCE FIRST, THEN ONBOARDING
+    setTimeout(async () => {
+        const legalModalShown = await showLegalAcceptanceModal();
+        
+        // If legal modal was NOT shown (already accepted), check onboarding
+        if (!legalModalShown) {
+            const hasCompletedOnboarding = checkOnboardingStatus();
+            if (!hasCompletedOnboarding) {
+                setTimeout(() => showOnboarding(), 500);
+            } else {
+                // Create new conversation for returning users
+                setTimeout(() => {
+                    createNewConversation();
+                    
+                    const container = DOM.messagesContainer.querySelector('.space-y-6');
+                    if (container) container.innerHTML = '';
+                    
+                    const userName = venueProfile.userName || '';
+                    const venueName = venueProfile.venueName || 'your venue';
+                    const city = venueProfile.city || '';
+                    const state = venueProfile.location || '';
+                    const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
+                    const locationText = city ? `${city}, ${state}` : state;
+                    addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+                }, 300);
             }
-            
-            const userName = venueProfile.userName || '';
-            const venueName = venueProfile.venueName || 'your venue';
-            const city = venueProfile.city || '';
-            const state = venueProfile.location || '';
-            const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
-            const locationText = city ? `${city}, ${state}` : state;
-            addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
-        }, 500);
-    }
+        }
+        // If legal modal WAS shown, acceptLegalTerms() handles onboarding after acceptance
+    }, 500);
 
     // Initialize and start daily tip rotation
     setTimeout(() => {
@@ -9645,6 +9649,18 @@ async function sendMessage() {
     const message = input.value.trim();
     
     if (!message) return;
+    
+    // ✅ CHECK LEGAL TERMS ACCEPTANCE FIRST
+    const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
+    const hasAcceptedTerms = localStorage.getItem('legalTermsAccepted_' + userKey) === 'true';
+    if (!hasAcceptedTerms) {
+        // Show legal acceptance modal
+        const modalShown = await showLegalAcceptanceModal();
+        if (modalShown) {
+            // Modal was shown, don't proceed with message
+            return;
+        }
+    }
     
     // ✅ DETECT DOCUMENT BUILDER NEED FIRST
     const docBuilderNeed = detectDocumentBuilderNeed(message);
@@ -15767,15 +15783,34 @@ function closePrivacyPolicy() {
 /**
  * Shows legal acceptance modal on first use
  */
-function showLegalAcceptanceModal() {
+async function showLegalAcceptanceModal() {
     const modal = document.getElementById('legalAcceptanceModal');
     const checkbox = document.getElementById('legalAcceptCheckbox');
     const acceptBtn = document.getElementById('acceptLegalButton');
     
-    // Check if user has already accepted
-    const hasAccepted = localStorage.getItem('legalTermsAccepted');
+    // Get user key for per-user storage
+    const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
     
-    if (hasAccepted === 'true') {
+    // Check if user has already accepted in localStorage
+    let hasAccepted = localStorage.getItem('legalTermsAccepted_' + userKey) === 'true';
+    
+    // If not in localStorage but user is Firebase user, check Firebase
+    if (!hasAccepted && currentUser && currentUser.uid && db) {
+        try {
+            const userDoc = await db.collection('users').doc(currentUser.uid).get();
+            if (userDoc.exists && userDoc.data().legalTermsAccepted) {
+                hasAccepted = true;
+                // Cache to localStorage
+                localStorage.setItem('legalTermsAccepted_' + userKey, 'true');
+                localStorage.setItem('legalTermsAcceptedAt_' + userKey, userDoc.data().legalTermsAcceptedAt || '');
+                console.log('✅ Legal acceptance found in Firebase');
+            }
+        } catch (e) {
+            console.error('Error checking Firebase for legal acceptance:', e);
+        }
+    }
+    
+    if (hasAccepted) {
         console.log('✅ User has already accepted legal terms');
         return false; // Don't show modal
     }
@@ -15783,19 +15818,23 @@ function showLegalAcceptanceModal() {
     console.log('⚠️ Showing legal acceptance modal (first use)');
     modal.classList.remove('hidden');
     
-    // Enable accept button only when checkbox is checked
-    checkbox.addEventListener('change', function() {
-        acceptBtn.disabled = !this.checked;
-    });
+    // Reset checkbox state
+    checkbox.checked = false;
+    acceptBtn.disabled = true;
     
-    trackEvent('legal_acceptance_modal_shown', { user: currentUser });
+    // Enable accept button only when checkbox is checked
+    checkbox.onchange = function() {
+        acceptBtn.disabled = !this.checked;
+    };
+    
+    trackEvent('legal_acceptance_modal_shown', { user: userKey });
     return true;
 }
 
 /**
  * User accepts legal terms
  */
-function acceptLegalTerms() {
+async function acceptLegalTerms() {
     const checkbox = document.getElementById('legalAcceptCheckbox');
     
     if (!checkbox.checked) {
@@ -15803,25 +15842,49 @@ function acceptLegalTerms() {
         return;
     }
     
+    // Get user key for per-user storage
+    const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
+    
     // Store acceptance with timestamp
     const timestamp = new Date().toISOString();
-    localStorage.setItem('legalTermsAccepted', 'true');
-    localStorage.setItem('legalTermsAcceptedAt', timestamp);
+    localStorage.setItem('legalTermsAccepted_' + userKey, 'true');
+    localStorage.setItem('legalTermsAcceptedAt_' + userKey, timestamp);
     
     console.log('✅ User accepted legal terms at:', timestamp);
+    
+    // Save to Firebase for cross-device sync
+    if (currentUser && currentUser.uid && db) {
+        try {
+            await db.collection('users').doc(currentUser.uid).set({
+                legalTermsAccepted: true,
+                legalTermsAcceptedAt: timestamp,
+                legalTermsVersion: '1.0',
+                legalTermsUserAgent: navigator.userAgent
+            }, { merge: true });
+            console.log('✅ Legal acceptance synced to Firebase');
+        } catch (err) {
+            console.error('❌ Failed to sync legal acceptance to Firebase:', err);
+        }
+    }
     
     // Close modal
     document.getElementById('legalAcceptanceModal').classList.add('hidden');
     
     // Track acceptance
     trackEvent('legal_terms_accepted', { 
-        user: currentUser,
+        user: userKey,
         timestamp: timestamp,
         version: '1.0' // Version your terms so you can track if they change
     });
     
-    // Log to Supabase for audit trail
-    logLegalAcceptance(currentUser, timestamp);
+    // Log to Supabase for audit trail (backup)
+    logLegalAcceptance(userKey, timestamp);
+    
+    // Now check if user needs onboarding
+    const hasCompletedOnboarding = checkOnboardingStatus();
+    if (!hasCompletedOnboarding) {
+        setTimeout(() => showOnboarding(), 500);
+    }
 }
 
 /**
@@ -15835,9 +15898,10 @@ function declineLegalTerms() {
     );
     
     if (confirmed) {
+        const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
         console.log('❌ User declined legal terms');
         
-        trackEvent('legal_terms_declined', { user: currentUser });
+        trackEvent('legal_terms_declined', { user: userKey });
         
         // Log them out
         alert('You have declined the terms. You will now be logged out.');
@@ -23116,27 +23180,34 @@ if (auth) {
             
             // Check if this is a new login (access screen was visible)
             if (accessScreen && accessScreen.classList.contains('hidden')) {
-                // Check if user needs onboarding
-                const hasCompletedOnboarding = checkOnboardingStatus();
-                if (!hasCompletedOnboarding) {
-                    setTimeout(() => showOnboarding(), 1000);
-                } else if (venueProfile.venueName) {
-                    // Create new conversation with welcome message for returning users
-                    setTimeout(() => {
-                        createNewConversation();
-                        
-                        const container = DOM.messagesContainer.querySelector('.space-y-6');
-                        if (container) container.innerHTML = '';
-                        
-                        const userName = venueProfile.userName || '';
-                        const venueName = venueProfile.venueName || 'your venue';
-                        const city = venueProfile.city || '';
-                        const state = venueProfile.location || '';
-                        const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
-                        const locationText = city ? `${city}, ${state}` : state;
-                        addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
-                    }, 1000);
+                // FIRST: Check if user needs to accept legal terms
+                const legalModalShown = await showLegalAcceptanceModal();
+                
+                // If legal modal was NOT shown (already accepted), check onboarding
+                if (!legalModalShown) {
+                    // Check if user needs onboarding
+                    const hasCompletedOnboarding = checkOnboardingStatus();
+                    if (!hasCompletedOnboarding) {
+                        setTimeout(() => showOnboarding(), 1000);
+                    } else if (venueProfile.venueName) {
+                        // Create new conversation with welcome message for returning users
+                        setTimeout(() => {
+                            createNewConversation();
+                            
+                            const container = DOM.messagesContainer.querySelector('.space-y-6');
+                            if (container) container.innerHTML = '';
+                            
+                            const userName = venueProfile.userName || '';
+                            const venueName = venueProfile.venueName || 'your venue';
+                            const city = venueProfile.city || '';
+                            const state = venueProfile.location || '';
+                            const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
+                            const locationText = city ? `${city}, ${state}` : state;
+                            addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+                        }, 1000);
+                    }
                 }
+                // If legal modal WAS shown, the acceptLegalTerms() function will handle showing onboarding after acceptance
             }
             
             setupRealtimeSync(user.uid);
