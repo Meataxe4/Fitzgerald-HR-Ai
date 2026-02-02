@@ -22866,6 +22866,315 @@ if (typeof window !== 'undefined') {
     };
 }
 
+
+// ============================================
+// COMPREHENSIVE CROSS-DEVICE SYNC SYSTEM
+// ============================================
+
+// This replaces the existing sync functions with a complete solution
+
+// ==========================================
+// 1. SAVE ALL DATA TO CLOUD
+// ==========================================
+
+async function saveAllDataToCloud() {
+    if (!currentUser || !db) {
+        console.log('⚠️ Not signed in - data saved locally only');
+        return;
+    }
+    
+    console.log('💾 Syncing all data to cloud...');
+    
+    try {
+        const userDocRef = db.collection('users').doc(currentUser.uid);
+        
+        // Get all localStorage data
+        const allData = {
+            // Conversations
+            conversations: JSON.parse(localStorage.getItem('fitz_conversations') || '[]'),
+            currentConversationId: localStorage.getItem('currentConversationId'),
+            
+            // Bookmarks
+            bookmarks: JSON.parse(localStorage.getItem('fitz_bookmarks') || '[]'),
+            recentTools: JSON.parse(localStorage.getItem('fitz_recent_tools') || '[]'),
+            
+            // Preferences
+            darkMode: localStorage.getItem('darkMode'),
+            venueProfile: JSON.parse(localStorage.getItem('venueProfile_' + currentUser.uid) || '{}'),
+            
+            // Get all contracts
+            contracts: getAllContractsFromLocalStorage(),
+            
+            // Get all checklists
+            checklists: getAllChecklistsFromLocalStorage(),
+            
+            // Get all training plans
+            trainingPlans: getAllTrainingPlansFromLocalStorage(),
+            
+            // Document logs
+            documentLogs: JSON.parse(localStorage.getItem('documentLogs_' + currentUser.uid) || '[]'),
+            
+            // Timestamp
+            lastSyncedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        // Save to a single user document for complete state
+        await userDocRef.set({
+            appState: allData,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        
+        console.log('✅ All data synced to cloud successfully');
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Failed to sync data to cloud:', error);
+        return false;
+    }
+}
+
+// Helper functions to get all items from localStorage
+function getAllContractsFromLocalStorage() {
+    const contracts = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('contract_')) {
+            try {
+                contracts.push(JSON.parse(localStorage.getItem(key)));
+            } catch (e) {
+                console.error('Error parsing contract:', key, e);
+            }
+        }
+    }
+    return contracts;
+}
+
+function getAllChecklistsFromLocalStorage() {
+    const checklists = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('checklist_')) {
+            try {
+                checklists.push(JSON.parse(localStorage.getItem(key)));
+            } catch (e) {
+                console.error('Error parsing checklist:', key, e);
+            }
+        }
+    }
+    return checklists;
+}
+
+function getAllTrainingPlansFromLocalStorage() {
+    const plans = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith('training_plan_')) {
+            try {
+                plans.push(JSON.parse(localStorage.getItem(key)));
+            } catch (e) {
+                console.error('Error parsing training plan:', key, e);
+            }
+        }
+    }
+    return plans;
+}
+
+// ==========================================
+// 2. LOAD ALL DATA FROM CLOUD
+// ==========================================
+
+async function loadAllDataFromCloud() {
+    if (!currentUser || !db) {
+        console.log('⚠️ Not signed in - using local data only');
+        return false;
+    }
+    
+    console.log('📥 Loading all data from cloud...');
+    
+    try {
+        const userDocRef = db.collection('users').doc(currentUser.uid);
+        const doc = await userDocRef.get();
+        
+        if (!doc.exists || !doc.data().appState) {
+            console.log('📭 No cloud data found - using local data');
+            return false;
+        }
+        
+        const cloudData = doc.data().appState;
+        console.log('📦 Cloud data retrieved:', Object.keys(cloudData));
+        
+        // Restore conversations
+        if (cloudData.conversations && cloudData.conversations.length > 0) {
+            localStorage.setItem('fitz_conversations', JSON.stringify(cloudData.conversations));
+            window.conversations = cloudData.conversations;
+            console.log('✅ Restored', cloudData.conversations.length, 'conversations');
+        }
+        
+        if (cloudData.currentConversationId) {
+            localStorage.setItem('currentConversationId', cloudData.currentConversationId);
+            window.currentConversationId = cloudData.currentConversationId;
+        }
+        
+        // Restore bookmarks
+        if (cloudData.bookmarks) {
+            localStorage.setItem('fitz_bookmarks', JSON.stringify(cloudData.bookmarks));
+        }
+        
+        if (cloudData.recentTools) {
+            localStorage.setItem('fitz_recent_tools', JSON.stringify(cloudData.recentTools));
+        }
+        
+        // Restore preferences
+        if (cloudData.darkMode) {
+            localStorage.setItem('darkMode', cloudData.darkMode);
+        }
+        
+        if (cloudData.venueProfile) {
+            localStorage.setItem('venueProfile_' + currentUser.uid, JSON.stringify(cloudData.venueProfile));
+        }
+        
+        // Restore contracts
+        if (cloudData.contracts && cloudData.contracts.length > 0) {
+            cloudData.contracts.forEach(contract => {
+                localStorage.setItem('contract_' + contract.contractId, JSON.stringify(contract));
+            });
+            console.log('✅ Restored', cloudData.contracts.length, 'contracts');
+        }
+        
+        // Restore checklists
+        if (cloudData.checklists && cloudData.checklists.length > 0) {
+            cloudData.checklists.forEach(checklist => {
+                localStorage.setItem('checklist_' + checklist.checklistId, JSON.stringify(checklist));
+            });
+            console.log('✅ Restored', cloudData.checklists.length, 'checklists');
+        }
+        
+        // Restore training plans
+        if (cloudData.trainingPlans && cloudData.trainingPlans.length > 0) {
+            cloudData.trainingPlans.forEach(plan => {
+                localStorage.setItem('training_plan_' + plan.planId, JSON.stringify(plan));
+            });
+            console.log('✅ Restored', cloudData.trainingPlans.length, 'training plans');
+        }
+        
+        // Restore document logs
+        if (cloudData.documentLogs) {
+            localStorage.setItem('documentLogs_' + currentUser.uid, JSON.stringify(cloudData.documentLogs));
+        }
+        
+        console.log('✅ All data loaded from cloud successfully');
+        
+        // NOW REFRESH THE UI
+        await refreshAllUI();
+        
+        return true;
+        
+    } catch (error) {
+        console.error('❌ Failed to load data from cloud:', error);
+        return false;
+    }
+}
+
+// ==========================================
+// 3. REFRESH ALL UI COMPONENTS
+// ==========================================
+
+async function refreshAllUI() {
+    console.log('🔄 Refreshing all UI components...');
+    
+    // Small delay to ensure data is written
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    try {
+        // Refresh conversation list
+        if (typeof window.conversations !== 'undefined') {
+            console.log('🔄 Refreshing conversation list...');
+            // The conversations variable is already updated, UI should auto-refresh
+            // If there's a specific function to refresh the sidebar, call it here
+        }
+        
+        // Trigger a page state update
+        const event = new CustomEvent('dataLoaded');
+        window.dispatchEvent(event);
+        
+        console.log('✅ UI refresh complete');
+        
+    } catch (error) {
+        console.error('❌ UI refresh error:', error);
+    }
+}
+
+// ==========================================
+// 4. AUTO-SYNC ON CHANGES
+// ==========================================
+
+// Debounce function to prevent too many syncs
+let syncTimeout = null;
+function debouncedSync() {
+    clearTimeout(syncTimeout);
+    syncTimeout = setTimeout(() => {
+        saveAllDataToCloud();
+    }, 2000); // Wait 2 seconds after last change
+}
+
+// Override localStorage.setItem to auto-sync
+const originalSetItem = localStorage.setItem;
+localStorage.setItem = function(key, value) {
+    originalSetItem.call(this, key, value);
+    
+    // Auto-sync for important data
+    if (currentUser && db) {
+        if (key.startsWith('contract_') || 
+            key.startsWith('checklist_') || 
+            key.startsWith('training_plan_') ||
+            key === 'fitz_conversations' ||
+            key === 'fitz_bookmarks' ||
+            key.startsWith('venueProfile_')) {
+            
+            console.log('🔄 Change detected:', key, '- queuing sync...');
+            debouncedSync();
+        }
+    }
+};
+
+// ==========================================
+// 5. REAL-TIME SYNC LISTENER
+// ==========================================
+
+let unsubscribeCloudSync = null;
+
+function setupRealTimeCloudSync() {
+    if (!currentUser || !db) return;
+    
+    console.log('👂 Setting up real-time cloud sync listener...');
+    
+    const userDocRef = db.collection('users').doc(currentUser.uid);
+    
+    unsubscribeCloudSync = userDocRef.onSnapshot((doc) => {
+        if (!doc.exists) return;
+        
+        const data = doc.data();
+        if (data.appState && data.appState.lastSyncedAt) {
+            console.log('🔔 Cloud data updated - reloading...');
+            loadAllDataFromCloud();
+        }
+    }, (error) => {
+        console.error('❌ Real-time sync listener error:', error);
+    });
+    
+    console.log('✅ Real-time sync listener active');
+}
+
+function stopRealTimeCloudSync() {
+    if (unsubscribeCloudSync) {
+        unsubscribeCloudSync();
+        unsubscribeCloudSync = null;
+        console.log('🔕 Real-time sync listener stopped');
+    }
+}
+
+console.log('🔥 Comprehensive sync system loaded');
+
 console.log('🔥 Firebase ready!');
 </script>
 </body>
