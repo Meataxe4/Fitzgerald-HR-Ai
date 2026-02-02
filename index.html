@@ -10196,13 +10196,20 @@ async function syncConversationsToCloud() {
     try {
         // Save each conversation to Firestore
         for (const conversation of conversations) {
+            // Create clean data object without undefined fields
+            const cleanData = {
+                id: conversation.id,
+                title: conversation.title,
+                messages: conversation.messages || [],
+                created: conversation.created,
+                updated: conversation.updated,
+                userId: currentUser.uid,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
             await db.collection('users').doc(currentUser.uid)
                     .collection('conversations').doc(conversation.id)
-                    .set({
-                        ...conversation,
-                        userId: currentUser.uid,
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    }, { merge: true });
+                    .set(cleanData, { merge: true });
         }
         console.log('✅ Synced', conversations.length, 'conversations to cloud');
     } catch (error) {
