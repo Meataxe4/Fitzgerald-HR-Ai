@@ -5117,6 +5117,242 @@ function detectDocumentBuilderNeed(message) {
 }
 
 /**
+ * Detects if user needs a specific tool based on their message
+ * Returns array of tool suggestions (can suggest multiple tools)
+ */
+function detectToolNeeds(message) {
+    const lowerMessage = message.toLowerCase();
+    const detectedTools = [];
+    
+    const toolTriggers = {
+        // Employment Contract / New Employee Toolkit
+        employmentContract: {
+            keywords: ['employment contract', 'employee contract', 'new hire contract', 'contract template', 'employment agreement', 'hiring contract', 'offer letter', 'letter of offer', 'new employee paperwork', 'employment paperwork', 'contract of employment', 'full time contract', 'part time contract', 'casual contract', 'fixed term contract'],
+            title: '📄 Employment Contract',
+            description: 'Create Fair Work compliant employment contracts with our New Employee Toolkit',
+            action: 'openNewEmployeeToolkit()',
+            buttonText: 'Open New Employee Toolkit',
+            color: 'emerald'
+        },
+        
+        // Job Description
+        jobDescription: {
+            keywords: ['job description', 'job ad', 'job advertisement', 'job posting', 'position description', 'role description', 'write a job', 'create a job ad', 'hiring for', 'recruiting for', 'need to hire', 'looking to hire', 'advertise position', 'advertise role', 'job listing'],
+            title: '📝 Job Description Generator',
+            description: 'Create professional, compliant job descriptions with our Recruitment Toolkit',
+            action: 'openRecruitmentToolkit()',
+            buttonText: 'Open Recruitment Toolkit',
+            color: 'purple'
+        },
+        
+        // Interview Questions
+        interviewQuestions: {
+            keywords: ['interview question', 'interview questions', 'interviewing candidate', 'how to interview', 'interview guide', 'interview template', 'what to ask in interview', 'behavioural interview', 'behavioral interview', 'interview prep', 'conducting interview', 'interview process'],
+            title: '🎤 Interview Questions Generator',
+            description: 'Generate role-specific, legally compliant interview questions',
+            action: 'openRecruitmentToolkit()',
+            buttonText: 'Open Recruitment Toolkit',
+            color: 'purple'
+        },
+        
+        // Reference Check
+        referenceCheck: {
+            keywords: ['reference check', 'check reference', 'reference call', 'reference form', 'calling referee', 'contact referee', 'previous employer', 'employment verification', 'verify employment', 'reference questions'],
+            title: '📋 Reference Check Form',
+            description: 'Generate a professional reference check form with key questions',
+            action: 'openReferenceCheckForm()',
+            buttonText: 'Open Reference Check Form',
+            color: 'blue'
+        },
+        
+        // Onboarding Checklist
+        onboardingChecklist: {
+            keywords: ['onboarding checklist', 'onboarding list', 'new starter checklist', 'induction checklist', 'new employee checklist', 'first day checklist', 'onboarding process', 'new hire onboarding', 'employee onboarding', 'induction process', 'orientation checklist', 'staff induction'],
+            title: '✅ Onboarding Checklist Builder',
+            description: 'Create a comprehensive onboarding checklist for new employees',
+            action: 'openOnboardingChecklist()',
+            buttonText: 'Build Onboarding Checklist',
+            color: 'amber'
+        },
+        
+        // Training Plan
+        trainingPlan: {
+            keywords: ['training plan', 'training program', 'development plan', 'learning plan', 'upskill', 'skill development', 'training schedule', 'employee training', 'staff training', 'train new employee', 'training checklist', 'competency training', 'training matrix'],
+            title: '📚 Training Plan Generator',
+            description: 'Create structured training plans for employee development',
+            action: 'openTrainingPlan()',
+            buttonText: 'Create Training Plan',
+            color: 'cyan'
+        },
+        
+        // Award Wizard / Pay Rates
+        awardRates: {
+            keywords: ['award rate', 'pay rate', 'minimum wage', 'hourly rate', 'what should i pay', 'how much to pay', 'casual rate', 'penalty rate', 'weekend rate', 'public holiday rate', 'overtime rate', 'classification', 'award classification', 'hospitality award', 'level 1', 'level 2', 'level 3', 'level 4', 'level 5', 'level 6'],
+            title: '🧙 Award Wizard',
+            description: 'Find the correct pay rates and classifications under the Hospitality Award',
+            action: 'openAwardWizard()',
+            buttonText: 'Open Award Wizard',
+            color: 'amber'
+        },
+        
+        // Award Calculator
+        awardCalculator: {
+            keywords: ['calculate pay', 'calculate wage', 'work out pay', 'shift calculator', 'pay calculator', 'wage calculator', 'calculate shift', 'how much for shift', 'calculate overtime', 'calculate penalty'],
+            title: '💰 Award Calculator',
+            description: 'Calculate exact pay for shifts including penalties and overtime',
+            action: 'openAwardCalculator()',
+            buttonText: 'Open Award Calculator',
+            color: 'green'
+        },
+        
+        // Roster Compliance / Stress Tester
+        rosterCompliance: {
+            keywords: ['roster compliance', 'check roster', 'roster legal', 'break compliance', 'minimum hours', 'maximum hours', 'roster check', 'compliant roster', 'roster rules', 'rostering rules', 'shift compliance', 'break requirement'],
+            title: '💥 Roster Stress Tester',
+            description: 'Check your roster for compliance issues before publishing',
+            action: 'openRosterStressTester()',
+            buttonText: 'Open Roster Stress Tester',
+            color: 'red'
+        },
+        
+        // Deputy Integration
+        deputyImport: {
+            keywords: ['import deputy', 'deputy roster', 'deputy data', 'connect deputy', 'sync deputy', 'deputy integration', 'deputy csv', 'export from deputy', 'deputy timesheet'],
+            title: '🔗 Deputy Integration',
+            description: 'Import rosters and timesheets from Deputy for compliance checking',
+            action: 'openIntegrationHub()',
+            buttonText: 'Open Integration Hub',
+            color: 'blue'
+        },
+        
+        // Xero Integration
+        xeroImport: {
+            keywords: ['import xero', 'xero data', 'connect xero', 'sync xero', 'xero integration', 'xero payroll', 'xero employees', 'export from xero'],
+            title: '🔗 Xero Integration',
+            description: 'Import employee and payroll data from Xero',
+            action: 'openIntegrationHub()',
+            buttonText: 'Open Integration Hub',
+            color: 'green'
+        },
+        
+        // Termination Risk Assessor
+        terminationRisk: {
+            keywords: ['termination risk', 'unfair dismissal', 'unfair dismissal risk', 'dismissal risk', 'can i fire', 'can i terminate', 'safe to terminate', 'risk of termination', 'termination assessment'],
+            title: '⚖️ Termination Risk Assessor',
+            description: 'Assess the legal risks before proceeding with termination',
+            action: 'openTerminationRisk()',
+            buttonText: 'Open Risk Assessor',
+            color: 'red'
+        },
+        
+        // Compliance Calendar
+        complianceCalendar: {
+            keywords: ['compliance calendar', 'compliance deadline', 'compliance reminder', 'award update', 'rate change', 'annual leave', 'leave accrual', 'casual conversion', 'compliance date'],
+            title: '📅 Compliance Calendar',
+            description: 'Track important compliance deadlines and get reminders',
+            action: 'openComplianceCalendar()',
+            buttonText: 'Open Compliance Calendar',
+            color: 'indigo'
+        },
+        
+        // === DOCUMENT BUILDER TOOLS ===
+        
+        // Formal Warning
+        formalWarning: {
+            keywords: ['formal warning', 'written warning', 'issue a warning', 'give a warning', 'write a warning', 'warning letter', 'first warning', 'second warning'],
+            title: '📝 Formal Warning Letter',
+            description: 'Create a legally compliant formal warning letter with our Document Builder',
+            action: "openDocumentBuilderFor('formalWarning')",
+            buttonText: 'Open Document Builder',
+            color: 'blue'
+        },
+        
+        // Record of Discussion
+        recordOfDiscussion: {
+            keywords: ['record of discussion', 'document conversation', 'discussion meeting', 'talk to employee about', 'verbal warning', 'informal warning', 'counselling session'],
+            title: '📝 Record of Discussion',
+            description: 'Create a record of discussion template with conversation script',
+            action: "openDocumentBuilderFor('recordOfDiscussion')",
+            buttonText: 'Open Document Builder',
+            color: 'blue'
+        },
+        
+        // Performance Improvement Plan
+        performanceImprovementPlan: {
+            keywords: ['performance improve', 'pip', 'performance plan', 'underperforming', 'performance manage', 'performance issue', 'not meeting expectations', 'poor performance'],
+            title: '📝 Performance Improvement Plan',
+            description: 'Create a structured 12-week performance improvement plan',
+            action: "openDocumentBuilderFor('performanceImprovementPlan')",
+            buttonText: 'Open Document Builder',
+            color: 'blue'
+        },
+        
+        // Letter of Allegation
+        letterOfAllegation: {
+            keywords: ['letter of allegation', 'show cause', 'show cause letter', 'respond to allegation'],
+            title: '📝 Letter of Allegation',
+            description: 'Create a letter of allegation for serious misconduct investigation',
+            action: "openDocumentBuilderFor('letterOfAllegation')",
+            buttonText: 'Open Document Builder',
+            color: 'blue'
+        }
+    };
+    
+    // Check each tool's keywords
+    for (const [toolId, config] of Object.entries(toolTriggers)) {
+        if (config.keywords.some(keyword => lowerMessage.includes(keyword))) {
+            detectedTools.push({
+                id: toolId,
+                ...config
+            });
+        }
+    }
+    
+    // Limit to top 2 most relevant tools to avoid overwhelming the user
+    return detectedTools.slice(0, 2);
+}
+
+/**
+ * Creates tool suggestion UI for detected tools
+ */
+function createToolSuggestions(detectedTools) {
+    if (!detectedTools || detectedTools.length === 0) return '';
+    
+    const colorClasses = {
+        emerald: { bg: 'bg-emerald-500/10', border: 'border-emerald-500', text: 'text-emerald-400', textLight: 'text-emerald-300', btn: 'bg-emerald-600 hover:bg-emerald-700' },
+        purple: { bg: 'bg-purple-500/10', border: 'border-purple-500', text: 'text-purple-400', textLight: 'text-purple-300', btn: 'bg-purple-600 hover:bg-purple-700' },
+        blue: { bg: 'bg-blue-500/10', border: 'border-blue-500', text: 'text-blue-400', textLight: 'text-blue-300', btn: 'bg-blue-600 hover:bg-blue-700' },
+        amber: { bg: 'bg-amber-500/10', border: 'border-amber-500', text: 'text-amber-400', textLight: 'text-amber-300', btn: 'bg-amber-600 hover:bg-amber-700' },
+        cyan: { bg: 'bg-cyan-500/10', border: 'border-cyan-500', text: 'text-cyan-400', textLight: 'text-cyan-300', btn: 'bg-cyan-600 hover:bg-cyan-700' },
+        green: { bg: 'bg-green-500/10', border: 'border-green-500', text: 'text-green-400', textLight: 'text-green-300', btn: 'bg-green-600 hover:bg-green-700' },
+        red: { bg: 'bg-red-500/10', border: 'border-red-500', text: 'text-red-400', textLight: 'text-red-300', btn: 'bg-red-600 hover:bg-red-700' },
+        indigo: { bg: 'bg-indigo-500/10', border: 'border-indigo-500', text: 'text-indigo-400', textLight: 'text-indigo-300', btn: 'bg-indigo-600 hover:bg-indigo-700' }
+    };
+    
+    let html = '<div class="mb-4 space-y-3">';
+    
+    detectedTools.forEach(tool => {
+        const colors = colorClasses[tool.color] || colorClasses.blue;
+        html += `
+            <div class="p-4 ${colors.bg} border-l-4 ${colors.border} rounded-r-lg">
+                <p class="${colors.text} font-bold mb-1 flex items-center gap-2">
+                    <span>${tool.title}</span>
+                </p>
+                <p class="${colors.textLight} text-sm mb-3">${tool.description}</p>
+                <button onclick="${tool.action}" 
+                        class="w-full ${colors.btn} text-white font-semibold py-2 px-4 rounded-lg transition-all flex items-center justify-center gap-2 text-sm">
+                    <span>${tool.buttonText}</span>
+                    <span>→</span>
+                </button>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    return html;
+}
+
+/**
  * Creates Document Builder suggestion box for message
  */
 function createDocumentBuilderSuggestion(detection) {
@@ -5341,7 +5577,7 @@ function withErrorHandling(asyncFunc) {
 function detectHighRiskTopic(message) {
     const lowerMessage = message.toLowerCase();
     
-    // Define high-risk keywords by category
+    // Define high-risk keywords - ONLY for critical legal/termination matters
     const riskCategories = {
         termination: {
             keywords: ['terminate', 'termination', 'fire', 'firing', 'dismiss', 'dismissal', 
@@ -5350,41 +5586,35 @@ function detectHighRiskTopic(message) {
             severity: 'critical'
         },
         investigation: {
-            keywords: ['investigate', 'investigation', 'allegation', 'complaint', 'misconduct',
-                      'serious misconduct', 'theft', 'harassment', 'bullying', 'discrimination'],
+            keywords: ['investigate', 'investigation', 'allegation', 'serious misconduct', 'theft'],
             title: 'Workplace Investigation',
             severity: 'critical'
         },
         legal: {
             keywords: ['legal action', 'lawsuit', 'sue', 'suing', 'unfair dismissal', 
                       'workers comp claim', 'discrimination claim', 'adverse action', 
-                      'general protections', 'fair work complaint'],
+                      'general protections', 'fair work complaint', 'fair work commission'],
             title: 'Legal Matter',
             severity: 'critical'
         },
         harassment: {
-            keywords: ['sexual harassment', 'harassment', 'hostile workplace', 'inappropriate behavior',
-                      'assault', 'threatening', 'violence', 'abuse'],
+            keywords: ['sexual harassment', 'assault', 'threatening', 'violence'],
             title: 'Harassment/Safety Issue',
             severity: 'critical'
-        },
-        performance: {
-            keywords: ['performance manage', 'pip', 'performance improvement', 'final warning',
-                      'written warning', 'underperforming'],
-            title: 'Performance Management',
-            severity: 'high'
         }
     };
     
-    // Check each category
+    // Check each category - only return for critical severity
     for (const [category, config] of Object.entries(riskCategories)) {
-        const hasKeyword = config.keywords.some(keyword => lowerMessage.includes(keyword));
-        if (hasKeyword) {
-            return {
-                category: category,
-                title: config.title,
-                severity: config.severity
-            };
+        if (config.severity === 'critical') {
+            const hasKeyword = config.keywords.some(keyword => lowerMessage.includes(keyword));
+            if (hasKeyword) {
+                return {
+                    category: category,
+                    title: config.title,
+                    severity: config.severity
+                };
+            }
         }
     }
     
@@ -9662,10 +9892,10 @@ async function sendMessage() {
         }
     }
     
-    // ✅ DETECT DOCUMENT BUILDER NEED FIRST
-    const docBuilderNeed = detectDocumentBuilderNeed(message);
+    // ✅ DETECT TOOL NEEDS (includes document builder, recruitment, integrations, etc.)
+    const toolNeeds = detectToolNeeds(message);
     
-    // Check for high-risk topics
+    // ✅ CHECK FOR HIGH-RISK TOPICS (only critical: termination, legal, harassment)
     const risk = detectHighRiskTopic(message);
     
     addMessage('user', message);
@@ -9688,13 +9918,20 @@ async function sendMessage() {
         // Build final response with injections
         let finalResponse = response;
         
-        // ✅ INJECT DOCUMENT BUILDER SUGGESTION FIRST (if detected)
-        if (docBuilderNeed) {
-            const docSuggestion = createDocumentBuilderSuggestion(docBuilderNeed);
-            finalResponse = docSuggestion + finalResponse;
+        // ✅ INJECT TOOL SUGGESTIONS SECOND (max 2 tools)
+        if (toolNeeds && toolNeeds.length > 0) {
+            const toolSuggestions = createToolSuggestions(toolNeeds);
+            finalResponse = toolSuggestions + finalResponse;
+            
+            // Track tool suggestions shown
+            trackEvent('tool_suggestions_shown', {
+                user: userKey,
+                tools: toolNeeds.map(t => t.id),
+                message_snippet: message.substring(0, 50)
+            });
         }
         
-        // Then add high-risk warning if needed
+        // ✅ INJECT HIGH-RISK WARNING FIRST (only for critical legal/termination matters)
         if (risk) {
             const warningBox = createHighRiskWarningBox(risk);
             finalResponse = warningBox + finalResponse;
