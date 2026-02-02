@@ -2017,27 +2017,6 @@ input, textarea, select {
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
 <!-- SYNC DEBUG PANEL - ADD THIS TO THE HEADER -->
-<div id="syncDebugPanel" style="position: fixed; top: 60px; right: 10px; background: #1e293b; border: 2px solid #f59e0b; padding: 15px; border-radius: 8px; z-index: 9999; max-width: 300px;">
-    <div style="color: #f59e0b; font-weight: bold; margin-bottom: 10px;">🔄 Sync Debug Panel</div>
-    
-    <button onclick="manualSyncToCloud()" style="width: 100%; padding: 8px; background: #10b981; color: white; border: none; border-radius: 4px; margin-bottom: 8px; cursor: pointer; font-weight: bold;">
-        💾 Save All to Cloud
-    </button>
-    
-    <button onclick="manualLoadFromCloud()" style="width: 100%; padding: 8px; background: #3b82f6; color: white; border: none; border-radius: 4px; margin-bottom: 8px; cursor: pointer; font-weight: bold;">
-        📥 Load All from Cloud
-    </button>
-    
-    <button onclick="checkFirestoreData()" style="width: 100%; padding: 8px; background: #8b5cf6; color: white; border: none; border-radius: 4px; margin-bottom: 8px; cursor: pointer; font-weight: bold;">
-        🔍 Check Firestore
-    </button>
-    
-    <button onclick="document.getElementById('syncDebugPanel').style.display='none'" style="width: 100%; padding: 6px; background: #64748b; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
-        Close
-    </button>
-    
-    <div id="syncStatus" style="margin-top: 10px; padding: 8px; background: #0f172a; border-radius: 4px; font-size: 12px; color: #94a3b8; max-height: 200px; overflow-y: auto;"></div>
-</div>
 
 <script>
 // Simple manual sync functions for testing
@@ -2203,17 +2182,6 @@ async function checkFirestoreData() {
     }
 }
 
-// Show debug panel on Ctrl+Shift+D
-document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-        const panel = document.getElementById('syncDebugPanel');
-        if (panel) {
-            panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-        }
-    }
-});
-
-console.log('🔧 Sync Debug Panel loaded - Press Ctrl+Shift+D to toggle');
 </script>
 
     
@@ -9518,13 +9486,24 @@ function checkAccess() {
                 showOnboarding();
             }, 1000);
         } else {
-            const userName = venueProfile.userName || '';
-            const venueName = venueProfile.venueName || 'your venue';
-            const city = venueProfile.city || '';
-            const state = venueProfile.location || '';
-            const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
-            const locationText = city ? `${city}, ${state}` : state;
-            addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+            // Always start a new conversation to capture welcome in Recent Chats
+            setTimeout(() => {
+                createNewConversation();
+                
+                // Clear the default welcome and add personalized one
+                const container = DOM.messagesContainer.querySelector('.space-y-6');
+                if (container) {
+                    container.innerHTML = '';
+                }
+                
+                const userName = venueProfile.userName || '';
+                const venueName = venueProfile.venueName || 'your venue';
+                const city = venueProfile.city || '';
+                const state = venueProfile.location || '';
+                const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
+                const locationText = city ? `${city}, ${state}` : state;
+                addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+            }, 500);
         }
 
         // Initialize and start daily tip rotation
@@ -9606,8 +9585,8 @@ function attemptAutoLogin() {
         }
     }
     
-    // Initialize conversation system
-    initConversationSystem();
+    // Load conversations first
+    loadConversations();
     
     // CHECK IF USER NEEDS ONBOARDING
     const hasCompletedOnboarding = checkOnboardingStatus();
@@ -9615,6 +9594,25 @@ function attemptAutoLogin() {
         setTimeout(() => {
             showOnboarding();
         }, 1000);
+    } else {
+        // Always create new conversation for returning users
+        setTimeout(() => {
+            createNewConversation();
+            
+            // Add personalized welcome message
+            const container = DOM.messagesContainer.querySelector('.space-y-6');
+            if (container) {
+                container.innerHTML = '';
+            }
+            
+            const userName = venueProfile.userName || '';
+            const venueName = venueProfile.venueName || 'your venue';
+            const city = venueProfile.city || '';
+            const state = venueProfile.location || '';
+            const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
+            const locationText = city ? `${city}, ${state}` : state;
+            addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+        }, 500);
     }
 
     // Initialize and start daily tip rotation
@@ -23051,6 +23049,31 @@ if (auth) {
                 }
             } else {
                 console.log('⚠️ No saved venue profile found');
+            }
+            
+            // Check if this is a new login (access screen was visible)
+            if (accessScreen && accessScreen.classList.contains('hidden')) {
+                // Check if user needs onboarding
+                const hasCompletedOnboarding = checkOnboardingStatus();
+                if (!hasCompletedOnboarding) {
+                    setTimeout(() => showOnboarding(), 1000);
+                } else if (venueProfile.venueName) {
+                    // Create new conversation with welcome message for returning users
+                    setTimeout(() => {
+                        createNewConversation();
+                        
+                        const container = DOM.messagesContainer.querySelector('.space-y-6');
+                        if (container) container.innerHTML = '';
+                        
+                        const userName = venueProfile.userName || '';
+                        const venueName = venueProfile.venueName || 'your venue';
+                        const city = venueProfile.city || '';
+                        const state = venueProfile.location || '';
+                        const greeting = userName ? `👋 Welcome back ${userName}!` : '👋 Welcome back!';
+                        const locationText = city ? `${city}, ${state}` : state;
+                        addMessage('assistant', `${greeting} I remember you run ${venueName} in ${locationText}. What can I help you with today?`);
+                    }, 1000);
+                }
             }
             
             setupRealtimeSync(user.uid);
