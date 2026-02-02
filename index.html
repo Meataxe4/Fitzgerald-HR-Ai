@@ -23402,12 +23402,18 @@ async function loadConversationsFromFirebase() {
     try {
         const snapshot = await db.collection('users').doc(currentUser.uid)
                                    .collection('conversations')
-                                   .orderBy('updated', 'desc')
                                    .get();
         
         window.conversations = [];
         snapshot.forEach(doc => {
             window.conversations.push(doc.data());
+        });
+        
+        // Sort in memory instead (safer)
+        window.conversations.sort((a, b) => {
+            const dateA = new Date(a.updated || a.created || 0);
+            const dateB = new Date(b.updated || b.created || 0);
+            return dateB - dateA; // Most recent first
         });
         
         console.log('✅ Loaded', window.conversations.length, 'conversations from Firebase');
