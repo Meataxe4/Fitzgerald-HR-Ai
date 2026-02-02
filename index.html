@@ -23008,7 +23008,7 @@ if (auth) {
                 console.log('✅ Auto-granted access');
             }
             updateUIForAuthenticatedUser(user);
-            await loadAllUserData(user.uid);
+            await loadAllDataFromFirebase(); // Use new Firebase-first system with retry
             setupRealtimeSync(user.uid);
         } else {
             console.log('👤 No user');
