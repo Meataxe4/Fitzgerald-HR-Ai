@@ -17859,24 +17859,381 @@ function resetAIImport() {
                 </div>
             </button>
             
-            <div class="text-left p-6 bg-slate-700/30 rounded-xl border border-slate-600 opacity-50">
+            
+            <button onclick="openTrainingPlan(); closeNewEmployeeToolkit();" class="text-left p-6 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
                 <div class="flex items-start gap-4">
                     <span class="text-4xl">🎓</span>
                     <div>
-                        <div class="font-semibold text-white text-lg mb-2">Training Plan Generator</div>
-                        <div class="text-sm text-slate-400 mb-3">Coming soon - Create structured training plans for new employees</div>
+                        <div class="font-semibold text-white text-lg mb-2">AI-Enhanced Training Plan Generator</div>
+                        <div class="text-sm text-slate-400 mb-3">Create role-specific training plans with AI-powered week-by-week schedules</div>
                         <div class="flex flex-wrap gap-2">
-                            <span class="text-xs bg-slate-600 text-slate-400 px-2 py-1 rounded">Coming Soon</span>
+                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">AI-Powered</span>
+                            <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Week-by-Week</span>
+                            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">Export Ready</span>
                         </div>
                     </div>
                 </div>
-            </div>
+            </button>
         </div>
     </div>
 </div>
 
 
 <!-- Onboarding Checklist Modal -->
+<!-- Training Plan Generator Modal -->
+<div id="trainingPlanModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-6xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                    <span>🎓</span> AI-Enhanced Training Plan Generator
+                </h2>
+                <p class="text-slate-400 text-sm">Create comprehensive, role-specific training plans in minutes</p>
+            </div>
+            <button onclick="closeTrainingPlan()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+
+        <!-- Employee Setup -->
+        <div class="bg-slate-700/50 rounded-xl p-6 mb-6">
+            <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <span>👤</span> Training Plan Details
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">Employee Name *</label>
+                    <input type="text" id="trainingEmployeeName" 
+                           class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
+                           placeholder="Full name">
+                </div>
+                
+                <div>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">Position/Role *</label>
+                    <select id="trainingPosition" 
+                            class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
+                            onchange="updateTrainingRoleInfo()">
+                        <option value="">Select position...</option>
+                        <optgroup label="Kitchen">
+                            <option value="head-chef">Head Chef</option>
+                            <option value="sous-chef">Sous Chef</option>
+                            <option value="chef-de-partie">Chef de Partie</option>
+                            <option value="commis-chef">Commis Chef</option>
+                            <option value="kitchen-hand">Kitchen Hand</option>
+                        </optgroup>
+                        <optgroup label="Front of House">
+                            <option value="restaurant-manager">Restaurant Manager</option>
+                            <option value="floor-supervisor">Floor Supervisor</option>
+                            <option value="waiter">Waiter/Waitress</option>
+                            <option value="bartender">Bartender</option>
+                            <option value="barista">Barista</option>
+                            <option value="host">Host/Hostess</option>
+                        </optgroup>
+                        <optgroup label="Other">
+                            <option value="cleaner">Cleaner</option>
+                            <option value="dishwasher">Dishwasher</option>
+                            <option value="delivery-driver">Delivery Driver</option>
+                        </optgroup>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">Experience Level *</label>
+                    <select id="trainingExperience" 
+                            class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none">
+                        <option value="">Select experience...</option>
+                        <option value="beginner">Beginner (No experience)</option>
+                        <option value="some-experience">Some Experience (1-2 years)</option>
+                        <option value="experienced">Experienced (3-5 years)</option>
+                        <option value="expert">Expert (5+ years)</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">Training Duration *</label>
+                    <select id="trainingDuration" 
+                            class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none">
+                        <option value="">Select duration...</option>
+                        <option value="1">1 Week (Fast Track)</option>
+                        <option value="2">2 Weeks (Standard)</option>
+                        <option value="4">4 Weeks (Comprehensive)</option>
+                        <option value="8">8 Weeks (In-Depth)</option>
+                        <option value="12">12 Weeks (Full Program)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <label class="block text-slate-300 text-sm font-semibold mb-2">Additional Focus Areas (Optional)</label>
+                <textarea id="trainingFocusAreas" 
+                          class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
+                          rows="2"
+                          placeholder="e.g., Customer service excellence, Wine knowledge, Dietary requirements..."></textarea>
+            </div>
+            
+            <div id="roleInfoBox" class="hidden mt-4 bg-blue-900/30 border border-blue-500 rounded-lg p-4">
+                <div class="flex items-start gap-2">
+                    <span class="text-2xl">💡</span>
+                    <div>
+                        <div class="text-blue-300 font-semibold mb-1">Role Information</div>
+                        <div id="roleInfoContent" class="text-blue-200 text-sm"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="generateTrainingPlan()" 
+                    class="mt-4 w-full px-6 py-3 bg-amber-500 hover:bg-amber-600 text-black font-semibold rounded-lg transition-all flex items-center justify-center gap-2">
+                <span>✨</span> Generate AI Training Plan
+            </button>
+        </div>
+
+        <!-- AI Insights Box -->
+        <div id="trainingAIInsights" class="hidden bg-gradient-to-r from-purple-900/50 to-blue-900/50 border border-purple-500 rounded-xl p-6 mb-6">
+            <div class="flex items-start gap-3">
+                <span class="text-3xl">🤖</span>
+                <div class="flex-1">
+                    <h4 class="text-lg font-bold text-white mb-2">AI Training Insights</h4>
+                    <div id="trainingAIContent" class="text-slate-300 text-sm leading-relaxed"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Training Plan Display -->
+        <div id="trainingPlanDisplay" class="hidden space-y-6">
+            <!-- Week-by-week breakdown will be inserted here -->
+        </div>
+
+        <!-- Timeline Visualization -->
+        <div id="trainingTimeline" class="hidden mb-6">
+            <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                <span>📅</span> Training Timeline
+            </h3>
+            <div id="timelineContent" class="relative">
+                <!-- Timeline will be inserted here -->
+            </div>
+        </div>
+
+        <!-- AI Coach Assistant -->
+        <div id="trainingCoachSection" class="hidden mt-6 bg-slate-700/30 rounded-xl p-4 border border-slate-600">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="text-2xl">🎯</span>
+                <h4 class="font-semibold text-white">AI Training Coach</h4>
+            </div>
+            <p class="text-slate-400 text-sm mb-3">Ask questions about this training plan or get suggestions for improvement</p>
+            <textarea id="trainingCoachInput" 
+                      class="w-full px-4 py-3 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none mb-3"
+                      placeholder="e.g., 'How should I adapt this for someone with prior experience?' or 'What equipment do I need?'"
+                      rows="2"></textarea>
+            <button onclick="askTrainingCoach()" 
+                    class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-all flex items-center gap-2">
+                <span>🤖</span> Ask AI Coach
+            </button>
+            <div id="trainingCoachResponse" class="hidden mt-4 p-4 bg-slate-800 rounded-lg border border-purple-500">
+                <div id="trainingCoachContent" class="text-slate-300 text-sm leading-relaxed"></div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div id="trainingActions" class="hidden mt-6 flex flex-wrap gap-3">
+            <button onclick="saveTrainingPlan()" 
+                    class="flex-1 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-all">
+                💾 Save Plan
+            </button>
+            <button onclick="exportTrainingPlanDOCX()" 
+                    class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all">
+                📥 Export DOCX
+            </button>
+            <button onclick="exportTrainingPlanPDF()" 
+                    class="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all">
+                📥 Export PDF
+            </button>
+            <button onclick="printTrainingPlan()" 
+                    class="px-6 py-3 bg-slate-600 hover:bg-slate-500 text-white font-semibold rounded-lg transition-all">
+                🖨️ Print
+            </button>
+        </div>
+
+        <div class="mt-6 text-center">
+            <button onclick="closeTrainingPlan()" 
+                    class="px-6 py-3 bg-slate-600 hover:bg-slate-500 text-white font-semibold rounded-lg transition-all">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Training Plan Generator Styles */
+#trainingPlanModal .training-week {
+    background: rgba(51, 65, 85, 0.5);
+    border: 1px solid rgba(148, 163, 184, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s;
+}
+
+#trainingPlanModal .training-week:hover {
+    border-color: rgba(251, 191, 36, 0.5);
+    background: rgba(51, 65, 105, 0.7);
+}
+
+#trainingPlanModal .training-day {
+    background: rgba(71, 85, 105, 0.3);
+    border-left: 4px solid #667eea;
+    padding: 16px;
+    margin: 12px 0;
+    border-radius: 8px;
+}
+
+#trainingPlanModal .training-activity {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 8px;
+    margin: 8px 0;
+}
+
+#trainingPlanModal .activity-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+#trainingPlanModal .icon-theory {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+#trainingPlanModal .icon-practical {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+}
+
+#trainingPlanModal .icon-assessment {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+}
+
+#trainingPlanModal .icon-shadowing {
+    background: linear-gradient(135deg, #43e97b, #38f9d7);
+}
+
+#trainingPlanModal .activity-content {
+    flex: 1;
+}
+
+#trainingPlanModal .activity-title {
+    color: white;
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 4px;
+}
+
+#trainingPlanModal .activity-description {
+    color: #94a3b8;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+#trainingPlanModal .activity-duration {
+    color: #fbbf24;
+    font-size: 12px;
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+#trainingPlanModal .timeline-item {
+    position: relative;
+    padding-left: 40px;
+    padding-bottom: 30px;
+}
+
+#trainingPlanModal .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(180deg, #667eea, #764ba2);
+}
+
+#trainingPlanModal .timeline-item:last-child::before {
+    background: linear-gradient(180deg, #667eea, transparent);
+}
+
+#trainingPlanModal .timeline-marker {
+    position: absolute;
+    left: 8px;
+    top: 5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #fbbf24;
+    border: 3px solid #1e293b;
+}
+
+#trainingPlanModal .milestone-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(251, 191, 36, 0.2);
+    border: 1px solid #fbbf24;
+    border-radius: 12px;
+    color: #fbbf24;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+#trainingPlanModal .competency-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+    background: rgba(71, 85, 105, 0.3);
+    border-radius: 6px;
+    margin: 6px 0;
+}
+
+#trainingPlanModal .competency-checkbox {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #64748b;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+}
+
+#trainingPlanModal .ai-thinking-training {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #a78bfa;
+    font-size: 14px;
+}
+
+#trainingPlanModal .ai-thinking-training::after {
+    content: "...";
+    animation: thinking 1.5s infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px rgba(251, 191, 36, 0.3); }
+    50% { box-shadow: 0 0 30px rgba(251, 191, 36, 0.6); }
+}
+
+#trainingPlanModal .generate-button-active {
+    animation: pulse-glow 2s infinite;
+}
+</style>
+
+
 <div id="onboardingChecklistModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
     <div class="bg-slate-800 rounded-2xl p-8 max-w-5xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
@@ -18912,6 +19269,735 @@ function closeOnboardingPrompt() {
     } else {
         console.log('Prompt modal not found');
     }
+}
+
+
+// ========================================
+// AI-ENHANCED TRAINING PLAN GENERATOR
+// ========================================
+
+let trainingPlanState = {
+    employeeName: '',
+    position: '',
+    experience: '',
+    duration: 0,
+    focusAreas: '',
+    plan: null,
+    planId: null
+};
+
+// Main Functions
+function openTrainingPlan() {
+    console.log('🎓 Opening Training Plan Generator');
+    const modal = document.getElementById('trainingPlanModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+    
+    loadTrainingProgress();
+    
+    if (typeof trackToolUsage === 'function') {
+        trackToolUsage('trainingPlanGenerator');
+    }
+}
+
+function closeTrainingPlan() {
+    const modal = document.getElementById('trainingPlanModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+// Update role information
+function updateTrainingRoleInfo() {
+    const position = document.getElementById('trainingPosition').value;
+    const infoBox = document.getElementById('roleInfoBox');
+    const infoContent = document.getElementById('roleInfoContent');
+    
+    if (!position) {
+        infoBox.classList.add('hidden');
+        return;
+    }
+    
+    const roleInfo = {
+        'head-chef': 'Requires advanced culinary skills, leadership abilities, menu planning, and kitchen management. Typical training: 4-8 weeks.',
+        'sous-chef': 'Needs strong cooking skills, team coordination, and ability to manage kitchen operations. Typical training: 4-8 weeks.',
+        'chef-de-partie': 'Must master specific kitchen station, timing, and quality control. Typical training: 2-4 weeks.',
+        'commis-chef': 'Entry-level chef position requiring basic culinary skills and kitchen procedures. Typical training: 2-4 weeks.',
+        'kitchen-hand': 'Focuses on cleaning, basic prep work, and supporting kitchen operations. Typical training: 1-2 weeks.',
+        'restaurant-manager': 'Requires leadership, operations management, customer service, and P&L understanding. Typical training: 4-12 weeks.',
+        'floor-supervisor': 'Needs team management, service coordination, and problem-solving skills. Typical training: 2-4 weeks.',
+        'waiter': 'Requires menu knowledge, service skills, POS system, and customer interaction. Typical training: 1-2 weeks.',
+        'bartender': 'Needs drink preparation skills, customer service, RSA certification, and bar management. Typical training: 2-4 weeks.',
+        'barista': 'Requires coffee-making skills, machine operation, customer service, and product knowledge. Typical training: 1-2 weeks.',
+        'host': 'Focuses on greeting guests, reservations, seating coordination, and customer service. Typical training: 1 week.',
+        'cleaner': 'Requires knowledge of cleaning standards, chemical safety, and efficiency. Typical training: 1 week.',
+        'dishwasher': 'Needs efficiency, hygiene practices, and equipment operation skills. Typical training: 1 week.',
+        'delivery-driver': 'Requires safe driving, customer service, order accuracy, and time management. Typical training: 1 week.'
+    };
+    
+    if (roleInfo[position]) {
+        infoContent.textContent = roleInfo[position];
+        infoBox.classList.remove('hidden');
+    }
+}
+
+// Generate Training Plan
+async function generateTrainingPlan() {
+    const employeeName = document.getElementById('trainingEmployeeName').value.trim();
+    const position = document.getElementById('trainingPosition').value;
+    const experience = document.getElementById('trainingExperience').value;
+    const duration = document.getElementById('trainingDuration').value;
+    const focusAreas = document.getElementById('trainingFocusAreas').value.trim();
+    
+    // Validation
+    if (!employeeName || !position || !experience || !duration) {
+        alert('Please fill in all required fields');
+        return;
+    }
+    
+    // Save to state
+    trainingPlanState = {
+        employeeName,
+        position,
+        experience,
+        duration: parseInt(duration),
+        focusAreas,
+        planId: 'training_' + Date.now(),
+        plan: null
+    };
+    
+    // Show loading
+    showTrainingAIThinking();
+    
+    try {
+        // Get AI insights
+        const insights = await getTrainingAIInsights();
+        displayTrainingInsights(insights);
+        
+        // Generate the plan
+        const plan = buildTrainingPlan();
+        trainingPlanState.plan = plan;
+        
+        // Display the plan
+        displayTrainingPlan(plan);
+        
+        // Show action buttons
+        document.getElementById('trainingActions').classList.remove('hidden');
+        document.getElementById('trainingCoachSection').classList.remove('hidden');
+        
+    } catch (error) {
+        console.error('Error generating plan:', error);
+        alert('Failed to generate training plan. Please try again.');
+    }
+}
+
+function showTrainingAIThinking() {
+    const insightsBox = document.getElementById('trainingAIInsights');
+    const content = document.getElementById('trainingAIContent');
+    
+    content.innerHTML = '<div class="ai-thinking-training">🤖 Analyzing role requirements and generating personalized training plan</div>';
+    insightsBox.classList.remove('hidden');
+}
+
+// Get AI Insights
+async function getTrainingAIInsights() {
+    const positionName = document.getElementById('trainingPosition').selectedOptions[0].text;
+    const prompt = `As an Australian hospitality training expert, provide 3 key insights for training a ${trainingPlanState.experience} ${positionName} over ${trainingPlanState.duration} weeks. ${trainingPlanState.focusAreas ? 'Focus areas: ' + trainingPlanState.focusAreas : ''}
+
+Provide:
+1. Critical skills to prioritize
+2. Common training challenges for this role
+3. Success indicators
+
+Be specific to Australian hospitality and practical.`;
+    
+    try {
+        const response = await callClaudeAPI(prompt);
+        return response;
+    } catch (error) {
+        console.error('AI error:', error);
+        return getFallbackInsights();
+    }
+}
+
+function getFallbackInsights() {
+    const positionName = document.getElementById('trainingPosition').selectedOptions[0].text;
+    return `For ${trainingPlanState.experience} ${positionName}:
+
+• Start with compliance and safety - WHS, food safety (if applicable), RSA (if applicable)
+• Focus on hands-on practice rather than theory - hospitality is learned by doing
+• Build confidence gradually - start with supervision, progress to independence
+• Key success indicator: Can perform core duties independently by end of training`;
+}
+
+function displayTrainingInsights(insights) {
+    const content = document.getElementById('trainingAIContent');
+    content.innerHTML = insights.replace(/\n/g, '<br>');
+}
+
+// Build Training Plan
+function buildTrainingPlan() {
+    const weeks = trainingPlanState.duration;
+    const position = trainingPlanState.position;
+    const experience = trainingPlanState.experience;
+    
+    const plan = {
+        weeks: []
+    };
+    
+    // Generate week-by-week plan
+    for (let weekNum = 1; weekNum <= weeks; weekNum++) {
+        plan.weeks.push(generateWeek(weekNum, weeks, position, experience));
+    }
+    
+    return plan;
+}
+
+function generateWeek(weekNum, totalWeeks, position, experience) {
+    const isFirstWeek = weekNum === 1;
+    const isLastWeek = weekNum === totalWeeks;
+    
+    const week = {
+        number: weekNum,
+        title: getWeekTitle(weekNum, totalWeeks),
+        days: []
+    };
+    
+    // Generate 5 days per week (Mon-Fri)
+    for (let dayNum = 1; dayNum <= 5; dayNum++) {
+        week.days.push(generateDay(dayNum, weekNum, totalWeeks, position, experience));
+    }
+    
+    return week;
+}
+
+function getWeekTitle(weekNum, totalWeeks) {
+    if (weekNum === 1) return 'Induction & Foundations';
+    if (weekNum === totalWeeks) return 'Mastery & Assessment';
+    if (weekNum === 2) return 'Core Skills Development';
+    if (weekNum <= totalWeeks / 2) return 'Skill Building';
+    return 'Advanced Training';
+}
+
+function generateDay(dayNum, weekNum, totalWeeks, position, experience) {
+    const globalDay = (weekNum - 1) * 5 + dayNum;
+    const isFirstDay = globalDay === 1;
+    const isLastDay = globalDay === (totalWeeks * 5);
+    
+    const day = {
+        number: dayNum,
+        title: getDayTitle(dayNum, weekNum, globalDay, isFirstDay, isLastDay),
+        activities: []
+    };
+    
+    // Add activities based on day and role
+    day.activities = generateActivities(dayNum, weekNum, globalDay, position, experience, isFirstDay, isLastDay, totalWeeks);
+    
+    return day;
+}
+
+function getDayTitle(dayNum, weekNum, globalDay, isFirstDay, isLastDay) {
+    if (isFirstDay) return 'Welcome & Induction';
+    if (isLastDay) return 'Final Assessment';
+    if (weekNum === 1 && dayNum === 5) return 'Week 1 Review';
+    if (weekNum > 1 && dayNum === 1) return 'Week Goals & Planning';
+    if (dayNum === 5) return 'Weekly Review';
+    
+    const titles = {
+        2: 'Foundational Training',
+        3: 'Practical Application',
+        4: 'Skill Development'
+    };
+    
+    return titles[dayNum] || 'Training Day';
+}
+
+function generateActivities(dayNum, weekNum, globalDay, position, experience, isFirstDay, isLastDay, totalWeeks) {
+    const activities = [];
+    
+    // First day - induction
+    if (isFirstDay) {
+        activities.push(
+            { type: 'theory', title: 'Welcome & Paperwork', description: 'Complete all onboarding paperwork, tax forms, super choice', duration: '1 hour' },
+            { type: 'theory', title: 'WHS & Safety Training', description: 'Workplace health & safety, emergency procedures, safe work practices', duration: '1.5 hours' },
+            { type: 'shadowing', title: 'Venue Tour', description: 'Complete tour of venue, meet the team, understand layout', duration: '45 mins' },
+            { type: 'theory', title: 'Role Overview', description: 'Understand position responsibilities, expectations, standards', duration: '1 hour' }
+        );
+        return activities;
+    }
+    
+    // Last day - final assessment
+    if (isLastDay) {
+        activities.push(
+            { type: 'practical', title: 'Practical Skills Demonstration', description: 'Demonstrate all key competencies learned during training', duration: '2 hours' },
+            { type: 'assessment', title: 'Knowledge Assessment', description: 'Written or verbal assessment of role knowledge', duration: '30 mins' },
+            { type: 'assessment', title: 'Performance Review', description: 'Final feedback session, discuss strengths and areas for growth', duration: '45 mins' },
+            { type: 'assessment', title: 'Training Completion', description: 'Sign off training, receive certification, plan ongoing development', duration: '45 mins' }
+        );
+        return activities;
+    }
+    
+    // Role-specific activities
+    if (position.includes('chef') || position.includes('kitchen')) {
+        activities.push(...getKitchenActivities(dayNum, weekNum, globalDay, experience, totalWeeks));
+    } else if (position.includes('waiter') || position.includes('host') || position.includes('supervisor')) {
+        activities.push(...getFrontOfHouseActivities(dayNum, weekNum, globalDay, experience, totalWeeks));
+    } else if (position.includes('bartender') || position.includes('barista')) {
+        activities.push(...getBarActivities(dayNum, weekNum, globalDay, experience, position, totalWeeks));
+    } else if (position === 'restaurant-manager') {
+        activities.push(...getManagerActivities(dayNum, weekNum, globalDay, experience, totalWeeks));
+    } else {
+        activities.push(...getGeneralActivities(dayNum, weekNum, globalDay, experience, totalWeeks));
+    }
+    
+    return activities;
+}
+
+function getKitchenActivities(dayNum, weekNum, globalDay, experience, totalWeeks) {
+    if (weekNum === 1) {
+        return [
+            { type: 'theory', title: 'Food Safety Certification', description: 'Complete food handler certificate, understand HACCP principles', duration: '2 hours' },
+            { type: 'shadowing', title: 'Kitchen Operations', description: 'Shadow experienced chef, observe mise en place and service', duration: '3 hours' },
+            { type: 'practical', title: 'Basic Prep Work', description: 'Practice knife skills, basic prep techniques with supervision', duration: '2 hours' }
+        ];
+    }
+    
+    if (weekNum === 2 || (totalWeeks >= 4 && weekNum <= 3)) {
+        return [
+            { type: 'practical', title: 'Station Training', description: 'Work specific station (grill, fry, garde manger, etc) with supervision', duration: '3 hours' },
+            { type: 'practical', title: 'Service Practice', description: 'Participate in service, build speed and consistency', duration: '3 hours' },
+            { type: 'theory', title: 'Menu Knowledge', description: 'Learn all menu items, ingredients, allergens, cooking methods', duration: '1 hour' }
+        ];
+    }
+    
+    return [
+        { type: 'practical', title: 'Independent Station Work', description: 'Run station independently during service with minimal supervision', duration: '4 hours' },
+        { type: 'practical', title: 'Quality Control', description: 'Maintain presentation and taste standards, plate dishes correctly', duration: '2 hours' },
+        { type: 'assessment', title: 'Skills Check', description: 'Supervisor assesses speed, quality, and consistency', duration: '1 hour' }
+    ];
+}
+
+function getFrontOfHouseActivities(dayNum, weekNum, globalDay, experience, totalWeeks) {
+    if (weekNum === 1) {
+        return [
+            { type: 'theory', title: 'Customer Service Standards', description: 'Learn service standards, greeting guests, handling requests', duration: '1.5 hours' },
+            { type: 'theory', title: 'POS System Training', description: 'Learn point of sale system, order entry, payments, table management', duration: '2 hours' },
+            { type: 'shadowing', title: 'Service Shadowing', description: 'Shadow experienced waiter, observe full service cycle', duration: '3 hours' },
+            { type: 'theory', title: 'Menu & Beverage Knowledge', description: 'Study menu items, wine list, cocktails, dietary requirements', duration: '1.5 hours' }
+        ];
+    }
+    
+    if (weekNum === 2 || (totalWeeks >= 4 && weekNum <= 3)) {
+        return [
+            { type: 'practical', title: 'Taking Orders', description: 'Practice taking orders, making recommendations, upselling', duration: '2 hours' },
+            { type: 'practical', title: 'Service Practice', description: 'Serve tables with supervision, manage small section', duration: '3 hours' },
+            { type: 'theory', title: 'Difficult Situations', description: 'Learn to handle complaints, special requests, challenging customers', duration: '1 hour' }
+        ];
+    }
+    
+    return [
+        { type: 'practical', title: 'Full Section Service', description: 'Manage full section independently during service', duration: '4 hours' },
+        { type: 'practical', title: 'Wine Service', description: 'Practice wine service, presentation, handling special occasions', duration: '1.5 hours' },
+        { type: 'assessment', title: 'Service Quality Check', description: 'Manager observes and provides feedback on service quality', duration: '30 mins' }
+    ];
+}
+
+function getBarActivities(dayNum, weekNum, globalDay, experience, position, totalWeeks) {
+    const isBarista = position.includes('barista');
+    
+    if (weekNum === 1) {
+        return [
+            { type: 'theory', title: isBarista ? 'Coffee Knowledge' : 'RSA Certification', description: isBarista ? 'Learn coffee types, extraction, milk texturing basics' : 'Complete Responsible Service of Alcohol certification', duration: '2 hours' },
+            { type: 'shadowing', title: isBarista ? 'Machine Operation' : 'Bar Operations', description: isBarista ? 'Shadow barista, observe machine use, workflow, cleaning' : 'Shadow bartender, observe service flow, drink preparation', duration: '3 hours' },
+            { type: 'practical', title: 'Basic Preparation', description: isBarista ? 'Practice espresso shots, milk steaming with supervision' : 'Learn basic drinks, garnishes, glassware', duration: '2 hours' }
+        ];
+    }
+    
+    if (weekNum === 2 || (totalWeeks >= 4 && weekNum <= 3)) {
+        return [
+            { type: 'practical', title: 'Drink Preparation', description: isBarista ? 'Make all coffee styles, practice latte art' : 'Prepare full range of cocktails and mixed drinks', duration: '3 hours' },
+            { type: 'practical', title: 'Customer Service', description: 'Serve customers, take orders, process payments', duration: '2 hours' },
+            { type: 'practical', title: 'Speed & Consistency', description: 'Build speed while maintaining quality standards', duration: '2 hours' }
+        ];
+    }
+    
+    return [
+        { type: 'practical', title: 'Independent Service', description: 'Work independently during busy periods', duration: '4 hours' },
+        { type: 'practical', title: isBarista ? 'Advanced Techniques' : 'Inventory Management', description: isBarista ? 'Advanced latte art, alternative brewing methods' : 'Stock control, ordering, wastage reduction', duration: '2 hours' },
+        { type: 'assessment', title: 'Skills Assessment', description: 'Demonstrate speed, quality, and customer service skills', duration: '1 hour' }
+    ];
+}
+
+function getManagerActivities(dayNum, weekNum, globalDay, experience, totalWeeks) {
+    if (weekNum === 1) {
+        return [
+            { type: 'theory', title: 'Operations Overview', description: 'Understand all business operations, systems, procedures', duration: '2 hours' },
+            { type: 'shadowing', title: 'Management Shadowing', description: 'Shadow current manager through full shift cycle', duration: '4 hours' },
+            { type: 'theory', title: 'Team & Roster', description: 'Learn team structure, roster system, staff management', duration: '1.5 hours' }
+        ];
+    }
+    
+    if (weekNum === 2 || (totalWeeks >= 4 && weekNum <= 3)) {
+        return [
+            { type: 'practical', title: 'Floor Management', description: 'Manage floor during service with support', duration: '3 hours' },
+            { type: 'theory', title: 'Financials & Reporting', description: 'Learn POS reports, daily takings, cost control basics', duration: '2 hours' },
+            { type: 'practical', title: 'Staff Coordination', description: 'Brief staff, delegate tasks, problem-solve issues', duration: '2 hours' }
+        ];
+    }
+    
+    return [
+        { type: 'practical', title: 'Independent Management', description: 'Manage shift independently, make decisions, handle escalations', duration: '4 hours' },
+        { type: 'practical', title: 'Performance Management', description: 'Provide staff feedback, conduct reviews, training', duration: '2 hours' },
+        { type: 'assessment', title: 'Management Review', description: 'Senior manager assesses decision-making and leadership', duration: '1 hour' }
+    ];
+}
+
+function getGeneralActivities(dayNum, weekNum, globalDay, experience, totalWeeks) {
+    if (weekNum === 1) {
+        return [
+            { type: 'theory', title: 'Role Training', description: 'Learn specific role duties, procedures, and standards', duration: '2 hours' },
+            { type: 'shadowing', title: 'Job Shadowing', description: 'Shadow experienced team member, observe best practices', duration: '3 hours' },
+            { type: 'practical', title: 'Basic Tasks', description: 'Practice core tasks with supervision and guidance', duration: '2 hours' }
+        ];
+    }
+    
+    return [
+        { type: 'practical', title: 'Supervised Work', description: 'Perform role duties with supervision and support', duration: '4 hours' },
+        { type: 'practical', title: 'Skill Building', description: 'Focus on efficiency, quality, and consistency', duration: '2 hours' },
+        { type: 'assessment', title: 'Progress Check', description: 'Review progress, provide feedback, address questions', duration: '1 hour' }
+    ];
+}
+
+// Display Training Plan
+function displayTrainingPlan(plan) {
+    const container = document.getElementById('trainingPlanDisplay');
+    
+    let html = '';
+    
+    plan.weeks.forEach(week => {
+        html += `
+            <div class="training-week">
+                <h3 class="text-xl font-bold text-white mb-4">Week ${week.number}: ${week.title}</h3>
+        `;
+        
+        week.days.forEach(day => {
+            html += `
+                <div class="training-day">
+                    <div class="text-lg font-semibold text-amber-500 mb-3">Day ${day.number}: ${day.title}</div>
+                    <div class="space-y-2">
+            `;
+            
+            day.activities.forEach(activity => {
+                const iconClass = `icon-${activity.type}`;
+                const icon = {
+                    'theory': '📚',
+                    'practical': '🔧',
+                    'assessment': '✅',
+                    'shadowing': '👥'
+                }[activity.type] || '📋';
+                
+                html += `
+                    <div class="training-activity">
+                        <div class="activity-icon ${iconClass}">${icon}</div>
+                        <div class="activity-content">
+                            <div class="activity-title">${activity.title}</div>
+                            <div class="activity-description">${activity.description}</div>
+                            <div class="activity-duration">⏱️ ${activity.duration}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += `
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += `</div>`;
+    });
+    
+    container.innerHTML = html;
+    container.classList.remove('hidden');
+}
+
+// AI Training Coach
+async function askTrainingCoach() {
+    const question = document.getElementById('trainingCoachInput').value.trim();
+    
+    if (!question) {
+        alert('Please enter a question');
+        return;
+    }
+    
+    const responseBox = document.getElementById('trainingCoachResponse');
+    const responseContent = document.getElementById('trainingCoachContent');
+    
+    responseBox.classList.remove('hidden');
+    responseContent.innerHTML = '<div class="ai-thinking-training">🤖 Thinking</div>';
+    
+    try {
+        const positionName = document.getElementById('trainingPosition').selectedOptions[0].text;
+        const context = `Training plan for ${trainingPlanState.experience} ${positionName} over ${trainingPlanState.duration} weeks`;
+        const prompt = `As an Australian hospitality training expert, answer this question:\n\nContext: ${context}\n\nQuestion: ${question}\n\nProvide practical, specific advice.`;
+        
+        const answer = await callClaudeAPI(prompt);
+        responseContent.innerHTML = answer.replace(/\n/g, '<br>');
+        
+        document.getElementById('trainingCoachInput').value = '';
+    } catch (error) {
+        console.error('AI Coach error:', error);
+        responseContent.innerHTML = 'Sorry, I encountered an error. Please try again.';
+    }
+}
+
+// Save/Load Functions
+function saveTrainingPlan() {
+    if (!trainingPlanState.plan) {
+        alert('Please generate a training plan first');
+        return;
+    }
+    
+    try {
+        localStorage.setItem('training_plan_' + trainingPlanState.planId, JSON.stringify(trainingPlanState));
+        
+        if (typeof showNotification === 'function') {
+            showNotification('✅ Training plan saved', 'success');
+        } else {
+            alert('✅ Training plan saved');
+        }
+    } catch (error) {
+        console.error('Error saving:', error);
+        alert('Failed to save training plan');
+    }
+}
+
+function loadTrainingProgress() {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('training_plan_'));
+    if (keys.length === 0) return;
+    
+    try {
+        const latestKey = keys[keys.length - 1];
+        const data = JSON.parse(localStorage.getItem(latestKey));
+        
+        if (data) {
+            trainingPlanState = data;
+            
+            // Populate form
+            if (data.employeeName) document.getElementById('trainingEmployeeName').value = data.employeeName;
+            if (data.position) document.getElementById('trainingPosition').value = data.position;
+            if (data.experience) document.getElementById('trainingExperience').value = data.experience;
+            if (data.duration) document.getElementById('trainingDuration').value = data.duration.toString();
+            if (data.focusAreas) document.getElementById('trainingFocusAreas').value = data.focusAreas;
+            
+            if (data.plan) {
+                displayTrainingPlan(data.plan);
+                document.getElementById('trainingActions').classList.remove('hidden');
+                document.getElementById('trainingCoachSection').classList.remove('hidden');
+            }
+        }
+    } catch (error) {
+        console.error('Error loading progress:', error);
+    }
+}
+
+// Export Functions
+function exportTrainingPlanDOCX() {
+    if (!trainingPlanState.plan) {
+        alert('Please generate a training plan first');
+        return;
+    }
+    
+    try {
+        const html = buildTrainingPlanHTML();
+        const converted = htmlDocx.asBlob(html);
+        const positionName = document.getElementById('trainingPosition').selectedOptions[0].text.replace(/\s+/g, '_');
+        const filename = `Training_Plan_${positionName}_${Date.now()}.docx`;
+        
+        saveAs(converted, filename);
+        
+        if (typeof showNotification === 'function') {
+            showNotification('✅ Training plan downloaded as DOCX', 'success');
+        }
+    } catch (error) {
+        console.error('Error generating DOCX:', error);
+        alert('Failed to generate DOCX. Please try again.');
+    }
+}
+
+function exportTrainingPlanPDF() {
+    if (!trainingPlanState.plan) {
+        alert('Please generate a training plan first');
+        return;
+    }
+    
+    try {
+        const docDefinition = buildTrainingPlanPDFDefinition();
+        const positionName = document.getElementById('trainingPosition').selectedOptions[0].text.replace(/\s+/g, '_');
+        const filename = `Training_Plan_${positionName}_${Date.now()}.pdf`;
+        
+        pdfMake.createPdf(docDefinition).download(filename);
+        
+        if (typeof showNotification === 'function') {
+            showNotification('✅ Training plan downloaded as PDF', 'success');
+        }
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        alert('Failed to generate PDF. Please try again.');
+    }
+}
+
+function printTrainingPlan() {
+    if (!trainingPlanState.plan) {
+        alert('Please generate a training plan first');
+        return;
+    }
+    
+    window.print();
+}
+
+// Build HTML for DOCX export
+function buildTrainingPlanHTML() {
+    const today = new Date().toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
+    const positionName = document.getElementById('trainingPosition').selectedOptions[0].text;
+    const plan = trainingPlanState.plan;
+    
+    let html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 20px; color: #000; }
+                h1 { color: #2c3e50; border-bottom: 3px solid #f39c12; padding-bottom: 10px; margin-bottom: 20px; }
+                h2 { color: #34495e; margin-top: 30px; border-bottom: 2px solid #bdc3c7; padding-bottom: 5px; }
+                h3 { color: #667eea; margin-top: 20px; }
+                .info-box { background: #ecf0f1; padding: 15px; border-radius: 8px; margin-bottom: 30px; }
+                .info-box p { margin: 5px 0; }
+                .week { margin: 30px 0; page-break-inside: avoid; }
+                .day { margin: 20px 0; padding: 15px; border-left: 4px solid #667eea; background: #f8f9fa; }
+                .activity { margin: 10px 0; padding: 10px; background: white; border-left: 3px solid #95a5a6; }
+                .activity-title { font-weight: bold; color: #2c3e50; }
+                .activity-description { color: #555; margin: 5px 0; }
+                .activity-duration { color: #f39c12; font-size: 14px; font-weight: 600; }
+                .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #bdc3c7; text-align: center; color: #7f8c8d; font-size: 12px; }
+            </style>
+        </head>
+        <body>
+            <h1>Training Plan: ${positionName}</h1>
+            
+            <div class="info-box">
+                <p><strong>Employee Name:</strong> ${trainingPlanState.employeeName}</p>
+                <p><strong>Position:</strong> ${positionName}</p>
+                <p><strong>Experience Level:</strong> ${trainingPlanState.experience}</p>
+                <p><strong>Training Duration:</strong> ${trainingPlanState.duration} weeks</p>
+                ${trainingPlanState.focusAreas ? `<p><strong>Focus Areas:</strong> ${trainingPlanState.focusAreas}</p>` : ''}
+            </div>
+    `;
+    
+    plan.weeks.forEach(week => {
+        html += `
+            <div class="week">
+                <h2>Week ${week.number}: ${week.title}</h2>
+        `;
+        
+        week.days.forEach(day => {
+            html += `
+                <div class="day">
+                    <h3>Day ${day.number}: ${day.title}</h3>
+            `;
+            
+            day.activities.forEach(activity => {
+                html += `
+                    <div class="activity">
+                        <div class="activity-title">${activity.title}</div>
+                        <div class="activity-description">${activity.description}</div>
+                        <div class="activity-duration">Duration: ${activity.duration}</div>
+                    </div>
+                `;
+            });
+            
+            html += `</div>`;
+        });
+        
+        html += `</div>`;
+    });
+    
+    html += `
+            <div class="footer">
+                <p>Generated by Fitzgerald HR on ${today}</p>
+                <p>This training plan provides a structured approach to employee development</p>
+            </div>
+        </body>
+        </html>
+    `;
+    
+    return html;
+}
+
+// Build PDF definition
+function buildTrainingPlanPDFDefinition() {
+    const today = new Date().toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
+    const positionName = document.getElementById('trainingPosition').selectedOptions[0].text;
+    const plan = trainingPlanState.plan;
+    
+    const content = [
+        { text: `Training Plan: ${positionName}`, style: 'header', margin: [0, 0, 0, 20] },
+        
+        {
+            table: {
+                widths: ['30%', '70%'],
+                body: [
+                    ['Employee Name:', trainingPlanState.employeeName],
+                    ['Position:', positionName],
+                    ['Experience Level:', trainingPlanState.experience],
+                    ['Training Duration:', `${trainingPlanState.duration} weeks`]
+                ]
+            },
+            layout: 'lightHorizontalLines',
+            margin: [0, 0, 0, 20]
+        }
+    ];
+    
+    plan.weeks.forEach(week => {
+        content.push({ text: `Week ${week.number}: ${week.title}`, style: 'weekHeader', margin: [0, 15, 0, 10], pageBreak: week.number > 1 ? 'before' : '' });
+        
+        week.days.forEach(day => {
+            content.push({ text: `Day ${day.number}: ${day.title}`, style: 'dayTitle', margin: [0, 10, 0, 5] });
+            
+            day.activities.forEach(activity => {
+                content.push({
+                    stack: [
+                        { text: activity.title, style: 'activityTitle' },
+                        { text: activity.description, style: 'activityDescription' },
+                        { text: `Duration: ${activity.duration}`, style: 'activityDuration' }
+                    ],
+                    margin: [10, 5, 0, 10]
+                });
+            });
+        });
+    });
+    
+    content.push({
+        text: `Generated by Fitzgerald HR on ${today}`,
+        style: 'footer',
+        margin: [0, 30, 0, 0]
+    });
+    
+    return {
+        content: content,
+        styles: {
+            header: { fontSize: 24, bold: true, color: '#2c3e50' },
+            weekHeader: { fontSize: 16, bold: true, color: '#34495e' },
+            dayTitle: { fontSize: 14, bold: true, color: '#667eea' },
+            activityTitle: { fontSize: 12, bold: true },
+            activityDescription: { fontSize: 10, color: '#555' },
+            activityDuration: { fontSize: 10, color: '#f39c12', italics: true },
+            footer: { fontSize: 10, color: '#95a5a6', alignment: 'center' }
+        },
+        defaultStyle: { font: 'Helvetica' }
+    };
 }
 
 
