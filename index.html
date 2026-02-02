@@ -10104,7 +10104,8 @@ function checkAccess() {
                 if (!hasCompletedOnboarding) {
                     setTimeout(() => showOnboarding(), 500);
                 } else {
-                    // RESTORE LAST CONVERSATION (like Claude.ai)
+                    // LOAD CONVERSATIONS FIRST, THEN RESTORE (like Claude.ai)
+                    loadConversations(); // Load from localStorage
                     setTimeout(() => {
                         restoreLastConversation();
                         updateSidebarChats();
@@ -14034,14 +14035,14 @@ function switchAdminTab(tabName) {
     document.getElementById(contentMap[tabName]).classList.remove('hidden');
     
     // Load data for selected tab
-    if (tabName === 'conversations') loadConversations();
+    if (tabName === 'conversations') loadConversationsAdmin();
     if (tabName === 'themes') loadThemes();
     if (tabName === 'users') loadUsers();
     if (tabName === 'highrisk') loadHighRisk();
     if (tabName === 'documents') loadDocuments();
 }
 
-async function loadConversations() {
+async function loadConversationsAdmin() {
     const list = document.getElementById('conversationsList');
     
     // Show loading state
@@ -23940,7 +23941,8 @@ if (auth) {
                     if (!hasCompletedOnboarding) {
                         setTimeout(() => showOnboarding(), 1000);
                     } else {
-                        // RESTORE LAST CONVERSATION (like Claude.ai)
+                        // LOAD CONVERSATIONS FIRST, THEN RESTORE (like Claude.ai)
+                        loadConversations(); // Load from localStorage
                         setTimeout(() => {
                             restoreLastConversation();
                             updateSidebarChats();
@@ -24341,29 +24343,59 @@ async function saveConversationToFirebase(conversation) {
 // Load all conversations from Firebase
 async function loadConversationsFromFirebase() {
     if (!currentUser || !db) {
-        console.log('⚠️ Not signed in');
-        window.conversations = [];
-        return;
+        console.log('⚠️ Not signed in, loading conversations from localStorage only');
+        // Load from localStorage instead of clearing
+        loadConversations();
+        return window.conversations || [];
     }
     
     try {
+        // First, load from localStorage to have something
+        loadConversations();
+        const localConversations = [...(window.conversations || [])];
+        console.log('📥 Local conversations loaded:', localConversations.length);
+        
         const snapshot = await db.collection('users').doc(currentUser.uid)
                                    .collection('conversations')
                                    .get();
         
-        window.conversations = [];
+        const firebaseConversations = [];
         snapshot.forEach(doc => {
-            window.conversations.push(doc.data());
+            firebaseConversations.push(doc.data());
         });
         
-        // Sort in memory instead (safer)
+        console.log('📥 Firebase conversations loaded:', firebaseConversations.length);
+        
+        // Merge: Firebase takes priority, but keep local ones that aren't in Firebase
+        const mergedMap = new Map();
+        
+        // Add local conversations first
+        localConversations.forEach(conv => {
+            if (conv && conv.id) {
+                mergedMap.set(conv.id, conv);
+            }
+        });
+        
+        // Override with Firebase conversations (more authoritative)
+        firebaseConversations.forEach(conv => {
+            if (conv && conv.id) {
+                mergedMap.set(conv.id, conv);
+            }
+        });
+        
+        window.conversations = Array.from(mergedMap.values());
+        
+        // Sort in memory (most recent first)
         window.conversations.sort((a, b) => {
             const dateA = new Date(a.updated || a.created || 0);
             const dateB = new Date(b.updated || b.created || 0);
-            return dateB - dateA; // Most recent first
+            return dateB - dateA;
         });
         
-        console.log('✅ Loaded', window.conversations.length, 'conversations from Firebase');
+        console.log('✅ Merged conversations:', window.conversations.length);
+        
+        // Save merged result back to localStorage
+        localStorage.setItem('fitz_conversations', JSON.stringify(window.conversations));
         
         // Update UI with multiple retry attempts
         const tryUpdateUI = (attempts = 0) => {
@@ -24382,9 +24414,10 @@ async function loadConversationsFromFirebase() {
         
         return window.conversations;
     } catch (error) {
-        console.error('❌ Failed to load conversations:', error);
-        window.conversations = [];
-        return [];
+        console.error('❌ Failed to load conversations from Firebase:', error);
+        // Keep localStorage data on error
+        loadConversations();
+        return window.conversations || [];
     }
 }
 
