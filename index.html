@@ -23412,10 +23412,15 @@ async function loadConversationsFromFirebase() {
         
         console.log('✅ Loaded', window.conversations.length, 'conversations from Firebase');
         
-        // Update UI
-        if (typeof updateSidebarChats === 'function') {
-            updateSidebarChats();
-        }
+        // Update UI with delay to ensure function is loaded
+        setTimeout(() => {
+            if (typeof updateSidebarChats === 'function') {
+                updateSidebarChats();
+                console.log('✅ Updated sidebar with conversations');
+            } else {
+                console.log('⚠️ updateSidebarChats not available yet');
+            }
+        }, 500);
         
         return window.conversations;
     } catch (error) {
@@ -23574,6 +23579,14 @@ async function loadAllDataFromFirebase() {
         
         console.log('✅ All data loaded from Firebase');
         console.log('🎉 Device is now synced!');
+        
+        // Force UI refresh after a short delay
+        setTimeout(() => {
+            if (typeof updateSidebarChats === 'function') {
+                updateSidebarChats();
+                console.log('✅ UI refreshed - conversations should appear!');
+            }
+        }, 1000);
         
         // Show notification
         if (typeof showNotification === 'function') {
