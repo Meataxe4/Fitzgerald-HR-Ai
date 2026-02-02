@@ -19804,7 +19804,7 @@ function resetAIImport() {
 <!-- ========================================== -->
 <!-- CONTRACT BUILDER TERMS OF USE MODAL -->
 <!-- ========================================== -->
-<div id="contractBuilderTermsModal" class="hidden fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 md:p-6 z-[70]">
+<div id="contractBuilderTermsModal" class="hidden fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4 md:p-6 z-[9999999]">
     <div class="bg-slate-800 rounded-2xl p-6 md:p-8 max-w-4xl w-full border-2 border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
         
         <!-- Header -->
@@ -21779,16 +21779,24 @@ function closeEmploymentContract() {
 
 // Navigation Functions
 function nextContractStep() {
+    console.log('🔄 nextContractStep called, currentStep:', contractBuilderState.currentStep);
+    
     if (!validateContractStep(contractBuilderState.currentStep)) {
+        console.log('❌ Validation failed');
         return;
     }
+    
+    console.log('✅ Validation passed');
     
     saveCurrentStepData();
     contractBuilderState.unsavedChanges = true;
     
+    console.log('💾 Data saved, step0 data:', contractBuilderState.data.step0);
+    
     // ✅ CHECK: If moving from Step 0 (Setup) to Step 1 (Position Details)
     // Show detailed Terms of Use modal if not already accepted
     if (contractBuilderState.currentStep === 0 && !contractBuilderState.data.step0.detailedTermsAccepted) {
+        console.log('📋 Showing Contract Builder Terms Modal');
         showContractBuilderTermsModal();
         return; // Don't proceed until terms are accepted
     }
@@ -21797,6 +21805,7 @@ function nextContractStep() {
         contractBuilderState.currentStep++;
         renderContractStep(contractBuilderState.currentStep);
         updateContractProgressBar();
+        console.log('➡️ Moved to step:', contractBuilderState.currentStep);
     }
 }
 
@@ -21804,12 +21813,19 @@ function nextContractStep() {
  * Show the Contract Builder Terms of Use modal
  */
 function showContractBuilderTermsModal() {
+    console.log('📋 showContractBuilderTermsModal called');
+    
     const modal = document.getElementById('contractBuilderTermsModal');
     const checkbox = document.getElementById('contractTermsCheckbox');
     const acceptBtn = document.getElementById('acceptContractTermsBtn');
     
+    console.log('📋 Modal element found:', !!modal);
+    console.log('📋 Checkbox element found:', !!checkbox);
+    console.log('📋 Accept button found:', !!acceptBtn);
+    
     if (modal) {
         modal.classList.remove('hidden');
+        console.log('📋 Modal should now be visible');
         
         // Reset checkbox state
         if (checkbox) checkbox.checked = false;
@@ -21828,6 +21844,8 @@ function showContractBuilderTermsModal() {
                 user: currentUser?.uid || currentUser 
             });
         }
+    } else {
+        console.error('❌ contractBuilderTermsModal element not found!');
     }
 }
 
@@ -21915,11 +21933,15 @@ function validateContractStep(stepNumber) {
     
     switch(stepNumber) {
         case 0:
-            if (!stepData.businessState) {
+            // Read directly from form elements (state not saved yet)
+            const businessState = document.getElementById('businessState')?.value;
+            const understandTemplate = document.getElementById('understandTemplate')?.checked;
+            
+            if (!businessState) {
                 alert('Please select your business state/territory.');
                 return false;
             }
-            if (!stepData.understandTemplate) {
+            if (!understandTemplate) {
                 alert('Please acknowledge that this is a template tool.');
                 return false;
             }
