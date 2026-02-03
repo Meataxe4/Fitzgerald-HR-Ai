@@ -26718,20 +26718,24 @@ async function loadConversationsFromFirebase() {
         // Save merged result back to localStorage
         localStorage.setItem('fitz_conversations', JSON.stringify(window.conversations));
         
-        // Update UI with multiple retry attempts
-        const tryUpdateUI = (attempts = 0) => {
-            if (typeof updateSidebarChats === 'function') {
+        // Update UI and restore last conversation
+        const tryUpdateAndRestore = (attempts = 0) => {
+            if (typeof updateSidebarChats === 'function' && typeof restoreLastConversation === 'function') {
                 updateSidebarChats();
                 console.log('✅ Updated sidebar with conversations');
+                
+                // Restore the last active conversation (like Claude does)
+                restoreLastConversation();
+                console.log('✅ Restored last conversation');
             } else if (attempts < 5) {
-                console.log('⚠️ updateSidebarChats not ready, retry', attempts + 1);
-                setTimeout(() => tryUpdateUI(attempts + 1), 500);
+                console.log('⚠️ Functions not ready, retry', attempts + 1);
+                setTimeout(() => tryUpdateAndRestore(attempts + 1), 500);
             } else {
-                console.log('❌ updateSidebarChats never loaded');
+                console.log('❌ Functions never loaded');
             }
         };
         
-        setTimeout(() => tryUpdateUI(), 1000);
+        setTimeout(() => tryUpdateAndRestore(), 500);
         
         return window.conversations;
     } catch (error) {
@@ -26891,17 +26895,6 @@ async function loadAllDataFromFirebase() {
         
         console.log('✅ All data loaded from Firebase');
         console.log('🎉 Device is now synced!');
-        
-        // Force UI refresh with retry
-        const tryUpdateMasterUI = (attempts = 0) => {
-            if (typeof updateSidebarChats === 'function') {
-                updateSidebarChats();
-                console.log('✅ UI refreshed - conversations should appear!');
-            } else if (attempts < 5) {
-                setTimeout(() => tryUpdateMasterUI(attempts + 1), 500);
-            }
-        };
-        setTimeout(() => tryUpdateMasterUI(), 1500);
         
         // Show notification
         if (typeof showNotification === 'function') {
