@@ -4411,18 +4411,10 @@ function continueWithEmail() {
                 </button>
                 
                 <button onclick="openToolFromMobile('newEmployeeToolkit')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
-                    <span class="text-2xl">📄</span>
+                    <span class="text-2xl">🌟</span>
                     <div>
                         <div class="font-semibold">New Employee Toolkit</div>
                         <div class="text-sm text-slate-400">Create employment contracts</div>
-                    </div>
-                </button>
-                
-                <button onclick="openToolFromMobile('rosterOptimizer')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
-                    <span class="text-2xl">📋</span>
-                    <div>
-                        <div class="font-semibold">Roster Optimiser</div>
-                        <div class="text-sm text-slate-400">Optimize staff scheduling</div>
                     </div>
                 </button>
                 
@@ -11920,7 +11912,6 @@ function loadBookmarks() {
     if (stored) {
         try {
             bookmarks = JSON.parse(stored);
-            console.log('📚 Loaded', bookmarks.length, 'bookmarks from localStorage');
         } catch (e) {
             bookmarks = [];
         }
@@ -11930,7 +11921,6 @@ function loadBookmarks() {
 // Load bookmarks from Firebase and merge with local
 async function loadBookmarksFromFirebase() {
     if (!currentUser || !currentUser.uid || !db) {
-        console.log('⚠️ Not signed in, using local bookmarks only');
         return;
     }
     
@@ -11939,8 +11929,6 @@ async function loadBookmarksFromFirebase() {
         if (userDoc.exists) {
             const userData = userDoc.data();
             const firebaseBookmarks = userData.bookmarks || [];
-            
-            console.log('📚 Firebase bookmarks:', firebaseBookmarks.length);
             
             // Merge: Firebase takes priority
             const mergedMap = new Map();
@@ -11960,13 +11948,11 @@ async function loadBookmarksFromFirebase() {
             // Save merged result
             localStorage.setItem('fitz_bookmarks', JSON.stringify(bookmarks));
             
-            console.log('✅ Merged bookmarks:', bookmarks.length);
-            
             // Update UI
             updateSidebarBookmarks();
         }
     } catch (error) {
-        console.error('❌ Failed to load bookmarks from Firebase:', error);
+        console.error('Failed to load bookmarks from Firebase:', error);
     }
 }
 
@@ -11978,10 +11964,8 @@ function saveBookmarks() {
     if (currentUser && currentUser.uid && db) {
         db.collection('users').doc(currentUser.uid).set({
             bookmarks: bookmarks
-        }, { merge: true }).then(() => {
-            console.log('✅ Bookmarks synced to Firebase');
-        }).catch(err => {
-            console.error('❌ Failed to sync bookmarks:', err);
+        }, { merge: true }).catch(err => {
+            console.error('Failed to sync bookmarks:', err);
         });
     }
 }
@@ -12042,24 +12026,16 @@ function updateBookmarkStars() {
 
 // Update sidebar bookmarks
 function updateSidebarBookmarks() {
-    console.log('🔖 updateSidebarBookmarks called');
-    console.log('🔖 bookmarks array:', bookmarks);
-    
     var bookmarksList = document.getElementById('sidebarBookmarksList');
-    console.log('🔖 bookmarksList element:', bookmarksList);
     
     if (!bookmarksList) {
-        console.error('❌ sidebarBookmarksList element not found!');
         return;
     }
     
     if (bookmarks.length === 0) {
         bookmarksList.innerHTML = '<p class="text-slate-500 text-sm py-4 text-center">No bookmarks yet</p>';
-        console.log('✅ No bookmarks, showing empty message');
         return;
     }
-    
-    console.log('✅ Rendering', bookmarks.length, 'bookmarks');
     
     bookmarksList.innerHTML = bookmarks.slice(0, 10).map(function(b) {
         // Use the stored preview (user's question) or fallback to content
@@ -12074,31 +12050,20 @@ function updateSidebarBookmarks() {
             '</button>' +
         '</div>';
     }).join('');
-    
-    console.log('✅ Bookmarks rendered');
 }
 
 // Jump to bookmark
 function jumpToBookmark(messageId) {
-    console.log('🔖 jumpToBookmark called with messageId:', messageId);
-    
     const bookmark = bookmarks.find(b => b.id === messageId);
     if (!bookmark) {
-        console.error('❌ Bookmark not found:', messageId);
         showToast('Bookmark not found', 'error', 2000);
         return;
     }
-    
-    console.log('🔖 Found bookmark:', bookmark);
-    console.log('🔖 Bookmark conversationId:', bookmark.conversationId);
-    console.log('🔖 Current conversationId:', currentConversationId);
-    console.log('🔖 Available conversations:', conversations.map(c => c.id));
     
     // Check if the conversation exists
     const targetConversation = conversations.find(c => c.id === bookmark.conversationId);
     
     if (!targetConversation) {
-        console.error('❌ Conversation not found for bookmark:', bookmark.conversationId);
         showToast('Conversation no longer exists', 'error', 2000);
         
         // Optionally remove the orphaned bookmark
@@ -12111,21 +12076,18 @@ function jumpToBookmark(messageId) {
     
     // If bookmark is in different conversation, load it
     if (bookmark.conversationId !== currentConversationId) {
-        console.log('🔖 Loading conversation:', bookmark.conversationId);
         loadConversation(bookmark.conversationId);
     }
     
     // Scroll to message after a delay to allow conversation to load
     setTimeout(() => {
         const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
-        console.log('🔖 Looking for message element:', messageId, 'Found:', !!messageElement);
         
         if (messageElement) {
             messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             messageElement.classList.add('highlight-flash');
             setTimeout(() => messageElement.classList.remove('highlight-flash'), 2000);
         } else {
-            console.warn('⚠️ Message element not found in DOM, conversation may have been edited');
             showToast('Message not found in conversation', 'warning', 2000);
         }
     }, 800);
@@ -12392,21 +12354,12 @@ function closeProfileMenu() {
 
 // Update sidebar venue name on load
 function updateSidebarVenueName() {
-    console.log('🏨 updateSidebarVenueName called');
-    console.log('🏨 venueProfile:', venueProfile);
-    console.log('🏨 venueProfile.venueName:', venueProfile.venueName);
-    
     var venueName = venueProfile.venueName || 'Fitz';
-    console.log('🏨 Using venueName:', venueName);
     
     var sidebarName = document.getElementById('sidebarVenueName');
-    console.log('🏨 sidebarName element:', sidebarName);
     
     if (sidebarName) {
         sidebarName.textContent = venueName;
-        console.log('✅ Sidebar name updated to:', venueName);
-    } else {
-        console.error('❌ sidebarVenueName element not found!');
     }
     
     // Also store in localStorage for easy access
@@ -19033,7 +18986,7 @@ function resetAIImport() {
             
             <button onclick="openNewEmployeeToolkit(); closeToolsMenu();" class="text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
                 <div class="flex items-start gap-3">
-                    <span class="text-3xl">📄</span>
+                    <span class="text-3xl">🌟</span>
                     <div>
                         <div class="font-semibold text-white mb-1">New Employee Toolkit</div>
                         <div class="text-sm text-slate-400">Create Fair Work compliant employment contracts</div>
@@ -19077,16 +19030,6 @@ function resetAIImport() {
                     <div>
                         <div class="font-semibold text-white mb-1">Award Wizard</div>
                         <div class="text-sm text-slate-400">Find the right award</div>
-                    </div>
-                </div>
-            </button>
-            
-            <button onclick="openRosterOptimizer(); closeToolsMenu();" class="text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
-                <div class="flex items-start gap-3">
-                    <span class="text-3xl">📅</span>
-                    <div>
-                        <div class="font-semibold text-white mb-1">Roster Optimizer</div>
-                        <div class="text-sm text-slate-400">Optimize staff scheduling</div>
                     </div>
                 </div>
             </button>
@@ -20079,7 +20022,7 @@ function resetAIImport() {
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
-                    <span>📄</span> New Employee Toolkit
+                    <span>🌟</span> New Employee Toolkit
                 </h2>
                 <p class="text-slate-400 text-sm">Everything you need to onboard new employees compliantly</p>
             </div>
@@ -21007,7 +20950,6 @@ function resetAIImport() {
 // ========================================
 
 function openNewEmployeeToolkit() {
-    console.log('📄 Opening New Employee Toolkit');
     const modal = document.getElementById('newEmployeeToolkitModal');
     if (modal) {
         modal.classList.remove('hidden');
@@ -27200,8 +27142,6 @@ function stopRealTimeCloudSync() {
     }
 }
 
-console.log('🔥 Comprehensive sync system loaded');
-
 // ============================================
 // FIREBASE-FIRST SYNC SYSTEM
 // No more localStorage dependency!
@@ -27210,7 +27150,6 @@ console.log('🔥 Comprehensive sync system loaded');
 // Save conversation to Firebase immediately
 async function saveConversationToFirebase(conversation) {
     if (!currentUser || !db) {
-        console.log('⚠️ Not signed in - conversation not saved');
         return false;
     }
     
@@ -27218,7 +27157,6 @@ async function saveConversationToFirebase(conversation) {
         await db.collection('users').doc(currentUser.uid)
                   .collection('conversations').doc(conversation.id)
                   .set(conversation, { merge: true });
-        console.log('✅ Conversation saved to Firebase:', conversation.id);
         return true;
     } catch (error) {
         console.error('❌ Failed to save conversation:', error);
@@ -27445,23 +27383,16 @@ async function loadAllDataFromFirebase() {
         // Update sidebar with loaded data
         if (typeof updateSidebarChats === 'function') {
             updateSidebarChats();
-            console.log('✅ Sidebar updated with Firebase conversations');
         }
         if (typeof updateSidebarBookmarks === 'function') {
             updateSidebarBookmarks();
-            console.log('✅ Sidebar updated with Firebase bookmarks');
         }
         
     } catch (error) {
-        console.error('❌ Failed to load data:', error);
+        console.error('Failed to load data:', error);
     }
 }
 
-// Override existing save functions to use Firebase
-console.log('🔥 Firebase-first sync system loaded');
-
-
-console.log('🔥 Firebase ready!');
 </script>
 </body>
 </html>
