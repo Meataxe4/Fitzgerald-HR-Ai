@@ -2,17 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fitzgerald HR Assistant - Beta Test</title>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#f59e0b">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Fitz HR">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="format-detection" content="telephone=no">
     
     <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" href="/icon-192.png">
@@ -448,13 +443,6 @@ header button[onclick*="logout"],
         max-width: calc(100vw - 16px) !important;
     }
     
-    /* Send button - bigger touch target */
-    button:has(span:contains('Send')) {
-        min-height: 48px !important;
-        padding-left: 24px !important;
-        padding-right: 24px !important;
-    }
-    
     /* Document preview modal - better mobile fit */
     #documentPreviewModal .max-w-5xl {
         max-width: 100% !important;
@@ -486,9 +474,9 @@ header button[onclick*="logout"],
        PHASE 5: MOBILE UX - SINGLE ROW HEADER
        ========================================== */
     
-    /* Main header - compact padding */
+    /* Main header - very compact */
     #mainHeader {
-        padding: 8px 12px !important;
+        padding: 6px 10px !important;
     }
     
     /* Header content - FORCE single row */
@@ -496,26 +484,24 @@ header button[onclick*="logout"],
         flex-direction: row !important;
         flex-wrap: nowrap !important;
         align-items: center !important;
-        gap: 8px !important;
+        gap: 6px !important;
     }
     
     /* Left side - compact */
     #headerLeft {
         flex: 0 0 auto !important;
-        gap: 8px !important;
+        gap: 6px !important;
     }
     
-    /* Sidebar button - touch friendly */
+    /* Sidebar button */
     .sidebar-toggle-btn-header {
-        padding: 8px !important;
-        min-width: 40px !important;
-        min-height: 40px !important;
+        padding: 6px !important;
     }
     
     /* Logo - smaller */
     #headerLeft .w-10 {
-        width: 32px !important;
-        height: 32px !important;
+        width: 28px !important;
+        height: 28px !important;
     }
     
     /* Hide title text on mobile */
@@ -523,27 +509,16 @@ header button[onclick*="logout"],
         display: none !important;
     }
     
-    /* Right side - compact */
+    /* Right side */
     #headerRight {
         flex: 1 1 auto !important;
         justify-content: flex-end !important;
-        gap: 6px !important;
+        gap: 4px !important;
     }
     
-    /* All header buttons - compact */
+    /* Header buttons */
     #headerRight button {
-        padding: 8px !important;
-        min-height: 36px !important;
-    }
-    
-    /* URGENT button */
-    #headerRight button[onclick*="activateCrisisMode"] {
-        padding: 6px 10px !important;
-    }
-    
-    /* Admin button - show for admins */
-    #adminButton.flex {
-        display: flex !important;
+        padding: 6px 8px !important;
     }
     
     /* Hide text labels on mobile */
@@ -553,20 +528,21 @@ header button[onclick*="logout"],
     
     /* Emoji sizes in header */
     #headerRight button span:first-child {
-        font-size: 16px !important;
+        font-size: 14px !important;
     }
     
-    /* Daily tip - compact */
+    /* Daily tip - very compact */
     #dailyTipBanner {
-        padding: 6px 12px !important;
+        padding: 4px 10px !important;
     }
     
     #dailyTipBanner .text-sm {
-        font-size: 11px !important;
+        font-size: 10px !important;
+        line-height: 1.3 !important;
     }
     
     #dailyTipBanner .text-lg {
-        font-size: 14px !important;
+        font-size: 12px !important;
     }
     
     #dailyTipBanner button {
@@ -611,49 +587,23 @@ header button[onclick*="logout"],
     #docBackBtn { order: 2 !important; }
     #docStartOverBtn { order: 3 !important; }
     
-    /* FIX 3: MUCH BIGGER MESSAGE INPUT */
-    /* 4 lines visible, very prominent and inviting */
+    /* FIX 3: MESSAGE INPUT - Readable but not huge */
     #messageInput {
-        min-height: 100px !important;     /* 4 lines visible! */
-        max-height: 220px !important;     /* Can expand even more */
-        padding: 18px !important;         /* Extra spacious */
-        font-size: 16px !important;       /* Prevent iOS zoom, readable */
-        line-height: 1.6 !important;      /* Extra readability */
-        border-width: 2px !important;     /* Visible border */
+        min-height: 60px !important;
+        max-height: 150px !important;
+        padding: 12px !important;
+        font-size: 16px !important;
+        line-height: 1.5 !important;
     }
     
-    /* Make focused state more obvious */
-    #messageInput:focus {
-        border-color: rgb(245 158 11) !important;  /* Amber on focus */
+    /* Send button */
+    #sendButton {
+        padding: 10px !important;
     }
     
-    /* Input container - more padding */
-    .flex.items-center.gap-3.bg-slate-900:has(#messageInput) {
-        padding: 14px !important;
-        border-radius: 16px !important;
-    }
-    
-    /* Send button - larger and prominent */
-    button:has(#sendButton),
-    button[onclick*="sendMessage"] {
-        min-height: 56px !important;
-        min-width: 56px !important;
-        padding: 16px !important;
-        border-radius: 12px !important;
-    }
-    
-    /* Voice button - larger */
-    button[onclick*="toggleVoiceInput"] {
-        min-height: 56px !important;
-        min-width: 56px !important;
-        padding: 16px !important;
-    }
-    
-    /* File upload button - larger */
-    button[onclick*="openUploadMenu"] {
-        min-height: 56px !important;
-        min-width: 56px !important;
-        padding: 16px !important;
+    /* Voice button */
+    #voiceButton {
+        padding: 10px !important;
     }
     
     /* FIX 4: CRISIS MODE MOBILE-RESPONSIVE */
@@ -1108,55 +1058,6 @@ header button[onclick*="logout"],
 /* Prevent zoom on input focus (iOS) */
 input, textarea, select {
     font-size: 16px;
-}
-
-/* Safe area support for devices with notches (iPhone X+) */
-@supports (padding: max(0px)) {
-    body {
-        padding-left: env(safe-area-inset-left);
-        padding-right: env(safe-area-inset-right);
-    }
-    
-    /* Input area - respect bottom safe area */
-    .bg-slate-800.border-t {
-        padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
-    }
-    
-    /* Footer disclaimer - respect bottom safe area */
-    .bg-slate-800\/50.border-t {
-        padding-bottom: max(12px, env(safe-area-inset-bottom)) !important;
-    }
-    
-    /* Full screen modals - respect safe areas */
-    @media (max-width: 768px) {
-        #toolsMenu > div,
-        #documentBuilderModal > div,
-        #contractBuilderStepsModal > div,
-        #venueSettingsModal > div,
-        #onboardingModal > div,
-        #legalAcceptanceModal > div,
-        #adminDashboardModal > div {
-            padding-top: max(16px, env(safe-area-inset-top)) !important;
-            padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
-            padding-left: max(16px, env(safe-area-inset-left)) !important;
-            padding-right: max(16px, env(safe-area-inset-right)) !important;
-        }
-    }
-}
-
-/* Smooth scrolling for all scrollable areas */
-* {
-    -webkit-overflow-scrolling: touch;
-}
-
-/* Prevent pull-to-refresh on mobile */
-body {
-    overscroll-behavior-y: contain;
-}
-
-/* Hide tap highlight on mobile */
-* {
-    -webkit-tap-highlight-color: transparent;
 }
 
         /* Crisis Mode Pulse Animation */
