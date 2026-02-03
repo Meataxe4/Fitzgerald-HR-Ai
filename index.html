@@ -1953,6 +1953,278 @@ input, textarea, select {
     background: #f8f9fa !important;
 }
 
+/* Form Section Styles */
+#employmentContractBuilder .form-section {
+    margin-bottom: 32px;
+    padding-bottom: 32px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+#employmentContractBuilder .form-section:last-of-type {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+#employmentContractBuilder .form-section-title {
+    color: #212529 !important;
+    font-size: 18px !important;
+    font-weight: 700 !important;
+    margin: 0 0 8px 0 !important;
+}
+
+#employmentContractBuilder .form-section-title.required::after {
+    content: ' *';
+    color: #dc3545;
+    font-weight: 700;
+}
+
+#employmentContractBuilder .form-section-description {
+    color: #6c757d !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    margin: 0 0 20px 0 !important;
+}
+
+#employmentContractBuilder .form-section-description a {
+    color: #007bff !important;
+    text-decoration: underline;
+}
+
+/* Input with Suffix */
+#employmentContractBuilder .input-with-suffix {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 300px;
+}
+
+#employmentContractBuilder .input-with-suffix .form-input {
+    flex: 0 0 120px;
+    width: 120px;
+}
+
+#employmentContractBuilder .input-suffix {
+    color: #495057 !important;
+    font-size: 14px !important;
+    white-space: nowrap;
+}
+
+/* Input with Prefix and Suffix */
+#employmentContractBuilder .input-with-prefix-suffix {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    max-width: 350px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+#employmentContractBuilder .input-with-prefix-suffix:focus-within {
+    border-color: #667eea;
+}
+
+#employmentContractBuilder .input-prefix {
+    padding: 12px 16px;
+    background: #f8f9fa !important;
+    color: #495057 !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    border-right: 1px solid #dee2e6;
+    white-space: nowrap;
+}
+
+#employmentContractBuilder .input-with-prefix-suffix .form-input {
+    flex: 1;
+    border: none !important;
+    border-radius: 0 !important;
+    padding: 12px 16px;
+    min-width: 100px;
+}
+
+#employmentContractBuilder .input-with-prefix-suffix .form-input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+#employmentContractBuilder .input-with-prefix-suffix .input-suffix {
+    padding: 12px 16px;
+    background: #f8f9fa !important;
+    color: #495057 !important;
+    font-size: 14px !important;
+    border-left: 1px solid #dee2e6;
+    white-space: nowrap;
+}
+
+/* Clause Preview Box */
+#employmentContractBuilder .clause-preview {
+    background: #f0f9f4 !important;
+    border: 2px solid #28a745;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+    transition: all 0.3s ease;
+}
+
+#employmentContractBuilder .clause-preview.collapsed {
+    display: none;
+}
+
+#employmentContractBuilder .clause-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+#employmentContractBuilder .clause-icon {
+    font-size: 20px;
+}
+
+#employmentContractBuilder .clause-title {
+    color: #212529 !important;
+    font-size: 16px !important;
+    font-weight: 600 !important;
+}
+
+#employmentContractBuilder .clause-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    margin-left: auto;
+}
+
+#employmentContractBuilder .clause-badge.included {
+    background: #28a745 !important;
+    color: #ffffff !important;
+}
+
+#employmentContractBuilder .clause-badge.optional {
+    background: #6c757d !important;
+    color: #ffffff !important;
+}
+
+#employmentContractBuilder .clause-content {
+    color: #495057 !important;
+    font-size: 14px !important;
+    line-height: 1.7 !important;
+}
+
+#employmentContractBuilder .clause-content p {
+    color: #495057 !important;
+    font-size: 14px !important;
+    line-height: 1.7 !important;
+    margin: 0 0 12px 0 !important;
+}
+
+#employmentContractBuilder .clause-content p:last-child {
+    margin-bottom: 0 !important;
+}
+
+#employmentContractBuilder .clause-content ul {
+    margin: 8px 0 12px 20px !important;
+    padding: 0 !important;
+}
+
+#employmentContractBuilder .clause-content li {
+    color: #495057 !important;
+    margin-bottom: 6px !important;
+    font-size: 14px !important;
+}
+
+/* Radio Group Vertical */
+#employmentContractBuilder .radio-group-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+#employmentContractBuilder .radio-option-card {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+    background: #ffffff !important;
+}
+
+#employmentContractBuilder .radio-option-card:hover {
+    border-color: #667eea;
+    background: #f8f9ff !important;
+}
+
+#employmentContractBuilder .radio-option-card input[type="radio"] {
+    margin-right: 12px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+#employmentContractBuilder .radio-option-card input[type="radio"]:checked + .radio-card-content {
+    color: #667eea !important;
+}
+
+#employmentContractBuilder .radio-option-card:has(input[type="radio"]:checked) {
+    border-color: #667eea;
+    background: #f0f4ff !important;
+}
+
+#employmentContractBuilder .radio-card-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #212529 !important;
+    font-size: 15px !important;
+}
+
+/* Optional Clause Toggle */
+#employmentContractBuilder .optional-clause-toggle {
+    margin: 16px 0;
+    padding: 12px 16px;
+    background: #f8f9fa !important;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+#employmentContractBuilder .optional-clause-toggle .checkbox-label {
+    padding: 0;
+    margin: 0;
+}
+
+#employmentContractBuilder .optional-clause-toggle .checkbox-text {
+    color: #212529 !important;
+    font-weight: 600 !important;
+}
+
+/* Roster Fields */
+#employmentContractBuilder .roster-fields {
+    background: #f8f9fa !important;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+    transition: all 0.3s ease;
+}
+
+#employmentContractBuilder .roster-fields.collapsed {
+    display: none;
+}
+
+#employmentContractBuilder .roster-fields .form-group {
+    margin-bottom: 20px;
+}
+
+#employmentContractBuilder .roster-fields .form-group:last-of-type {
+    margin-bottom: 16px;
+}
+
 #employmentContractBuilder .loading-overlay {
     position: fixed;
     top: 0;
@@ -19942,6 +20214,29 @@ function resetAIImport() {
     </div>
 </div>
 
+<!-- ========================================== -->
+<!-- CONTRACT BUILDER VALIDATION POPUP -->
+<!-- ========================================== -->
+<div id="contractValidationPopup" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[99999999]">
+    <div class="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+        <div class="text-center mb-4">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+                <span class="text-4xl">⚠️</span>
+            </div>
+            <h3 class="text-xl font-bold text-gray-900">Required Fields Missing</h3>
+            <p class="text-gray-600 mt-2">Please complete the following fields before continuing:</p>
+        </div>
+        
+        <div id="validationErrorList" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 max-h-60 overflow-y-auto">
+            <!-- Error items will be inserted here -->
+        </div>
+        
+        <button onclick="closeValidationPopup()" class="w-full px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-semibold transition-all">
+            OK, I'll Fix These
+        </button>
+    </div>
+</div>
+
 <script>
 // ========================================
 // ========================================
@@ -21735,11 +22030,51 @@ const contractBuilderState = {
     data: {
         step0: { businessState: '', knowMyAward: false, understandTemplate: false, detailedTermsAccepted: false, detailedTermsAcceptedAt: null, timestamp: null },
         step1: { positionTitle: '', dutiesOption: 'attach', duties: '', awardName: '', businessStructure: '', workplaceAddress: '', employmentType: '', isPermanent: true, startDate: '', endDate: '', hasProbation: false, probationLength: '6' },
-        step2: { hoursPerWeek: '', workPattern: '', overtimeApplies: true, shiftWork: false },
-        step3: { payRate: '', payFrequency: 'weekly', payMethod: 'bank', superannuation: true },
-        step4: { annualLeave: true, sickLeave: true, parentalLeave: true, longServiceLeave: true, publicHolidays: true },
+        step2: { 
+            hoursPerWeek: '', 
+            isShiftworker: 'no',
+            flexibleHours: false,
+            averagingHours: false,
+            onCallStandby: false,
+            includeRostersClause: false,
+            rosterNoticeDays: '7',
+            rosterChangeDays: '7',
+            employeeRosterNoticeDays: '7',
+            workPattern: '', 
+            overtimeApplies: true, 
+            shiftWork: false 
+        },
+        step3: { 
+            payRateType: 'hourly',
+            payRate: '', 
+            payFrequency: 'weekly', 
+            payMethod: 'bank', 
+            superannuation: true,
+            additionalSuper: false,
+            additionalSuperPercent: '',
+            penaltyRatesOvertime: false,
+            allowances: false,
+            commission: false,
+            commissionArrangement: '',
+            annualBonus: false,
+            annualPayReview: false
+        },
+        step4: { 
+            annualLeaveMeasure: 'weeks',
+            annualLeaveAmount: '4',
+            additionalParentalLeave: false,
+            additionalParentalLeaveWeeks: ''
+        },
         step5: { employeeObligations: true, conflictOfInterest: false, confidentiality: false, intellectualProperty: false, consultation: false, disputes: true },
-        step6: { noticeWeeks: { 'year1': '1', 'year1to3': '2', 'year3to5': '3', 'year5plus': '4' }, misconductClause: true },
+        step6: { 
+            resignationNotice: { 
+                year1: '1', 
+                year1to3: '2', 
+                year3to5: '3', 
+                year5plus: '4' 
+            }, 
+            misconductClause: false 
+        },
         step7: { reviewComplete: false },
         step8: { deliveryMethod: 'download' }
     },
@@ -21779,33 +22114,39 @@ function closeEmploymentContract() {
 
 // Navigation Functions
 function nextContractStep() {
-    console.log('🔄 nextContractStep called, currentStep:', contractBuilderState.currentStep);
-    
-    if (!validateContractStep(contractBuilderState.currentStep)) {
-        console.log('❌ Validation failed');
-        return;
-    }
-    
-    console.log('✅ Validation passed');
-    
-    saveCurrentStepData();
-    contractBuilderState.unsavedChanges = true;
-    
-    console.log('💾 Data saved, step0 data:', contractBuilderState.data.step0);
-    
-    // ✅ CHECK: If moving from Step 0 (Setup) to Step 1 (Position Details)
-    // Show detailed Terms of Use modal if not already accepted
-    if (contractBuilderState.currentStep === 0 && !contractBuilderState.data.step0.detailedTermsAccepted) {
-        console.log('📋 Showing Contract Builder Terms Modal');
-        showContractBuilderTermsModal();
-        return; // Don't proceed until terms are accepted
-    }
-    
-    if (contractBuilderState.currentStep < contractBuilderState.totalSteps - 1) {
-        contractBuilderState.currentStep++;
-        renderContractStep(contractBuilderState.currentStep);
-        updateContractProgressBar();
-        console.log('➡️ Moved to step:', contractBuilderState.currentStep);
+    try {
+        console.log('🔄 nextContractStep called, currentStep:', contractBuilderState.currentStep);
+        
+        if (!validateContractStep(contractBuilderState.currentStep)) {
+            console.log('❌ Validation failed');
+            return;
+        }
+        
+        console.log('✅ Validation passed');
+        
+        saveCurrentStepData();
+        contractBuilderState.unsavedChanges = true;
+        
+        console.log('💾 Data saved, current step data:', contractBuilderState.data[`step${contractBuilderState.currentStep}`]);
+        
+        // ✅ CHECK: If moving from Step 0 (Setup) to Step 1 (Position Details)
+        // Show detailed Terms of Use modal if not already accepted
+        if (contractBuilderState.currentStep === 0 && !contractBuilderState.data.step0.detailedTermsAccepted) {
+            console.log('📋 Showing Contract Builder Terms Modal');
+            showContractBuilderTermsModal();
+            return; // Don't proceed until terms are accepted
+        }
+        
+        if (contractBuilderState.currentStep < contractBuilderState.totalSteps - 1) {
+            contractBuilderState.currentStep++;
+            console.log('➡️ Moving to step:', contractBuilderState.currentStep);
+            renderContractStep(contractBuilderState.currentStep);
+            updateContractProgressBar();
+            console.log('✅ Step rendered successfully');
+        }
+    } catch (error) {
+        console.error('❌ Error in nextContractStep:', error);
+        alert('An error occurred: ' + error.message);
     }
 }
 
@@ -21927,64 +22268,164 @@ function jumpToContractStep(stepNumber) {
     }
 }
 
+// Validation Popup Functions
+function showValidationPopup(errors) {
+    const popup = document.getElementById('contractValidationPopup');
+    const errorList = document.getElementById('validationErrorList');
+    
+    if (popup && errorList) {
+        // Build error list HTML
+        errorList.innerHTML = errors.map(error => `
+            <div style="display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid #fecaca;">
+                <span style="color: #dc2626; font-weight: bold;">•</span>
+                <span style="color: #991b1b;">${error}</span>
+            </div>
+        `).join('');
+        
+        popup.classList.remove('hidden');
+    }
+}
+
+function closeValidationPopup() {
+    const popup = document.getElementById('contractValidationPopup');
+    if (popup) {
+        popup.classList.add('hidden');
+    }
+}
+
 // Validation Function
 function validateContractStep(stepNumber) {
     const stepData = contractBuilderState.data[`step${stepNumber}`];
+    const errors = [];
     
     switch(stepNumber) {
-        case 0:
+        case 0: {
             // Read directly from form elements (state not saved yet)
             const businessState = document.getElementById('businessState')?.value;
             const understandTemplate = document.getElementById('understandTemplate')?.checked;
             
             if (!businessState) {
-                alert('Please select your business state/territory.');
-                return false;
+                errors.push('Business State/Territory is required');
             }
             if (!understandTemplate) {
-                alert('Please acknowledge that this is a template tool.');
-                return false;
+                errors.push('You must acknowledge that this is a template tool');
             }
-            return true;
-        case 1:
-            if (!stepData.positionTitle) {
-                alert('Please enter the position title.');
-                return false;
+            break;
+        }
+        case 1: {
+            // Read directly from form elements (state not saved yet)
+            const positionTitle = document.getElementById('positionTitle')?.value;
+            const awardName = document.getElementById('awardName')?.value;
+            const employmentType = document.querySelector('input[name="employmentType"]:checked')?.value;
+            const startDate = document.getElementById('startDate')?.value;
+            const isPermanent = document.querySelector('input[name="isPermanent"]:checked')?.value;
+            const endDate = document.getElementById('endDate')?.value;
+            
+            if (!positionTitle) {
+                errors.push('Position Title is required');
             }
-            if (!stepData.awardName) {
-                alert('Please enter the award name.');
-                return false;
+            if (!awardName) {
+                errors.push('Modern Award is required');
             }
-            if (!stepData.employmentType) {
-                alert('Please select the employment type.');
-                return false;
+            if (!employmentType) {
+                errors.push('Employment Type is required');
             }
-            if (!stepData.startDate) {
-                alert('Please enter the start date.');
-                return false;
+            if (!startDate) {
+                errors.push('Start Date is required');
             }
-            return true;
-        case 2:
-            if (!stepData.hoursPerWeek && contractBuilderState.data.step1.employmentType !== 'casual') {
-                alert('Please enter the hours per week.');
-                return false;
+            if (isPermanent === 'false' && !endDate) {
+                errors.push('End Date is required for fixed-term employment');
             }
-            return true;
-        case 3:
-            if (!stepData.payRate) {
-                alert('Please enter the pay rate.');
-                return false;
+            break;
+        }
+        case 2: {
+            // Read directly from form elements (state not saved yet)
+            const hoursPerWeek = document.getElementById('hoursPerWeek')?.value;
+            const step1EmpType = contractBuilderState.data.step1.employmentType;
+            const isShiftworker = document.querySelector('input[name="isShiftworker"]:checked')?.value;
+            
+            // Check step1 employment type from saved state (already saved when we moved to step 2)
+            if (!hoursPerWeek && step1EmpType !== 'casual') {
+                errors.push('Hours per week is required');
             }
-            return true;
-        case 7:
-            if (!stepData.reviewComplete) {
-                alert('Please review all sections before generating the contract.');
-                return false;
+            if (!isShiftworker) {
+                errors.push('Shiftworker status is required');
             }
-            return true;
+            break;
+        }
+        case 3: {
+            // Read directly from form elements (state not saved yet)
+            const payRate = document.getElementById('payRate')?.value;
+            const payRateType = document.querySelector('input[name="payRateType"]:checked')?.value;
+            const payFrequency = document.querySelector('input[name="payFrequency"]:checked')?.value;
+            const payMethod = document.querySelector('input[name="payMethod"]:checked')?.value;
+            
+            if (!payRateType) {
+                errors.push('Pay rate type (hourly/weekly) is required');
+            }
+            if (!payRate) {
+                errors.push('Pay rate amount is required');
+            }
+            if (!payFrequency) {
+                errors.push('Pay frequency is required');
+            }
+            if (!payMethod) {
+                errors.push('Payment method is required');
+            }
+            break;
+        }
+        case 4: {
+            // Leave step - annual leave amount required for non-casuals
+            const step1EmpType = contractBuilderState.data.step1.employmentType;
+            const annualLeaveAmount = document.getElementById('annualLeaveAmount')?.value;
+            
+            if (step1EmpType !== 'casual' && !annualLeaveAmount) {
+                errors.push('Annual leave amount is required');
+            }
+            break;
+        }
+        case 5: {
+            // Additional terms - no required fields, all optional
+            break;
+        }
+        case 6: {
+            // Ending employment - check resignation notice fields
+            const resignYear1 = document.getElementById('resignYear1')?.value;
+            const resignYear1to3 = document.getElementById('resignYear1to3')?.value;
+            const resignYear3to5 = document.getElementById('resignYear3to5')?.value;
+            const resignYear5plus = document.getElementById('resignYear5plus')?.value;
+            
+            if (!resignYear1) {
+                errors.push('Resignation notice period for 1 year or less is required');
+            }
+            if (!resignYear1to3) {
+                errors.push('Resignation notice period for 1-3 years is required');
+            }
+            if (!resignYear3to5) {
+                errors.push('Resignation notice period for 3-5 years is required');
+            }
+            if (!resignYear5plus) {
+                errors.push('Resignation notice period for 5+ years is required');
+            }
+            break;
+        }
+        case 7: {
+            const reviewComplete = document.getElementById('reviewComplete')?.checked;
+            if (!reviewComplete) {
+                errors.push('You must confirm you have reviewed all sections');
+            }
+            break;
+        }
         default:
-            return true;
+            break;
     }
+    
+    if (errors.length > 0) {
+        showValidationPopup(errors);
+        return false;
+    }
+    
+    return true;
 }
 
 // Progress Bar Update
@@ -22025,6 +22466,23 @@ function saveCurrentStepData() {
     inputs.forEach(input => {
         const name = input.name || input.id;
         if (!name) return;
+        
+        // Special handling for Step 6 resignation notice nested fields
+        if (stepNumber === 6 && name.startsWith('resign')) {
+            if (!contractBuilderState.data[stepKey].resignationNotice) {
+                contractBuilderState.data[stepKey].resignationNotice = {};
+            }
+            if (name === 'resignYear1') {
+                contractBuilderState.data[stepKey].resignationNotice.year1 = input.value;
+            } else if (name === 'resignYear1to3') {
+                contractBuilderState.data[stepKey].resignationNotice.year1to3 = input.value;
+            } else if (name === 'resignYear3to5') {
+                contractBuilderState.data[stepKey].resignationNotice.year3to5 = input.value;
+            } else if (name === 'resignYear5plus') {
+                contractBuilderState.data[stepKey].resignationNotice.year5plus = input.value;
+            }
+            return;
+        }
         
         if (input.type === 'checkbox') {
             contractBuilderState.data[stepKey][name] = input.checked;
@@ -22143,8 +22601,11 @@ function renderContractStep(stepNumber) {
             break;
     }
     
-    // Scroll to top
-    container.scrollTop = 0;
+    // Scroll to top - the employmentContractBuilder div has overflow-y: auto
+    const contractBuilder = document.getElementById('employmentContractBuilder');
+    if (contractBuilder) {
+        contractBuilder.scrollTop = 0;
+    }
 }
 
 // ========================================
@@ -22157,6 +22618,7 @@ function getStep0Template() {
     return `
         <h2 class="step-title">Before You Begin</h2>
         <p class="step-description">This tool will take approximately 30 minutes to complete. Let's start with some basic information.</p>
+        <p style="color: #dc3545; font-size: 13px; margin-bottom: 20px;"><span style="font-weight: bold;">*</span> Required fields</p>
         
         <div class="warning-box">
             <div class="warning-box-title">⚠️ Important Legal Notice</div>
@@ -22215,7 +22677,7 @@ function getStep0Template() {
                 <input type="checkbox" class="checkbox-input" id="understandTemplate" name="understandTemplate" ${data.understandTemplate ? 'checked' : ''} required onchange="checkStep0Validation()">
                 <span class="checkbox-text">
                     <strong>I understand this is a template tool and not legal advice.</strong> 
-                    I will review any contract with a qualified professional before use.
+                    I will review any contract with a qualified professional before use. <span style="color: #dc3545; font-weight: bold;">*</span>
                 </span>
             </label>
         </div>
@@ -22380,6 +22842,7 @@ function getStep1Template() {
     return `
         <h2 class="step-title">Position Details</h2>
         <p class="step-description">Provide the key information about this employment position.</p>
+        <p style="color: #dc3545; font-size: 13px; margin-bottom: 20px;"><span style="font-weight: bold;">*</span> Required fields</p>
         
         <div class="form-group">
             <label class="form-label required">Position Title</label>
@@ -22605,115 +23068,331 @@ function getStep2Template() {
     const empType = contractBuilderState.data.step1.employmentType;
     
     return `
-        <h2 class="step-title">Hours and Work Pattern</h2>
-        <p class="step-description">Define the working hours and patterns for this ${empType} position.</p>
+        <h2 class="step-title">Hours of Work</h2>
+        <p class="step-description">Define the working hours and conditions for this ${empType} position.</p>
+        <p style="color: #dc3545; font-size: 13px; margin-bottom: 20px;"><span style="font-weight: bold;">*</span> Required fields</p>
         
-        ${empType !== 'casual' ? `
-        <div class="form-group">
-            <label class="form-label required">Ordinary Hours Per Week</label>
-            <input type="number" class="form-input" id="hoursPerWeek" name="hoursPerWeek" 
-                   value="${data.hoursPerWeek}" 
-                   placeholder="${empType === 'full-time' ? '38' : 'e.g., 20'}"
-                   min="1" max="38" step="0.5">
-            <span class="form-hint">${empType === 'full-time' ? 'Full-time is typically 38 hours per week' : 'Enter the regular weekly hours for this part-time position'}</span>
-        </div>
-        ` : `
-        <div class="info-box">
-            <div class="info-box-title">ℹ️ Casual Employment Hours</div>
-            <div class="info-box-content">
-                <p>For casual employees, hours are not guaranteed and will vary based on roster requirements.</p>
-                <p>Casual employees receive a 25% loading instead of paid leave entitlements.</p>
+        <!-- HOURS PER WEEK -->
+        <div class="form-section">
+            <h3 class="form-section-title required">How many ordinary hours per week will the employee work?</h3>
+            <p class="form-section-description">The maximum weekly ordinary hours can vary between awards. Full-time employees usually work an average of 38 ordinary hours per week, part-time employees work less.</p>
+            
+            ${empType !== 'casual' ? `
+            <div class="form-group">
+                <div class="input-with-suffix">
+                    <input type="number" class="form-input" id="hoursPerWeek" name="hoursPerWeek" 
+                           value="${data.hoursPerWeek}" 
+                           placeholder="${empType === 'full-time' ? '38' : 'e.g., 20'}"
+                           min="1" max="50" step="0.5">
+                    <span class="input-suffix">hour(s) per week</span>
+                </div>
             </div>
-        </div>
-        `}
-        
-        <div class="form-group">
-            <label class="form-label">Work Pattern / Roster</label>
-            <textarea class="form-textarea" id="workPattern" name="workPattern" 
-                      placeholder="Describe the typical work schedule, e.g., 'Monday to Friday, 9am-5pm' or 'Rotating roster including weekends and evenings' or 'As per roster - may include mornings, evenings, weekends'">${data.workPattern}</textarea>
-            <span class="form-hint">Describe the usual days, times, and any roster rotation</span>
-        </div>
-        
-        <div class="help-section">
-            <button class="help-toggle" onclick="toggleHelpSection(this)">
-                <span class="help-toggle-icon">▶</span>
-                <span class="help-toggle-text">What about weekend and evening work?</span>
-            </button>
-            <div class="help-content">
-                <p><strong>Hospitality businesses typically operate:</strong></p>
-                <ul>
-                    <li>7 days a week including weekends</li>
-                    <li>Early mornings through to late evenings</li>
-                    <li>Public holidays</li>
-                </ul>
-                <p><strong>Important:</strong> If employees work weekends, evenings, or public holidays, they are entitled to penalty rates as per the Modern Award (typically 150-250% of base rate).</p>
-                <p>Make sure your work pattern description reflects the reality of when employees may be rostered.</p>
+            
+            <div class="clause-preview">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Hours of work clause</span>
+                    <span class="clause-badge included">Included</span>
+                </div>
+                <div class="clause-content">
+                    <p>You are expected to work <strong>${data.hoursPerWeek || '[number]'}</strong> ordinary hour(s) per week. We may also request or require you to work additional hours if the additional hours are reasonable.</p>
+                </div>
             </div>
-        </div>
-        
-        ${empType !== 'casual' ? `
-        <div class="form-group">
-            <label class="checkbox-label">
-                <input type="checkbox" class="checkbox-input" id="overtimeApplies" name="overtimeApplies" 
-                       ${data.overtimeApplies ? 'checked' : ''}>
-                <span class="checkbox-text">Employee may be required to work reasonable additional hours (overtime as per Award)</span>
-            </label>
-        </div>
-        
-        <div class="help-section">
-            <button class="help-toggle" onclick="toggleHelpSection(this)">
-                <span class="help-toggle-icon">▶</span>
-                <span class="help-toggle-text">What are "reasonable additional hours"?</span>
-            </button>
-            <div class="help-content">
-                <p>Full-time and part-time employees can be asked to work reasonable additional hours beyond their ordinary hours.</p>
-                <p><strong>What's "reasonable" depends on:</strong></p>
-                <ul>
-                    <li>The employee's personal circumstances (family responsibilities, health, etc.)</li>
-                    <li>The nature of the role and industry (hospitality often requires flexibility)</li>
-                    <li>Whether the employee is compensated (overtime rates, time off in lieu)</li>
-                    <li>How much notice is given</li>
-                    <li>The employee's usual work pattern</li>
-                </ul>
-                <p>Overtime is typically paid at 150% for the first 2-3 hours, then 200% after that (check your Modern Award for exact rates).</p>
+            ` : `
+            <div class="info-box">
+                <div class="info-box-title">ℹ️ Casual Employment Hours</div>
+                <div class="info-box-content">
+                    <p>For casual employees, hours are not guaranteed and will vary based on roster requirements.</p>
+                    <p>Casual employees receive a 25% loading instead of paid leave entitlements.</p>
+                </div>
             </div>
-        </div>
-        ` : ''}
-        
-        <div class="form-group">
-            <label class="checkbox-label">
-                <input type="checkbox" class="checkbox-input" id="shiftWork" name="shiftWork" 
-                       ${data.shiftWork ? 'checked' : ''}>
-                <span class="checkbox-text">Position involves shift work (including nights, weekends, public holidays)</span>
-            </label>
+            `}
         </div>
         
-        <div class="help-section">
-            <button class="help-toggle" onclick="toggleHelpSection(this)">
-                <span class="help-toggle-icon">▶</span>
-                <span class="help-toggle-text">Why specify shift work?</span>
-            </button>
-            <div class="help-content">
-                <p>Shift workers may be entitled to additional benefits:</p>
-                <ul>
-                    <li><strong>Extra annual leave:</strong> Shift workers who regularly work Sundays and public holidays may get 5 weeks annual leave instead of 4 weeks</li>
-                    <li><strong>Penalty rates:</strong> Higher pay rates for evenings, weekends, and public holidays</li>
-                    <li><strong>Shift allowances:</strong> Some awards provide additional allowances for shift work</li>
-                </ul>
-                <p>Most hospitality roles involve some form of shift work due to the nature of the industry.</p>
+        <!-- SHIFTWORKER -->
+        <div class="form-section">
+            <h3 class="form-section-title required">Will the employee be a shiftworker?</h3>
+            <p class="form-section-description">Whether your employee is considered a shiftworker will depend on the award they are under. 
+            <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/employment-conditions/hours-of-work-breaks-and-rosters/shift-work', 'Fair Work Shift Work information');">Check the award to see if it has a definition of shiftworker</a> – they're not all the same.</p>
+            
+            <div class="radio-group-vertical">
+                <label class="radio-option-card">
+                    <input type="radio" name="isShiftworker" value="yes" ${data.isShiftworker === 'yes' ? 'checked' : ''}>
+                    <span class="radio-card-content">
+                        <span class="radio-indicator"></span>
+                        <span>Yes – they meet the award definition of a shiftworker</span>
+                    </span>
+                </label>
+                <label class="radio-option-card">
+                    <input type="radio" name="isShiftworker" value="no" ${data.isShiftworker === 'no' ? 'checked' : ''}>
+                    <span class="radio-card-content">
+                        <span class="radio-indicator"></span>
+                        <span>No – they will not be a shiftworker</span>
+                    </span>
+                </label>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Check the award for hours</span>
+                </button>
+                <div class="help-content">
+                    <p>The award sets out the:</p>
+                    <ul>
+                        <li>Maximum ordinary hours per day and week</li>
+                        <li>Span of hours (when work can be performed)</li>
+                        <li>Definition of shiftworker for your industry</li>
+                        <li>Penalty rates for shift work</li>
+                    </ul>
+                    <p>Shift workers may be entitled to 5 weeks annual leave instead of 4 weeks.</p>
+                </div>
             </div>
         </div>
         
-        <div class="info-box">
-            <div class="info-box-title">💡 Tip: Roster Flexibility</div>
-            <div class="info-box-content">
-                <p>In hospitality, rosters often change based on business needs. Make sure your work pattern description includes phrases like:</p>
-                <ul>
-                    <li>"As per roster" or "Rotating roster"</li>
-                    <li>"May include weekends and public holidays"</li>
-                    <li>"Hours may vary based on business requirements"</li>
-                </ul>
-                <p>This gives you flexibility while staying compliant with Fair Work requirements.</p>
+        <!-- FLEXIBLE HOURS (Optional) -->
+        <div class="form-section">
+            <h3 class="form-section-title">Flexible hours</h3>
+            <p class="form-section-description">Include this clause to provide for employee requests to work flexible hours.</p>
+            
+            <div class="optional-clause-toggle">
+                <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input" id="flexibleHours" name="flexibleHours" 
+                           ${data.flexibleHours ? 'checked' : ''} onchange="toggleClauseVisibility('flexibleHoursClause', this.checked)">
+                    <span class="checkbox-text">Include Flexible hours clause (optional)</span>
+                </label>
+            </div>
+            
+            <div class="clause-preview ${data.flexibleHours ? '' : 'collapsed'}" id="flexibleHoursClause">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Flexible hours clause</span>
+                    <span class="clause-badge optional">Optional to include</span>
+                </div>
+                <div class="clause-content">
+                    <p>You may have a right to make a written request for flexible working arrangements under the National Employment Standards, including for when to start and end work each day or your location of work. We may refuse your request in writing, but only if we have reasonable business grounds.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Why provide flexible hours?</span>
+                </button>
+                <div class="help-content">
+                    <p>Flexible hours can help support a positive employment relationship. For example, you might allow your employee to start and finish work earlier on some days to pick their child up from school.</p>
+                    <p>Some employees are legally entitled to request flexible working arrangements (including flexible hours and patterns of work). You can only refuse these requests if you have a good business reason.</p>
+                    <p>The right to request flexible working arrangements is a minimum entitlement in the National Employment Standards. You can't set conditions that are less than or exclude the National Employment Standards.</p>
+                    <p><a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/employment-conditions/flexibility-in-the-workplace/flexible-working-arrangements', 'Fair Work Flexible Working Arrangements');">Find out more about flexible working arrangements</a> on the Fair Work Ombudsman website.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- AVERAGING HOURS (Optional) -->
+        <div class="form-section">
+            <h3 class="form-section-title">Averaging hours over more than a week</h3>
+            <p class="form-section-description">This allows averaging of the employee's ordinary hours over more than one week. This means they can work more one week and less in another. 
+            <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/employment-conditions/hours-of-work-breaks-and-rosters/hours-of-work', 'Fair Work Averaging Hours');">Check the award for specific rules around averaging hours</a> before you select this clause.</p>
+            
+            <div class="optional-clause-toggle">
+                <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input" id="averagingHours" name="averagingHours" 
+                           ${data.averagingHours ? 'checked' : ''} onchange="toggleClauseVisibility('averagingHoursClause', this.checked)">
+                    <span class="checkbox-text">Include Averaging hours clause (optional)</span>
+                </label>
+            </div>
+            
+            <div class="clause-preview ${data.averagingHours ? '' : 'collapsed'}" id="averagingHoursClause">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Averaging hours clause</span>
+                    <span class="clause-badge optional">Optional to include</span>
+                </div>
+                <div class="clause-content">
+                    <p>Your hours per week may be averaged over more than one week in accordance with the award.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Example of averaging hours</span>
+                </button>
+                <div class="help-content">
+                    <p><strong>Example:</strong> Cindy works in a restaurant as a full-time employee and is covered by the Restaurant Industry Award. She averages her 38 hours a week by working 76 hours over 2 weeks. She works 42 hours the first week, and 34 hours the second week. 42 + 34 = 76 hours. So over 2 weeks she works an average of 38 hours per week.</p>
+                    <p>This arrangement is also consistent with other rules in the Restaurant Industry Award 2020 about ordinary hours of work.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ON CALL OR STAND-BY (Optional) -->
+        <div class="form-section">
+            <h3 class="form-section-title">On call or stand-by</h3>
+            <p class="form-section-description">Include this if you'll sometimes want your employee to be on call (stand-by).</p>
+            
+            <div class="optional-clause-toggle">
+                <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input" id="onCallStandby" name="onCallStandby" 
+                           ${data.onCallStandby ? 'checked' : ''} onchange="toggleClauseVisibility('onCallClause', this.checked)">
+                    <span class="checkbox-text">Include On call or stand-by clause (optional)</span>
+                </label>
+            </div>
+            
+            <div class="clause-preview ${data.onCallStandby ? '' : 'collapsed'}" id="onCallClause">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">On call or stand-by clause</span>
+                    <span class="clause-badge optional">Optional to include</span>
+                </div>
+                <div class="clause-content">
+                    <p>We may require you to be on call (on stand-by) for work outside your normal hours.</p>
+                    <p>Your on call or stand-by conditions will be in accordance with the award, including:</p>
+                    <ul>
+                        <li>rostering to be on call</li>
+                        <li>pay rates or allowances when on call</li>
+                        <li>pay rates if you are called out to work while on call.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">On call rules & Right to disconnect</span>
+                </button>
+                <div class="help-content">
+                    <p><strong>On call rules:</strong> On call means your employee is ready and available to work if you need them outside their normal work hours. If you want your employee to be on call (on stand-by), be aware that there may be rules in the award for:</p>
+                    <ul>
+                        <li>if and when you're allowed to roster your employee to be on call</li>
+                        <li>pay rates or allowances when on call</li>
+                        <li>pay rates if called out to work while on call</li>
+                    </ul>
+                    <p><strong>Right to disconnect:</strong> Employees have the right to refuse to monitor, read or respond to contact (or attempted contact) from their employer or a third-party outside of working hours, unless the refusal is unreasonable. Several factors must be considered when determining whether an employee's refusal is unreasonable, such as whether they are receiving compensation to be on call.</p>
+                    <p><a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/employment-conditions/hours-of-work-breaks-and-rosters/right-to-disconnect', 'Fair Work Right to Disconnect');">Learn about the right to disconnect</a> on the Fair Work Ombudsman's website.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ROSTERS (Optional) -->
+        <div class="form-section">
+            <h3 class="form-section-title">Rosters</h3>
+            <p class="form-section-description">Include this clause to specify roster notice periods. Check the award rules for rosters on the <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/employment-conditions/hours-of-work-breaks-and-rosters/rosters', 'Fair Work Rosters');">Fair Work Ombudsman's Rosters page</a>.</p>
+            
+            <div class="optional-clause-toggle">
+                <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input" id="includeRostersClause" name="includeRostersClause" 
+                           ${data.includeRostersClause ? 'checked' : ''} onchange="toggleRosterFields(this.checked)">
+                    <span class="checkbox-text">Include Rosters clause (optional)</span>
+                </label>
+            </div>
+            
+            <div class="roster-fields ${data.includeRostersClause ? '' : 'collapsed'}" id="rosterFields">
+                <div class="form-group">
+                    <label class="form-label">How long before the start of a roster will you provide it to your employee?</label>
+                    <p class="form-hint">e.g. 14 days (rosters are typically provided 7 or 14 days before they start).</p>
+                    <div class="input-with-suffix">
+                        <input type="number" class="form-input" id="rosterNoticeDays" name="rosterNoticeDays" 
+                               value="${data.rosterNoticeDays || '7'}" min="1" max="30" placeholder="7">
+                        <span class="input-suffix">day(s)</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">How much notice will you give your employee if you want to change the roster?</label>
+                    <p class="form-hint">Changes to rosters typically require 7 days' notice for full and part-time employees.</p>
+                    <div class="input-with-suffix">
+                        <input type="number" class="form-input" id="rosterChangeDays" name="rosterChangeDays" 
+                               value="${data.rosterChangeDays || '7'}" min="1" max="30" placeholder="7">
+                        <span class="input-suffix">day(s)</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">How much notice will you require from your employee when they ask for a roster change?</label>
+                    <p class="form-hint">e.g. 7 days.</p>
+                    <div class="input-with-suffix">
+                        <input type="number" class="form-input" id="employeeRosterNoticeDays" name="employeeRosterNoticeDays" 
+                               value="${data.employeeRosterNoticeDays || '7'}" min="1" max="30" placeholder="7">
+                        <span class="input-suffix">day(s)</span>
+                    </div>
+                </div>
+                
+                <div class="info-box" style="margin-bottom: 16px;">
+                    <div class="info-box-content">
+                        <p>ℹ️ Make sure you check the award. Some have rules around when to provide rosters and how many days' notice you need to change them.</p>
+                    </div>
+                </div>
+                
+                <div class="clause-preview" id="rostersClause">
+                    <div class="clause-header">
+                        <span class="clause-icon">📋</span>
+                        <span class="clause-title">Rosters clause</span>
+                        <span class="clause-badge included">Included</span>
+                    </div>
+                    <div class="clause-content">
+                        <p>We will provide you with your days and hours of work in a roster at least <strong>${data.rosterNoticeDays || '[number]'}</strong> day(s) before the start of the roster.</p>
+                        <p>If we need to change your roster, we will give you <strong>${data.rosterChangeDays || '[number]'}</strong> days' notice or ask for your agreement to the change.</p>
+                        <p>If you wish to ask for a change to your roster, we require <strong>${data.employeeRosterNoticeDays || '[number]'}</strong> days' notice. You will need our agreement to the change.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Roster rules</span>
+                </button>
+                <div class="help-content">
+                    <p>A roster is a timetable that shows the days and times your employees are required to work.</p>
+                    <p>Some awards have rules for rosters, including:</p>
+                    <ul>
+                        <li>when and how you need to provide them</li>
+                        <li>notice you need to give your employee to change their roster</li>
+                        <li>how to change a roster</li>
+                        <li>consultation with your employee about changes to their regular roster</li>
+                    </ul>
+                    <p>Your employee should also give you notice when asking for a change to their roster, and they'll need your agreement to the change.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- BREAKS (Always Included) -->
+        <div class="form-section">
+            <h3 class="form-section-title">Breaks</h3>
+            <p class="form-section-description">This provides a general clause in your employment contract about your employee's entitlement to breaks. Entitlements to breaks vary between awards, so check the award for details.</p>
+            
+            <div class="clause-preview">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Breaks clause</span>
+                    <span class="clause-badge included">Included</span>
+                </div>
+                <div class="clause-content">
+                    <p>Depending on the number of hours you work, you may be entitled to meal breaks. The award sets out:</p>
+                    <ul>
+                        <li>the length of the breaks</li>
+                        <li>when they need to be taken</li>
+                        <li>the rules about payment.</li>
+                    </ul>
+                    <p>You may also be entitled to rest breaks.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Breaks vary between awards</span>
+                </button>
+                <div class="help-content">
+                    <p>Awards have different rules for rest breaks and meal breaks, including:</p>
+                    <ul>
+                        <li>the length of the breaks</li>
+                        <li>when they need to be taken</li>
+                        <li>the rules about payment</li>
+                        <li>what happens if you don't provide a break</li>
+                    </ul>
+                    <p><a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/employment-conditions/hours-of-work-breaks-and-rosters/breaks', 'Fair Work Breaks information');">Find out more about breaks in your industry</a> on the Fair Work Ombudsman website.</p>
+                </div>
             </div>
         </div>
         
@@ -22725,13 +23404,61 @@ function getStep2Template() {
     `;
 }
 
+// Toggle clause visibility based on checkbox
+function toggleClauseVisibility(clauseId, isVisible) {
+    const clause = document.getElementById(clauseId);
+    if (clause) {
+        if (isVisible) {
+            clause.classList.remove('collapsed');
+        } else {
+            clause.classList.add('collapsed');
+        }
+    }
+    saveCurrentStepData();
+}
+
+function toggleRosterFields(isVisible) {
+    const rosterFields = document.getElementById('rosterFields');
+    if (rosterFields) {
+        if (isVisible) {
+            rosterFields.classList.remove('collapsed');
+        } else {
+            rosterFields.classList.add('collapsed');
+        }
+    }
+    saveCurrentStepData();
+}
+
 function initializeStep2Listeners() {
     const inputs = document.querySelectorAll('#contractStepContent input, #contractStepContent select, #contractStepContent textarea');
     inputs.forEach(input => {
         input.addEventListener('change', () => {
             saveCurrentStepData();
+            // Update clause previews with current values
+            updateStep2ClausePreviews();
         });
     });
+}
+
+function updateStep2ClausePreviews() {
+    // Update hours clause with current value
+    const hoursInput = document.getElementById('hoursPerWeek');
+    const rostersClause = document.getElementById('rostersClause');
+    
+    if (rostersClause) {
+        const rosterNoticeDays = document.getElementById('rosterNoticeDays')?.value || '[number]';
+        const rosterChangeDays = document.getElementById('rosterChangeDays')?.value || '[number]';
+        const employeeRosterNoticeDays = document.getElementById('employeeRosterNoticeDays')?.value || '[number]';
+        
+        const clauseContent = rostersClause.querySelector('.clause-content');
+        if (clauseContent) {
+            clauseContent.innerHTML = `
+                <p>We will provide you with your days and hours of work in a roster at least <strong>${rosterNoticeDays}</strong> day(s) before the start of the roster.</p>
+                <p>If we need to change your roster, we will give you <strong>${rosterChangeDays}</strong> days' notice or ask for your agreement to the change.</p>
+                <p>If you wish to ask for a change to your roster, we require <strong>${employeeRosterNoticeDays}</strong> days' notice. You will need our agreement to the change.</p>
+            `;
+        }
+    }
 }
 
 
@@ -22742,68 +23469,433 @@ function getStep3Template() {
     return `
         <h2 class="step-title">Pay and Conditions</h2>
         <p class="step-description">Set the compensation details for this position.</p>
+        <p style="color: #dc3545; font-size: 13px; margin-bottom: 20px;"><span style="font-weight: bold;">*</span> Required fields</p>
         
-        <div class="form-group">
-            <label class="form-label required">Pay Rate</label>
-            <input type="number" class="form-input" id="payRate" name="payRate" 
-                   value="${data.payRate}" 
-                   placeholder="${empType === 'casual' ? 'Hourly rate (including casual loading)' : 'Hourly or annual rate'}"
-                   step="0.01" min="0">
-            <span class="form-hint">
-                ${empType === 'casual' ? 'Include 25% casual loading in this rate' : 'Enter base rate (before super)'}
-                <button class="btn btn-link" style="padding: 0; display: inline;" onclick="openAwardCalculatorFromContract(); return false;">
-                    Use Award Calculator
+        <!-- PAY RATE -->
+        <div class="form-section">
+            <h3 class="form-section-title required">What is the employee's rate of pay?</h3>
+            <p class="form-section-description">Select an hourly or a weekly rate of pay. Use the <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/pay-and-wages/paying-wages', 'Fair Work Pay and Conditions Tool');">Fair Work Ombudsman's Pay and Conditions Tool</a> to find minimum pay rates for your employee's classification level.</p>
+            
+            <div class="radio-group-vertical" style="margin-bottom: 16px;">
+                <label class="radio-option-card">
+                    <input type="radio" name="payRateType" value="hourly" ${data.payRateType === 'hourly' ? 'checked' : ''} onchange="updatePayRateLabel()">
+                    <span class="radio-card-content">
+                        <span class="radio-indicator"></span>
+                        <span>hourly</span>
+                    </span>
+                </label>
+                <label class="radio-option-card">
+                    <input type="radio" name="payRateType" value="weekly" ${data.payRateType === 'weekly' ? 'checked' : ''} onchange="updatePayRateLabel()">
+                    <span class="radio-card-content">
+                        <span class="radio-indicator"></span>
+                        <span>weekly</span>
+                    </span>
+                </label>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label" id="payRateLabelText">Enter the ${data.payRateType || 'hourly'} pay rate</label>
+                <div class="input-with-prefix-suffix">
+                    <span class="input-prefix">$AUD</span>
+                    <input type="number" class="form-input" id="payRate" name="payRate" 
+                           value="${data.payRate}" 
+                           placeholder="0.00"
+                           step="0.01" min="0">
+                    <span class="input-suffix" id="payRateSuffix">per ${data.payRateType === 'weekly' ? 'week' : 'hour'}</span>
+                </div>
+            </div>
+            
+            <div class="info-box" style="border-color: #17a2b8; background: #e7f6f8;">
+                <div class="info-box-title" style="color: #0c5460;">ℹ️ Award minimum rate</div>
+                <div class="info-box-content">
+                    <p>Enter an amount that, at least, covers the minimum award rate that applies to your employee's classification. Award minimum rates for juniors, apprentices, trainees or employees on a supported wage may be lower.</p>
+                    <p>Some awards also include introductory minimum rates for the early stages of jobs or entry level jobs. These typically can only apply on a temporary basis. Check the award for more information.</p>
+                </div>
+            </div>
+            
+            <div class="clause-preview">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Pay clause</span>
+                    <span class="clause-badge included">Included</span>
+                </div>
+                <div class="clause-content">
+                    <p>You will be paid <strong>$${data.payRate || '[number]'}</strong> per <strong>${data.payRateType === 'weekly' ? 'week' : 'hour'}</strong>. This pay rate does not include superannuation, we'll pay this separately.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Wages</span>
                 </button>
-            </span>
-        </div>
-        
-        <div class="form-group">
-            <label class="form-label required">Pay Frequency</label>
-            <select class="form-select" id="payFrequency" name="payFrequency">
-                <option value="weekly" ${data.payFrequency === 'weekly' ? 'selected' : ''}>Weekly</option>
-                <option value="fortnightly" ${data.payFrequency === 'fortnightly' ? 'selected' : ''}>Fortnightly</option>
-                <option value="monthly" ${data.payFrequency === 'monthly' ? 'selected' : ''}>Monthly</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label class="form-label required">Payment Method</label>
-            <select class="form-select" id="payMethod" name="payMethod">
-                <option value="bank" ${data.payMethod === 'bank' ? 'selected' : ''}>Direct deposit (bank transfer)</option>
-                <option value="cash" ${data.payMethod === 'cash' ? 'selected' : ''}>Cash</option>
-                <option value="cheque" ${data.payMethod === 'cheque' ? 'selected' : ''}>Cheque</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label class="checkbox-label">
-                <input type="checkbox" class="checkbox-input" id="superannuation" name="superannuation" 
-                       ${data.superannuation ? 'checked' : ''}>
-                <span class="checkbox-text">Superannuation contributions apply (currently 11.5%)</span>
-            </label>
-        </div>
-        
-        <div class="help-section">
-            <button class="help-toggle" onclick="toggleHelpSection(this)">
-                <span class="help-toggle-icon">▶</span>
-                <span class="help-toggle-text">Understanding pay rates in hospitality</span>
-            </button>
-            <div class="help-content">
-                <p><strong>Base rates vs penalties:</strong></p>
-                <ul>
-                    <li>Base hourly rate is for ordinary hours</li>
-                    <li>Weekends attract penalty rates (usually 150-200%)</li>
-                    <li>Public holidays have higher penalties</li>
-                    <li>Night shifts may have loadings</li>
-                    <li>Casual employees get 25% loading instead of paid leave</li>
-                </ul>
-                <p>Check your Modern Award for specific rates.</p>
+                <div class="help-content">
+                    <p>Your employee's minimum wages are set out under the award – you must pay at least this amount. You'll also have to pay any applicable penalties, overtime, loadings and allowances.</p>
+                </div>
             </div>
         </div>
         
-        <div class="info-box">
-            <div class="info-box-content">
-                <p><strong>Minimum wage compliance:</strong> Ensure the pay rate meets or exceeds the minimum wage in the applicable Modern Award for this classification level.</p>
+        <!-- PAYMENT METHOD -->
+        <div class="form-section">
+            <h3 class="form-section-title required">How often will you pay your employee?</h3>
+            <p class="form-section-description">Check how often you have to pay by selecting the employee's award on the <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/pay-and-wages/paying-wages', 'Fair Work Frequency of Pay');">Fair Work Ombudsman's Frequency of pay page</a>.</p>
+            
+            <div class="radio-group-vertical" style="margin-bottom: 20px;">
+                <label class="radio-option-card">
+                    <input type="radio" name="payFrequency" value="weekly" ${data.payFrequency === 'weekly' ? 'checked' : ''}>
+                    <span class="radio-card-content">
+                        <span class="radio-indicator"></span>
+                        <span>weekly</span>
+                    </span>
+                </label>
+                <label class="radio-option-card">
+                    <input type="radio" name="payFrequency" value="fortnightly" ${data.payFrequency === 'fortnightly' ? 'checked' : ''}>
+                    <span class="radio-card-content">
+                        <span class="radio-indicator"></span>
+                        <span>fortnightly</span>
+                    </span>
+                </label>
+                <label class="radio-option-card">
+                    <input type="radio" name="payFrequency" value="monthly" ${data.payFrequency === 'monthly' ? 'checked' : ''}>
+                    <span class="radio-card-content">
+                        <span class="radio-indicator"></span>
+                        <span>monthly</span>
+                    </span>
+                </label>
+            </div>
+            
+            <h3 class="form-section-title required">How will you pay your employee?</h3>
+            <p class="form-section-description">It's up to you which method you use, but record keeping might be easier if you pay electronically into a bank account.</p>
+            
+            <div class="radio-group-vertical">
+                <label class="radio-option-card">
+                    <input type="radio" name="payMethod" value="bank" ${data.payMethod === 'bank' ? 'checked' : ''}>
+                    <span class="radio-card-content">
+                        <span class="radio-indicator"></span>
+                        <span>into the employee's nominated bank account</span>
+                    </span>
+                </label>
+                <label class="radio-option-card">
+                    <input type="radio" name="payMethod" value="cash" ${data.payMethod === 'cash' ? 'checked' : ''}>
+                    <span class="radio-card-content">
+                        <span class="radio-indicator"></span>
+                        <span>in cash</span>
+                    </span>
+                </label>
+                <label class="radio-option-card">
+                    <input type="radio" name="payMethod" value="cheque" ${data.payMethod === 'cheque' ? 'checked' : ''}>
+                    <span class="radio-card-content">
+                        <span class="radio-indicator"></span>
+                        <span>by cheque</span>
+                    </span>
+                </label>
+            </div>
+            
+            <div class="clause-preview">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Payment method clause</span>
+                    <span class="clause-badge included">Included</span>
+                </div>
+                <div class="clause-content">
+                    <p>We will pay you <strong>${data.payFrequency || 'weekly'}</strong> into your nominated bank account.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">How and when to pay</span>
+                </button>
+                <div class="help-content">
+                    <p>Most awards outline how often you must pay employees – generally it will be weekly or fortnightly, and it must be at least monthly. You must pay money. Do not 'pay in kind', for example, with goods or food.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- SUPERANNUATION -->
+        <div class="form-section">
+            <h3 class="form-section-title">Superannuation</h3>
+            <p class="form-section-description">To avoid the superannuation guarantee charge (SGC), you must ensure super guarantee (SG) contributions for eligible employees are:</p>
+            <ul style="color: #495057; margin: 0 0 16px 20px; font-size: 14px;">
+                <li>paid at the correct amount in full</li>
+                <li>received by their super fund by the quarterly due dates</li>
+                <li>paid into a fund that meets the choice of fund rules.</li>
+            </ul>
+            
+            <div class="clause-preview">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Superannuation clause</span>
+                    <span class="clause-badge included">Included</span>
+                </div>
+                <div class="clause-content">
+                    <p>If you are eligible for the super guarantee (SG), we will pay the contributions on your behalf in accordance with legislation and your award. We will pay contributions into a super fund of your choice.</p>
+                    <p>If you do not tell us your choice of fund, we may need to contact the ATO to find out if you have a 'stapled' super fund to make your SG contributions into.</p>
+                    <p>If you do not tell us your choice of fund and the ATO confirms you don't have a stapled super fund, we will pay your SG contributions to our default fund or another fund that meets the choice of fund rules.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Is your employee eligible?</span>
+                </button>
+                <div class="help-content">
+                    <p>Generally, all employees are eligible for super guarantee (SG) regardless of how much they earn. It doesn't matter if they are:</p>
+                    <ul>
+                        <li>full-time, part-time, or casual</li>
+                        <li>a temporary resident</li>
+                        <li>receiving a super pension or annuity while still working</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ADDITIONAL SUPER CONTRIBUTIONS (Optional) -->
+        <div class="form-section">
+            <h3 class="form-section-title">Additional super contributions</h3>
+            <p class="form-section-description">Select this clause if the <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/pay-and-wages/superannuation', 'Fair Work Additional Super');">award requires additional super</a> on top of the super guarantee (SG). If the award does not require additional super, you can choose whether to pay extra as an incentive to your employee.</p>
+            
+            <div class="optional-clause-toggle">
+                <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input" id="additionalSuper" name="additionalSuper" 
+                           ${data.additionalSuper ? 'checked' : ''} onchange="toggleClauseVisibility('additionalSuperClause', this.checked)">
+                    <span class="checkbox-text">Include Additional superannuation clause (optional)</span>
+                </label>
+            </div>
+            
+            <div class="clause-preview ${data.additionalSuper ? '' : 'collapsed'}" id="additionalSuperClause">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Additional superannuation clause</span>
+                    <span class="clause-badge optional">Optional to include</span>
+                </div>
+                <div class="clause-content">
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label class="form-label">Additional super percentage:</label>
+                        <div class="input-with-suffix" style="max-width: 150px;">
+                            <input type="number" class="form-input" id="additionalSuperPercent" name="additionalSuperPercent" 
+                                   value="${data.additionalSuperPercent || ''}" placeholder="0" step="0.5" min="0" max="50">
+                            <span class="input-suffix">%</span>
+                        </div>
+                    </div>
+                    <p>In addition to the SG, we will contribute <strong>${data.additionalSuperPercent || '[number]'} percent</strong> of your base salary into super.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PENALTY RATES AND OVERTIME (Optional) -->
+        <div class="form-section">
+            <h3 class="form-section-title">Penalty rates and overtime</h3>
+            <p class="form-section-description">Your employee may be entitled to overtime or penalty rates, depending on the hours they work. You must pay overtime or penalty rates if your employee is entitled to them, even if you do not include this clause.</p>
+            
+            <div class="optional-clause-toggle">
+                <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input" id="penaltyRatesOvertime" name="penaltyRatesOvertime" 
+                           ${data.penaltyRatesOvertime ? 'checked' : ''} onchange="toggleClauseVisibility('penaltyRatesClause', this.checked)">
+                    <span class="checkbox-text">Include Penalty rates and overtime clause (optional)</span>
+                </label>
+            </div>
+            
+            <div class="clause-preview ${data.penaltyRatesOvertime ? '' : 'collapsed'}" id="penaltyRatesClause">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Penalty rates and overtime clause</span>
+                    <span class="clause-badge optional">Optional to include</span>
+                </div>
+                <div class="clause-content">
+                    <p>You may be entitled to overtime rates under your award if you work:</p>
+                    <ul>
+                        <li>more than your ordinary hours of work</li>
+                        <li>outside the spread of ordinary hours.</li>
+                    </ul>
+                    <p>You may be entitled to penalty rates or shift loadings according to your award if you work:</p>
+                    <ul>
+                        <li>on a weekend</li>
+                        <li>on a public holiday</li>
+                        <li>late night or early morning shifts.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Rules vary between awards</span>
+                </button>
+                <div class="help-content">
+                    <p>The rules around penalty rates and overtime differ between awards. Check the award for details (including pay rates).</p>
+                    <p>Find out more about <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/pay-and-wages/penalty-rates-and-allowances', 'Fair Work Penalty Rates');">penalty rates</a> and <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/pay-and-wages/overtime', 'Fair Work Overtime');">overtime</a> on the Fair Work Ombudsman website.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ALLOWANCES (Optional) -->
+        <div class="form-section">
+            <h3 class="form-section-title">Allowances</h3>
+            <p class="form-section-description">Include this to add a general allowances clause to your employment agreement. You must pay allowances if your employee is entitled to them, even if you do not include this clause.</p>
+            
+            <div class="optional-clause-toggle">
+                <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input" id="allowances" name="allowances" 
+                           ${data.allowances ? 'checked' : ''} onchange="toggleClauseVisibility('allowancesClause', this.checked)">
+                    <span class="checkbox-text">Include Allowances clause (optional)</span>
+                </label>
+            </div>
+            
+            <div class="clause-preview ${data.allowances ? '' : 'collapsed'}" id="allowancesClause">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Allowances clause</span>
+                    <span class="clause-badge optional">Optional to include</span>
+                </div>
+                <div class="clause-content">
+                    <p>You may be entitled to allowances in accordance with your award, for example, if you:</p>
+                    <ul>
+                        <li>do certain tasks or are required to use a particular skill in the duties of your role</li>
+                        <li>have to use your own tools at work</li>
+                        <li>work in particular conditions, environments or in remote locations.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Examples of allowances</span>
+                </button>
+                <div class="help-content">
+                    <p>Allowances are extra payments you may have to provide to your employee if they:</p>
+                    <ul>
+                        <li>use their own vehicle for work</li>
+                        <li>work in unpleasant or hazardous conditions</li>
+                        <li>hold special qualifications or licenses</li>
+                        <li>are required to wear a uniform</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- COMMISSION (Optional) -->
+        <div class="form-section">
+            <h3 class="form-section-title">Commission</h3>
+            <p class="form-section-description">Include this if you plan to pay your employee commission on top of their wages or salary.</p>
+            
+            <div class="optional-clause-toggle">
+                <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input" id="commission" name="commission" 
+                           ${data.commission ? 'checked' : ''} onchange="toggleClauseVisibility('commissionClause', this.checked)">
+                    <span class="checkbox-text">Include Commission clause (optional)</span>
+                </label>
+            </div>
+            
+            <div class="clause-preview ${data.commission ? '' : 'collapsed'}" id="commissionClause">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Commission clause</span>
+                    <span class="clause-badge optional">Optional to include</span>
+                </div>
+                <div class="clause-content">
+                    <p>In addition to your base pay, we will pay you commission under the following arrangement:</p>
+                    <div class="form-group" style="margin: 12px 0;">
+                        <textarea class="form-textarea" id="commissionArrangement" name="commissionArrangement" 
+                                  placeholder="Describe the commission arrangement, e.g., '5% of sales revenue generated by the employee'"
+                                  style="min-height: 80px;">${data.commissionArrangement || ''}</textarea>
+                    </div>
+                    <p>If we agree to change this commission arrangement during your employment with us, we will update this employment contract. Any changes to your commission arrangement will be made according to the requirements of the modern award which applies to you.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">What commission is</span>
+                </button>
+                <div class="help-content">
+                    <p>Commission is an amount paid to your employee, usually based on how much they sell. It's often calculated as either:</p>
+                    <ul>
+                        <li>a percentage of sales</li>
+                        <li>a flat amount per sale or unit</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ANNUAL BONUS (Optional) -->
+        <div class="form-section">
+            <h3 class="form-section-title">Annual bonus</h3>
+            <p class="form-section-description">Include this if you want to use an annual bonus as an incentive to your employee.</p>
+            
+            <div class="optional-clause-toggle">
+                <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input" id="annualBonus" name="annualBonus" 
+                           ${data.annualBonus ? 'checked' : ''} onchange="toggleClauseVisibility('annualBonusClause', this.checked)">
+                    <span class="checkbox-text">Include Annual bonus clause (optional)</span>
+                </label>
+            </div>
+            
+            <div class="clause-preview ${data.annualBonus ? '' : 'collapsed'}" id="annualBonusClause">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Annual bonus clause</span>
+                    <span class="clause-badge optional">Optional to include</span>
+                </div>
+                <div class="clause-content">
+                    <p>We may pay you an annual bonus at our discretion, taking into consideration your performance and other relevant business factors.</p>
+                    <p>There is no guarantee that you will get a bonus, and you will not be eligible for one after your employment with us ends.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Why offer a bonus?</span>
+                </button>
+                <div class="help-content">
+                    <p>An annual bonus can be a great way to reward your employee's hard work throughout the year.</p>
+                    <p>Whether you pay a bonus will be your decision, based on your employee's performance, how the business is going and other relevant factors.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ANNUAL PAY REVIEW (Optional) -->
+        <div class="form-section">
+            <h3 class="form-section-title">Annual pay review</h3>
+            <p class="form-section-description">An annual pay review can help ensure you're paying your employee the right rate and keep them motivated.</p>
+            
+            <div class="optional-clause-toggle">
+                <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input" id="annualPayReview" name="annualPayReview" 
+                           ${data.annualPayReview ? 'checked' : ''} onchange="toggleClauseVisibility('annualPayReviewClause', this.checked)">
+                    <span class="checkbox-text">Include Annual pay review clause (optional)</span>
+                </label>
+            </div>
+            
+            <div class="clause-preview ${data.annualPayReview ? '' : 'collapsed'}" id="annualPayReviewClause">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Annual pay review clause</span>
+                    <span class="clause-badge optional">Optional to include</span>
+                </div>
+                <div class="clause-content">
+                    <p>We will review your pay annually to determine whether you are eligible for an increase, taking into consideration:</p>
+                    <ul>
+                        <li>your performance</li>
+                        <li>the business's financial position.</li>
+                    </ul>
+                    <p>Any increase in your pay, above your award entitlements, is our decision.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Benefits of a pay review</span>
+                </button>
+                <div class="help-content">
+                    <p>This is a good way to reward your employee's work over the year. It also helps ensure that you're keeping up with any award changes to minimum pay rates.</p>
+                </div>
             </div>
         </div>
         
@@ -22815,8 +23907,23 @@ function getStep3Template() {
     `;
 }
 
+function updatePayRateLabel() {
+    const payRateType = document.querySelector('input[name="payRateType"]:checked')?.value || 'hourly';
+    const labelText = document.getElementById('payRateLabelText');
+    const suffix = document.getElementById('payRateSuffix');
+    
+    if (labelText) {
+        labelText.textContent = 'Enter the ' + payRateType + ' pay rate';
+    }
+    if (suffix) {
+        suffix.textContent = 'per ' + (payRateType === 'weekly' ? 'week' : 'hour');
+    }
+    
+    saveCurrentStepData();
+}
+
 function initializeStep3Listeners() {
-    const inputs = document.querySelectorAll('#contractStepContent input, #contractStepContent select');
+    const inputs = document.querySelectorAll('#contractStepContent input, #contractStepContent select, #contractStepContent textarea');
     inputs.forEach(input => {
         input.addEventListener('change', () => {
             saveCurrentStepData();
@@ -22833,133 +23940,375 @@ function getStep4Template() {
     
     return `
         <h2 class="step-title">Leave Entitlements</h2>
-        <p class="step-description">Select which leave entitlements apply to this ${empType} position.</p>
+        <p class="step-description">This section outlines the leave entitlements for this ${empType} position.</p>
+        <p style="color: #dc3545; font-size: 13px; margin-bottom: 20px;"><span style="font-weight: bold;">*</span> Required fields</p>
         
         ${empType === 'casual' ? `
-        <div class="warning-box">
-            <div class="warning-box-content">
-                <p><strong>Note:</strong> Casual employees generally don't receive paid leave entitlements. Instead, they receive a casual loading (typically 25%) to compensate.</p>
-                <p>However, some leave types may still apply:</p>
-            </div>
-        </div>
-        ` : ''}
-        
-        ${empType !== 'casual' ? `
-        <div class="form-group">
-            <label class="checkbox-label">
-                <input type="checkbox" class="checkbox-input" id="annualLeave" name="annualLeave" 
-                       ${data.annualLeave ? 'checked' : ''}>
-                <span class="checkbox-text"><strong>Annual Leave</strong> (4 weeks per year for full-time, pro-rata for part-time)</span>
-            </label>
-        </div>
-        
-        <div class="help-section">
-            <button class="help-toggle" onclick="toggleHelpSection(this)">
-                <span class="help-toggle-icon">▶</span>
-                <span class="help-toggle-text">How much annual leave?</span>
-            </button>
-            <div class="help-content">
-                <p>Full-time and part-time permanent employees are entitled to 4 weeks paid annual leave per year.</p>
-                <p><strong>Shift workers</strong> may be entitled to 5 weeks if they regularly work on Sundays and public holidays.</p>
-            </div>
-        </div>
-        
-        <div class="form-group">
-            <label class="checkbox-label">
-                <input type="checkbox" class="checkbox-input" id="sickLeave" name="sickLeave" 
-                       ${data.sickLeave ? 'checked' : ''}>
-                <span class="checkbox-text"><strong>Personal/Carer's Leave</strong> (10 days per year, cumulative)</span>
-            </label>
-        </div>
-        
-        <div class="help-section">
-            <button class="help-toggle" onclick="toggleHelpSection(this)">
-                <span class="help-toggle-icon">▶</span>
-                <span class="help-toggle-text">Personal, carer's and sick leave</span>
-            </button>
-            <div class="help-content">
-                <p>Personal/carer's leave includes:</p>
-                <ul>
-                    <li><strong>Sick leave:</strong> When the employee is ill or injured</li>
-                    <li><strong>Carer's leave:</strong> When caring for an immediate family or household member who is sick or injured</li>
-                </ul>
-                <p>This leave is paid and accrues. Unused leave carries over to the next year.</p>
-            </div>
-        </div>
-        ` : ''}
-        
-        <div class="form-group">
-            <label class="checkbox-label">
-                <input type="checkbox" class="checkbox-input" id="parentalLeave" name="parentalLeave" 
-                       ${data.parentalLeave ? 'checked' : ''}>
-                <span class="checkbox-text"><strong>Parental Leave</strong> (12 months unpaid, eligibility conditions apply)</span>
-            </label>
-        </div>
-        
-        <div class="help-section">
-            <button class="help-toggle" onclick="toggleHelpSection(this)">
-                <span class="help-toggle-icon">▶</span>
-                <span class="help-toggle-text">Who gets parental leave?</span>
-            </button>
-            <div class="help-content">
-                <p>Employees are entitled to 12 months unpaid parental leave if they have worked for their employer for at least 12 months before the expected birth or adoption.</p>
-                <p>This includes birth-related leave and adoption leave.</p>
-            </div>
-        </div>
-        
-        ${empType !== 'casual' ? `
-        <div class="form-group">
-            <label class="checkbox-label">
-                <input type="checkbox" class="checkbox-input" id="longServiceLeave" name="longServiceLeave" 
-                       ${data.longServiceLeave ? 'checked' : ''}>
-                <span class="checkbox-text"><strong>Long Service Leave</strong> (State-based entitlements)</span>
-            </label>
-        </div>
-        
-        <div class="help-section">
-            <button class="help-toggle" onclick="toggleHelpSection(this)">
-                <span class="help-toggle-icon">▶</span>
-                <span class="help-toggle-text">Long service leave laws</span>
-            </button>
-            <div class="help-content">
-                <p>Long service leave is governed by state and territory laws. Entitlements vary by location:</p>
-                <ul>
-                    <li><strong>NSW:</strong> 2 months after 10 years</li>
-                    <li><strong>VIC:</strong> 13 weeks after 15 years (pro-rata after 7 years)</li>
-                    <li><strong>QLD:</strong> 8.6667 weeks after 10 years</li>
-                    <li><strong>Other states:</strong> Check your state's legislation</li>
-                </ul>
-            </div>
-        </div>
-        ` : ''}
-        
-        <div class="form-group">
-            <label class="checkbox-label">
-                <input type="checkbox" class="checkbox-input" id="publicHolidays" name="publicHolidays" 
-                       ${data.publicHolidays ? 'checked' : ''}>
-                <span class="checkbox-text"><strong>Public Holidays</strong> (Paid day off or penalty rates if working)</span>
-            </label>
-        </div>
-        
-        <div class="help-section">
-            <button class="help-toggle" onclick="toggleHelpSection(this)">
-                <span class="help-toggle-icon">▶</span>
-                <span class="help-toggle-text">Work on a public holiday</span>
-            </button>
-            <div class="help-content">
-                <p>Full-time and part-time employees get a paid day off on public holidays. If they work on a public holiday:</p>
-                <ul>
-                    <li>They must agree to work (unless their award requires it)</li>
-                    <li>They're paid penalty rates (usually 150-250%)</li>
-                    <li>They may get an alternative day off</li>
-                </ul>
-                <p>Check your Modern Award for specific public holiday rates and conditions.</p>
-            </div>
-        </div>
-        
-        <div class="info-box">
+        <div class="info-box" style="border-color: #17a2b8; background: #e7f6f8; margin-bottom: 24px;">
+            <div class="info-box-title" style="color: #0c5460;">ℹ️ Casual employees and leave</div>
             <div class="info-box-content">
-                <p><strong>Additional leave types:</strong> Employees may also be entitled to compassionate leave, community service leave, and family and domestic violence leave under the National Employment Standards.</p>
+                <p>Casual employees generally don't receive paid annual leave or personal/carer's leave. Instead, they receive a casual loading (typically 25%) to compensate.</p>
+                <p>However, casual employees are still entitled to:</p>
+                <ul>
+                    <li>2 days unpaid carer's leave per occasion</li>
+                    <li>2 days unpaid compassionate leave per occasion</li>
+                    <li>Community service leave</li>
+                    <li>Family and domestic violence leave</li>
+                </ul>
+            </div>
+        </div>
+        ` : ''}
+        
+        ${empType !== 'casual' ? `
+        <!-- ANNUAL LEAVE -->
+        <div class="form-section">
+            <h3 class="form-section-title required">Annual leave</h3>
+            <p class="form-section-description">An employee (other than a casual employee) generally accumulates 4 weeks of paid annual leave for each year of service with the employer based on their ordinary hours of work.</p>
+            <p class="form-section-description">Some awards can provide more than 4 weeks of annual leave. Shiftworkers who meet the definition of a shiftworker in their award are also entitled to an extra week of annual leave.</p>
+            <p class="form-section-description">Check your employee's award to see if they are entitled to more than 4 weeks of annual leave each year.</p>
+            
+            <div class="form-group">
+                <label class="form-label">Would you like to measure your employee's annual leave in weeks, days or hours?</label>
+                <div class="radio-group-vertical" style="margin-top: 8px;">
+                    <label class="radio-option-card">
+                        <input type="radio" name="annualLeaveMeasure" value="weeks" ${data.annualLeaveMeasure === 'weeks' ? 'checked' : ''} onchange="updateAnnualLeaveClause()">
+                        <span class="radio-card-content">
+                            <span class="radio-indicator"></span>
+                            <span>Weeks</span>
+                        </span>
+                    </label>
+                    <label class="radio-option-card">
+                        <input type="radio" name="annualLeaveMeasure" value="days" ${data.annualLeaveMeasure === 'days' ? 'checked' : ''} onchange="updateAnnualLeaveClause()">
+                        <span class="radio-card-content">
+                            <span class="radio-indicator"></span>
+                            <span>Days</span>
+                        </span>
+                    </label>
+                    <label class="radio-option-card">
+                        <input type="radio" name="annualLeaveMeasure" value="hours" ${data.annualLeaveMeasure === 'hours' ? 'checked' : ''} onchange="updateAnnualLeaveClause()">
+                        <span class="radio-card-content">
+                            <span class="radio-indicator"></span>
+                            <span>Hours</span>
+                        </span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">How much annual leave will your employee get each year?</label>
+                <p class="form-hint">Enter an amount based on their ordinary hours of work</p>
+                <div class="input-with-suffix">
+                    <input type="number" class="form-input" id="annualLeaveAmount" name="annualLeaveAmount" 
+                           value="${data.annualLeaveAmount || '4'}" min="1" max="52" placeholder="4" onchange="updateAnnualLeaveClause()">
+                    <span class="input-suffix" id="annualLeaveSuffix">${data.annualLeaveMeasure || 'week'}(s)</span>
+                </div>
+            </div>
+            
+            <div class="clause-preview" id="annualLeaveClause">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Annual leave clause</span>
+                    <span class="clause-badge included">Included</span>
+                </div>
+                <div class="clause-content">
+                    <p>You are entitled to <strong>${data.annualLeaveAmount || '4'} ${data.annualLeaveMeasure || 'week'}(s)</strong> of annual leave each year, based on your ordinary hours of work per week.</p>
+                    <p>We will provide any applicable annual leave loading entitlements in accordance with your award.</p>
+                    <p>Annual leave accumulates during the year. Any unused annual leave will roll over from year to year.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">How much annual leave</span>
+                </button>
+                <div class="help-content">
+                    <p>Under the National Employment Standards (NES), full-time and part-time employees accrue 4 weeks of paid annual leave each year, based on their ordinary hours of work. Annual leave accumulates gradually during the year (pro-rata for part-time employees).</p>
+                </div>
+            </div>
+        </div>
+        ` : ''}
+        
+        <!-- PARENTAL LEAVE -->
+        <div class="form-section">
+            <h3 class="form-section-title">Parental leave</h3>
+            <p class="form-section-description">Your employee may be entitled to 12 months of unpaid parental leave after working for you for at least 12 months.</p>
+            
+            <div class="clause-preview">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Parental leave clause</span>
+                    <span class="clause-badge included">Included</span>
+                </div>
+                <div class="clause-content">
+                    <p>After you have been working for us for 12 months or more, you may be entitled to take unpaid parental leave from your position for 12 months.</p>
+                    <p>You may also:</p>
+                    <ul>
+                        <li>request up to an extra 12 months of unpaid parental leave</li>
+                        <li>be entitled to Parental Leave Pay from the Australian Government, administered by Services Australia.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Who gets parental leave</span>
+                </button>
+                <div class="help-content">
+                    <p>The parental leave entitlement applies to full and part-time employees. Casual employees may also get parental leave if they:</p>
+                    <ul>
+                        <li>have worked for you on a regular and systematic basis for 12 months or more</li>
+                        <li>had a reasonable expectation of continuing their employment on a regular and systematic basis had it not been for the birth or adoption of a child.</li>
+                    </ul>
+                    <p><a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/leave/maternity-and-parental-leave', 'Fair Work Parental Leave');">Find out more about parental leave</a> on the Fair Work Ombudsman website.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- ADDITIONAL PARENTAL LEAVE (Optional) -->
+        <div class="form-section">
+            <h3 class="form-section-title">Additional parental leave</h3>
+            <p class="form-section-description">You can choose whether to provide additional paid leave (on top of the above parental leave) as an incentive.</p>
+            
+            <div class="optional-clause-toggle">
+                <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input" id="additionalParentalLeave" name="additionalParentalLeave" 
+                           ${data.additionalParentalLeave ? 'checked' : ''} onchange="toggleClauseVisibility('additionalParentalLeaveClause', this.checked)">
+                    <span class="checkbox-text">Include Additional parental leave clause (optional)</span>
+                </label>
+            </div>
+            
+            <div class="clause-preview ${data.additionalParentalLeave ? '' : 'collapsed'}" id="additionalParentalLeaveClause">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Additional parental leave clause</span>
+                    <span class="clause-badge optional">Optional to include</span>
+                </div>
+                <div class="clause-content">
+                    <div class="form-group" style="margin-bottom: 12px;">
+                        <label class="form-label">Number of weeks:</label>
+                        <div class="input-with-suffix" style="max-width: 150px;">
+                            <input type="number" class="form-input" id="additionalParentalLeaveWeeks" name="additionalParentalLeaveWeeks" 
+                                   value="${data.additionalParentalLeaveWeeks || ''}" placeholder="0" min="0" max="52">
+                            <span class="input-suffix">week(s)</span>
+                        </div>
+                    </div>
+                    <p>In addition to the above parental leave, we will provide you with <strong>${data.additionalParentalLeaveWeeks || '[number]'} week(s)</strong> paid parental leave.</p>
+                </div>
+            </div>
+        </div>
+        
+        ${empType !== 'casual' ? `
+        <!-- PERSONAL/CARER'S LEAVE -->
+        <div class="form-section">
+            <h3 class="form-section-title">Personal/carer's leave</h3>
+            <p class="form-section-description">This sets out your employee's entitlement to personal and carer's leave in your employment contract. Casual employees are entitled to unpaid carer's leave.</p>
+            
+            <div class="clause-preview">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Personal/carer's leave clause</span>
+                    <span class="clause-badge included">Included</span>
+                </div>
+                <div class="clause-content">
+                    <p>You are entitled to accrue 10 days paid personal/carer's leave (pro-rata for part-time employees) per year based on your ordinary hours of work. This is calculated as 1/26 of your ordinary hours of work in a year.</p>
+                    <p>You can take personal/carer's leave when you can't work because you are sick or injured. You can also use it to care for a member of your immediate family or household who requires care or support because of:</p>
+                    <ul>
+                        <li>personal injury</li>
+                        <li>personal illness</li>
+                        <li>an unexpected emergency.</li>
+                    </ul>
+                    <p>Your personal/carer's leave accrues throughout the year and from year to year. You must give us notice as soon as possible to take personal/carer's leave. We may also require evidence (such as a medical certificate).</p>
+                    <p>You are also entitled to 2 days unpaid carer's leave (in accordance with the National Employment Standards). This is available each time an immediate family member or household member needs your care or support. You can only take unpaid carer's leave if you do not have any paid personal/carer's leave left.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Personal, carer's and sick leave</span>
+                </button>
+                <div class="help-content">
+                    <p>Personal/carer's leave (sometimes called sick and carer's leave) is for when your employee cannot work because:</p>
+                    <ul>
+                        <li>they're sick or injured, or</li>
+                        <li>a member of their immediate family or household needs their care or support for an injury, sickness or unexpected emergency.</li>
+                    </ul>
+                    <p><a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/leave/sick-and-carers-leave', 'Fair Work Personal/Carer\\'s Leave');">Find out more about personal/carer's leave</a> on the Fair Work Ombudsman website.</p>
+                </div>
+            </div>
+        </div>
+        ` : ''}
+        
+        <!-- COMPASSIONATE LEAVE -->
+        <div class="form-section">
+            <h3 class="form-section-title">Compassionate leave</h3>
+            <p class="form-section-description">This sets out compassionate leave entitlements in your employment contract.</p>
+            
+            <div class="clause-preview">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Compassionate leave clause</span>
+                    <span class="clause-badge included">Included</span>
+                </div>
+                <div class="clause-content">
+                    <p>You are entitled to 2 days ${empType === 'casual' ? 'unpaid' : 'paid'} compassionate leave (in accordance with the National Employment Standards) each time:</p>
+                    <ul>
+                        <li>a member of your immediate family or household dies, or contracts or develops a life threatening illness or injury</li>
+                        <li>a child is stillborn, that would have been a member of your immediate family or household if born alive</li>
+                        <li>you or your current spouse or de facto partner has a miscarriage.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Paid or unpaid?</span>
+                </button>
+                <div class="help-content">
+                    <ul>
+                        <li>Full and part-time employees get paid compassionate leave.</li>
+                        <li>Casual employees get unpaid compassionate leave.</li>
+                    </ul>
+                    <p><a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/leave/compassionate-and-bereavement-leave', 'Fair Work Compassionate Leave');">Find out more about compassionate and bereavement leave</a> on the Fair Work Ombudsman website.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- COMMUNITY SERVICE LEAVE -->
+        <div class="form-section">
+            <h3 class="form-section-title">Community service leave</h3>
+            <p class="form-section-description">This sets out your employee's entitlement to community service leave in your employment contract.</p>
+            
+            <div class="clause-preview">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Community service leave clause</span>
+                    <span class="clause-badge included">Included</span>
+                </div>
+                <div class="clause-content">
+                    <p>You may be entitled to community service leave (in accordance with the National Employment Standards) for certain activities such as:</p>
+                    <ul>
+                        <li>voluntary emergency management activities</li>
+                        <li>jury duty and jury selection.</li>
+                    </ul>
+                    <p>You must give us:</p>
+                    <ul>
+                        <li>notice of your leave as soon as possible</li>
+                        <li>details of the period, or expected period, that you will be away from work.</li>
+                    </ul>
+                    <p>We may ask you to provide evidence that you require community service leave.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Community service leave entitlements</span>
+                </button>
+                <div class="help-content">
+                    <p>Community service leave is unpaid, except for the first 10 days of absence from work because of jury duty.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FAMILY AND DOMESTIC VIOLENCE LEAVE -->
+        <div class="form-section">
+            <h3 class="form-section-title">Family and domestic violence leave</h3>
+            <p class="form-section-description">This sets out your employee's entitlement to family and domestic violence leave in your employment contract.</p>
+            
+            <div class="clause-preview">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Family and domestic violence leave clause</span>
+                    <span class="clause-badge included">Included</span>
+                </div>
+                <div class="clause-content">
+                    <p>You may be entitled to 10 days of paid family and domestic violence leave (in accordance with the National Employment Standards) each 12 month period.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Who it applies to</span>
+                </button>
+                <div class="help-content">
+                    <p>All employees (including part-time and casual employees) are entitled to 10 full days of paid family and domestic violence leave each 12 month period.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PUBLIC HOLIDAYS -->
+        <div class="form-section">
+            <h3 class="form-section-title">Public holidays</h3>
+            <p class="form-section-description">This sets out the work and pay rules for public holidays in your employment contract.</p>
+            
+            <div class="clause-preview">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Public holiday clause</span>
+                    <span class="clause-badge included">Included</span>
+                </div>
+                <div class="clause-content">
+                    <p>You have a right to be absent from work on a public holiday.</p>
+                    <p>We may ask you to work on a public holiday. You may refuse our request to work (in accordance with the Fair Work Act 2009) if:</p>
+                    <ul>
+                        <li>your refusal is reasonable, or</li>
+                        <li>our request is unreasonable.</li>
+                    </ul>
+                    <p>If you work on a public holiday, you are entitled to any additional entitlements under your award, such as public holiday penalty rates.</p>
+                    <p>If you do not work on a public holiday, and it falls on a day you would normally work, you are entitled to be paid your base rate of pay for your ordinary hours of work on that day.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Work on a public holiday</span>
+                </button>
+                <div class="help-content">
+                    <ul>
+                        <li>You can ask an employee to work on a public holiday – if it's reasonable.</li>
+                        <li>If they do work, you'll need to pay them at least the award rates for public holidays.</li>
+                    </ul>
+                    <p><a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/leave/public-holidays', 'Fair Work Public Holidays');">Find out more about public holidays</a> on the Fair Work Ombudsman website.</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- LONG SERVICE LEAVE -->
+        <div class="form-section">
+            <h3 class="form-section-title">Long service leave</h3>
+            <p class="form-section-description">This provides an overview of long service leave in your employment contract.</p>
+            <p class="form-section-description">Long service leave rules differ between states and territories, as well as between industries, so specific details are not provided here.</p>
+            
+            <div class="clause-preview">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Long service leave clause</span>
+                    <span class="clause-badge included">Included</span>
+                </div>
+                <div class="clause-content">
+                    <p>You may be entitled to long service leave after working with us for a specific period of time in accordance with relevant state or territory legislation or the Fair Work Act.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Long service leave laws</span>
+                </button>
+                <div class="help-content">
+                    <p>State and territory laws (and in some cases long service leave terms under pre-modern awards which have been preserved under the National Employment Standards) set out how:</p>
+                    <ul>
+                        <li>long service leave accrues</li>
+                        <li>when it can be taken</li>
+                        <li>how much leave an employee gets</li>
+                    </ul>
+                </div>
             </div>
         </div>
         
@@ -22969,6 +24318,32 @@ function getStep4Template() {
             <button class="btn btn-primary" onclick="nextContractStep()">Next: Additional Terms →</button>
         </div>
     `;
+}
+
+function updateAnnualLeaveClause() {
+    const measure = document.querySelector('input[name="annualLeaveMeasure"]:checked')?.value || 'weeks';
+    const amount = document.getElementById('annualLeaveAmount')?.value || '4';
+    
+    // Update suffix label
+    const suffix = document.getElementById('annualLeaveSuffix');
+    if (suffix) {
+        suffix.textContent = measure === 'weeks' ? 'week(s)' : measure === 'days' ? 'day(s)' : 'hour(s)';
+    }
+    
+    // Update clause preview
+    const clause = document.getElementById('annualLeaveClause');
+    if (clause) {
+        const clauseContent = clause.querySelector('.clause-content');
+        if (clauseContent) {
+            clauseContent.innerHTML = `
+                <p>You are entitled to <strong>${amount} ${measure === 'weeks' ? 'week' : measure === 'days' ? 'day' : 'hour'}(s)</strong> of annual leave each year, based on your ordinary hours of work per week.</p>
+                <p>We will provide any applicable annual leave loading entitlements in accordance with your award.</p>
+                <p>Annual leave accumulates during the year. Any unused annual leave will roll over from year to year.</p>
+            `;
+        }
+    }
+    
+    saveCurrentStepData();
 }
 
 function initializeStep4Listeners() {
@@ -23157,130 +24532,247 @@ function getStep6Template() {
     
     return `
         <h2 class="step-title">Ending Employment</h2>
-        <p class="step-description">Define the notice periods and termination terms.</p>
+        <p class="step-description">Define the notice periods and termination terms for this employment contract.</p>
+        <p style="color: #dc3545; font-size: 13px; margin-bottom: 20px;"><span style="font-weight: bold;">*</span> Required fields</p>
         
-        <div class="info-box">
-            <div class="info-box-content">
-                <p>Notice periods must comply with the National Employment Standards and any applicable Modern Award.</p>
-            </div>
-        </div>
-        
-        <div class="form-group">
-            <label class="form-label required">Employee Resignation Notice Periods</label>
-            <p class="form-hint" style="margin-bottom: 12px;">Enter the number of weeks notice required based on length of service:</p>
+        <!-- RESIGNATION NOTICE -->
+        <div class="form-section">
+            <h3 class="form-section-title required">Resignation notice</h3>
+            <p class="form-section-description"><strong>If your employee resigns, how much notice will they need to give you?</strong></p>
+            <p class="form-section-description">Insert at least the <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/ending-employment/notice-and-final-pay', 'Fair Work Minimum Notice');">minimum notice</a> from the award. If your award isn't listed, choose 'Other' then find it in the linked list of awards. If the award doesn't have rules, consider using the same minimum notice period required for dismissals.</p>
             
-            <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 16px;">
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px;">
-                    <div style="color: #495057; font-weight: 600;">Period of Service</div>
-                    <div style="color: #495057; font-weight: 600;">Weeks Notice</div>
+            <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin: 16px 0;">
+                <div style="display: grid; grid-template-columns: 1fr 200px; gap: 12px; margin-bottom: 16px;">
+                    <div style="color: #212529; font-weight: 600;">Continuous employment</div>
+                    <div style="color: #212529; font-weight: 600;">Minimum notice period</div>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px; align-items: center;">
-                    <div style="color: #212529;">1 year or less</div>
-                    <input type="number" class="form-input" id="noticeYear1" name="noticeYear1" 
-                           value="${data.noticeWeeks.year1}" min="1" max="8" style="margin: 0;">
+                <div style="display: grid; grid-template-columns: 1fr 200px; gap: 12px; margin-bottom: 12px; align-items: center;">
+                    <div style="color: #495057;">1 year or less</div>
+                    <div class="input-with-suffix">
+                        <input type="number" class="form-input" id="resignYear1" name="resignYear1" 
+                               value="${data.resignationNotice?.year1 || '1'}" min="1" max="12" style="width: 80px;" onchange="updateResignationClause()">
+                        <span class="input-suffix">week(s)</span>
+                    </div>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px; align-items: center;">
-                    <div style="color: #212529;">More than 1 year, up to 3 years</div>
-                    <input type="number" class="form-input" id="noticeYear1to3" name="noticeYear1to3" 
-                           value="${data.noticeWeeks.year1to3}" min="1" max="8" style="margin: 0;">
+                <div style="display: grid; grid-template-columns: 1fr 200px; gap: 12px; margin-bottom: 12px; align-items: center;">
+                    <div style="color: #495057;">More than 1 year to 3 years</div>
+                    <div class="input-with-suffix">
+                        <input type="number" class="form-input" id="resignYear1to3" name="resignYear1to3" 
+                               value="${data.resignationNotice?.year1to3 || '2'}" min="1" max="12" style="width: 80px;" onchange="updateResignationClause()">
+                        <span class="input-suffix">week(s)</span>
+                    </div>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; margin-bottom: 12px; align-items: center;">
-                    <div style="color: #212529;">More than 3 years, up to 5 years</div>
-                    <input type="number" class="form-input" id="noticeYear3to5" name="noticeYear3to5" 
-                           value="${data.noticeWeeks.year3to5}" min="1" max="8" style="margin: 0;">
+                <div style="display: grid; grid-template-columns: 1fr 200px; gap: 12px; margin-bottom: 12px; align-items: center;">
+                    <div style="color: #495057;">More than 3 years to 5 years</div>
+                    <div class="input-with-suffix">
+                        <input type="number" class="form-input" id="resignYear3to5" name="resignYear3to5" 
+                               value="${data.resignationNotice?.year3to5 || '3'}" min="1" max="12" style="width: 80px;" onchange="updateResignationClause()">
+                        <span class="input-suffix">week(s)</span>
+                    </div>
                 </div>
                 
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: center;">
-                    <div style="color: #212529;">More than 5 years</div>
-                    <input type="number" class="form-input" id="noticeYear5plus" name="noticeYear5plus" 
-                           value="${data.noticeWeeks.year5plus}" min="1" max="8" style="margin: 0;">
+                <div style="display: grid; grid-template-columns: 1fr 200px; gap: 12px; align-items: center;">
+                    <div style="color: #495057;">More than 5 years</div>
+                    <div class="input-with-suffix">
+                        <input type="number" class="form-input" id="resignYear5plus" name="resignYear5plus" 
+                               value="${data.resignationNotice?.year5plus || '4'}" min="1" max="12" style="width: 80px;" onchange="updateResignationClause()">
+                        <span class="input-suffix">week(s)</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="clause-preview" id="resignationClause">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Resignation notice clause</span>
+                    <span class="clause-badge included">Included</span>
+                </div>
+                <div class="clause-content">
+                    <p>You must give us the following minimum notice periods if you resign.</p>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 12px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #dee2e6;">
+                                <th style="text-align: left; padding: 8px 0; color: #212529;">Continuous employment with us</th>
+                                <th style="text-align: left; padding: 8px 0; color: #212529;">Minimum notice period</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 8px 0; color: #495057;">1 year or less</td>
+                                <td style="padding: 8px 0; color: #495057;"><strong>${data.resignationNotice?.year1 || '1'}</strong> week(s)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 8px 0; color: #495057;">More than 1 year to 3 years</td>
+                                <td style="padding: 8px 0; color: #495057;"><strong>${data.resignationNotice?.year1to3 || '2'}</strong> week(s)</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 8px 0; color: #495057;">More than 3 years to 5 years</td>
+                                <td style="padding: 8px 0; color: #495057;"><strong>${data.resignationNotice?.year3to5 || '3'}</strong> week(s)</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: #495057;">More than 5 years</td>
+                                <td style="padding: 8px 0; color: #495057;"><strong>${data.resignationNotice?.year5plus || '4'}</strong> week(s)</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Notice period</span>
+                </button>
+                <div class="help-content">
+                    <p>When an employee resigns, they have to give notice to you. The minimum notice period is the length of time they must give notice to you before they end employment.</p>
                 </div>
             </div>
         </div>
         
-        <div class="help-section">
-            <button class="help-toggle" onclick="toggleHelpSection(this)">
-                <span class="help-toggle-icon">▶</span>
-                <span class="help-toggle-text">Minimum notice periods</span>
-            </button>
-            <div class="help-content">
-                <p>The National Employment Standards requires <strong>minimum</strong> notice periods when an employer dismisses an employee:</p>
-                <ul>
-                    <li>1 year or less: 1 week</li>
-                    <li>1-3 years: 2 weeks</li>
-                    <li>3-5 years: 3 weeks</li>
-                    <li>5+ years: 4 weeks</li>
-                </ul>
-                <p>Employees over 45 with 2+ years service get an extra week. Check your Modern Award for any additional requirements.</p>
+        <!-- DISMISSAL NOTICE -->
+        <div class="form-section">
+            <h3 class="form-section-title">Dismissal notice</h3>
+            <p class="form-section-description">If you dismiss an employee, you must provide specific minimum notice periods or the equivalent pay (unless they're in the list of employees that do not get notice). You should also <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/ending-employment/notice-and-final-pay', 'Fair Work Notice in Award');">check the minimum notice in the award</a> – some have longer notice periods. If your award isn't listed, choose 'Other' then find it in the linked list of awards.</p>
+            
+            <div class="clause-preview">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Dismissal notice clause</span>
+                    <span class="clause-badge included">Included</span>
+                </div>
+                <div class="clause-content">
+                    <p>You are entitled to the following minimum notice periods (or payment in lieu of notice) if we end your employment. This does not apply if we end your employment for serious misconduct.</p>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 12px;">
+                        <thead>
+                            <tr style="border-bottom: 2px solid #dee2e6;">
+                                <th style="text-align: left; padding: 8px 0; color: #212529;">Continuous employment with us</th>
+                                <th style="text-align: left; padding: 8px 0; color: #212529;">Minimum notice period</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 8px 0; color: #495057;">1 year or less</td>
+                                <td style="padding: 8px 0; color: #495057;"><strong>1 week</strong></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 8px 0; color: #495057;">More than 1 year to 3 years</td>
+                                <td style="padding: 8px 0; color: #495057;"><strong>2 weeks</strong></td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #dee2e6;">
+                                <td style="padding: 8px 0; color: #495057;">More than 3 years to 5 years</td>
+                                <td style="padding: 8px 0; color: #495057;"><strong>3 weeks</strong></td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 8px 0; color: #495057;">More than 5 years</td>
+                                <td style="padding: 8px 0; color: #495057;"><strong>4 weeks</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p style="margin-top: 12px;">You may be entitled to a longer minimum notice period under your award.</p>
+                    <p>You will get an extra week of notice if you're older than 45 years and have worked for us for at least 2 years.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Some employees do not get notice</span>
+                </button>
+                <div class="help-content">
+                    <p>Exclusions apply. For example, employees do not get notice if their employment is terminated:</p>
+                    <ul>
+                        <li>for serious misconduct</li>
+                        <li>if they're a casual employee</li>
+                        <li>if they're employed for a specified period of time, task, or season</li>
+                    </ul>
+                </div>
             </div>
         </div>
         
-        <div class="warning-box">
-            <div class="warning-box-content">
-                <p><strong>Redundancy pay:</strong> Employees may be entitled to redundancy pay if their position is made redundant. This is separate from notice periods and is based on years of service.</p>
+        <!-- REDUNDANCY -->
+        <div class="form-section">
+            <h3 class="form-section-title">Redundancy</h3>
+            <p class="form-section-description">Redundancy can occur when you either no longer need an employee's job to be done by anyone (e.g. you get technology that replaces the job), or you become insolvent or bankrupt.</p>
+            
+            <div class="clause-preview">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Redundancy clause</span>
+                    <span class="clause-badge included">Included</span>
+                </div>
+                <div class="clause-content">
+                    <p>If your position is terminated due to redundancy, any notice and redundancy pay entitlements will be in accordance with the National Employment Standards and your award.</p>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Redundancy pay</span>
+                </button>
+                <div class="help-content">
+                    <p>When an employee's job is made redundant, you may have to provide redundancy pay if:</p>
+                    <ul>
+                        <li>the employee has at least 12 months continuous service</li>
+                        <li>your business has 15 or more employees</li>
+                    </ul>
+                    <p>The amount depends on the employee's years of service.</p>
+                </div>
             </div>
         </div>
         
-        <div class="help-section">
-            <button class="help-toggle" onclick="toggleHelpSection(this)">
-                <span class="help-toggle-icon">▶</span>
-                <span class="help-toggle-text">When does redundancy pay apply?</span>
-            </button>
-            <div class="help-content">
-                <p>Redundancy pay applies when:</p>
-                <ul>
-                    <li>The employer no longer needs the employee's job to be done</li>
-                    <li>The employee has worked for at least 12 months</li>
-                    <li>The business has 15 or more employees</li>
-                </ul>
-                <p><strong>Redundancy pay scale (National Employment Standards):</strong></p>
-                <ul>
-                    <li>1-2 years: 4 weeks</li>
-                    <li>2-3 years: 6 weeks</li>
-                    <li>3-4 years: 7 weeks</li>
-                    <li>4-5 years: 8 weeks</li>
-                    <li>5-6 years: 10 weeks</li>
-                    <li>6-7 years: 11 weeks</li>
-                    <li>7-8 years: 13 weeks</li>
-                    <li>8-9 years: 14 weeks</li>
-                    <li>9-10 years: 16 weeks</li>
-                    <li>10+ years: 12 weeks</li>
-                </ul>
+        <!-- MISCONDUCT (Optional) -->
+        <div class="form-section">
+            <h3 class="form-section-title">Misconduct</h3>
+            <p class="form-section-description">This sets out that you can dismiss (fire) the employee for serious misconduct without notice.</p>
+            
+            <div class="optional-clause-toggle">
+                <label class="checkbox-label">
+                    <input type="checkbox" class="checkbox-input" id="misconductClause" name="misconductClause" 
+                           ${data.misconductClause ? 'checked' : ''} onchange="toggleClauseVisibility('misconductClausePreview', this.checked)">
+                    <span class="checkbox-text">Include Misconduct clause (optional)</span>
+                </label>
             </div>
-        </div>
-        
-        <div class="form-group">
-            <label class="checkbox-label">
-                <input type="checkbox" class="checkbox-input" id="misconductClause" name="misconductClause" 
-                       ${data.misconductClause ? 'checked' : ''}>
-                <span class="checkbox-text">Include <strong>Serious Misconduct</strong> clause (allows immediate termination without notice in specific circumstances)</span>
-            </label>
-        </div>
-        
-        <div class="help-section">
-            <button class="help-toggle" onclick="toggleHelpSection(this)">
-                <span class="help-toggle-icon">▶</span>
-                <span class="help-toggle-text">What is serious misconduct?</span>
-            </button>
-            <div class="help-content">
-                <p>Serious misconduct includes behavior that is:</p>
-                <ul>
-                    <li>Willful or deliberate</li>
-                    <li>Inconsistent with continuing employment</li>
-                    <li>Destroys the trust relationship</li>
-                </ul>
-                <p><strong>Examples:</strong></p>
-                <ul>
-                    <li>Theft or fraud</li>
-                    <li>Violence or threatening behavior</li>
-                    <li>Being intoxicated at work</li>
-                    <li>Refusal to carry out lawful instructions</li>
-                    <li>Serious breaches of health and safety</li>
-                </ul>
-                <p>For serious misconduct, an employer can dismiss without notice or payment in lieu.</p>
+            
+            <div class="clause-preview ${data.misconductClause ? '' : 'collapsed'}" id="misconductClausePreview">
+                <div class="clause-header">
+                    <span class="clause-icon">📋</span>
+                    <span class="clause-title">Misconduct clause</span>
+                    <span class="clause-badge optional">Optional to include</span>
+                </div>
+                <div class="clause-content">
+                    <p>We may terminate your employment without notice, or payment in lieu of notice, if you engage in serious misconduct.</p>
+                    <p>Serious misconduct is when an employee:</p>
+                    <ul>
+                        <li>causes serious and imminent risk to the health and safety of another person or to the reputation, viability or profits of their employer's business, or</li>
+                        <li>wilfully or deliberately behaves in a way that's inconsistent with continuing their employment.</li>
+                    </ul>
+                    <p>Examples of serious misconduct include:</p>
+                    <ul>
+                        <li>theft</li>
+                        <li>fraud</li>
+                        <li>violence/assault</li>
+                        <li>sexual harassment</li>
+                        <li>serious breaches of health and safety requirements</li>
+                        <li>being drunk or affected by drugs at work</li>
+                        <li>refusing to carry out work duties.</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="help-section">
+                <button class="help-toggle" onclick="toggleHelpSection(this)">
+                    <span class="help-toggle-icon">▶</span>
+                    <span class="help-toggle-text">Serious misconduct</span>
+                </button>
+                <div class="help-content">
+                    <p>To dismiss an employee without notice, you must believe that their conduct is serious enough to justify immediate dismissal.</p>
+                    <p>It's a good idea to document the misconduct, in case your employee makes an unfair dismissal claim. Be careful dismissing an employee this way. If the dismissal is found to be unfair, you may have to pay compensation, lost wages and/or give the employee their job back.</p>
+                    <p><a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/ending-employment/dismissal/misconduct-and-serious-misconduct', 'Fair Work Serious Misconduct');">Check the Fair Work Ombudsman's website for more information on serious misconduct</a>.</p>
+                </div>
             </div>
         </div>
         
@@ -23290,6 +24782,51 @@ function getStep6Template() {
             <button class="btn btn-primary" onclick="nextContractStep()">Next: Review Contract →</button>
         </div>
     `;
+}
+
+function updateResignationClause() {
+    const year1 = document.getElementById('resignYear1')?.value || '1';
+    const year1to3 = document.getElementById('resignYear1to3')?.value || '2';
+    const year3to5 = document.getElementById('resignYear3to5')?.value || '3';
+    const year5plus = document.getElementById('resignYear5plus')?.value || '4';
+    
+    const clause = document.getElementById('resignationClause');
+    if (clause) {
+        const clauseContent = clause.querySelector('.clause-content');
+        if (clauseContent) {
+            clauseContent.innerHTML = `
+                <p>You must give us the following minimum notice periods if you resign.</p>
+                <table style="width: 100%; border-collapse: collapse; margin-top: 12px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #dee2e6;">
+                            <th style="text-align: left; padding: 8px 0; color: #212529;">Continuous employment with us</th>
+                            <th style="text-align: left; padding: 8px 0; color: #212529;">Minimum notice period</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid #dee2e6;">
+                            <td style="padding: 8px 0; color: #495057;">1 year or less</td>
+                            <td style="padding: 8px 0; color: #495057;"><strong>${year1}</strong> week(s)</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #dee2e6;">
+                            <td style="padding: 8px 0; color: #495057;">More than 1 year to 3 years</td>
+                            <td style="padding: 8px 0; color: #495057;"><strong>${year1to3}</strong> week(s)</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid #dee2e6;">
+                            <td style="padding: 8px 0; color: #495057;">More than 3 years to 5 years</td>
+                            <td style="padding: 8px 0; color: #495057;"><strong>${year3to5}</strong> week(s)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #495057;">More than 5 years</td>
+                            <td style="padding: 8px 0; color: #495057;"><strong>${year5plus}</strong> week(s)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            `;
+        }
+    }
+    
+    saveCurrentStepData();
 }
 
 function initializeStep6Listeners() {
@@ -23311,6 +24848,7 @@ function getStep7Template() {
     let summary = `
         <h2 class="step-title">Review Your Contract</h2>
         <p class="step-description">Review all the information you've entered. Click any section to edit.</p>
+        <p style="color: #dc3545; font-size: 13px; margin-bottom: 20px;"><span style="font-weight: bold;">*</span> Required fields</p>
         
         <div class="warning-box">
             <div class="warning-box-content">
@@ -23375,24 +24913,67 @@ function getStep7Template() {
             </div>
             <div style="display: grid; grid-template-columns: 200px 1fr; gap: 12px; color: #495057;">
                 <div style="font-weight: 600;">Pay Rate:</div>
-                <div>$${data.step3.payRate || '0.00'} per hour</div>
+                <div>$${data.step3.payRate || '0.00'} per ${data.step3.payRateType === 'weekly' ? 'week' : 'hour'}</div>
                 
                 <div style="font-weight: 600;">Pay Frequency:</div>
                 <div>${formatPayFrequency(data.step3.payFrequency)}</div>
                 
+                <div style="font-weight: 600;">Payment Method:</div>
+                <div>${data.step3.payMethod === 'bank' ? 'Bank account' : data.step3.payMethod === 'cash' ? 'Cash' : 'Cheque'}</div>
+                
                 <div style="font-weight: 600;">Superannuation:</div>
-                <div>${data.step3.superannuation ? 'Included (11.5%)' : 'Not applicable'}</div>
+                <div>Included (as per legislation)</div>
+                
+                ${data.step3.additionalSuper ? `
+                <div style="font-weight: 600;">Additional Super:</div>
+                <div>${data.step3.additionalSuperPercent || '0'}%</div>
+                ` : ''}
+                
+                ${data.step3.penaltyRatesOvertime ? `
+                <div style="font-weight: 600;">Penalty Rates/Overtime:</div>
+                <div>Clause included</div>
+                ` : ''}
+                
+                ${data.step3.allowances ? `
+                <div style="font-weight: 600;">Allowances:</div>
+                <div>Clause included</div>
+                ` : ''}
+                
+                ${data.step3.commission ? `
+                <div style="font-weight: 600;">Commission:</div>
+                <div>Clause included</div>
+                ` : ''}
+                
+                ${data.step3.annualBonus ? `
+                <div style="font-weight: 600;">Annual Bonus:</div>
+                <div>Clause included</div>
+                ` : ''}
+                
+                ${data.step3.annualPayReview ? `
+                <div style="font-weight: 600;">Annual Pay Review:</div>
+                <div>Clause included</div>
+                ` : ''}
             </div>
         </div>
     `;
     
     // Step 4: Leave
+    const empTypeForLeave = data.step1.employmentType;
     const leaveItems = [];
-    if (data.step4.annualLeave) leaveItems.push('Annual Leave');
-    if (data.step4.sickLeave) leaveItems.push('Personal/Carer\'s Leave');
-    if (data.step4.parentalLeave) leaveItems.push('Parental Leave');
-    if (data.step4.longServiceLeave) leaveItems.push('Long Service Leave');
-    if (data.step4.publicHolidays) leaveItems.push('Public Holidays');
+    
+    if (empTypeForLeave !== 'casual') {
+        leaveItems.push(`Annual Leave (${data.step4.annualLeaveAmount || '4'} ${data.step4.annualLeaveMeasure || 'week'}s per year)`);
+        leaveItems.push('Personal/Carer\'s Leave (10 days per year)');
+    }
+    leaveItems.push('Parental Leave (12 months unpaid)');
+    if (data.step4.additionalParentalLeave) {
+        leaveItems.push(`Additional Parental Leave (${data.step4.additionalParentalLeaveWeeks || '0'} weeks paid)`);
+    }
+    leaveItems.push('Compassionate Leave (2 days per occasion)');
+    leaveItems.push('Community Service Leave');
+    leaveItems.push('Family and Domestic Violence Leave (10 days per year)');
+    leaveItems.push('Public Holidays');
+    leaveItems.push('Long Service Leave (as per state legislation)');
     
     summary += `
         <div style="background: #f8f9fa; border: 2px solid #dee2e6; border-radius: 12px; padding: 24px; margin-bottom: 20px;">
@@ -23401,9 +24982,9 @@ function getStep7Template() {
                 <button class="btn btn-link" onclick="jumpToContractStep(4)" style="padding: 8px 16px;">Edit</button>
             </div>
             <div style="color: #495057;">
-                ${leaveItems.length > 0 ? leaveItems.map(item => `
+                ${leaveItems.map(item => `
                     <div style="padding: 8px 0; border-bottom: 1px solid #dee2e6;">✓ ${item}</div>
-                `).join('') : '<em>No leave entitlements selected</em>'}
+                `).join('')}
             </div>
         </div>
     `;
@@ -23431,19 +25012,23 @@ function getStep7Template() {
         </div>
     `;
     
-    // Step 6: Notice Periods
+    // Step 6: Ending Employment
+    const resignNotice = data.step6.resignationNotice || { year1: '1', year1to3: '2', year3to5: '3', year5plus: '4' };
     summary += `
         <div style="background: #f8f9fa; border: 2px solid #dee2e6; border-radius: 12px; padding: 24px; margin-bottom: 20px;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3 style="color: #212529; font-size: 20px; font-weight: 700; margin: 0;">Notice Periods</h3>
+                <h3 style="color: #212529; font-size: 20px; font-weight: 700; margin: 0;">Ending Employment</h3>
                 <button class="btn btn-link" onclick="jumpToContractStep(6)" style="padding: 8px 16px;">Edit</button>
             </div>
             <div style="color: #495057;">
-                <div style="padding: 8px 0;">1 year or less: ${data.step6.noticeWeeks.year1} weeks</div>
-                <div style="padding: 8px 0;">1-3 years: ${data.step6.noticeWeeks.year1to3} weeks</div>
-                <div style="padding: 8px 0;">3-5 years: ${data.step6.noticeWeeks.year3to5} weeks</div>
-                <div style="padding: 8px 0;">5+ years: ${data.step6.noticeWeeks.year5plus} weeks</div>
-                ${data.step6.misconductClause ? '<div style="padding: 8px 0; margin-top: 12px;">✓ Serious Misconduct clause included</div>' : ''}
+                <div style="font-weight: 600; margin-bottom: 8px;">Resignation Notice Periods:</div>
+                <div style="padding: 4px 0;">1 year or less: ${resignNotice.year1} week(s)</div>
+                <div style="padding: 4px 0;">1-3 years: ${resignNotice.year1to3} week(s)</div>
+                <div style="padding: 4px 0;">3-5 years: ${resignNotice.year3to5} week(s)</div>
+                <div style="padding: 4px 0;">5+ years: ${resignNotice.year5plus} week(s)</div>
+                <div style="margin-top: 12px; padding-top: 12px; border-top: 1px solid #dee2e6;">✓ Dismissal notice clause included (NES minimum)</div>
+                <div style="padding: 4px 0;">✓ Redundancy clause included</div>
+                ${data.step6.misconductClause ? '<div style="padding: 4px 0;">✓ Misconduct clause included</div>' : ''}
             </div>
         </div>
     `;
@@ -23453,7 +25038,7 @@ function getStep7Template() {
             <label class="checkbox-label">
                 <input type="checkbox" class="checkbox-input" id="reviewComplete" name="reviewComplete">
                 <span class="checkbox-text">
-                    <strong>I have reviewed all sections and confirm the information is correct.</strong>
+                    <strong>I have reviewed all sections and confirm the information is correct.</strong> <span style="color: #dc3545; font-weight: bold;">*</span>
                 </span>
             </label>
         </div>
@@ -23714,14 +25299,67 @@ function buildContractHTML() {
             <h2>5. REMUNERATION</h2>
             <div class="clause">
                 <h3>5.1 Pay Rate</h3>
-                <p>The Employee will be paid at the rate of <strong>$${data.step3.payRate} per hour</strong>${data.step1.employmentType === 'casual' ? ' (including 25% casual loading)' : ''}.</p>
+                <p>The Employee will be paid <strong>$${data.step3.payRate} per ${data.step3.payRateType === 'weekly' ? 'week' : 'hour'}</strong>${data.step1.employmentType === 'casual' ? ' (including 25% casual loading)' : ''}. This pay rate does not include superannuation, which will be paid separately.</p>
                 
-                <h3>5.2 Payment Frequency</h3>
-                <p>Payment will be made <strong>${data.step3.payFrequency}</strong> by ${data.step3.payMethod === 'bank' ? 'direct deposit to the Employee\'s nominated bank account' : data.step3.payMethod}.</p>
+                <h3>5.2 Payment Method</h3>
+                <p>The Employee will be paid <strong>${data.step3.payFrequency}</strong> ${data.step3.payMethod === 'bank' ? 'into the Employee\'s nominated bank account' : data.step3.payMethod === 'cash' ? 'in cash' : 'by cheque'}.</p>
                 
-                ${data.step3.superannuation ? `
-                    <h3>5.3 Superannuation</h3>
-                    <p>The Employer will make superannuation contributions on behalf of the Employee in accordance with the Superannuation Guarantee legislation (currently 11.5% of ordinary time earnings).</p>
+                <h3>5.3 Superannuation</h3>
+                <p>If the Employee is eligible for the super guarantee (SG), the Employer will pay the contributions on the Employee's behalf in accordance with legislation and the applicable award. The Employer will pay contributions into a super fund of the Employee's choice.</p>
+                <p>If the Employee does not advise their choice of fund, the Employer may need to contact the ATO to find out if the Employee has a 'stapled' super fund to make SG contributions into.</p>
+                <p>If the Employee does not advise their choice of fund and the ATO confirms there is no stapled super fund, the Employer will pay SG contributions to the default fund or another fund that meets the choice of fund rules.</p>
+                
+                ${data.step3.additionalSuper ? `
+                <h3>5.4 Additional Superannuation</h3>
+                <p>In addition to the SG, the Employer will contribute <strong>${data.step3.additionalSuperPercent || '0'} percent</strong> of the Employee's base salary into superannuation.</p>
+                ` : ''}
+                
+                ${data.step3.penaltyRatesOvertime ? `
+                <h3>${data.step3.additionalSuper ? '5.5' : '5.4'} Penalty Rates and Overtime</h3>
+                <p>The Employee may be entitled to overtime rates under the applicable award if they work:</p>
+                <ul>
+                    <li>more than their ordinary hours of work</li>
+                    <li>outside the spread of ordinary hours.</li>
+                </ul>
+                <p>The Employee may be entitled to penalty rates or shift loadings according to the award if they work:</p>
+                <ul>
+                    <li>on a weekend</li>
+                    <li>on a public holiday</li>
+                    <li>late night or early morning shifts.</li>
+                </ul>
+                ` : ''}
+                
+                ${data.step3.allowances ? `
+                <h3>${data.step3.additionalSuper && data.step3.penaltyRatesOvertime ? '5.6' : data.step3.additionalSuper || data.step3.penaltyRatesOvertime ? '5.5' : '5.4'} Allowances</h3>
+                <p>The Employee may be entitled to allowances in accordance with the applicable award, for example, if they:</p>
+                <ul>
+                    <li>do certain tasks or are required to use a particular skill in the duties of their role</li>
+                    <li>have to use their own tools at work</li>
+                    <li>work in particular conditions, environments or in remote locations.</li>
+                </ul>
+                ` : ''}
+                
+                ${data.step3.commission ? `
+                <h3>Commission</h3>
+                <p>In addition to the base pay, the Employer will pay the Employee commission under the following arrangement:</p>
+                <p><em>${data.step3.commissionArrangement || '[Commission arrangement to be specified]'}</em></p>
+                <p>If the parties agree to change this commission arrangement during the employment, this employment contract will be updated. Any changes to the commission arrangement will be made according to the requirements of the modern award which applies to the Employee.</p>
+                ` : ''}
+                
+                ${data.step3.annualBonus ? `
+                <h3>Annual Bonus</h3>
+                <p>The Employer may pay the Employee an annual bonus at its discretion, taking into consideration the Employee's performance and other relevant business factors.</p>
+                <p>There is no guarantee that the Employee will receive a bonus, and the Employee will not be eligible for one after their employment ends.</p>
+                ` : ''}
+                
+                ${data.step3.annualPayReview ? `
+                <h3>Annual Pay Review</h3>
+                <p>The Employer will review the Employee's pay annually to determine whether they are eligible for an increase, taking into consideration:</p>
+                <ul>
+                    <li>the Employee's performance</li>
+                    <li>the business's financial position.</li>
+                </ul>
+                <p>Any increase in pay, above award entitlements, is at the Employer's discretion.</p>
                 ` : ''}
             </div>
             
@@ -23761,42 +25399,114 @@ function buildContractHTML() {
 }
 
 function generateLeaveSection(leaveData) {
+    const empType = contractBuilderState.data.step1.employmentType;
     let html = '<h2>6. LEAVE ENTITLEMENTS</h2><div class="clause">';
+    let clauseNum = 1;
     
-    if (leaveData.annualLeave) {
+    // Annual Leave (not for casuals)
+    if (empType !== 'casual') {
         html += `
-            <h3>6.1 Annual Leave</h3>
-            <p>The Employee is entitled to 4 weeks paid annual leave per year, accruing progressively during the year of service.</p>
+            <h3>6.${clauseNum} Annual Leave</h3>
+            <p>The Employee is entitled to <strong>${leaveData.annualLeaveAmount || '4'} ${leaveData.annualLeaveMeasure || 'week'}(s)</strong> of annual leave each year, based on their ordinary hours of work per week.</p>
+            <p>The Employer will provide any applicable annual leave loading entitlements in accordance with the applicable award.</p>
+            <p>Annual leave accumulates during the year. Any unused annual leave will roll over from year to year.</p>
         `;
+        clauseNum++;
     }
     
-    if (leaveData.sickLeave) {
+    // Parental Leave
+    html += `
+        <h3>6.${clauseNum} Parental Leave</h3>
+        <p>After the Employee has been working for the Employer for 12 months or more, they may be entitled to take unpaid parental leave from their position for 12 months.</p>
+        <p>The Employee may also:</p>
+        <ul>
+            <li>request up to an extra 12 months of unpaid parental leave</li>
+            <li>be entitled to Parental Leave Pay from the Australian Government, administered by Services Australia.</li>
+        </ul>
+    `;
+    clauseNum++;
+    
+    // Additional Parental Leave (if selected)
+    if (leaveData.additionalParentalLeave && leaveData.additionalParentalLeaveWeeks) {
         html += `
-            <h3>6.2 Personal/Carer's Leave</h3>
-            <p>The Employee is entitled to 10 days paid personal/carer's leave per year. This leave is cumulative.</p>
+            <h3>6.${clauseNum} Additional Parental Leave</h3>
+            <p>In addition to the above parental leave, the Employer will provide the Employee with <strong>${leaveData.additionalParentalLeaveWeeks} week(s)</strong> paid parental leave.</p>
         `;
+        clauseNum++;
     }
     
-    if (leaveData.parentalLeave) {
+    // Personal/Carer's Leave (not for casuals)
+    if (empType !== 'casual') {
         html += `
-            <h3>6.3 Parental Leave</h3>
-            <p>The Employee may be entitled to up to 12 months unpaid parental leave if they have completed 12 months continuous service with the Employer.</p>
+            <h3>6.${clauseNum} Personal/Carer's Leave</h3>
+            <p>The Employee is entitled to accrue 10 days paid personal/carer's leave (pro-rata for part-time employees) per year based on their ordinary hours of work. This is calculated as 1/26 of their ordinary hours of work in a year.</p>
+            <p>The Employee can take personal/carer's leave when they can't work because they are sick or injured. They can also use it to care for a member of their immediate family or household who requires care or support because of:</p>
+            <ul>
+                <li>personal injury</li>
+                <li>personal illness</li>
+                <li>an unexpected emergency.</li>
+            </ul>
+            <p>Personal/carer's leave accrues throughout the year and from year to year. The Employee must give notice as soon as possible to take personal/carer's leave. The Employer may require evidence (such as a medical certificate).</p>
+            <p>The Employee is also entitled to 2 days unpaid carer's leave (in accordance with the National Employment Standards). This is available each time an immediate family member or household member needs care or support.</p>
         `;
+        clauseNum++;
     }
     
-    if (leaveData.longServiceLeave) {
-        html += `
-            <h3>6.4 Long Service Leave</h3>
-            <p>The Employee will be entitled to long service leave in accordance with applicable state or territory legislation.</p>
-        `;
-    }
+    // Compassionate Leave
+    html += `
+        <h3>6.${clauseNum} Compassionate Leave</h3>
+        <p>The Employee is entitled to 2 days ${empType === 'casual' ? 'unpaid' : 'paid'} compassionate leave (in accordance with the National Employment Standards) each time:</p>
+        <ul>
+            <li>a member of their immediate family or household dies, or contracts or develops a life threatening illness or injury</li>
+            <li>a child is stillborn, that would have been a member of their immediate family or household if born alive</li>
+            <li>they or their current spouse or de facto partner has a miscarriage.</li>
+        </ul>
+    `;
+    clauseNum++;
     
-    if (leaveData.publicHolidays) {
-        html += `
-            <h3>6.5 Public Holidays</h3>
-            <p>The Employee is entitled to all public holidays as prescribed by the National Employment Standards and the applicable Modern Award.</p>
-        `;
-    }
+    // Community Service Leave
+    html += `
+        <h3>6.${clauseNum} Community Service Leave</h3>
+        <p>The Employee may be entitled to community service leave (in accordance with the National Employment Standards) for certain activities such as:</p>
+        <ul>
+            <li>voluntary emergency management activities</li>
+            <li>jury duty and jury selection.</li>
+        </ul>
+        <p>The Employee must give the Employer:</p>
+        <ul>
+            <li>notice of their leave as soon as possible</li>
+            <li>details of the period, or expected period, that they will be away from work.</li>
+        </ul>
+        <p>The Employer may ask for evidence that community service leave is required.</p>
+    `;
+    clauseNum++;
+    
+    // Family and Domestic Violence Leave
+    html += `
+        <h3>6.${clauseNum} Family and Domestic Violence Leave</h3>
+        <p>The Employee may be entitled to 10 days of paid family and domestic violence leave (in accordance with the National Employment Standards) each 12 month period.</p>
+    `;
+    clauseNum++;
+    
+    // Public Holidays
+    html += `
+        <h3>6.${clauseNum} Public Holidays</h3>
+        <p>The Employee has a right to be absent from work on a public holiday.</p>
+        <p>The Employer may ask the Employee to work on a public holiday. The Employee may refuse the request to work (in accordance with the Fair Work Act 2009) if:</p>
+        <ul>
+            <li>their refusal is reasonable, or</li>
+            <li>the Employer's request is unreasonable.</li>
+        </ul>
+        <p>If the Employee works on a public holiday, they are entitled to any additional entitlements under the applicable award, such as public holiday penalty rates.</p>
+        <p>If the Employee does not work on a public holiday, and it falls on a day they would normally work, they are entitled to be paid their base rate of pay for their ordinary hours of work on that day.</p>
+    `;
+    clauseNum++;
+    
+    // Long Service Leave
+    html += `
+        <h3>6.${clauseNum} Long Service Leave</h3>
+        <p>The Employee may be entitled to long service leave after working with the Employer for a specific period of time in accordance with relevant state or territory legislation or the Fair Work Act.</p>
+    `;
     
     html += '</div>';
     return html;
@@ -23869,56 +25579,83 @@ function generateAdditionalTermsSection(termsData) {
 }
 
 function generateNoticeSection(noticeData) {
+    const resignNotice = noticeData.resignationNotice || { year1: '1', year1to3: '2', year3to5: '3', year5plus: '4' };
+    
     let html = `
         <h2>8. TERMINATION OF EMPLOYMENT</h2>
         <div class="clause">
-            <h3>8.1 Notice by Employee</h3>
-            <p>The Employee must provide the following notice periods when resigning:</p>
+            <h3>8.1 Resignation Notice</h3>
+            <p>The Employee must give the Employer the following minimum notice periods if they resign:</p>
             <table>
                 <tr>
-                    <th>Period of Continuous Service</th>
-                    <th>Notice Period</th>
+                    <th>Continuous employment with the Employer</th>
+                    <th>Minimum notice period</th>
                 </tr>
                 <tr>
                     <td>1 year or less</td>
-                    <td>${noticeData.noticeWeeks.year1} week(s)</td>
+                    <td>${resignNotice.year1} week(s)</td>
                 </tr>
                 <tr>
-                    <td>More than 1 year, up to 3 years</td>
-                    <td>${noticeData.noticeWeeks.year1to3} week(s)</td>
+                    <td>More than 1 year to 3 years</td>
+                    <td>${resignNotice.year1to3} week(s)</td>
                 </tr>
                 <tr>
-                    <td>More than 3 years, up to 5 years</td>
-                    <td>${noticeData.noticeWeeks.year3to5} week(s)</td>
+                    <td>More than 3 years to 5 years</td>
+                    <td>${resignNotice.year3to5} week(s)</td>
                 </tr>
                 <tr>
                     <td>More than 5 years</td>
-                    <td>${noticeData.noticeWeeks.year5plus} week(s)</td>
+                    <td>${resignNotice.year5plus} week(s)</td>
                 </tr>
             </table>
             
-            <h3>8.2 Notice by Employer</h3>
-            <p>The Employer must provide notice in accordance with the National Employment Standards:</p>
-            <ul>
-                <li>1 year or less: 1 week</li>
-                <li>1-3 years: 2 weeks</li>
-                <li>3-5 years: 3 weeks</li>
-                <li>5+ years: 4 weeks</li>
-                <li>Plus 1 additional week if employee is over 45 and has completed 2+ years service</li>
-            </ul>
-            <p>The Employer may provide payment in lieu of notice.</p>
+            <h3>8.2 Dismissal Notice</h3>
+            <p>The Employee is entitled to the following minimum notice periods (or payment in lieu of notice) if the Employer ends their employment. This does not apply if the Employer ends the Employee's employment for serious misconduct.</p>
+            <table>
+                <tr>
+                    <th>Continuous employment with the Employer</th>
+                    <th>Minimum notice period</th>
+                </tr>
+                <tr>
+                    <td>1 year or less</td>
+                    <td>1 week</td>
+                </tr>
+                <tr>
+                    <td>More than 1 year to 3 years</td>
+                    <td>2 weeks</td>
+                </tr>
+                <tr>
+                    <td>More than 3 years to 5 years</td>
+                    <td>3 weeks</td>
+                </tr>
+                <tr>
+                    <td>More than 5 years</td>
+                    <td>4 weeks</td>
+                </tr>
+            </table>
+            <p>The Employee may be entitled to a longer minimum notice period under their award.</p>
+            <p>The Employee will get an extra week of notice if they are older than 45 years and have worked for the Employer for at least 2 years.</p>
             
             <h3>8.3 Redundancy</h3>
-            <p>If the Employee's position is made redundant, the Employee may be entitled to redundancy pay in accordance with the National Employment Standards and the applicable Modern Award.</p>
+            <p>If the Employee's position is terminated due to redundancy, any notice and redundancy pay entitlements will be in accordance with the National Employment Standards and the applicable award.</p>
             
             ${noticeData.misconductClause ? `
-                <h3>8.4 Serious Misconduct</h3>
-                <p>The Employer may terminate the Employee's employment without notice or payment in lieu if the Employee engages in serious misconduct, including but not limited to:</p>
+                <h3>8.4 Misconduct</h3>
+                <p>The Employer may terminate the Employee's employment without notice, or payment in lieu of notice, if the Employee engages in serious misconduct.</p>
+                <p>Serious misconduct is when an employee:</p>
                 <ul>
-                    <li>Theft, fraud, or assault</li>
-                    <li>Being intoxicated at work</li>
-                    <li>Refusal to carry out lawful and reasonable instructions</li>
-                    <li>Serious breaches of health and safety requirements</li>
+                    <li>causes serious and imminent risk to the health and safety of another person or to the reputation, viability or profits of their employer's business, or</li>
+                    <li>wilfully or deliberately behaves in a way that's inconsistent with continuing their employment.</li>
+                </ul>
+                <p>Examples of serious misconduct include:</p>
+                <ul>
+                    <li>theft</li>
+                    <li>fraud</li>
+                    <li>violence/assault</li>
+                    <li>sexual harassment</li>
+                    <li>serious breaches of health and safety requirements</li>
+                    <li>being drunk or affected by drugs at work</li>
+                    <li>refusing to carry out work duties.</li>
                 </ul>
             ` : ''}
         </div>
