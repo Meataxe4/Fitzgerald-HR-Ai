@@ -11800,6 +11800,23 @@ function loadConversation(convId) {
     // Update UI
     updateSidebarChats();
     
+    // Scroll to bottom after messages are rendered so user sees most recent messages
+    // Also focus the message input so user can start typing immediately
+    // Use multiple timeouts to ensure scroll happens after all content renders
+    setTimeout(function() {
+        scrollToBottomInstant();
+    }, 150);
+    
+    // Second scroll as backup after longer delay for slow-rendering content
+    setTimeout(function() {
+        scrollToBottomInstant();
+        // Focus the message input on desktop
+        const messageInput = document.getElementById('messageInput');
+        if (messageInput && window.innerWidth >= 768) {
+            messageInput.focus();
+        }
+    }, 400);
+    
     console.log('✅ Loaded conversation:', conv.title);
 }
 
@@ -13816,6 +13833,20 @@ function scrollToBottom() {
         });
         // Update button visibility after scroll completes
         setTimeout(updateScrollButtonVisibility, 500);
+    }
+}
+
+/**
+ * Scroll to bottom instantly without animation
+ * Used for initial page load so user immediately sees most recent messages
+ */
+function scrollToBottomInstant() {
+    const container = document.getElementById('messagesContainer');
+    if (container) {
+        container.scrollTop = container.scrollHeight;
+        // Update button visibility
+        setTimeout(updateScrollButtonVisibility, 100);
+        console.log('📜 Scrolled to bottom of messages');
     }
 }
 
@@ -27193,6 +27224,16 @@ if (auth) {
                                     showToast('Welcome back! Your conversation has been restored.', 'success', 3000);
                                 }
                             }
+                            
+                            // Ensure we scroll to bottom after everything is loaded
+                            // Multiple timeouts to handle varying load times
+                            setTimeout(() => {
+                                scrollToBottomInstant();
+                            }, 400);
+                            
+                            setTimeout(() => {
+                                scrollToBottomInstant();
+                            }, 800);
                         }, 500);
                     }
                 }
