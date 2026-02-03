@@ -22191,7 +22191,7 @@ function getStep0Template() {
             <div class="info-box-content">
                 <p>You'll need to know which Modern Award applies to your employee. Not sure?</p>
                 <button class="btn btn-link" onclick="openAwardWizardFromContract(); return false;">Use Award Wizard →</button>
-                <a href="https://www.fairwork.gov.au/find-my-award" target="_blank" style="color: #007bff; text-decoration: underline;">Visit Fair Work Award Finder</a>
+                <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/find-my-award', 'Fair Work Award Finder');" style="color: #007bff; text-decoration: underline;">Visit Fair Work Award Finder</a>
             </div>
         </div>
         
@@ -22264,6 +22264,22 @@ function checkStep0Validation() {
 
 // Helper functions to open Award Wizard and Job Description Builder
 function openAwardWizardFromContract() {
+    // Show confirmation dialog
+    const confirmed = confirm(
+        '⚠️ Navigate Away?\n\n' +
+        'This will close the Employment Contract Builder and take you to the Award Wizard.\n\n' +
+        'Your current progress will be saved, but you will need to return to continue building your contract.\n\n' +
+        'Are you sure you want to leave?'
+    );
+    
+    if (!confirmed) {
+        return; // User cancelled
+    }
+    
+    // Save current progress before leaving
+    saveCurrentStepData();
+    saveContractProgress();
+    
     // Close contract builder
     closeEmploymentContract();
     
@@ -22276,6 +22292,22 @@ function openAwardWizardFromContract() {
 }
 
 function openJobDescriptionFromContract() {
+    // Show confirmation dialog
+    const confirmed = confirm(
+        '⚠️ Navigate Away?\n\n' +
+        'This will close the Employment Contract Builder and take you to the Job Description Builder.\n\n' +
+        'Your current progress will be saved, but you will need to return to continue building your contract.\n\n' +
+        'Are you sure you want to leave?'
+    );
+    
+    if (!confirmed) {
+        return; // User cancelled
+    }
+    
+    // Save current progress before leaving
+    saveCurrentStepData();
+    saveContractProgress();
+    
     // Close contract builder
     closeEmploymentContract();
     
@@ -22284,6 +22316,58 @@ function openJobDescriptionFromContract() {
         openJobDescriptionBuilder();
     } else {
         alert('Job Description Builder is not available. Please contact support.');
+    }
+}
+
+/**
+ * Open external link from Contract Builder with confirmation
+ */
+function openExternalLinkFromContract(url, siteName) {
+    // Show confirmation dialog
+    const confirmed = confirm(
+        '⚠️ Navigate Away?\n\n' +
+        `This will open ${siteName || 'an external website'} in a new tab.\n\n` +
+        'Your current progress in the Employment Contract Builder will be preserved.\n\n' +
+        'Are you sure you want to open this link?'
+    );
+    
+    if (!confirmed) {
+        return false; // User cancelled
+    }
+    
+    // Open in new tab
+    window.open(url, '_blank');
+    return false; // Prevent default link behavior
+}
+
+/**
+ * Open Award Calculator from Contract Builder with confirmation
+ */
+function openAwardCalculatorFromContract() {
+    // Show confirmation dialog
+    const confirmed = confirm(
+        '⚠️ Navigate Away?\n\n' +
+        'This will close the Employment Contract Builder and take you to the Award Calculator.\n\n' +
+        'Your current progress will be saved, but you will need to return to continue building your contract.\n\n' +
+        'Are you sure you want to leave?'
+    );
+    
+    if (!confirmed) {
+        return; // User cancelled
+    }
+    
+    // Save current progress before leaving
+    saveCurrentStepData();
+    saveContractProgress();
+    
+    // Close contract builder
+    closeEmploymentContract();
+    
+    // Open Award Calculator (using existing function)
+    if (typeof openAwardCalculator === 'function') {
+        openAwardCalculator();
+    } else {
+        alert('Award Calculator is not available. Please contact support.');
     }
 }
 
@@ -22667,7 +22751,7 @@ function getStep3Template() {
                    step="0.01" min="0">
             <span class="form-hint">
                 ${empType === 'casual' ? 'Include 25% casual loading in this rate' : 'Enter base rate (before super)'}
-                <button class="btn btn-link" style="padding: 0; display: inline;" onclick="openAwardCalculator(); return false;">
+                <button class="btn btn-link" style="padding: 0; display: inline;" onclick="openAwardCalculatorFromContract(); return false;">
                     Use Award Calculator
                 </button>
             </span>
