@@ -13830,18 +13830,30 @@ function scrollToBottom() {
             top: container.scrollHeight,
             behavior: 'smooth'
         });
-        // Update button visibility after scroll completes
-        setTimeout(updateScrollButtonVisibility, 500);
+        // Hide button immediately when clicked
+        const btn = document.getElementById('scrollToBottomBtn');
+        if (btn) btn.classList.remove('visible');
     }
 }
 
 // Scroll to bottom instantly (no animation) - used after login
 function scrollToBottomInstant() {
     const container = document.getElementById('messagesContainer');
+    const input = document.getElementById('messageInput');
+    
+    // Scroll messages container to bottom
     if (container) {
         container.scrollTop = container.scrollHeight;
-        updateScrollButtonVisibility();
     }
+    
+    // Focus on input and scroll it into view
+    if (input) {
+        input.scrollIntoView({ behavior: 'instant', block: 'end' });
+        input.focus();
+    }
+    
+    // Update button visibility
+    updateScrollButtonVisibility();
 }
 
 // Update scroll button visibility based on scroll position (desktop and mobile)
@@ -17663,9 +17675,11 @@ document.addEventListener('DOMContentLoaded', function() {
     loadRecentTools();
     updateSidebarRecentTools();
     
-    // Initialize scroll to bottom button for mobile
+    // Initialize scroll to bottom button (desktop and mobile)
     if (DOM.messagesContainer) {
         DOM.messagesContainer.addEventListener('scroll', updateScrollButtonVisibility);
+        // Also update on window resize
+        window.addEventListener('resize', updateScrollButtonVisibility);
         // Initial visibility check after a short delay
         setTimeout(updateScrollButtonVisibility, 1000);
     }
