@@ -504,8 +504,17 @@ header button[onclick*="logout"],
         height: 28px !important;
     }
     
-    /* Hide title text on mobile */
+    /* Show FITZ title but hide beta text */
     #headerTitle {
+        display: block !important;
+    }
+    
+    #headerTitle h1 {
+        font-size: 14px !important;
+        line-height: 1.2 !important;
+    }
+    
+    #headerTitle p {
         display: none !important;
     }
     
@@ -547,6 +556,11 @@ header button[onclick*="logout"],
     
     #dailyTipBanner button {
         display: none !important;
+    }
+    
+    /* Scroll to bottom button - show on mobile */
+    #scrollToBottomBtn {
+        display: flex !important;
     }
     
     /* FIX 2: STACK TOOL NAVIGATION BUTTONS */
@@ -697,20 +711,24 @@ header button[onclick*="logout"],
        MOBILE UX ENHANCEMENTS - PHASE 2
        ========================================== */
     
-    /* Tools Menu - Full screen on mobile */
+    /* Tools Menu - Full screen on mobile with proper scrolling */
     #toolsMenu {
         padding: 0 !important;
         align-items: flex-start !important;
+        overflow-y: auto !important;
     }
     
     #toolsMenu > div {
         max-width: 100% !important;
         width: 100% !important;
-        min-height: 100vh !important;
+        min-height: auto !important;
+        max-height: none !important;
         border-radius: 0 !important;
         padding: 16px !important;
+        padding-bottom: 100px !important;
         margin: 0 !important;
         border: none !important;
+        overflow-y: visible !important;
     }
     
     #toolsMenu h2 {
@@ -723,12 +741,12 @@ header button[onclick*="logout"],
     }
     
     #toolsMenu button {
-        padding: 16px !important;
-        min-height: 72px !important;
+        padding: 14px !important;
+        min-height: 60px !important;
     }
     
     #toolsMenu .text-3xl {
-        font-size: 2rem !important;
+        font-size: 1.5rem !important;
     }
     
     /* Document Builder Modal - Full screen */
@@ -840,6 +858,21 @@ header button[onclick*="logout"],
     .chat-sidebar {
         width: 85vw !important;
         max-width: 320px !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    /* Make sidebar content scrollable */
+    .sidebar-content {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding-bottom: 20px !important;
+    }
+    
+    /* Ensure all sidebar sections are visible */
+    .sidebar-section {
+        display: block !important;
     }
     
     .sidebar-chat-item {
@@ -1162,6 +1195,36 @@ input, textarea, select {
         
         .toast-exit {
             animation: slideOutRight 0.3s ease-in;
+        }
+        
+        /* Scroll to bottom button - hidden by default on desktop */
+        #scrollToBottomBtn {
+            display: none;
+            position: fixed;
+            bottom: 140px;
+            right: 20px;
+            width: 44px;
+            height: 44px;
+            background: rgba(245, 158, 11, 0.7);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s ease;
+        }
+        
+        #scrollToBottomBtn:hover {
+            background: rgba(245, 158, 11, 0.9);
+            transform: scale(1.1);
+        }
+        
+        #scrollToBottomBtn:active {
+            transform: scale(0.95);
         }
         
         /* Toast container */
@@ -3307,6 +3370,11 @@ function continueWithEmail() {
 </div>
 
         <!-- Messages Container (Scrollable Area) -->
+<!-- Scroll to Bottom Button (Mobile Only) -->
+<button id="scrollToBottomBtn" onclick="scrollToBottom()" title="Scroll to bottom">
+    ↓
+</button>
+
 <div id="messagesContainer" class="flex-1 overflow-y-auto px-6 py-6">
     <div class="max-w-5xl mx-auto space-y-6">
         <!-- Messages will be added here dynamically -->
@@ -13336,6 +13404,17 @@ async function readFileContent(file) {
 function autoResizeTextarea(textarea) {
     textarea.style.height = 'auto';
     textarea.style.height = textarea.scrollHeight + 'px';
+}
+
+// Scroll to bottom of messages (for mobile button)
+function scrollToBottom() {
+    const container = document.getElementById('messagesContainer');
+    if (container) {
+        container.scrollTo({
+            top: container.scrollHeight,
+            behavior: 'smooth'
+        });
+    }
 }
 
 // Create new chat from sidebar
