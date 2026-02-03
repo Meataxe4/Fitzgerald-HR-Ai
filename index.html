@@ -560,26 +560,32 @@ header button[onclick*="logout"],
     
     /* Scroll to bottom button - ALWAYS show on mobile */
     #scrollToBottomBtn {
-        display: flex !important;
+        display: none;
         position: fixed !important;
-        bottom: 140px !important;
-        right: 20px !important;
-        width: 56px !important;
-        height: 56px !important;
-        background: #f59e0b !important;
-        border: 3px solid #fff !important;
+        bottom: 120px !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+        width: 36px !important;
+        height: 36px !important;
+        background: rgba(55, 65, 81, 0.95) !important;
+        border: 1px solid rgba(100, 116, 139, 0.5) !important;
         border-radius: 50% !important;
-        color: white !important;
+        color: #94a3b8 !important;
         z-index: 9999 !important;
         align-items: center !important;
         justify-content: center !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
         opacity: 1 !important;
     }
     
-    #scrollToBottomBtn.hidden-btn {
-        opacity: 0 !important;
-        pointer-events: none !important;
+    #scrollToBottomBtn.visible {
+        display: flex !important;
+    }
+    
+    #scrollToBottomBtn svg {
+        width: 20px !important;
+        height: 20px !important;
     }
     
     /* FIX 2: STACK TOOL NAVIGATION BUTTONS */
@@ -1267,29 +1273,39 @@ input, textarea, select {
         #scrollToBottomBtn {
             display: none;
             position: fixed;
-            bottom: 120px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            background: #f59e0b;
-            border: 3px solid #ffffff;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 32px;
+            height: 32px;
+            background: rgba(55, 65, 81, 0.9);
+            border: 1px solid rgba(100, 116, 139, 0.5);
             border-radius: 50%;
-            color: white;
+            color: #94a3b8;
             cursor: pointer;
             z-index: 9999;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-            transition: opacity 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: opacity 0.2s ease, background 0.2s ease;
         }
         
         #scrollToBottomBtn:hover {
-            background: #d97706;
-            transform: scale(1.1);
+            background: rgba(71, 85, 105, 0.95);
+            color: #e2e8f0;
         }
         
         #scrollToBottomBtn:active {
-            transform: scale(0.95);
+            transform: translateX(-50%) scale(0.95);
+        }
+        
+        #scrollToBottomBtn.visible {
+            display: flex;
+        }
+        
+        #scrollToBottomBtn svg {
+            width: 18px;
+            height: 18px;
         }
         
         /* Toast container */
@@ -2904,6 +2920,11 @@ async function checkFirestoreData() {
             if (accessScreen) accessScreen.classList.add('hidden');
             if (assistantScreen) assistantScreen.classList.remove('hidden');
             
+            // Scroll to bottom (message input) after login
+            setTimeout(function() {
+                if (typeof scrollToBottomInstant === 'function') scrollToBottomInstant();
+            }, 100);
+            
             var userCodeEl = document.getElementById('userCode');
             if (userCodeEl) userCodeEl.textContent = code;
             
@@ -3435,10 +3456,10 @@ function continueWithEmail() {
 </div>
 
         <!-- Messages Container (Scrollable Area) -->
-<!-- Scroll to Bottom Button (Mobile Only) -->
+<!-- Scroll to Bottom Button -->
 <button id="scrollToBottomBtn" onclick="scrollToBottom()" title="Scroll to bottom">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 5v14M5 12l7 7 7-7"/>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M19 12l-7 7-7-7"/>
     </svg>
 </button>
 
@@ -10823,6 +10844,9 @@ function checkAccess() {
         if (assistantScreen) assistantScreen.classList.remove('hidden');
         if (error) error.classList.add('hidden');
         
+        // Scroll to bottom (message input) after login
+        setTimeout(scrollToBottomInstant, 100);
+        
         trackEvent('beta_access', { code: input });
         
         // Admin access is now email-based only (via Google Sign-In)
@@ -10923,6 +10947,9 @@ function attemptAutoLogin() {
     if (userCodeEl) userCodeEl.textContent = storedCode;
     if (accessScreen) accessScreen.classList.add('hidden');
     if (assistantScreen) assistantScreen.classList.remove('hidden');
+    
+    // Scroll to bottom (message input) after login
+    setTimeout(scrollToBottomInstant, 100);
     
     // Update last login timestamp
     localStorage.setItem('fitzhr_last_login', new Date().toISOString());
@@ -13808,29 +13835,32 @@ function scrollToBottom() {
     }
 }
 
-// Update scroll button visibility based on scroll position
+// Scroll to bottom instantly (no animation) - used after login
+function scrollToBottomInstant() {
+    const container = document.getElementById('messagesContainer');
+    if (container) {
+        container.scrollTop = container.scrollHeight;
+        updateScrollButtonVisibility();
+    }
+}
+
+// Update scroll button visibility based on scroll position (desktop and mobile)
 function updateScrollButtonVisibility() {
     const container = document.getElementById('messagesContainer');
     const btn = document.getElementById('scrollToBottomBtn');
     
     if (!container || !btn) return;
     
-    // Only show on mobile
-    if (window.innerWidth >= 768) {
-        btn.style.display = 'none';
-        return;
-    }
-    
     const scrollTop = container.scrollTop;
     const scrollHeight = container.scrollHeight;
     const clientHeight = container.clientHeight;
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
     
-    // Hide button when within 50px of bottom OR when content doesn't need scrolling
-    if (distanceFromBottom < 50 || scrollHeight <= clientHeight) {
-        btn.classList.add('hidden-btn');
+    // Show button when scrolled up more than 100px from bottom AND content needs scrolling
+    if (distanceFromBottom > 100 && scrollHeight > clientHeight) {
+        btn.classList.add('visible');
     } else {
-        btn.classList.remove('hidden-btn');
+        btn.classList.remove('visible');
     }
 }
 
@@ -26975,6 +27005,9 @@ if (auth) {
                 if (assistantScreen) assistantScreen.classList.remove('hidden');
                 const userCodeEl = document.getElementById('userCode');
                 if (userCodeEl) userCodeEl.textContent = 'Google Account';
+                
+                // Scroll to bottom (message input) after login
+                setTimeout(scrollToBottomInstant, 100);
             }
             updateUIForAuthenticatedUser(user);
             
