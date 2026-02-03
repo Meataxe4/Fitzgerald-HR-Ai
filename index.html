@@ -4702,6 +4702,7 @@ function continueWithEmail() {
                 </div>
             </div>
         </div>
+    </div>
 
         <!-- Back button (shown after step 1) -->
         <button id="wizardBackBtn" onclick="wizardGoBack()" class="hidden mt-4 text-slate-400 hover:text-white transition-colors flex items-center gap-2">
@@ -4808,13 +4809,22 @@ Be as specific as possible!"></textarea>
         <div class="mb-6 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-lg p-4">
             <h3 class="text-white font-bold mb-4 flex items-center gap-2">
                 <span>🎉</span>
-                <span>Upcoming Public Holidays</span>
+                <span>2026 Public Holidays</span>
                 <span id="stateHolidayBadge" class="ml-2 px-2 py-0.5 bg-purple-500/30 text-purple-300 text-xs rounded">NSW</span>
             </h3>
-            <div id="publicHolidaysList" class="space-y-2 text-sm">
+            <div id="publicHolidaysList" class="space-y-2 text-sm max-h-64 overflow-y-auto">
                 <!-- Populated by JavaScript -->
             </div>
-            <p class="text-xs text-slate-400 mt-3">⚠️ Staff working on public holidays are entitled to penalty rates under the Hospitality Award</p>
+            <div class="mt-4 pt-3 border-t border-slate-700/50">
+                <p class="text-xs text-slate-400 mb-2">⚠️ Staff working on public holidays are entitled to penalty rates under the Hospitality Award</p>
+                <a href="https://www.fairwork.gov.au/employment-conditions/public-holidays/2026-public-holidays" 
+                   target="_blank" 
+                   rel="noopener noreferrer"
+                   class="inline-flex items-center gap-2 text-xs text-amber-400 hover:text-amber-300 transition-colors">
+                    <span>📋</span>
+                    <span>View official list on Fair Work Ombudsman →</span>
+                </a>
+            </div>
         </div>
 
         <!-- Upcoming Alerts -->
@@ -12494,178 +12504,279 @@ function openRosterOptimizer() {
 }
 
 function openComplianceCalendar() {
-    trackToolUsage('complianceCalendarModal');
-    var modal = document.getElementById('complianceCalendarModal');
-    if (modal) modal.classList.remove('hidden');
-    
-    // Set state selector to user's saved state
-    initializeComplianceCalendarState();
+    try {
+        trackToolUsage('complianceCalendarModal');
+        var modal = document.getElementById('complianceCalendarModal');
+        if (modal) {
+            modal.classList.remove('hidden');
+            console.log('✅ Compliance Calendar modal opened');
+        } else {
+            console.error('❌ complianceCalendarModal not found!');
+            alert('Error: Could not find Compliance Calendar modal');
+            return;
+        }
+        
+        // Set state selector to user's saved state
+        initializeComplianceCalendarState();
+    } catch (error) {
+        console.error('❌ Error opening Compliance Calendar:', error);
+        alert('Error opening Compliance Calendar: ' + error.message);
+    }
 }
 
-// Australian Public Holidays by State/Territory (2025-2026)
-const PUBLIC_HOLIDAYS = {
-    // National holidays (all states)
-    national: [
-        { date: '2025-01-01', name: "New Year's Day" },
-        { date: '2025-01-27', name: "Australia Day (observed)" },
-        { date: '2025-04-18', name: "Good Friday" },
-        { date: '2025-04-19', name: "Saturday before Easter Sunday" },
-        { date: '2025-04-20', name: "Easter Sunday" },
-        { date: '2025-04-21', name: "Easter Monday" },
-        { date: '2025-04-25', name: "ANZAC Day" },
-        { date: '2025-06-09', name: "Queen's Birthday" },
-        { date: '2025-12-25', name: "Christmas Day" },
-        { date: '2025-12-26', name: "Boxing Day" },
+// Australian Public Holidays by State/Territory (2026)
+// Source: Fair Work Ombudsman - https://www.fairwork.gov.au/employment-conditions/public-holidays/2026-public-holidays
+const PUBLIC_HOLIDAYS_2026 = {
+    // New South Wales
+    NSW: [
         { date: '2026-01-01', name: "New Year's Day" },
         { date: '2026-01-26', name: "Australia Day" },
+        { date: '2026-04-03', name: "Good Friday" },
+        { date: '2026-04-04', name: "Easter Saturday" },
+        { date: '2026-04-05', name: "Easter Sunday" },
+        { date: '2026-04-06', name: "Easter Monday" },
+        { date: '2026-04-25', name: "Anzac Day" },
+        { date: '2026-06-08', name: "King's Birthday" },
+        { date: '2026-10-05', name: "Labour Day" },
+        { date: '2026-12-25', name: "Christmas Day" },
+        { date: '2026-12-26', name: "Boxing Day" },
+        { date: '2026-12-28', name: "Additional Public Holiday (Boxing Day)" }
+    ],
+    // Victoria
+    VIC: [
+        { date: '2026-01-01', name: "New Year's Day" },
+        { date: '2026-01-26', name: "Australia Day" },
+        { date: '2026-03-09', name: "Labour Day" },
         { date: '2026-04-03', name: "Good Friday" },
         { date: '2026-04-04', name: "Saturday before Easter Sunday" },
         { date: '2026-04-05', name: "Easter Sunday" },
         { date: '2026-04-06', name: "Easter Monday" },
-        { date: '2026-04-25', name: "ANZAC Day" },
-        { date: '2026-06-08', name: "Queen's Birthday" },
+        { date: '2026-04-25', name: "Anzac Day" },
+        { date: '2026-06-08', name: "King's Birthday" },
+        { date: '2026-11-03', name: "Melbourne Cup Day", regional: true },
         { date: '2026-12-25', name: "Christmas Day" },
-        { date: '2026-12-26', name: "Boxing Day" }
+        { date: '2026-12-26', name: "Boxing Day" },
+        { date: '2026-12-28', name: "Additional Public Holiday (Boxing Day)" }
     ],
-    // State-specific holidays
-    NSW: [
-        { date: '2025-08-04', name: "Bank Holiday (NSW)" }
-    ],
-    VIC: [
-        { date: '2025-03-10', name: "Labour Day (VIC)" },
-        { date: '2025-11-04', name: "Melbourne Cup Day (Metro)" }
-    ],
+    // Queensland
     QLD: [
-        { date: '2025-05-05', name: "Labour Day (QLD)" },
-        { date: '2025-08-13', name: "Royal Queensland Show (Brisbane)" },
-        { date: '2025-10-06', name: "Queen's Birthday (QLD)" }
+        { date: '2026-01-01', name: "New Year's Day" },
+        { date: '2026-01-26', name: "Australia Day" },
+        { date: '2026-04-03', name: "Good Friday" },
+        { date: '2026-04-04', name: "The day after Good Friday" },
+        { date: '2026-04-05', name: "Easter Sunday" },
+        { date: '2026-04-06', name: "Easter Monday" },
+        { date: '2026-04-25', name: "Anzac Day" },
+        { date: '2026-05-04', name: "Labour Day" },
+        { date: '2026-08-12', name: "Royal Queensland Show (Brisbane)", regional: true },
+        { date: '2026-10-05', name: "King's Birthday" },
+        { date: '2026-12-24', name: "Christmas Eve (from 6pm)", partDay: true },
+        { date: '2026-12-25', name: "Christmas Day" },
+        { date: '2026-12-26', name: "Boxing Day" },
+        { date: '2026-12-28', name: "Additional Public Holiday (Boxing Day)" }
     ],
+    // South Australia
     SA: [
-        { date: '2025-03-10', name: "Adelaide Cup Day" },
-        { date: '2025-12-24', name: "Christmas Eve (from 7pm)" },
-        { date: '2025-12-31', name: "New Year's Eve (from 7pm)" },
-        { date: '2026-03-09', name: "Adelaide Cup Day" }
+        { date: '2026-01-01', name: "New Year's Day" },
+        { date: '2026-01-26', name: "Australia Day" },
+        { date: '2026-03-09', name: "Adelaide Cup Day" },
+        { date: '2026-04-03', name: "Good Friday" },
+        { date: '2026-04-04', name: "Easter Saturday" },
+        { date: '2026-04-05', name: "Easter Sunday" },
+        { date: '2026-04-06', name: "Easter Monday" },
+        { date: '2026-04-25', name: "Anzac Day" },
+        { date: '2026-06-08', name: "King's Birthday" },
+        { date: '2026-10-05', name: "Labour Day" },
+        { date: '2026-12-24', name: "Christmas Eve (from 7pm)", partDay: true },
+        { date: '2026-12-25', name: "Christmas Day" },
+        { date: '2026-12-26', name: "Proclamation Day" },
+        { date: '2026-12-28', name: "Additional Public Holiday (Proclamation Day)" },
+        { date: '2026-12-31', name: "New Year's Eve (from 7pm)", partDay: true }
     ],
+    // Western Australia
     WA: [
-        { date: '2025-03-03', name: "Labour Day (WA)" },
-        { date: '2025-06-02', name: "Western Australia Day" },
-        { date: '2025-09-29', name: "Queen's Birthday (WA)" }
+        { date: '2026-01-01', name: "New Year's Day" },
+        { date: '2026-01-26', name: "Australia Day" },
+        { date: '2026-03-02', name: "Labour Day" },
+        { date: '2026-04-03', name: "Good Friday" },
+        { date: '2026-04-05', name: "Easter Sunday" },
+        { date: '2026-04-06', name: "Easter Monday" },
+        { date: '2026-04-25', name: "Anzac Day" },
+        { date: '2026-04-27', name: "Additional Public Holiday (Anzac Day)" },
+        { date: '2026-06-01', name: "Western Australia Day" },
+        { date: '2026-09-28', name: "King's Birthday" },
+        { date: '2026-12-25', name: "Christmas Day" },
+        { date: '2026-12-26', name: "Boxing Day" },
+        { date: '2026-12-28', name: "Additional Public Holiday (Boxing Day)" }
     ],
+    // Tasmania
     TAS: [
-        { date: '2025-02-10', name: "Royal Hobart Regatta (South TAS)" },
-        { date: '2025-03-10', name: "Eight Hours Day (TAS)" },
-        { date: '2025-11-03', name: "Recreation Day (North TAS)" }
+        { date: '2026-01-01', name: "New Year's Day" },
+        { date: '2026-01-26', name: "Australia Day" },
+        { date: '2026-02-09', name: "Royal Hobart Regatta (Hobart area)", regional: true },
+        { date: '2026-03-09', name: "Eight Hours Day" },
+        { date: '2026-04-03', name: "Good Friday" },
+        { date: '2026-04-06', name: "Easter Monday" },
+        { date: '2026-04-07', name: "Easter Tuesday (Public Service)", partDay: true },
+        { date: '2026-04-25', name: "Anzac Day" },
+        { date: '2026-06-08', name: "King's Birthday" },
+        { date: '2026-10-22', name: "Royal Hobart Show (Hobart area)", regional: true },
+        { date: '2026-11-02', name: "Recreation Day (North TAS)", regional: true },
+        { date: '2026-12-25', name: "Christmas Day" },
+        { date: '2026-12-28', name: "Boxing Day" }
     ],
+    // Northern Territory
     NT: [
-        { date: '2025-05-05', name: "May Day (NT)" },
-        { date: '2025-07-07', name: "Alice Springs Show Day" },
-        { date: '2025-07-11', name: "Tennant Creek Show Day" },
-        { date: '2025-07-18', name: "Katherine Show Day" },
-        { date: '2025-07-25', name: "Darwin Show Day" },
-        { date: '2025-08-18', name: "Picnic Day (NT)" }
+        { date: '2026-01-01', name: "New Year's Day" },
+        { date: '2026-01-26', name: "Australia Day" },
+        { date: '2026-04-03', name: "Good Friday" },
+        { date: '2026-04-04', name: "Easter Saturday" },
+        { date: '2026-04-05', name: "Easter Sunday" },
+        { date: '2026-04-06', name: "Easter Monday" },
+        { date: '2026-04-25', name: "Anzac Day" },
+        { date: '2026-05-04', name: "May Day" },
+        { date: '2026-06-08', name: "King's Birthday" },
+        { date: '2026-08-03', name: "Picnic Day" },
+        { date: '2026-12-24', name: "Christmas Eve (from 7pm)", partDay: true },
+        { date: '2026-12-25', name: "Christmas Day" },
+        { date: '2026-12-26', name: "Boxing Day" },
+        { date: '2026-12-28', name: "Additional Public Holiday (Boxing Day)" },
+        { date: '2026-12-31', name: "New Year's Eve (from 7pm)", partDay: true }
     ],
+    // Australian Capital Territory
     ACT: [
-        { date: '2025-03-10', name: "Canberra Day" },
-        { date: '2025-05-26', name: "Reconciliation Day (ACT)" },
-        { date: '2025-09-29', name: "Family & Community Day (ACT)" }
+        { date: '2026-01-01', name: "New Year's Day" },
+        { date: '2026-01-26', name: "Australia Day" },
+        { date: '2026-03-09', name: "Canberra Day" },
+        { date: '2026-04-03', name: "Good Friday" },
+        { date: '2026-04-04', name: "Easter Saturday" },
+        { date: '2026-04-05', name: "Easter Sunday" },
+        { date: '2026-04-06', name: "Easter Monday" },
+        { date: '2026-04-27', name: "Anzac Day (observed)" },
+        { date: '2026-06-01', name: "Reconciliation Day" },
+        { date: '2026-06-08', name: "King's Birthday" },
+        { date: '2026-10-05', name: "Labour Day" },
+        { date: '2026-12-25', name: "Christmas Day" },
+        { date: '2026-12-26', name: "Boxing Day" },
+        { date: '2026-12-28', name: "Additional Public Holiday (Boxing Day)" }
     ]
 };
 
 function initializeComplianceCalendarState() {
-    const selector = document.getElementById('complianceStateSelector');
-    if (!selector) return;
-    
-    // Try to get user's state from venue profile
-    let userState = 'NSW'; // Default
-    
-    const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
-    if (userKey) {
-        const savedProfile = localStorage.getItem('venueProfile_' + userKey);
-        if (savedProfile) {
-            try {
-                const profile = JSON.parse(savedProfile);
-                if (profile.state) {
-                    userState = profile.state;
-                }
-            } catch (e) {}
+    try {
+        const selector = document.getElementById('complianceStateSelector');
+        if (!selector) {
+            console.warn('⚠️ complianceStateSelector not found');
+            return;
         }
+        
+        // Try to get user's state from venue profile
+        let userState = 'NSW'; // Default
+        
+        const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
+        if (userKey) {
+            const savedProfile = localStorage.getItem('venueProfile_' + userKey);
+            if (savedProfile) {
+                try {
+                    const profile = JSON.parse(savedProfile);
+                    if (profile.state) {
+                        userState = profile.state;
+                    }
+                } catch (e) {
+                    console.warn('⚠️ Could not parse venue profile:', e);
+                }
+            }
+        }
+        
+        // Also check global venueProfile
+        if (typeof venueProfile !== 'undefined' && venueProfile && venueProfile.state) {
+            userState = venueProfile.state;
+        }
+        
+        selector.value = userState;
+        updatePublicHolidays();
+    } catch (error) {
+        console.error('❌ Error initializing compliance calendar state:', error);
     }
-    
-    // Also check global venueProfile
-    if (typeof venueProfile !== 'undefined' && venueProfile && venueProfile.state) {
-        userState = venueProfile.state;
-    }
-    
-    selector.value = userState;
-    updatePublicHolidays();
 }
 
 function updatePublicHolidays() {
-    const selector = document.getElementById('complianceStateSelector');
-    const list = document.getElementById('publicHolidaysList');
-    const badge = document.getElementById('stateHolidayBadge');
-    
-    if (!selector || !list) return;
-    
-    const state = selector.value;
-    if (badge) badge.textContent = state;
-    
-    // Combine national and state holidays
-    const allHolidays = [...PUBLIC_HOLIDAYS.national];
-    if (PUBLIC_HOLIDAYS[state]) {
-        allHolidays.push(...PUBLIC_HOLIDAYS[state]);
-    }
-    
-    // Sort by date
-    allHolidays.sort((a, b) => new Date(a.date) - new Date(b.date));
-    
-    // Filter to upcoming holidays only (from today)
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    
-    const upcoming = allHolidays.filter(h => new Date(h.date) >= today).slice(0, 8);
-    
-    // Generate HTML
-    if (upcoming.length === 0) {
-        list.innerHTML = '<p class="text-slate-400">No upcoming public holidays found.</p>';
-        return;
-    }
-    
-    list.innerHTML = upcoming.map(h => {
-        const date = new Date(h.date);
-        const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
-        const formattedDate = date.toLocaleDateString('en-AU', options);
-        const daysUntil = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
+    try {
+        const selector = document.getElementById('complianceStateSelector');
+        const list = document.getElementById('publicHolidaysList');
+        const badge = document.getElementById('stateHolidayBadge');
         
-        let urgencyClass = 'text-slate-400';
-        let urgencyText = '';
-        
-        if (daysUntil <= 7) {
-            urgencyClass = 'text-red-400 font-semibold';
-            urgencyText = daysUntil === 0 ? '(Today!)' : daysUntil === 1 ? '(Tomorrow!)' : `(${daysUntil} days)`;
-        } else if (daysUntil <= 14) {
-            urgencyClass = 'text-yellow-400';
-            urgencyText = `(${daysUntil} days)`;
-        } else if (daysUntil <= 30) {
-            urgencyText = `(${daysUntil} days)`;
+        if (!selector || !list) {
+            console.warn('⚠️ Missing elements for public holidays update');
+            return;
         }
         
-        const isStateSpecific = PUBLIC_HOLIDAYS[state]?.some(sh => sh.date === h.date && sh.name === h.name);
-        const stateTag = isStateSpecific ? `<span class="ml-2 px-1.5 py-0.5 bg-purple-500/30 text-purple-300 text-xs rounded">${state}</span>` : '';
+        const state = selector.value;
+        if (badge) badge.textContent = state;
         
-        return `
-            <div class="flex justify-between items-center py-2 border-b border-slate-700/50">
-                <div class="flex items-center gap-2">
-                    <span class="text-slate-300">${formattedDate}</span>
-                    <span class="${urgencyClass} text-xs">${urgencyText}</span>
+        // Get holidays for selected state
+        const stateHolidays = PUBLIC_HOLIDAYS_2026[state] || [];
+        
+        // Sort by date
+        const sortedHolidays = [...stateHolidays].sort((a, b) => new Date(a.date) - new Date(b.date));
+        
+        // Filter to upcoming holidays only (from today)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        const upcoming = sortedHolidays.filter(h => new Date(h.date) >= today).slice(0, 10);
+        
+        // Generate HTML
+        if (upcoming.length === 0) {
+            list.innerHTML = '<p class="text-slate-400">No upcoming public holidays found for 2026.</p>';
+            return;
+        }
+        
+        list.innerHTML = upcoming.map(h => {
+            const date = new Date(h.date);
+            const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+            const formattedDate = date.toLocaleDateString('en-AU', options);
+            const daysUntil = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
+            
+            let urgencyClass = 'text-slate-400';
+            let urgencyText = '';
+            
+            if (daysUntil <= 7) {
+                urgencyClass = 'text-red-400 font-semibold';
+                urgencyText = daysUntil === 0 ? '(Today!)' : daysUntil === 1 ? '(Tomorrow!)' : `(${daysUntil} days)`;
+            } else if (daysUntil <= 14) {
+                urgencyClass = 'text-yellow-400';
+                urgencyText = `(${daysUntil} days)`;
+            } else if (daysUntil <= 30) {
+                urgencyText = `(${daysUntil} days)`;
+            }
+            
+            // Show regional or part-day badge
+            let extraBadge = '';
+            if (h.regional) {
+                extraBadge = '<span class="ml-1 px-1.5 py-0.5 bg-blue-500/30 text-blue-300 text-xs rounded">Regional</span>';
+            } else if (h.partDay) {
+                extraBadge = '<span class="ml-1 px-1.5 py-0.5 bg-amber-500/30 text-amber-300 text-xs rounded">Part Day</span>';
+            }
+            
+            return `
+                <div class="flex justify-between items-center py-2 border-b border-slate-700/50">
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-300">${formattedDate}</span>
+                        <span class="${urgencyClass} text-xs">${urgencyText}</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="text-purple-300 text-sm">${h.name}</span>
+                        ${extraBadge}
+                    </div>
                 </div>
-                <div class="flex items-center">
-                    <span class="text-purple-300">${h.name}</span>
-                    ${stateTag}
-                </div>
-            </div>
-        `;
-    }).join('');
+            `;
+        }).join('');
+        
+        console.log('✅ Public holidays updated for', state);
+    } catch (error) {
+        console.error('❌ Error updating public holidays:', error);
+    }
 }
 
 function openTerminationRisk() {
