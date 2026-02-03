@@ -20414,7 +20414,9 @@ function generateChecklistItems(employmentType, position) {
             id: 1,
             category: 'Legal & Compliance',
             title: 'Provide Fair Work Information Statement',
-            hint: 'Must be given before or on the first day of work. Download from Fair Work website.',
+            hint: 'Must be given before or on the first day of work.',
+            link: 'https://www.fairwork.gov.au/employment-conditions/information-statements/fair-work-information-statement',
+            linkText: 'Download from Fair Work',
             priority: 'high',
             daysUntil: 0,
             actions: ['Download Template', 'Mark as Given']
@@ -20432,7 +20434,9 @@ function generateChecklistItems(employmentType, position) {
             id: 3,
             category: 'Payroll Setup',
             title: 'Collect Tax File Number (TFN) Declaration',
-            hint: 'Required for tax purposes. Use ATO TFN declaration form.',
+            hint: 'Required for tax purposes.',
+            link: 'https://www.ato.gov.au/forms-and-instructions/tax-file-number-declaration',
+            linkText: 'Download TFN Declaration Form',
             priority: 'high',
             daysUntil: 1,
             actions: ['Download Form', 'Mark Received']
@@ -20442,6 +20446,8 @@ function generateChecklistItems(employmentType, position) {
             category: 'Payroll Setup',
             title: 'Super Fund Choice Form',
             hint: 'Employee must choose superannuation fund or use your default fund.',
+            link: 'https://www.ato.gov.au/forms-and-instructions/superannuation-standard-choice-form',
+            linkText: 'Download Super Choice Form',
             priority: 'high',
             daysUntil: 1,
             actions: ['Download Form', 'Mark Completed']
@@ -20646,6 +20652,15 @@ function renderChecklistItem(item) {
                     <span class="priority-badge priority-${item.priority}">${item.priority}</span>
                 </div>
                 <div class="item-hint">${item.hint}</div>
+                ${item.link ? `
+                    <div class="mt-2">
+                        <a href="${item.link}" target="_blank" rel="noopener noreferrer" 
+                           style="color: #f59e0b; text-decoration: underline; font-size: 13px; display: inline-flex; align-items: center; gap: 4px;">
+                            📥 ${item.linkText || 'Download Form'}
+                            <span style="font-size: 10px;">↗</span>
+                        </a>
+                    </div>
+                ` : ''}
                 ${item.daysUntil !== undefined ? `
                     <div class="text-xs text-slate-400 mt-2">
                         ${item.daysUntil === 0 ? '⚡ Due today' : item.daysUntil === 1 ? '📅 Due tomorrow' : `📅 Due in ${item.daysUntil} days`}
@@ -22653,7 +22668,7 @@ function getStep0Template() {
             <div class="info-box-content">
                 <p>You'll need to know which Modern Award applies to your employee. Not sure?</p>
                 <button class="btn btn-link" onclick="openAwardWizardFromContract(); return false;">Use Award Wizard →</button>
-                <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/find-my-award', 'Fair Work Award Finder');" style="color: #007bff; text-decoration: underline;">Visit Fair Work Award Finder</a>
+                <a href="https://services.fairwork.gov.au/find-my-award" target="_blank" rel="noopener noreferrer" style="color: #007bff; text-decoration: underline;">Visit Fair Work Award Finder ↗</a>
             </div>
         </div>
         
@@ -23113,7 +23128,7 @@ function getStep2Template() {
         <div class="form-section">
             <h3 class="form-section-title required">Will the employee be a shiftworker?</h3>
             <p class="form-section-description">Whether your employee is considered a shiftworker will depend on the award they are under. 
-            <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/employment-conditions/hours-of-work-breaks-and-rosters/shift-work', 'Fair Work Shift Work information');">Check the award to see if it has a definition of shiftworker</a> – they're not all the same.</p>
+            <a href="https://www.fairwork.gov.au/employment-conditions/hours-of-work-breaks-and-rosters/shift-work" target="_blank" rel="noopener noreferrer">Check the award to see if it has a definition of shiftworker</a> – they're not all the same.</p>
             
             <div class="radio-group-vertical">
                 <label class="radio-option-card">
@@ -23183,7 +23198,7 @@ function getStep2Template() {
                     <p>Flexible hours can help support a positive employment relationship. For example, you might allow your employee to start and finish work earlier on some days to pick their child up from school.</p>
                     <p>Some employees are legally entitled to request flexible working arrangements (including flexible hours and patterns of work). You can only refuse these requests if you have a good business reason.</p>
                     <p>The right to request flexible working arrangements is a minimum entitlement in the National Employment Standards. You can't set conditions that are less than or exclude the National Employment Standards.</p>
-                    <p><a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/employment-conditions/flexibility-in-the-workplace/flexible-working-arrangements', 'Fair Work Flexible Working Arrangements');">Find out more about flexible working arrangements</a> on the Fair Work Ombudsman website.</p>
+                    <p><a href="https://www.fairwork.gov.au/employment-conditions/flexibility-in-the-workplace/flexible-working-arrangements" target="_blank" rel="noopener noreferrer">Find out more about flexible working arrangements</a> on the Fair Work Ombudsman website.</p>
                 </div>
             </div>
         </div>
@@ -23192,7 +23207,7 @@ function getStep2Template() {
         <div class="form-section">
             <h3 class="form-section-title">Averaging hours over more than a week</h3>
             <p class="form-section-description">This allows averaging of the employee's ordinary hours over more than one week. This means they can work more one week and less in another. 
-            <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/employment-conditions/hours-of-work-breaks-and-rosters/hours-of-work', 'Fair Work Averaging Hours');">Check the award for specific rules around averaging hours</a> before you select this clause.</p>
+            <a href="https://www.fairwork.gov.au/employment-conditions/hours-of-work-breaks-and-rosters/hours-of-work" target="_blank" rel="noopener noreferrer">Check the award for specific rules around averaging hours</a> before you select this clause.</p>
             
             <div class="optional-clause-toggle">
                 <label class="checkbox-label">
@@ -23268,7 +23283,7 @@ function getStep2Template() {
                         <li>pay rates if called out to work while on call</li>
                     </ul>
                     <p><strong>Right to disconnect:</strong> Employees have the right to refuse to monitor, read or respond to contact (or attempted contact) from their employer or a third-party outside of working hours, unless the refusal is unreasonable. Several factors must be considered when determining whether an employee's refusal is unreasonable, such as whether they are receiving compensation to be on call.</p>
-                    <p><a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/employment-conditions/hours-of-work-breaks-and-rosters/right-to-disconnect', 'Fair Work Right to Disconnect');">Learn about the right to disconnect</a> on the Fair Work Ombudsman's website.</p>
+                    <p><a href="https://www.fairwork.gov.au/employment-conditions/hours-of-work-breaks-and-rosters/right-to-disconnect" target="_blank" rel="noopener noreferrer">Learn about the right to disconnect</a> on the Fair Work Ombudsman's website.</p>
                 </div>
             </div>
         </div>
@@ -23276,7 +23291,7 @@ function getStep2Template() {
         <!-- ROSTERS (Optional) -->
         <div class="form-section">
             <h3 class="form-section-title">Rosters</h3>
-            <p class="form-section-description">Include this clause to specify roster notice periods. Check the award rules for rosters on the <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/employment-conditions/hours-of-work-breaks-and-rosters/rosters', 'Fair Work Rosters');">Fair Work Ombudsman's Rosters page</a>.</p>
+            <p class="form-section-description">Include this clause to specify roster notice periods. Check the award rules for rosters on the <a href="https://www.fairwork.gov.au/employment-conditions/hours-of-work-breaks-and-rosters/rosters" target="_blank" rel="noopener noreferrer">Fair Work Ombudsman's Rosters page</a>.</p>
             
             <div class="optional-clause-toggle">
                 <label class="checkbox-label">
@@ -23391,7 +23406,7 @@ function getStep2Template() {
                         <li>the rules about payment</li>
                         <li>what happens if you don't provide a break</li>
                     </ul>
-                    <p><a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/employment-conditions/hours-of-work-breaks-and-rosters/breaks', 'Fair Work Breaks information');">Find out more about breaks in your industry</a> on the Fair Work Ombudsman website.</p>
+                    <p><a href="https://www.fairwork.gov.au/employment-conditions/hours-of-work-breaks-and-rosters/breaks" target="_blank" rel="noopener noreferrer">Find out more about breaks in your industry</a> on the Fair Work Ombudsman website.</p>
                 </div>
             </div>
         </div>
@@ -23474,7 +23489,7 @@ function getStep3Template() {
         <!-- PAY RATE -->
         <div class="form-section">
             <h3 class="form-section-title required">What is the employee's rate of pay?</h3>
-            <p class="form-section-description">Select an hourly or a weekly rate of pay. Use the <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/pay-and-wages/paying-wages', 'Fair Work Pay and Conditions Tool');">Fair Work Ombudsman's Pay and Conditions Tool</a> to find minimum pay rates for your employee's classification level.</p>
+            <p class="form-section-description">Select an hourly or a weekly rate of pay. Use the <a href="https://www.fairwork.gov.au/pay-and-wages/paying-wages" target="_blank" rel="noopener noreferrer">Fair Work Ombudsman's Pay and Conditions Tool</a> to find minimum pay rates for your employee's classification level.</p>
             
             <div class="radio-group-vertical" style="margin-bottom: 16px;">
                 <label class="radio-option-card">
@@ -23538,7 +23553,7 @@ function getStep3Template() {
         <!-- PAYMENT METHOD -->
         <div class="form-section">
             <h3 class="form-section-title required">How often will you pay your employee?</h3>
-            <p class="form-section-description">Check how often you have to pay by selecting the employee's award on the <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/pay-and-wages/paying-wages', 'Fair Work Frequency of Pay');">Fair Work Ombudsman's Frequency of pay page</a>.</p>
+            <p class="form-section-description">Check how often you have to pay by selecting the employee's award on the <a href="https://www.fairwork.gov.au/pay-and-wages/paying-wages" target="_blank" rel="noopener noreferrer">Fair Work Ombudsman's Frequency of pay page</a>.</p>
             
             <div class="radio-group-vertical" style="margin-bottom: 20px;">
                 <label class="radio-option-card">
@@ -23655,7 +23670,7 @@ function getStep3Template() {
         <!-- ADDITIONAL SUPER CONTRIBUTIONS (Optional) -->
         <div class="form-section">
             <h3 class="form-section-title">Additional super contributions</h3>
-            <p class="form-section-description">Select this clause if the <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/pay-and-wages/superannuation', 'Fair Work Additional Super');">award requires additional super</a> on top of the super guarantee (SG). If the award does not require additional super, you can choose whether to pay extra as an incentive to your employee.</p>
+            <p class="form-section-description">Select this clause if the <a href="https://www.fairwork.gov.au/pay-and-wages/superannuation" target="_blank" rel="noopener noreferrer">award requires additional super</a> on top of the super guarantee (SG). If the award does not require additional super, you can choose whether to pay extra as an incentive to your employee.</p>
             
             <div class="optional-clause-toggle">
                 <label class="checkbox-label">
@@ -23726,7 +23741,7 @@ function getStep3Template() {
                 </button>
                 <div class="help-content">
                     <p>The rules around penalty rates and overtime differ between awards. Check the award for details (including pay rates).</p>
-                    <p>Find out more about <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/pay-and-wages/penalty-rates-and-allowances', 'Fair Work Penalty Rates');">penalty rates</a> and <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/pay-and-wages/overtime', 'Fair Work Overtime');">overtime</a> on the Fair Work Ombudsman website.</p>
+                    <p>Find out more about <a href="https://www.fairwork.gov.au/pay-and-wages/penalty-rates-and-allowances" target="_blank" rel="noopener noreferrer">penalty rates</a> and <a href="https://www.fairwork.gov.au/pay-and-wages/overtime" target="_blank" rel="noopener noreferrer">overtime</a> on the Fair Work Ombudsman website.</p>
                 </div>
             </div>
         </div>
@@ -24061,7 +24076,7 @@ function getStep4Template() {
                         <li>have worked for you on a regular and systematic basis for 12 months or more</li>
                         <li>had a reasonable expectation of continuing their employment on a regular and systematic basis had it not been for the birth or adoption of a child.</li>
                     </ul>
-                    <p><a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/leave/maternity-and-parental-leave', 'Fair Work Parental Leave');">Find out more about parental leave</a> on the Fair Work Ombudsman website.</p>
+                    <p><a href="https://www.fairwork.gov.au/leave/maternity-and-parental-leave" target="_blank" rel="noopener noreferrer">Find out more about parental leave</a> on the Fair Work Ombudsman website.</p>
                 </div>
             </div>
         </div>
@@ -24135,7 +24150,7 @@ function getStep4Template() {
                         <li>they're sick or injured, or</li>
                         <li>a member of their immediate family or household needs their care or support for an injury, sickness or unexpected emergency.</li>
                     </ul>
-                    <p><a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/leave/sick-and-carers-leave', 'Fair Work Personal/Carer\\'s Leave');">Find out more about personal/carer's leave</a> on the Fair Work Ombudsman website.</p>
+                    <p><a href="https://www.fairwork.gov.au/leave/sick-and-carers-leave" target="_blank" rel="noopener noreferrer">Find out more about personal/carer's leave</a> on the Fair Work Ombudsman website.</p>
                 </div>
             </div>
         </div>
@@ -24172,7 +24187,7 @@ function getStep4Template() {
                         <li>Full and part-time employees get paid compassionate leave.</li>
                         <li>Casual employees get unpaid compassionate leave.</li>
                     </ul>
-                    <p><a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/leave/compassionate-and-bereavement-leave', 'Fair Work Compassionate Leave');">Find out more about compassionate and bereavement leave</a> on the Fair Work Ombudsman website.</p>
+                    <p><a href="https://www.fairwork.gov.au/leave/compassionate-and-bereavement-leave" target="_blank" rel="noopener noreferrer">Find out more about compassionate and bereavement leave</a> on the Fair Work Ombudsman website.</p>
                 </div>
             </div>
         </div>
@@ -24274,7 +24289,7 @@ function getStep4Template() {
                         <li>You can ask an employee to work on a public holiday – if it's reasonable.</li>
                         <li>If they do work, you'll need to pay them at least the award rates for public holidays.</li>
                     </ul>
-                    <p><a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/leave/public-holidays', 'Fair Work Public Holidays');">Find out more about public holidays</a> on the Fair Work Ombudsman website.</p>
+                    <p><a href="https://www.fairwork.gov.au/leave/public-holidays" target="_blank" rel="noopener noreferrer">Find out more about public holidays</a> on the Fair Work Ombudsman website.</p>
                 </div>
             </div>
         </div>
@@ -24539,7 +24554,7 @@ function getStep6Template() {
         <div class="form-section">
             <h3 class="form-section-title required">Resignation notice</h3>
             <p class="form-section-description"><strong>If your employee resigns, how much notice will they need to give you?</strong></p>
-            <p class="form-section-description">Insert at least the <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/ending-employment/notice-and-final-pay', 'Fair Work Minimum Notice');">minimum notice</a> from the award. If your award isn't listed, choose 'Other' then find it in the linked list of awards. If the award doesn't have rules, consider using the same minimum notice period required for dismissals.</p>
+            <p class="form-section-description">Insert at least the <a href="https://www.fairwork.gov.au/ending-employment/notice-and-final-pay" target="_blank" rel="noopener noreferrer">minimum notice</a> from the award. If your award isn't listed, choose 'Other' then find it in the linked list of awards. If the award doesn't have rules, consider using the same minimum notice period required for dismissals.</p>
             
             <div style="background: #f8f9fa; border: 1px solid #dee2e6; border-radius: 8px; padding: 20px; margin: 16px 0;">
                 <div style="display: grid; grid-template-columns: 1fr 200px; gap: 12px; margin-bottom: 16px;">
@@ -24635,7 +24650,7 @@ function getStep6Template() {
         <!-- DISMISSAL NOTICE -->
         <div class="form-section">
             <h3 class="form-section-title">Dismissal notice</h3>
-            <p class="form-section-description">If you dismiss an employee, you must provide specific minimum notice periods or the equivalent pay (unless they're in the list of employees that do not get notice). You should also <a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/ending-employment/notice-and-final-pay', 'Fair Work Notice in Award');">check the minimum notice in the award</a> – some have longer notice periods. If your award isn't listed, choose 'Other' then find it in the linked list of awards.</p>
+            <p class="form-section-description">If you dismiss an employee, you must provide specific minimum notice periods or the equivalent pay (unless they're in the list of employees that do not get notice). You should also <a href="https://www.fairwork.gov.au/ending-employment/notice-and-final-pay" target="_blank" rel="noopener noreferrer">check the minimum notice in the award</a> – some have longer notice periods. If your award isn't listed, choose 'Other' then find it in the linked list of awards.</p>
             
             <div class="clause-preview">
                 <div class="clause-header">
@@ -24771,7 +24786,7 @@ function getStep6Template() {
                 <div class="help-content">
                     <p>To dismiss an employee without notice, you must believe that their conduct is serious enough to justify immediate dismissal.</p>
                     <p>It's a good idea to document the misconduct, in case your employee makes an unfair dismissal claim. Be careful dismissing an employee this way. If the dismissal is found to be unfair, you may have to pay compensation, lost wages and/or give the employee their job back.</p>
-                    <p><a href="#" onclick="return openExternalLinkFromContract('https://www.fairwork.gov.au/ending-employment/dismissal/misconduct-and-serious-misconduct', 'Fair Work Serious Misconduct');">Check the Fair Work Ombudsman's website for more information on serious misconduct</a>.</p>
+                    <p><a href="https://www.fairwork.gov.au/ending-employment/dismissal/misconduct-and-serious-misconduct" target="_blank" rel="noopener noreferrer">Check the Fair Work Ombudsman's website for more information on serious misconduct</a>.</p>
                 </div>
             </div>
         </div>
