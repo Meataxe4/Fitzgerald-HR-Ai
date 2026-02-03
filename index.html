@@ -1104,6 +1104,16 @@ header button[onclick*="logout"],
     }
 }
 
+/* Desktop styles for tools menu (restore flex centering) */
+@media (min-width: 769px) {
+    #toolsMenu:not(.hidden) {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+    }
+}
+
 /* Tablet optimizations (768px - 1024px) */
 @media (min-width: 768px) and (max-width: 1024px) {
     /* Slightly reduce padding for tablets */
@@ -18972,7 +18982,7 @@ function resetAIImport() {
 </div>
 
 <!-- Tools Modal - Same Structure as Settings Modal -->
-<div id="toolsMenu" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50 overflow-y-auto">
+<div id="toolsMenu" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 overflow-y-auto">
     <div id="toolsMenuInner" class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in md:max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
             <div>
