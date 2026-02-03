@@ -326,12 +326,6 @@ header button[onclick*="logout"],
 
 /* Improve mobile touch targets */
 @media (max-width: 768px) {
-    /* Make all buttons at least 44px tall (Apple's recommended touch target) */
-    button {
-        min-height: 44px;
-        min-width: 44px;
-    }
-    
     /* Prevent text selection on buttons */
     button, .tool-card, .modal-button {
         -webkit-user-select: none;
@@ -367,23 +361,11 @@ header button[onclick*="logout"],
         padding: 16px !important;
     }
     
-    /* Make Daily Tip bar more compact on mobile */
-    .bg-blue-500\/10 {
-        padding: 12px !important;
-        font-size: 14px !important;
-    }
-    
     /* Suggestion boxes - more compact */
     .bg-amber-500\/10,
     .bg-yellow-500\/10 {
         padding: 12px !important;
         font-size: 14px !important;
-    }
-    
-    /* Header adjustments */
-    header {
-        padding-top: 8px !important;
-        padding-bottom: 8px !important;
     }
     
     /* Tools menu - HIDE on mobile (use modal instead) */
@@ -486,12 +468,6 @@ header button[onclick*="logout"],
         margin-bottom: 12px !important;
     }
     
-    /* Navigation buttons - wrap better */
-    header button {
-        font-size: 13px !important;
-        padding: 8px 12px !important;
-    }
-    
     /* Hide secondary text on very small screens */
     @media (max-width: 380px) {
         .hidden.sm\\:inline {
@@ -504,115 +480,97 @@ header button[onclick*="logout"],
         #messagesContainer {
             max-height: 50vh !important;
         }
-        
-        header {
-            position: sticky !important;
-            top: 0 !important;
-            z-index: 50 !important;
-        }
     }
     
     /* ==========================================
        PHASE 5: MOBILE UX - SINGLE ROW HEADER
        ========================================== */
     
-    /* FIX 1: CLEAN SINGLE ROW HEADER */
-    /* [☰] [Fitz] [🚨 URGENT] [Tools] [Logout] [⋯ More] */
-    
-    /* Header container - single row */
-    .bg-slate-800\/80.backdrop-blur-sm {
-        padding: 12px 16px !important;
-    }
-    
-    .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl {
-        max-width: 100% !important;
-        padding: 0 !important;
-    }
-    
-    .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div {
-        flex-direction: row !important;
-        justify-content: space-between !important;
-        align-items: center !important;
-        gap: 8px !important;
-    }
-    
-    /* Left side: Sidebar + Logo */
-    .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div > div:first-child {
-        flex: 0 0 auto !important;
-        gap: 8px !important;
-    }
-    
-    /* Sidebar button */
-    .sidebar-toggle-btn-header {
-        padding: 10px !important;
-        min-width: 44px !important;
-        min-height: 44px !important;
-    }
-    
-    /* Logo and text container */
-    .bg-slate-800\/80.backdrop-blur-sm .w-10.h-10 {
-        width: 36px !important;
-        height: 36px !important;
-    }
-    
-    /* Hide "Beta" text on mobile */
-    .bg-slate-800\/80.backdrop-blur-sm .text-xs.text-slate-400 {
-        display: none !important;
-    }
-    
-    /* Right side: URGENT + Tools + Logout + More */
-    .bg-slate-800\/80.backdrop-blur-sm .max-w-5xl > div > div:last-child {
-        flex: 0 0 auto !important;
-        display: flex !important;
-        gap: 6px !important;
-        align-items: center !important;
-    }
-    
-    /* URGENT button - FIRST (order -1 to come before others) */
-    button[onclick*="activateCrisisMode"] {
+    /* Main header - compact padding */
+    #mainHeader {
         padding: 8px 12px !important;
-        min-height: 44px !important;
-        font-size: 13px !important;
-        font-weight: 700 !important;
-        order: -1 !important;  /* Negative to come first */
     }
     
-    /* Tools button - SECOND */
-    button[onclick*="toggleToolsMenu"] {
-        min-width: 44px !important;
-        min-height: 44px !important;
-        padding: 10px !important;
-        order: 1 !important;
+    /* Header content - FORCE single row */
+    #headerContent {
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 8px !important;
     }
     
-    /* More button - THIRD now */
-    #moreMenuButton {
-        order: 2 !important;  /* Now third in order */
+    /* Left side - compact */
+    #headerLeft {
+        flex: 0 0 auto !important;
+        gap: 8px !important;
     }
     
-    /* Hide these buttons ONLY in header - NOT in Profile menu */
-    header button[onclick*="toggleDarkMode"],
-    header button[onclick*="showVenueSettings"],
-    header button[onclick*="showFeedback"],
-    .bg-slate-800\/80 button[onclick*="toggleDarkMode"],
-    .bg-slate-800\/80 button[onclick*="showVenueSettings"],
-    .bg-slate-800\/80 button[onclick*="showFeedback"] {
+    /* Sidebar button - touch friendly */
+    .sidebar-toggle-btn-header {
+        padding: 8px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+    }
+    
+    /* Logo - smaller */
+    #headerLeft .w-10 {
+        width: 32px !important;
+        height: 32px !important;
+    }
+    
+    /* Hide title text on mobile */
+    #headerTitle {
         display: none !important;
     }
     
-    /* Hide dividers */
-    .bg-slate-800\/80.backdrop-blur-sm .hidden.md\\:block {
+    /* Right side - compact */
+    #headerRight {
+        flex: 1 1 auto !important;
+        justify-content: flex-end !important;
+        gap: 6px !important;
+    }
+    
+    /* All header buttons - compact */
+    #headerRight button {
+        padding: 8px !important;
+        min-height: 36px !important;
+    }
+    
+    /* URGENT button */
+    #headerRight button[onclick*="activateCrisisMode"] {
+        padding: 6px 10px !important;
+    }
+    
+    /* Admin button - show for admins */
+    #adminButton.flex {
+        display: flex !important;
+    }
+    
+    /* Hide text labels on mobile */
+    #headerRight .hidden.sm\\:inline {
         display: none !important;
     }
     
-    /* Hide admin */
-    #adminButton {
-        display: none !important;
+    /* Emoji sizes in header */
+    #headerRight button span:first-child {
+        font-size: 16px !important;
     }
     
-    /* Icon sizes */
-    .bg-slate-800\/80.backdrop-blur-sm button span:first-child {
-        font-size: 18px !important;
+    /* Daily tip - compact */
+    #dailyTipBanner {
+        padding: 6px 12px !important;
+    }
+    
+    #dailyTipBanner .text-sm {
+        font-size: 11px !important;
+    }
+    
+    #dailyTipBanner .text-lg {
+        font-size: 14px !important;
+    }
+    
+    #dailyTipBanner button {
+        display: none !important;
     }
     
     /* FIX 2: STACK TOOL NAVIGATION BUTTONS */
@@ -788,18 +746,6 @@ header button[onclick*="logout"],
     /* ==========================================
        MOBILE UX ENHANCEMENTS - PHASE 2
        ========================================== */
-    
-    /* SHOW Admin button on mobile for admin users */
-    #adminButton {
-        display: flex !important;
-        padding: 8px !important;
-        min-width: 40px !important;
-        min-height: 40px !important;
-    }
-    
-    #adminButton .hidden.sm\\:inline {
-        display: none !important;
-    }
     
     /* Tools Menu - Full screen on mobile */
     #toolsMenu {
@@ -3373,14 +3319,14 @@ function continueWithEmail() {
     <!-- Main Assistant Screen (Hidden Initially) -->
     <div id="assistantScreen" class="hidden min-h-screen flex flex-col">
         <!-- Header -->
-        <div class="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700 px-4 md:px-6 py-3 md:py-4">
+        <div id="mainHeader" class="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700 px-4 md:px-6 py-3 md:py-4">
     <div class="max-w-5xl mx-auto">
         
         <!-- Mobile: Stacked Layout, Desktop: Side-by-side -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
+        <div id="headerContent" class="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-0">
             
             <!-- Left: Sidebar Toggle + Logo & Title -->
-            <div class="flex items-center gap-3">
+            <div id="headerLeft" class="flex items-center gap-3">
                 <!-- Sidebar Toggle Button -->
                 <button onclick="toggleSidebar()" class="sidebar-toggle-btn-header p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -3391,14 +3337,14 @@ function continueWithEmail() {
                 <div class="w-10 h-10 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
                     <span class="text-xl">🏨</span>
                 </div>
-                <div>
+                <div id="headerTitle">
                     <h1 class="text-lg md:text-xl font-bold text-white">Fitz</h1>
                     <p class="text-xs text-slate-400">Beta - <span id="userCode"></span></p>
                 </div>
             </div>
 
             <!-- Right: Simplified Buttons -->
-            <div class="flex items-center gap-2 text-sm">
+            <div id="headerRight" class="flex items-center gap-2 text-sm">
                 
                 <!-- Crisis Mode Button -->
                 <button onclick="activateCrisisMode()" 
