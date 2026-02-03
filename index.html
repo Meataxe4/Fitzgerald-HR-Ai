@@ -17452,31 +17452,22 @@ async function showLegalAcceptanceModal() {
     // Get user key for per-user storage
     const userKey = currentUser && currentUser.uid ? currentUser.uid : (currentUser || null);
     
-    console.log('📋 showLegalAcceptanceModal called');
-    console.log('📋 currentUser:', currentUser);
-    console.log('📋 userKey:', userKey);
-    
     // If no valid user key, don't show modal (shouldn't happen but safety check)
     if (!userKey) {
-        console.warn('⚠️ No valid user key for legal check, skipping modal');
         return false;
     }
     
     // STEP 1: Check localStorage first (fast)
     let hasAccepted = localStorage.getItem('legalTermsAccepted_' + userKey) === 'true';
-    console.log('📋 localStorage check - legalTermsAccepted_' + userKey + ':', hasAccepted);
     
     // STEP 2: If not in localStorage, check Firebase (for cross-device sync)
     if (!hasAccepted && currentUser && currentUser.uid && db) {
-        console.log('📋 Not in localStorage, checking Firebase...');
         try {
             const userDoc = await db.collection('users').doc(currentUser.uid).get();
-            console.log('📋 Firebase doc exists:', userDoc.exists);
             
             if (userDoc.exists) {
                 const userData = userDoc.data();
                 const firebaseValue = userData.legalTermsAccepted;
-                console.log('📋 Firebase legalTermsAccepted:', firebaseValue, '(type:', typeof firebaseValue, ')');
                 
                 // Accept both boolean true and string 'true'
                 if (firebaseValue === true || firebaseValue === 'true') {
@@ -17484,28 +17475,21 @@ async function showLegalAcceptanceModal() {
                     // Cache to localStorage for future fast checks
                     localStorage.setItem('legalTermsAccepted_' + userKey, 'true');
                     localStorage.setItem('legalTermsAcceptedAt_' + userKey, userData.legalTermsAcceptedAt || new Date().toISOString());
-                    console.log('✅ Found in Firebase, cached to localStorage');
                 }
             }
         } catch (e) {
-            console.error('❌ Error checking Firebase for legal acceptance:', e);
+            console.error('Error checking Firebase for legal acceptance:', e);
             // Continue - will show modal if not in localStorage
         }
     }
     
     // STEP 3: Final decision
-    console.log('📋 Final hasAccepted:', hasAccepted);
-    
     if (hasAccepted) {
-        console.log('✅ User has already accepted legal terms - NOT showing modal');
         return false; // Don't show modal
     }
     
     // STEP 4: Show modal (user hasn't accepted)
-    console.log('⚠️ User has NOT accepted legal terms - showing modal');
-    
     if (!modal) {
-        console.error('❌ Legal acceptance modal element not found!');
         return false;
     }
     
@@ -17537,44 +17521,60 @@ async function acceptLegalTerms() {
         return;
     }
     
-    // Get user key for per-user storage
-    const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
+    // Get user key - try multiple sources
+    let userKey = null;
+    let firebaseUser = null;
+    
+    // Try 1: currentUser variable
+    if (currentUser && currentUser.uid) {
+        userKey = currentUser.uid;
+        firebaseUser = currentUser;
+    } else if (currentUser && typeof currentUser === 'string') {
+        userKey = currentUser;
+    }
+    
+    // Try 2: Firebase auth directly (fallback)
+    if (!userKey && typeof auth !== 'undefined' && auth && auth.currentUser) {
+        userKey = auth.currentUser.uid;
+        firebaseUser = auth.currentUser;
+        // Also fix currentUser variable
+        currentUser = auth.currentUser;
+    }
+    
+    // Try 3: localStorage fallback for access code users
+    if (!userKey) {
+        const storedCode = localStorage.getItem('fitzhr_access_code');
+        if (storedCode) {
+            userKey = storedCode;
+        }
+    }
     
     if (!userKey) {
-        console.error('❌ No valid user key for saving legal acceptance');
-        alert('Error: Unable to save acceptance. Please refresh and try again.');
+        alert('Error: Unable to identify user. Please refresh the page and try signing in again.');
         return;
     }
     
     // Store acceptance with timestamp
     const timestamp = new Date().toISOString();
     
-    console.log('📋 Saving legal acceptance for user:', userKey);
-    
     // Save to localStorage first (immediate)
     localStorage.setItem('legalTermsAccepted_' + userKey, 'true');
     localStorage.setItem('legalTermsAcceptedAt_' + userKey, timestamp);
-    console.log('✅ Legal acceptance saved to localStorage');
     
-    // Save to Firebase for cross-device sync (wait for completion)
-    let firebaseSaveSuccess = false;
-    if (currentUser && currentUser.uid && db) {
+    // Save to Firebase for cross-device sync
+    if (firebaseUser && firebaseUser.uid && db) {
         try {
-            await db.collection('users').doc(currentUser.uid).set({
+            await db.collection('users').doc(firebaseUser.uid).set({
                 legalTermsAccepted: true,
                 legalTermsAcceptedAt: timestamp,
                 legalTermsVersion: '1.0',
                 legalTermsUserAgent: navigator.userAgent,
-                legalTermsAcceptedBy: currentUser.email || userKey
+                legalTermsAcceptedBy: firebaseUser.email || userKey
             }, { merge: true });
-            firebaseSaveSuccess = true;
-            console.log('✅ Legal acceptance synced to Firebase successfully');
         } catch (err) {
-            console.error('❌ Failed to sync legal acceptance to Firebase:', err);
+            console.error('Failed to sync legal acceptance to Firebase:', err);
             // Continue anyway since localStorage worked
         }
-    } else {
-        console.warn('⚠️ Firebase not available, saved to localStorage only');
     }
     
     // Close modal
@@ -17584,14 +17584,11 @@ async function acceptLegalTerms() {
     trackEvent('legal_terms_accepted', { 
         user: userKey,
         timestamp: timestamp,
-        version: '1.0',
-        firebaseSaved: firebaseSaveSuccess
+        version: '1.0'
     });
     
     // Log to Supabase for audit trail (backup)
     logLegalAcceptance(userKey, timestamp);
-    
-    console.log('✅ User accepted legal terms at:', timestamp);
     
     // Now check if user needs onboarding
     const hasCompletedOnboarding = checkOnboardingStatus();
@@ -26639,7 +26636,6 @@ function stopRealtimeSync() {
 if (auth) {
     auth.onAuthStateChanged(async function(user) {
         if (user) {
-            console.log('👤 Signed in:', user.displayName);
             currentUser = user;
             const accessScreen = document.getElementById('accessScreen');
             const assistantScreen = document.getElementById('assistantScreen');
@@ -26650,7 +26646,6 @@ if (auth) {
                 if (assistantScreen) assistantScreen.classList.remove('hidden');
                 const userCodeEl = document.getElementById('userCode');
                 if (userCodeEl) userCodeEl.textContent = 'Google Account';
-                console.log('✅ Auto-granted access');
             }
             updateUIForAuthenticatedUser(user);
             
@@ -26660,91 +26655,60 @@ if (auth) {
                 const adminBtn = document.getElementById('adminButton');
                 if (adminBtn) {
                     adminBtn.classList.remove('hidden');
-                    console.log('🔐 Admin access granted for:', user.email);
                 }
             }
             
             await loadAllDataFromFirebase(); // Use new Firebase-first system with retry
             
-            // ============================================================
-            // CRITICAL: ALWAYS CHECK FIREBASE FOR LEGAL ACCEPTANCE FIRST
-            // This must run EVERY time, regardless of localStorage state
-            // ============================================================
-            console.log('📋 Starting legal acceptance check for user:', user.uid);
-            
+            // Check Firebase for legal acceptance
             if (db) {
                 try {
                     const userDoc = await db.collection('users').doc(user.uid).get();
-                    console.log('📋 Firebase user document exists:', userDoc.exists);
                     
                     if (userDoc.exists) {
                         const userData = userDoc.data();
-                        console.log('📋 Firebase legalTermsAccepted value:', userData.legalTermsAccepted);
-                        console.log('📋 Firebase legalTermsAccepted type:', typeof userData.legalTermsAccepted);
                         
                         // Check for truthy value (handles boolean true, string "true", etc.)
                         if (userData.legalTermsAccepted === true || userData.legalTermsAccepted === 'true') {
-                            console.log('✅ Legal acceptance FOUND in Firebase - caching to localStorage');
                             localStorage.setItem('legalTermsAccepted_' + user.uid, 'true');
                             localStorage.setItem('legalTermsAcceptedAt_' + user.uid, userData.legalTermsAcceptedAt || new Date().toISOString());
                             
-                            // ✅ CRITICAL: Also hide the modal if it was shown by another flow
+                            // Hide the modal if it was shown by another flow
                             const legalModal = document.getElementById('legalAcceptanceModal');
                             if (legalModal && !legalModal.classList.contains('hidden')) {
-                                console.log('📋 Hiding legal modal that was shown by another flow');
                                 legalModal.classList.add('hidden');
                             }
-                        } else {
-                            console.log('⚠️ Legal acceptance NOT found in Firebase (value was:', userData.legalTermsAccepted, ')');
                         }
                         
                         // Also load venue profile if present
                         if (userData.venueProfile) {
-                            console.log('🏨 Loaded venue profile from Firebase');
                             localStorage.setItem('venueProfile_' + user.uid, JSON.stringify(userData.venueProfile));
                         }
-                    } else {
-                        console.log('⚠️ User document does not exist in Firebase yet');
                     }
                 } catch (e) {
-                    console.error('❌ Error checking Firebase for user data:', e);
+                    console.error('Error checking Firebase for user data:', e);
                 }
-            } else {
-                console.warn('⚠️ Firebase db not available');
             }
-            
-            // Now verify what's in localStorage after Firebase check
-            const localLegalAccepted = localStorage.getItem('legalTermsAccepted_' + user.uid);
-            console.log('📋 localStorage legalTermsAccepted_' + user.uid + ':', localLegalAccepted);
             
             // Load venue profile from localStorage
             let savedVenueProfile = localStorage.getItem('venueProfile_' + user.uid);
             if (savedVenueProfile) {
                 try {
                     venueProfile = JSON.parse(savedVenueProfile);
-                    console.log('🏨 Parsed venueProfile:', venueProfile);
                     setTimeout(() => {
                         updateSidebarVenueName();
                     }, 500);
                 } catch (e) {
-                    console.error('❌ Error parsing venue profile:', e);
+                    console.error('Error parsing venue profile:', e);
                 }
-            } else {
-                console.log('⚠️ No saved venue profile found');
             }
             
-            // ============================================================
-            // NOW CHECK IF WE NEED TO SHOW LEGAL MODAL
-            // Only show if user has NOT accepted (based on localStorage which
-            // was just populated from Firebase above)
-            // ============================================================
+            // Check if we need to show legal modal
             if (accessScreen && accessScreen.classList.contains('hidden')) {
                 const hasAcceptedLegal = localStorage.getItem('legalTermsAccepted_' + user.uid) === 'true';
-                console.log('📋 Final hasAcceptedLegal check:', hasAcceptedLegal);
                 
                 if (!hasAcceptedLegal) {
                     // Show legal modal
-                    console.log('⚠️ Showing legal acceptance modal (not accepted yet)');
                     const modal = document.getElementById('legalAcceptanceModal');
                     const checkbox = document.getElementById('legalAcceptCheckbox');
                     const acceptBtn = document.getElementById('acceptLegalButton');
@@ -26762,14 +26726,12 @@ if (auth) {
                     }
                 } else {
                     // Legal already accepted - check onboarding
-                    console.log('✅ Legal terms already accepted - checking onboarding');
                     const hasCompletedOnboarding = checkOnboardingStatus();
                     if (!hasCompletedOnboarding) {
                         setTimeout(() => showOnboarding(), 1000);
                     } else {
                         // Firebase data already loaded by loadAllDataFromFirebase()
                         // Just restore the last conversation and update UI
-                        console.log('🔄 Restoring last conversation...');
                         setTimeout(() => {
                             restoreLastConversation();
                             updateSidebarChats();
@@ -26780,7 +26742,6 @@ if (auth) {
             
             setupRealtimeSync(user.uid);
         } else {
-            console.log('👤 No user');
             currentUser = null;
             stopRealtimeSync();
             updateUIForUnauthenticatedUser();
