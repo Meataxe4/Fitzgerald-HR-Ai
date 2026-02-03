@@ -602,28 +602,20 @@ header button[onclick*="logout"],
         display: none !important;
     }
     
-    /* Scroll to bottom button - ALWAYS show on mobile */
+    /* Scroll to bottom button - larger on mobile for touch */
     #scrollToBottomBtn {
-        display: flex !important;
-        position: fixed !important;
-        bottom: 140px !important;
-        right: 20px !important;
-        width: 56px !important;
-        height: 56px !important;
-        background: #f59e0b !important;
-        border: 3px solid #fff !important;
-        border-radius: 50% !important;
-        color: white !important;
-        z-index: 9999 !important;
-        align-items: center !important;
-        justify-content: center !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
-        opacity: 1 !important;
+        width: 48px !important;
+        height: 48px !important;
+        bottom: 130px !important;
     }
     
-    #scrollToBottomBtn.hidden-btn {
-        opacity: 0 !important;
-        pointer-events: none !important;
+    #scrollToBottomBtn.visible {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+    
+    #scrollToBottomBtn:hover {
+        transform: translateX(-50%) scale(1.05) !important;
     }
     
     /* FIX 2: STACK TOOL NAVIGATION BUTTONS */
@@ -1307,33 +1299,58 @@ input, textarea, select {
             animation: slideOutRight 0.3s ease-in;
         }
         
-        /* Scroll to bottom button - hidden by default on desktop */
+        /* Scroll to bottom button - Claude-style floating button */
         #scrollToBottomBtn {
-            display: none;
+            display: flex;
             position: fixed;
-            bottom: 120px;
-            right: 20px;
-            width: 56px;
-            height: 56px;
-            background: #f59e0b;
-            border: 3px solid #ffffff;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: rgba(30, 41, 59, 0.95); /* slate-800 with opacity */
+            border: 1px solid rgba(71, 85, 105, 0.8); /* slate-600 */
             border-radius: 50%;
-            color: white;
+            color: #94a3b8; /* slate-400 */
             cursor: pointer;
             z-index: 9999;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
-            transition: opacity 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        #scrollToBottomBtn.visible {
+            opacity: 1;
+            pointer-events: auto;
         }
         
         #scrollToBottomBtn:hover {
-            background: #d97706;
-            transform: scale(1.1);
+            background: rgba(51, 65, 85, 0.95); /* slate-700 */
+            color: #f59e0b; /* amber-500 */
+            border-color: #f59e0b;
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
         }
         
         #scrollToBottomBtn:active {
-            transform: scale(0.95);
+            transform: translateX(-50%) scale(0.95);
+        }
+        
+        /* Light mode adjustments */
+        .light-mode #scrollToBottomBtn {
+            background: rgba(255, 255, 255, 0.95);
+            border-color: rgba(203, 213, 225, 0.8);
+            color: #64748b;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .light-mode #scrollToBottomBtn:hover {
+            background: rgba(248, 250, 252, 0.95);
+            color: #f59e0b;
+            border-color: #f59e0b;
         }
         
         /* Toast container */
@@ -3479,10 +3496,10 @@ function continueWithEmail() {
 </div>
 
         <!-- Messages Container (Scrollable Area) -->
-<!-- Scroll to Bottom Button (Mobile Only) -->
-<button id="scrollToBottomBtn" onclick="scrollToBottom()" title="Scroll to bottom">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 5v14M5 12l7 7 7-7"/>
+<!-- Scroll to Bottom Button - Claude-style floating button -->
+<button id="scrollToBottomBtn" onclick="scrollToBottom()" title="Scroll to bottom" aria-label="Scroll to bottom">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 9l6 6 6-6"/>
     </svg>
 </button>
 
@@ -13901,22 +13918,16 @@ function updateScrollButtonVisibility() {
     
     if (!container || !btn) return;
     
-    // Only show on mobile
-    if (window.innerWidth >= 768) {
-        btn.style.display = 'none';
-        return;
-    }
-    
     const scrollTop = container.scrollTop;
     const scrollHeight = container.scrollHeight;
     const clientHeight = container.clientHeight;
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
     
-    // Hide button when within 50px of bottom OR when content doesn't need scrolling
-    if (distanceFromBottom < 50 || scrollHeight <= clientHeight) {
-        btn.classList.add('hidden-btn');
+    // Show button when scrolled up more than 150px from bottom AND content is scrollable
+    if (distanceFromBottom > 150 && scrollHeight > clientHeight) {
+        btn.classList.add('visible');
     } else {
-        btn.classList.remove('hidden-btn');
+        btn.classList.remove('visible');
     }
 }
 
@@ -17743,7 +17754,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadRecentTools();
     updateSidebarRecentTools();
     
-    // Initialize scroll to bottom button for mobile
+    // Initialize scroll to bottom button (works on all devices)
     if (DOM.messagesContainer) {
         DOM.messagesContainer.addEventListener('scroll', updateScrollButtonVisibility);
         // Initial visibility check after a short delay
