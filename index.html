@@ -560,32 +560,26 @@ header button[onclick*="logout"],
     
     /* Scroll to bottom button - ALWAYS show on mobile */
     #scrollToBottomBtn {
-        display: none;
+        display: flex !important;
         position: fixed !important;
-        bottom: 120px !important;
-        left: 50% !important;
-        right: auto !important;
-        transform: translateX(-50%) !important;
-        width: 36px !important;
-        height: 36px !important;
-        background: rgba(55, 65, 81, 0.95) !important;
-        border: 1px solid rgba(100, 116, 139, 0.5) !important;
+        bottom: 140px !important;
+        right: 20px !important;
+        width: 56px !important;
+        height: 56px !important;
+        background: #f59e0b !important;
+        border: 3px solid #fff !important;
         border-radius: 50% !important;
-        color: #94a3b8 !important;
+        color: white !important;
         z-index: 9999 !important;
         align-items: center !important;
         justify-content: center !important;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
         opacity: 1 !important;
     }
     
-    #scrollToBottomBtn.visible {
-        display: flex !important;
-    }
-    
-    #scrollToBottomBtn svg {
-        width: 20px !important;
-        height: 20px !important;
+    #scrollToBottomBtn.hidden-btn {
+        opacity: 0 !important;
+        pointer-events: none !important;
     }
     
     /* FIX 2: STACK TOOL NAVIGATION BUTTONS */
@@ -1273,39 +1267,29 @@ input, textarea, select {
         #scrollToBottomBtn {
             display: none;
             position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 32px;
-            height: 32px;
-            background: rgba(55, 65, 81, 0.9);
-            border: 1px solid rgba(100, 116, 139, 0.5);
+            bottom: 120px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
+            background: #f59e0b;
+            border: 3px solid #ffffff;
             border-radius: 50%;
-            color: #94a3b8;
+            color: white;
             cursor: pointer;
             z-index: 9999;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            transition: opacity 0.2s ease, background 0.2s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+            transition: opacity 0.3s ease, transform 0.2s ease;
         }
         
         #scrollToBottomBtn:hover {
-            background: rgba(71, 85, 105, 0.95);
-            color: #e2e8f0;
+            background: #d97706;
+            transform: scale(1.1);
         }
         
         #scrollToBottomBtn:active {
-            transform: translateX(-50%) scale(0.95);
-        }
-        
-        #scrollToBottomBtn.visible {
-            display: flex;
-        }
-        
-        #scrollToBottomBtn svg {
-            width: 18px;
-            height: 18px;
+            transform: scale(0.95);
         }
         
         /* Toast container */
@@ -2929,10 +2913,6 @@ async function checkFirestoreData() {
             
             if (typeof initConversationSystem === 'function') {
                 initConversationSystem();
-                // Scroll to bottom after conversation is loaded
-                setTimeout(function() {
-                    if (typeof scrollToBottomInstant === 'function') scrollToBottomInstant();
-                }, 200);
             }
         } else {
             if (errorEl) {
@@ -3455,10 +3435,10 @@ function continueWithEmail() {
 </div>
 
         <!-- Messages Container (Scrollable Area) -->
-<!-- Scroll to Bottom Button -->
+<!-- Scroll to Bottom Button (Mobile Only) -->
 <button id="scrollToBottomBtn" onclick="scrollToBottom()" title="Scroll to bottom">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 5v14M19 12l-7 7-7-7"/>
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
     </svg>
 </button>
 
@@ -10863,8 +10843,6 @@ function checkAccess() {
                     setTimeout(() => {
                         restoreLastConversation();
                         updateSidebarChats();
-                        // Scroll to bottom after conversation is loaded
-                        setTimeout(scrollToBottomInstant, 100);
                     }, 300);
                 }
             }
@@ -10968,8 +10946,6 @@ function attemptAutoLogin() {
                 setTimeout(() => {
                     restoreLastConversation();
                     updateSidebarChats();
-                    // Scroll to bottom after conversation is loaded
-                    setTimeout(scrollToBottomInstant, 100);
                 }, 300);
             }
         }
@@ -13827,49 +13803,34 @@ function scrollToBottom() {
             top: container.scrollHeight,
             behavior: 'smooth'
         });
-        // Hide button immediately when clicked
-        const btn = document.getElementById('scrollToBottomBtn');
-        if (btn) btn.classList.remove('visible');
+        // Update button visibility after scroll completes
+        setTimeout(updateScrollButtonVisibility, 500);
     }
 }
 
-// Scroll to bottom instantly (no animation) - used after login
-function scrollToBottomInstant() {
-    const container = document.getElementById('messagesContainer');
-    const input = document.getElementById('messageInput');
-    
-    // Scroll messages container to bottom
-    if (container) {
-        container.scrollTop = container.scrollHeight;
-    }
-    
-    // Focus on input and scroll it into view
-    if (input) {
-        input.scrollIntoView({ behavior: 'instant', block: 'end' });
-        input.focus();
-    }
-    
-    // Update button visibility
-    updateScrollButtonVisibility();
-}
-
-// Update scroll button visibility based on scroll position (desktop and mobile)
+// Update scroll button visibility based on scroll position
 function updateScrollButtonVisibility() {
     const container = document.getElementById('messagesContainer');
     const btn = document.getElementById('scrollToBottomBtn');
     
     if (!container || !btn) return;
     
+    // Only show on mobile
+    if (window.innerWidth >= 768) {
+        btn.style.display = 'none';
+        return;
+    }
+    
     const scrollTop = container.scrollTop;
     const scrollHeight = container.scrollHeight;
     const clientHeight = container.clientHeight;
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
     
-    // Show button when scrolled up more than 100px from bottom AND content needs scrolling
-    if (distanceFromBottom > 100 && scrollHeight > clientHeight) {
-        btn.classList.add('visible');
+    // Hide button when within 50px of bottom OR when content doesn't need scrolling
+    if (distanceFromBottom < 50 || scrollHeight <= clientHeight) {
+        btn.classList.add('hidden-btn');
     } else {
-        btn.classList.remove('visible');
+        btn.classList.remove('hidden-btn');
     }
 }
 
@@ -17672,11 +17633,9 @@ document.addEventListener('DOMContentLoaded', function() {
     loadRecentTools();
     updateSidebarRecentTools();
     
-    // Initialize scroll to bottom button (desktop and mobile)
+    // Initialize scroll to bottom button for mobile
     if (DOM.messagesContainer) {
         DOM.messagesContainer.addEventListener('scroll', updateScrollButtonVisibility);
-        // Also update on window resize
-        window.addEventListener('resize', updateScrollButtonVisibility);
         // Initial visibility check after a short delay
         setTimeout(updateScrollButtonVisibility, 1000);
     }
@@ -27719,12 +27678,6 @@ async function loadAllDataFromFirebase() {
             updateSidebarBookmarks();
         }
         
-        // Restore last conversation and scroll to bottom
-        if (typeof restoreLastConversation === 'function') {
-            restoreLastConversation();
-            setTimeout(scrollToBottomInstant, 200);
-        }
-        
     } catch (error) {
         console.error('Failed to load data:', error);
     }
@@ -27733,3 +27686,4 @@ async function loadAllDataFromFirebase() {
 </script>
 </body>
 </html>
+
