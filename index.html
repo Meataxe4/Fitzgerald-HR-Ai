@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
     <title>Fitzgerald HR Assistant - Beta Test</title>
     
     <!-- PWA Manifest -->
@@ -11,6 +11,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Fitz HR">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
     
     <!-- Apple Touch Icons -->
     <link rel="apple-touch-icon" href="/icon-192.png">
@@ -782,6 +784,366 @@ header button[onclick*="logout"],
             font-size: 15px !important;
         }
     }
+    
+    /* ==========================================
+       MOBILE UX ENHANCEMENTS - PHASE 2
+       ========================================== */
+    
+    /* SHOW Admin button on mobile for admin users */
+    #adminButton {
+        display: flex !important;
+        padding: 8px !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+    }
+    
+    #adminButton .hidden.sm\\:inline {
+        display: none !important;
+    }
+    
+    /* Tools Menu - Full screen on mobile */
+    #toolsMenu {
+        padding: 0 !important;
+        align-items: flex-start !important;
+    }
+    
+    #toolsMenu > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        border-radius: 0 !important;
+        padding: 16px !important;
+        margin: 0 !important;
+        border: none !important;
+    }
+    
+    #toolsMenu h2 {
+        font-size: 1.5rem !important;
+    }
+    
+    #toolsMenu .grid {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+    
+    #toolsMenu button {
+        padding: 16px !important;
+        min-height: 72px !important;
+    }
+    
+    #toolsMenu .text-3xl {
+        font-size: 2rem !important;
+    }
+    
+    /* Document Builder Modal - Full screen */
+    #documentBuilderModal {
+        padding: 0 !important;
+        align-items: flex-start !important;
+    }
+    
+    #documentBuilderModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        border-radius: 0 !important;
+        padding: 16px !important;
+        margin: 0 !important;
+    }
+    
+    #documentBuilderModal h2 {
+        font-size: 1.25rem !important;
+    }
+    
+    #documentBuilderModal select,
+    #documentBuilderModal input,
+    #documentBuilderModal textarea {
+        font-size: 16px !important;
+        padding: 14px !important;
+        min-height: 48px !important;
+    }
+    
+    /* Contract Builder - Full screen */
+    #contractBuilderStepsModal {
+        padding: 0 !important;
+    }
+    
+    #contractBuilderStepsModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+    }
+    
+    #contractBuilderStepsModal .contract-header {
+        padding: 12px 16px !important;
+    }
+    
+    #contractBuilderStepsModal .contract-header h2 {
+        font-size: 1.1rem !important;
+    }
+    
+    #contractBuilderStepsModal .contract-body {
+        padding: 16px !important;
+    }
+    
+    #contractBuilderStepsModal .contract-footer {
+        padding: 12px 16px !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+    }
+    
+    #contractBuilderStepsModal .contract-footer button {
+        width: 100% !important;
+        padding: 14px !important;
+    }
+    
+    /* Contract step content - better mobile form fields */
+    #contractStepContent select,
+    #contractStepContent input,
+    #contractStepContent textarea {
+        font-size: 16px !important;
+        padding: 12px !important;
+        min-height: 48px !important;
+    }
+    
+    #contractStepContent .grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    /* Employee Onboarding Checklist Modal */
+    #employeeOnboardingChecklistModal {
+        padding: 0 !important;
+    }
+    
+    #employeeOnboardingChecklistModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 16px !important;
+    }
+    
+    /* Training Plan Modal */
+    #trainingPlanModal {
+        padding: 0 !important;
+    }
+    
+    #trainingPlanModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 16px !important;
+    }
+    
+    /* Sidebar improvements */
+    .chat-sidebar {
+        width: 85vw !important;
+        max-width: 320px !important;
+    }
+    
+    .sidebar-chat-item {
+        padding: 14px 12px !important;
+        min-height: 48px !important;
+    }
+    
+    .sidebar-new-chat-btn {
+        min-height: 48px !important;
+        padding: 14px !important;
+    }
+    
+    .sidebar-close-btn {
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 10px !important;
+    }
+    
+    /* Better touch targets for bookmark stars */
+    .bookmark-star {
+        min-width: 44px !important;
+        min-height: 44px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 1.5rem !important;
+    }
+    
+    /* Chat messages - better mobile spacing */
+    #messagesContainer .space-y-6 > div {
+        padding: 14px !important;
+        margin-bottom: 12px !important;
+    }
+    
+    /* Suggestion chips - wrap better on mobile */
+    .flex.flex-wrap.gap-2 {
+        gap: 8px !important;
+    }
+    
+    .flex.flex-wrap.gap-2 button {
+        padding: 10px 14px !important;
+        font-size: 14px !important;
+        min-height: 44px !important;
+    }
+    
+    /* Legal acceptance modal - full screen */
+    #legalAcceptanceModal {
+        padding: 0 !important;
+    }
+    
+    #legalAcceptanceModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 20px !important;
+    }
+    
+    /* Onboarding modal - full screen */
+    #onboardingModal {
+        padding: 0 !important;
+    }
+    
+    #onboardingModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 24px !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+    
+    #onboardingModal select,
+    #onboardingModal input {
+        font-size: 16px !important;
+        padding: 14px !important;
+        min-height: 52px !important;
+    }
+    
+    #onboardingModal button {
+        min-height: 52px !important;
+        font-size: 16px !important;
+    }
+    
+    /* Settings modal - full screen */
+    #venueSettingsModal {
+        padding: 0 !important;
+    }
+    
+    #venueSettingsModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        max-height: 100vh !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        overflow-y: auto !important;
+    }
+    
+    /* Document preview modal - full screen */
+    #documentPreviewModal {
+        padding: 0 !important;
+    }
+    
+    #documentPreviewModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        height: 100vh !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* Validation popup - centered and readable */
+    #validationPopup {
+        padding: 16px !important;
+    }
+    
+    #validationPopup > div {
+        max-width: calc(100vw - 32px) !important;
+        padding: 20px !important;
+    }
+    
+    /* Better spacing for form sections on mobile */
+    .form-section {
+        padding: 16px !important;
+        margin-bottom: 16px !important;
+    }
+    
+    .form-section-title {
+        font-size: 1rem !important;
+        margin-bottom: 12px !important;
+    }
+    
+    /* Progress indicators on mobile */
+    .step-indicator {
+        padding: 8px !important;
+    }
+    
+    .step-indicator .step-number {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 12px !important;
+    }
+    
+    .step-indicator .step-label {
+        font-size: 11px !important;
+    }
+    
+    /* Footer disclaimer - more compact */
+    .bg-slate-800\/50.border-t {
+        padding: 8px 12px !important;
+    }
+    
+    .bg-slate-800\/50.border-t p {
+        font-size: 10px !important;
+        line-height: 1.4 !important;
+    }
+    
+    /* Quick action cards - stack on mobile */
+    .grid.grid-cols-2.md\\:grid-cols-4 {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+    
+    .grid.grid-cols-2.md\\:grid-cols-4 > div {
+        padding: 12px !important;
+    }
+    
+    /* Toast notifications - better mobile positioning */
+    .toast-container {
+        bottom: 80px !important;
+        left: 16px !important;
+        right: 16px !important;
+        max-width: calc(100vw - 32px) !important;
+    }
+    
+    /* Profile dropdown - better mobile sizing */
+    #profileDropdown {
+        right: 8px !important;
+        min-width: 200px !important;
+    }
+    
+    #profileDropdown button {
+        padding: 14px 16px !important;
+        min-height: 48px !important;
+    }
+    
+    /* More menu dropdown - better mobile */
+    #moreMenuDropdown {
+        right: 8px !important;
+        min-width: 180px !important;
+    }
+    
+    #moreMenuDropdown button {
+        padding: 14px 16px !important;
+        min-height: 48px !important;
+    }
 }
 
 /* Tablet optimizations (768px - 1024px) */
@@ -800,6 +1162,55 @@ header button[onclick*="logout"],
 /* Prevent zoom on input focus (iOS) */
 input, textarea, select {
     font-size: 16px;
+}
+
+/* Safe area support for devices with notches (iPhone X+) */
+@supports (padding: max(0px)) {
+    body {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+    
+    /* Input area - respect bottom safe area */
+    .bg-slate-800.border-t {
+        padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+    }
+    
+    /* Footer disclaimer - respect bottom safe area */
+    .bg-slate-800\/50.border-t {
+        padding-bottom: max(12px, env(safe-area-inset-bottom)) !important;
+    }
+    
+    /* Full screen modals - respect safe areas */
+    @media (max-width: 768px) {
+        #toolsMenu > div,
+        #documentBuilderModal > div,
+        #contractBuilderStepsModal > div,
+        #venueSettingsModal > div,
+        #onboardingModal > div,
+        #legalAcceptanceModal > div,
+        #adminDashboardModal > div {
+            padding-top: max(16px, env(safe-area-inset-top)) !important;
+            padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+            padding-left: max(16px, env(safe-area-inset-left)) !important;
+            padding-right: max(16px, env(safe-area-inset-right)) !important;
+        }
+    }
+}
+
+/* Smooth scrolling for all scrollable areas */
+* {
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Prevent pull-to-refresh on mobile */
+body {
+    overscroll-behavior-y: contain;
+}
+
+/* Hide tap highlight on mobile */
+* {
+    -webkit-tap-highlight-color: transparent;
 }
 
         /* Crisis Mode Pulse Animation */
