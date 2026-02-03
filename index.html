@@ -2525,10 +2525,7 @@ async function checkFirestoreData() {
             
             window.currentUser = code;
             
-            if (code === 'FITZGERALD-TEST' || code === 'DEMO-2025') {
-                var adminBtn = document.getElementById('adminButton');
-                if (adminBtn) adminBtn.classList.remove('hidden');
-            }
+            // Admin access is now email-based only (via Google Sign-In)
             
             if (typeof initConversationSystem === 'function') {
                 initConversationSystem();
@@ -10373,13 +10370,7 @@ function checkAccess() {
         
         trackEvent('beta_access', { code: input });
         
-        // Show admin button for admin codes
-        if (['FITZGERALD-TEST', 'DEMO-2025'].includes(input)) {
-            const adminBtn = document.getElementById('adminButton');
-            if (adminBtn) {
-                adminBtn.classList.remove('hidden');
-            }
-        }
+        // Admin access is now email-based only (via Google Sign-In)
         
         // ✅ SHOW LEGAL ACCEPTANCE MODAL FIRST
         // The modal function will check if already accepted and handle the flow
@@ -10481,13 +10472,7 @@ function attemptAutoLogin() {
     // Update last login timestamp
     localStorage.setItem('fitzhr_last_login', new Date().toISOString());
     
-    // Show admin button for admin codes
-    if (['FITZGERALD-TEST', 'DEMO-2025'].includes(storedCode)) {
-        const adminBtn = document.getElementById('adminButton');
-        if (adminBtn) {
-            adminBtn.classList.remove('hidden');
-        }
-    }
+    // Admin access is now email-based only (via Google Sign-In)
     
     // Load conversations first
     loadConversations();
@@ -14326,33 +14311,38 @@ function closeAdminDashboard() {
 }
 
 async function loadAnalytics() {
-    if (!supabaseClient) {
-        alert('⚠️ Database not connected. Check console for errors.');
+    if (!db) {
+        alert('⚠️ Firebase not connected. Check console for errors.');
         return;
     }
     
     try {
-        // Load total counts from Supabase
-        const { count: convCount } = await supabaseClient
-            .from('conversations')
-            .select('*', { count: 'exact', head: true });
+        // Load user count from Firebase
+        const usersSnapshot = await db.collection('users').get();
+        const userCount = usersSnapshot.size;
         
-        const { count: userCount } = await supabaseClient
-            .from('user_profiles')
-            .select('*', { count: 'exact', head: true });
+        // Load all conversations across all users
+        let totalConversations = 0;
+        let todayConversations = 0;
+        const today = new Date().toDateString();
         
-        // Get today's activity
-        const today = new Date().toISOString().split('T')[0];
-        const { count: todayCount } = await supabaseClient
-            .from('conversations')
-            .select('*', { count: 'exact', head: true })
-            .gte('timestamp', today);
+        for (const userDoc of usersSnapshot.docs) {
+            const conversationsSnapshot = await db.collection('users').doc(userDoc.id).collection('conversations').get();
+            totalConversations += conversationsSnapshot.size;
+            
+            conversationsSnapshot.forEach(conv => {
+                const data = conv.data();
+                if (data.timestamp && new Date(data.timestamp.toDate ? data.timestamp.toDate() : data.timestamp).toDateString() === today) {
+                    todayConversations++;
+                }
+            });
+        }
         
         // Update stats
         document.getElementById('statTotalUsers').textContent = userCount || 0;
-        document.getElementById('statTotalMessages').textContent = convCount || 0;
-        document.getElementById('statActiveToday').textContent = todayCount || 0;
-        document.getElementById('statAvgSession').textContent = '5m'; // Simplified
+        document.getElementById('statTotalMessages').textContent = totalConversations || 0;
+        document.getElementById('statActiveToday').textContent = todayConversations || 0;
+        document.getElementById('statAvgSession').textContent = '5m';
         
         // Load conversations tab by default
         switchAdminTab('conversations');
@@ -14385,7 +14375,7 @@ function switchAdminTab(tabName) {
         'themes': 'adminThemesTab',
         'users': 'adminUsersTab',
         'highrisk': 'adminHighRiskTab',
-	'documents': 'adminDocumentsTab'
+        'documents': 'adminDocumentsTab'
     };
     
     document.getElementById(contentMap[tabName]).classList.remove('hidden');
@@ -14401,47 +14391,77 @@ function switchAdminTab(tabName) {
 async function loadConversationsAdmin() {
     const list = document.getElementById('conversationsList');
     
-    // Show loading state
-    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading conversations...</div>';
+    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading conversations from Firebase...</div>';
     
-    if (!supabaseClient) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Database not connected</div>';
+    if (!db) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
         return;
     }
     
     try {
-        // Fetch from Supabase
-        const { data: conversations, error } = await supabaseClient
-            .from('conversations')
-            .select('*')
-            .order('timestamp', { ascending: false })
-            .limit(50);
+        // Collect conversations from all users
+        const allConversations = [];
+        const usersSnapshot = await db.collection('users').get();
         
-        if (error) throw error;
+        for (const userDoc of usersSnapshot.docs) {
+            const userData = userDoc.data();
+            const userName = userData.displayName || userData.email || userDoc.id.substring(0, 8);
+            
+            const conversationsSnapshot = await db.collection('users').doc(userDoc.id)
+                .collection('conversations')
+                .orderBy('timestamp', 'desc')
+                .limit(20)
+                .get();
+            
+            conversationsSnapshot.forEach(convDoc => {
+                const conv = convDoc.data();
+                // Get messages from conversation
+                if (conv.messages && conv.messages.length > 0) {
+                    const lastUserMsg = conv.messages.filter(m => m.role === 'user').pop();
+                    const lastAssistantMsg = conv.messages.filter(m => m.role === 'assistant').pop();
+                    
+                    if (lastUserMsg) {
+                        allConversations.push({
+                            userId: userDoc.id,
+                            userName: userName,
+                            userMessage: lastUserMsg.content.substring(0, 200),
+                            assistantResponse: lastAssistantMsg ? lastAssistantMsg.content.substring(0, 200) : 'N/A',
+                            timestamp: conv.timestamp,
+                            title: conv.title || 'Untitled'
+                        });
+                    }
+                }
+            });
+        }
         
-        if (!conversations || conversations.length === 0) {
+        // Sort by timestamp (newest first)
+        allConversations.sort((a, b) => {
+            const dateA = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp || 0);
+            const dateB = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp || 0);
+            return dateB - dateA;
+        });
+        
+        if (allConversations.length === 0) {
             list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No conversations yet</div>';
             return;
         }
         
         let html = '';
-        conversations.forEach(conv => {
-            const date = new Date(conv.timestamp).toLocaleString('en-AU');
-            const riskBadge = conv.is_high_risk ? '<span class="text-xs bg-red-500 text-white px-2 py-1 rounded">HIGH RISK</span>' : '';
+        allConversations.slice(0, 50).forEach(conv => {
+            const date = conv.timestamp?.toDate ? conv.timestamp.toDate().toLocaleString('en-AU') : 'Unknown';
             
             html += `
                 <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 hover:border-purple-500 transition-all">
                     <div class="flex items-start justify-between mb-2">
                         <div>
-                            <span class="text-purple-400 font-semibold">${conv.user_code}</span>
+                            <span class="text-purple-400 font-semibold">${conv.userName}</span>
                             <span class="text-slate-500 text-xs ml-2">${date}</span>
-                            ${riskBadge}
                         </div>
-                        <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${conv.theme || 'N/A'}</span>
+                        <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${conv.title}</span>
                     </div>
                     <div class="text-sm">
-                        <p class="text-slate-300 mb-2"><strong>User:</strong> ${conv.user_message}</p>
-                        <p class="text-slate-400 text-xs"><strong>Response:</strong> ${conv.assistant_response.substring(0, 150)}...</p>
+                        <p class="text-slate-300 mb-2"><strong>User:</strong> ${conv.userMessage}...</p>
+                        <p class="text-slate-400 text-xs"><strong>Response:</strong> ${conv.assistantResponse}...</p>
                     </div>
                 </div>
             `;
@@ -14450,29 +14470,63 @@ async function loadConversationsAdmin() {
         list.innerHTML = html;
     } catch (error) {
         console.error('Error loading conversations:', error);
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data</div>';
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
     }
 }
 
 async function loadThemes() {
     const list = document.getElementById('themesList');
     
-    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading themes...</div>';
+    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Analyzing conversation themes...</div>';
     
-    if (!supabaseClient) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Database not connected</div>';
+    if (!db) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
         return;
     }
     
     try {
-        const { data: themes, error } = await supabaseClient
-            .from('themes')
-            .select('*')
-            .order('count', { ascending: false });
+        // Collect themes from conversation titles/content
+        const themeCount = {};
+        const usersSnapshot = await db.collection('users').get();
         
-        if (error) throw error;
+        for (const userDoc of usersSnapshot.docs) {
+            const conversationsSnapshot = await db.collection('users').doc(userDoc.id)
+                .collection('conversations')
+                .get();
+            
+            conversationsSnapshot.forEach(convDoc => {
+                const conv = convDoc.data();
+                const title = conv.title || 'Other';
+                
+                // Categorize by keywords
+                let theme = 'Other';
+                const titleLower = title.toLowerCase();
+                
+                if (titleLower.includes('award') || titleLower.includes('pay') || titleLower.includes('wage')) {
+                    theme = 'Pay & Awards';
+                } else if (titleLower.includes('roster') || titleLower.includes('shift') || titleLower.includes('hours')) {
+                    theme = 'Rostering & Hours';
+                } else if (titleLower.includes('leave') || titleLower.includes('sick') || titleLower.includes('annual')) {
+                    theme = 'Leave';
+                } else if (titleLower.includes('termination') || titleLower.includes('dismiss') || titleLower.includes('fire')) {
+                    theme = 'Termination';
+                } else if (titleLower.includes('contract') || titleLower.includes('employment')) {
+                    theme = 'Contracts';
+                } else if (titleLower.includes('warning') || titleLower.includes('disciplin') || titleLower.includes('performance')) {
+                    theme = 'Discipline & Warnings';
+                } else if (titleLower.includes('super') || titleLower.includes('tax') || titleLower.includes('tfn')) {
+                    theme = 'Super & Tax';
+                }
+                
+                themeCount[theme] = (themeCount[theme] || 0) + 1;
+            });
+        }
         
-        if (!themes || themes.length === 0) {
+        const themes = Object.entries(themeCount)
+            .map(([theme, count]) => ({ theme, count }))
+            .sort((a, b) => b.count - a.count);
+        
+        if (themes.length === 0) {
             list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No themes tracked yet</div>';
             return;
         }
@@ -14506,50 +14560,69 @@ async function loadThemes() {
 async function loadUsers() {
     const list = document.getElementById('usersList');
     
-    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading users...</div>';
+    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading users from Firebase...</div>';
     
-    if (!supabaseClient) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Database not connected</div>';
+    if (!db) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
         return;
     }
     
     try {
-        const { data: users, error } = await supabaseClient
-            .from('user_profiles')
-            .select('*')
-            .order('last_active', { ascending: false });
+        const usersSnapshot = await db.collection('users').get();
         
-        if (error) throw error;
-        
-        if (!users || users.length === 0) {
+        if (usersSnapshot.empty) {
             list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No users yet</div>';
             return;
         }
         
+        const users = [];
+        
+        for (const userDoc of usersSnapshot.docs) {
+            const userData = userDoc.data();
+            
+            // Count conversations for this user
+            const conversationsSnapshot = await db.collection('users').doc(userDoc.id).collection('conversations').get();
+            const messageCount = conversationsSnapshot.size;
+            
+            users.push({
+                id: userDoc.id,
+                displayName: userData.displayName || 'Unknown',
+                email: userData.email || 'N/A',
+                venueProfile: userData.venueProfile || null,
+                legalTermsAccepted: userData.legalTermsAccepted || false,
+                legalTermsAcceptedAt: userData.legalTermsAcceptedAt || null,
+                messageCount: messageCount
+            });
+        }
+        
+        // Sort by message count
+        users.sort((a, b) => b.messageCount - a.messageCount);
+        
         let html = '';
         users.forEach(profile => {
-            const venueInfo = profile.venue_type 
-                ? `${profile.venue_type} in ${profile.venue_location}` 
+            const venueInfo = profile.venueProfile 
+                ? `${profile.venueProfile.venueType || 'Unknown'} in ${profile.venueProfile.location || 'Unknown'}` 
                 : 'No venue info';
+            
+            const legalStatus = profile.legalTermsAccepted 
+                ? '<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">✓ Legal Accepted</span>'
+                : '<span class="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded">Pending</span>';
             
             html += `
                 <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
                     <div class="flex items-start justify-between mb-3">
                         <div>
-                            <p class="text-purple-400 font-semibold">${profile.user_code}</p>
-                            <p class="text-xs text-slate-400">${venueInfo}</p>
+                            <p class="text-purple-400 font-semibold">${profile.displayName}</p>
+                            <p class="text-xs text-slate-500">${profile.email}</p>
+                            <p class="text-xs text-slate-400 mt-1">${venueInfo}</p>
                         </div>
-                        <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${profile.message_count} messages</span>
+                        <div class="flex flex-col items-end gap-1">
+                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${profile.messageCount} chats</span>
+                            ${legalStatus}
+                        </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
-                        <div>
-                            <p class="text-slate-500">First seen:</p>
-                            <p class="text-slate-300">${new Date(profile.first_seen).toLocaleDateString('en-AU')}</p>
-                        </div>
-                        <div>
-                            <p class="text-slate-500">Last active:</p>
-                            <p class="text-slate-300">${new Date(profile.last_active).toLocaleDateString('en-AU')}</p>
-                        </div>
+                    <div class="text-xs text-slate-500">
+                        User ID: ${profile.id.substring(0, 12)}...
                     </div>
                 </div>
             `;
@@ -14558,37 +14631,72 @@ async function loadUsers() {
         list.innerHTML = html;
     } catch (error) {
         console.error('Error loading users:', error);
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data</div>';
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
     }
 }
 
 async function loadHighRisk() {
     const list = document.getElementById('highRiskList');
     
-    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading high-risk topics...</div>';
+    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Scanning for high-risk topics...</div>';
     
-    if (!supabaseClient) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Database not connected</div>';
+    if (!db) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
         return;
     }
     
     try {
-        const { data: highRisk, error } = await supabaseClient
-            .from('high_risk_topics')
-            .select('*')
-            .order('timestamp', { ascending: false })
-            .limit(50);
+        // Scan conversations for high-risk keywords
+        const highRiskItems = [];
+        const highRiskKeywords = ['termination', 'unfair dismissal', 'lawsuit', 'legal action', 'sexual harassment', 
+                                   'discrimination', 'bullying', 'assault', 'theft', 'fraud', 'workers comp'];
         
-        if (error) throw error;
+        const usersSnapshot = await db.collection('users').get();
         
-        if (!highRisk || highRisk.length === 0) {
+        for (const userDoc of usersSnapshot.docs) {
+            const userData = userDoc.data();
+            const userName = userData.displayName || userData.email || userDoc.id.substring(0, 8);
+            
+            const conversationsSnapshot = await db.collection('users').doc(userDoc.id)
+                .collection('conversations')
+                .get();
+            
+            conversationsSnapshot.forEach(convDoc => {
+                const conv = convDoc.data();
+                const title = (conv.title || '').toLowerCase();
+                
+                // Check for high-risk keywords
+                for (const keyword of highRiskKeywords) {
+                    if (title.includes(keyword)) {
+                        highRiskItems.push({
+                            userName: userName,
+                            title: conv.title,
+                            keyword: keyword,
+                            timestamp: conv.timestamp,
+                            severity: keyword.includes('harassment') || keyword.includes('assault') ? 'critical' : 
+                                     keyword.includes('dismissal') || keyword.includes('lawsuit') ? 'high' : 'medium'
+                        });
+                        break; // Only add once per conversation
+                    }
+                }
+            });
+        }
+        
+        // Sort by timestamp
+        highRiskItems.sort((a, b) => {
+            const dateA = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp || 0);
+            const dateB = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp || 0);
+            return dateB - dateA;
+        });
+        
+        if (highRiskItems.length === 0) {
             list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No high-risk topics detected</div>';
             return;
         }
         
         let html = '';
-        highRisk.forEach(risk => {
-            const date = new Date(risk.timestamp).toLocaleString('en-AU');
+        highRiskItems.slice(0, 50).forEach(risk => {
+            const date = risk.timestamp?.toDate ? risk.timestamp.toDate().toLocaleString('en-AU') : 'Unknown';
             const colorMap = { critical: 'red', high: 'yellow', medium: 'blue' };
             const color = colorMap[risk.severity] || 'gray';
             
@@ -14601,8 +14709,8 @@ async function loadHighRisk() {
                         </div>
                         <span class="text-xs bg-${color}-500 text-white px-2 py-1 rounded uppercase">${risk.severity}</span>
                     </div>
-                    <p class="text-slate-400 text-xs mb-2"><strong>User:</strong> ${risk.user_code}</p>
-                    <p class="text-slate-300 text-sm">${risk.message_preview}</p>
+                    <p class="text-slate-400 text-xs mb-2"><strong>User:</strong> ${risk.userName}</p>
+                    <p class="text-slate-300 text-sm">Detected keyword: <strong>${risk.keyword}</strong></p>
                 </div>
             `;
         });
@@ -14617,31 +14725,56 @@ async function loadHighRisk() {
 async function loadDocuments() {
     const list = document.getElementById('documentsList');
     
-    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading documents...</div>';
+    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading documents from Firebase...</div>';
     
-    if (!supabaseClient) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Database not connected</div>';
+    if (!db) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
         return;
     }
     
     try {
-        const { data: documents, error } = await supabaseClient
-            .from('generated_documents')
-            .select('*')
-            .order('generated_at', { ascending: false })
-            .limit(100);
+        // Load documents from the global documents collection
+        const documentsSnapshot = await db.collection('generated_documents')
+            .orderBy('generated_at', 'desc')
+            .limit(100)
+            .get();
         
-        if (error) throw error;
+        let documents = [];
         
-        if (!documents || documents.length === 0) {
+        if (documentsSnapshot.empty) {
+            // If no global collection, try to get from users
+            const usersSnapshot = await db.collection('users').get();
+            
+            for (const userDoc of usersSnapshot.docs) {
+                const userData = userDoc.data();
+                const userDocs = userData.generatedDocuments || [];
+                
+                userDocs.forEach(doc => {
+                    documents.push({
+                        ...doc,
+                        user_code: userData.displayName || userData.email || userDoc.id.substring(0, 8)
+                    });
+                });
+            }
+        } else {
+            documentsSnapshot.forEach(doc => {
+                documents.push({ id: doc.id, ...doc.data() });
+            });
+        }
+        
+        if (documents.length === 0) {
             list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No documents generated yet</div>';
             return;
         }
         
-        console.log('📊 Documents loaded:', documents.length);
-        console.log('📊 Sample document:', documents[0]);
+        // Sort by date
+        documents.sort((a, b) => {
+            const dateA = a.generated_at?.toDate ? a.generated_at.toDate() : new Date(a.generated_at || 0);
+            const dateB = b.generated_at?.toDate ? b.generated_at.toDate() : new Date(b.generated_at || 0);
+            return dateB - dateA;
+        });
         
-        // ✅ Calculate stats with FORMAT breakdown
+        // Calculate stats
         const totalGenerated = documents.length;
         const totalDownloaded = documents.filter(d => d.downloaded === true).length;
         const totalPDF = documents.filter(d => d.format === 'pdf').length;
@@ -14651,20 +14784,9 @@ async function loadDocuments() {
         const totalRecords = documents.filter(d => d.document_type === 'recordOfDiscussion').length;
         const totalPIPs = documents.filter(d => d.document_type === 'performanceImprovementPlan').length;
         
-        console.log('📊 Stats:', {
-            total: totalGenerated,
-            downloaded: totalDownloaded,
-            pdf: totalPDF,
-            word: totalWord,
-            warnings: totalWarnings,
-            investigations: totalInvestigations,
-            records: totalRecords,
-            pips: totalPIPs
-        });
-        
         let html = '<div class="space-y-6">';
         
-        // ✅ Updated stats summary with FORMAT breakdown
+        // Stats summary
         html += `
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
@@ -14727,16 +14849,17 @@ async function loadDocuments() {
             letterOfAllegation: 'red'
         };
         
-        // ✅ Format badge mapping
         const formatBadge = {
             'pdf': '<span class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded">📄 PDF</span>',
             'docx': '<span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">📝 Word</span>',
             null: '<span class="text-xs bg-slate-700 text-slate-400 px-2 py-1 rounded">Not downloaded</span>'
         };
         
-        // Document list with FORMAT badges
+        // Document list
         documents.forEach(doc => {
-            const date = new Date(doc.generated_at).toLocaleString('en-AU');
+            const date = doc.generated_at?.toDate 
+                ? doc.generated_at.toDate().toLocaleString('en-AU') 
+                : new Date(doc.generated_at).toLocaleString('en-AU');
             const emoji = typeEmoji[doc.document_type] || '📄';
             const name = typeName[doc.document_type] || doc.document_type || 'Unknown Document';
             const color = typeColor[doc.document_type] || 'blue';
@@ -14764,7 +14887,7 @@ async function loadDocuments() {
                     <div class="text-sm">
                         <p class="text-slate-300"><strong>Employee:</strong> ${doc.employee_name || 'N/A'}</p>
                         ${doc.venue_name ? `<p class="text-slate-400 text-xs mt-1">Venue: ${doc.venue_name}</p>` : ''}
-                        <p class="text-slate-500 text-xs mt-2">Document ID: ${doc.document_id || 'N/A'}</p>
+                        <p class="text-slate-500 text-xs mt-2">Document ID: ${doc.document_id || doc.id || 'N/A'}</p>
                     </div>
                 </div>
             `;
@@ -14775,7 +14898,7 @@ async function loadDocuments() {
         list.innerHTML = html;
     } catch (error) {
         console.error('Error loading documents:', error);
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data</div>';
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
     }
 }
 
@@ -26025,6 +26148,17 @@ if (auth) {
                 console.log('✅ Auto-granted access');
             }
             updateUIForAuthenticatedUser(user);
+            
+            // Show admin button for admin email
+            const adminEmails = ['blakefitzgerald4@gmail.com'];
+            if (adminEmails.includes(user.email)) {
+                const adminBtn = document.getElementById('adminButton');
+                if (adminBtn) {
+                    adminBtn.classList.remove('hidden');
+                    console.log('🔐 Admin access granted for:', user.email);
+                }
+            }
+            
             await loadAllDataFromFirebase(); // Use new Firebase-first system with retry
             
             // ============================================================
