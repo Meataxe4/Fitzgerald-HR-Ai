@@ -4474,7 +4474,7 @@ function continueWithEmail() {
         <!-- Step Progress -->
         <div class="mb-6">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-sm text-slate-400">Step <span id="wizardCurrentStep">1</span> of 6</span>
+                <span class="text-sm text-slate-400">Step <span id="wizardCurrentStep">1</span> of 5</span>
                 <span class="text-sm text-amber-400" id="wizardProgress">20% Complete</span>
             </div>
             <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
@@ -4485,35 +4485,8 @@ function continueWithEmail() {
         <!-- Wizard Steps -->
         <div id="wizardSteps" class="space-y-6">
             
-            <!-- Step 1: Industry -->
-            <div class="wizard-step" data-step="1">
-                <h3 class="text-lg font-bold text-white mb-4">What type of venue is it?</h3>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="wizardAnswer('venue', 'restaurant')" class="wizard-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="text-2xl mb-2">🍽️</div>
-                        <div class="font-semibold">Restaurant</div>
-                        <div class="text-xs text-slate-400">Dine-in service</div>
-                    </button>
-                    <button onclick="wizardAnswer('venue', 'cafe')" class="wizard-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="text-2xl mb-2">☕</div>
-                        <div class="font-semibold">Café</div>
-                        <div class="text-xs text-slate-400">Coffee & light meals</div>
-                    </button>
-                    <button onclick="wizardAnswer('venue', 'hotel')" class="wizard-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="text-2xl mb-2">🏨</div>
-                        <div class="font-semibold">Hotel/Pub</div>
-                        <div class="text-xs text-slate-400">Accommodation or pub</div>
-                    </button>
-                    <button onclick="wizardAnswer('venue', 'fastfood')" class="wizard-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="text-2xl mb-2">🍔</div>
-                        <div class="font-semibold">Fast Food</div>
-                        <div class="text-xs text-slate-400">Quick service</div>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Step 2: Role -->
-<div class="wizard-step hidden" data-step="2">
+            <!-- Step 1: Role -->
+<div class="wizard-step" data-step="1">
     <h3 class="text-lg font-bold text-white mb-4">What's their role?</h3>
     <div class="space-y-2">
         <!-- Food & Beverage -->
@@ -4595,8 +4568,8 @@ function continueWithEmail() {
     </div>
 </div>
 
-            <!-- Step 3: Experience -->
-            <div class="wizard-step hidden" data-step="3">
+            <!-- Step 2: Experience -->
+            <div class="wizard-step hidden" data-step="2">
                 <h3 class="text-lg font-bold text-white mb-4">What's their experience level?</h3>
                 <div class="space-y-2">
                     <button onclick="wizardAnswer('experience', 'intro')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
@@ -4622,8 +4595,8 @@ function continueWithEmail() {
                 </div>
             </div>
 
-            <!-- Step 4: Hours -->
-            <div class="wizard-step hidden" data-step="4">
+            <!-- Step 3: Hours -->
+            <div class="wizard-step hidden" data-step="3">
                 <h3 class="text-lg font-bold text-white mb-4">What hours do they typically work?</h3>
                 <div class="space-y-2">
                     <button onclick="wizardAnswer('hours', 'weekday-day')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
@@ -4649,8 +4622,8 @@ function continueWithEmail() {
                 </div>
             </div>
 
-            <!-- Step 5: Age Category (NEW) -->
-<div class="wizard-step hidden" data-step="5">
+            <!-- Step 4: Age Category -->
+<div class="wizard-step hidden" data-step="4">
     <h3 class="text-lg font-bold text-white mb-4">How old is the employee?</h3>
     <div class="space-y-2">
         <button onclick="wizardAnswer('age', 'adult')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
@@ -4664,8 +4637,8 @@ function continueWithEmail() {
     </div>
 </div>
 
-<!-- Step 6: Employment Type -->
-<div class="wizard-step hidden" data-step="6">
+<!-- Step 5: Employment Type -->
+<div class="wizard-step hidden" data-step="5">
     <h3 class="text-lg font-bold text-white mb-4">What type of employment?</h3>
     <div class="space-y-2">
         <button onclick="wizardAnswer('employment', 'casual')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
@@ -4737,7 +4710,6 @@ function continueWithEmail() {
         </button>
     </div>
 </div>
-</div>
 
 <!-- ========================================== -->
 <!-- NEW MODAL: ROSTER STRESS TESTER -->
@@ -4808,6 +4780,41 @@ Be as specific as possible!"></textarea>
                 <p class="text-slate-400 text-sm">Upcoming deadlines & proactive compliance alerts</p>
             </div>
             <button onclick="closeToolModal('complianceCalendarModal')" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+
+        <!-- State/Territory Selector -->
+        <div class="mb-6 bg-slate-900 rounded-lg p-4">
+            <div class="flex items-center justify-between flex-wrap gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">📍</span>
+                    <span class="text-slate-300 text-sm">Showing public holidays for:</span>
+                </div>
+                <select id="complianceStateSelector" onchange="updatePublicHolidays()" 
+                        class="bg-slate-700 text-white border border-slate-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-amber-500">
+                    <option value="NSW">New South Wales</option>
+                    <option value="VIC">Victoria</option>
+                    <option value="QLD">Queensland</option>
+                    <option value="SA">South Australia</option>
+                    <option value="WA">Western Australia</option>
+                    <option value="TAS">Tasmania</option>
+                    <option value="NT">Northern Territory</option>
+                    <option value="ACT">Australian Capital Territory</option>
+                </select>
+            </div>
+            <p class="text-xs text-slate-500 mt-2">💡 This is based on your venue location. Change if you operate in multiple states.</p>
+        </div>
+
+        <!-- Public Holidays Section -->
+        <div class="mb-6 bg-gradient-to-r from-purple-500/10 to-pink-500/10 border border-purple-500/30 rounded-lg p-4">
+            <h3 class="text-white font-bold mb-4 flex items-center gap-2">
+                <span>🎉</span>
+                <span>Upcoming Public Holidays</span>
+                <span id="stateHolidayBadge" class="ml-2 px-2 py-0.5 bg-purple-500/30 text-purple-300 text-xs rounded">NSW</span>
+            </h3>
+            <div id="publicHolidaysList" class="space-y-2 text-sm">
+                <!-- Populated by JavaScript -->
+            </div>
+            <p class="text-xs text-slate-400 mt-3">⚠️ Staff working on public holidays are entitled to penalty rates under the Hospitality Award</p>
         </div>
 
         <!-- Upcoming Alerts -->
@@ -5596,7 +5603,7 @@ const CONFIG = {
     },
     
     // Application constants
-    WIZARD_STEPS: 6,
+    WIZARD_STEPS: 5,
     TOOL_SUGGESTION_LIMIT: 2,
     MAX_CONVERSATION_HISTORY: 50,
     
@@ -6505,15 +6512,62 @@ async function loadAwardRates() {
 // Fallback rates if GitHub is down
 function getFallbackRates() {
     return {
-        adult_fulltime_parttime: {
-            introductory: { rate: 24.28 },
-            level_1: { food_beverage_grade1: { rate: 24.95 } },
-            level_2: { cook_grade1: { rate: 25.85 } },
-            level_3: { cook_grade2: { rate: 26.70 } },
-            level_4: { cook_tradesperson_grade3: { rate: 28.12 } },
-            level_5: { cook_tradesperson_grade4: { rate: 29.88 } },
-            level_6: { cook_tradesperson_grade5: { rate: 30.68 } }
-        },
+        version: 'fallback-2025',
+        effective_date: '2024-07-01',
+        next_review_date: '2025-07-01',
+        notes: ['Using offline fallback rates'],
+        rates: [
+            { category: 'adult', employment_type: 'full_time', classification: 'introductory', rate: 24.28, title: 'Introductory Level' },
+            { category: 'adult', employment_type: 'casual', classification: 'introductory', rate: 30.35, title: 'Introductory Level (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_1.food_beverage_grade1', rate: 24.95, title: 'Food & Beverage Grade 1' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_1.food_beverage_grade1', rate: 31.19, title: 'Food & Beverage Grade 1 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_1.kitchen_attendant_grade1', rate: 24.95, title: 'Kitchen Attendant Grade 1' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_1.kitchen_attendant_grade1', rate: 31.19, title: 'Kitchen Attendant Grade 1 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_1.guest_service_grade1', rate: 24.95, title: 'Guest Services Grade 1' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_1.guest_service_grade1', rate: 31.19, title: 'Guest Services Grade 1 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_2.food_beverage_grade2', rate: 25.85, title: 'Food & Beverage Grade 2' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_2.food_beverage_grade2', rate: 32.31, title: 'Food & Beverage Grade 2 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_2.cook_grade1', rate: 25.85, title: 'Cook Grade 1' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_2.cook_grade1', rate: 32.31, title: 'Cook Grade 1 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_2.kitchen_attendant_grade2', rate: 25.85, title: 'Kitchen Attendant Grade 2' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_2.kitchen_attendant_grade2', rate: 32.31, title: 'Kitchen Attendant Grade 2 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_2.guest_service_grade2', rate: 25.85, title: 'Guest Services Grade 2' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_2.guest_service_grade2', rate: 32.31, title: 'Guest Services Grade 2 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_2.front_office_grade1', rate: 25.85, title: 'Front Office Grade 1' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_2.front_office_grade1', rate: 32.31, title: 'Front Office Grade 1 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_2.doorperson_security', rate: 25.85, title: 'Doorperson/Security' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_2.doorperson_security', rate: 32.31, title: 'Doorperson/Security (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_3.food_beverage_grade3', rate: 26.70, title: 'Food & Beverage Grade 3' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_3.food_beverage_grade3', rate: 33.38, title: 'Food & Beverage Grade 3 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_3.cook_grade2', rate: 26.70, title: 'Cook Grade 2' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_3.cook_grade2', rate: 33.38, title: 'Cook Grade 2 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_3.kitchen_attendant_grade3', rate: 26.70, title: 'Kitchen Attendant Grade 3' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_3.kitchen_attendant_grade3', rate: 33.38, title: 'Kitchen Attendant Grade 3 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_3.guest_service_grade3', rate: 26.70, title: 'Guest Services Grade 3' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_3.guest_service_grade3', rate: 33.38, title: 'Guest Services Grade 3 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_3.front_office_grade2', rate: 26.70, title: 'Front Office Grade 2' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_3.front_office_grade2', rate: 33.38, title: 'Front Office Grade 2 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_3.timekeeper_security_grade2', rate: 26.70, title: 'Timekeeper/Security Grade 2' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_3.timekeeper_security_grade2', rate: 33.38, title: 'Timekeeper/Security Grade 2 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_4.food_beverage_tradesperson_grade4', rate: 28.12, title: 'Food & Beverage Tradesperson Grade 4' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_4.food_beverage_tradesperson_grade4', rate: 35.15, title: 'Food & Beverage Tradesperson Grade 4 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_4.cook_tradesperson_grade3', rate: 28.12, title: 'Cook Tradesperson Grade 3' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_4.cook_tradesperson_grade3', rate: 35.15, title: 'Cook Tradesperson Grade 3 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_4.guest_service_grade4', rate: 28.12, title: 'Guest Services Grade 4' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_4.guest_service_grade4', rate: 35.15, title: 'Guest Services Grade 4 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_4.front_office_grade3', rate: 28.12, title: 'Front Office Grade 3' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_4.front_office_grade3', rate: 35.15, title: 'Front Office Grade 3 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_5.food_beverage_supervisor', rate: 29.88, title: 'Food & Beverage Supervisor' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_5.food_beverage_supervisor', rate: 37.35, title: 'Food & Beverage Supervisor (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_5.cook_tradesperson_grade4', rate: 29.88, title: 'Cook Tradesperson Grade 4' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_5.cook_tradesperson_grade4', rate: 37.35, title: 'Cook Tradesperson Grade 4 (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_5.guest_service_supervisor', rate: 29.88, title: 'Guest Services Supervisor' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_5.guest_service_supervisor', rate: 37.35, title: 'Guest Services Supervisor (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_5.front_office_supervisor', rate: 29.88, title: 'Front Office Supervisor' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_5.front_office_supervisor', rate: 37.35, title: 'Front Office Supervisor (Casual)' },
+            { category: 'adult', employment_type: 'full_time', classification: 'level_6.cook_tradesperson_grade5', rate: 30.68, title: 'Cook Tradesperson Grade 5' },
+            { category: 'adult', employment_type: 'casual', classification: 'level_6.cook_tradesperson_grade5', rate: 38.35, title: 'Cook Tradesperson Grade 5 (Casual)' }
+        ],
         penalty_rates: {
             saturday: 1.5,
             sunday: 1.75,
@@ -12402,8 +12456,35 @@ function openRosterStressTester() {
 
 function openAwardWizard() {
     trackToolUsage('awardWizardModal');
-    var modal = document.getElementById('awardWizardModal');
-    if (modal) modal.classList.remove('hidden');
+    
+    // Reset wizard state
+    wizardData = {};
+    currentWizardStep = 1;
+    
+    // Reset UI to step 1
+    const wizardModal = document.getElementById('awardWizardModal');
+    if (wizardModal) {
+        // Show modal
+        wizardModal.classList.remove('hidden');
+        
+        // Reset all steps visibility
+        wizardModal.querySelectorAll('.wizard-step').forEach(step => {
+            step.classList.add('hidden');
+        });
+        
+        // Show step 1
+        const step1 = wizardModal.querySelector('[data-step="1"]');
+        if (step1) step1.classList.remove('hidden');
+        
+        // Hide back button
+        const backBtn = document.getElementById('wizardBackBtn');
+        if (backBtn) backBtn.classList.add('hidden');
+        
+        // Reset progress bar
+        document.getElementById('wizardCurrentStep').textContent = '1';
+        document.getElementById('wizardProgress').textContent = '20% Complete';
+        document.getElementById('wizardProgressBar').style.width = '20%';
+    }
 }
 
 function openRosterOptimizer() {
@@ -12416,6 +12497,175 @@ function openComplianceCalendar() {
     trackToolUsage('complianceCalendarModal');
     var modal = document.getElementById('complianceCalendarModal');
     if (modal) modal.classList.remove('hidden');
+    
+    // Set state selector to user's saved state
+    initializeComplianceCalendarState();
+}
+
+// Australian Public Holidays by State/Territory (2025-2026)
+const PUBLIC_HOLIDAYS = {
+    // National holidays (all states)
+    national: [
+        { date: '2025-01-01', name: "New Year's Day" },
+        { date: '2025-01-27', name: "Australia Day (observed)" },
+        { date: '2025-04-18', name: "Good Friday" },
+        { date: '2025-04-19', name: "Saturday before Easter Sunday" },
+        { date: '2025-04-20', name: "Easter Sunday" },
+        { date: '2025-04-21', name: "Easter Monday" },
+        { date: '2025-04-25', name: "ANZAC Day" },
+        { date: '2025-06-09', name: "Queen's Birthday" },
+        { date: '2025-12-25', name: "Christmas Day" },
+        { date: '2025-12-26', name: "Boxing Day" },
+        { date: '2026-01-01', name: "New Year's Day" },
+        { date: '2026-01-26', name: "Australia Day" },
+        { date: '2026-04-03', name: "Good Friday" },
+        { date: '2026-04-04', name: "Saturday before Easter Sunday" },
+        { date: '2026-04-05', name: "Easter Sunday" },
+        { date: '2026-04-06', name: "Easter Monday" },
+        { date: '2026-04-25', name: "ANZAC Day" },
+        { date: '2026-06-08', name: "Queen's Birthday" },
+        { date: '2026-12-25', name: "Christmas Day" },
+        { date: '2026-12-26', name: "Boxing Day" }
+    ],
+    // State-specific holidays
+    NSW: [
+        { date: '2025-08-04', name: "Bank Holiday (NSW)" }
+    ],
+    VIC: [
+        { date: '2025-03-10', name: "Labour Day (VIC)" },
+        { date: '2025-11-04', name: "Melbourne Cup Day (Metro)" }
+    ],
+    QLD: [
+        { date: '2025-05-05', name: "Labour Day (QLD)" },
+        { date: '2025-08-13', name: "Royal Queensland Show (Brisbane)" },
+        { date: '2025-10-06', name: "Queen's Birthday (QLD)" }
+    ],
+    SA: [
+        { date: '2025-03-10', name: "Adelaide Cup Day" },
+        { date: '2025-12-24', name: "Christmas Eve (from 7pm)" },
+        { date: '2025-12-31', name: "New Year's Eve (from 7pm)" },
+        { date: '2026-03-09', name: "Adelaide Cup Day" }
+    ],
+    WA: [
+        { date: '2025-03-03', name: "Labour Day (WA)" },
+        { date: '2025-06-02', name: "Western Australia Day" },
+        { date: '2025-09-29', name: "Queen's Birthday (WA)" }
+    ],
+    TAS: [
+        { date: '2025-02-10', name: "Royal Hobart Regatta (South TAS)" },
+        { date: '2025-03-10', name: "Eight Hours Day (TAS)" },
+        { date: '2025-11-03', name: "Recreation Day (North TAS)" }
+    ],
+    NT: [
+        { date: '2025-05-05', name: "May Day (NT)" },
+        { date: '2025-07-07', name: "Alice Springs Show Day" },
+        { date: '2025-07-11', name: "Tennant Creek Show Day" },
+        { date: '2025-07-18', name: "Katherine Show Day" },
+        { date: '2025-07-25', name: "Darwin Show Day" },
+        { date: '2025-08-18', name: "Picnic Day (NT)" }
+    ],
+    ACT: [
+        { date: '2025-03-10', name: "Canberra Day" },
+        { date: '2025-05-26', name: "Reconciliation Day (ACT)" },
+        { date: '2025-09-29', name: "Family & Community Day (ACT)" }
+    ]
+};
+
+function initializeComplianceCalendarState() {
+    const selector = document.getElementById('complianceStateSelector');
+    if (!selector) return;
+    
+    // Try to get user's state from venue profile
+    let userState = 'NSW'; // Default
+    
+    const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
+    if (userKey) {
+        const savedProfile = localStorage.getItem('venueProfile_' + userKey);
+        if (savedProfile) {
+            try {
+                const profile = JSON.parse(savedProfile);
+                if (profile.state) {
+                    userState = profile.state;
+                }
+            } catch (e) {}
+        }
+    }
+    
+    // Also check global venueProfile
+    if (typeof venueProfile !== 'undefined' && venueProfile && venueProfile.state) {
+        userState = venueProfile.state;
+    }
+    
+    selector.value = userState;
+    updatePublicHolidays();
+}
+
+function updatePublicHolidays() {
+    const selector = document.getElementById('complianceStateSelector');
+    const list = document.getElementById('publicHolidaysList');
+    const badge = document.getElementById('stateHolidayBadge');
+    
+    if (!selector || !list) return;
+    
+    const state = selector.value;
+    if (badge) badge.textContent = state;
+    
+    // Combine national and state holidays
+    const allHolidays = [...PUBLIC_HOLIDAYS.national];
+    if (PUBLIC_HOLIDAYS[state]) {
+        allHolidays.push(...PUBLIC_HOLIDAYS[state]);
+    }
+    
+    // Sort by date
+    allHolidays.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    // Filter to upcoming holidays only (from today)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const upcoming = allHolidays.filter(h => new Date(h.date) >= today).slice(0, 8);
+    
+    // Generate HTML
+    if (upcoming.length === 0) {
+        list.innerHTML = '<p class="text-slate-400">No upcoming public holidays found.</p>';
+        return;
+    }
+    
+    list.innerHTML = upcoming.map(h => {
+        const date = new Date(h.date);
+        const options = { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' };
+        const formattedDate = date.toLocaleDateString('en-AU', options);
+        const daysUntil = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
+        
+        let urgencyClass = 'text-slate-400';
+        let urgencyText = '';
+        
+        if (daysUntil <= 7) {
+            urgencyClass = 'text-red-400 font-semibold';
+            urgencyText = daysUntil === 0 ? '(Today!)' : daysUntil === 1 ? '(Tomorrow!)' : `(${daysUntil} days)`;
+        } else if (daysUntil <= 14) {
+            urgencyClass = 'text-yellow-400';
+            urgencyText = `(${daysUntil} days)`;
+        } else if (daysUntil <= 30) {
+            urgencyText = `(${daysUntil} days)`;
+        }
+        
+        const isStateSpecific = PUBLIC_HOLIDAYS[state]?.some(sh => sh.date === h.date && sh.name === h.name);
+        const stateTag = isStateSpecific ? `<span class="ml-2 px-1.5 py-0.5 bg-purple-500/30 text-purple-300 text-xs rounded">${state}</span>` : '';
+        
+        return `
+            <div class="flex justify-between items-center py-2 border-b border-slate-700/50">
+                <div class="flex items-center gap-2">
+                    <span class="text-slate-300">${formattedDate}</span>
+                    <span class="${urgencyClass} text-xs">${urgencyText}</span>
+                </div>
+                <div class="flex items-center">
+                    <span class="text-purple-300">${h.name}</span>
+                    ${stateTag}
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 function openTerminationRisk() {
@@ -15648,7 +15898,7 @@ function updateWizardStep() {
     
     // Update progress
     document.getElementById('wizardCurrentStep').textContent = currentWizardStep;
-    const progress = Math.round((currentWizardStep / 6) * 100);
+    const progress = Math.round((currentWizardStep / 5) * 100);
     document.getElementById('wizardProgress').textContent = `${progress}% Complete`;
     document.getElementById('wizardProgressBar').style.width = `${progress}%`;
     
@@ -15676,136 +15926,116 @@ function showWizardResults() {
     console.log('🎯 showWizardResults() called!');
     console.log('🎯 Wizard data:', JSON.stringify(wizardData, null, 2));
     
+    // Check if employee is a junior (19 or younger)
+    if (wizardData.age === 'junior') {
+        console.log('🎯 Junior detected, redirecting...');
+        showJuniorRedirect();
+        return;
+    }
+    
+    console.log('🎯 Adult path, proceeding...');
+    
+    // Build a simple result for now to ensure display works
+    let resultRate = 0;
+    let resultTitle = 'Classification';
+    let resultAward = 'Hospitality Industry (General) Award MA000009';
+    let penaltiesHTML = '<div>Standard rates apply</div>';
+    let stepsHTML = '<li>Verify rate with Fair Work</li>';
+    
+    // Try to calculate from award rates if available
     try {
-        // Check if employee is a junior (19 or younger)
-        if (wizardData.age === 'junior') {
-            console.log('🎯 Junior detected, redirecting...');
-            showJuniorRedirect();
-            return;
-        }
-        
-        console.log('🎯 Adult path, proceeding...');
-        
-        // Calculate classification FIRST
-        console.log('🔍 Calculating classification...');
-        const result = calculateAwardClassification(wizardData);
-        console.log('🔍 Calculation complete:', result);
-        
-        // Safety check
-        if (!result || !result.rate) {
-            console.error('❌ Invalid result:', result);
-            alert('⚠️ Error calculating award classification. Please try again or contact support.');
-            resetWizard();
-            return;
-        }
-        
-        console.log('✅ Calculation valid, building results HTML...');
-        
-        // Build the complete results HTML
-        let penaltiesHTML = '';
-        if (result.penalties && result.penalties.length > 0) {
-            result.penalties.forEach(penalty => {
-                penaltiesHTML += `<div>• ${penalty}</div>`;
-            });
-        } else {
-            penaltiesHTML = '<div>Standard rates apply</div>';
-        }
-        
-        let stepsHTML = '';
-        if (result.nextSteps && result.nextSteps.length > 0) {
-            result.nextSteps.forEach(step => {
-                stepsHTML += `<li>${step}</li>`;
-            });
-        } else {
-            stepsHTML = '<li>Consult with Fitzgerald HR for next steps</li>';
-        }
-        
-        const resultsHTML = `
-            <div class="bg-green-500/10 border-2 border-green-500 rounded-lg p-6">
-                <h3 class="text-green-400 font-bold text-xl mb-4 flex items-center gap-2">
-                    <span>✅</span>
-                    <span>Award Classification Complete!</span>
-                </h3>
+        if (awardRates && awardRates.rates && awardRates.rates.length > 0) {
+            const result = calculateAwardClassification(wizardData);
+            if (result && typeof result.rate === 'number') {
+                resultRate = result.rate;
+                resultTitle = result.level || 'Classification';
+                resultAward = result.award || resultAward;
                 
-                <div class="space-y-4 text-slate-200">
+                if (result.penalties && result.penalties.length > 0) {
+                    penaltiesHTML = result.penalties.map(p => `<div>• ${p}</div>`).join('');
+                }
+                if (result.nextSteps && result.nextSteps.length > 0) {
+                    stepsHTML = result.nextSteps.map(s => `<li>${s}</li>`).join('');
+                }
+            }
+        } else {
+            // Use fallback display - rates not loaded
+            console.warn('⚠️ Award rates not loaded, using display fallback');
+            resultTitle = 'Rate lookup unavailable';
+            penaltiesHTML = '<div>• Connect to internet to load current rates</div>';
+            stepsHTML = '<li>Refresh page when online to get accurate rates</li>';
+        }
+    } catch (calcError) {
+        console.error('⚠️ Calculation error:', calcError);
+        resultTitle = 'Calculation Error';
+    }
+    
+    // Build the results HTML
+    const resultsHTML = `
+        <div class="bg-green-500/10 border-2 border-green-500 rounded-lg p-6">
+            <h3 class="text-green-400 font-bold text-xl mb-4 flex items-center gap-2">
+                <span>✅</span>
+                <span>Award Classification Complete!</span>
+            </h3>
+            
+            <div class="space-y-4 text-slate-200">
+                <div class="bg-slate-700/50 rounded-lg p-4">
+                    <p class="text-sm text-slate-400 mb-1">Applicable Award</p>
+                    <p class="font-bold text-lg">${resultAward}</p>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
                     <div class="bg-slate-700/50 rounded-lg p-4">
-                        <p class="text-sm text-slate-400 mb-1">Applicable Award</p>
-                        <p class="font-bold text-lg">${result.award || 'Unknown'}</p>
+                        <p class="text-sm text-slate-400 mb-1">Classification Level</p>
+                        <p class="font-bold">${resultTitle}</p>
                     </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-slate-700/50 rounded-lg p-4">
-                            <p class="text-sm text-slate-400 mb-1">Classification Level</p>
-                            <p class="font-bold">${result.level || 'Unknown'}</p>
-                        </div>
-                        <div class="bg-slate-700/50 rounded-lg p-4">
-                            <p class="text-sm text-slate-400 mb-1">Base Rate (per hour)</p>
-                            <p class="font-bold text-2xl text-amber-400">$${result.rate ? result.rate.toFixed(2) : '0.00'}</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-4">
-                        <p class="font-semibold text-amber-400 mb-2">Penalty Rates & Loadings:</p>
-                        <div class="text-sm space-y-1">${penaltiesHTML}</div>
-                    </div>
-
-                    <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-4">
-                        <p class="font-semibold text-blue-400 mb-2">📝 Next Steps:</p>
-                        <ul class="text-sm space-y-1">${stepsHTML}</ul>
+                    <div class="bg-slate-700/50 rounded-lg p-4">
+                        <p class="text-sm text-slate-400 mb-1">Base Rate (per hour)</p>
+                        <p class="font-bold text-2xl text-amber-400">$${resultRate.toFixed(2)}</p>
                     </div>
                 </div>
 
-                <div class="flex gap-3 mt-6">
-                    <button onclick="downloadWizardResults()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
-                        📄 Download Summary
-                    </button>
-                    <button onclick="resetWizard()" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
-                        Start Over
-                    </button>
+                <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-4">
+                    <p class="font-semibold text-amber-400 mb-2">Penalty Rates & Loadings:</p>
+                    <div class="text-sm space-y-1">${penaltiesHTML}</div>
+                </div>
+
+                <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-4">
+                    <p class="font-semibold text-blue-400 mb-2">📝 Next Steps:</p>
+                    <ul class="text-sm space-y-1">${stepsHTML}</ul>
                 </div>
             </div>
-        `;
-        
-        // REPLACE wizardSteps content with results
-        const wizardStepsDiv = document.getElementById('wizardSteps');
-        if (wizardStepsDiv) {
-            wizardStepsDiv.innerHTML = resultsHTML;
-            wizardStepsDiv.classList.remove('hidden'); // Keep it visible
-            console.log('✅ Results inserted into wizardSteps div');
-        } else {
-            console.error('❌ wizardSteps div not found!');
-            return;
-        }
-        
-        // Hide back button and progress bar
-        const backBtn = document.getElementById('wizardBackBtn');
-        if (backBtn) backBtn.classList.add('hidden');
-        
-        // Hide progress bar
-        const progressContainer = wizardStepsDiv.previousElementSibling;
-        if (progressContainer && progressContainer.querySelector('#wizardProgressBar')) {
-            progressContainer.classList.add('hidden');
-        }
-        
-        // Track event
-        try {
-            trackEvent('award_wizard_completed', {
-                user: currentUser,
-                role: wizardData.role,
-                classification: result.level,
-                rate: result.rate
-            });
-        } catch (trackError) {
-            console.warn('⚠️ Tracking failed:', trackError);
-        }
-        
-        console.log('🎉 showWizardResults() complete - results displayed!');
-        
-    } catch (error) {
-        console.error('❌ FATAL ERROR in showWizardResults():', error);
-        console.error('Stack:', error.stack);
-        alert('Critical error showing results: ' + error.message + '\n\nPlease refresh and try again.');
+
+            <div class="flex gap-3 mt-6">
+                <button onclick="downloadWizardResults()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+                    📄 Download Summary
+                </button>
+                <button onclick="resetWizard()" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
+                    Start Over
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Display the results
+    const wizardStepsDiv = document.getElementById('wizardSteps');
+    if (wizardStepsDiv) {
+        wizardStepsDiv.innerHTML = resultsHTML;
+        console.log('✅ Results displayed in wizardSteps div');
+    } else {
+        console.error('❌ wizardSteps div not found!');
+        alert('Error: Could not display results. Please try again.');
+        return;
     }
+    
+    // Hide back button and progress bar
+    const backBtn = document.getElementById('wizardBackBtn');
+    if (backBtn) backBtn.classList.add('hidden');
+    
+    const progressContainer = document.querySelector('#awardWizardModal .mb-6');
+    if (progressContainer) progressContainer.classList.add('hidden');
+    
+    console.log('🎉 showWizardResults() complete!');
 }
 function showJuniorRedirect() {
     console.log('🎯 showJuniorRedirect() called');
@@ -16169,37 +16399,10 @@ function resetWizard() {
             return;
         }
         
-        // Restore original wizard HTML (all 6 steps)
+        // Restore original wizard HTML (all 5 steps)
         wizardStepsDiv.innerHTML = `
-            <!-- Step 1: Industry -->
+            <!-- Step 1: Role -->
             <div class="wizard-step" data-step="1">
-                <h3 class="text-lg font-bold text-white mb-4">What type of venue is it?</h3>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="wizardAnswer('venue', 'restaurant')" class="wizard-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="text-2xl mb-2">🍽️</div>
-                        <div class="font-semibold">Restaurant</div>
-                        <div class="text-xs text-slate-400">Dine-in service</div>
-                    </button>
-                    <button onclick="wizardAnswer('venue', 'cafe')" class="wizard-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="text-2xl mb-2">☕</div>
-                        <div class="font-semibold">Café</div>
-                        <div class="text-xs text-slate-400">Coffee & light meals</div>
-                    </button>
-                    <button onclick="wizardAnswer('venue', 'hotel')" class="wizard-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="text-2xl mb-2">🏨</div>
-                        <div class="font-semibold">Hotel/Pub</div>
-                        <div class="text-xs text-slate-400">Accommodation or pub</div>
-                    </button>
-                    <button onclick="wizardAnswer('venue', 'fastfood')" class="wizard-option p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="text-2xl mb-2">🍔</div>
-                        <div class="font-semibold">Fast Food</div>
-                        <div class="text-xs text-slate-400">Quick service</div>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Step 2: Role -->
-            <div class="wizard-step hidden" data-step="2">
                 <h3 class="text-lg font-bold text-white mb-4">What's their role?</h3>
                 <div class="space-y-2">
                     <button onclick="wizardAnswer('role', 'waiter')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
@@ -16268,8 +16471,8 @@ function resetWizard() {
                 </div>
             </div>
 
-            <!-- Step 3: Experience -->
-            <div class="wizard-step hidden" data-step="3">
+            <!-- Step 2: Experience -->
+            <div class="wizard-step hidden" data-step="2">
                 <h3 class="text-lg font-bold text-white mb-4">What's their experience level?</h3>
                 <div class="space-y-2">
                     <button onclick="wizardAnswer('experience', 'intro')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
@@ -16295,8 +16498,8 @@ function resetWizard() {
                 </div>
             </div>
 
-            <!-- Step 4: Hours -->
-            <div class="wizard-step hidden" data-step="4">
+            <!-- Step 3: Hours -->
+            <div class="wizard-step hidden" data-step="3">
                 <h3 class="text-lg font-bold text-white mb-4">What hours do they typically work?</h3>
                 <div class="space-y-2">
                     <button onclick="wizardAnswer('hours', 'weekday-day')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
@@ -16322,8 +16525,8 @@ function resetWizard() {
                 </div>
             </div>
 
-            <!-- Step 5: Age -->
-            <div class="wizard-step hidden" data-step="5">
+            <!-- Step 4: Age -->
+            <div class="wizard-step hidden" data-step="4">
                 <h3 class="text-lg font-bold text-white mb-4">How old is the employee?</h3>
                 <div class="space-y-2">
                     <button onclick="wizardAnswer('age', 'adult')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
@@ -16337,8 +16540,8 @@ function resetWizard() {
                 </div>
             </div>
 
-            <!-- Step 6: Employment Type -->
-            <div class="wizard-step hidden" data-step="6">
+            <!-- Step 5: Employment Type -->
+            <div class="wizard-step hidden" data-step="5">
                 <h3 class="text-lg font-bold text-white mb-4">What type of employment?</h3>
                 <div class="space-y-2">
                     <button onclick="wizardAnswer('employment', 'casual')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
