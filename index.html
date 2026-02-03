@@ -11714,8 +11714,12 @@ function saveCurrentConversation() {
         return;
     }
     
-    // Save current conversation ID to localStorage for persistence
-    localStorage.setItem('fitz_currentConversationId', currentConversationId);
+    // Save current conversation ID to localStorage with user-specific key for persistence
+    const userKey = currentUser && currentUser.uid ? currentUser.uid : (currentUser || 'anonymous');
+    localStorage.setItem('fitz_currentConversationId_' + userKey, currentConversationId);
+    
+    // Also save to Firebase for cross-device continuity
+    saveCurrentConversationIdToFirebase(currentConversationId);
     
     var conv = getCurrentConversation();
     console.log('💾 Found conversation:', conv);
@@ -11814,8 +11818,15 @@ function restoreLastConversation() {
     
     console.log('🔄 After load, conversations:', conversations.length);
     
-    // Try to get the last active conversation ID
-    const lastConvId = localStorage.getItem('fitz_currentConversationId');
+    // Try to get the last active conversation ID using user-specific key
+    const userKey = currentUser && currentUser.uid ? currentUser.uid : (currentUser || 'anonymous');
+    let lastConvId = localStorage.getItem('fitz_currentConversationId_' + userKey);
+    
+    // Fallback to old key for backwards compatibility
+    if (!lastConvId) {
+        lastConvId = localStorage.getItem('fitz_currentConversationId');
+    }
+    
     console.log('🔄 Last conversation ID from localStorage:', lastConvId);
     
     // Check if that conversation still exists
@@ -17016,7 +17027,7 @@ function closeLogoutModal() {
  * Performs logout with specified type (soft or hard)
  * @param {string} type - 'soft' (keep code) or 'hard' (forget device)
  */
-function confirmLogout(type) {
+async function confirmLogout(type) {
     console.log('🚪 Confirming logout - type:', type);
     
     // Close the modal first
@@ -17036,8 +17047,8 @@ function confirmLogout(type) {
         localStorage.removeItem('fitzhr_last_login');
     }
     
-    // Perform the actual logout
-    performLogout(loggedOutUser, type);
+    // Perform the actual logout (now async)
+    await performLogout(loggedOutUser, type);
 }
 
 /**
@@ -17045,13 +17056,37 @@ function confirmLogout(type) {
  * @param {string} loggedOutUser - User code before logout
  * @param {string} type - Logout type for analytics
  */
-function performLogout(loggedOutUser, type) {
+async function performLogout(loggedOutUser, type) {
     console.log('🔄 Performing logout cleanup...');
     
-    // IMPORTANT: Save current conversation BEFORE clearing!
-    if (currentConversationId && typeof saveCurrentConversation === 'function') {
-        console.log('💾 Saving conversation before logout');
-        saveCurrentConversation();
+    // IMPORTANT: Save current conversation to Firebase BEFORE clearing!
+    if (currentConversationId) {
+        console.log('💾 Saving conversation state to Firebase before logout...');
+        
+        // Save the current conversation
+        if (typeof saveCurrentConversation === 'function') {
+            saveCurrentConversation();
+        }
+        
+        // Wait for Firebase sync to complete
+        if (typeof syncConversationsToCloud === 'function') {
+            try {
+                await syncConversationsToCloud();
+                console.log('✅ Conversations synced to Firebase');
+            } catch (e) {
+                console.error('⚠️ Could not sync to Firebase:', e);
+            }
+        }
+        
+        // Save the last conversation ID to Firebase
+        if (currentUser && currentUser.uid && typeof saveCurrentConversationIdToFirebase === 'function') {
+            try {
+                await saveCurrentConversationIdToFirebase(currentConversationId);
+                console.log('✅ Last conversation ID saved to Firebase');
+            } catch (e) {
+                console.error('⚠️ Could not save conversation ID to Firebase:', e);
+            }
+        }
     }
     
     // Reset current user
@@ -26848,10 +26883,78 @@ async function signInWithGoogleFromAccess() {
 async function signOut() {
     if (!auth) return;
     try {
+        // Save current conversation state before signing out
+        console.log('📤 Saving conversation state before sign out...');
+        if (currentConversationId && typeof saveCurrentConversation === 'function') {
+            saveCurrentConversation();
+        }
+        
+        // Ensure conversations are synced to Firebase
+        if (typeof syncConversationsToCloud === 'function') {
+            await syncConversationsToCloud();
+        }
+        
+        // Save the current conversation ID to Firebase one last time
+        if (currentConversationId && currentUser && currentUser.uid) {
+            await saveCurrentConversationIdToFirebase(currentConversationId);
+        }
+        
+        console.log('✅ State saved, signing out...');
         await auth.signOut();
         console.log('✅ Signed out');
         if (typeof showNotification === 'function') showNotification('Signed out', 'success');
     } catch (error) { console.error('Sign out error:', error); }
+}
+
+/**
+ * Save the current conversation ID to Firebase for cross-device continuity
+ * @param {string} conversationId - The ID of the current active conversation
+ */
+async function saveCurrentConversationIdToFirebase(conversationId) {
+    if (!currentUser || !currentUser.uid || !db) {
+        console.log('⚠️ Cannot save conversation ID to Firebase - not signed in');
+        return;
+    }
+    
+    try {
+        await db.collection('users').doc(currentUser.uid).set({
+            lastConversationId: conversationId,
+            lastConversationUpdated: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        console.log('✅ Saved last conversation ID to Firebase:', conversationId);
+    } catch (error) {
+        console.error('❌ Failed to save conversation ID to Firebase:', error);
+    }
+}
+
+/**
+ * Load the last conversation ID from Firebase
+ * @returns {Promise<string|null>} The last conversation ID or null if not found
+ */
+async function loadLastConversationIdFromFirebase() {
+    if (!currentUser || !currentUser.uid || !db) {
+        console.log('⚠️ Cannot load conversation ID from Firebase - not signed in');
+        return null;
+    }
+    
+    try {
+        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            const lastConvId = userData.lastConversationId;
+            if (lastConvId) {
+                console.log('✅ Loaded last conversation ID from Firebase:', lastConvId);
+                // Also save to localStorage for faster access next time
+                localStorage.setItem('fitz_currentConversationId_' + currentUser.uid, lastConvId);
+                return lastConvId;
+            }
+        }
+        console.log('📭 No last conversation ID found in Firebase');
+        return null;
+    } catch (error) {
+        console.error('❌ Failed to load conversation ID from Firebase:', error);
+        return null;
+    }
 }
 
 // Beta Tester Whitelist - Easy to add more emails here!
@@ -26989,7 +27092,7 @@ if (auth) {
             
             await loadAllDataFromFirebase(); // Use new Firebase-first system with retry
             
-            // Check Firebase for legal acceptance
+            // Check Firebase for legal acceptance and load last conversation ID
             if (db) {
                 try {
                     const userDoc = await db.collection('users').doc(user.uid).get();
@@ -27007,6 +27110,12 @@ if (auth) {
                             if (legalModal && !legalModal.classList.contains('hidden')) {
                                 legalModal.classList.add('hidden');
                             }
+                        }
+                        
+                        // Load last conversation ID for continuity
+                        if (userData.lastConversationId) {
+                            console.log('✅ Found last conversation ID in Firebase:', userData.lastConversationId);
+                            localStorage.setItem('fitz_currentConversationId_' + user.uid, userData.lastConversationId);
                         }
                         
                         // Also load venue profile if present
@@ -27060,10 +27169,30 @@ if (auth) {
                         setTimeout(() => showOnboarding(), 1000);
                     } else {
                         // Firebase data already loaded by loadAllDataFromFirebase()
-                        // Just restore the last conversation and update UI
-                        setTimeout(() => {
-                            restoreLastConversation();
+                        // Restore the last conversation with cloud continuity
+                        setTimeout(async () => {
+                            console.log('🔄 Starting conversation restoration...');
+                            
+                            // Try to load last conversation ID from Firebase if not in localStorage
+                            const userKey = user.uid;
+                            let lastConvId = localStorage.getItem('fitz_currentConversationId_' + userKey);
+                            
+                            if (!lastConvId) {
+                                // Try loading from Firebase
+                                lastConvId = await loadLastConversationIdFromFirebase();
+                            }
+                            
+                            // Now restore the conversation
+                            const restored = restoreLastConversation();
                             updateSidebarChats();
+                            
+                            // Show welcome back message if conversation was restored
+                            if (restored && conversations.length > 0) {
+                                const conv = conversations.find(c => c.id === currentConversationId);
+                                if (conv && conv.messages && conv.messages.length > 1) {
+                                    showToast('Welcome back! Your conversation has been restored.', 'success', 3000);
+                                }
+                            }
                         }, 500);
                     }
                 }
@@ -27686,4 +27815,3 @@ async function loadAllDataFromFirebase() {
 </script>
 </body>
 </html>
-
