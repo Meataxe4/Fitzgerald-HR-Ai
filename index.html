@@ -14478,46 +14478,76 @@ async function loadConversationsAdmin() {
     
     list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading conversations from Firebase...</div>';
     
+    console.log('📊 Admin: Starting to load conversations...');
+    console.log('📊 Admin: db =', db);
+    console.log('📊 Admin: currentUser =', currentUser);
+    
     if (!db) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
+        console.error('📊 Admin: Firebase db is null!');
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected. Check console for details.</div>';
         return;
     }
     
     try {
         // Collect conversations from all users
         const allConversations = [];
+        
+        console.log('📊 Admin: Fetching users collection...');
         const usersSnapshot = await db.collection('users').get();
+        
+        console.log('📊 Admin: Found', usersSnapshot.size, 'users');
+        
+        if (usersSnapshot.size === 0) {
+            list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No users found in database</div>';
+            return;
+        }
         
         for (const userDoc of usersSnapshot.docs) {
             const userData = userDoc.data();
             const userName = userData.displayName || userData.email || userDoc.id.substring(0, 8);
             
+            console.log('📊 Admin: Processing user:', userName, '(', userDoc.id, ')');
+            
+            // Get conversations without orderBy (may not have index)
             const conversationsSnapshot = await db.collection('users').doc(userDoc.id)
                 .collection('conversations')
-                .orderBy('timestamp', 'desc')
-                .limit(20)
+                .limit(50)
                 .get();
+            
+            console.log('📊 Admin: User', userName, 'has', conversationsSnapshot.size, 'conversations');
             
             conversationsSnapshot.forEach(convDoc => {
                 const conv = convDoc.data();
+                console.log('📊 Admin: Conversation data:', conv.id || convDoc.id, conv.title, 'messages:', conv.messages?.length || 0);
+                
                 // Get messages from conversation
                 if (conv.messages && conv.messages.length > 0) {
                     const lastUserMsg = conv.messages.filter(m => m.role === 'user').pop();
                     const lastAssistantMsg = conv.messages.filter(m => m.role === 'assistant').pop();
                     
-                    if (lastUserMsg) {
-                        allConversations.push({
-                            userId: userDoc.id,
-                            userName: userName,
-                            userMessage: lastUserMsg.content.substring(0, 200),
-                            assistantResponse: lastAssistantMsg ? lastAssistantMsg.content.substring(0, 200) : 'N/A',
-                            timestamp: conv.timestamp,
-                            title: conv.title || 'Untitled'
-                        });
-                    }
+                    allConversations.push({
+                        oduserId: userDoc.id,
+                        userName: userName,
+                        userMessage: lastUserMsg && lastUserMsg.content ? lastUserMsg.content.substring(0, 200) : 'No user message',
+                        assistantResponse: lastAssistantMsg && lastAssistantMsg.content ? lastAssistantMsg.content.substring(0, 200) : 'No response',
+                        timestamp: conv.timestamp || conv.updated || conv.created,
+                        title: conv.title || 'Untitled'
+                    });
+                } else {
+                    // Conversation exists but might have no messages yet or different structure
+                    allConversations.push({
+                        userId: userDoc.id,
+                        userName: userName,
+                        userMessage: 'No messages yet',
+                        assistantResponse: 'N/A',
+                        timestamp: conv.timestamp || conv.updated || conv.created,
+                        title: conv.title || 'Untitled'
+                    });
                 }
             });
         }
+        
+        console.log('📊 Admin: Total conversations collected:', allConversations.length);
         
         // Sort by timestamp (newest first)
         allConversations.sort((a, b) => {
@@ -14527,20 +14557,28 @@ async function loadConversationsAdmin() {
         });
         
         if (allConversations.length === 0) {
-            list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No conversations yet</div>';
+            list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No conversations found across all users</div>';
             return;
         }
         
         let html = '';
         allConversations.slice(0, 50).forEach(conv => {
-            const date = conv.timestamp?.toDate ? conv.timestamp.toDate().toLocaleString('en-AU') : 'Unknown';
+            let dateStr = 'Unknown';
+            try {
+                if (conv.timestamp) {
+                    const date = conv.timestamp.toDate ? conv.timestamp.toDate() : new Date(conv.timestamp);
+                    dateStr = date.toLocaleString('en-AU');
+                }
+            } catch (e) {
+                dateStr = 'Unknown';
+            }
             
             html += `
                 <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 hover:border-purple-500 transition-all">
                     <div class="flex items-start justify-between mb-2">
                         <div>
                             <span class="text-purple-400 font-semibold">${conv.userName}</span>
-                            <span class="text-slate-500 text-xs ml-2">${date}</span>
+                            <span class="text-slate-500 text-xs ml-2">${dateStr}</span>
                         </div>
                         <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${conv.title}</span>
                     </div>
@@ -14553,9 +14591,10 @@ async function loadConversationsAdmin() {
         });
         
         list.innerHTML = html;
+        console.log('📊 Admin: Rendered', allConversations.length, 'conversations');
     } catch (error) {
-        console.error('Error loading conversations:', error);
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
+        console.error('📊 Admin: Error loading conversations:', error);
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error: ' + error.message + '</div>';
     }
 }
 
