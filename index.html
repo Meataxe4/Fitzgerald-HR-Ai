@@ -620,11 +620,11 @@ header button[onclick*="logout"],
     #docBackBtn { order: 2 !important; }
     #docStartOverBtn { order: 3 !important; }
     
-    /* FIX 3: MESSAGE INPUT - Readable but not huge */
+    /* FIX 3: MESSAGE INPUT - Taller like Claude's */
     #messageInput {
-        min-height: 60px !important;
-        max-height: 150px !important;
-        padding: 12px !important;
+        min-height: 80px !important;
+        max-height: 200px !important;
+        padding: 14px !important;
         font-size: 16px !important;
         line-height: 1.5 !important;
     }
@@ -1129,6 +1129,15 @@ header button[onclick*="logout"],
         align-items: center;
         justify-content: center;
         padding: 24px;
+    }
+    
+    /* Desktop message input - taller like Claude */
+    #messageInput {
+        min-height: 100px;
+        max-height: 250px;
+        padding: 16px;
+        font-size: 15px;
+        line-height: 1.6;
     }
 }
 
@@ -3475,8 +3484,8 @@ function continueWithEmail() {
             <!-- Text Input -->
             <textarea id="messageInput" 
                 placeholder="Ask me anything about hospitality HR in Australia..." 
-                rows="1"
-                class="flex-1 bg-slate-900 text-slate-100 border border-slate-700 rounded-xl px-4 py-3 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none max-h-32"
+                rows="3"
+                class="flex-1 bg-slate-900 text-slate-100 border border-slate-700 rounded-xl px-4 py-3 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none min-h-[80px] max-h-[200px]"
                 onkeypress="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
                 oninput="autoResizeTextarea(this)"></textarea>
             
