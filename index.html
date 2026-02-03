@@ -712,24 +712,34 @@ header button[onclick*="logout"],
        MOBILE UX ENHANCEMENTS - PHASE 2
        ========================================== */
     
-    /* Tools Menu - properly scrollable on mobile (only when visible) */
+    /* Tools Menu - FORCE scrollable on mobile */
     #toolsMenu:not(.hidden) {
+        display: block !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
         padding: 0 !important;
         overflow-y: scroll !important;
         -webkit-overflow-scrolling: touch !important;
+        z-index: 9999 !important;
     }
     
     #toolsMenu > div,
-    #toolsMenuInner {
+    #toolsMenu #toolsMenuInner {
+        position: relative !important;
         max-width: 100% !important;
         width: 100% !important;
         min-height: auto !important;
         max-height: none !important;
+        height: auto !important;
         border-radius: 0 !important;
         padding: 16px !important;
-        padding-bottom: 120px !important;
+        padding-bottom: 150px !important;
         margin: 0 !important;
         border: none !important;
+        overflow: visible !important;
     }
     
     #toolsMenu h2 {
@@ -865,15 +875,17 @@ header button[onclick*="logout"],
         max-width: 320px !important;
         display: flex !important;
         flex-direction: column !important;
+        height: 100vh !important;
+        max-height: 100vh !important;
     }
     
-    /* Make sidebar content scrollable */
+    /* Make sidebar content DEFINITELY scrollable */
     .sidebar-content {
-        flex: 1 1 auto !important;
+        flex: 1 1 0 !important;
         overflow-y: scroll !important;
         -webkit-overflow-scrolling: touch !important;
-        padding-bottom: 100px !important;
-        max-height: calc(100vh - 140px) !important;
+        padding-bottom: 20px !important;
+        min-height: 0 !important;
     }
     
     /* Ensure all sidebar sections are visible */
@@ -1218,26 +1230,26 @@ input, textarea, select {
         #scrollToBottomBtn {
             display: none;
             position: fixed;
-            bottom: 140px;
-            right: 20px;
-            width: 48px;
-            height: 48px;
-            background: rgba(245, 158, 11, 0.95);
-            border: none;
+            bottom: 100px;
+            right: 16px;
+            width: 50px;
+            height: 50px;
+            background: #f59e0b;
+            border: 2px solid #fff;
             border-radius: 50%;
             color: white;
             font-size: 24px;
             font-weight: bold;
             cursor: pointer;
-            z-index: 100;
+            z-index: 9998;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            transition: opacity 0.3s ease, transform 0.2s ease;
         }
         
         #scrollToBottomBtn:hover {
-            background: rgb(245, 158, 11);
+            background: #d97706;
             transform: scale(1.1);
         }
         
@@ -13442,15 +13454,21 @@ function updateScrollButtonVisibility() {
     const container = document.getElementById('messagesContainer');
     const btn = document.getElementById('scrollToBottomBtn');
     
-    if (!container || !btn || window.innerWidth >= 768) return;
+    if (!container || !btn) return;
+    
+    // Only run on mobile
+    if (window.innerWidth >= 768) {
+        btn.style.display = 'none';
+        return;
+    }
     
     const scrollTop = container.scrollTop;
     const scrollHeight = container.scrollHeight;
     const clientHeight = container.clientHeight;
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
     
-    // Hide button when within 100px of bottom
-    if (distanceFromBottom < 100) {
+    // Hide button when within 50px of bottom, show otherwise
+    if (distanceFromBottom < 50) {
         btn.style.opacity = '0';
         btn.style.pointerEvents = 'none';
     } else {
@@ -18955,7 +18973,7 @@ function resetAIImport() {
 
 <!-- Tools Modal - Same Structure as Settings Modal -->
 <div id="toolsMenu" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50 overflow-y-auto">
-    <div id="toolsMenuInner" class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+    <div id="toolsMenuInner" class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in md:max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
