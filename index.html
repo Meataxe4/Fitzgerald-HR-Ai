@@ -712,10 +712,9 @@ header button[onclick*="logout"],
        MOBILE UX ENHANCEMENTS - PHASE 2
        ========================================== */
     
-    /* Tools Menu - properly scrollable on mobile */
-    #toolsMenu {
+    /* Tools Menu - properly scrollable on mobile (only when visible) */
+    #toolsMenu:not(.hidden) {
         padding: 0 !important;
-        display: block !important;
         overflow-y: scroll !important;
         -webkit-overflow-scrolling: touch !important;
     }
