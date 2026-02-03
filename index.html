@@ -11528,15 +11528,70 @@ function loadBookmarks() {
     if (stored) {
         try {
             bookmarks = JSON.parse(stored);
+            console.log('📚 Loaded', bookmarks.length, 'bookmarks from localStorage');
         } catch (e) {
             bookmarks = [];
         }
     }
 }
 
+// Load bookmarks from Firebase and merge with local
+async function loadBookmarksFromFirebase() {
+    if (!currentUser || !currentUser.uid || !db) {
+        console.log('⚠️ Not signed in, using local bookmarks only');
+        return;
+    }
+    
+    try {
+        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            const firebaseBookmarks = userData.bookmarks || [];
+            
+            console.log('📚 Firebase bookmarks:', firebaseBookmarks.length);
+            
+            // Merge: Firebase takes priority
+            const mergedMap = new Map();
+            
+            // Add local bookmarks first
+            bookmarks.forEach(b => {
+                if (b && b.id) mergedMap.set(b.id, b);
+            });
+            
+            // Override with Firebase bookmarks
+            firebaseBookmarks.forEach(b => {
+                if (b && b.id) mergedMap.set(b.id, b);
+            });
+            
+            bookmarks = Array.from(mergedMap.values());
+            
+            // Save merged result
+            localStorage.setItem('fitz_bookmarks', JSON.stringify(bookmarks));
+            
+            console.log('✅ Merged bookmarks:', bookmarks.length);
+            
+            // Update UI
+            updateSidebarBookmarks();
+        }
+    } catch (error) {
+        console.error('❌ Failed to load bookmarks from Firebase:', error);
+    }
+}
+
 // Save bookmarks
 function saveBookmarks() {
     localStorage.setItem('fitz_bookmarks', JSON.stringify(bookmarks));
+    
+    // Sync to Firebase
+    if (currentUser && currentUser.uid && db) {
+        db.collection('users').doc(currentUser.uid).set({
+            bookmarks: bookmarks
+        }, { merge: true }).then(() => {
+            console.log('✅ Bookmarks synced to Firebase');
+        }).catch(err => {
+            console.error('❌ Failed to sync bookmarks:', err);
+        });
+    }
 }
 
 // Toggle bookmark
@@ -11633,23 +11688,55 @@ function updateSidebarBookmarks() {
 
 // Jump to bookmark
 function jumpToBookmark(messageId) {
+    console.log('🔖 jumpToBookmark called with messageId:', messageId);
+    
     const bookmark = bookmarks.find(b => b.id === messageId);
-    if (!bookmark) return;
+    if (!bookmark) {
+        console.error('❌ Bookmark not found:', messageId);
+        showToast('Bookmark not found', 'error', 2000);
+        return;
+    }
+    
+    console.log('🔖 Found bookmark:', bookmark);
+    console.log('🔖 Bookmark conversationId:', bookmark.conversationId);
+    console.log('🔖 Current conversationId:', currentConversationId);
+    console.log('🔖 Available conversations:', conversations.map(c => c.id));
+    
+    // Check if the conversation exists
+    const targetConversation = conversations.find(c => c.id === bookmark.conversationId);
+    
+    if (!targetConversation) {
+        console.error('❌ Conversation not found for bookmark:', bookmark.conversationId);
+        showToast('Conversation no longer exists', 'error', 2000);
+        
+        // Optionally remove the orphaned bookmark
+        const removeOrphan = confirm('The bookmarked conversation no longer exists. Remove this bookmark?');
+        if (removeOrphan) {
+            removeBookmark(messageId);
+        }
+        return;
+    }
     
     // If bookmark is in different conversation, load it
     if (bookmark.conversationId !== currentConversationId) {
+        console.log('🔖 Loading conversation:', bookmark.conversationId);
         loadConversation(bookmark.conversationId);
     }
     
-    // Scroll to message
+    // Scroll to message after a delay to allow conversation to load
     setTimeout(() => {
         const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
+        console.log('🔖 Looking for message element:', messageId, 'Found:', !!messageElement);
+        
         if (messageElement) {
             messageElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
             messageElement.classList.add('highlight-flash');
             setTimeout(() => messageElement.classList.remove('highlight-flash'), 2000);
+        } else {
+            console.warn('⚠️ Message element not found in DOM, conversation may have been edited');
+            showToast('Message not found in conversation', 'warning', 2000);
         }
-    }, 500);
+    }, 800);
     
     // Close sidebar on mobile
     if (window.innerWidth < 768) {
@@ -26870,16 +26957,21 @@ async function loadAllDataFromFirebase() {
             loadConversationsFromFirebase(),
             loadContractsFromFirebase(),
             loadChecklistsFromFirebase(),
-            loadTrainingPlansFromFirebase()
+            loadTrainingPlansFromFirebase(),
+            loadBookmarksFromFirebase()
         ]);
         
         console.log('✅ All data loaded from Firebase');
         console.log('🎉 Device is now synced!');
         
-        // Update sidebar with loaded conversations
+        // Update sidebar with loaded data
         if (typeof updateSidebarChats === 'function') {
             updateSidebarChats();
             console.log('✅ Sidebar updated with Firebase conversations');
+        }
+        if (typeof updateSidebarBookmarks === 'function') {
+            updateSidebarBookmarks();
+            console.log('✅ Sidebar updated with Firebase bookmarks');
         }
         
     } catch (error) {
