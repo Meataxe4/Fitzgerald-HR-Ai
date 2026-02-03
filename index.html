@@ -2920,11 +2920,6 @@ async function checkFirestoreData() {
             if (accessScreen) accessScreen.classList.add('hidden');
             if (assistantScreen) assistantScreen.classList.remove('hidden');
             
-            // Scroll to bottom (message input) after login
-            setTimeout(function() {
-                if (typeof scrollToBottomInstant === 'function') scrollToBottomInstant();
-            }, 100);
-            
             var userCodeEl = document.getElementById('userCode');
             if (userCodeEl) userCodeEl.textContent = code;
             
@@ -2934,6 +2929,10 @@ async function checkFirestoreData() {
             
             if (typeof initConversationSystem === 'function') {
                 initConversationSystem();
+                // Scroll to bottom after conversation is loaded
+                setTimeout(function() {
+                    if (typeof scrollToBottomInstant === 'function') scrollToBottomInstant();
+                }, 200);
             }
         } else {
             if (errorEl) {
@@ -10844,9 +10843,6 @@ function checkAccess() {
         if (assistantScreen) assistantScreen.classList.remove('hidden');
         if (error) error.classList.add('hidden');
         
-        // Scroll to bottom (message input) after login
-        setTimeout(scrollToBottomInstant, 100);
-        
         trackEvent('beta_access', { code: input });
         
         // Admin access is now email-based only (via Google Sign-In)
@@ -10867,6 +10863,8 @@ function checkAccess() {
                     setTimeout(() => {
                         restoreLastConversation();
                         updateSidebarChats();
+                        // Scroll to bottom after conversation is loaded
+                        setTimeout(scrollToBottomInstant, 100);
                     }, 300);
                 }
             }
@@ -10948,9 +10946,6 @@ function attemptAutoLogin() {
     if (accessScreen) accessScreen.classList.add('hidden');
     if (assistantScreen) assistantScreen.classList.remove('hidden');
     
-    // Scroll to bottom (message input) after login
-    setTimeout(scrollToBottomInstant, 100);
-    
     // Update last login timestamp
     localStorage.setItem('fitzhr_last_login', new Date().toISOString());
     
@@ -10973,6 +10968,8 @@ function attemptAutoLogin() {
                 setTimeout(() => {
                     restoreLastConversation();
                     updateSidebarChats();
+                    // Scroll to bottom after conversation is loaded
+                    setTimeout(scrollToBottomInstant, 100);
                 }, 300);
             }
         }
@@ -27019,9 +27016,6 @@ if (auth) {
                 if (assistantScreen) assistantScreen.classList.remove('hidden');
                 const userCodeEl = document.getElementById('userCode');
                 if (userCodeEl) userCodeEl.textContent = 'Google Account';
-                
-                // Scroll to bottom (message input) after login
-                setTimeout(scrollToBottomInstant, 100);
             }
             updateUIForAuthenticatedUser(user);
             
@@ -27723,6 +27717,12 @@ async function loadAllDataFromFirebase() {
         }
         if (typeof updateSidebarBookmarks === 'function') {
             updateSidebarBookmarks();
+        }
+        
+        // Restore last conversation and scroll to bottom
+        if (typeof restoreLastConversation === 'function') {
+            restoreLastConversation();
+            setTimeout(scrollToBottomInstant, 200);
         }
         
     } catch (error) {
