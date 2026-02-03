@@ -2373,9 +2373,7 @@ async function manualLoadFromCloud() {
         // Restore conversations
         if (cloudData.conversations && cloudData.conversations.length > 0) {
             localStorage.setItem('fitz_conversations', JSON.stringify(cloudData.conversations));
-            if (typeof window.conversations !== 'undefined') {
-                window.conversations = cloudData.conversations;
-            }
+            conversations = cloudData.conversations;
         }
         
         // Restore contracts
@@ -26262,8 +26260,9 @@ if (auth) {
                     if (!hasCompletedOnboarding) {
                         setTimeout(() => showOnboarding(), 1000);
                     } else {
-                        // LOAD CONVERSATIONS FIRST, THEN RESTORE (like Claude.ai)
-                        loadConversations(); // Load from localStorage
+                        // Firebase data already loaded by loadAllDataFromFirebase()
+                        // Just restore the last conversation and update UI
+                        console.log('🔄 Restoring last conversation...');
                         setTimeout(() => {
                             restoreLastConversation();
                             updateSidebarChats();
@@ -26468,13 +26467,13 @@ async function loadAllDataFromCloud() {
         // Restore conversations
         if (cloudData.conversations && cloudData.conversations.length > 0) {
             localStorage.setItem('fitz_conversations', JSON.stringify(cloudData.conversations));
-            window.conversations = cloudData.conversations;
+            conversations = cloudData.conversations;
             console.log('✅ Restored', cloudData.conversations.length, 'conversations');
         }
         
         if (cloudData.currentConversationId) {
             localStorage.setItem('currentConversationId', cloudData.currentConversationId);
-            window.currentConversationId = cloudData.currentConversationId;
+            currentConversationId = cloudData.currentConversationId;
         }
         
         // Restore bookmarks
@@ -26549,10 +26548,11 @@ async function refreshAllUI() {
     
     try {
         // Refresh conversation list
-        if (typeof window.conversations !== 'undefined') {
-            console.log('🔄 Refreshing conversation list...');
-            // The conversations variable is already updated, UI should auto-refresh
-            // If there's a specific function to refresh the sidebar, call it here
+        if (conversations && conversations.length > 0) {
+            console.log('🔄 Refreshing conversation list with', conversations.length, 'conversations');
+            if (typeof updateSidebarChats === 'function') {
+                updateSidebarChats();
+            }
         }
         
         // Trigger a page state update
@@ -26665,15 +26665,14 @@ async function saveConversationToFirebase(conversation) {
 async function loadConversationsFromFirebase() {
     if (!currentUser || !db) {
         console.log('⚠️ Not signed in, loading conversations from localStorage only');
-        // Load from localStorage instead of clearing
         loadConversations();
-        return window.conversations || [];
+        return conversations || [];
     }
     
     try {
         // First, load from localStorage to have something
         loadConversations();
-        const localConversations = [...(window.conversations || [])];
+        const localConversations = [...conversations];
         console.log('📥 Local conversations loaded:', localConversations.length);
         
         const snapshot = await db.collection('users').doc(currentUser.uid)
@@ -26704,45 +26703,26 @@ async function loadConversationsFromFirebase() {
             }
         });
         
-        window.conversations = Array.from(mergedMap.values());
+        // Update the global conversations variable
+        conversations = Array.from(mergedMap.values());
         
         // Sort in memory (most recent first)
-        window.conversations.sort((a, b) => {
+        conversations.sort((a, b) => {
             const dateA = new Date(a.updated || a.created || 0);
             const dateB = new Date(b.updated || b.created || 0);
             return dateB - dateA;
         });
         
-        console.log('✅ Merged conversations:', window.conversations.length);
+        console.log('✅ Merged conversations:', conversations.length);
         
         // Save merged result back to localStorage
-        localStorage.setItem('fitz_conversations', JSON.stringify(window.conversations));
+        localStorage.setItem('fitz_conversations', JSON.stringify(conversations));
         
-        // Update UI and restore last conversation
-        const tryUpdateAndRestore = (attempts = 0) => {
-            if (typeof updateSidebarChats === 'function' && typeof restoreLastConversation === 'function') {
-                updateSidebarChats();
-                console.log('✅ Updated sidebar with conversations');
-                
-                // Restore the last active conversation (like Claude does)
-                restoreLastConversation();
-                console.log('✅ Restored last conversation');
-            } else if (attempts < 5) {
-                console.log('⚠️ Functions not ready, retry', attempts + 1);
-                setTimeout(() => tryUpdateAndRestore(attempts + 1), 500);
-            } else {
-                console.log('❌ Functions never loaded');
-            }
-        };
-        
-        setTimeout(() => tryUpdateAndRestore(), 500);
-        
-        return window.conversations;
+        return conversations;
     } catch (error) {
         console.error('❌ Failed to load conversations from Firebase:', error);
-        // Keep localStorage data on error
         loadConversations();
-        return window.conversations || [];
+        return conversations || [];
     }
 }
 
@@ -26896,9 +26876,10 @@ async function loadAllDataFromFirebase() {
         console.log('✅ All data loaded from Firebase');
         console.log('🎉 Device is now synced!');
         
-        // Show notification
-        if (typeof showNotification === 'function') {
-            showNotification('✅ Data synced from cloud', 'success');
+        // Update sidebar with loaded conversations
+        if (typeof updateSidebarChats === 'function') {
+            updateSidebarChats();
+            console.log('✅ Sidebar updated with Firebase conversations');
         }
         
     } catch (error) {
