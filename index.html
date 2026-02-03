@@ -3696,24 +3696,40 @@ function continueWithEmail() {
 
             <div class="onboarding-step hidden" data-step="2">
                 <h3 class="text-xl font-bold text-white mb-4">What type of venue do you run?</h3>
-                <div class="grid grid-cols-2 gap-3">
-                    <button onclick="saveOnboardingAnswer('venueType', 'restaurant')" class="p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all">
-                        <div class="text-3xl mb-2">🍽️</div>
-                        <div class="font-semibold">Restaurant</div>
-                    </button>
-                    <button onclick="saveOnboardingAnswer('venueType', 'cafe')" class="p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all">
-                        <div class="text-3xl mb-2">☕</div>
-                        <div class="font-semibold">Café</div>
-                    </button>
-                    <button onclick="saveOnboardingAnswer('venueType', 'hotel')" class="p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all">
-                        <div class="text-3xl mb-2">🏨</div>
-                        <div class="font-semibold">Hotel/Pub</div>
-                    </button>
-                    <button onclick="saveOnboardingAnswer('venueType', 'fastfood')" class="p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all">
-                        <div class="text-3xl mb-2">🍔</div>
-                        <div class="font-semibold">Fast Food</div>
-                    </button>
-                </div>
+                <select id="onboardingVenueType" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white mb-4">
+                    <option value="">Select venue type...</option>
+                    <option value="bakery-cafe">Bakery Café</option>
+                    <option value="bar">Bar</option>
+                    <option value="bistro">Bistro</option>
+                    <option value="boutique-hotel">Boutique Hotel</option>
+                    <option value="brewery">Brewery / Brewpub</option>
+                    <option value="cafe">Café</option>
+                    <option value="cinema-fnb">Cinema with Food & Beverage Service</option>
+                    <option value="conference-venue">Conference Venue</option>
+                    <option value="dessert-bar">Dessert Bar</option>
+                    <option value="distillery-bar">Distillery Bar</option>
+                    <option value="entertainment-venue">Entertainment Venue (Comedy Club / Theatre)</option>
+                    <option value="food-court">Food Court Outlet</option>
+                    <option value="function-centre">Function Centre</option>
+                    <option value="hotel-accommodation">Hotel (Accommodation Venue)</option>
+                    <option value="ice-cream-bar">Ice Cream / Gelato Bar</option>
+                    <option value="juice-bar">Juice / Smoothie Bar</option>
+                    <option value="live-music-venue">Live Music Venue</option>
+                    <option value="motel">Motel</option>
+                    <option value="nightclub">Nightclub</option>
+                    <option value="pub">Pub / Hotel</option>
+                    <option value="resort">Resort</option>
+                    <option value="restaurant">Restaurant</option>
+                    <option value="rooftop-bar">Rooftop Bar</option>
+                    <option value="serviced-apartments">Serviced Apartments</option>
+                    <option value="sports-bar">Sports Bar</option>
+                    <option value="tea-house">Tea House</option>
+                    <option value="wine-bar">Wine Bar</option>
+                </select>
+                <button onclick="saveOnboardingVenueType()" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg">
+                    Next →
+                </button>
             </div>
 
             <div class="onboarding-step hidden" data-step="3">
@@ -13860,6 +13876,17 @@ function saveOnboardingLocation() {
     updateOnboardingStep();
 }
 
+function saveOnboardingVenueType() {
+    const venueType = document.getElementById('onboardingVenueType').value;
+    if (!venueType) {
+        alert('Please select a venue type');
+        return;
+    }
+    venueProfile.venueType = venueType;
+    onboardingCurrentStep++;
+    updateOnboardingStep();
+}
+
 function updateOnboardingStep() {
     document.querySelectorAll('.onboarding-step').forEach(step => step.classList.add('hidden'));
     const current = document.querySelector(`[data-step="${onboardingCurrentStep}"]`);
@@ -13916,14 +13943,40 @@ function skipOnboarding() {
 
 function getVenueTypeLabel(type) {
     const labels = { 
-        restaurant: 'restaurant', 
-        cafe: 'café', 
-        hotel: 'hotel/pub', 
-        fastfood: 'fast food venue', 
-        club: 'club/bar', 
-        other: 'hospitality venue' 
+        'bakery-cafe': 'bakery café',
+        'bar': 'bar',
+        'bistro': 'bistro',
+        'boutique-hotel': 'boutique hotel',
+        'brewery': 'brewery/brewpub',
+        'cafe': 'café',
+        'cinema-fnb': 'cinema with F&B service',
+        'conference-venue': 'conference venue',
+        'dessert-bar': 'dessert bar',
+        'distillery-bar': 'distillery bar',
+        'entertainment-venue': 'entertainment venue',
+        'food-court': 'food court outlet',
+        'function-centre': 'function centre',
+        'hotel-accommodation': 'hotel (accommodation)',
+        'ice-cream-bar': 'ice cream/gelato bar',
+        'juice-bar': 'juice/smoothie bar',
+        'live-music-venue': 'live music venue',
+        'motel': 'motel',
+        'nightclub': 'nightclub',
+        'pub': 'pub/hotel',
+        'resort': 'resort',
+        'restaurant': 'restaurant',
+        'rooftop-bar': 'rooftop bar',
+        'serviced-apartments': 'serviced apartments',
+        'sports-bar': 'sports bar',
+        'tea-house': 'tea house',
+        'wine-bar': 'wine bar',
+        // Legacy values for backwards compatibility
+        'hotel': 'hotel/pub',
+        'fastfood': 'fast food venue',
+        'club': 'club/bar',
+        'other': 'hospitality venue'
     };
-    return labels[type] || type;
+    return labels[type] || type || 'hospitality venue';
 }
 
 function showVenueSettings() {
@@ -13949,10 +14002,34 @@ function showVenueSettings() {
             <div>
                 <label class="block text-slate-300 text-sm mb-2">Venue Type</label>
                 <select id="settingsVenueType" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
-                    <option value="restaurant" ${venueProfile.venueType === 'restaurant' ? 'selected' : ''}>Restaurant</option>
+                    <option value="">Select venue type...</option>
+                    <option value="bakery-cafe" ${venueProfile.venueType === 'bakery-cafe' ? 'selected' : ''}>Bakery Café</option>
+                    <option value="bar" ${venueProfile.venueType === 'bar' ? 'selected' : ''}>Bar</option>
+                    <option value="bistro" ${venueProfile.venueType === 'bistro' ? 'selected' : ''}>Bistro</option>
+                    <option value="boutique-hotel" ${venueProfile.venueType === 'boutique-hotel' ? 'selected' : ''}>Boutique Hotel</option>
+                    <option value="brewery" ${venueProfile.venueType === 'brewery' ? 'selected' : ''}>Brewery / Brewpub</option>
                     <option value="cafe" ${venueProfile.venueType === 'cafe' ? 'selected' : ''}>Café</option>
-                    <option value="hotel" ${venueProfile.venueType === 'hotel' ? 'selected' : ''}>Hotel/Pub</option>
-                    <option value="fastfood" ${venueProfile.venueType === 'fastfood' ? 'selected' : ''}>Fast Food</option>
+                    <option value="cinema-fnb" ${venueProfile.venueType === 'cinema-fnb' ? 'selected' : ''}>Cinema with Food & Beverage Service</option>
+                    <option value="conference-venue" ${venueProfile.venueType === 'conference-venue' ? 'selected' : ''}>Conference Venue</option>
+                    <option value="dessert-bar" ${venueProfile.venueType === 'dessert-bar' ? 'selected' : ''}>Dessert Bar</option>
+                    <option value="distillery-bar" ${venueProfile.venueType === 'distillery-bar' ? 'selected' : ''}>Distillery Bar</option>
+                    <option value="entertainment-venue" ${venueProfile.venueType === 'entertainment-venue' ? 'selected' : ''}>Entertainment Venue (Comedy Club / Theatre)</option>
+                    <option value="food-court" ${venueProfile.venueType === 'food-court' ? 'selected' : ''}>Food Court Outlet</option>
+                    <option value="function-centre" ${venueProfile.venueType === 'function-centre' ? 'selected' : ''}>Function Centre</option>
+                    <option value="hotel-accommodation" ${venueProfile.venueType === 'hotel-accommodation' ? 'selected' : ''}>Hotel (Accommodation Venue)</option>
+                    <option value="ice-cream-bar" ${venueProfile.venueType === 'ice-cream-bar' ? 'selected' : ''}>Ice Cream / Gelato Bar</option>
+                    <option value="juice-bar" ${venueProfile.venueType === 'juice-bar' ? 'selected' : ''}>Juice / Smoothie Bar</option>
+                    <option value="live-music-venue" ${venueProfile.venueType === 'live-music-venue' ? 'selected' : ''}>Live Music Venue</option>
+                    <option value="motel" ${venueProfile.venueType === 'motel' ? 'selected' : ''}>Motel</option>
+                    <option value="nightclub" ${venueProfile.venueType === 'nightclub' ? 'selected' : ''}>Nightclub</option>
+                    <option value="pub" ${venueProfile.venueType === 'pub' ? 'selected' : ''}>Pub / Hotel</option>
+                    <option value="resort" ${venueProfile.venueType === 'resort' ? 'selected' : ''}>Resort</option>
+                    <option value="restaurant" ${venueProfile.venueType === 'restaurant' ? 'selected' : ''}>Restaurant</option>
+                    <option value="rooftop-bar" ${venueProfile.venueType === 'rooftop-bar' ? 'selected' : ''}>Rooftop Bar</option>
+                    <option value="serviced-apartments" ${venueProfile.venueType === 'serviced-apartments' ? 'selected' : ''}>Serviced Apartments</option>
+                    <option value="sports-bar" ${venueProfile.venueType === 'sports-bar' ? 'selected' : ''}>Sports Bar</option>
+                    <option value="tea-house" ${venueProfile.venueType === 'tea-house' ? 'selected' : ''}>Tea House</option>
+                    <option value="wine-bar" ${venueProfile.venueType === 'wine-bar' ? 'selected' : ''}>Wine Bar</option>
                 </select>
             </div>
             
