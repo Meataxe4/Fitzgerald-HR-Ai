@@ -558,10 +558,28 @@ header button[onclick*="logout"],
         display: none !important;
     }
     
-    /* Scroll to bottom button - show on mobile */
+    /* Scroll to bottom button - ALWAYS show on mobile */
     #scrollToBottomBtn {
         display: flex !important;
-        transition: opacity 0.3s ease !important;
+        position: fixed !important;
+        bottom: 140px !important;
+        right: 20px !important;
+        width: 56px !important;
+        height: 56px !important;
+        background: #f59e0b !important;
+        border: 3px solid #fff !important;
+        border-radius: 50% !important;
+        color: white !important;
+        z-index: 9999 !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
+        opacity: 1 !important;
+    }
+    
+    #scrollToBottomBtn.hidden-btn {
+        opacity: 0 !important;
+        pointer-events: none !important;
     }
     
     /* FIX 2: STACK TOOL NAVIGATION BUTTONS */
@@ -1240,21 +1258,19 @@ input, textarea, select {
         #scrollToBottomBtn {
             display: none;
             position: fixed;
-            bottom: 100px;
-            right: 16px;
-            width: 50px;
-            height: 50px;
+            bottom: 120px;
+            right: 20px;
+            width: 56px;
+            height: 56px;
             background: #f59e0b;
-            border: 2px solid #fff;
+            border: 3px solid #ffffff;
             border-radius: 50%;
             color: white;
-            font-size: 24px;
-            font-weight: bold;
             cursor: pointer;
-            z-index: 9998;
+            z-index: 9999;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
             transition: opacity 0.3s ease, transform 0.2s ease;
         }
         
@@ -3412,7 +3428,7 @@ function continueWithEmail() {
         <!-- Messages Container (Scrollable Area) -->
 <!-- Scroll to Bottom Button (Mobile Only) -->
 <button id="scrollToBottomBtn" onclick="scrollToBottom()" title="Scroll to bottom">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 5v14M5 12l7 7 7-7"/>
     </svg>
 </button>
@@ -13464,6 +13480,8 @@ function scrollToBottom() {
             top: container.scrollHeight,
             behavior: 'smooth'
         });
+        // Update button visibility after scroll completes
+        setTimeout(updateScrollButtonVisibility, 500);
     }
 }
 
@@ -13474,7 +13492,7 @@ function updateScrollButtonVisibility() {
     
     if (!container || !btn) return;
     
-    // Only run on mobile
+    // Only show on mobile
     if (window.innerWidth >= 768) {
         btn.style.display = 'none';
         return;
@@ -13485,13 +13503,11 @@ function updateScrollButtonVisibility() {
     const clientHeight = container.clientHeight;
     const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
     
-    // Hide button when within 50px of bottom, show otherwise
-    if (distanceFromBottom < 50) {
-        btn.style.opacity = '0';
-        btn.style.pointerEvents = 'none';
+    // Hide button when within 50px of bottom OR when content doesn't need scrolling
+    if (distanceFromBottom < 50 || scrollHeight <= clientHeight) {
+        btn.classList.add('hidden-btn');
     } else {
-        btn.style.opacity = '1';
-        btn.style.pointerEvents = 'auto';
+        btn.classList.remove('hidden-btn');
     }
 }
 
