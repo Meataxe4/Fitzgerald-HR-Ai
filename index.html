@@ -17594,6 +17594,12 @@ async function acceptLegalTerms() {
     const hasCompletedOnboarding = checkOnboardingStatus();
     if (!hasCompletedOnboarding) {
         setTimeout(() => showOnboarding(), 500);
+    } else {
+        // Onboarding already complete - restore last conversation
+        setTimeout(() => {
+            restoreLastConversation();
+            updateSidebarChats();
+        }, 500);
     }
 }
 
