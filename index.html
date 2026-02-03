@@ -561,6 +561,7 @@ header button[onclick*="logout"],
     /* Scroll to bottom button - show on mobile */
     #scrollToBottomBtn {
         display: flex !important;
+        transition: opacity 0.3s ease !important;
     }
     
     /* FIX 2: STACK TOOL NAVIGATION BUTTONS */
@@ -711,42 +712,47 @@ header button[onclick*="logout"],
        MOBILE UX ENHANCEMENTS - PHASE 2
        ========================================== */
     
-    /* Tools Menu - Full screen on mobile with proper scrolling */
+    /* Tools Menu - properly scrollable on mobile */
     #toolsMenu {
         padding: 0 !important;
-        align-items: flex-start !important;
-        overflow-y: auto !important;
+        display: block !important;
+        overflow-y: scroll !important;
+        -webkit-overflow-scrolling: touch !important;
     }
     
-    #toolsMenu > div {
+    #toolsMenu > div,
+    #toolsMenuInner {
         max-width: 100% !important;
         width: 100% !important;
         min-height: auto !important;
         max-height: none !important;
         border-radius: 0 !important;
         padding: 16px !important;
-        padding-bottom: 100px !important;
+        padding-bottom: 120px !important;
         margin: 0 !important;
         border: none !important;
-        overflow-y: visible !important;
     }
     
     #toolsMenu h2 {
-        font-size: 1.5rem !important;
+        font-size: 1.3rem !important;
     }
     
     #toolsMenu .grid {
         grid-template-columns: 1fr !important;
-        gap: 12px !important;
+        gap: 10px !important;
     }
     
-    #toolsMenu button {
-        padding: 14px !important;
-        min-height: 60px !important;
+    #toolsMenu .grid button {
+        padding: 12px !important;
+        min-height: 54px !important;
     }
     
     #toolsMenu .text-3xl {
-        font-size: 1.5rem !important;
+        font-size: 1.25rem !important;
+    }
+    
+    #toolsMenu .text-sm {
+        font-size: 11px !important;
     }
     
     /* Document Builder Modal - Full screen */
@@ -864,14 +870,26 @@ header button[onclick*="logout"],
     
     /* Make sidebar content scrollable */
     .sidebar-content {
-        flex: 1 !important;
-        overflow-y: auto !important;
+        flex: 1 1 auto !important;
+        overflow-y: scroll !important;
         -webkit-overflow-scrolling: touch !important;
-        padding-bottom: 20px !important;
+        padding-bottom: 100px !important;
+        max-height: calc(100vh - 140px) !important;
     }
     
     /* Ensure all sidebar sections are visible */
     .sidebar-section {
+        display: block !important;
+        margin-bottom: 16px !important;
+    }
+    
+    .sidebar-section-title {
+        display: block !important;
+        padding: 8px 16px !important;
+        font-size: 11px !important;
+    }
+    
+    .sidebar-items-list {
         display: block !important;
     }
     
@@ -1203,23 +1221,24 @@ input, textarea, select {
             position: fixed;
             bottom: 140px;
             right: 20px;
-            width: 44px;
-            height: 44px;
-            background: rgba(245, 158, 11, 0.7);
+            width: 48px;
+            height: 48px;
+            background: rgba(245, 158, 11, 0.95);
             border: none;
             border-radius: 50%;
             color: white;
-            font-size: 20px;
+            font-size: 24px;
+            font-weight: bold;
             cursor: pointer;
             z-index: 100;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s ease;
         }
         
         #scrollToBottomBtn:hover {
-            background: rgba(245, 158, 11, 0.9);
+            background: rgb(245, 158, 11);
             transform: scale(1.1);
         }
         
@@ -3372,7 +3391,9 @@ function continueWithEmail() {
         <!-- Messages Container (Scrollable Area) -->
 <!-- Scroll to Bottom Button (Mobile Only) -->
 <button id="scrollToBottomBtn" onclick="scrollToBottom()" title="Scroll to bottom">
-    ↓
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 5v14M5 12l7 7 7-7"/>
+    </svg>
 </button>
 
 <div id="messagesContainer" class="flex-1 overflow-y-auto px-6 py-6">
@@ -13417,6 +13438,28 @@ function scrollToBottom() {
     }
 }
 
+// Update scroll button visibility based on scroll position
+function updateScrollButtonVisibility() {
+    const container = document.getElementById('messagesContainer');
+    const btn = document.getElementById('scrollToBottomBtn');
+    
+    if (!container || !btn || window.innerWidth >= 768) return;
+    
+    const scrollTop = container.scrollTop;
+    const scrollHeight = container.scrollHeight;
+    const clientHeight = container.clientHeight;
+    const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+    
+    // Hide button when within 100px of bottom
+    if (distanceFromBottom < 100) {
+        btn.style.opacity = '0';
+        btn.style.pointerEvents = 'none';
+    } else {
+        btn.style.opacity = '1';
+        btn.style.pointerEvents = 'auto';
+    }
+}
+
 // Create new chat from sidebar
 function createNewChatFromSidebar() {
     createNewConversation();
@@ -17262,6 +17305,13 @@ document.addEventListener('DOMContentLoaded', function() {
     loadRecentTools();
     updateSidebarRecentTools();
     
+    // Initialize scroll to bottom button for mobile
+    if (DOM.messagesContainer) {
+        DOM.messagesContainer.addEventListener('scroll', updateScrollButtonVisibility);
+        // Initial visibility check after a short delay
+        setTimeout(updateScrollButtonVisibility, 1000);
+    }
+    
     // Load venueProfile from localStorage FIRST
     if (currentUser) {
         // Use currentUser.uid for Firebase users, or currentUser as string for access code users
@@ -18905,8 +18955,8 @@ function resetAIImport() {
 </div>
 
 <!-- Tools Modal - Same Structure as Settings Modal -->
-<div id="toolsMenu" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-    <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+<div id="toolsMenu" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50 overflow-y-auto">
+    <div id="toolsMenuInner" class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
