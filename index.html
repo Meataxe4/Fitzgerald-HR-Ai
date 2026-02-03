@@ -319,6 +319,50 @@ header button[onclick*="logout"],
     display: none !important;
 }
 
+/* ========================================
+   STICKY HEADER - Always visible when scrolling
+   ======================================== */
+
+/* Make the assistant screen a proper flex container that fills viewport */
+#assistantScreen {
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
+    max-height: 100vh;
+    max-height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Make header sticky at top */
+#mainHeader {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    flex-shrink: 0;
+}
+
+/* Make daily tip banner also sticky, right below header */
+#dailyTipBanner {
+    position: sticky;
+    top: 0;
+    z-index: 99;
+    flex-shrink: 0;
+}
+
+/* Messages container takes remaining space and scrolls */
+#messagesContainer {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0; /* Important for flex children to scroll properly */
+}
+
+/* Input area stays at bottom */
+#inputArea, 
+#assistantScreen > div:last-child {
+    flex-shrink: 0;
+}
+
 /* Improve mobile touch targets */
 @media (max-width: 768px) {
     /* Prevent text selection on buttons */
@@ -3346,7 +3390,7 @@ function continueWithEmail() {
 </div>
 
     <!-- Main Assistant Screen (Hidden Initially) -->
-    <div id="assistantScreen" class="hidden min-h-screen flex flex-col">
+    <div id="assistantScreen" class="hidden flex flex-col">
         <!-- Header -->
         <div id="mainHeader" class="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700 px-4 md:px-6 py-3 md:py-4">
     <div class="max-w-5xl mx-auto">
