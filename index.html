@@ -658,7 +658,7 @@ header button[onclick*="logout"],
     
     /* FIX 3: MESSAGE INPUT - Taller like Claude's */
     #messageInput {
-        min-height: 80px !important;
+        min-height: 44px !important;
         max-height: 200px !important;
         padding: 14px !important;
         font-size: 16px !important;
@@ -2790,11 +2790,8 @@ async function manualSyncToCloud() {
         ✔️ ${allData.checklists.length} checklists<br>
         📚 ${allData.trainingPlans.length} training plans`;
         
-        console.log('✅ Manual sync complete:', allData);
-        
     } catch (error) {
         status.innerHTML = '❌ Error: ' + error.message;
-        console.error('Sync error:', error);
     }
 }
 
@@ -2851,14 +2848,11 @@ async function manualLoadFromCloud() {
         📚 ${cloudData.trainingPlans?.length || 0} training plans<br><br>
         🔄 Refresh page to see changes`;
         
-        console.log('✅ Manual load complete:', cloudData);
-        
         // Show notification
-        alert('✅ Data loaded! Refresh the page to see everything.');
+        showAlert('✅ Data loaded! Refresh the page to see everything.');
         
     } catch (error) {
         status.innerHTML = '❌ Error: ' + error.message;
-        console.error('Load error:', error);
     }
 }
 
@@ -2891,11 +2885,8 @@ async function checkFirestoreData() {
         ✔️ ${syncedData.checklists?.length || 0} checklists<br>
         📚 ${syncedData.trainingPlans?.length || 0} training plans`;
         
-        console.log('Firestore data:', data);
-        
     } catch (error) {
         status.innerHTML = '❌ Error: ' + error.message;
-        console.error('Check error:', error);
     }
 }
 
@@ -2914,18 +2905,12 @@ async function checkFirestoreData() {
     const error = urlParams.get('error');
     
     if (code && state) {
-        console.log('🔵 [IMMEDIATE] Deputy OAuth callback detected!');
-        console.log('Code:', code.substring(0, 20) + '...');
-        console.log('State:', state);
-        
         // Store in sessionStorage so it survives any refresh
         sessionStorage.setItem('deputy_oauth_code', code);
         sessionStorage.setItem('deputy_oauth_state', state);
         sessionStorage.setItem('deputy_oauth_timestamp', Date.now().toString());
         
-        console.log('✅ [IMMEDIATE] OAuth params saved to sessionStorage');
     } else if (error) {
-        console.error('❌ [IMMEDIATE] Deputy OAuth error:', error);
         sessionStorage.setItem('deputy_oauth_error', error);
     }
     
@@ -2934,7 +2919,6 @@ async function checkFirestoreData() {
     if (storedCode) {
         const timestamp = sessionStorage.getItem('deputy_oauth_timestamp');
         const age = Date.now() - parseInt(timestamp);
-        console.log(`🔍 [IMMEDIATE] Found stored OAuth code (${Math.floor(age/1000)}s old)`);
     }
 })();
 
@@ -3385,17 +3369,17 @@ function continueWithEmail() {
     const email = document.getElementById('emailInput').value.trim();
     
     if (!email) {
-        alert('Please enter your email address');
+        showAlert('Please enter your email address');
         return;
     }
     
     if (!email.includes('@')) {
-        alert('Please enter a valid email address');
+        showAlert('Please enter a valid email address');
         return;
     }
     
     // For now, show a message (you can implement magic link later)
-    alert('Email sign-in coming soon! Please use "Continue with Google" for now.');
+    showAlert('Email sign-in coming soon! Please use "Continue with Google" for now.');
     
     // TODO: Implement Firebase email link authentication
     // firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings)
@@ -3545,8 +3529,8 @@ function continueWithEmail() {
             <!-- Text Input -->
             <textarea id="messageInput" 
                 placeholder="Ask me anything about hospitality HR in Australia..." 
-                rows="3"
-                class="flex-1 bg-slate-900 text-slate-100 border border-slate-700 rounded-xl px-4 py-3 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none min-h-[80px] max-h-[200px]"
+                rows="1"
+                class="flex-1 bg-slate-900 text-slate-100 border border-slate-700 rounded-xl px-4 py-3 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none min-h-[44px] max-h-[200px]"
                 onkeypress="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
                 oninput="autoResizeTextarea(this)"></textarea>
             
@@ -5717,17 +5701,13 @@ function initializeSupabase() {
     try {
         // Check if Supabase library loaded
         if (typeof supabase === 'undefined') {
-            console.error('❌ Supabase library not loaded - check script tag');
             return false;
         }
         
         // Create client
         supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-        console.log('✅ Supabase initialized successfully');
-        console.log('📊 Connected to:', SUPABASE_CONFIG.url);
         return true;
     } catch (error) {
-        console.error('❌ Error initializing Supabase:', error);
         return false;
     }
 }
@@ -6604,7 +6584,6 @@ function openDocumentBuilder() {
             user: currentUser
         });
     } else {
-        console.error('Document Builder modal not found');
     }
 }
 
@@ -6644,12 +6623,8 @@ async function loadAwardRates() {
         if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to load rates`);
         
         awardRates = await response.json();
-        console.log('✅ Award rates loaded from GitHub:', awardRates.version);
         return true;
     } catch (error) {
-        console.error('❌ Error loading award rates from GitHub:', error.message);
-        console.warn('⚠️ Using fallback rates - some features may be limited');
-        
         // Fallback to basic rates if GitHub fails
         awardRates = getFallbackRates();
         return false;
@@ -6777,12 +6752,10 @@ async function fetchWithRetry(url, options = {}, maxRetries = CONFIG.MAX_RETRIES
             // If not the last retry, wait before trying again
             if (i < maxRetries - 1) {
                 const delay = CONFIG.RETRY_DELAY * (i + 1); // Exponential backoff
-                console.log(`Retry ${i + 1}/${maxRetries - 1} for ${url} after ${delay}ms`);
                 await new Promise(resolve => setTimeout(resolve, delay));
             }
         } catch (error) {
             if (i === maxRetries - 1) throw error;
-            console.warn(`Attempt ${i + 1} failed:`, error.message);
         }
     }
     throw new Error(`Failed to fetch ${url} after ${maxRetries} attempts`);
@@ -6798,11 +6771,9 @@ function withErrorHandling(asyncFunc) {
         try {
             return await asyncFunc(...args);
         } catch (error) {
-            console.error(`Error in ${asyncFunc.name}:`, error);
-            
             // Show user-friendly error
             const errorMessage = error.message || 'An unexpected error occurred';
-            alert(`⚠️ ${errorMessage}\n\nPlease try again or contact support if the issue persists.`);
+            showAlert(`⚠️ ${errorMessage}\n\nPlease try again or contact support if the issue persists.`);
             
             // Re-throw for caller to handle if needed
             throw error;
@@ -7365,12 +7336,9 @@ async function generatePDFDocument(content, filename = 'document.pdf', metadata 
     try {
         // Check if pdfMake is loaded
         if (typeof pdfMake === 'undefined') {
-            console.error('❌ pdfMake library not loaded');
-            alert('PDF library not loaded. Please refresh the page and try again.');
+            showAlert('PDF library not loaded. Please refresh the page and try again.');
             return false;
         }
-
-        console.log('📄 Generating PDF with pdfMake...');
 
         // Convert content to HTML first
         const htmlContent = convertAIContentToHTML(content);
@@ -7378,20 +7346,16 @@ async function generatePDFDocument(content, filename = 'document.pdf', metadata 
         // Parse HTML to pdfMake document definition
         const docDefinition = convertHTMLToPdfMake(htmlContent, metadata);
         
-        console.log('✅ Document definition created');
-
         // Generate PDF
         pdfMake.createPdf(docDefinition).download(filename);
 
         // Track document generation
         trackDocumentGeneration(filename, metadata);
 
-        console.log('✅ PDF generated successfully:', filename);
         return true;
 
     } catch (error) {
-        console.error('❌ PDF generation error:', error);
-        alert('Error generating PDF: ' + error.message);
+        showAlert('Error generating PDF: ' + error.message);
         return false;
     }
 }
@@ -7405,8 +7369,6 @@ async function generatePDFDocument(content, filename = 'document.pdf', metadata 
 // ========================================
 
 function convertAIContentToHTML(rawContent) {
-    console.log('🔄 Converting AI content to HTML...');
-    
     let html = rawContent
         // Convert markdown headers to HTML
         .replace(/^### (.+)$/gm, '<h3>$1</h3>')
@@ -7444,7 +7406,6 @@ function convertAIContentToHTML(rawContent) {
         })
         .join('\n\n');
     
-    console.log('✅ Converted to HTML');
     return html;
 }
 
@@ -8083,7 +8044,6 @@ function convertAIContentToHTML(rawContent) {
             // Also track as event
             trackEvent('document_generated', documentLog);
             
-            console.log('Document generated:', documentLog);
         }
         
         function generateDocumentId() {
@@ -8830,8 +8790,6 @@ async function handleRODUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
     
-    console.log('📄 ROD file uploaded:', file.name);
-    
     // Show uploading status
     const statusDiv = document.getElementById('rodUploadStatus');
     statusDiv.innerHTML = '<p class="text-blue-400">📤 Processing file...</p>';
@@ -8865,7 +8823,6 @@ async function handleRODUpload(event) {
         showToast('✅ Record of Discussion uploaded successfully!', 'success', 3000);
         
     } catch (error) {
-        console.error('ROD upload error:', error);
         statusDiv.innerHTML = '<p class="text-red-400">❌ Error processing file. Please try again.</p>';
         showToast('Error processing file', 'error', 3000);
     }
@@ -8966,7 +8923,7 @@ function docWizardNext() {
         
         if (field.required && !value) {
             allValid = false;
-            alert(`Please fill in: ${field.label}`);
+            showAlert(`Please fill in: ${field.label}`);
         }
         
         documentBuilderState.data[field.name] = value;
@@ -9019,7 +8976,7 @@ function validateFormalWarningProceduralFairness() {
         const completedROD = documentBuilderState.data.completedRecordOfDiscussion;
         
         if (completedROD === 'No') {
-            alert(
+            showAlert(
                 '⚠️ PROCEDURAL FAIRNESS REQUIRED\n\n' +
                 'You MUST complete the Record of Discussion process before issuing a Formal Warning.\n\n' +
                 'This means:\n' +
@@ -9050,7 +9007,7 @@ function validateFormalWarningProceduralFairness() {
         const offeredSupport = documentBuilderState.data.offeredSupportPerson;
         
         if (providedNotice === 'No') {
-            alert(
+            showAlert(
                 '⚠️ IMPORTANT: You must provide the employee with 24 hours notice before the outcome meeting.\n\n' +
                 'This is a requirement of procedural fairness.\n\n' +
                 'Please schedule the outcome meeting for at least 24 hours from now before continuing.'
@@ -9068,7 +9025,7 @@ function validateFormalWarningProceduralFairness() {
         }
         
         if (offeredSupport === 'No') {
-            alert(
+            showAlert(
                 '⚠️ IMPORTANT: You must offer the employee the right to bring a support person.\n\n' +
                 'A support person can be:\n' +
                 '• A family member or friend\n' +
@@ -9105,7 +9062,7 @@ function validateLetterOfAllegationMeetingPrep() {
     
     // Check 24 hours notice
     if (notice24hours === 'No') {
-        alert(
+        showAlert(
             '⚠️ IMPORTANT: You must provide the employee with 24 hours notice before the meeting.\n\n' +
             'This is a requirement of procedural fairness.\n\n' +
             'Please schedule the meeting for at least 24 hours from now before continuing.'
@@ -9128,7 +9085,7 @@ function validateLetterOfAllegationMeetingPrep() {
     
     // Check support person offered
     if (supportPersonOffered === 'No') {
-        alert(
+        showAlert(
             '⚠️ IMPORTANT: You must offer the employee the right to bring a support person.\n\n' +
             'A support person can be:\n' +
             '• A family member or friend\n' +
@@ -9161,7 +9118,7 @@ function validateRecordOfDiscussionStep2() {
     
     // Check 24 hours notice
     if (notice24hours === 'No') {
-        alert('⚠️ IMPORTANT: You must provide the employee with 24 hours notice before the meeting.\n\n' +
+        showAlert('⚠️ IMPORTANT: You must provide the employee with 24 hours notice before the meeting.\n\n' +
               'This is a requirement of procedural fairness.\n\n' +
               'Please schedule the meeting for at least 24 hours from now before continuing.');
         return false;
@@ -9169,7 +9126,7 @@ function validateRecordOfDiscussionStep2() {
     
     // Check support person
     if (supportPersonOffered === 'No') {
-        alert('⚠️ IMPORTANT: You must offer the employee the right to bring a support person.\n\n' +
+        showAlert('⚠️ IMPORTANT: You must offer the employee the right to bring a support person.\n\n' +
               'A support person can be:\n' +
               '• A family member or friend\n' +
               '• A union representative\n' +
@@ -9190,7 +9147,7 @@ function validateFormalProbationReview() {
         const supportPersonOffered = documentBuilderState.data.supportPersonOffered;
         
         if (noticeGiven === 'No') {
-            alert(
+            showAlert(
                 '⚠️ PROCEDURAL FAIRNESS REQUIRED\n\n' +
                 'You must provide the employee with at least 24 hours notice of this Formal Probation Review meeting.\n\n' +
                 'This is a requirement of procedural fairness.\n\n' +
@@ -9202,7 +9159,7 @@ function validateFormalProbationReview() {
         }
         
         if (purposeExplained === 'No') {
-            alert(
+            showAlert(
                 '⚠️ PROCEDURAL FAIRNESS REQUIRED\n\n' +
                 'The employee must be told the purpose of this meeting before it takes place.\n\n' +
                 'They need to know this is a Formal Probation Review so they can:\n' +
@@ -9217,7 +9174,7 @@ function validateFormalProbationReview() {
         }
         
         if (supportPersonOffered === 'No') {
-            alert(
+            showAlert(
                 '⚠️ PROCEDURAL FAIRNESS REQUIRED\n\n' +
                 'You must offer the employee the right to bring a support person.\n\n' +
                 'A support person can be:\n' +
@@ -9322,10 +9279,6 @@ function docWizardGoBack() {
 }
 
 async function generateDocumentWithAI() {
-    console.log('📄 generateDocumentWithAI() called');
-    console.log('📄 Document type:', documentBuilderState.currentType);
-    console.log('📄 Wizard data at generation:', JSON.stringify(documentBuilderState.data, null, 2));
-    
     // Hide wizard, show loading
     document.getElementById('documentWizardSteps').classList.add('hidden');
     document.getElementById('documentGenerating').classList.remove('hidden');
@@ -9334,11 +9287,7 @@ async function generateDocumentWithAI() {
     
     try {
         const prompt = buildDocumentPrompt();
-        console.log('📄 Prompt built, calling Claude API...');
-        
         const response = await callClaudeAPI(prompt);
-        console.log('📄 Response received from API');
-        
         documentBuilderState.generatedDocument = response;
         
         // ✅ STORE the document ID that was just logged
@@ -9348,10 +9297,7 @@ async function generateDocumentWithAI() {
         // ✅ Store the database ID so we can update it later
         if (logResult && logResult.id) {
             documentBuilderState.lastGeneratedDocId = logResult.id;
-            console.log('✅ Stored document database ID:', logResult.id);
         }
-        
-        console.log('✅ Document generation logged successfully');
         
         // Close document builder modal
         closeToolModal('documentBuilderModal');
@@ -9366,8 +9312,7 @@ async function generateDocumentWithAI() {
         });
         
     } catch (error) {
-        console.error('❌ Document generation error:', error);
-        alert('⚠️ Error generating document. Please try again or contact support.');
+        showAlert('⚠️ Error generating document. Please try again or contact support.');
         
         // Reset to wizard
         document.getElementById('documentGenerating').classList.add('hidden');
@@ -10536,13 +10481,8 @@ DO NOT add fictional details. Use the specific information provided. Expand and 
 }
 
 function showDocumentPreview(generatedDoc) {
-    console.log('📄 Showing document preview...');
-    console.log('Raw content sample:', generatedDoc.substring(0, 200));
-    
     // Convert the AI-generated content to proper HTML
     const formattedHTML = convertAIContentToHTML(generatedDoc);
-    
-    console.log('Formatted HTML sample:', formattedHTML.substring(0, 200));
     
     document.getElementById('documentPreviewContent').innerHTML = formattedHTML;
     document.getElementById('documentPreviewModal').classList.remove('hidden');
@@ -10556,8 +10496,6 @@ function closeDocumentPreview() {
 
 // Silent reset (used when closing modal)
 function resetDocumentBuilderSilent() {
-    console.log('🔄 Resetting Document Builder (silent)...');
-    
     // Reset state
     documentBuilderState.currentType = null;
     documentBuilderState.currentStep = 1;
@@ -10583,7 +10521,6 @@ function resetDocumentBuilderSilent() {
     if (progress) progress.textContent = '0% Complete';
     if (progressBar) progressBar.style.width = '0%';
     
-    console.log('✅ Document Builder reset (silent)');
 }
 
 // Reset with confirmation (used when user clicks "Start Over" button)
@@ -10624,7 +10561,6 @@ async function downloadGeneratedDocument(format = 'pdf') {
     );
     
     if (!userAccepts) {
-        console.log('❌ User cancelled download - did not accept terms');
         trackEvent('document_download_cancelled_at_confirmation', {
             user: currentUser,
             documentType: documentBuilderState.currentType,
@@ -10634,7 +10570,6 @@ async function downloadGeneratedDocument(format = 'pdf') {
         return false;
     }
     
-    console.log(`✅ User accepted legal terms and is downloading ${format.toUpperCase()}`);
     trackEvent('document_download_legal_terms_accepted', {
         user: currentUser,
         documentType: documentBuilderState.currentType,
@@ -10673,8 +10608,6 @@ async function downloadGeneratedDocument(format = 'pdf') {
         
         const formattedHTML = previewElement.innerHTML;
         
-        console.log(`📄 Using formatted HTML from preview for ${format.toUpperCase()}`);
-        
         let success = false;
         
         if (format === 'pdf') {
@@ -10705,7 +10638,7 @@ async function downloadGeneratedDocument(format = 'pdf') {
         
         closeDocumentPreview();
         
-        alert(
+        showAlert(
             `✅ ${format.toUpperCase()} Document Downloaded!\n\n` +
             'CRITICAL REMINDERS:\n' +
             '1. This is a DRAFT document\n' +
@@ -10717,8 +10650,7 @@ async function downloadGeneratedDocument(format = 'pdf') {
         return true;
         
     } catch (error) {
-        console.error('❌ Download error:', error);
-        alert(`Download failed: ${error.message}`);
+        showAlert(`Download failed: ${error.message}`);
         return false;
     }
 }
@@ -10733,10 +10665,6 @@ async function downloadGeneratedDocument(format = 'pdf') {
  */
 async function generateWordDocument(htmlContent, filename, metadata = {}) {
     try {
-        console.log('📝 Generating Word document via server...');
-        console.log('📝 Filename:', filename);
-        console.log('📝 Metadata:', metadata);
-        
         // Show loading indicator
         const loadingDiv = document.createElement('div');
         loadingDiv.id = 'word-loading';
@@ -10757,8 +10685,6 @@ async function generateWordDocument(htmlContent, filename, metadata = {}) {
         document.body.appendChild(loadingDiv);
         
         // Call Netlify function
-        console.log('📝 Calling /.netlify/functions/generate-word...');
-        
         const response = await fetch('/.netlify/functions/generate-word', {
             method: 'POST',
             headers: {
@@ -10775,21 +10701,16 @@ async function generateWordDocument(htmlContent, filename, metadata = {}) {
             })
         });
         
-        console.log('📝 Response status:', response.status);
-        
         // Remove loading indicator
         loadingDiv.remove();
         
         if (!response.ok) {
             const errorData = await response.json();
-            console.error('❌ Server error:', errorData);
             throw new Error(errorData.error || `Server error: ${response.status}`);
         }
         
         // Get the Word document as a blob
         const blob = await response.blob();
-        console.log('✅ Blob received, size:', blob.size);
-        
         if (blob.size === 0) {
             throw new Error('Received empty document from server');
         }
@@ -10797,15 +10718,10 @@ async function generateWordDocument(htmlContent, filename, metadata = {}) {
         // Download it
         saveAs(blob, filename);
         
-        console.log('✅ Word document downloaded:', filename);
-        
         return true;
         
     } catch (error) {
-        console.error('❌ Word generation error:', error);
-        console.error('❌ Stack:', error.stack);
-        
-        alert(
+        showAlert(
             '⚠️ Error Generating Word Document\n\n' +
             error.message + '\n\n' +
             'Please try again or download as PDF instead.\n' +
@@ -10821,8 +10737,6 @@ async function generateWordDocument(htmlContent, filename, metadata = {}) {
  * Removes problematic elements and attributes
  */
 function cleanHTMLForWord(html) {
-    console.log('🧹 Cleaning HTML for Word conversion...');
-    
     // Parse HTML
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, 'text/html');
@@ -10875,20 +10789,12 @@ function cleanHTMLForWord(html) {
     // Get cleaned body content
     const cleaned = doc.body.innerHTML;
     
-    console.log('✅ HTML cleaned. Original length:', html.length, '→ Cleaned length:', cleaned.length);
-    
     return cleaned;
 }
 
 async function logDocumentGeneration() {
-    console.log('📊 logDocumentGeneration() called');
-    console.log('📊 currentType:', documentBuilderState.currentType);
-    console.log('📊 employeeName:', documentBuilderState.data.employeeName);
-    console.log('📊 Full data object:', JSON.stringify(documentBuilderState.data, null, 2));
-    
     // Validate that we have the required data
     if (!documentBuilderState.currentType) {
-        console.error('❌ Cannot log - no document type');
         return null;
     }
     
@@ -10906,42 +10812,29 @@ async function logDocumentGeneration() {
         venue_type: venueProfile.venueType || null
     };
     
-    console.log('📊 Log object to insert:', JSON.stringify(log, null, 2));
-    
     // Store in localStorage as backup
     const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
     const logs = JSON.parse(localStorage.getItem('documentLogs_' + userKey) || '[]');
     logs.push(log);
     localStorage.setItem('documentLogs_' + userKey, JSON.stringify(logs));
-    console.log('✅ Saved to localStorage');
-    
     // Store in Supabase
     if (supabaseClient) {
         try {
-            console.log('📊 Attempting Supabase insert...');
-            
             const { data, error } = await supabaseClient
                 .from('generated_documents')
                 .insert([log])
                 .select(); // ✅ This returns the inserted record including its ID
             
             if (error) {
-                console.error('❌ Supabase insert error:', error);
-                console.error('❌ Error details:', JSON.stringify(error, null, 2));
                 return null;
             } else {
-                console.log('✅ Document logged to Supabase successfully');
-                console.log('✅ Inserted data:', JSON.stringify(data, null, 2));
                 // ✅ Return the inserted record (includes database ID)
                 return data[0];
             }
         } catch (err) {
-            console.error('❌ Exception logging to Supabase:', err);
-            console.error('❌ Exception stack:', err.stack);
             return null;
         }
     } else {
-        console.warn('⚠️ Supabase not connected - only saved locally');
         return null;
     }
 }
@@ -10952,23 +10845,15 @@ async function logDocumentGeneration() {
  * @param {Object} metadata - Document metadata including format
  */
 async function logDocumentDownload(metadata) {
-    console.log('📥 Logging document download');
-    console.log('📥 Stored doc ID:', documentBuilderState.lastGeneratedDocId);
-    console.log('📥 Format:', metadata.format);
-    
     if (!supabaseClient) {
-        console.warn('⚠️ Supabase not connected - cannot update download status');
         return;
     }
     
     if (!documentBuilderState.lastGeneratedDocId) {
-        console.error('❌ No document ID stored - cannot update download status');
         return;
     }
     
     try {
-        console.log('📥 Updating document ID:', documentBuilderState.lastGeneratedDocId);
-        
         // ✅ Update with format information
         const { data: updateData, error: updateError } = await supabaseClient
             .from('generated_documents')
@@ -10981,19 +10866,12 @@ async function logDocumentDownload(metadata) {
             .select();
         
         if (updateError) {
-            console.error('❌ Error updating download status:', updateError);
         } else {
-            console.log('✅ Download status updated successfully');
-            console.log('✅ Updated record:', updateData);
-            console.log(`✅ Format logged: ${metadata.format || 'pdf'}`);
-            
             // Clear the stored ID after successful update
             documentBuilderState.lastGeneratedDocId = null;
         }
         
     } catch (err) {
-        console.error('❌ Exception in logDocumentDownload:', err);
-        console.error('❌ Stack:', err.stack);
     }
     
     // Track event with format
@@ -11149,9 +11027,7 @@ function checkAccess() {
     if (rememberMe) {
         localStorage.setItem('fitzhr_access_code', input);
         localStorage.setItem('fitzhr_last_login', new Date().toISOString());
-        console.log('✅ Access code stored in localStorage');
     } else {
-        console.log('ℹ️ Remember me not checked - code not stored');
     }
         
         // Continue with normal login process
@@ -11193,7 +11069,6 @@ function checkAccess() {
             startDailyTipRotation();
         }, 500);
         
-        console.log('✅ Access code stored in localStorage');
     } else {
         error.textContent = 'Invalid access code. Please check and try again.';
         error.classList.remove('hidden');
@@ -11209,12 +11084,9 @@ function checkAccess() {
  * @returns {boolean} True if auto-login successful, false otherwise
  */
 function attemptAutoLogin() {
-    console.log('🔐 Checking for stored access code...');
-    
     // ✅ SKIP IF GOOGLE AUTH IS ACTIVE - Firebase will handle the login
     const googleAuth = localStorage.getItem('fitzhr_google_auth');
     if (googleAuth === 'true') {
-        console.log('🔐 Google auth detected - skipping access code auto-login (Firebase will handle)');
         return false; // Let Firebase auth handler take over
     }
     
@@ -11222,7 +11094,6 @@ function attemptAutoLogin() {
     const lastLogin = localStorage.getItem('fitzhr_last_login');
     
     if (!storedCode) {
-        console.log('❌ No stored access code found');
         return false;
     }
     
@@ -11234,7 +11105,6 @@ function attemptAutoLogin() {
         
         // Optional: Expire codes after 30 days of inactivity
         if (daysSinceLogin > 30) {
-            console.log('⚠️ Access code expired (30 days inactive)');
             localStorage.removeItem('fitzhr_access_code');
             localStorage.removeItem('fitzhr_last_login');
             return false;
@@ -11243,14 +11113,10 @@ function attemptAutoLogin() {
     
     // Verify code is still in valid codes list
     if (!CONFIG.VALID_CODES.includes(storedCode)) {
-        console.log('❌ Stored code no longer valid:', storedCode);
         localStorage.removeItem('fitzhr_access_code');
         localStorage.removeItem('fitzhr_last_login');
         return false;
     }
-    
-    console.log('✅ Valid stored code found:', storedCode);
-    console.log('📅 Last login:', lastLogin);
     
     // Perform automatic login
     const accessScreen = document.getElementById('accessScreen');
@@ -11302,7 +11168,6 @@ function attemptAutoLogin() {
         daysSinceLastLogin: lastLogin ? Math.floor((new Date() - new Date(lastLogin)) / (1000 * 60 * 60 * 24)) : null
     });
     
-    console.log('✅ Auto-login successful');
     return true;
 }
 
@@ -11393,11 +11258,13 @@ async function sendMessage() {
         removeThinkingIndicator(thinkingDiv);
         handleError(error, 'sendMessage');
         addMessage('assistant', '⚠️ I encountered an issue processing your message. Please try again. If the problem persists, try refreshing the page.');
-        console.error('Error:', error);
     }
     
     sendBtn.disabled = false;
     sendBtn.innerHTML = '<span>Send</span><span>→</span>';
+    
+    // Reset textarea height after sending
+    autoResizeTextarea(input);
 }
 
 function showThinkingIndicator() {
@@ -11567,7 +11434,6 @@ async function callClaudeAPI(message) {
         const data = await response.json();
         return data.message;
     } catch (error) {
-        console.error('API Error:', error);
         throw error;
     }
 }
@@ -11728,7 +11594,7 @@ async function submitCrisis() {
     const phone = document.getElementById('crisisPhone').value;
 
     if (!crisisType || !description || !phone) {
-        alert('Please fill in all fields');
+        showAlert('Please fill in all fields');
         return;
     }
 
@@ -11747,14 +11613,13 @@ async function submitCrisis() {
         const result = await response.json();
 
         if (response.ok) {
-            alert(`🚨 URGENT ALERT SENT\n\nCrisis ID: ${result.crisisId}\n\nA consultant will call ${phone} within 15 minutes.`);
+            showAlert(`🚨 URGENT ALERT SENT\n\nCrisis ID: ${result.crisisId}\n\nA consultant will call ${phone} within 15 minutes.`);
             closeCrisisModal();
         } else {
             throw new Error(result.error || 'Failed');
         }
     } catch (error) {
-        console.error('Crisis error:', error);
-        alert(`⚠️ ALERT FAILED\n\nPLEASE CALL: +61 400 211 014\n\nYour submission is logged locally.`);
+        showAlert(`⚠️ ALERT FAILED\n\nPLEASE CALL: +61 400 211 014\n\nYour submission is logged locally.`);
     } finally {
         submitBtn.disabled = false;
         submitBtn.innerHTML = originalText;
@@ -11857,9 +11722,7 @@ function loadConversations() {
     if (stored) {
         try {
             conversations = JSON.parse(stored);
-            console.log('✅ Loaded', conversations.length, 'conversations');
         } catch (e) {
-            console.error('Error loading conversations:', e);
             conversations = [];
         }
     }
@@ -11869,19 +11732,15 @@ function loadConversations() {
 function saveConversations() {
     try {
         localStorage.setItem('fitz_conversations', JSON.stringify(conversations));
-        console.log('💾 Saved', conversations.length, 'conversations');
-        
         // Sync to cloud
         syncConversationsToCloud();
     } catch (e) {
-        console.error('Error saving conversations:', e);
     }
 }
 
 // Sync all conversations to cloud
 async function syncConversationsToCloud() {
     if (!currentUser || !db) {
-        console.log('⚠️ Conversations saved locally only (not signed in)');
         return;
     }
     
@@ -11903,16 +11762,13 @@ async function syncConversationsToCloud() {
                     .collection('conversations').doc(conversation.id)
                     .set(cleanData, { merge: true });
         }
-        console.log('✅ Synced', conversations.length, 'conversations to cloud');
     } catch (error) {
-        console.error('❌ Failed to sync conversations:', error);
     }
 }
 
 // Load conversations from cloud
 async function loadConversationsFromCloud() {
     if (!currentUser || !db) {
-        console.log('⚠️ Loading conversations from localStorage only');
         return;
     }
     
@@ -11921,7 +11777,6 @@ async function loadConversationsFromCloud() {
                                   .collection('conversations').get();
         
         if (snapshot.empty) {
-            console.log('📭 No conversations in cloud yet');
             return;
         }
         
@@ -11936,13 +11791,10 @@ async function loadConversationsFromCloud() {
         // Save to localStorage
         localStorage.setItem('fitz_conversations', JSON.stringify(conversations));
         
-        console.log('✅ Loaded', conversations.length, 'conversations from cloud');
-        
         // Refresh the conversation list UI
         refreshConversationListUI();
         
     } catch (error) {
-        console.error('❌ Failed to load conversations from cloud:', error);
     }
 }
 
@@ -11953,7 +11805,6 @@ function refreshConversationListUI() {
     if (recentChatsContainer && typeof displayRecentConversations === 'function') {
         displayRecentConversations();
     }
-    console.log('🔄 Conversation UI refreshed');
 }
 
 
@@ -12037,18 +11888,11 @@ function createNewConversation() {
     
     showToast('New chat started', 'success', 2000);
     
-    console.log('✅ Created new conversation:', newConv.id);
 }
 
 // Save current conversation
 function saveCurrentConversation() {
-    console.log('💾 saveCurrentConversation called');
-    console.log('💾 currentConversationId:', currentConversationId);
-    console.log('💾 conversationHistory length:', conversationHistory.length);
-    console.log('💾 conversationHistory:', conversationHistory);
-    
     if (!currentConversationId) {
-        console.error('❌ No currentConversationId - exiting');
         return;
     }
     
@@ -12060,44 +11904,29 @@ function saveCurrentConversation() {
     saveCurrentConversationIdToFirebase(currentConversationId);
     
     var conv = getCurrentConversation();
-    console.log('💾 Found conversation:', conv);
-    
     if (!conv) {
-        console.error('❌ Conversation not found in array - exiting');
         return;
     }
-    
-    console.log('💾 BEFORE update - conv.messages:', conv.messages);
     
     // Update messages
     conv.messages = conversationHistory;
     conv.updated = new Date().toISOString();
-    
-    console.log('💾 AFTER update - conv.messages:', conv.messages);
-    console.log('💾 conv.messages length:', conv.messages.length);
     
     // Update title from first user message if still "New Chat"
     if (conv.title === 'New Chat' && conversationHistory.length > 0) {
         var firstUserMsg = conversationHistory.find(function(m) { return m.role === 'user'; });
         if (firstUserMsg) {
             conv.title = firstUserMsg.content.substring(0, 50) + (firstUserMsg.content.length > 50 ? '...' : '');
-            console.log('💾 Updated title to:', conv.title);
         }
     }
     
-    console.log('💾 About to save to localStorage');
     saveConversations();
     updateSidebarChats();
     
-    console.log('✅ Saved conversation:', conv.title);
 }
 
 // Load conversation by ID
 function loadConversation(convId) {
-    console.log('🔍 loadConversation called with:', convId);
-    console.log('🔍 conversations array:', conversations);
-    console.log('🔍 DOM.messagesContainer:', DOM.messagesContainer);
-    
     // Save current first
     if (currentConversationId && currentConversationId !== convId) {
         saveCurrentConversation();
@@ -12105,17 +11934,13 @@ function loadConversation(convId) {
     
     var conv = conversations.find(function(c) { return c.id === convId; });
     if (!conv) {
-        console.error('❌ Conversation not found:', convId);
         return;
     }
     
-    console.log('✅ Found conversation:', conv);
     currentConversationId = convId;
     
     // Clear UI
     var container = DOM.messagesContainer.querySelector('.space-y-6');
-    console.log('🔍 Container before clear:', container);
-    
     if (container) {
         container.innerHTML = '';
     } else {
@@ -12123,15 +11948,10 @@ function loadConversation(convId) {
         container = DOM.messagesContainer.querySelector('.space-y-6');
     }
     
-    console.log('🔍 Container after clear:', container);
-    
     // Load messages
     conversationHistory = conv.messages || [];
-    console.log('🔍 Loading messages:', conversationHistory.length);
-    
     // Render messages
     conversationHistory.forEach(function(msg, index) {
-        console.log('🔍 Rendering message', index, ':', msg.role, msg.content.substring(0, 50));
         addMessage(msg.role, msg.content);
     });
     
@@ -12155,7 +11975,6 @@ function loadConversation(convId) {
         }
     }, 400);
     
-    console.log('✅ Loaded conversation:', conv.title);
 }
 
 /**
@@ -12163,15 +11982,10 @@ function loadConversation(convId) {
  * Similar to how Claude.ai works - shows previous chat instead of blank
  */
 function restoreLastConversation() {
-    console.log('🔄 restoreLastConversation called');
-    console.log('🔄 conversations:', conversations.length);
-    
     // First, load conversations from localStorage if not already loaded
     if (conversations.length === 0) {
         loadConversations();
     }
-    
-    console.log('🔄 After load, conversations:', conversations.length);
     
     // Try to get the last active conversation ID using user-specific key
     const userKey = currentUser && currentUser.uid ? currentUser.uid : (currentUser || 'anonymous');
@@ -12182,13 +11996,10 @@ function restoreLastConversation() {
         lastConvId = localStorage.getItem('fitz_currentConversationId');
     }
     
-    console.log('🔄 Last conversation ID from localStorage:', lastConvId);
-    
     // Check if that conversation still exists
     let targetConv = null;
     if (lastConvId) {
         targetConv = conversations.find(c => c.id === lastConvId);
-        console.log('🔄 Found last conversation:', targetConv ? 'yes' : 'no');
     }
     
     // If last conversation doesn't exist, get the most recent one
@@ -12198,15 +12009,12 @@ function restoreLastConversation() {
             return new Date(b.updated || b.created) - new Date(a.updated || a.created);
         });
         targetConv = sorted[0];
-        console.log('🔄 Using most recent conversation:', targetConv.id);
     }
     
     // If we have a conversation to restore
     if (targetConv) {
         // Check if it has meaningful messages (more than just welcome message)
         const hasMeaningfulMessages = targetConv.messages && targetConv.messages.length > 1;
-        console.log('🔄 Has meaningful messages:', hasMeaningfulMessages, '(count:', targetConv.messages?.length || 0, ')');
-        
         // Load the conversation
         loadConversation(targetConv.id);
         
@@ -12219,7 +12027,6 @@ function restoreLastConversation() {
     }
     
     // No conversations exist - create a new one
-    console.log('🔄 No conversations to restore, creating new');
     createNewConversation();
     return false; // New conversation created
 }
@@ -12391,7 +12198,6 @@ async function loadBookmarksFromFirebase() {
             updateSidebarBookmarks();
         }
     } catch (error) {
-        console.error('Failed to load bookmarks from Firebase:', error);
     }
 }
 
@@ -12404,7 +12210,6 @@ function saveBookmarks() {
         db.collection('users').doc(currentUser.uid).set({
             bookmarks: bookmarks
         }, { merge: true }).catch(err => {
-            console.error('Failed to sync bookmarks:', err);
         });
     }
 }
@@ -12554,9 +12359,7 @@ function loadRecentTools() {
     try {
         const stored = localStorage.getItem('fitz_recent_tools');
         recentTools = stored ? JSON.parse(stored) : [];
-        console.log('📋 Loaded recent tools:', recentTools.length);
     } catch (e) {
-        console.error('Error loading recent tools:', e);
         recentTools = [];
     }
 }
@@ -12565,13 +12368,10 @@ function saveRecentTools() {
     try {
         localStorage.setItem('fitz_recent_tools', JSON.stringify(recentTools));
     } catch (e) {
-        console.error('Error saving recent tools:', e);
     }
 }
 
 function trackToolUsage(toolId) {
-    console.log('🛠️ Tracking tool usage:', toolId);
-    
     const tool = toolMetadata[toolId];
     if (!tool) return;
     
@@ -12739,12 +12539,7 @@ function toggleUploadMenu() {
 }
 
 // Toggle Tools Menu
-function toggleToolsMenu() {
-    var menu = document.getElementById('toolsMenu');
-    if (menu) {
-        menu.classList.toggle('hidden');
-    }
-}
+// toggleToolsMenu - defined below with mobile/desktop handling
 
 function closeToolsMenu() {
     var menu = document.getElementById('toolsMenu');
@@ -12875,18 +12670,15 @@ function openComplianceCalendar() {
         var modal = document.getElementById('complianceCalendarModal');
         if (modal) {
             modal.classList.remove('hidden');
-            console.log('✅ Compliance Calendar modal opened');
         } else {
-            console.error('❌ complianceCalendarModal not found!');
-            alert('Error: Could not find Compliance Calendar modal');
+            showAlert('Error: Could not find Compliance Calendar modal');
             return;
         }
         
         // Set state selector to user's saved state
         initializeComplianceCalendarState();
     } catch (error) {
-        console.error('❌ Error opening Compliance Calendar:', error);
-        alert('Error opening Compliance Calendar: ' + error.message);
+        showAlert('Error opening Compliance Calendar: ' + error.message);
     }
 }
 
@@ -13032,7 +12824,6 @@ function initializeComplianceCalendarState() {
     try {
         const selector = document.getElementById('complianceStateSelector');
         if (!selector) {
-            console.warn('⚠️ complianceStateSelector not found');
             return;
         }
         
@@ -13049,7 +12840,6 @@ function initializeComplianceCalendarState() {
                         userState = profile.state;
                     }
                 } catch (e) {
-                    console.warn('⚠️ Could not parse venue profile:', e);
                 }
             }
         }
@@ -13062,7 +12852,6 @@ function initializeComplianceCalendarState() {
         selector.value = userState;
         updatePublicHolidays();
     } catch (error) {
-        console.error('❌ Error initializing compliance calendar state:', error);
     }
 }
 
@@ -13073,7 +12862,6 @@ function updatePublicHolidays() {
         const badge = document.getElementById('stateHolidayBadge');
         
         if (!selector || !list) {
-            console.warn('⚠️ Missing elements for public holidays update');
             return;
         }
         
@@ -13139,9 +12927,7 @@ function updatePublicHolidays() {
             `;
         }).join('');
         
-        console.log('✅ Public holidays updated for', state);
     } catch (error) {
-        console.error('❌ Error updating public holidays:', error);
     }
 }
 
@@ -13223,14 +13009,14 @@ function jdNextStep() {
     if (jdCurrentStep === 1) {
         const jobTitle = document.getElementById('jdJobTitle').value.trim();
         if (!jobTitle) {
-            alert('Please enter a job title');
+            showAlert('Please enter a job title');
             return;
         }
         jdData.jobTitle = jobTitle;
     }
     
     if (jdCurrentStep === 2 && !jdData.experienceLevel) {
-        alert('Please select an experience level');
+        showAlert('Please select an experience level');
         return;
     }
     
@@ -13302,7 +13088,6 @@ async function generateResponsibilities() {
         textarea.classList.remove('hidden');
         help.classList.remove('hidden');
     } catch (error) {
-        console.error('Error generating responsibilities:', error);
         textarea.value = '• [Add key responsibility]\n• [Add key responsibility]\n• [Add key responsibility]';
         loading.classList.add('hidden');
         textarea.classList.remove('hidden');
@@ -13395,7 +13180,6 @@ Format as a complete, professional job description with sections for: Position O
         
         trackEvent('job_description_generated', { jobTitle: jdData.jobTitle, experienceLevel: jdData.experienceLevel });
     } catch (error) {
-        console.error('Error generating job description:', error);
         showToast('Error generating job description', 'error');
         
         // Show wizard steps again on error
@@ -13430,7 +13214,6 @@ async function downloadJobDescription(format) {
             
             trackEvent('job_description_downloaded', { format: 'docx', jobTitle: jdData.jobTitle });
         } catch (error) {
-            console.error('Error downloading DOCX:', error);
             showToast('Error generating Word document', 'error');
         }
     } else if (format === 'pdf') {
@@ -13447,7 +13230,6 @@ async function downloadJobDescription(format) {
             
             trackEvent('job_description_downloaded', { format: 'pdf', jobTitle: jdData.jobTitle });
         } catch (error) {
-            console.error('Error downloading PDF:', error);
             showToast('Error generating PDF document', 'error');
         }
     }
@@ -13548,14 +13330,14 @@ function iqNextStep() {
     if (iqCurrentStep === 1) {
         const jobTitle = document.getElementById('iqJobTitle').value.trim();
         if (!jobTitle) {
-            alert('Please enter a job title');
+            showAlert('Please enter a job title');
             return;
         }
         iqData.jobTitle = jobTitle;
     }
     
     if (iqCurrentStep === 2 && !iqData.experienceLevel) {
-        alert('Please select an experience level');
+        showAlert('Please select an experience level');
         return;
     }
     
@@ -13566,7 +13348,7 @@ function iqNextStep() {
         if (document.getElementById('iqSituational').checked) iqData.categories.push('Situational');
         
         if (iqData.categories.length === 0) {
-            alert('Please select at least one category');
+            showAlert('Please select at least one category');
             return;
         }
     }
@@ -13607,7 +13389,7 @@ function selectIQCount(count) {
 
 async function generateInterviewQuestions() {
     if (!iqData.questionCount) {
-        alert('Please select number of questions');
+        showAlert('Please select number of questions');
         return;
     }
     
@@ -13661,8 +13443,6 @@ Keep it concise - just list the questions with brief context.`;
         
         trackEvent('interview_questions_generated', { jobTitle: iqData.jobTitle, count: iqData.questionCount });
     } catch (error) {
-        console.error('Error generating questions:', error);
-        
         // Show user-friendly error message
         let errorMessage = 'Error generating questions';
         if (error.message.includes('timeout') || error.message.includes('fewer questions')) {
@@ -13703,7 +13483,6 @@ async function downloadInterviewQuestions(format) {
             
             trackEvent('interview_questions_downloaded', { format: 'docx', jobTitle: iqData.jobTitle });
         } catch (error) {
-            console.error('Error downloading DOCX:', error);
             showToast('Error generating Word document', 'error');
         }
     } else if (format === 'pdf') {
@@ -13720,7 +13499,6 @@ async function downloadInterviewQuestions(format) {
             
             trackEvent('interview_questions_downloaded', { format: 'pdf', jobTitle: iqData.jobTitle });
         } catch (error) {
-            console.error('Error downloading PDF:', error);
             showToast('Error generating PDF document', 'error');
         }
     }
@@ -13799,7 +13577,7 @@ function generateReferenceCheck() {
     const company = document.getElementById('rcCompany').value.trim();
     
     if (!candidateName || !position || !refereeName || !relationship || !company) {
-        alert('Please fill in all required fields (marked with *)');
+        showAlert('Please fill in all required fields (marked with *)');
         return;
     }
     
@@ -13924,7 +13702,6 @@ async function downloadReferenceCheck(format) {
             
             trackEvent('reference_check_downloaded', { format: 'docx', candidateName: candidateName });
         } catch (error) {
-            console.error('Error downloading DOCX:', error);
             showToast('Error generating Word document', 'error');
         }
     } else if (format === 'pdf') {
@@ -13938,7 +13715,6 @@ async function downloadReferenceCheck(format) {
             
             trackEvent('reference_check_downloaded', { format: 'pdf', candidateName: candidateName });
         } catch (error) {
-            console.error('Error downloading PDF:', error);
             showToast('Error generating PDF document', 'error');
         }
     }
@@ -13969,7 +13745,6 @@ function triggerFileUpload(type) {
     if (input) {
         input.click();
     } else {
-        console.error('File input not found:', inputId);
     }
 }
 
@@ -13977,8 +13752,6 @@ function triggerFileUpload(type) {
 async function handleFileUpload(event) {
     var file = event.target.files[0];
     if (!file) return;
-    
-    console.log('📁 Uploading file:', file.name);
     
     // Validate file size (10MB max)
     var maxSize = 10 * 1024 * 1024;
@@ -14041,7 +13814,6 @@ async function handleFileUpload(event) {
             throw new Error('Processing failed');
         }
     } catch (error) {
-        console.error('Upload error:', error);
         showToast('❌ Error: ' + error.message, 'error', 4000);
     }
     
@@ -14053,8 +13825,6 @@ async function handleFileUpload(event) {
 async function handleImageUpload(event) {
     var file = event.target.files[0];
     if (!file) return;
-    
-    console.log('🖼️ Uploading image:', file.name);
     
     // Validate file size (5MB max for images)
     var maxSize = 5 * 1024 * 1024;
@@ -14095,7 +13865,6 @@ async function handleImageUpload(event) {
         
         reader.readAsDataURL(file);
     } catch (error) {
-        console.error('Image upload error:', error);
         showToast('❌ Error: ' + error.message, 'error', 4000);
     }
     
@@ -14158,7 +13927,12 @@ async function readFileContent(file) {
 // Auto-resize textarea
 function autoResizeTextarea(textarea) {
     textarea.style.height = 'auto';
-    textarea.style.height = textarea.scrollHeight + 'px';
+    // Collapse back to single row when empty
+    if (!textarea.value.trim()) {
+        textarea.style.height = '44px';
+    } else {
+        textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+    }
 }
 
 // Scroll to bottom of messages (for mobile button)
@@ -14184,7 +13958,6 @@ function scrollToBottomInstant() {
         container.scrollTop = container.scrollHeight;
         // Update button visibility
         setTimeout(updateScrollButtonVisibility, 100);
-        console.log('📜 Scrolled to bottom of messages');
     }
 }
 
@@ -14704,6 +14477,54 @@ function showToast(message, type = 'info', duration = 4000) {
  * Show loading skeleton for chat message
  * @returns {HTMLElement} - The skeleton element
  */
+
+
+/**
+ * Styled in-app alert replacement for native showAlert()
+ * @param {string} message - Message to display (supports \n for line breaks)
+ */
+function showAlert(message) {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'styledAlertOverlay';
+    overlay.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-[9999]';
+    overlay.style.animation = 'fadeIn 0.15s ease-out';
+    
+    // Convert newlines to HTML breaks and handle emoji headers
+    let formattedMessage = message
+        .replace(/\n/g, '<br>')
+        .replace(/^(⚠️|✅|✓|🚨|🔗|❌)\s*/g, '<span class="text-2xl block mb-2">$1</span>');
+    
+    overlay.innerHTML = `
+        <div class="bg-slate-800 rounded-2xl border border-slate-600 p-6 max-w-md w-full shadow-2xl" style="animation: fadeIn 0.2s ease-out;">
+            <div class="text-slate-100 text-sm leading-relaxed mb-6">${formattedMessage}</div>
+            <button onclick="document.getElementById('styledAlertOverlay').remove()" 
+                    class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-lg transition-all">
+                OK
+            </button>
+        </div>
+    `;
+    
+    // Close on overlay click (not inner content)
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) overlay.remove();
+    });
+    
+    // Close on Escape
+    const escHandler = (e) => {
+        if (e.key === 'Escape') {
+            overlay.remove();
+            document.removeEventListener('keydown', escHandler);
+        }
+    };
+    document.addEventListener('keydown', escHandler);
+    
+    document.body.appendChild(overlay);
+    
+    // Focus the OK button for keyboard accessibility
+    overlay.querySelector('button').focus();
+}
+
 function showChatSkeleton() {
     const container = document.getElementById('messagesContainer');
     const skeleton = document.createElement('div');
@@ -14775,8 +14596,6 @@ function hideLoadingOverlay(elementId) {
  * @param {string} context - Context of where error occurred
  */
 function handleError(error, context = '') {
-    console.error(`Error in ${context}:`, error);
-    
     let userMessage = 'Something went wrong. Please try again.';
     
     // Provide specific messages for common errors
@@ -14849,18 +14668,56 @@ function isInViewport(element) {
  */
 function initKeyboardNavigation() {
     document.addEventListener('keydown', (e) => {
-        // Escape to close modals
+        // Escape to close the topmost open modal
         if (e.key === 'Escape') {
-            // Close tools modal if open
-            const mobileToolsModal = document.getElementById('mobileToolsModal');
-            if (mobileToolsModal && !mobileToolsModal.classList.contains('hidden')) {
-                closeMobileTools();
+            // List of all modal IDs in priority order (most specific first)
+            const modalIds = [
+                'styledAlertOverlay',
+                'documentPreviewModal',
+                'mobileToolsModal',
+                'adminDashboardModal',
+                'awardCalculatorModal',
+                'awardWizardModal',
+                'rosterOptimizerModal',
+                'rosterStressTesterModal',
+                'terminationRiskModal',
+                'scenarioAnalysisModal',
+                'complianceCalendarModal',
+                'xeroIntegrationModal',
+                'documentBuilderModal',
+                'terminationConsultantModal',
+                'venueOnboardingModal',
+                'venueSettingsModal',
+                'feedbackModal',
+                'crisisModal',
+                'searchModal',
+                'bookmarksModal',
+                'multiFileModal',
+                'analyticsModal',
+                'termsModal',
+                'privacyModal',
+                'logoutModal',
+                'toolsMenu'
+            ];
+            
+            // Close the first visible modal found
+            for (const id of modalIds) {
+                const modal = document.getElementById(id);
+                if (modal && !modal.classList.contains('hidden')) {
+                    modal.classList.add('hidden');
+                    // Special cleanup for document builder
+                    if (id === 'documentBuilderModal' && typeof resetDocumentBuilderSilent === 'function') {
+                        resetDocumentBuilderSilent();
+                    }
+                    e.preventDefault();
+                    break;
+                }
             }
             
-            // Close admin dashboard if open
-            const adminModal = document.getElementById('adminDashboardModal');
-            if (adminModal && !adminModal.classList.contains('hidden')) {
-                closeAdminDashboard();
+            // Also close sidebar if open
+            const sidebar = document.getElementById('chatSidebar');
+            if (sidebar && sidebar.classList.contains('open')) {
+                toggleSidebar();
             }
         }
         
@@ -14870,6 +14727,14 @@ function initKeyboardNavigation() {
             const messageInput = document.getElementById('messageInput');
             if (messageInput) {
                 messageInput.focus();
+            }
+        }
+        
+        // Ctrl/Cmd + N for new chat
+        if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+            e.preventDefault();
+            if (typeof createNewConversation === 'function') {
+                createNewConversation();
             }
         }
     });
@@ -15048,12 +14913,12 @@ function saveOnboardingNameAndVenue() {
     const venueName = document.getElementById('onboardingVenueName').value.trim();
     
     if (!userName) {
-        alert('Please enter your name');
+        showAlert('Please enter your name');
         return;
     }
     
     if (!venueName) {
-        alert('Please enter your venue name');
+        showAlert('Please enter your venue name');
         return;
     }
     
@@ -15067,7 +14932,7 @@ function saveOnboardingLocation() {
     const location = document.getElementById('onboardingLocation').value;
     const city = document.getElementById('onboardingCity').value.trim();
     if (!location) {
-        alert('Please select a state');
+        showAlert('Please select a state');
         return;
     }
     venueProfile.location = location;
@@ -15079,7 +14944,7 @@ function saveOnboardingLocation() {
 function saveOnboardingVenueType() {
     const venueType = document.getElementById('onboardingVenueType').value;
     if (!venueType) {
-        alert('Please select a venue type');
+        showAlert('Please select a venue type');
         return;
     }
     venueProfile.venueType = venueType;
@@ -15111,9 +14976,7 @@ function completeOnboarding() {
         db.collection('users').doc(currentUser.uid).set({
             venueProfile: venueProfile
         }, { merge: true }).then(() => {
-            console.log('✅ Onboarding profile synced to Firebase');
         }).catch(err => {
-            console.error('❌ Failed to sync onboarding profile:', err);
         });
     }
     
@@ -15287,9 +15150,7 @@ function saveVenueSettings() {
         db.collection('users').doc(currentUser.uid).set({
             venueProfile: venueProfile
         }, { merge: true }).then(() => {
-            console.log('✅ Venue profile synced to Firebase');
         }).catch(err => {
-            console.error('❌ Failed to sync venue profile:', err);
         });
     }
     
@@ -15297,7 +15158,7 @@ function saveVenueSettings() {
     updateSidebarVenueName();
     
     closeVenueSettings();
-    alert('✅ Venue settings saved!');
+    showAlert('✅ Venue settings saved!');
 }
 
 function closeVenueSettings() {
@@ -15335,15 +15196,11 @@ async function trackConversation(userMessage, assistantResponse) {
                 .insert([conversation]);
             
             if (error) {
-                console.error('❌ Supabase save error:', error);
             } else {
-                console.log('✅ Conversation saved to Supabase');
             }
         } catch (err) {
-            console.error('❌ Failed to save to Supabase:', err);
         }
     } else {
-        console.warn('⚠️ Supabase not initialized - conversation only saved locally');
     }
     
     // 3. Update theme counts
@@ -15415,7 +15272,6 @@ async function updateThemeCount(theme) {
                     .insert([{ theme: theme, count: 1 }]);
             }
         } catch (err) {
-            console.error('Error updating theme count:', err);
         }
     }
 }
@@ -15444,9 +15300,7 @@ async function trackHighRiskTopic(message) {
             await supabaseClient
                 .from('high_risk_topics')
                 .insert([highRiskEntry]);
-            console.log('✅ High-risk topic saved to Supabase');
         } catch (err) {
-            console.error('Error saving high-risk topic:', err);
         }
     }
 }
@@ -15511,7 +15365,6 @@ async function updateUserProfile(user, message) {
                     }]);
             }
         } catch (err) {
-            console.error('Error updating user profile:', err);
         }
     }
 }
@@ -15527,7 +15380,7 @@ function closeAdminDashboard() {
 
 async function loadAnalytics() {
     if (!db) {
-        alert('⚠️ Firebase not connected. Check console for errors.');
+        showAlert('⚠️ Firebase not connected. Check console for errors.');
         return;
     }
     
@@ -15562,8 +15415,7 @@ async function loadAnalytics() {
         // Load conversations tab by default
         switchAdminTab('conversations');
     } catch (error) {
-        console.error('Error loading analytics:', error);
-        alert('Error loading analytics. Check console.');
+        showAlert('Error loading analytics. Check console.');
     }
 }
 
@@ -15608,12 +15460,7 @@ async function loadConversationsAdmin() {
     
     list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading conversations from Firebase...</div>';
     
-    console.log('📊 Admin: Starting to load conversations...');
-    console.log('📊 Admin: db =', db);
-    console.log('📊 Admin: currentUser =', currentUser);
-    
     if (!db) {
-        console.error('📊 Admin: Firebase db is null!');
         list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected. Check console for details.</div>';
         return;
     }
@@ -15622,10 +15469,7 @@ async function loadConversationsAdmin() {
         // Collect conversations from all users
         const allConversations = [];
         
-        console.log('📊 Admin: Fetching users collection...');
         const usersSnapshot = await db.collection('users').get();
-        
-        console.log('📊 Admin: Found', usersSnapshot.size, 'users');
         
         if (usersSnapshot.size === 0) {
             list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No users found in database</div>';
@@ -15636,20 +15480,14 @@ async function loadConversationsAdmin() {
             const userData = userDoc.data();
             const userName = userData.displayName || userData.email || userDoc.id.substring(0, 8);
             
-            console.log('📊 Admin: Processing user:', userName, '(', userDoc.id, ')');
-            
             // Get conversations without orderBy (may not have index)
             const conversationsSnapshot = await db.collection('users').doc(userDoc.id)
                 .collection('conversations')
                 .limit(50)
                 .get();
             
-            console.log('📊 Admin: User', userName, 'has', conversationsSnapshot.size, 'conversations');
-            
             conversationsSnapshot.forEach(convDoc => {
                 const conv = convDoc.data();
-                console.log('📊 Admin: Conversation data:', conv.id || convDoc.id, conv.title, 'messages:', conv.messages?.length || 0);
-                
                 // Get messages from conversation
                 if (conv.messages && conv.messages.length > 0) {
                     const lastUserMsg = conv.messages.filter(m => m.role === 'user').pop();
@@ -15676,8 +15514,6 @@ async function loadConversationsAdmin() {
                 }
             });
         }
-        
-        console.log('📊 Admin: Total conversations collected:', allConversations.length);
         
         // Sort by timestamp (newest first)
         allConversations.sort((a, b) => {
@@ -15721,9 +15557,7 @@ async function loadConversationsAdmin() {
         });
         
         list.innerHTML = html;
-        console.log('📊 Admin: Rendered', allConversations.length, 'conversations');
     } catch (error) {
-        console.error('📊 Admin: Error loading conversations:', error);
         list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error: ' + error.message + '</div>';
     }
 }
@@ -15806,7 +15640,6 @@ async function loadThemes() {
         
         list.innerHTML = html;
     } catch (error) {
-        console.error('Error loading themes:', error);
         list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data</div>';
     }
 }
@@ -15884,7 +15717,6 @@ async function loadUsers() {
         
         list.innerHTML = html;
     } catch (error) {
-        console.error('Error loading users:', error);
         list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
     }
 }
@@ -15971,7 +15803,6 @@ async function loadHighRisk() {
         
         list.innerHTML = html;
     } catch (error) {
-        console.error('Error loading high-risk topics:', error);
         list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data</div>';
     }
 }
@@ -16151,7 +15982,6 @@ async function loadDocuments() {
         
         list.innerHTML = html;
     } catch (error) {
-        console.error('Error loading documents:', error);
         list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
     }
 }
@@ -16201,7 +16031,7 @@ function filterConversations() {
 
 function refreshAnalytics() {
     loadAnalytics();
-    alert('✅ Analytics refreshed!');
+    showAlert('✅ Analytics refreshed!');
 }
 
 function exportAnalytics() {
@@ -16221,7 +16051,7 @@ function exportAnalytics() {
     
     generateExcelSpreadsheet(data, `Analytics_Export_${Date.now()}.xlsx`, 'Conversations');
     
-    alert('✅ Analytics exported to Excel!');
+    showAlert('✅ Analytics exported to Excel!');
 }
 
 function getVenueContext() {
@@ -16264,7 +16094,7 @@ function calculateAward() {
     const overtime = parseFloat(document.getElementById('calcOvertime').value);
 
     if (!baseRate || !hours) {
-        alert('Please enter all required fields');
+        showAlert('Please enter all required fields');
         return;
     }
 
@@ -16332,7 +16162,6 @@ function getNestedRate(obj, path) {
         if (current && current[part] !== undefined) {
             current = current[part];
         } else {
-            console.error(`Path not found: ${path} at part: ${part}`);
             return null;
         }
     }
@@ -16351,16 +16180,10 @@ function getNestedRate(obj, path) {
 function wizardAnswer(question, answer) {
     wizardData[question] = answer;
     
-    console.log('🔍 Wizard Answer:', question, '=', answer);
-    console.log('🔍 Current step:', currentWizardStep, '/', CONFIG.WIZARD_STEPS);
-    console.log('🔍 Wizard data so far:', wizardData);
-    
     if (currentWizardStep < CONFIG.WIZARD_STEPS) {
         currentWizardStep++;
-        console.log('🔍 Moving to step:', currentWizardStep);
         updateWizardStep();
     } else {
-        console.log('🔍 Wizard complete! Calling showWizardResults()...');
         showWizardResults();
     }
 }
@@ -16409,17 +16232,11 @@ function wizardGoBack() {
 
 // Show wizard results
 function showWizardResults() {
-    console.log('🎯 showWizardResults() called!');
-    console.log('🎯 Wizard data:', JSON.stringify(wizardData, null, 2));
-    
     // Check if employee is a junior (19 or younger)
     if (wizardData.age === 'junior') {
-        console.log('🎯 Junior detected, redirecting...');
         showJuniorRedirect();
         return;
     }
-    
-    console.log('🎯 Adult path, proceeding...');
     
     // Build a simple result for now to ensure display works
     let resultRate = 0;
@@ -16446,13 +16263,11 @@ function showWizardResults() {
             }
         } else {
             // Use fallback display - rates not loaded
-            console.warn('⚠️ Award rates not loaded, using display fallback');
             resultTitle = 'Rate lookup unavailable';
             penaltiesHTML = '<div>• Connect to internet to load current rates</div>';
             stepsHTML = '<li>Refresh page when online to get accurate rates</li>';
         }
     } catch (calcError) {
-        console.error('⚠️ Calculation error:', calcError);
         resultTitle = 'Calculation Error';
     }
     
@@ -16507,10 +16322,8 @@ function showWizardResults() {
     const wizardStepsDiv = document.getElementById('wizardSteps');
     if (wizardStepsDiv) {
         wizardStepsDiv.innerHTML = resultsHTML;
-        console.log('✅ Results displayed in wizardSteps div');
     } else {
-        console.error('❌ wizardSteps div not found!');
-        alert('Error: Could not display results. Please try again.');
+        showAlert('Error: Could not display results. Please try again.');
         return;
     }
     
@@ -16521,11 +16334,8 @@ function showWizardResults() {
     const progressContainer = document.querySelector('#awardWizardModal .mb-6');
     if (progressContainer) progressContainer.classList.add('hidden');
     
-    console.log('🎉 showWizardResults() complete!');
 }
 function showJuniorRedirect() {
-    console.log('🎯 showJuniorRedirect() called');
-    
     try {
         // Build the junior redirect HTML
         const juniorHTML = `
@@ -16602,9 +16412,7 @@ function showJuniorRedirect() {
         if (wizardStepsDiv) {
             wizardStepsDiv.innerHTML = juniorHTML;
             wizardStepsDiv.classList.remove('hidden'); // Keep it visible
-            console.log('✅ Junior redirect inserted into wizardSteps div');
         } else {
-            console.error('❌ wizardSteps div not found!');
             return;
         }
         
@@ -16625,14 +16433,10 @@ function showJuniorRedirect() {
                 role: wizardData.role
             });
         } catch (trackError) {
-            console.warn('⚠️ Tracking failed:', trackError);
         }
         
-        console.log('🎉 Junior redirect complete!');
-        
     } catch (error) {
-        console.error('❌ Error in showJuniorRedirect():', error);
-        alert('Error showing junior information: ' + error.message);
+        showAlert('Error showing junior information: ' + error.message);
     }
 }
 
@@ -16649,11 +16453,7 @@ function showJuniorRedirect() {
  * @returns {Object} Classification result with award, level, rate, penalties, and next steps
  */
 function calculateAwardClassification(data) {
-    console.log('🔍 WIZARD DEBUG: Starting classification');
-    console.log('🔍 Input data:', JSON.stringify(data, null, 2));
-    
     if (!awardRates || !awardRates.rates) {
-        console.error('❌ Award rates not loaded!');
         return {
             award: 'Hospitality Industry (General) Award MA000009',
             level: 'Error - Rates Not Loaded',
@@ -16663,14 +16463,9 @@ function calculateAwardClassification(data) {
         };
     }
     
-    console.log('✅ Award rates loaded:', awardRates.version);
-    console.log('✅ Total rates in array:', awardRates.rates.length);
-    
     // Determine employment type for filtering
     const isCasual = data.employment === 'casual';
     const employmentType = (isCasual || data.employment === 'part-time') ? 'casual' : 'full_time';
-    
-    console.log('🔍 Employment type for filter:', employmentType);
     
     // Build classification path based on role and experience
     const levelMap = {
@@ -16684,8 +16479,6 @@ function calculateAwardClassification(data) {
     };
     
     const levelPrefix = levelMap[data.experience] || 'introductory';
-    console.log('🔍 Level prefix from experience:', levelPrefix);
-    
     // Role to classification mapping
     const roleSuffixes = {
         'cook': {
@@ -16775,11 +16568,8 @@ function calculateAwardClassification(data) {
     if (roleSuffixes[data.role] && roleSuffixes[data.role][levelPrefix]) {
         classificationPath = roleSuffixes[data.role][levelPrefix];
     } else {
-        console.warn(`⚠️ No mapping for role: ${data.role} at level: ${levelPrefix}`);
         classificationPath = 'introductory';
     }
-    
-    console.log('🔍 Final classification path:', classificationPath);
     
     // SEARCH THE ARRAY for matching rate
     const matchingRate = awardRates.rates.find(r => 
@@ -16788,10 +16578,7 @@ function calculateAwardClassification(data) {
         r.classification === classificationPath
     );
     
-    console.log('🔍 Matching rate found:', matchingRate);
-    
     if (!matchingRate) {
-        console.error('❌ No rate found for:', { employmentType, classificationPath });
         return {
             award: 'Error',
             level: 'Rate not found',
@@ -16804,11 +16591,7 @@ function calculateAwardClassification(data) {
     const baseRate = matchingRate.rate;
     const title = matchingRate.title;
     
-    console.log('✅ Base rate:', baseRate);
-    console.log('✅ Title:', title);
-    
     if (!baseRate || typeof baseRate !== 'number' || isNaN(baseRate)) {
-        console.error('❌ Invalid base rate:', baseRate);
         return {
             award: 'Error',
             level: title || 'Unknown',
@@ -16857,15 +16640,11 @@ function calculateAwardClassification(data) {
         notes: awardRates.notes || []
     };
     
-    console.log('✅ FINAL RESULT:', JSON.stringify(result, null, 2));
-    
     return result;
 }
 
 // Reset wizard
 function resetWizard() {
-    console.log('🔄 Resetting wizard...');
-    
     // Reset wizard data and step
     wizardData = {};
     currentWizardStep = 1;
@@ -16881,7 +16660,6 @@ function resetWizard() {
         const backBtn = document.getElementById('wizardBackBtn');
         
         if (!wizardStepsDiv) {
-            console.error('❌ Cannot find wizard steps div!');
             return;
         }
         
@@ -17065,7 +16843,6 @@ function resetWizard() {
         // Reopen modal
         document.getElementById('awardWizardModal').classList.remove('hidden');
         
-        console.log('✅ Wizard reset and reopened');
     }, 150);
 }
 // ========================================
@@ -17132,7 +16909,7 @@ async function analyzeRosterDescription() {
     const description = document.getElementById('rosterDescription').value.trim();
     
     if (!description) {
-        alert('Please describe your roster');
+        showAlert('Please describe your roster');
         return;
     }
     
@@ -17202,7 +16979,7 @@ function handleRosterUpload(event) {
 }
 
 function showManualRoster() {
-    alert('Manual entry coming soon! Please upload Excel/CSV for now.');
+    showAlert('Manual entry coming soon! Please upload Excel/CSV for now.');
 }
 
 function downloadOptimizedRoster() {
@@ -17210,7 +16987,7 @@ function downloadOptimizedRoster() {
         { Employee: 'John Smith', Monday: '9am-5pm', Tuesday: '9am-5pm', Wednesday: 'OFF' }
     ];
     generateExcelSpreadsheet(data, `Optimized_Roster_${Date.now()}.xlsx`, 'Roster');
-    alert('✓ Downloaded! Review before implementing.');
+    showAlert('✓ Downloaded! Review before implementing.');
 }
 
 // ========================================
@@ -17223,7 +17000,7 @@ function assessTerminationRisk() {
     const warnings = document.getElementById('termWarnings').value;
 
     if (!tenure || !reason || !warnings) {
-        alert('Please answer all questions');
+        showAlert('Please answer all questions');
         return;
     }
 
@@ -17267,7 +17044,7 @@ async function analyzeScenario() {
     const description = document.getElementById('scenarioDescription').value;
 
     if (!description) {
-        alert('Please describe your situation');
+        showAlert('Please describe your situation');
         return;
     }
 
@@ -17301,7 +17078,7 @@ async function analyzeScenario() {
 // ========================================
 
 function connectXero() {
-    alert('🔗 XERO INTEGRATION\n\nOAuth connection would happen here in production.\n\nContact info@fitzgeraldhr.com.au to enable.');
+    showAlert('🔗 XERO INTEGRATION\n\nOAuth connection would happen here in production.\n\nContact info@fitzgeraldhr.com.au to enable.');
     
     document.getElementById('xeroNotConnected').classList.add('hidden');
     document.getElementById('xeroConnected').classList.remove('hidden');
@@ -17336,7 +17113,7 @@ function saveComplianceSettings() {
     
     trackEvent('compliance_settings_saved', { user: userKey });
     
-    alert('✓ Settings Saved!\n\nYou will receive reminders for selected items.\n\n(Email notifications require backend integration)');
+    showAlert('✓ Settings Saved!\n\nYou will receive reminders for selected items.\n\n(Email notifications require backend integration)');
 }
 
 // ========================================
@@ -17356,8 +17133,6 @@ function closeFeedback() {
 // ========================================
 
 function logout() {
-    console.log('🚪 Logout initiated - showing options modal');
-    
     // Show the logout options modal
     document.getElementById('logoutModal').classList.remove('hidden');
     
@@ -17383,7 +17158,6 @@ function setRating(rating) {
  */
 function closeLogoutModal() {
     document.getElementById('logoutModal').classList.add('hidden');
-    console.log('ℹ️ Logout cancelled by user');
     trackEvent('logout_cancelled', { user: currentUser });
 }
 
@@ -17392,8 +17166,6 @@ function closeLogoutModal() {
  * @param {string} type - 'soft' (keep code) or 'hard' (forget device)
  */
 async function confirmLogout(type) {
-    console.log('🚪 Confirming logout - type:', type);
-    
     // Close the modal first
     closeLogoutModal();
     
@@ -17402,11 +17174,9 @@ async function confirmLogout(type) {
     
     if (type === 'soft') {
         // ✅ SOFT LOGOUT - Keep access code stored for auto-login
-        console.log('🔄 Soft logout - keeping access code stored');
         // localStorage stays intact - user will auto-login next visit
     } else if (type === 'hard') {
         // ✅ HARD LOGOUT - Clear everything, forget this device
-        console.log('🗑️ Hard logout - clearing access code and session data');
         localStorage.removeItem('fitzhr_access_code');
         localStorage.removeItem('fitzhr_last_login');
     }
@@ -17421,12 +17191,8 @@ async function confirmLogout(type) {
  * @param {string} type - Logout type for analytics
  */
 async function performLogout(loggedOutUser, type) {
-    console.log('🔄 Performing logout cleanup...');
-    
     // IMPORTANT: Save current conversation to Firebase BEFORE clearing!
     if (currentConversationId) {
-        console.log('💾 Saving conversation state to Firebase before logout...');
-        
         // Save the current conversation
         if (typeof saveCurrentConversation === 'function') {
             saveCurrentConversation();
@@ -17436,9 +17202,7 @@ async function performLogout(loggedOutUser, type) {
         if (typeof syncConversationsToCloud === 'function') {
             try {
                 await syncConversationsToCloud();
-                console.log('✅ Conversations synced to Firebase');
             } catch (e) {
-                console.error('⚠️ Could not sync to Firebase:', e);
             }
         }
         
@@ -17446,9 +17210,7 @@ async function performLogout(loggedOutUser, type) {
         if (currentUser && currentUser.uid && typeof saveCurrentConversationIdToFirebase === 'function') {
             try {
                 await saveCurrentConversationIdToFirebase(currentConversationId);
-                console.log('✅ Last conversation ID saved to Firebase');
             } catch (e) {
-                console.error('⚠️ Could not save conversation ID to Firebase:', e);
             }
         }
     }
@@ -17572,17 +17334,8 @@ async function performLogout(loggedOutUser, type) {
                 logout_type: type,
                 timestamp: new Date().toISOString()
             }])
-            .then(() => console.log('✅ Logout logged to database'))
-            .catch(err => console.warn('⚠️ Failed to log logout:', err));
-    }
-    
-    console.log(`✅ ${type === 'soft' ? 'Soft' : 'Hard'} logout complete`);
-    
-    // Show confirmation message
-    if (type === 'soft') {
-        console.log('💡 User will auto-login next time');
-    } else {
-        console.log('🔒 User must enter access code next time');
+            .then(() => {})
+            .catch(() => {});
     }
 }
 
@@ -17611,7 +17364,7 @@ function submitFeedback() {
             likes, improve, willPay
         });
         
-        alert('✓ Thank you! Your feedback has been submitted.\n\nWe really appreciate your help improving this tool!');
+        showAlert('✓ Thank you! Your feedback has been submitted.\n\nWe really appreciate your help improving this tool!');
         closeFeedback();
         
         // Reset form
@@ -17625,8 +17378,7 @@ function submitFeedback() {
         });
     })
     .catch(err => {
-        console.error('Feedback submission error:', err);
-        alert('⚠️ Error submitting feedback. Please try again or email us at info@fitzgeraldhr.com.au');
+        showAlert('⚠️ Error submitting feedback. Please try again or email us at info@fitzgeraldhr.com.au');
     });
 }
 
@@ -17642,13 +17394,12 @@ function validateStoredCode() {
     const storedCode = localStorage.getItem('fitzhr_access_code');
     
     if (storedCode && !CONFIG.VALID_CODES.includes(storedCode)) {
-        console.warn('⚠️ Stored code no longer valid - clearing');
         localStorage.removeItem('fitzhr_access_code');
         localStorage.removeItem('fitzhr_last_login');
         
         // If user is currently logged in, log them out
         if (currentUser === storedCode) {
-            alert('⚠️ Your access code is no longer valid. Please contact support.');
+            showAlert('⚠️ Your access code is no longer valid. Please contact support.');
             logout();
         }
     }
@@ -17662,7 +17413,6 @@ document.addEventListener('visibilitychange', function() {
 });
 
 function trackEvent(eventName, data) {
-    console.log('Event:', eventName, data);
     // TODO: Send to analytics platform
 }
 
@@ -17973,7 +17723,7 @@ ${venueName}
     
     // Show confirmation
     setTimeout(() => {
-        alert(
+        showAlert(
             '✉️ Email Template Opened\n\n' +
             'Your email client should open with a pre-filled template.\n\n' +
             'Please:\n' +
@@ -18048,7 +17798,6 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 venueProfile = JSON.parse(saved);
             } catch (e) {
-                console.error('Error parsing venueProfile:', e);
             }
         }
     }
@@ -18057,10 +17806,7 @@ document.addEventListener('DOMContentLoaded', function() {
     updateSidebarVenueName();
 
     // Initialize Supabase
-    const supabaseInitialized = initializeSupabase();
-    if (!supabaseInitialized) {
-        console.warn('⚠️ Supabase initialization failed - analytics will only save locally');
-    }
+    initializeSupabase();
     
     // ✅ ATTEMPT AUTO-LOGIN BEFORE SHOWING ACCESS SCREEN
     const autoLoginSuccessful = attemptAutoLogin();    
@@ -18070,9 +17816,6 @@ document.addEventListener('DOMContentLoaded', function() {
         startTestimonialRotation();
     }
     
-    console.log('✅ DOM cache initialized');
-    console.log('Fitzgerald HR Assistant loaded successfully ✓');
-    console.log('All JavaScript fixes applied ✓');
 });
 
 // ========================================
@@ -18084,9 +17827,6 @@ document.addEventListener('DOMContentLoaded', function() {
  * Provides user feedback and prevents white screen of death
  */
 window.addEventListener('error', function(event) {
-    console.error('❌ Unhandled error:', event.error);
-    console.error('Stack trace:', event.error?.stack);
-    
     // Create error notification bar
     const errorBar = document.createElement('div');
     errorBar.id = 'global-error-bar';
@@ -18115,7 +17855,6 @@ window.addEventListener('error', function(event) {
     
     // Auto-reload after delay
     setTimeout(() => {
-        console.log('Auto-reloading page after error...');
         location.reload();
     }, CONFIG.ERROR_DISPLAY_TIME);
     
@@ -18127,11 +17866,9 @@ window.addEventListener('error', function(event) {
  * Handles unhandled promise rejections
  */
 window.addEventListener('unhandledrejection', function(event) {
-    console.error('❌ Unhandled promise rejection:', event.reason);
-    
     // Create user-friendly error message
     const message = event.reason?.message || 'An unexpected error occurred';
-    alert(`⚠️ Error: ${message}\n\nPlease try again or contact support if the issue persists.`);
+    showAlert(`⚠️ Error: ${message}\n\nPlease try again or contact support if the issue persists.`);
     
     // Prevent default handling
     event.preventDefault();
@@ -18200,7 +17937,6 @@ async function showLegalAcceptanceModal() {
                 }
             }
         } catch (e) {
-            console.error('Error checking Firebase for legal acceptance:', e);
             // Continue - will show modal if not in localStorage
         }
     }
@@ -18239,7 +17975,7 @@ async function acceptLegalTerms() {
     const checkbox = document.getElementById('legalAcceptCheckbox');
     
     if (!checkbox.checked) {
-        alert('⚠️ Please check the box to confirm you understand and agree to the terms.');
+        showAlert('⚠️ Please check the box to confirm you understand and agree to the terms.');
         return;
     }
     
@@ -18272,7 +18008,7 @@ async function acceptLegalTerms() {
     }
     
     if (!userKey) {
-        alert('Error: Unable to identify user. Please refresh the page and try signing in again.');
+        showAlert('Error: Unable to identify user. Please refresh the page and try signing in again.');
         return;
     }
     
@@ -18294,7 +18030,6 @@ async function acceptLegalTerms() {
                 legalTermsAcceptedBy: firebaseUser.email || userKey
             }, { merge: true });
         } catch (err) {
-            console.error('Failed to sync legal acceptance to Firebase:', err);
             // Continue anyway since localStorage worked
         }
     }
@@ -18337,12 +18072,10 @@ function declineLegalTerms() {
     
     if (confirmed) {
         const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
-        console.log('❌ User declined legal terms');
-        
         trackEvent('legal_terms_declined', { user: userKey });
         
         // Log them out
-        alert('You have declined the terms. You will now be logged out.');
+        showAlert('You have declined the terms. You will now be logged out.');
         logout();
     }
 }
@@ -18352,7 +18085,6 @@ function declineLegalTerms() {
  */
 async function logLegalAcceptance(user, timestamp) {
     if (!supabaseClient) {
-        console.warn('⚠️ Supabase not initialized - cannot log legal acceptance');
         return;
     }
     
@@ -18368,12 +18100,9 @@ async function logLegalAcceptance(user, timestamp) {
             }]);
         
         if (error) {
-            console.error('❌ Error logging legal acceptance:', error);
         } else {
-            console.log('✅ Legal acceptance logged to database');
         }
     } catch (err) {
-        console.error('❌ Exception logging legal acceptance:', err);
     }
 }
 
@@ -18406,8 +18135,7 @@ async function handleDeputyCallbackInPopup() {
         const state = urlParams.get('state');
         
         if (!code) {
-            console.error('No code in callback');
-            alert('❌ No authorization code received');
+            showAlert('❌ No authorization code received');
             window.close();
             return;
         }
@@ -18415,13 +18143,10 @@ async function handleDeputyCallbackInPopup() {
         // Verify state
         const savedState = sessionStorage.getItem('deputy_oauth_state');
         if (state !== savedState) {
-            console.error('State mismatch!');
-            alert('❌ Security check failed');
+            showAlert('❌ Security check failed');
             window.close();
             return;
         }
-        
-        console.log('✅ OAuth code received, exchanging for token...');
         
         const userId = sessionStorage.getItem('deputy_oauth_user_id') || 'test-user-' + Date.now();
         
@@ -18442,8 +18167,6 @@ async function handleDeputyCallbackInPopup() {
         if (!data.success) {
             throw new Error(data.error || 'Failed to connect');
         }
-        
-        console.log('✅ Deputy connected successfully!');
         
         // Notify parent window
         if (window.opener && !window.opener.closed) {
@@ -18474,7 +18197,6 @@ async function handleDeputyCallbackInPopup() {
         }, 2000);
         
     } catch (error) {
-        console.error('OAuth callback error:', error);
         // Show error message
         document.body.innerHTML = `
             <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #0f172a; color: white; font-family: sans-serif;">
@@ -18501,7 +18223,6 @@ window.addEventListener('message', (event) => {
     if (event.origin !== window.location.origin) return;
     
     if (event.data.type === 'deputy_oauth_success') {
-        console.log('✅ Received success message from OAuth popup');
         showNotification('✅ Deputy connected successfully!', 'success');
         closeDeputyConnection();
         
@@ -18517,29 +18238,18 @@ window.addEventListener('message', (event) => {
     }
     
     if (event.data.type === 'deputy_oauth_error') {
-        console.error('❌ OAuth error from popup:', event.data.error);
         showNotification(`❌ Connection failed: ${event.data.error}`, 'error');
     }
 });
 
 
 window.addEventListener('DOMContentLoaded', function() {
-    console.log('🧪 Testing html-docx-js library...');
-    console.log('htmlDocx exists?', typeof htmlDocx);
-    console.log('htmlDocx object:', htmlDocx);
-    
     if (typeof htmlDocx !== 'undefined') {
-        console.log('htmlDocx.asBlob exists?', typeof htmlDocx.asBlob);
-        
         // Try the absolute simplest conversion
         const testHTML = '<html><body><p>Test</p></body></html>';
         try {
             const result = htmlDocx.asBlob(testHTML);
-            console.log('✅ Test conversion result:', result);
-            console.log('✅ Result type:', result?.type);
-            console.log('✅ Result size:', result?.size);
         } catch (e) {
-            console.error('❌ Test conversion failed:', e);
         }
     }
     
@@ -18621,7 +18331,6 @@ async function checkDeputyConnection() {
     try {
         // Check if supabase is initialized
         if (!window.supabaseClient || !supabaseClient.auth) {
-            console.log('Supabase not initialized yet');
             return;
         }
         
@@ -18653,7 +18362,6 @@ async function checkDeputyConnection() {
             document.getElementById('connectedCount').textContent = '1';
         }
     } catch (error) {
-        console.error('Error checking Deputy:', error);
     }
 }
 
@@ -18662,15 +18370,11 @@ async function checkDeputyConnection() {
 // Universal roster sync function (works with both OAuth and token)
 async function syncRosterData() {
     try {
-        console.log('🔵 syncRosterData() called');
         showNotification('🔄 Syncing rosters...', 'info');
         
         // Get token from sessionStorage first (for token users)
         let deputyToken = sessionStorage.getItem('deputy_token');
         let userId = sessionStorage.getItem('deputy_user_id') || 'test-user-' + Date.now();
-        
-        console.log('Token from sessionStorage:', deputyToken ? '✅ Found' : '❌ Not found');
-        console.log('User ID:', userId);
         
         // If no token in sessionStorage, try Supabase (for OAuth users)
         if (!deputyToken && typeof supabaseClient !== 'undefined' && supabaseClient) {
@@ -18691,7 +18395,6 @@ async function syncRosterData() {
                     }
                 }
             } catch (error) {
-                console.log('Could not get token from Supabase');
             }
         }
         
@@ -18704,7 +18407,6 @@ async function syncRosterData() {
         await syncDeputyRostersWithToken(deputyToken);
         
     } catch (error) {
-        console.error('Sync error:', error);
         showNotification(`❌ Sync failed: ${error.message}`, 'error');
     }
 }
@@ -18740,18 +18442,13 @@ async function syncAllIntegrations() {
             
             if (integration && integration.access_token) {
                 deputyToken = integration.access_token;
-                console.log('Token retrieved from Supabase');
             }
         } catch (error) {
-            console.log('Could not get token from Supabase, checking sessionStorage...');
         }
         
         // Fall back to sessionStorage
         if (!deputyToken) {
             deputyToken = sessionStorage.getItem('deputy_token');
-            if (deputyToken) {
-                console.log('Token retrieved from sessionStorage');
-            }
         }
         
         if (!deputyToken) {
@@ -18763,7 +18460,6 @@ async function syncAllIntegrations() {
         await syncDeputyRostersWithToken(deputyToken);
         
     } catch (error) {
-        console.error('Sync error:', error);
         showNotification(`❌ Sync failed: ${error.message}`, 'error');
     }
 }
@@ -18836,7 +18532,7 @@ async function saveDeputyToken() {
     const token = document.getElementById('deputyTokenInput').value.trim();
     
     if (!token) {
-        alert('Please enter a token');
+        showAlert('Please enter a token');
         return;
     }
     
@@ -18844,8 +18540,6 @@ async function saveDeputyToken() {
         showNotification('🔄 Connecting with token...', 'info');
         
         // Save token directly to Supabase (skip API test due to CORS)
-        console.log('Saving Deputy token...');
-        
         // Save token to Supabase
         if (typeof supabaseClient !== 'undefined' && supabaseClient) {
             let userId;
@@ -18875,7 +18569,7 @@ async function saveDeputyToken() {
                 });
             
             if (error) {
-                console.error('Supabase error:', error);
+                throw new Error('Failed to save connection');
             }
         }
         
@@ -18888,7 +18582,6 @@ async function saveDeputyToken() {
         openRosterCompliance();
         
     } catch (error) {
-        console.error('Token save error:', error);
         showNotification(`❌ ${error.message}`, 'error');
     }
 }
@@ -18937,7 +18630,6 @@ async function syncDeputyRostersWithToken(token) {
         }
         
     } catch (error) {
-        console.error('Roster sync error:', error);
         showNotification(`❌ ${error.message}`, 'error');
     }
 }
@@ -18976,50 +18668,36 @@ function closeDeputyConnection() {
 
 async function initiateDeputyOAuth() {
     try {
-        console.log('🔵 Starting Deputy OAuth flow...');
-        
         if (typeof supabaseClient === 'undefined' || !supabaseClient) {
-            console.error('❌ Supabase not initialized');
-            alert('❌ System not ready. Please refresh the page.');
+            showAlert('❌ System not ready. Please refresh the page.');
             return;
         }
-        console.log('✅ Supabase is ready');
-        
         let user;
         try {
             const { data: { user: authUser }, error: userError } = await supabaseClient.auth.getUser();
             user = authUser;
-            console.log('User check:', user ? 'Logged in' : 'Not logged in', userError);
         } catch (error) {
-            console.log('⚠️ Could not check user status, allowing connection for testing');
             user = null;
         }
         
         // For testing: Allow connection even if not logged in
         if (!user) { 
-            console.log('⚠️ Not logged in, but allowing Deputy connection for testing');
             user = { id: 'test-user-' + Date.now() };
         }
-        console.log('✅ User ID for Deputy connection:', user.id);
-        
         // Check Pro plan (skip if subscriptions table doesn't exist yet)
         try {
             const { data: subscription, error: subError } = await supabaseClient.from('subscriptions').select('plan').eq('user_id', user.id).single();
-            console.log('Subscription check:', subscription, subError);
             if (subscription && subscription.plan !== 'pro') { 
-                alert('⚠️ Deputy integration requires the Pro plan ($149/month). Please upgrade to continue.');
+                showAlert('⚠️ Deputy integration requires the Pro plan ($149/month). Please upgrade to continue.');
                 return;
             }
         } catch (error) {
-            console.log('Note: Skipping Pro plan check (subscriptions table not found)');
         }
         
         const clientId = '478e80ddc33b583f97849b407d7a1265944cc607';
         const redirectUri = `${window.location.origin}/auth/deputy/callback`;
         const scope = 'longlife_refresh_token roster.read employee.read timesheet.read';
         const state = generateRandomString(32);
-        
-        console.log('🔵 Opening Deputy OAuth in new window...');
         
         // Save state and user ID for callback
         sessionStorage.setItem('deputy_oauth_state', state);
@@ -19031,24 +18709,18 @@ async function initiateDeputyOAuth() {
         const oauthWindow = window.open(oauthUrl, 'deputyOAuth', 'width=600,height=700');
         
         if (!oauthWindow) {
-            alert('Please allow popups for this site to connect Deputy');
+            showAlert('Please allow popups for this site to connect Deputy');
             return;
         }
         
         showNotification('🔵 Authorize Deputy in the popup window...', 'info');
-        console.log('✅ OAuth window opened');
-        
     } catch (error) { 
-        console.error('❌ Deputy OAuth Error:', error);
-        console.error('Error details:', error.message, error.stack);
-        alert(`❌ Failed to connect Deputy: ${error.message}`); 
+        showAlert(`❌ Failed to connect Deputy: ${error.message}`); 
     }
 }
 
 async function handleDeputyCallback() {
     try {
-        console.log('🔵 handleDeputyCallback() called');
-        
         // Try to get code from URL first, then sessionStorage
         const urlParams = new URLSearchParams(window.location.search);
         let code = urlParams.get('code');
@@ -19060,13 +18732,10 @@ async function handleDeputyCallback() {
             state = sessionStorage.getItem('deputy_oauth_state');
             
             if (code) {
-                console.log('✅ Retrieved OAuth code from sessionStorage');
             } else {
-                console.log('❌ No OAuth code in URL or sessionStorage');
                 return;
             }
         } else {
-            console.log('✅ OAuth code found in URL');
         }
         
         if (!code) return;
@@ -19089,7 +18758,6 @@ async function handleDeputyCallback() {
         sessionStorage.removeItem('deputy_oauth_state');
         sessionStorage.removeItem('deputy_oauth_code');
         sessionStorage.removeItem('deputy_oauth_timestamp');
-        console.log('✅ Cleared OAuth data from sessionStorage');
         window.history.replaceState({}, document.title, window.location.pathname);
         showNotification('✅ Connected!', 'success');
         await syncDeputyRosters();
@@ -19100,7 +18768,6 @@ async function handleDeputyCallback() {
         sessionStorage.removeItem('deputy_oauth_state');
         sessionStorage.removeItem('deputy_oauth_code');
         sessionStorage.removeItem('deputy_oauth_timestamp');
-        console.log('✅ Cleared OAuth data from sessionStorage');
         window.history.replaceState({}, document.title, window.location.pathname);
     }
 }
@@ -19146,21 +18813,17 @@ function openRosterCompliance() {
     
     // Check if Deputy is connected
     const hasToken = sessionStorage.getItem('deputy_token');
-    console.log('Opening roster dashboard, token present:', !!hasToken);
-    
     if (hasToken) {
         // Show connected status
         document.getElementById('lastSyncTime').textContent = 'Just connected';
         
         // Auto-sync if no data
         if (!rosterData || !rosterData.length) {
-            console.log('No roster data, triggering auto-sync...');
             syncRosterData();
         } else {
             updateRosterDashboard(rosterData);
         }
     } else {
-        console.warn('No Deputy token found!');
         showNotification('⚠️ Deputy not connected', 'warning');
     }
 }
@@ -19190,14 +18853,8 @@ function generateRandomString(length) {
 
 // Check for Deputy OAuth callback IMMEDIATELY
 if (window.location.search.includes('code=') && window.location.search.includes('state=')) {
-    console.log('🔵 Deputy OAuth callback detected in URL');
-    console.log('window.opener exists:', !!window.opener);
-    console.log('window.name:', window.name);
-    
     // If we're in the popup window, handle callback and close
     if (window.opener || window.name === 'deputyOAuth') {
-        console.log('✅ Running in popup window, will handle callback');
-        
         // Hide the main UI in popup
         document.body.innerHTML = `
             <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #0f172a; color: white; font-family: sans-serif;">
@@ -19213,7 +18870,6 @@ if (window.location.search.includes('code=') && window.location.search.includes(
         const checkAndHandleCallback = setInterval(() => {
             if (typeof supabaseClient !== 'undefined' && supabaseClient) {
                 clearInterval(checkAndHandleCallback);
-                console.log('✅ Supabase ready, handling Deputy callback...');
                 handleDeputyCallbackInPopup();
             }
         }, 100);
@@ -19221,8 +18877,7 @@ if (window.location.search.includes('code=') && window.location.search.includes(
         setTimeout(() => {
             clearInterval(checkAndHandleCallback);
             if (typeof supabaseClient === 'undefined' || !supabaseClient) {
-                console.error('❌ Timeout: Supabase never initialized');
-                alert('Connection timeout. Please try again.');
+                showAlert('Connection timeout. Please try again.');
             }
         }, 10000);
     }
@@ -19238,8 +18893,7 @@ async function handleDeputyCallbackInPopup() {
         const state = urlParams.get('state');
         
         if (!code) {
-            console.error('No code in callback');
-            alert('❌ No authorization code received');
+            showAlert('❌ No authorization code received');
             window.close();
             return;
         }
@@ -19247,13 +18901,10 @@ async function handleDeputyCallbackInPopup() {
         // Verify state
         const savedState = sessionStorage.getItem('deputy_oauth_state');
         if (state !== savedState) {
-            console.error('State mismatch!');
-            alert('❌ Security check failed');
+            showAlert('❌ Security check failed');
             window.close();
             return;
         }
-        
-        console.log('✅ OAuth code received, exchanging for token...');
         
         const userId = sessionStorage.getItem('deputy_oauth_user_id') || 'test-user-' + Date.now();
         
@@ -19274,8 +18925,6 @@ async function handleDeputyCallbackInPopup() {
         if (!data.success) {
             throw new Error(data.error || 'Failed to connect');
         }
-        
-        console.log('✅ Deputy connected successfully!');
         
         // Notify parent window
         if (window.opener && !window.opener.closed) {
@@ -19306,7 +18955,6 @@ async function handleDeputyCallbackInPopup() {
         }, 2000);
         
     } catch (error) {
-        console.error('OAuth callback error:', error);
         // Show error message
         document.body.innerHTML = `
             <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #0f172a; color: white; font-family: sans-serif;">
@@ -19333,7 +18981,6 @@ window.addEventListener('message', (event) => {
     if (event.origin !== window.location.origin) return;
     
     if (event.data.type === 'deputy_oauth_success') {
-        console.log('✅ Received success message from OAuth popup');
         showNotification('✅ Deputy connected successfully!', 'success');
         closeDeputyConnection();
         
@@ -19349,14 +18996,12 @@ window.addEventListener('message', (event) => {
     }
     
     if (event.data.type === 'deputy_oauth_error') {
-        console.error('❌ OAuth error from popup:', event.data.error);
         showNotification(`❌ Connection failed: ${event.data.error}`, 'error');
     }
 });
 
 
 window.addEventListener('DOMContentLoaded', () => {
-    console.log('Page loaded');
 });
 
 
@@ -19370,27 +19015,21 @@ let parsedAIData = null;
 function openAIImportModal(type) {
     currentImportType = type;
     
-    console.log('🚀 Opening AI Import Modal for:', type);
-    
     // Hide Integration Hub
     const integrationHub = document.getElementById('integrationHubModal');
     if (integrationHub) {
         integrationHub.classList.add('hidden');
-        console.log('✅ Hidden Integration Hub');
     }
     
     // Show import container (it's already fixed position overlay)
     const importContainer = document.getElementById('importContainer');
     if (!importContainer) {
-        console.error('❌ Import container not found!');
         showNotification('❌ Import system not loaded', 'error');
         return;
     }
     
     // Simply set display to block - the fixed positioning handles the rest
     importContainer.style.display = 'block';
-    console.log('✅ Import container visible');
-    
     // Reset UI to upload state
     const uploadZone = document.getElementById('uploadZone');
     const aiAnalysis = document.getElementById('aiAnalysis');
@@ -19398,7 +19037,6 @@ function openAIImportModal(type) {
     
     if (uploadZone) {
         uploadZone.style.display = 'block';
-        console.log('✅ Upload zone visible');
     }
     if (aiAnalysis) {
         aiAnalysis.style.display = 'none';
@@ -19418,31 +19056,25 @@ function openAIImportModal(type) {
     const headerTitle = document.querySelector('.import-container .header h1');
     if (headerTitle) {
         headerTitle.textContent = `AI-Powered Import: ${titles[type] || 'Upload Data'}`;
-        console.log('✅ Title updated to:', headerTitle.textContent);
     }
     
     // Setup file upload listeners
     setupAIFileUpload();
     
-    console.log('✅ AI Import Modal fully loaded');
 }
 
 
 function closeAIImport() {
-    console.log('🔙 Closing AI Import');
-    
     // Hide import container
     const importContainer = document.getElementById('importContainer');
     if (importContainer) {
         importContainer.style.display = 'none';
-        console.log('✅ Import container hidden');
     }
     
     // Show Integration Hub again
     const integrationHub = document.getElementById('integrationHubModal');
     if (integrationHub) {
         integrationHub.classList.remove('hidden');
-        console.log('✅ Integration Hub shown');
     }
     
     // Reset
@@ -19530,7 +19162,6 @@ async function processAIFile(file) {
         showNotification('✅ File analyzed successfully!', 'success');
         
     } catch (error) {
-        console.error('File process error:', error);
         showNotification(`❌ ${error.message}`, 'error');
     } finally {
         document.getElementById('aiProcessingOverlay').style.display = 'none';
@@ -21824,7 +21455,6 @@ let onboardingState = {
 
 // Main Functions
 function openOnboardingChecklist() {
-    console.log('📋 Opening Onboarding Checklist');
     const modal = document.getElementById('onboardingChecklistModal');
     if (modal) {
         modal.classList.remove('hidden');
@@ -21854,7 +21484,7 @@ async function generateSmartChecklist() {
     
     // Validation
     if (!employeeName || !position || !employmentType || !startDate) {
-        alert('Please fill in all required fields (Name, Position, Employment Type, Start Date)');
+        showAlert('Please fill in all required fields (Name, Position, Employment Type, Start Date)');
         return;
     }
     
@@ -21887,8 +21517,7 @@ async function generateSmartChecklist() {
         updateProgress();
         
     } catch (error) {
-        console.error('Error generating checklist:', error);
-        alert('Failed to generate checklist. Please try again.');
+        showAlert('Failed to generate checklist. Please try again.');
     }
 }
 
@@ -21905,7 +21534,6 @@ Keep it concise, actionable, and specific to Australian hospitality.`;
         const response = await callClaudeAPI(prompt);
         return response;
     } catch (error) {
-        console.error('AI Insights error:', error);
         return getFallbackInsights(position, employmentType);
     }
 }
@@ -22275,9 +21903,9 @@ function handleItemAction(itemId, action) {
         toggleTaskCompletion(itemId);
     } else if (action.includes('Schedule')) {
         // Could integrate with calendar
-        alert(`Action "${action}" - Would integrate with calendar system`);
+        showAlert(`Action "${action}" - Would integrate with calendar system`);
     } else {
-        alert(`Action "${action}" for item: ${item.title}`);
+        showAlert(`Action "${action}" for item: ${item.title}`);
     }
 }
 
@@ -22286,7 +21914,7 @@ async function askAIAssistant() {
     const question = document.getElementById('aiQuestionInput').value.trim();
     
     if (!question) {
-        alert('Please enter a question');
+        showAlert('Please enter a question');
         return;
     }
     
@@ -22306,7 +21934,6 @@ async function askAIAssistant() {
         // Clear input
         document.getElementById('aiQuestionInput').value = '';
     } catch (error) {
-        console.error('AI Assistant error:', error);
         responseContent.innerHTML = 'Sorry, I encountered an error. Please try again or contact support.';
     }
 }
@@ -22326,11 +21953,10 @@ function saveOnboardingProgress() {
         if (typeof showNotification === 'function') {
             showNotification('✅ Progress saved', 'success');
         } else {
-            alert('✅ Progress saved');
+            showAlert('✅ Progress saved');
         }
     } catch (error) {
-        console.error('Error saving:', error);
-        alert('Failed to save progress');
+        showAlert('Failed to save progress');
     }
 }
 
@@ -22363,7 +21989,6 @@ function loadOnboardingProgress() {
             }
         }
     } catch (error) {
-        console.error('Error loading progress:', error);
     }
 }
 
@@ -22426,8 +22051,6 @@ function promptForOnboardingChecklist() {
 
 // Create onboarding checklist with pre-filled data from contract
 function createOnboardingFromContract() {
-    console.log('📋 Creating onboarding checklist from contract data');
-    
     // Close the prompt modal first
     closeOnboardingPrompt();
     
@@ -22436,8 +22059,6 @@ function createOnboardingFromContract() {
     
     // Extract data from contract builder
     const contractData = contractBuilderState.data.step1;
-    
-    console.log('Contract data:', contractData);
     
     // Pre-fill onboarding state
     onboardingState.employeeName = contractData.positionTitle ? `New ${contractData.positionTitle}` : 'New Employee';
@@ -22461,13 +22082,6 @@ function createOnboardingFromContract() {
             if (typeField) typeField.value = onboardingState.employmentType;
             if (dateField) dateField.value = onboardingState.startDate;
             
-            console.log('Form pre-filled with:', {
-                name: onboardingState.employeeName,
-                position: onboardingState.position,
-                type: onboardingState.employmentType,
-                date: onboardingState.startDate
-            });
-            
             // Auto-generate the checklist after a moment
             setTimeout(() => {
                 generateSmartChecklist();
@@ -22477,13 +22091,10 @@ function createOnboardingFromContract() {
 }
 
 function closeOnboardingPrompt() {
-    console.log('Closing onboarding prompt');
     const modal = document.getElementById('onboardingPromptModal');
     if (modal) {
         modal.remove();
-        console.log('Prompt modal removed');
     } else {
-        console.log('Prompt modal not found');
     }
 }
 
@@ -22504,7 +22115,6 @@ let trainingPlanState = {
 
 // Main Functions
 function openTrainingPlan() {
-    console.log('🎓 Opening Training Plan Generator');
     const modal = document.getElementById('trainingPlanModal');
     if (modal) {
         modal.classList.remove('hidden');
@@ -22568,7 +22178,7 @@ async function generateTrainingPlan() {
     
     // Validation
     if (!employeeName || !position || !experience || !duration) {
-        alert('Please fill in all required fields');
+        showAlert('Please fill in all required fields');
         return;
     }
     
@@ -22603,8 +22213,7 @@ async function generateTrainingPlan() {
         document.getElementById('trainingCoachSection').classList.remove('hidden');
         
     } catch (error) {
-        console.error('Error generating plan:', error);
-        alert('Failed to generate training plan. Please try again.');
+        showAlert('Failed to generate training plan. Please try again.');
     }
 }
 
@@ -22632,7 +22241,6 @@ Be specific to Australian hospitality and practical.`;
         const response = await callClaudeAPI(prompt);
         return response;
     } catch (error) {
-        console.error('AI error:', error);
         return getFallbackInsights();
     }
 }
@@ -22943,7 +22551,7 @@ async function askTrainingCoach() {
     const question = document.getElementById('trainingCoachInput').value.trim();
     
     if (!question) {
-        alert('Please enter a question');
+        showAlert('Please enter a question');
         return;
     }
     
@@ -22963,7 +22571,6 @@ async function askTrainingCoach() {
         
         document.getElementById('trainingCoachInput').value = '';
     } catch (error) {
-        console.error('AI Coach error:', error);
         responseContent.innerHTML = 'Sorry, I encountered an error. Please try again.';
     }
 }
@@ -22971,7 +22578,7 @@ async function askTrainingCoach() {
 // Save/Load Functions
 function saveTrainingPlan() {
     if (!trainingPlanState.plan) {
-        alert('Please generate a training plan first');
+        showAlert('Please generate a training plan first');
         return;
     }
     
@@ -22981,11 +22588,10 @@ function saveTrainingPlan() {
         if (typeof showNotification === 'function') {
             showNotification('✅ Training plan saved', 'success');
         } else {
-            alert('✅ Training plan saved');
+            showAlert('✅ Training plan saved');
         }
     } catch (error) {
-        console.error('Error saving:', error);
-        alert('Failed to save training plan');
+        showAlert('Failed to save training plan');
     }
 }
 
@@ -23014,14 +22620,13 @@ function loadTrainingProgress() {
             }
         }
     } catch (error) {
-        console.error('Error loading progress:', error);
     }
 }
 
 // Export Functions
 function exportTrainingPlanDOCX() {
     if (!trainingPlanState.plan) {
-        alert('Please generate a training plan first');
+        showAlert('Please generate a training plan first');
         return;
     }
     
@@ -23037,14 +22642,13 @@ function exportTrainingPlanDOCX() {
             showNotification('✅ Training plan downloaded as DOCX', 'success');
         }
     } catch (error) {
-        console.error('Error generating DOCX:', error);
-        alert('Failed to generate DOCX. Please try again.');
+        showAlert('Failed to generate DOCX. Please try again.');
     }
 }
 
 function exportTrainingPlanPDF() {
     if (!trainingPlanState.plan) {
-        alert('Please generate a training plan first');
+        showAlert('Please generate a training plan first');
         return;
     }
     
@@ -23059,14 +22663,13 @@ function exportTrainingPlanPDF() {
             showNotification('✅ Training plan downloaded as PDF', 'success');
         }
     } catch (error) {
-        console.error('Error generating PDF:', error);
-        alert('Failed to generate PDF. Please try again.');
+        showAlert('Failed to generate PDF. Please try again.');
     }
 }
 
 function printTrainingPlan() {
     if (!trainingPlanState.plan) {
-        alert('Please generate a training plan first');
+        showAlert('Please generate a training plan first');
         return;
     }
     
@@ -23405,7 +23008,6 @@ const probationWizardSteps = [
 // ========================================
 
 function openProbationCheckIn() {
-    console.log('🔄 Opening Probation Check-In Builder');
     const modal = document.getElementById('probationCheckInModal');
     if (modal) {
         modal.classList.remove('hidden');
@@ -23594,7 +23196,7 @@ function probationWizardNext() {
     });
     
     if (!allValid) {
-        alert('⚠️ Please complete all required fields before continuing.');
+        showAlert('⚠️ Please complete all required fields before continuing.');
         return;
     }
     
@@ -23639,7 +23241,7 @@ function validateProbationProceduralFairness() {
     const data = probationCheckInState.data;
     
     if (data.noticeGiven === 'No') {
-        alert(
+        showAlert(
             '⚠️ REASONABLE NOTICE REQUIRED\n\n' +
             'The employee should be given at least 24 hours notice of this probation check-in meeting.\n\n' +
             'This allows them to:\n' +
@@ -23654,7 +23256,7 @@ function validateProbationProceduralFairness() {
     }
     
     if (data.purposeExplained === 'No') {
-        alert(
+        showAlert(
             '⚠️ PURPOSE MUST BE COMMUNICATED\n\n' +
             'The employee must understand this is a supportive probation review meeting — NOT a disciplinary meeting.\n\n' +
             'Please inform the employee that the purpose is to:\n' +
@@ -23669,7 +23271,7 @@ function validateProbationProceduralFairness() {
     }
     
     if (data.supportPersonAdvised === 'No') {
-        alert(
+        showAlert(
             '⚠️ SUPPORT PERSON OPTION\n\n' +
             'While a probation check-in is supportive in nature, best practice is to advise the employee they may bring a support person if they wish.\n\n' +
             'A support person can be:\n' +
@@ -23691,8 +23293,6 @@ function validateProbationProceduralFairness() {
 // ========================================
 
 async function generateProbationCheckInDocument() {
-    console.log('📄 Generating Probation Check-In document...');
-    
     // Hide wizard, show loading
     document.getElementById('probationStepContent').classList.add('hidden');
     document.getElementById('probationProgressSection').classList.add('hidden');
@@ -23724,8 +23324,7 @@ async function generateProbationCheckInDocument() {
         }
         
     } catch (error) {
-        console.error('❌ Probation check-in generation error:', error);
-        alert('⚠️ Error generating document. Please try again.');
+        showAlert('⚠️ Error generating document. Please try again.');
         
         // Reset to wizard
         document.getElementById('probationGenerating').classList.add('hidden');
@@ -23936,8 +23535,6 @@ IMPORTANT INSTRUCTIONS:
 // ========================================
 
 function showProbationPreview(generatedDoc) {
-    console.log('📄 Showing probation check-in preview...');
-    
     // Use existing convertAIContentToHTML if available
     const formattedHTML = (typeof convertAIContentToHTML === 'function') ?
         convertAIContentToHTML(generatedDoc) : generatedDoc.replace(/\n/g, '<br>');
@@ -24014,7 +23611,7 @@ async function downloadProbationDocument(format = 'pdf') {
                 const blob = htmlDocx.asBlob(fullHTML);
                 saveAs(blob, `${filename}.docx`);
             } else {
-                alert('Word document generation is not available. Please try PDF instead.');
+                showAlert('Word document generation is not available. Please try PDF instead.');
             }
         }
         
@@ -24033,8 +23630,7 @@ async function downloadProbationDocument(format = 'pdf') {
         }
         
     } catch (error) {
-        console.error('❌ Download error:', error);
-        alert('⚠️ Error downloading document. Please try again.');
+        showAlert('⚠️ Error downloading document. Please try again.');
     }
 }
 
@@ -24046,7 +23642,7 @@ async function downloadProbationDocument(format = 'pdf') {
 // Export to DOCX
 function exportChecklistDOCX() {
     if (!onboardingState.checklist || onboardingState.checklist.length === 0) {
-        alert('Please generate a checklist first');
+        showAlert('Please generate a checklist first');
         return;
     }
     
@@ -24061,15 +23657,14 @@ function exportChecklistDOCX() {
             showNotification('✅ Checklist downloaded as DOCX', 'success');
         }
     } catch (error) {
-        console.error('Error generating DOCX:', error);
-        alert('Failed to generate DOCX. Please try again.');
+        showAlert('Failed to generate DOCX. Please try again.');
     }
 }
 
 // Export to PDF
 function exportChecklistPDF() {
     if (!onboardingState.checklist || onboardingState.checklist.length === 0) {
-        alert('Please generate a checklist first');
+        showAlert('Please generate a checklist first');
         return;
     }
     
@@ -24090,8 +23685,7 @@ function exportChecklistPDF() {
             showNotification('✅ Checklist downloaded as PDF', 'success');
         }
     } catch (error) {
-        console.error('Error generating PDF:', error);
-        alert('Failed to generate PDF. Please try again.');
+        showAlert('Failed to generate PDF. Please try again.');
     }
 }
 
@@ -24376,7 +23970,6 @@ function buildChecklistHTML() {
 
 
 function openEmploymentContractBuilder() {
-    console.log('📄 Opening Employment Contract Builder');
     const builder = document.getElementById('employmentContractBuilder');
     if (builder) {
         builder.classList.add('active');
@@ -24461,7 +24054,6 @@ const contractBuilderState = {
 
 // Main Functions
 function openEmploymentContract() {
-    console.log('📄 Opening Employment Contract Builder');
     const builder = document.getElementById('employmentContractBuilder');
     builder.classList.add('active');
     
@@ -24486,44 +24078,32 @@ function closeEmploymentContract() {
     
     const builder = document.getElementById('employmentContractBuilder');
     builder.classList.remove('active');
-    console.log('📄 Closed Employment Contract Builder');
 }
 
 // Navigation Functions
 function nextContractStep() {
     try {
-        console.log('🔄 nextContractStep called, currentStep:', contractBuilderState.currentStep);
-        
         if (!validateContractStep(contractBuilderState.currentStep)) {
-            console.log('❌ Validation failed');
             return;
         }
-        
-        console.log('✅ Validation passed');
         
         saveCurrentStepData();
         contractBuilderState.unsavedChanges = true;
         
-        console.log('💾 Data saved, current step data:', contractBuilderState.data[`step${contractBuilderState.currentStep}`]);
-        
         // ✅ CHECK: If moving from Step 0 (Setup) to Step 1 (Position Details)
         // Show detailed Terms of Use modal if not already accepted
         if (contractBuilderState.currentStep === 0 && !contractBuilderState.data.step0.detailedTermsAccepted) {
-            console.log('📋 Showing Contract Builder Terms Modal');
             showContractBuilderTermsModal();
             return; // Don't proceed until terms are accepted
         }
         
         if (contractBuilderState.currentStep < contractBuilderState.totalSteps - 1) {
             contractBuilderState.currentStep++;
-            console.log('➡️ Moving to step:', contractBuilderState.currentStep);
             renderContractStep(contractBuilderState.currentStep);
             updateContractProgressBar();
-            console.log('✅ Step rendered successfully');
         }
     } catch (error) {
-        console.error('❌ Error in nextContractStep:', error);
-        alert('An error occurred: ' + error.message);
+        showAlert('An error occurred: ' + error.message);
     }
 }
 
@@ -24531,20 +24111,12 @@ function nextContractStep() {
  * Show the Contract Builder Terms of Use modal
  */
 function showContractBuilderTermsModal() {
-    console.log('📋 showContractBuilderTermsModal called');
-    
     const modal = document.getElementById('contractBuilderTermsModal');
     const checkbox = document.getElementById('contractTermsCheckbox');
     const acceptBtn = document.getElementById('acceptContractTermsBtn');
     
-    console.log('📋 Modal element found:', !!modal);
-    console.log('📋 Checkbox element found:', !!checkbox);
-    console.log('📋 Accept button found:', !!acceptBtn);
-    
     if (modal) {
         modal.classList.remove('hidden');
-        console.log('📋 Modal should now be visible');
-        
         // Reset checkbox state
         if (checkbox) checkbox.checked = false;
         if (acceptBtn) acceptBtn.disabled = true;
@@ -24563,7 +24135,6 @@ function showContractBuilderTermsModal() {
             });
         }
     } else {
-        console.error('❌ contractBuilderTermsModal element not found!');
     }
 }
 
@@ -24574,15 +24145,13 @@ function acceptContractTerms() {
     const checkbox = document.getElementById('contractTermsCheckbox');
     
     if (!checkbox || !checkbox.checked) {
-        alert('⚠️ Please check the box to confirm you have read and agree to the Terms of Use.');
+        showAlert('⚠️ Please check the box to confirm you have read and agree to the Terms of Use.');
         return;
     }
     
     // Save acceptance to contract builder state
     contractBuilderState.data.step0.detailedTermsAccepted = true;
     contractBuilderState.data.step0.detailedTermsAcceptedAt = new Date().toISOString();
-    
-    console.log('✅ Contract Builder Detailed Terms accepted');
     
     // Close modal
     const modal = document.getElementById('contractBuilderTermsModal');
@@ -24872,7 +24441,6 @@ function saveCurrentStepData() {
         }
     });
     
-    console.log(`💾 Saved Step ${stepNumber} data:`, contractBuilderState.data[stepKey]);
 }
 
 async function saveContractProgress() {
@@ -24886,16 +24454,13 @@ async function saveContractProgress() {
         contractBuilderState.unsavedChanges = false;
         contractBuilderState.lastSaved = new Date();
         
-        console.log('✅ Contract progress saved');
-        
         if (typeof showNotification === 'function') {
             showNotification('✅ Progress saved', 'success');
         }
         
         return true;
     } catch (error) {
-        console.error('❌ Error saving contract:', error);
-        alert('Failed to save progress. Please try again.');
+        showAlert('Failed to save progress. Please try again.');
         return false;
     }
 }
@@ -24910,10 +24475,8 @@ async function loadContractProgress() {
             contractBuilderState.data = data.data || contractBuilderState.data;
             contractBuilderState.lastSaved = data.lastSaved ? new Date(data.lastSaved) : null;
             
-            console.log('✅ Loaded contract progress from', contractBuilderState.lastSaved);
         }
     } catch (error) {
-        console.error('❌ Error loading contract:', error);
     }
 }
 
@@ -25126,7 +24689,7 @@ function openAwardWizardFromContract() {
     if (typeof openAwardWizard === 'function') {
         openAwardWizard();
     } else {
-        alert('Award Wizard is not available. Please contact support.');
+        showAlert('Award Wizard is not available. Please contact support.');
     }
 }
 
@@ -25154,7 +24717,7 @@ function openJobDescriptionFromContract() {
     if (typeof openJobDescriptionBuilder === 'function') {
         openJobDescriptionBuilder();
     } else {
-        alert('Job Description Builder is not available. Please contact support.');
+        showAlert('Job Description Builder is not available. Please contact support.');
     }
 }
 
@@ -25206,7 +24769,7 @@ function openAwardCalculatorFromContract() {
     if (typeof openAwardCalculator === 'function') {
         openAwardCalculator();
     } else {
-        alert('Award Calculator is not available. Please contact support.');
+        showAlert('Award Calculator is not available. Please contact support.');
     }
 }
 
@@ -27568,9 +27131,8 @@ async function generateEmploymentContract() {
         }, 1000);
         
     } catch (error) {
-        console.error('Error generating contract:', error);
         hideContractLoading();
-        alert('Failed to generate contract. Please try again.');
+        showAlert('Failed to generate contract. Please try again.');
     }
 }
 
@@ -28049,9 +27611,7 @@ async function generateContractWordDocument(html) {
         
         saveAs(converted, filename);
         
-        console.log('✅ Word document generated:', filename);
     } catch (error) {
-        console.error('Error generating Word document:', error);
         throw error;
     }
 }
@@ -28073,9 +27633,7 @@ async function generateContractPDFDocument(html) {
         const filename = `Employment_Contract_${contractBuilderState.data.step1.positionTitle.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
         pdfMake.createPdf(docDefinition).download(filename);
         
-        console.log('✅ PDF generated:', filename);
     } catch (error) {
-        console.error('Error generating PDF:', error);
         throw error;
     }
 }
@@ -28128,35 +27686,30 @@ try {
   firebase.initializeApp(firebaseConfig);
   auth = firebase.auth();
   db = firebase.firestore();
-  console.log('✅ Firebase initialized - Fitzgerald HR');
 } catch (error) {
-  console.error('❌ Firebase error:', error);
 }
 
 async function signInWithGoogle() {
-    if (!auth) { alert('Firebase not ready'); return; }
+    if (!auth) { showAlert('Firebase not ready'); return; }
     try {
         const provider = new firebase.auth.GoogleAuthProvider();
         const result = await auth.signInWithPopup(provider);
-        console.log('✅ Signed in:', result.user.displayName);
         await createOrUpdateUserProfile(result.user);
         if (typeof showNotification === 'function') showNotification('Welcome ' + result.user.displayName + '!', 'success');
         return result.user;
     } catch (error) {
-        console.error('Sign in error:', error);
         if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
-            alert(error.code === 'auth/popup-blocked' ? 'Please allow popups' : 'Sign in failed: ' + error.message);
+            showAlert(error.code === 'auth/popup-blocked' ? 'Please allow popups' : 'Sign in failed: ' + error.message);
         }
     }
 }
 
 async function signInWithGoogleFromAccess() {
-    if (!auth) { alert('Firebase not ready'); return; }
+    if (!auth) { showAlert('Firebase not ready'); return; }
     try {
         const provider = new firebase.auth.GoogleAuthProvider();
         const result = await auth.signInWithPopup(provider);
         const user = result.user;
-        console.log('✅ Access page sign in:', user.displayName);
         await createOrUpdateUserProfile(user);
         localStorage.setItem('fitzhr_google_auth', 'true');
         localStorage.setItem('fitzhr_last_login', new Date().toISOString());
@@ -28166,12 +27719,10 @@ async function signInWithGoogleFromAccess() {
         if (assistantScreen) assistantScreen.classList.remove('hidden');
         const userCodeEl = document.getElementById('userCode');
         if (userCodeEl) userCodeEl.textContent = 'Google Account';
-        console.log('✅ Access granted via Google');
         return user;
     } catch (error) {
-        console.error('Sign in error:', error);
         if (error.code !== 'auth/popup-closed-by-user' && error.code !== 'auth/cancelled-popup-request') {
-            alert(error.code === 'auth/popup-blocked' ? 'Please allow popups' : 'Sign in failed: ' + error.message);
+            showAlert(error.code === 'auth/popup-blocked' ? 'Please allow popups' : 'Sign in failed: ' + error.message);
         }
     }
 }
@@ -28180,7 +27731,6 @@ async function signOut() {
     if (!auth) return;
     try {
         // Save current conversation state before signing out
-        console.log('📤 Saving conversation state before sign out...');
         if (currentConversationId && typeof saveCurrentConversation === 'function') {
             saveCurrentConversation();
         }
@@ -28195,11 +27745,9 @@ async function signOut() {
             await saveCurrentConversationIdToFirebase(currentConversationId);
         }
         
-        console.log('✅ State saved, signing out...');
         await auth.signOut();
-        console.log('✅ Signed out');
         if (typeof showNotification === 'function') showNotification('Signed out', 'success');
-    } catch (error) { console.error('Sign out error:', error); }
+    } catch (error) { }
 }
 
 /**
@@ -28208,7 +27756,6 @@ async function signOut() {
  */
 async function saveCurrentConversationIdToFirebase(conversationId) {
     if (!currentUser || !currentUser.uid || !db) {
-        console.log('⚠️ Cannot save conversation ID to Firebase - not signed in');
         return;
     }
     
@@ -28217,9 +27764,7 @@ async function saveCurrentConversationIdToFirebase(conversationId) {
             lastConversationId: conversationId,
             lastConversationUpdated: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
-        console.log('✅ Saved last conversation ID to Firebase:', conversationId);
     } catch (error) {
-        console.error('❌ Failed to save conversation ID to Firebase:', error);
     }
 }
 
@@ -28229,7 +27774,6 @@ async function saveCurrentConversationIdToFirebase(conversationId) {
  */
 async function loadLastConversationIdFromFirebase() {
     if (!currentUser || !currentUser.uid || !db) {
-        console.log('⚠️ Cannot load conversation ID from Firebase - not signed in');
         return null;
     }
     
@@ -28239,16 +27783,13 @@ async function loadLastConversationIdFromFirebase() {
             const userData = userDoc.data();
             const lastConvId = userData.lastConversationId;
             if (lastConvId) {
-                console.log('✅ Loaded last conversation ID from Firebase:', lastConvId);
                 // Also save to localStorage for faster access next time
                 localStorage.setItem('fitz_currentConversationId_' + currentUser.uid, lastConvId);
                 return lastConvId;
             }
         }
-        console.log('📭 No last conversation ID found in Firebase');
         return null;
     } catch (error) {
-        console.error('❌ Failed to load conversation ID from Firebase:', error);
         return null;
     }
 }
@@ -28284,28 +27825,24 @@ async function createOrUpdateUserProfile(user) {
                 subscriptionStatus: 'active',
                 betaTester: isBetaTester
             });
-            console.log(isBetaTester ? '✅ Beta tester profile created (Professional tier)' : '✅ User profile created (Free tier)');
         } else {
             await userRef.update({ 
                 lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(), 
                 displayName: user.displayName, 
                 photoURL: user.photoURL 
             });
-            console.log('✅ User profile updated');
         }
-    } catch (error) { console.error('Profile error:', error); }
+    } catch (error) { }
 }
 
 async function saveToCloud(collection, docId, data) {
     const cacheKey = collection + '_' + docId;
-    try { localStorage.setItem(cacheKey, JSON.stringify(data)); } catch (e) { console.error('LocalStorage error:', e); }
-    if (!currentUser || !db) { console.log('⚠️ ' + collection + '/' + docId + ' local only'); return { success: true, synced: false }; }
+    try { localStorage.setItem(cacheKey, JSON.stringify(data)); } catch (e) { }
+    if (!currentUser || !db) { return { success: true, synced: false }; }
     try {
         await db.collection('users').doc(currentUser.uid).collection(collection).doc(docId).set({...data, userId: currentUser.uid, updatedAt: firebase.firestore.FieldValue.serverTimestamp()}, { merge: true });
-        console.log('✅ ' + collection + '/' + docId + ' synced');
         return { success: true, synced: true };
     } catch (error) {
-        console.error('❌ Sync failed ' + collection + '/' + docId + ':', error);
         return { success: true, synced: false, error };
     }
 }
@@ -28320,24 +27857,20 @@ async function loadFromCloud(collection) {
             items.push(data);
             localStorage.setItem(collection + '_' + doc.id, JSON.stringify(data));
         });
-        console.log('✅ Loaded ' + items.length + ' ' + collection);
         return items;
-    } catch (error) { console.error('Load error ' + collection + ':', error); return []; }
+    } catch (error) { return []; }
 }
 
 async function loadAllUserData(userId) {
-    console.log('📥 Loading data...');
     try {
         await Promise.all([loadFromCloud('contracts'), loadFromCloud('checklists'), loadFromCloud('trainingPlans'), loadFromCloud('conversations')]);
-        console.log('✅ Data loaded');
         if (typeof showNotification === 'function') showNotification('✅ Synced', 'success');
-    } catch (error) { console.error('Load error:', error); }
+    } catch (error) { }
 }
 
 let unsubscribeListeners = [];
 function setupRealtimeSync(userId) {
     if (!db) return;
-    console.log('🔄 Setting up sync...');
     ['contracts', 'checklists', 'trainingPlans', 'conversations'].forEach(function(collection) {
         const unsub = db.collection('users').doc(userId).collection(collection).onSnapshot(function(snapshot) {
             snapshot.docChanges().forEach(function(change) {
@@ -28345,7 +27878,6 @@ function setupRealtimeSync(userId) {
                 const data = change.doc.data();
                 if (change.type === 'added' || change.type === 'modified') {
                     localStorage.setItem(collection + '_' + docId, JSON.stringify(data));
-                    console.log('🔄 ' + collection + '/' + docId + ' synced');
                 } else if (change.type === 'removed') {
                     localStorage.removeItem(collection + '_' + docId);
                 }
@@ -28353,7 +27885,6 @@ function setupRealtimeSync(userId) {
         });
         unsubscribeListeners.push(unsub);
     });
-    console.log('✅ Real-time sync active');
 }
 
 function stopRealtimeSync() {
@@ -28386,6 +27917,18 @@ if (auth) {
                 }
             }
             
+            // Show loading skeleton while data loads
+            const msgContainer = document.getElementById('messagesContainer');
+            if (msgContainer) {
+                msgContainer.innerHTML = '<div class="max-w-5xl mx-auto space-y-6 p-6">' +
+                    '<div class="flex justify-start"><div class="max-w-3xl w-full bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">' +
+                    '<div class="space-y-3 animate-pulse">' +
+                    '<div class="h-4 bg-slate-700 rounded w-3/4"></div>' +
+                    '<div class="h-4 bg-slate-700 rounded w-full"></div>' +
+                    '<div class="h-4 bg-slate-700 rounded w-5/6"></div>' +
+                    '</div></div></div></div>';
+            }
+            
             await loadAllDataFromFirebase(); // Use new Firebase-first system with retry
             
             // Check Firebase for legal acceptance and load last conversation ID
@@ -28410,7 +27953,6 @@ if (auth) {
                         
                         // Load last conversation ID for continuity
                         if (userData.lastConversationId) {
-                            console.log('✅ Found last conversation ID in Firebase:', userData.lastConversationId);
                             localStorage.setItem('fitz_currentConversationId_' + user.uid, userData.lastConversationId);
                         }
                         
@@ -28420,7 +27962,6 @@ if (auth) {
                         }
                     }
                 } catch (e) {
-                    console.error('Error checking Firebase for user data:', e);
                 }
             }
             
@@ -28433,7 +27974,6 @@ if (auth) {
                         updateSidebarVenueName();
                     }, 500);
                 } catch (e) {
-                    console.error('Error parsing venue profile:', e);
                 }
             }
             
@@ -28467,8 +28007,6 @@ if (auth) {
                         // Firebase data already loaded by loadAllDataFromFirebase()
                         // Restore the last conversation with cloud continuity
                         setTimeout(async () => {
-                            console.log('🔄 Starting conversation restoration...');
-                            
                             // Try to load last conversation ID from Firebase if not in localStorage
                             const userKey = user.uid;
                             let lastConvId = localStorage.getItem('fitz_currentConversationId_' + userKey);
@@ -28572,11 +28110,8 @@ if (typeof window !== 'undefined') {
 
 async function saveAllDataToCloud() {
     if (!currentUser || !db) {
-        console.log('⚠️ Not signed in - data saved locally only');
         return;
     }
-    
-    console.log('💾 Syncing all data to cloud...');
     
     try {
         const userDocRef = db.collection('users').doc(currentUser.uid);
@@ -28617,11 +28152,9 @@ async function saveAllDataToCloud() {
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
         
-        console.log('✅ All data synced to cloud successfully');
         return true;
         
     } catch (error) {
-        console.error('❌ Failed to sync data to cloud:', error);
         return false;
     }
 }
@@ -28635,7 +28168,6 @@ function getAllContractsFromLocalStorage() {
             try {
                 contracts.push(JSON.parse(localStorage.getItem(key)));
             } catch (e) {
-                console.error('Error parsing contract:', key, e);
             }
         }
     }
@@ -28650,7 +28182,6 @@ function getAllChecklistsFromLocalStorage() {
             try {
                 checklists.push(JSON.parse(localStorage.getItem(key)));
             } catch (e) {
-                console.error('Error parsing checklist:', key, e);
             }
         }
     }
@@ -28665,7 +28196,6 @@ function getAllTrainingPlansFromLocalStorage() {
             try {
                 plans.push(JSON.parse(localStorage.getItem(key)));
             } catch (e) {
-                console.error('Error parsing training plan:', key, e);
             }
         }
     }
@@ -28678,29 +28208,22 @@ function getAllTrainingPlansFromLocalStorage() {
 
 async function loadAllDataFromCloud() {
     if (!currentUser || !db) {
-        console.log('⚠️ Not signed in - using local data only');
         return false;
     }
-    
-    console.log('📥 Loading all data from cloud...');
     
     try {
         const userDocRef = db.collection('users').doc(currentUser.uid);
         const doc = await userDocRef.get();
         
         if (!doc.exists || !doc.data().appState) {
-            console.log('📭 No cloud data found - using local data');
             return false;
         }
         
         const cloudData = doc.data().appState;
-        console.log('📦 Cloud data retrieved:', Object.keys(cloudData));
-        
         // Restore conversations
         if (cloudData.conversations && cloudData.conversations.length > 0) {
             localStorage.setItem('fitz_conversations', JSON.stringify(cloudData.conversations));
             conversations = cloudData.conversations;
-            console.log('✅ Restored', cloudData.conversations.length, 'conversations');
         }
         
         if (cloudData.currentConversationId) {
@@ -28731,7 +28254,6 @@ async function loadAllDataFromCloud() {
             cloudData.contracts.forEach(contract => {
                 localStorage.setItem('contract_' + contract.contractId, JSON.stringify(contract));
             });
-            console.log('✅ Restored', cloudData.contracts.length, 'contracts');
         }
         
         // Restore checklists
@@ -28739,7 +28261,6 @@ async function loadAllDataFromCloud() {
             cloudData.checklists.forEach(checklist => {
                 localStorage.setItem('checklist_' + checklist.checklistId, JSON.stringify(checklist));
             });
-            console.log('✅ Restored', cloudData.checklists.length, 'checklists');
         }
         
         // Restore training plans
@@ -28747,7 +28268,6 @@ async function loadAllDataFromCloud() {
             cloudData.trainingPlans.forEach(plan => {
                 localStorage.setItem('training_plan_' + plan.planId, JSON.stringify(plan));
             });
-            console.log('✅ Restored', cloudData.trainingPlans.length, 'training plans');
         }
         
         // Restore document logs
@@ -28755,15 +28275,12 @@ async function loadAllDataFromCloud() {
             localStorage.setItem('documentLogs_' + currentUser.uid, JSON.stringify(cloudData.documentLogs));
         }
         
-        console.log('✅ All data loaded from cloud successfully');
-        
         // NOW REFRESH THE UI
         await refreshAllUI();
         
         return true;
         
     } catch (error) {
-        console.error('❌ Failed to load data from cloud:', error);
         return false;
     }
 }
@@ -28773,15 +28290,12 @@ async function loadAllDataFromCloud() {
 // ==========================================
 
 async function refreshAllUI() {
-    console.log('🔄 Refreshing all UI components...');
-    
     // Small delay to ensure data is written
     await new Promise(resolve => setTimeout(resolve, 500));
     
     try {
         // Refresh conversation list
         if (conversations && conversations.length > 0) {
-            console.log('🔄 Refreshing conversation list with', conversations.length, 'conversations');
             if (typeof updateSidebarChats === 'function') {
                 updateSidebarChats();
             }
@@ -28791,10 +28305,7 @@ async function refreshAllUI() {
         const event = new CustomEvent('dataLoaded');
         window.dispatchEvent(event);
         
-        console.log('✅ UI refresh complete');
-        
     } catch (error) {
-        console.error('❌ UI refresh error:', error);
     }
 }
 
@@ -28825,7 +28336,6 @@ localStorage.setItem = function(key, value) {
             key === 'fitz_bookmarks' ||
             key.startsWith('venueProfile_')) {
             
-            console.log('🔄 Change detected:', key, '- queuing sync...');
             debouncedSync();
         }
     }
@@ -28840,8 +28350,6 @@ let unsubscribeCloudSync = null;
 function setupRealTimeCloudSync() {
     if (!currentUser || !db) return;
     
-    console.log('👂 Setting up real-time cloud sync listener...');
-    
     const userDocRef = db.collection('users').doc(currentUser.uid);
     
     unsubscribeCloudSync = userDocRef.onSnapshot((doc) => {
@@ -28849,21 +28357,17 @@ function setupRealTimeCloudSync() {
         
         const data = doc.data();
         if (data.appState && data.appState.lastSyncedAt) {
-            console.log('🔔 Cloud data updated - reloading...');
             loadAllDataFromCloud();
         }
     }, (error) => {
-        console.error('❌ Real-time sync listener error:', error);
     });
     
-    console.log('✅ Real-time sync listener active');
 }
 
 function stopRealTimeCloudSync() {
     if (unsubscribeCloudSync) {
         unsubscribeCloudSync();
         unsubscribeCloudSync = null;
-        console.log('🔕 Real-time sync listener stopped');
     }
 }
 
@@ -28884,7 +28388,6 @@ async function saveConversationToFirebase(conversation) {
                   .set(conversation, { merge: true });
         return true;
     } catch (error) {
-        console.error('❌ Failed to save conversation:', error);
         return false;
     }
 }
@@ -28892,7 +28395,6 @@ async function saveConversationToFirebase(conversation) {
 // Load all conversations from Firebase
 async function loadConversationsFromFirebase() {
     if (!currentUser || !db) {
-        console.log('⚠️ Not signed in, loading conversations from localStorage only');
         loadConversations();
         return conversations || [];
     }
@@ -28901,8 +28403,6 @@ async function loadConversationsFromFirebase() {
         // First, load from localStorage to have something
         loadConversations();
         const localConversations = [...conversations];
-        console.log('📥 Local conversations loaded:', localConversations.length);
-        
         const snapshot = await db.collection('users').doc(currentUser.uid)
                                    .collection('conversations')
                                    .get();
@@ -28911,8 +28411,6 @@ async function loadConversationsFromFirebase() {
         snapshot.forEach(doc => {
             firebaseConversations.push(doc.data());
         });
-        
-        console.log('📥 Firebase conversations loaded:', firebaseConversations.length);
         
         // Merge: Firebase takes priority, but keep local ones that aren't in Firebase
         const mergedMap = new Map();
@@ -28941,14 +28439,11 @@ async function loadConversationsFromFirebase() {
             return dateB - dateA;
         });
         
-        console.log('✅ Merged conversations:', conversations.length);
-        
         // Save merged result back to localStorage
         localStorage.setItem('fitz_conversations', JSON.stringify(conversations));
         
         return conversations;
     } catch (error) {
-        console.error('❌ Failed to load conversations from Firebase:', error);
         loadConversations();
         return conversations || [];
     }
@@ -28957,7 +28452,6 @@ async function loadConversationsFromFirebase() {
 // Save contract to Firebase
 async function saveContractToFirebase(contract) {
     if (!currentUser || !db) {
-        console.log('⚠️ Not signed in - contract not saved');
         return false;
     }
     
@@ -28965,10 +28459,8 @@ async function saveContractToFirebase(contract) {
         await db.collection('users').doc(currentUser.uid)
                   .collection('contracts').doc(contract.contractId)
                   .set(contract, { merge: true });
-        console.log('✅ Contract saved to Firebase:', contract.contractId);
         return true;
     } catch (error) {
-        console.error('❌ Failed to save contract:', error);
         return false;
     }
 }
@@ -28976,7 +28468,6 @@ async function saveContractToFirebase(contract) {
 // Load all contracts from Firebase
 async function loadContractsFromFirebase() {
     if (!currentUser || !db) {
-        console.log('⚠️ Not signed in');
         return [];
     }
     
@@ -28989,10 +28480,8 @@ async function loadContractsFromFirebase() {
             contracts.push(doc.data());
         });
         
-        console.log('✅ Loaded', contracts.length, 'contracts from Firebase');
         return contracts;
     } catch (error) {
-        console.error('❌ Failed to load contracts:', error);
         return [];
     }
 }
@@ -29000,7 +28489,6 @@ async function loadContractsFromFirebase() {
 // Save checklist to Firebase
 async function saveChecklistToFirebase(checklist) {
     if (!currentUser || !db) {
-        console.log('⚠️ Not signed in - checklist not saved');
         return false;
     }
     
@@ -29008,10 +28496,8 @@ async function saveChecklistToFirebase(checklist) {
         await db.collection('users').doc(currentUser.uid)
                   .collection('checklists').doc(checklist.checklistId)
                   .set(checklist, { merge: true });
-        console.log('✅ Checklist saved to Firebase:', checklist.checklistId);
         return true;
     } catch (error) {
-        console.error('❌ Failed to save checklist:', error);
         return false;
     }
 }
@@ -29019,7 +28505,6 @@ async function saveChecklistToFirebase(checklist) {
 // Load all checklists from Firebase
 async function loadChecklistsFromFirebase() {
     if (!currentUser || !db) {
-        console.log('⚠️ Not signed in');
         return [];
     }
     
@@ -29032,10 +28517,8 @@ async function loadChecklistsFromFirebase() {
             checklists.push(doc.data());
         });
         
-        console.log('✅ Loaded', checklists.length, 'checklists from Firebase');
         return checklists;
     } catch (error) {
-        console.error('❌ Failed to load checklists:', error);
         return [];
     }
 }
@@ -29043,7 +28526,6 @@ async function loadChecklistsFromFirebase() {
 // Save training plan to Firebase
 async function saveTrainingPlanToFirebase(plan) {
     if (!currentUser || !db) {
-        console.log('⚠️ Not signed in - training plan not saved');
         return false;
     }
     
@@ -29051,10 +28533,8 @@ async function saveTrainingPlanToFirebase(plan) {
         await db.collection('users').doc(currentUser.uid)
                   .collection('trainingPlans').doc(plan.planId)
                   .set(plan, { merge: true });
-        console.log('✅ Training plan saved to Firebase:', plan.planId);
         return true;
     } catch (error) {
-        console.error('❌ Failed to save training plan:', error);
         return false;
     }
 }
@@ -29062,7 +28542,6 @@ async function saveTrainingPlanToFirebase(plan) {
 // Load all training plans from Firebase
 async function loadTrainingPlansFromFirebase() {
     if (!currentUser || !db) {
-        console.log('⚠️ Not signed in');
         return [];
     }
     
@@ -29075,10 +28554,8 @@ async function loadTrainingPlansFromFirebase() {
             plans.push(doc.data());
         });
         
-        console.log('✅ Loaded', plans.length, 'training plans from Firebase');
         return plans;
     } catch (error) {
-        console.error('❌ Failed to load training plans:', error);
         return [];
     }
 }
@@ -29086,11 +28563,8 @@ async function loadTrainingPlansFromFirebase() {
 // MASTER LOAD FUNCTION - Load everything on sign in
 async function loadAllDataFromFirebase() {
     if (!currentUser || !db) {
-        console.log('⚠️ Not signed in - cannot load data');
         return;
     }
-    
-    console.log('📥 Loading all data from Firebase...');
     
     try {
         // Load all data types
@@ -29102,9 +28576,6 @@ async function loadAllDataFromFirebase() {
             loadBookmarksFromFirebase()
         ]);
         
-        console.log('✅ All data loaded from Firebase');
-        console.log('🎉 Device is now synced!');
-        
         // Update sidebar with loaded data
         if (typeof updateSidebarChats === 'function') {
             updateSidebarChats();
@@ -29114,7 +28585,6 @@ async function loadAllDataFromFirebase() {
         }
         
     } catch (error) {
-        console.error('Failed to load data:', error);
     }
 }
 
