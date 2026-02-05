@@ -6084,6 +6084,41 @@ function detectToolNeeds(message) {
         },
         
         // ============================================================
+        // PROBATION CHECK-IN
+        // ============================================================
+        probationCheckIn: {
+            keywords: [
+                // Direct terms
+                'probation check-in', 'probation check in', 'probation checkin',
+                'probation review', 'probation meeting', 'probation assessment',
+                'probation evaluation', 'probation period', 'probation progress',
+                // Variations
+                'probationary review', 'probationary period', 'probationary check',
+                'probation report', 'probation document', 'probation template',
+                // Actions
+                'review probation', 'check probation', 'assess probation',
+                'probation conversation', 'probation discussion', 'probation feedback',
+                // Questions
+                'how to do probation review', 'probation check in template',
+                'what to cover in probation', 'probation review questions',
+                'probation meeting template', 'probation review form',
+                // Contextual
+                'new employee review', 'new starter review', 'new hire review',
+                'first month review', 'second month review', 'third month review',
+                'end of probation', 'pass probation', 'fail probation', 'extend probation',
+                'confirm employment', 'confirm permanent', 'probation outcome',
+                // Combined
+                'probation support', 'probation development', 'probation plan',
+                'during probation', 'probation period review'
+            ],
+            title: '🔄 Probation Check-In Builder',
+            description: 'Generate structured probation review documents with AI',
+            action: 'openProbationCheckIn()',
+            buttonText: 'Build Probation Check-In',
+            color: 'teal'
+        },
+        
+        // ============================================================
         // AWARD WIZARD / PAY RATES
         // ============================================================
         awardRates: {
@@ -14712,7 +14747,8 @@ function openTool(toolName) {
         'complianceCalendar': 'complianceCalendarModal',
         'documentBuilder': 'documentBuilderModal',
         'recruitmentToolkit': 'recruitmentToolkitModal',
-        'newEmployeeToolkit': 'newEmployeeToolkitModal'
+        'newEmployeeToolkit': 'newEmployeeToolkitModal',
+        'probationCheckIn': 'probationCheckInModal'
     };
     const modalId = modalMap[toolName];
     if (modalId) {
@@ -20525,12 +20561,122 @@ function resetAIImport() {
                     </div>
                 </div>
             </button>
+
+            <button onclick="openProbationCheckIn(); closeNewEmployeeToolkit();" class="text-left p-6 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-4">
+                    <span class="text-4xl">🔄</span>
+                    <div>
+                        <div class="font-semibold text-white text-lg mb-2">Probation Check-In Builder</div>
+                        <div class="text-sm text-slate-400 mb-3">Generate structured probation review documents covering requirements, deliverables, behaviours and support plans</div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">AI-Powered</span>
+                            <span class="text-xs bg-teal-500/20 text-teal-400 px-2 py-1 rounded">Procedural Fairness</span>
+                            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">DOCX/PDF</span>
+                        </div>
+                    </div>
+                </div>
+            </button>
         </div>
     </div>
 </div>
 
 
 <!-- Onboarding Checklist Modal -->
+<!-- Probation Check-In Builder Modal -->
+<div id="probationCheckInModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-4xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                    <span>🔄</span> Probation Check-In Builder
+                </h2>
+                <p class="text-slate-400 text-sm">AI-powered probation review document generation</p>
+            </div>
+            <button onclick="closeProbationCheckIn()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="probationProgressSection" class="mb-6">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-slate-400 text-sm">Step <span id="probationCurrentStep">1</span> of <span id="probationTotalSteps">6</span></span>
+                <span class="text-amber-400 text-sm" id="probationProgress">0% Complete</span>
+            </div>
+            <div class="w-full bg-slate-700 rounded-full h-2">
+                <div class="bg-amber-500 h-2 rounded-full transition-all duration-500" style="width: 0%" id="probationProgressBar"></div>
+            </div>
+        </div>
+
+        <!-- Step Content Container -->
+        <div id="probationStepContent" class="bg-slate-700/50 rounded-xl p-6 mb-6">
+            <!-- Dynamically rendered -->
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="flex items-center justify-between">
+            <button id="probationBackBtn" onclick="probationWizardBack()" style="display:none"
+                    class="px-6 py-3 bg-slate-600 hover:bg-slate-500 text-white rounded-lg transition-all">
+                ← Back
+            </button>
+            <div class="flex-1"></div>
+            <div class="flex gap-3">
+                <button id="probationStartOverBtn" onclick="resetProbationCheckIn()" class="hidden px-4 py-3 bg-slate-600 hover:bg-slate-500 text-white rounded-lg text-sm transition-all">
+                    🔄 Start Over
+                </button>
+                <button id="probationNextBtn" onclick="probationWizardNext()"
+                        class="px-6 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold rounded-lg transition-all">
+                    Next Step →
+                </button>
+            </div>
+        </div>
+
+        <!-- AI Generation Loading (hidden initially) -->
+        <div id="probationGenerating" class="hidden text-center py-12">
+            <div class="inline-flex items-center gap-3 mb-4">
+                <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+            </div>
+            <p class="text-amber-400 font-semibold text-lg">Fitz is generating your Probation Check-In document...</p>
+            <p class="text-slate-400 text-sm mt-2">This usually takes 15-30 seconds</p>
+        </div>
+    </div>
+</div>
+
+<!-- Probation Check-In Preview Modal -->
+<div id="probationPreviewModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl max-w-4xl w-full border border-amber-500 fade-in max-h-[90vh] flex flex-col">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-6 border-b border-slate-700 flex-shrink-0">
+            <h2 class="text-xl font-bold text-amber-500 flex items-center gap-2">
+                <span>📄</span> Probation Check-In Document
+            </h2>
+            <button onclick="closeProbationPreview()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+
+        <!-- Document Content (scrollable) -->
+        <div class="flex-1 overflow-y-auto p-6">
+            <div class="bg-white rounded-lg p-8 text-gray-800 max-w-none prose">
+                <!-- AI-generated document appears here -->
+                <div id="probationPreviewContent"></div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="p-6 border-t border-slate-700 flex-shrink-0">
+            <div class="flex flex-wrap gap-3 justify-center">
+                <button onclick="downloadProbationDocument('pdf')" 
+                        class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold flex items-center gap-2">
+                    📕 Download PDF
+                </button>
+                <button onclick="downloadProbationDocument('docx')" 
+                        class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold flex items-center gap-2">
+                    📘 Download Word
+                </button>
+            </div>
+            <p class="text-center text-slate-400 text-xs mt-3">⚠️ All documents should be reviewed before use. Ensure both employee and leader retain a signed copy.</p>
+        </div>
+    </div>
+</div>
 <!-- Training Plan Generator Modal -->
 <div id="trainingPlanModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
     <div class="bg-slate-800 rounded-2xl p-8 max-w-6xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
@@ -22826,6 +22972,828 @@ function buildTrainingPlanPDFDefinition() {
         },
         defaultStyle: { font: 'Helvetica' }
     };
+}
+
+
+// ========================================
+// PROBATION CHECK-IN BUILDER
+// ========================================
+
+let probationCheckInState = {
+    currentStep: 1,
+    totalSteps: 6,
+    data: {},
+    generatedDocument: null,
+    isGenerating: false
+};
+
+const probationWizardSteps = [
+    // Step 1: Procedural Fairness
+    {
+        id: 1,
+        title: "Procedural Fairness & Meeting Preparation",
+        infoBox: {
+            type: 'info',
+            icon: '⚖️',
+            title: 'Why Procedural Fairness Matters',
+            content: `<p class="mb-2">A probation check-in is a <strong>supportive conversation</strong> designed to help new employees succeed. To ensure fairness and transparency:</p>
+            <ul class="list-disc pl-5 space-y-1 text-sm">
+                <li>The employee should know in advance this meeting is happening and its purpose</li>
+                <li>They should be given the opportunity to prepare their own reflections</li>
+                <li>The conversation must be two-way — the employee's perspective matters</li>
+                <li>Any concerns raised must be specific, factual and supported by examples</li>
+                <li>The employee must be offered support and a clear path to improvement</li>
+                <li>Both the employee and leader retain a copy of the completed document</li>
+            </ul>
+            <p class="mt-2 text-amber-400 font-semibold text-sm">This is NOT a disciplinary meeting. It is a development and support conversation.</p>`
+        },
+        fields: [
+            {
+                name: "noticeGiven",
+                label: "Has the employee been given reasonable notice of this probation check-in meeting (at least 24 hours)?",
+                type: "radio",
+                options: ["Yes", "No"],
+                required: true
+            },
+            {
+                name: "purposeExplained",
+                label: "Has the employee been told the purpose of the meeting (i.e., a probation review to discuss progress, not a disciplinary meeting)?",
+                type: "radio",
+                options: ["Yes", "No"],
+                required: true
+            },
+            {
+                name: "supportPersonAdvised",
+                label: "Has the employee been advised they may bring a support person if they wish?",
+                type: "radio",
+                options: ["Yes", "No"],
+                required: true
+            }
+        ]
+    },
+    // Step 2: Employee & Probation Details
+    {
+        id: 2,
+        title: "Employee & Probation Details",
+        fields: [
+            { name: "employeeName", label: "Employee's full name", type: "text", required: true, placeholder: "e.g., Sarah Johnson" },
+            { name: "position", label: "Position/Role", type: "text", required: true, placeholder: "e.g., Bartender" },
+            { name: "employmentType", label: "Employment Type", type: "select",
+              options: ["Full-Time", "Part-Time", "Casual"], required: true },
+            { name: "startDate", label: "Employment start date", type: "date", required: true },
+            { name: "probationEndDate", label: "Probation end date", type: "date", required: true },
+            { name: "checkInNumber", label: "Which probation check-in is this?", type: "select",
+              options: ["1st Check-In (Month 1)", "2nd Check-In (Month 2)", "3rd Check-In (Month 3)", "4th Check-In (Month 4)", "5th Check-In (Month 5)", "Final Check-In (Month 6 / End of Probation)"],
+              required: true },
+            { name: "managerName", label: "Manager/Supervisor conducting the review", type: "text", required: true, placeholder: "Your name" }
+        ]
+    },
+    // Step 3: Key Requirements Review
+    {
+        id: 3,
+        title: "Key Role Requirements",
+        infoBox: {
+            type: 'tip',
+            icon: '💡',
+            title: 'Tip',
+            content: '<p>List the core requirements of the role that were communicated at hiring. These should be the fundamental expectations the employee needs to meet to pass probation.</p>'
+        },
+        fields: [
+            { name: "keyRequirements", label: "What are the key requirements of this role? (List 3-5 core requirements)",
+              type: "textarea", required: true, rows: 4,
+              placeholder: "e.g.,\n• Consistently arrive on time for all rostered shifts\n• Maintain RSA compliance and responsible service practices\n• Complete all opening and closing duties to standard\n• Work effectively as part of the team\n• Follow all food safety and WHS procedures" },
+            { name: "requirementsRating", label: "Overall, how is the employee tracking against these requirements?", type: "select",
+              options: ["Exceeding expectations", "Meeting expectations", "Partially meeting expectations", "Not meeting expectations"],
+              required: true },
+            { name: "requirementsComments", label: "Specific comments on requirements (provide examples where possible)",
+              type: "textarea", required: true, rows: 3,
+              placeholder: "e.g., Sarah has been punctual for all shifts except two occasions in week 3. She has completed RSA training and follows service standards well." }
+        ]
+    },
+    // Step 4: Deliverables & Behaviours
+    {
+        id: 4,
+        title: "Role Deliverables & Behaviours",
+        infoBox: {
+            type: 'tip',
+            icon: '💡',
+            title: 'Tip',
+            content: '<p>Deliverables are the tangible outputs expected. Behaviours relate to how the employee conducts themselves — teamwork, communication, attitude, professionalism. Be specific and use examples.</p>'
+        },
+        fields: [
+            { name: "deliverables", label: "Key deliverables — what the employee should be producing/achieving at this stage",
+              type: "textarea", required: true, rows: 3,
+              placeholder: "e.g.,\n• Independently manage a section of 6 tables\n• Accurately process orders through POS system\n• Upsell menu items to achieve average spend targets" },
+            { name: "deliverablesRating", label: "How is the employee tracking on deliverables?", type: "select",
+              options: ["Exceeding expectations", "Meeting expectations", "Partially meeting expectations", "Not meeting expectations"],
+              required: true },
+            { name: "behaviours", label: "Behavioural expectations — how the employee is expected to conduct themselves",
+              type: "textarea", required: true, rows: 3,
+              placeholder: "e.g.,\n• Positive and professional attitude with guests and team\n• Takes initiative and asks questions when unsure\n• Communicates effectively during service\n• Accepts feedback constructively" },
+            { name: "behavioursRating", label: "How is the employee tracking on behaviours?", type: "select",
+              options: ["Exceeding expectations", "Meeting expectations", "Partially meeting expectations", "Not meeting expectations"],
+              required: true },
+            { name: "deliverablesAndBehavioursComments", label: "Specific examples and comments on deliverables and behaviours",
+              type: "textarea", required: true, rows: 3,
+              placeholder: "e.g., Sarah's guest interactions are excellent — she's received two positive customer comments. She could improve on communication with kitchen during busy service." }
+        ]
+    },
+    // Step 5: Support & Development
+    {
+        id: 5,
+        title: "Support & Development",
+        infoBox: {
+            type: 'info',
+            icon: '🤝',
+            title: 'Support is Key',
+            content: '<p>Probation is a two-way street. The employee must be given genuine support, training, and regular feedback. Document what has been provided and what additional support is needed.</p>'
+        },
+        fields: [
+            { name: "trainingProvided", label: "What training and support has been provided so far?",
+              type: "textarea", required: true, rows: 3,
+              placeholder: "e.g.,\n• 3-day induction program completed\n• Buddy assigned (James - Senior Bartender)\n• RSA training completed\n• POS system training completed\n• Menu knowledge sessions x2" },
+            { name: "additionalTrainingNeeded", label: "What additional training or support does the employee need?",
+              type: "textarea", required: true, rows: 3,
+              placeholder: "e.g.,\n• Cocktail masterclass for premium drinks\n• Advanced POS functions (split bills, modifications)\n• Cellar and wine knowledge training" },
+            { name: "oneOnOneFrequency", label: "How often are you having one-on-one check-ins?", type: "select",
+              options: ["Weekly", "Fortnightly", "Monthly", "Ad hoc / as needed", "Not currently scheduled"],
+              required: true },
+            { name: "oneOnOneComments", label: "Comments on one-on-one meetings and feedback provided",
+              type: "textarea", required: false, rows: 2,
+              placeholder: "e.g., Weekly 15-min catch-ups on Mondays before shift. Employee is receptive to feedback." },
+            { name: "employeeFeedback", label: "Has the employee raised any concerns, questions, or feedback?",
+              type: "textarea", required: false, rows: 2,
+              placeholder: "e.g., Sarah mentioned she'd like more exposure to cocktail making. No concerns raised about the role or team." }
+        ]
+    },
+    // Step 6: Overall Assessment & Next Steps
+    {
+        id: 6,
+        title: "Overall Assessment & Next Steps",
+        fields: [
+            { name: "overallAssessment", label: "Overall probation assessment at this stage", type: "select",
+              options: [
+                "On track — progressing well, no concerns",
+                "On track with minor areas for development",
+                "At risk — some concerns that need to be addressed",
+                "Significant concerns — improvement plan required",
+                "Final check-in: Recommend confirming employment",
+                "Final check-in: Recommend extending probation",
+                "Final check-in: Recommend ending employment"
+              ],
+              required: true },
+            { name: "areasOfStrength", label: "Key areas of strength to acknowledge",
+              type: "textarea", required: true, rows: 2,
+              placeholder: "e.g., Excellent customer interactions, strong work ethic, reliable attendance" },
+            { name: "areasForImprovement", label: "Areas for improvement (if any) — be specific",
+              type: "textarea", required: false, rows: 2,
+              placeholder: "e.g., Needs to improve speed of service during peak periods, could be more proactive in asking for tasks during quiet periods" },
+            { name: "agreedActions", label: "Agreed actions for the next period (for both employee AND leader)",
+              type: "textarea", required: true, rows: 3,
+              placeholder: "e.g.,\nEmployee:\n• Focus on speed of service during Friday/Saturday peaks\n• Complete cocktail training by end of month\n\nLeader:\n• Arrange cocktail masterclass with Head Bartender\n• Continue weekly check-ins\n• Provide real-time feedback during busy shifts" },
+            { name: "nextCheckInDate", label: "Next probation check-in date", type: "date", required: true },
+            { name: "additionalNotes", label: "Any additional notes or comments",
+              type: "textarea", required: false, rows: 2 }
+        ]
+    }
+];
+
+// ========================================
+// PROBATION CHECK-IN - CORE FUNCTIONS
+// ========================================
+
+function openProbationCheckIn() {
+    console.log('🔄 Opening Probation Check-In Builder');
+    const modal = document.getElementById('probationCheckInModal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
+    // Reset state
+    probationCheckInState.currentStep = 1;
+    probationCheckInState.data = {};
+    probationCheckInState.generatedDocument = null;
+    probationCheckInState.isGenerating = false;
+    
+    // Show wizard, hide generating
+    document.getElementById('probationGenerating').classList.add('hidden');
+    document.getElementById('probationStepContent').classList.remove('hidden');
+    document.getElementById('probationProgressSection').classList.remove('hidden');
+    document.getElementById('probationNextBtn').classList.remove('hidden');
+    document.getElementById('probationBackBtn').style.display = 'none';
+    
+    showProbationStep(1);
+    
+    if (typeof trackToolUsage === 'function') {
+        trackToolUsage('probationCheckIn');
+    }
+}
+
+function closeProbationCheckIn() {
+    const modal = document.getElementById('probationCheckInModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function closeProbationPreview() {
+    document.getElementById('probationPreviewModal').classList.add('hidden');
+}
+
+function resetProbationCheckIn() {
+    if (!confirm('Start over? This will clear all your entered information.')) return;
+    probationCheckInState.currentStep = 1;
+    probationCheckInState.data = {};
+    probationCheckInState.generatedDocument = null;
+    
+    document.getElementById('probationGenerating').classList.add('hidden');
+    document.getElementById('probationStepContent').classList.remove('hidden');
+    document.getElementById('probationProgressSection').classList.remove('hidden');
+    document.getElementById('probationNextBtn').classList.remove('hidden');
+    
+    showProbationStep(1);
+}
+
+// ========================================
+// PROBATION CHECK-IN - STEP RENDERING
+// ========================================
+
+function showProbationStep(stepNumber) {
+    const step = probationWizardSteps[stepNumber - 1];
+    if (!step) return;
+    
+    probationCheckInState.currentStep = stepNumber;
+    
+    // Update progress
+    document.getElementById('probationCurrentStep').textContent = stepNumber;
+    document.getElementById('probationTotalSteps').textContent = probationCheckInState.totalSteps;
+    const progress = Math.round((stepNumber / probationCheckInState.totalSteps) * 100);
+    document.getElementById('probationProgress').textContent = `${progress}% Complete`;
+    document.getElementById('probationProgressBar').style.width = `${progress}%`;
+    
+    // Build step HTML
+    let html = `<h3 class="text-xl font-bold text-white mb-4">${step.title}</h3>`;
+    
+    // Add info box if present
+    if (step.infoBox) {
+        const bgColor = step.infoBox.type === 'info' ? 'bg-blue-500/10 border-blue-500/30' : 'bg-amber-500/10 border-amber-500/30';
+        const textColor = step.infoBox.type === 'info' ? 'text-blue-300' : 'text-amber-300';
+        html += `
+            <div class="${bgColor} border rounded-lg p-4 mb-6">
+                <p class="${textColor} font-semibold mb-2 flex items-center gap-2">
+                    <span>${step.infoBox.icon}</span> ${step.infoBox.title}
+                </p>
+                <div class="${textColor} text-sm">${step.infoBox.content}</div>
+            </div>
+        `;
+    }
+    
+    html += '<div class="space-y-4">';
+    
+    step.fields.forEach(field => {
+        html += '<div>';
+        html += `<label class="block text-slate-300 text-sm mb-2">
+                    ${field.label}${field.required ? ' <span class="text-red-400">*</span>' : ''}
+                 </label>`;
+        
+        const savedValue = probationCheckInState.data[field.name] || '';
+        
+        if (field.type === 'text') {
+            html += `<input type="text" id="prob_${field.name}" 
+                           placeholder="${field.placeholder || ''}"
+                           value="${savedValue}"
+                           class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:border-amber-500 focus:outline-none"
+                           ${field.required ? 'required' : ''}>`;
+        } else if (field.type === 'textarea') {
+            html += `<textarea id="prob_${field.name}" rows="${field.rows || 3}"
+                              placeholder="${field.placeholder || ''}"
+                              class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:border-amber-500 focus:outline-none"
+                              ${field.required ? 'required' : ''}>${savedValue}</textarea>`;
+        } else if (field.type === 'select') {
+            html += `<select id="prob_${field.name}" 
+                            class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:border-amber-500 focus:outline-none"
+                            ${field.required ? 'required' : ''}>
+                        <option value="">Select...</option>`;
+            field.options.forEach(opt => {
+                const selected = savedValue === opt ? 'selected' : '';
+                html += `<option value="${opt}" ${selected}>${opt}</option>`;
+            });
+            html += '</select>';
+        } else if (field.type === 'radio') {
+            field.options.forEach(opt => {
+                const checked = savedValue === opt ? 'checked' : '';
+                html += `<label class="flex items-center gap-2 text-slate-300 mb-2 cursor-pointer">
+                            <input type="radio" name="prob_${field.name}" value="${opt}" ${checked}
+                                   class="text-amber-500 focus:ring-amber-500">
+                            <span>${opt}</span>
+                         </label>`;
+            });
+        } else if (field.type === 'date') {
+            const today = new Date().toISOString().split('T')[0];
+            html += `<input type="date" id="prob_${field.name}" 
+                           value="${savedValue || today}"
+                           class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:border-amber-500 focus:outline-none"
+                           ${field.required ? 'required' : ''}>`;
+        } else if (field.type === 'number') {
+            html += `<input type="number" id="prob_${field.name}" 
+                           min="${field.min || 0}" max="${field.max || 100}"
+                           placeholder="${field.placeholder || ''}"
+                           value="${savedValue}"
+                           class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:border-amber-500 focus:outline-none"
+                           ${field.required ? 'required' : ''}>`;
+        }
+        
+        html += '</div>';
+    });
+    
+    html += '</div>';
+    
+    document.getElementById('probationStepContent').innerHTML = html;
+    
+    // Show/hide back button
+    document.getElementById('probationBackBtn').style.display = stepNumber > 1 ? 'block' : 'none';
+    
+    // Show/hide start over button
+    const startOverBtn = document.getElementById('probationStartOverBtn');
+    if (startOverBtn) {
+        startOverBtn.classList.toggle('hidden', stepNumber <= 1);
+    }
+    
+    // Update next button text
+    const nextBtn = document.getElementById('probationNextBtn');
+    if (stepNumber === probationCheckInState.totalSteps) {
+        nextBtn.innerHTML = '✨ Generate Document';
+    } else {
+        nextBtn.innerHTML = 'Next Step →';
+    }
+}
+
+// ========================================
+// PROBATION CHECK-IN - NAVIGATION & VALIDATION
+// ========================================
+
+function probationWizardNext() {
+    const step = probationWizardSteps[probationCheckInState.currentStep - 1];
+    let allValid = true;
+    
+    // Save field values
+    step.fields.forEach(field => {
+        let value;
+        if (field.type === 'radio') {
+            const radio = document.querySelector(`input[name="prob_${field.name}"]:checked`);
+            value = radio ? radio.value : '';
+        } else {
+            const element = document.getElementById(`prob_${field.name}`);
+            value = element ? element.value.trim() : '';
+        }
+        
+        if (field.required && !value) {
+            allValid = false;
+        }
+        
+        probationCheckInState.data[field.name] = value;
+    });
+    
+    if (!allValid) {
+        alert('⚠️ Please complete all required fields before continuing.');
+        return;
+    }
+    
+    // Procedural fairness validation on Step 1
+    if (probationCheckInState.currentStep === 1) {
+        if (!validateProbationProceduralFairness()) {
+            return;
+        }
+    }
+    
+    // Move to next step or generate
+    if (probationCheckInState.currentStep < probationCheckInState.totalSteps) {
+        probationCheckInState.currentStep++;
+        showProbationStep(probationCheckInState.currentStep);
+    } else {
+        generateProbationCheckInDocument();
+    }
+}
+
+function probationWizardBack() {
+    if (probationCheckInState.currentStep > 1) {
+        // Save current step data first
+        const step = probationWizardSteps[probationCheckInState.currentStep - 1];
+        step.fields.forEach(field => {
+            let value;
+            if (field.type === 'radio') {
+                const radio = document.querySelector(`input[name="prob_${field.name}"]:checked`);
+                value = radio ? radio.value : '';
+            } else {
+                const element = document.getElementById(`prob_${field.name}`);
+                value = element ? element.value.trim() : '';
+            }
+            probationCheckInState.data[field.name] = value;
+        });
+        
+        probationCheckInState.currentStep--;
+        showProbationStep(probationCheckInState.currentStep);
+    }
+}
+
+function validateProbationProceduralFairness() {
+    const data = probationCheckInState.data;
+    
+    if (data.noticeGiven === 'No') {
+        alert(
+            '⚠️ REASONABLE NOTICE REQUIRED\n\n' +
+            'The employee should be given at least 24 hours notice of this probation check-in meeting.\n\n' +
+            'This allows them to:\n' +
+            '• Prepare their own reflections on their progress\n' +
+            '• Think about any questions or concerns they have\n' +
+            '• Arrange a support person if they wish\n\n' +
+            'Please schedule the meeting for at least 24 hours from now.'
+        );
+        probationCheckInState.data.noticeGiven = '';
+        showProbationStep(1);
+        return false;
+    }
+    
+    if (data.purposeExplained === 'No') {
+        alert(
+            '⚠️ PURPOSE MUST BE COMMUNICATED\n\n' +
+            'The employee must understand this is a supportive probation review meeting — NOT a disciplinary meeting.\n\n' +
+            'Please inform the employee that the purpose is to:\n' +
+            '• Review their progress during probation\n' +
+            '• Discuss what\'s going well and any areas for development\n' +
+            '• Agree on support and next steps\n\n' +
+            'Please communicate this to the employee before continuing.'
+        );
+        probationCheckInState.data.purposeExplained = '';
+        showProbationStep(1);
+        return false;
+    }
+    
+    if (data.supportPersonAdvised === 'No') {
+        alert(
+            '⚠️ SUPPORT PERSON OPTION\n\n' +
+            'While a probation check-in is supportive in nature, best practice is to advise the employee they may bring a support person if they wish.\n\n' +
+            'A support person can be:\n' +
+            '• A colleague\n' +
+            '• A family member or friend\n' +
+            '• A union representative\n\n' +
+            'Please advise the employee of this option before continuing.'
+        );
+        probationCheckInState.data.supportPersonAdvised = '';
+        showProbationStep(1);
+        return false;
+    }
+    
+    return true;
+}
+
+// ========================================
+// PROBATION CHECK-IN - AI GENERATION
+// ========================================
+
+async function generateProbationCheckInDocument() {
+    console.log('📄 Generating Probation Check-In document...');
+    
+    // Hide wizard, show loading
+    document.getElementById('probationStepContent').classList.add('hidden');
+    document.getElementById('probationProgressSection').classList.add('hidden');
+    document.getElementById('probationNextBtn').classList.add('hidden');
+    document.getElementById('probationBackBtn').style.display = 'none';
+    document.getElementById('probationStartOverBtn').classList.add('hidden');
+    document.getElementById('probationGenerating').classList.remove('hidden');
+    
+    probationCheckInState.isGenerating = true;
+    
+    try {
+        const prompt = buildProbationCheckInPrompt();
+        const response = await callClaudeAPI(prompt);
+        
+        probationCheckInState.generatedDocument = response;
+        
+        // Close builder modal
+        closeProbationCheckIn();
+        
+        // Show preview
+        showProbationPreview(response);
+        
+        if (typeof trackEvent === 'function') {
+            trackEvent('probation_checkin_generated', {
+                user: currentUser,
+                employeeName: probationCheckInState.data.employeeName,
+                checkInNumber: probationCheckInState.data.checkInNumber
+            });
+        }
+        
+    } catch (error) {
+        console.error('❌ Probation check-in generation error:', error);
+        alert('⚠️ Error generating document. Please try again.');
+        
+        // Reset to wizard
+        document.getElementById('probationGenerating').classList.add('hidden');
+        document.getElementById('probationStepContent').classList.remove('hidden');
+        document.getElementById('probationProgressSection').classList.remove('hidden');
+        document.getElementById('probationNextBtn').classList.remove('hidden');
+        showProbationStep(probationCheckInState.currentStep);
+    } finally {
+        probationCheckInState.isGenerating = false;
+    }
+}
+
+function buildProbationCheckInPrompt() {
+    const data = probationCheckInState.data;
+    
+    const venueContext = (typeof venueProfile !== 'undefined' && venueProfile.setupComplete) ?
+        `Venue: ${venueProfile.venueName} (${venueProfile.venueType}) in ${venueProfile.city}, ${venueProfile.location}` :
+        'Australian hospitality venue';
+    
+    const today = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
+    
+    return `You are generating a PROBATION CHECK-IN DOCUMENT for Australian hospitality HR.
+
+This is a supportive probation review document — NOT a disciplinary document. The purpose is to support a new employee during their probation period by reviewing progress, identifying development needs, and agreeing on support.
+
+VENUE CONTEXT:
+${venueContext}
+Award: Hospitality Industry (General) Award MA000009
+Manager/Reviewer: ${data.managerName || '[Manager Name]'}
+
+EMPLOYEE DETAILS:
+- Name: ${data.employeeName}
+- Position: ${data.position}
+- Employment Type: ${data.employmentType}
+- Start Date: ${data.startDate}
+- Probation End Date: ${data.probationEndDate}
+- Check-In: ${data.checkInNumber}
+
+PROCEDURAL FAIRNESS:
+- Reasonable notice given: ${data.noticeGiven}
+- Purpose explained: ${data.purposeExplained}
+- Support person option advised: ${data.supportPersonAdvised}
+
+KEY ROLE REQUIREMENTS:
+${data.keyRequirements}
+
+Requirements Rating: ${data.requirementsRating}
+Manager Comments on Requirements: ${data.requirementsComments}
+
+ROLE DELIVERABLES:
+${data.deliverables}
+Deliverables Rating: ${data.deliverablesRating}
+
+BEHAVIOURAL EXPECTATIONS:
+${data.behaviours}
+Behaviours Rating: ${data.behavioursRating}
+
+Manager Comments on Deliverables & Behaviours: ${data.deliverablesAndBehavioursComments}
+
+SUPPORT & DEVELOPMENT:
+Training Provided: ${data.trainingProvided}
+Additional Training Needed: ${data.additionalTrainingNeeded}
+One-on-One Frequency: ${data.oneOnOneFrequency}
+${data.oneOnOneComments ? `One-on-One Comments: ${data.oneOnOneComments}` : ''}
+${data.employeeFeedback ? `Employee Feedback/Concerns: ${data.employeeFeedback}` : ''}
+
+OVERALL ASSESSMENT:
+Assessment: ${data.overallAssessment}
+Areas of Strength: ${data.areasOfStrength}
+${data.areasForImprovement ? `Areas for Improvement: ${data.areasForImprovement}` : 'No specific areas for improvement noted.'}
+Agreed Actions: ${data.agreedActions}
+Next Check-In Date: ${data.nextCheckInDate}
+${data.additionalNotes ? `Additional Notes: ${data.additionalNotes}` : ''}
+
+**CRITICAL FORMATTING REQUIREMENTS:**
+1. Use ## for major sections (e.g., ## EMPLOYEE DETAILS)
+2. Use blank lines between ALL paragraphs and sections
+3. Use **text** for emphasis sparingly
+4. For lists, use bullet points with "• " prefix
+5. Structure clearly with proper spacing
+6. Separate each major section with a blank line before and after
+7. ALWAYS add a space after colons in labels
+
+Generate a complete, professional Probation Check-In document with the following structure:
+
+# PROBATION CHECK-IN RECORD
+
+## DOCUMENT DETAILS
+
+Date of Review: ${today}
+Check-In: ${data.checkInNumber}
+Reviewer: ${data.managerName}
+
+## EMPLOYEE DETAILS
+
+Full Name: ${data.employeeName}
+Position: ${data.position}
+Employment Type: ${data.employmentType}
+Start Date: ${data.startDate}
+Probation End Date: ${data.probationEndDate}
+
+## PROCEDURAL FAIRNESS CONFIRMATION
+
+Confirm each of the following were completed:
+• Employee given reasonable notice of this meeting: ${data.noticeGiven}
+• Employee informed of the meeting purpose (supportive probation review): ${data.purposeExplained}
+• Employee advised they may bring a support person: ${data.supportPersonAdvised}
+
+## KEY ROLE REQUIREMENTS REVIEW
+
+Take the key requirements provided and present each one as a row/item with the manager's assessment. Expand the manager's comments into a professional, specific narrative. Include the overall rating.
+
+## ROLE DELIVERABLES & BEHAVIOURS
+
+Split into two sub-sections:
+
+### Deliverables
+Take the deliverables provided and expand into a professional assessment with specific examples.
+
+### Behaviours
+Take the behavioural expectations provided and expand into a professional assessment with specific examples.
+
+Include both ratings.
+
+## SUPPORT & DEVELOPMENT
+
+### Training & Support Provided
+List training that has been provided.
+
+### Additional Training & Support Required
+List what is still needed and when it should be completed.
+
+### One-on-One Meetings & Feedback
+Document the current one-on-one meeting schedule, quality of feedback, and any comments.
+
+### Employee Feedback
+Document any concerns, questions or feedback the employee has raised. If none, note that the employee was given the opportunity and had no concerns.
+
+## OVERALL ASSESSMENT
+
+Provide a professional narrative summary that:
+1. Acknowledges strengths with specific examples
+2. Addresses any areas for improvement constructively with specific, actionable guidance
+3. Sets clear expectations for the next period
+4. Is supportive and development-focused in tone
+
+Overall Probation Status: ${data.overallAssessment}
+
+## AGREED ACTIONS
+
+Split into:
+
+### Employee Actions
+List specific, measurable actions for the employee.
+
+### Leader/Manager Actions
+List specific support actions the manager commits to providing.
+
+### Timeline
+Next check-in date and any milestone dates.
+
+## EMPLOYEE COMMENTS
+
+*Space for the employee to add their own comments, reflections, or feedback during or after the meeting:*
+
+__________________________________________________________________________________
+__________________________________________________________________________________
+__________________________________________________________________________________
+
+## ACKNOWLEDGEMENT & SIGNATURES
+
+This document records the discussion held on ${today} as part of the probation review process. Both parties acknowledge:
+
+• This check-in has been conducted fairly and the employee was given the opportunity to respond
+• The agreed actions have been discussed and understood by both parties
+• Both the employee and the manager/leader will retain a copy of this document for their records
+• This document is a supportive development record and does not constitute disciplinary action
+
+Employee Signature: _________________________________ Date: ______________
+
+Employee Name (Print): ${data.employeeName}
+
+Manager Signature: _________________________________ Date: ______________
+
+Manager Name (Print): ${data.managerName}
+
+## DOCUMENT DISTRIBUTION
+
+☐ Copy provided to employee
+☐ Copy retained by manager/leader for employee file
+
+---
+
+**CONFIDENTIAL** — This document contains personal employment information and should be stored securely in accordance with privacy obligations.
+
+IMPORTANT INSTRUCTIONS:
+- Expand the brief manager comments into professional, specific narratives while staying factual
+- Use a supportive, development-focused tone throughout — this is NOT a disciplinary document
+- Be specific and constructive in all feedback areas
+- Ensure the document reads as a complete, standalone record of the probation check-in
+- DO NOT add fictional details — only expand and contextualise what was provided
+- Make sure the document acknowledges the employee's strengths first before any areas for improvement
+- The overall tone should make the employee feel supported and clear about expectations`;
+}
+
+// ========================================
+// PROBATION CHECK-IN - PREVIEW & DOWNLOAD
+// ========================================
+
+function showProbationPreview(generatedDoc) {
+    console.log('📄 Showing probation check-in preview...');
+    
+    // Use existing convertAIContentToHTML if available
+    const formattedHTML = (typeof convertAIContentToHTML === 'function') ?
+        convertAIContentToHTML(generatedDoc) : generatedDoc.replace(/\n/g, '<br>');
+    
+    document.getElementById('probationPreviewContent').innerHTML = formattedHTML;
+    document.getElementById('probationPreviewModal').classList.remove('hidden');
+}
+
+async function downloadProbationDocument(format = 'pdf') {
+    const userAccepts = confirm(
+        "📄 PROBATION CHECK-IN DOCUMENT\n\n" +
+        "Before finalising this document, please ensure:\n\n" +
+        "✓ All factual details are accurate\n" +
+        "✓ The employee has had the opportunity to add their comments\n" +
+        "✓ Both parties sign the document\n" +
+        "✓ A copy is provided to the employee\n" +
+        "✓ A copy is retained by the manager for the employee file\n\n" +
+        "Click OK to download, or Cancel to return."
+    );
+    
+    if (!userAccepts) return;
+    
+    try {
+        const employeeName = probationCheckInState.data.employeeName || 'Employee';
+        const checkIn = probationCheckInState.data.checkInNumber || 'Check-In';
+        const checkInShort = checkIn.replace(/[^a-zA-Z0-9]/g, '_').replace(/_+/g, '_');
+        const filename = `Probation_CheckIn_${employeeName.replace(/\s+/g, '_')}_${checkInShort}_${new Date().toISOString().slice(0,10)}`;
+        
+        const previewElement = document.getElementById('probationPreviewContent');
+        if (!previewElement) {
+            throw new Error('Preview content not found');
+        }
+        
+        const formattedHTML = previewElement.innerHTML;
+        
+        if (format === 'pdf') {
+            // Use existing PDF generation
+            if (typeof convertHTMLToPdfMake === 'function' && typeof pdfMake !== 'undefined') {
+                const metadata = {
+                    title: `Probation Check-In - ${employeeName}`,
+                    documentType: 'Probation Check-In',
+                    generatedBy: 'Fitzgerald HR Assistant'
+                };
+                const docDefinition = convertHTMLToPdfMake(formattedHTML, metadata);
+                pdfMake.createPdf(docDefinition).download(`${filename}.pdf`);
+            } else {
+                // Fallback: print to PDF
+                const printWindow = window.open('', '_blank');
+                printWindow.document.write(`
+                    <html><head><title>${filename}</title>
+                    <style>body{font-family:Arial,sans-serif;max-width:800px;margin:0 auto;padding:40px;color:#333;line-height:1.6}
+                    h1{color:#1a1a2e;border-bottom:3px solid #f59e0b;padding-bottom:10px}
+                    h2{color:#2d3748;border-bottom:1px solid #e2e8f0;padding-bottom:5px;margin-top:25px}
+                    h3{color:#4a5568;margin-top:15px}</style>
+                    </head><body>${formattedHTML}</body></html>
+                `);
+                printWindow.document.close();
+                printWindow.print();
+            }
+        } else {
+            // Word document
+            if (typeof generateWordDocument === 'function') {
+                await generateWordDocument(formattedHTML, `${filename}.docx`);
+            } else if (typeof htmlDocx !== 'undefined') {
+                const fullHTML = `
+                    <html><head><style>
+                    body{font-family:Arial,sans-serif;color:#333;line-height:1.6}
+                    h1{color:#1a1a2e;border-bottom:3px solid #f59e0b;padding-bottom:10px;font-size:24px}
+                    h2{color:#2d3748;border-bottom:1px solid #e2e8f0;padding-bottom:5px;margin-top:20px;font-size:18px}
+                    h3{color:#4a5568;margin-top:15px;font-size:16px}
+                    p{margin:8px 0}
+                    </style></head><body>${formattedHTML}</body></html>
+                `;
+                const blob = htmlDocx.asBlob(fullHTML);
+                saveAs(blob, `${filename}.docx`);
+            } else {
+                alert('Word document generation is not available. Please try PDF instead.');
+            }
+        }
+        
+        if (typeof trackEvent === 'function') {
+            trackEvent('probation_checkin_downloaded', {
+                user: currentUser,
+                format: format,
+                employeeName: employeeName,
+                checkIn: checkIn
+            });
+        }
+        
+        // Show reminder toast
+        if (typeof showToast === 'function') {
+            showToast('📄 Remember: Provide a copy to the employee and retain one for your records.', 'info', 5000);
+        }
+        
+    } catch (error) {
+        console.error('❌ Download error:', error);
+        alert('⚠️ Error downloading document. Please try again.');
+    }
 }
 
 
