@@ -5042,7 +5042,23 @@ Be as specific as possible!"></textarea>
     </button>
 
 
-    <!-- 2. Performance Improvement Plan - BLUE (NEW) -->
+    <!-- 2. Formal Probation Review - TEAL (NEW) -->
+    <button onclick="selectDocumentType('formalProbationReview')" 
+            class="w-full text-left p-6 bg-slate-700 hover:bg-teal-600 rounded-lg transition-all border-2 border-transparent hover:border-teal-500">
+        <div class="flex items-start gap-4">
+            <div class="text-4xl">📑</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold text-lg mb-1">Formal Probation Review</h3>
+                <p class="text-slate-300 text-sm mb-2">For: Guiding an open & honest probation discussion on performance, behaviours & support</p>
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-1 bg-teal-500/20 text-teal-400 text-xs rounded">Template + Script</span>
+                    <span class="text-slate-500 text-xs">• 8 steps • Action plan • Procedural fairness</span>
+                </div>
+            </div>
+        </div>
+    </button>
+
+    <!-- 3. Performance Improvement Plan - BLUE -->
     <button onclick="selectDocumentType('performanceImprovementPlan')" 
             class="w-full text-left p-6 bg-slate-700 hover:bg-blue-600 rounded-lg transition-all border-2 border-transparent hover:border-blue-500">
         <div class="flex items-start gap-4">
@@ -6090,31 +6106,56 @@ function detectToolNeeds(message) {
             keywords: [
                 // Direct terms
                 'probation check-in', 'probation check in', 'probation checkin',
-                'probation review', 'probation meeting', 'probation assessment',
+                'probation meeting', 'probation assessment',
                 'probation evaluation', 'probation period', 'probation progress',
                 // Variations
-                'probationary review', 'probationary period', 'probationary check',
-                'probation report', 'probation document', 'probation template',
+                'probationary period', 'probationary check',
+                'probation report', 'probation template',
                 // Actions
-                'review probation', 'check probation', 'assess probation',
+                'check probation', 'assess probation',
                 'probation conversation', 'probation discussion', 'probation feedback',
                 // Questions
-                'how to do probation review', 'probation check in template',
-                'what to cover in probation', 'probation review questions',
-                'probation meeting template', 'probation review form',
+                'probation check in template',
+                'what to cover in probation',
+                'probation meeting template',
                 // Contextual
                 'new employee review', 'new starter review', 'new hire review',
                 'first month review', 'second month review', 'third month review',
-                'end of probation', 'pass probation', 'fail probation', 'extend probation',
-                'confirm employment', 'confirm permanent', 'probation outcome',
                 // Combined
                 'probation support', 'probation development', 'probation plan',
-                'during probation', 'probation period review'
+                'during probation'
             ],
             title: '🔄 Probation Check-In Builder',
             description: 'Generate structured probation review documents with AI',
             action: 'openProbationCheckIn()',
             buttonText: 'Build Probation Check-In',
+            color: 'teal'
+        },
+        
+        // ============================================================
+        // FORMAL PROBATION REVIEW
+        // ============================================================
+        formalProbationReview: {
+            keywords: [
+                // Direct terms
+                'formal probation review', 'formal probation', 'probation review document',
+                'probation review form', 'probation review template',
+                // Actions
+                'review probation', 'probation review',
+                // End of probation outcomes
+                'end of probation', 'pass probation', 'fail probation', 'extend probation',
+                'confirm employment', 'confirm permanent', 'probation outcome',
+                'probationary review', 'probation period review',
+                // Formal review context
+                'not meeting probation', 'failing probation', 'probation concerns',
+                'terminate during probation', 'end employment probation',
+                'probation performance review', 'how to do probation review',
+                'probation review questions'
+            ],
+            title: '📑 Formal Probation Review',
+            description: 'Generate a formal probation review document with AI — includes action plan, key messages & signatures',
+            action: "openDocumentBuilderFor('formalProbationReview')",
+            buttonText: 'Build Formal Probation Review',
             color: 'teal'
         },
         
@@ -7355,148 +7396,9 @@ async function generatePDFDocument(content, filename = 'document.pdf', metadata 
     }
 }
 
-        // ========================================
-        // SMART DOCUMENT DETECTION & BUTTONS
-        // ========================================
-        
-        function detectDocumentType(content) {
-            const lowerContent = content.toLowerCase();
-            
-            const documentKeywords = {
-                'employmentContract': ['employment contract', 'hire', 'new employee', 'employment agreement', 'contract of employment'],
-                'warningLetter': ['warning', 'disciplinary', 'performance issue', 'misconduct', 'written warning'],
-                'performanceReview': ['performance review', 'performance appraisal', 'performance evaluation', 'annual review']
-            };
-            
-            for (const [docType, keywords] of Object.entries(documentKeywords)) {
-                if (keywords.some(keyword => lowerContent.includes(keyword))) {
-                    return docType;
-                }
-            }
-            
-            return null;
-        }
-        
-        function extractDataFromConversation(messages, documentType) {
-            // Parse conversation to extract relevant data
-            const conversationText = messages.map(m => m.content).join(' ').toLowerCase();
-            const data = {};
-            
-            // Extract employee name
-            const nameMatch = conversationText.match(/(?:employee name|name is|called)\s+(?:is\s+)?([A-Z][a-z]+\s+[A-Z][a-z]+)/i);
-            if (nameMatch) data.employeeName = nameMatch[1];
-            
-            // Extract position
-            const positionMatch = conversationText.match(/(?:position|role|job)\s+(?:is|as|of)?\s+([a-z\s]+?)(?:\s|,|\.|$)/i);
-            if (positionMatch) data.position = positionMatch[1].trim();
-            
-            // Extract date
-            const dateMatch = conversationText.match(/(\d{1,2}[\/\-]\d{1,2}[\/\-]\d{2,4})/);
-            if (dateMatch) data.startDate = dateMatch[1];
-            
-            // Extract rate
-            const rateMatch = conversationText.match(/\$?(\d+(?:\.\d{2})?)\s*(?:per hour|\/hr|hourly)/i);
-            if (rateMatch) data.baseRate = rateMatch[1];
-            
-            // Document-specific extraction
-            if (documentType === 'warningLetter') {
-                const issueMatch = conversationText.match(/(?:issue|problem|concern).*?(?:is|was|regarding)\s+([^.]+)/i);
-                if (issueMatch) data.issue = issueMatch[1];
-            }
-            
-            return data;
-        }
-        
-        function addDocumentDownloadButtons(messageDiv, documentType, conversationData) {
-            const buttonContainer = document.createElement('div');
-            buttonContainer.className = 'mt-4 p-4 bg-slate-700/50 rounded-lg border border-amber-500/30';
-            
-            const documentNames = {
-                'employmentContract': 'Employment Contract',
-                'warningLetter': 'Warning Letter',
-                'performanceReview': 'Performance Review'
-            };
-            
-            buttonContainer.innerHTML = `
-                <div class="flex items-center justify-between mb-3">
-                    <p class="text-amber-400 font-semibold flex items-center gap-2">
-                        <span>📄</span>
-                        <span>Generate ${documentNames[documentType]}</span>
-                    </p>
-                </div>
-                <p class="text-slate-300 text-sm mb-3">Based on our conversation, I can generate a customized template for you:</p>
-                <div class="flex gap-2 flex-wrap">
-                    <button onclick="downloadDocument('${documentType}', 'word')" 
-                            class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors flex items-center gap-2 text-sm font-medium">
-                        <span>📝</span> Download Word Doc
-                    </button>
-                    <button onclick="downloadDocument('${documentType}', 'pdf')" 
-                            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors flex items-center gap-2 text-sm font-medium">
-                        <span>📄</span> Download PDF
-                    </button>
-                </div>
-                <p class="text-xs text-slate-400 mt-3 flex items-start gap-2">
-                    <span>⚠️</span>
-                    <span>This template must be reviewed by a Senior Consultant before use</span>
-                </p>
-            `;
-            
-            messageDiv.querySelector('.max-w-3xl').appendChild(buttonContainer);
-        }
-        
-        function downloadDocument(documentType, format) {
-            // Show disclaimer first
-            const confirmed = confirm(
-                "⚠️ IMPORTANT LEGAL DISCLAIMER\n\n" +
-                "This document is a TEMPLATE generated by Fitz AI for guidance purposes only.\n\n" +
-                "Before using this document:\n" +
-                "✓ You MUST have it reviewed by a Fitzgerald HR Senior Consultant\n" +
-                "✓ This ensures legal compliance and protects your business\n" +
-                "✓ Templates may need customization for your specific situation\n\n" +
-                "Failure to have documents professionally reviewed may expose you to legal risks.\n\n" +
-                "Contact: info@fitzgeraldhr.com.au\n\n" +
-                "Click OK to download template, or Cancel to return."
-            );
-            
-            if (!confirmed) return;
-            
-            // Extract data from conversation
-            const data = extractDataFromConversation(conversationHistory, documentType);
-            
-            // Add metadata
-            const metadata = {
-                documentId: generateDocumentId(),
-                userName: currentUser,
-                generatedAt: new Date().toISOString(),
-                documentType: documentType
-            };
-            
-            // Generate document content
-            const template = hrTemplates[documentType];
-            if (!template) {
-                alert('Template not found');
-                return;
-            }
-            
-            const content = template(data);
-            
-            // Generate filename
-            const timestamp = new Date().toISOString().slice(0,10);
-            const filename = `${documentType}_${timestamp}.${format === 'word' ? 'doc' : 'pdf'}`;
-            
-            // Download
-            if (format === 'word') {
-                generateWordDocument(content, filename, metadata);
-            } else {
-                generatePDFDocument(content, filename);
-            }
-            
-            // Show confirmation
-            alert(`✓ Document downloaded: ${filename}\n\n` +
-                  `Remember to have this reviewed by a Senior Consultant before use.\n` +
-                  `Contact: info@fitzgeraldhr.com.au`);
-        }
-        
+        // [Removed: old detectDocumentType, extractDataFromConversation,
+        //  addDocumentDownloadButtons, downloadDocument - replaced by later versions at ~line 11985]
+
 
 // ========================================
 // PDF GENERATION HELPER FUNCTIONS
@@ -7546,185 +7448,13 @@ function convertAIContentToHTML(rawContent) {
     return html;
 }
 
-function convertHTMLToPdfMake(html, metadata) {
-    const parser = new DOMParser();
-    const doc = parser.parseFromString(html, 'text/html');
-    const content = [];
-
-    const processNode = (node) => {
-        if (node.nodeType === Node.TEXT_NODE) {
-            const text = node.textContent.trim();
-            if (text) {
-                return { text: text };
-            }
-            return null;
-        }
-
-        if (node.nodeType !== Node.ELEMENT_NODE) return null;
-
-        const tagName = node.tagName.toLowerCase();
-
-        switch (tagName) {
-            case 'h1':
-                return {
-                    text: node.textContent.trim(),
-                    style: 'header1',
-                    margin: [0, 10, 0, 5]
-                };
-
-            case 'h2':
-                return {
-                    text: node.textContent.trim(),
-                    style: 'header2',
-                    margin: [0, 8, 0, 4]
-                };
-
-            case 'h3':
-                return {
-                    text: node.textContent.trim(),
-                    style: 'header3',
-                    margin: [0, 6, 0, 3]
-                };
-
-            case 'p':
-                const pContent = [];
-                for (const child of node.childNodes) {
-                    const processed = processInlineNode(child);
-                    if (processed) {
-                        if (Array.isArray(processed)) {
-                            pContent.push(...processed);
-                        } else {
-                            pContent.push(processed);
-                        }
-                    }
-                }
-                return {
-                    text: pContent.length > 0 ? pContent : node.textContent.trim(),
-                    margin: [0, 0, 0, 5]
-                };
-
-            case 'ul':
-                const listItems = [];
-                for (const li of node.querySelectorAll('li')) {
-                    listItems.push(li.textContent.trim());
-                }
-                return {
-                    ul: listItems,
-                    margin: [0, 0, 0, 5]
-                };
-
-            case 'li':
-                return {
-                    text: node.textContent.trim(),
-                    margin: [0, 0, 0, 2]
-                };
-
-            case 'br':
-                return { text: '', margin: [0, 3, 0, 0] };
-
-            default:
-                const children = [];
-                for (const child of node.childNodes) {
-                    const processed = processNode(child);
-                    if (processed) children.push(processed);
-                }
-                return children.length > 0 ? children : null;
-        }
-    };
-
-    const processInlineNode = (node) => {
-        if (node.nodeType === Node.TEXT_NODE) {
-            const text = node.textContent.trim();
-            return text ? { text: text } : null;
-        }
-
-        const tagName = node.tagName?.toLowerCase();
-        const text = node.textContent.trim();
-
-        if (!text) return null;
-
-        switch (tagName) {
-            case 'strong':
-            case 'b':
-                return { text: text, bold: true };
-            case 'em':
-            case 'i':
-                return { text: text, italics: true };
-            default:
-                return { text: text };
-        }
-    };
-
-    // Process all body children
-    for (const child of doc.body.childNodes) {
-        const processed = processNode(child);
-        if (processed) {
-            if (Array.isArray(processed)) {
-                content.push(...processed);
-            } else {
-                content.push(processed);
-            }
-        }
-    }
-
-    // Add footer
-    content.push(
-        { text: '', margin: [0, 20, 0, 0] },
-        {
-            canvas: [
-                {
-                    type: 'line',
-                    x1: 0, y1: 0,
-                    x2: 515, y2: 0,
-                    lineWidth: 1,
-                    lineColor: '#cccccc'
-                }
-            ],
-            margin: [0, 0, 0, 10]
-        },
-        { text: 'FITZGERALD HR - AI-Powered Hospitality HR Solutions', bold: true, fontSize: 10, margin: [0, 0, 0, 4] },
-        { text: 'Email: info@fitzgeraldhr.com.au', fontSize: 9, margin: [0, 0, 0, 3] },
-        { text: `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}`, fontSize: 9, margin: [0, 0, 0, 3] },
-        { text: `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}`, fontSize: 9, margin: [0, 0, 0, 3] },
-        { text: 'For personalised advice and document review, contact our Senior Consultants.', fontSize: 9, italics: true, color: '#666666' }
-    );
-
-    // Define document with styles
-    return {
-        content: content,
-        styles: {
-            header1: {
-                fontSize: 18,
-                bold: true,
-                color: '#E2A14A',
-                decoration: 'underline',
-                decorationColor: '#E2A14A'
-            },
-            header2: {
-                fontSize: 14,
-                bold: true,
-                color: '#1E3A5F'
-            },
-            header3: {
-                fontSize: 12,
-                bold: true,
-                color: '#1E3A5F'
-            }
-        },
-        defaultStyle: {
-            fontSize: 11,
-            font: 'Roboto'
-        },
-        pageMargins: [40, 40, 40, 40]
-    };
-}
-
-async function generatePDFDocument(content, filename = 'document.pdf', metadata = {}) {
-    // ... your existing generatePDFDocument code ...
-}
+// [Removed: duplicate convertHTMLToPdfMake - keeping first version with bulletList style]
 
 
-        function generatePDFDocument(content, filename = 'document.pdf') {
+// [Removed: empty generatePDFDocument stub - was overriding pdfMake version]
+
+
+        function generatePDFDocumentPrintFallback(content, filename = 'document.pdf') {
             const printWindow = window.open('', '_blank');
             
             printWindow.document.write(`
@@ -8519,6 +8249,195 @@ formalWarning: [
     }
 ],
 
+    formalProbationReview: [
+    // STEP 1: Procedural Fairness
+    {
+        id: 1,
+        title: "Procedural Fairness & Meeting Preparation",
+        infoBox: {
+            type: 'info',
+            icon: '⚖️',
+            title: 'Why Procedural Fairness Matters',
+            content: `<p class="mb-2">A Formal Probation Review is a <strong>structured conversation</strong> to openly discuss whether the employee is meeting the requirements of the role during their probation period. To ensure fairness:</p>
+            <ul class="list-disc pl-5 space-y-1 text-sm">
+                <li>The employee must be given reasonable notice (at least 24 hours) that this meeting is taking place</li>
+                <li>The purpose of the meeting must be clearly explained — this is a formal probation review</li>
+                <li>The employee must be offered the right to bring a support person</li>
+                <li>The conversation must be two-way — the employee must have a genuine opportunity to respond</li>
+                <li>Any concerns raised must be specific, factual and supported by examples</li>
+                <li>The employee must be offered support and a clear path to improvement</li>
+                <li>Both parties retain a copy of the completed document</li>
+            </ul>
+            <p class="mt-2 text-amber-400 font-semibold text-sm">This is a development conversation with formal documentation, not a disciplinary meeting.</p>`
+        },
+        fields: [
+            {
+                name: "noticeGiven",
+                label: "Has the employee been given at least 24 hours notice of this Formal Probation Review meeting?",
+                type: "radio",
+                options: ["Yes", "No"],
+                required: true
+            },
+            {
+                name: "purposeExplained",
+                label: "Has the employee been told this is a Formal Probation Review to discuss their performance and suitability for the role?",
+                type: "radio",
+                options: ["Yes", "No"],
+                required: true
+            },
+            {
+                name: "supportPersonOffered",
+                label: "Has the employee been advised they may bring a support person if they wish?",
+                type: "radio",
+                options: ["Yes", "No"],
+                required: true
+            }
+        ]
+    },
+    // STEP 2: Probation Check-In Gate
+    {
+        id: 2,
+        title: "Prior Probation Check-In Confirmation",
+        infoBox: {
+            type: 'warning',
+            icon: '⚠️',
+            title: 'Important — Check-In Required Before This Step',
+            content: `<p class="mb-2">Generally, <strong>at least one Probation Check-In Conversation</strong> should have occurred before a Formal Probation Review.</p>
+            <p class="text-sm">The Probation Check-In is an informal, supportive conversation that documents early feedback and gives the employee an opportunity to adjust. Moving to a Formal Probation Review without a prior check-in may undermine procedural fairness.</p>
+            <p class="mt-2 text-amber-400 font-semibold text-sm">If you haven't completed a Probation Check-In yet, you'll be directed to that tool first.</p>`
+        },
+        fields: [
+            {
+                name: "priorCheckInCompleted",
+                label: "Has at least one Probation Check-In Conversation been completed with this employee before this Formal Review?",
+                type: "radio",
+                options: ["Yes", "No"],
+                required: true
+            }
+        ]
+    },
+    // STEP 3: Employee & Probation Details
+    {
+        id: 3,
+        title: "Employee & Probation Details",
+        fields: [
+            { name: "employeeName", label: "Employee's full name", type: "text", required: true, placeholder: "e.g., Sarah Johnson" },
+            { name: "position", label: "Position/Role", type: "text", required: true, placeholder: "e.g., Bartender" },
+            { name: "peopleLeader", label: "People Leader / Manager conducting the review", type: "text", required: true, placeholder: "Your name" },
+            { name: "meetingDate", label: "Meeting date", type: "date", required: true },
+            { name: "employmentType", label: "Employment Type", type: "select",
+              options: ["Full-Time", "Part-Time", "Casual"], required: true },
+            { name: "startDate", label: "Employment start date", type: "date", required: true },
+            { name: "probationEndDate", label: "Probation end date", type: "date", required: true }
+        ]
+    },
+    // STEP 4: Previous Check-In Conversations
+    {
+        id: 4,
+        title: "Previous Coaching & Check-In Conversations",
+        infoBox: {
+            type: 'tip',
+            icon: '💡',
+            title: 'Document Prior Conversations',
+            content: '<p>List all prior coaching conversations and/or Probation Check-Ins that have occurred. This establishes the history of support and feedback the employee has received.</p>'
+        },
+        fields: [
+            { name: "checkInHistory", label: "List previous check-in/coaching conversations (date and brief overview of each)",
+              type: "textarea", required: true, rows: 5,
+              placeholder: "e.g.,\n• 15 Jan 2026 — Informal catch-up: Discussed settling in, answered questions about rosters and POS system\n• 29 Jan 2026 — Probation Check-In #1: Reviewed key requirements, identified speed of service as area for development, agreed to buddy shifts with senior staff\n• 12 Feb 2026 — Ad hoc coaching: Discussed customer complaint regarding wait times, provided real-time feedback on section management" }
+        ]
+    },
+    // STEP 5: Review of Performance — Strengths
+    {
+        id: 5,
+        title: "Review of Performance — Strengths",
+        infoBox: {
+            type: 'tip',
+            icon: '✅',
+            title: 'Acknowledge What Is Working',
+            content: '<p>Discuss the areas of performance and/or behaviours that <strong>are</strong> currently meeting the required standards. Be specific and use examples — recognition motivates continued positive performance.</p>'
+        },
+        fields: [
+            { name: "strengths", label: "What areas of performance and/or behaviour ARE currently meeting the required standards?",
+              type: "textarea", required: true, rows: 4,
+              placeholder: "e.g.,\n• Punctuality and attendance have been excellent — no unexplained absences\n• Positive attitude with guests — received two written compliments\n• Follows WHS procedures consistently\n• Works well with the team and communicates during service" },
+            { name: "strengthsComments", label: "Additional comments on strengths (specific examples)",
+              type: "textarea", required: false, rows: 3,
+              placeholder: "e.g., Sarah has shown strong initiative in learning the wine list and regularly asks questions to improve her product knowledge." }
+        ]
+    },
+    // STEP 6: Opportunities for Development
+    {
+        id: 6,
+        title: "Opportunities for Development",
+        infoBox: {
+            type: 'info',
+            icon: '📈',
+            title: 'Be Specific and Fair',
+            content: '<p>Discuss the areas of performance and/or behaviours that are <strong>not</strong> currently meeting the required standards. Be specific with examples and dates. This is an opportunity for the employee to understand exactly what needs to change and to respond with their perspective.</p>'
+        },
+        fields: [
+            { name: "developmentAreas", label: "What areas of performance and/or behaviour are NOT currently meeting the required standards?",
+              type: "textarea", required: true, rows: 4,
+              placeholder: "e.g.,\n• Speed of service during peak periods — average table turn time is 15 mins above target\n• Accuracy of orders — 3 incorrect orders in the past 2 weeks\n• Needs to be more proactive seeking tasks during quiet periods rather than waiting to be directed" },
+            { name: "developmentComments", label: "Additional comments on development areas (specific examples and context)",
+              type: "textarea", required: false, rows: 3,
+              placeholder: "e.g., On Friday 7 Feb, section turnaround during the 7pm rush took 25 minutes compared to the 10-minute target. Two tables received incorrect mains." },
+            { name: "conductConcerns", label: "Are there any conduct or compliance concerns? (If yes, describe)",
+              type: "textarea", required: false, rows: 2,
+              placeholder: "e.g., No conduct or compliance concerns at this time. OR: One instance of incorrect uniform on 3 Feb — addressed verbally at the time." }
+        ]
+    },
+    // STEP 7: Action Plan
+    {
+        id: 7,
+        title: "Action Plan — Agreed Actions",
+        infoBox: {
+            type: 'tip',
+            icon: '🎯',
+            title: 'Focus on Actions and Outcomes',
+            content: '<p>The most effective Action Plans focus on <strong>behaviours and actions</strong> (inputs) rather than just metrics and outcomes (outputs). Include agreed actions for <strong>both</strong> the employee and the leader — probation is a two-way street.</p>'
+        },
+        fields: [
+            { name: "agreedActions", label: "Agreed actions to improve performance — what specifically will be done, by whom, and by when?",
+              type: "textarea", required: true, rows: 5,
+              placeholder: "e.g.,\nEmployee:\n• Focus on speed of service during Friday/Saturday peaks — aim for 10-min table turns\n• Double-check all orders before sending to kitchen\n• Proactively ask supervisor for tasks during quiet periods\n\nLeader:\n• Arrange buddy shifts with Senior Waiter (James) for next 2 weeks\n• Provide real-time coaching during Friday/Saturday peak services\n• Continue fortnightly check-ins to review progress" },
+            { name: "trainingAndSupport", label: "What additional training or support will be provided?",
+              type: "textarea", required: true, rows: 3,
+              placeholder: "e.g.,\n• Advanced POS refresher training (split bills, modifications) — scheduled Week of 17 Feb\n• Shadow senior staff during 2 weekend peak shifts\n• Menu knowledge quiz to build confidence" },
+            { name: "nextReviewDate", label: "When will the next review take place to assess progress?", type: "date", required: true }
+        ]
+    },
+    // STEP 8: Employee Feedback & Key Messages
+    {
+        id: 8,
+        title: "Employee Feedback & Key Messages",
+        infoBox: {
+            type: 'info',
+            icon: '💬',
+            title: 'The Employee\'s Voice Matters',
+            content: '<p>This section captures the employee\'s self-assessment and any barriers they\'re facing. It also sets out the key messages that should be clearly communicated during the meeting. The AI will generate these based on the information you\'ve provided.</p>'
+        },
+        fields: [
+            { name: "employeeSelfAssessment", label: "Employee's comments/feedback — how do they feel they are performing? Any barriers or support needed?",
+              type: "textarea", required: false, rows: 4,
+              placeholder: "Leave blank if you want to complete this section during the meeting with the employee. Or pre-fill with anything they've already communicated.\n\ne.g., Employee feels they are settling in well but finds Friday nights overwhelming. Would like more guidance on handling large party bookings." },
+            { name: "overallOutcome", label: "What is the overall outcome of this Formal Probation Review?", type: "select",
+              options: [
+                "On track — employee is meeting expectations, continue to support",
+                "On track with development areas — minor concerns addressed with clear action plan",
+                "At risk — significant concerns raised, improvement required within clear timeframe",
+                "Recommend extending probation period (if applicable)",
+                "Recommend confirming employment — probation passed",
+                "Recommend ending employment during probation"
+              ],
+              required: true },
+            { name: "additionalNotes", label: "Any additional notes or context for the AI to consider?",
+              type: "textarea", required: false, rows: 2 }
+        ]
+    }
+],
+
     performanceImprovementPlan: [
         // Step 1: Employee Details
         {
@@ -8760,7 +8679,26 @@ function showDocumentStep(stepNumber) {
     document.getElementById('docProgressBar').style.width = `${progress}%`;
     
     // Build step HTML
-    let html = `<h3 class="text-xl font-bold text-white mb-4">${step.title}</h3><div class="space-y-4">`;
+    let html = `<h3 class="text-xl font-bold text-white mb-4">${step.title}</h3>`;
+    
+    // Render infoBox if present
+    if (step.infoBox) {
+        const box = step.infoBox;
+        const bgColor = box.type === 'warning' ? 'bg-amber-500/10 border-amber-500' : 
+                         box.type === 'tip' ? 'bg-blue-500/10 border-blue-500' : 
+                         'bg-teal-500/10 border-teal-500';
+        const textColor = box.type === 'warning' ? 'text-amber-400' : 
+                          box.type === 'tip' ? 'text-blue-400' : 
+                          'text-teal-400';
+        html += `<div class="mb-4 p-4 ${bgColor} border rounded-lg">
+            <p class="${textColor} font-bold text-sm flex items-center gap-2 mb-2">
+                <span>${box.icon}</span> ${box.title}
+            </p>
+            <div class="text-slate-300 text-sm">${box.content}</div>
+        </div>`;
+    }
+    
+    html += `<div class="space-y-4">`;
     
     step.fields.forEach(field => {
         // Check conditional display
@@ -9057,6 +8995,13 @@ function docWizardNext() {
         }
     }
     
+    // ✅ VALIDATION FOR FORMAL PROBATION REVIEW
+    if (documentBuilderState.currentType === 'formalProbationReview') {
+        if (!validateFormalProbationReview()) {
+            return;
+        }
+    }
+    
     // Move to next step or generate
     if (documentBuilderState.currentStep < documentBuilderState.totalSteps) {
         documentBuilderState.currentStep++;
@@ -9236,30 +9181,137 @@ function validateRecordOfDiscussionStep2() {
     return true;
 }
 
-function validateRecordOfDiscussionStep2() {
-    const notice24hours = documentBuilderState.data.notice24hours;
-    const supportPersonOffered = documentBuilderState.data.supportPersonOffered;
-    
-    // Check 24 hours notice
-    if (notice24hours === 'No') {
-        alert('⚠️ IMPORTANT: You must provide the employee with 24 hours notice before the meeting.\n\n' +
-              'This is a requirement of procedural fairness.\n\n' +
-              'Please schedule the meeting for at least 24 hours from now before continuing.');
-        return false;
+// ✅ VALIDATION FOR FORMAL PROBATION REVIEW
+function validateFormalProbationReview() {
+    // Step 1: Procedural Fairness
+    if (documentBuilderState.currentStep === 1) {
+        const noticeGiven = documentBuilderState.data.noticeGiven;
+        const purposeExplained = documentBuilderState.data.purposeExplained;
+        const supportPersonOffered = documentBuilderState.data.supportPersonOffered;
+        
+        if (noticeGiven === 'No') {
+            alert(
+                '⚠️ PROCEDURAL FAIRNESS REQUIRED\n\n' +
+                'You must provide the employee with at least 24 hours notice of this Formal Probation Review meeting.\n\n' +
+                'This is a requirement of procedural fairness.\n\n' +
+                'Please schedule the meeting for at least 24 hours from now before continuing.'
+            );
+            documentBuilderState.data.noticeGiven = '';
+            showDocumentStep(documentBuilderState.currentStep);
+            return false;
+        }
+        
+        if (purposeExplained === 'No') {
+            alert(
+                '⚠️ PROCEDURAL FAIRNESS REQUIRED\n\n' +
+                'The employee must be told the purpose of this meeting before it takes place.\n\n' +
+                'They need to know this is a Formal Probation Review so they can:\n' +
+                '• Prepare their own reflections\n' +
+                '• Arrange a support person if desired\n' +
+                '• Gather any relevant information\n\n' +
+                'Please inform the employee of the meeting purpose before continuing.'
+            );
+            documentBuilderState.data.purposeExplained = '';
+            showDocumentStep(documentBuilderState.currentStep);
+            return false;
+        }
+        
+        if (supportPersonOffered === 'No') {
+            alert(
+                '⚠️ PROCEDURAL FAIRNESS REQUIRED\n\n' +
+                'You must offer the employee the right to bring a support person.\n\n' +
+                'A support person can be:\n' +
+                '• A family member or friend\n' +
+                '• A union representative\n' +
+                '• A fellow employee (if appropriate)\n\n' +
+                'Please inform the employee of this right before continuing.'
+            );
+            documentBuilderState.data.supportPersonOffered = '';
+            showDocumentStep(documentBuilderState.currentStep);
+            return false;
+        }
+        
+        return true;
     }
     
-    // Check support person
-    if (supportPersonOffered === 'No') {
-        alert('⚠️ IMPORTANT: You must offer the employee the right to bring a support person.\n\n' +
-              'A support person can be:\n' +
-              '• A family member or friend\n' +
-              '• A union representative\n' +
-              '• A fellow employee (if appropriate and no conflict of interest)\n\n' +
-              'Please inform the employee of this right before continuing.');
-        return false;
+    // Step 2: Prior Probation Check-In Gate
+    if (documentBuilderState.currentStep === 2) {
+        const priorCheckIn = documentBuilderState.data.priorCheckInCompleted;
+        
+        if (priorCheckIn === 'No') {
+            // Show popup with link to Probation Check-In tool
+            showProbationCheckInRequiredPopup();
+            return false;
+        }
+        
+        return true;
     }
     
     return true;
+}
+
+// Popup when user hasn't completed a Probation Check-In
+function showProbationCheckInRequiredPopup() {
+    // Create modal overlay
+    const popup = document.createElement('div');
+    popup.id = 'probationCheckInRequiredPopup';
+    popup.className = 'fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-[60]';
+    popup.innerHTML = `
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-lg w-full border-2 border-amber-500 fade-in">
+            <div class="text-center mb-6">
+                <div class="text-6xl mb-4">⚠️</div>
+                <h3 class="text-xl font-bold text-amber-400 mb-2">Probation Check-In Required</h3>
+                <p class="text-slate-300 text-sm leading-relaxed">
+                    Generally, at least one <strong class="text-white">Probation Check-In Conversation</strong> should be completed before conducting a Formal Probation Review.
+                </p>
+            </div>
+            
+            <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 mb-6">
+                <p class="text-amber-300 text-sm mb-2"><strong>Why?</strong></p>
+                <ul class="text-slate-300 text-sm space-y-1">
+                    <li>• It gives the employee early feedback and a chance to improve</li>
+                    <li>• It demonstrates you've provided support before escalating</li>
+                    <li>• It strengthens your procedural fairness position</li>
+                    <li>• It creates a documented history of the employee's progress</li>
+                </ul>
+            </div>
+            
+            <div class="space-y-3">
+                <button onclick="openProbationCheckInFromPopup()" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-2">
+                    <span>🔄</span> Open Probation Check-In Tool
+                </button>
+                <button onclick="closeProbationCheckInRequiredPopup()" 
+                        class="w-full bg-slate-700 hover:bg-slate-600 text-white py-3 px-6 rounded-lg transition-all text-sm">
+                    ← Go Back to Formal Probation Review
+                </button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(popup);
+}
+
+function openProbationCheckInFromPopup() {
+    // Close the popup
+    closeProbationCheckInRequiredPopup();
+    // Close the document builder modal
+    closeToolModal('documentBuilderModal');
+    // Reset document builder state
+    resetDocumentBuilderSilent();
+    // Open the Probation Check-In tool
+    if (typeof openProbationCheckIn === 'function') {
+        openProbationCheckIn();
+    }
+}
+
+function closeProbationCheckInRequiredPopup() {
+    const popup = document.getElementById('probationCheckInRequiredPopup');
+    if (popup) {
+        popup.remove();
+    }
+    // Reset the answer so they can try again
+    documentBuilderState.data.priorCheckInCompleted = '';
+    showDocumentStep(documentBuilderState.currentStep);
 }
 
 function docWizardGoBack() {
@@ -9942,6 +9994,196 @@ Include:
 - Signature section
 
 TONE: Professional, neutral, procedurally fair. This is NOT a punishment - it's the start of a fair process.`;
+	
+    } else if (type === 'formalProbationReview') {
+        prompt = `You are generating a FORMAL PROBATION REVIEW DOCUMENT for Australian hospitality HR.
+
+The purpose of this Formal Probation Review Document is to guide an open and honest discussion about performance and/or behaviours in probation, including support the employee may need.
+
+The probation period is an opportunity for the venue and the employee to determine the employee's suitability for the role and culture fit.
+
+THIS IS A TEMPLATE & CONVERSATION GUIDE — the manager will use this during the actual meeting with the employee and complete sections together.
+
+VENUE CONTEXT:
+${venueContext}
+Award: Hospitality Industry (General) Award MA000009
+
+EMPLOYEE DETAILS:
+- Employee Name: ${data.employeeName}
+- Position: ${data.position}
+- People Leader: ${data.peopleLeader}
+- Meeting Date: ${data.meetingDate}
+- Employment Type: ${data.employmentType}
+- Start Date: ${data.startDate}
+- Probation End Date: ${data.probationEndDate}
+
+PREVIOUS CHECK-IN/COACHING CONVERSATIONS:
+${data.checkInHistory}
+
+REVIEW OF PERFORMANCE — STRENGTHS:
+Areas currently meeting the required standards:
+${data.strengths}
+${data.strengthsComments ? `Additional comments: ${data.strengthsComments}` : ''}
+
+OPPORTUNITIES FOR DEVELOPMENT:
+Areas NOT currently meeting the required standards:
+${data.developmentAreas}
+${data.developmentComments ? `Additional comments: ${data.developmentComments}` : ''}
+${data.conductConcerns ? `Conduct/compliance concerns: ${data.conductConcerns}` : 'No conduct or compliance concerns noted.'}
+
+ACTION PLAN:
+Agreed actions:
+${data.agreedActions}
+
+Training and support to be provided:
+${data.trainingAndSupport}
+
+Next review date: ${data.nextReviewDate}
+
+EMPLOYEE FEEDBACK:
+${data.employeeSelfAssessment || 'To be completed during the meeting with the employee.'}
+
+OVERALL OUTCOME: ${data.overallOutcome}
+${data.additionalNotes ? `Additional notes: ${data.additionalNotes}` : ''}
+
+**CRITICAL FORMATTING REQUIREMENTS:**
+1. Use ## for major sections
+2. Use blank lines between ALL paragraphs and sections
+3. Use **text** for emphasis on key headings only
+4. For lists, use bullet points with "• " prefix
+5. Structure clearly with proper spacing
+6. ALWAYS add a space after colons in labels (e.g., "Date: " not "Date:")
+7. Include writable lines (______) for sections completed during the meeting
+
+Generate a complete, professional Formal Probation Review Document with the following structure:
+
+## FORMAL PROBATION REVIEW DOCUMENT
+
+*Start with a brief purpose statement: "The purpose of this Formal Probation Review Document is to guide an open and honest discussion about performance and/or behaviours in probation, including support the employee may need."*
+
+*Add: "The probation period is an opportunity for [venue name] and the employee to determine the employee's suitability for the role and culture fit."*
+
+*Add: "Generally, at least one Probation Check-In Conversation has occurred before a Formal Probation Review."*
+
+## EMPLOYEE DETAILS
+
+Create a clear details table with:
+- Employee Name: ${data.employeeName}
+- Position: ${data.position}
+- People Leader: ${data.peopleLeader}
+- Meeting Date: ${data.meetingDate}
+- Employment Start Date: ${data.startDate}
+- Probation End Date: ${data.probationEndDate}
+
+## PREVIOUS COACHING & CHECK-IN CONVERSATIONS
+
+*Add: "The following coaching and/or check-in conversations have occurred:"*
+
+List each conversation from the provided history as bullet points with date and overview. Format as:
+• [date] — [overview of conversation]
+
+## REVIEW OF PERFORMANCE
+
+### Strengths
+
+*Add: "Discuss the areas of performance and/or behaviours that ARE currently meeting the required standards."*
+
+Expand the provided strengths into clear, professional bullet points with specific examples. Then add a comments section:
+
+Comments:
+__________________________________________________________________________________
+__________________________________________________________________________________
+__________________________________________________________________________________
+
+### Opportunities for Development
+
+*Add: "Discuss the areas of performance and/or behaviours that are NOT currently meeting the required standards."*
+
+Expand the provided development areas into clear, professional bullet points with specific examples. Then add a comments section:
+
+Comments:
+__________________________________________________________________________________
+__________________________________________________________________________________
+__________________________________________________________________________________
+
+${data.conductConcerns ? `*Add a note about conduct/compliance matters if applicable: "${data.conductConcerns}"*` : '*Add: "Conduct or compliance breaches? Contact Fitzgerald HR: info@fitzgeraldhr.com.au"*'}
+
+## ACTION PLAN
+
+*Add: "What is to be done, who will do it, when it needs to be completed. The most effective Action Plans focus on behaviours and actions (inputs) rather than metrics and outcomes (outputs)."*
+
+*Add: "To help improve performance and/or behaviours to the required standard, the following action plan is agreed:"*
+
+Create a clear action plan table/section with columns:
+- Agreed Actions | By Whom | By When
+
+Expand the provided agreed actions into the table. Include BOTH employee actions AND leader actions.
+
+Then add the training and support section with specific details.
+
+Next Review Date: ${data.nextReviewDate}
+
+## EMPLOYEE'S COMMENTS/FEEDBACK
+
+*Add: "Ask the employee for their self-assessment on their performance and/or behaviours, including any barriers they are facing, support they need, and feedback for you as their leader."*
+
+${data.employeeSelfAssessment ? `Pre-filled: ${data.employeeSelfAssessment}` : ''}
+
+Comments:
+__________________________________________________________________________________
+__________________________________________________________________________________
+__________________________________________________________________________________
+__________________________________________________________________________________
+
+## KEY MESSAGES
+
+*Add: "The following points were discussed and agreed (adjust as appropriate):"*
+
+Based on the overall outcome "${data.overallOutcome}", generate appropriate key messages. These should be specific bullet points that summarise what was discussed and agreed. Include messages like:
+
+${data.overallOutcome.includes('On track') ? 
+`- The employee is currently meeting the required performance and/or behavioural standards for their role
+- Areas of strength have been acknowledged and areas for continued development have been identified
+- Both parties have agreed on an action plan for the next period
+- A follow-up review will take place on ${data.nextReviewDate} to continue tracking progress` :
+data.overallOutcome.includes('At risk') || data.overallOutcome.includes('Significant') ?
+`- The employee is not currently meeting the required performance and/or behavioural standards required of their role
+- The employee will need to address these performance or behavioural gaps and show sufficient improvement to be considered suitable for ongoing employment
+- We have discussed and confirmed that the employee has received appropriate training to date to understand and perform the requirements of their role
+- Both parties have agreed on an action plan with specific, measurable improvements required
+- Another meeting will take place on ${data.nextReviewDate} to review their progress and to determine next steps` :
+data.overallOutcome.includes('ending employment') ?
+`- The employee has not demonstrated sufficient improvement during the probation period despite support and feedback provided
+- The requirements of the role and expected standards were clearly communicated
+- Support, training and regular feedback were provided throughout the probation period
+- The employee was given a genuine opportunity to improve
+- The decision to end employment during the probation period has been made in accordance with procedural fairness` :
+`- Generate 4-5 appropriate key messages based on the outcome: ${data.overallOutcome}`}
+
+*Add: "Should the employee feel they need any support in dealing with this matter, confidential independent professional counsellors can be contacted for a range of issues." (Include an EAP reference if the venue has one)*
+
+## SIGNATURES
+
+People Leader's Signature: _________________________ Date: __ / __ / ____
+
+Employee's Signature: _________________________ Date: __ / __ / ____
+
+---
+
+**IMPORTANT REMINDERS:**
+
+✓ Both parties should retain a copy of this completed document
+✓ This document forms part of the employee's probation record
+✓ Any serious concerns should be escalated to Fitzgerald HR: info@fitzgeraldhr.com.au
+✓ The tone throughout should be supportive and developmental — firm where needed but always fair
+
+**⚠️ All generated documents must be reviewed by a Fitzgerald HR consultant before use.**
+
+Contact: info@fitzgeraldhr.com.au
+
+TONE: Professional, supportive, and fair. This is a development conversation — not a disciplinary meeting. Be specific with examples, balanced in acknowledging strengths and identifying areas for improvement, and constructive in the action plan. The document should demonstrate genuine procedural fairness.
+
+DO NOT add fictional details. Expand and contextualise what was provided. DO NOT reference any other organisations by name.`;
 	
     } else if (type === 'performanceImprovementPlan') {
         prompt = `You are generating a PERFORMANCE IMPROVEMENT PLAN (PIP) for Australian hospitality HR.
@@ -27304,10 +27546,10 @@ async function generateEmploymentContract() {
         
         if (format === 'docx') {
             // Generate Word document using html-docx-js
-            await generateWordDocument(contractHTML);
+            await generateContractWordDocument(contractHTML);
         } else {
             // Generate PDF
-            await generatePDFDocument(contractHTML);
+            await generateContractPDFDocument(contractHTML);
         }
         
         // Mark as saved
@@ -27799,7 +28041,7 @@ function generateNoticeSection(noticeData) {
     return html;
 }
 
-async function generateWordDocument(html) {
+async function generateContractWordDocument(html) {
     try {
         // Use the html-docx-js library that's already loaded
         const converted = htmlDocx.asBlob(html);
@@ -27814,7 +28056,7 @@ async function generateWordDocument(html) {
     }
 }
 
-async function generatePDFDocument(html) {
+async function generateContractPDFDocument(html) {
     try {
         // Use pdfmake which is already loaded
         const docDefinition = {
