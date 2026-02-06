@@ -5986,8 +5986,8 @@ function setBilling(billing) {
 <!-- ========================================== -->
 <!-- CONSULTATION BOOKING MODAL (Main booking flow) -->
 <!-- ========================================== -->
-<div id="consultationBookingModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
-    <div class="bg-slate-800 rounded-2xl max-w-2xl w-full border border-purple-500/50 fade-in my-4">
+<div id="consultationBookingModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-start justify-center p-4 z-50 overflow-y-auto">
+    <div class="bg-slate-800 rounded-2xl max-w-3xl w-full border border-purple-500/50 fade-in my-4">
         
         <!-- Header -->
         <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-t-2xl p-6 text-center relative">
@@ -6189,9 +6189,9 @@ function setBilling(billing) {
                 </h3>
                 
                 <!-- Calendly Container -->
-                <div id="calendlyContainer" class="bg-white rounded-xl overflow-hidden" style="min-height: 600px;">
+                <div id="calendlyContainer" class="bg-white rounded-xl overflow-hidden" style="min-height: 700px;">
                     <!-- Calendly inline widget will be loaded here -->
-                    <div id="calendlyPlaceholder" class="flex items-center justify-center h-96 bg-slate-100">
+                    <div id="calendlyPlaceholder" class="flex items-center justify-center bg-slate-100" style="height: 650px;">
                         <div class="text-center">
                             <div class="animate-spin text-4xl mb-4">⏳</div>
                             <p class="text-slate-600">Loading calendar...</p>
@@ -12102,7 +12102,7 @@ function closeConsultationBookingModal() {
     const calendlyContainer = document.getElementById('calendlyContainer');
     if (calendlyContainer) {
         calendlyContainer.innerHTML = `
-            <div id="calendlyPlaceholder" class="flex items-center justify-center h-96 bg-slate-100">
+            <div id="calendlyPlaceholder" class="flex items-center justify-center bg-slate-100" style="height: 650px;">
                 <div class="text-center">
                     <div class="animate-spin text-4xl mb-4">⏳</div>
                     <p class="text-slate-600">Loading calendar...</p>
@@ -12351,7 +12351,7 @@ function loadCalendlyWidget() {
     } else {
         // Show manual booking fallback
         container.innerHTML = `
-            <div class="flex flex-col items-center justify-center h-96 bg-slate-100 rounded-xl p-6">
+            <div class="flex flex-col items-center justify-center bg-slate-100 rounded-xl p-6" style="height: 650px;">
                 <div class="text-5xl mb-4">📅</div>
                 <h3 class="text-xl font-bold text-slate-800 mb-2">Book Your Consultation</h3>
                 <p class="text-slate-600 text-center mb-6">Click the button below to select your preferred time slot.</p>
