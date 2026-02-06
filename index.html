@@ -10475,26 +10475,30 @@ async function generateDocumentWithAI() {
             documentBuilderState.lastGeneratedDocId = logResult.id;
         }
         
+        // ✅ Store docType and docName BEFORE closing modal (which resets state)
+        const currentDocType = docType;
+        const currentDocName = CONFIG.CREDITS.DOCUMENT_COSTS[docType]?.name || 'Document';
+        
         // Close document builder modal
         closeToolModal('documentBuilderModal');
         
         // ✅ CHECK IF USER CAN AFFORD - Apply blur if not
-        const shouldBlur = shouldBlurDocument(docType);
+        const shouldBlur = shouldBlurDocument(currentDocType);
         
         // Show preview modal
         showDocumentPreview(response);
         
-        // Apply blur after preview is shown
+        // Apply blur after preview is shown (pass stored values)
         if (shouldBlur) {
             setTimeout(() => {
-                applyDocumentBlur();
+                applyDocumentBlur(currentDocType, currentDocName);
             }, 100);
         }
         
         trackEvent('document_generated_ai', {
             user: currentUser,
-            type: documentBuilderState.currentType,
-            employeeName: documentBuilderState.data.employeeName,
+            type: currentDocType,
+            employeeName: documentBuilderState.data?.employeeName,
             blurred: shouldBlur
         });
         
@@ -12352,10 +12356,19 @@ function showNotification(message, type = 'info') {
 /**
  * Apply blur to document preview (for unpaid documents)
  * Shows first ~25-30 lines clearly, then blurs the rest
+ * @param {string} docType - Document type for unlock modal
+ * @param {string} docName - Document name for display
  */
-function applyDocumentBlur() {
+function applyDocumentBlur(docType, docName) {
     const previewContent = document.getElementById('documentPreviewContent');
     if (!previewContent) return;
+    
+    // Store docType in the preview modal for the unlock button
+    const previewModal = document.getElementById('documentPreviewModal');
+    if (previewModal) {
+        previewModal.dataset.docType = docType || '';
+        previewModal.dataset.docName = docName || 'Document';
+    }
     
     // Make preview container relative for absolute positioning
     const previewContainer = previewContent.parentElement;
@@ -12422,7 +12435,7 @@ function applyDocumentBlur() {
             <div class="text-4xl mb-3">🔒</div>
             <h3 class="text-xl font-bold text-white mb-2">Preview Only</h3>
             <p class="text-slate-300 text-sm mb-4">Unlock this document to view the full content and download.</p>
-            <button onclick="openDocumentUnlockModal('${documentBuilderState.currentType}', '${CONFIG.CREDITS.DOCUMENT_COSTS[documentBuilderState.currentType]?.name || 'Document'}')" 
+            <button onclick="openDocumentUnlockModal('${docType}', '${docName}')" 
                     class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-6 rounded-lg transition-all">
                 Unlock Document
             </button>
