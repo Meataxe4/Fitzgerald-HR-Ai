@@ -275,6 +275,35 @@ body.light-mode {
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
 }
 
+/* Credits display in header - LIGHT MODE */
+.light-mode #creditsDisplay {
+    background-color: #f1f5f9 !important;
+    border: 2px solid #cbd5e1 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.light-mode #creditsDisplay span.text-slate-300 {
+    color: #475569 !important;
+}
+
+.light-mode #creditsDisplay span.text-amber-400 {
+    color: #d97706 !important;
+}
+
+.light-mode #promptsCounter {
+    background-color: #2563eb !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+}
+
+.light-mode #promptsCounter.bg-amber-600 {
+    background-color: #d97706 !important;
+}
+
+.light-mode #promptsCounter.bg-red-600 {
+    background-color: #dc2626 !important;
+}
+
 /* Message input box - ULTRA CLEAR */
 .light-mode #messageInput {
     background-color: #ffffff !important;
@@ -3549,7 +3578,7 @@ function continueWithEmail() {
                 </div>
                 <div id="headerTitle">
                     <h1 class="text-lg md:text-xl font-bold text-white">Fitz</h1>
-                    <p class="text-xs text-slate-400">Beta - <span id="userCode"></span></p>
+                    <p id="headerSubtitle" class="text-xs text-slate-400"><span id="userTierDisplay">Free</span> Plan</p>
                 </div>
             </div>
 
@@ -3557,15 +3586,14 @@ function continueWithEmail() {
             <div id="headerRight" class="flex items-center gap-2 text-sm">
                 
                 <!-- Credits Display -->
-                <div id="creditsDisplay" class="hidden flex items-center gap-2 bg-slate-700/50 rounded-lg px-3 py-2">
+                <div id="creditsDisplay" class="hidden flex items-center gap-2 bg-slate-900/80 border border-slate-600 rounded-lg px-3 py-2">
                     <div class="flex items-center gap-1">
                         <span class="text-amber-400">💳</span>
                         <span id="creditsBalance" class="font-bold text-green-400">0</span>
-                        <span class="text-slate-400 text-xs">credits</span>
+                        <span class="text-slate-300 text-xs">credits</span>
                     </div>
-                    <div id="promptsDisplay" class="hidden border-l border-slate-600 pl-2 ml-1">
-                        <span class="text-slate-400 text-xs">Prompts: </span>
-                        <span class="text-blue-400 text-xs font-medium">20/20</span>
+                    <div id="promptsDisplay" class="hidden border-l border-slate-500 pl-2 ml-1">
+                        <span id="promptsCounter" class="text-white text-xs font-semibold bg-blue-600 px-2 py-0.5 rounded">20/20</span>
                     </div>
                     <button onclick="openCreditsModal()" class="text-amber-400 hover:text-amber-300 ml-1" title="Manage Credits">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -6589,11 +6617,36 @@ function initializeUserCredits() {
             if (!resetDate || now.getMonth() !== resetDate.getMonth() || now.getFullYear() !== resetDate.getFullYear()) {
                 userCredits.monthlyPromptsUsed = 0;
                 userCredits.monthlyPromptsReset = now.toISOString();
+                
+                // For subscribers, refresh monthly credits
+                if (userCredits.tier !== 'free') {
+                    const tierConfig = CONFIG.CREDITS.TIERS[userCredits.tier];
+                    if (tierConfig) {
+                        // Add monthly credits (respecting rollover max)
+                        const newCredits = userCredits.subscriptionCredits + tierConfig.monthlyCredits;
+                        userCredits.subscriptionCredits = Math.min(newCredits, tierConfig.maxBanked);
+                    }
+                }
+                
                 saveUserCredits();
             }
         } catch (e) {
             console.error('Error parsing credits:', e);
         }
+    } else {
+        // New user - initialize with free tier defaults
+        userCredits = {
+            balance: 0,
+            tier: 'free',
+            monthlyPromptsUsed: 0,
+            monthlyPromptsReset: new Date().toISOString(),
+            freeDocumentUsed: false,
+            activeBundles: [],
+            purchasedCredits: 0,
+            subscriptionCredits: 0,
+            lastCreditRefresh: null
+        };
+        saveUserCredits();
     }
     
     updateCreditsDisplay();
@@ -6715,32 +6768,74 @@ function updateCreditsDisplay() {
     const creditsDisplay = document.getElementById('creditsDisplay');
     const creditsBalance = document.getElementById('creditsBalance');
     const promptsDisplay = document.getElementById('promptsDisplay');
+    const promptsCounter = document.getElementById('promptsCounter');
+    const userTierDisplay = document.getElementById('userTierDisplay');
     
     if (creditsDisplay) {
         creditsDisplay.classList.remove('hidden');
     }
     
-    if (creditsBalance) {
-        const total = getTotalCredits();
-        creditsBalance.textContent = total;
+    // Update tier display in header
+    if (userTierDisplay) {
+        const tierName = CONFIG.CREDITS.TIERS[userCredits.tier]?.name || 'Free';
+        userTierDisplay.textContent = tierName;
         
-        // Color code based on balance
-        creditsBalance.classList.remove('text-green-400', 'text-amber-400', 'text-red-400');
-        if (total >= 10) {
-            creditsBalance.classList.add('text-green-400');
-        } else if (total >= 3) {
-            creditsBalance.classList.add('text-amber-400');
+        // Color code by tier
+        userTierDisplay.classList.remove('text-slate-400', 'text-blue-400', 'text-amber-400', 'text-purple-400');
+        if (userCredits.tier === 'enterprise') {
+            userTierDisplay.classList.add('text-purple-400');
+        } else if (userCredits.tier === 'professional') {
+            userTierDisplay.classList.add('text-amber-400');
+        } else if (userCredits.tier === 'starter') {
+            userTierDisplay.classList.add('text-blue-400');
         } else {
-            creditsBalance.classList.add('text-red-400');
+            userTierDisplay.classList.add('text-slate-400');
         }
     }
     
-    if (promptsDisplay && userCredits.tier === 'free') {
-        const remaining = getRemainingPrompts();
-        promptsDisplay.textContent = `${remaining}/${CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS}`;
-        promptsDisplay.classList.remove('hidden');
-    } else if (promptsDisplay) {
-        promptsDisplay.classList.add('hidden');
+    if (creditsBalance) {
+        const total = getTotalCredits();
+        
+        // For free tier, show "1 free" if they haven't used their free document
+        if (userCredits.tier === 'free' && !userCredits.freeDocumentUsed && total === 0) {
+            creditsBalance.textContent = '1 free';
+            creditsBalance.classList.remove('text-green-400', 'text-amber-400', 'text-red-400');
+            creditsBalance.classList.add('text-green-400');
+        } else {
+            creditsBalance.textContent = total;
+            
+            // Color code based on balance
+            creditsBalance.classList.remove('text-green-400', 'text-amber-400', 'text-red-400');
+            if (total >= 10) {
+                creditsBalance.classList.add('text-green-400');
+            } else if (total >= 3) {
+                creditsBalance.classList.add('text-amber-400');
+            } else {
+                creditsBalance.classList.add('text-red-400');
+            }
+        }
+    }
+    
+    // Update prompts display for free tier
+    if (promptsDisplay && promptsCounter) {
+        if (userCredits.tier === 'free') {
+            const remaining = getRemainingPrompts();
+            promptsCounter.textContent = `${remaining}/${CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS}`;
+            promptsDisplay.classList.remove('hidden');
+            
+            // Color code prompts based on remaining
+            promptsCounter.classList.remove('bg-blue-600', 'bg-amber-600', 'bg-red-600');
+            if (remaining > 10) {
+                promptsCounter.classList.add('bg-blue-600');
+            } else if (remaining > 5) {
+                promptsCounter.classList.add('bg-amber-600');
+            } else {
+                promptsCounter.classList.add('bg-red-600');
+            }
+        } else {
+            // Paid tiers get unlimited prompts
+            promptsDisplay.classList.add('hidden');
+        }
     }
 }
 
@@ -11938,6 +12033,10 @@ async function initiateStripeCheckout(priceKey) {
         const userKey = currentUser?.uid || currentUser || 'anonymous';
         const userEmail = currentUser?.email || null;
         
+        // Determine what's being purchased and store for return
+        const purchaseInfo = getPurchaseInfo(priceKey);
+        localStorage.setItem('pendingPurchase', JSON.stringify(purchaseInfo));
+        
         // Call our Netlify function to create checkout session
         const response = await fetch('/.netlify/functions/stripe-checkout', {
             method: 'POST',
@@ -11968,8 +12067,34 @@ async function initiateStripeCheckout(priceKey) {
         
     } catch (error) {
         console.error('Checkout error:', error);
+        localStorage.removeItem('pendingPurchase');
         showNotification('Checkout failed: ' + error.message, 'error');
     }
+}
+
+/**
+ * Get purchase info for tracking
+ */
+function getPurchaseInfo(priceKey) {
+    const purchaseMap = {
+        // Subscriptions
+        starter_monthly: { type: 'subscription', tier: 'starter', tierName: 'Starter', credits: 5 },
+        starter_annual: { type: 'subscription', tier: 'starter', tierName: 'Starter', credits: 5 },
+        professional_monthly: { type: 'subscription', tier: 'professional', tierName: 'Professional', credits: 14 },
+        professional_annual: { type: 'subscription', tier: 'professional', tierName: 'Professional', credits: 14 },
+        enterprise_monthly: { type: 'subscription', tier: 'enterprise', tierName: 'Enterprise', credits: 25 },
+        enterprise_annual: { type: 'subscription', tier: 'enterprise', tierName: 'Enterprise', credits: 25 },
+        
+        // Credit packs
+        credits_5: { type: 'credits', credits: 5 },
+        credits_10: { type: 'credits', credits: 10 },
+        credits_20: { type: 'credits', credits: 20 },
+        
+        // Chat top-up
+        chat_topup: { type: 'topup', prompts: 30 }
+    };
+    
+    return purchaseMap[priceKey] || { type: 'unknown' };
 }
 
 /**
@@ -11978,21 +12103,71 @@ async function initiateStripeCheckout(priceKey) {
 function handlePaymentReturn() {
     const urlParams = new URLSearchParams(window.location.search);
     const paymentStatus = urlParams.get('payment');
+    const sessionId = urlParams.get('session_id');
     
     if (paymentStatus === 'success') {
-        showNotification('🎉 Payment successful! Your credits have been added.', 'success');
+        // Get the pending purchase from localStorage
+        const pendingPurchase = localStorage.getItem('pendingPurchase');
         
-        // Refresh credits display (in production, this would fetch from Firebase)
-        setTimeout(() => {
-            // For now, show a message to refresh
-            addMessage('assistant', `## 🎉 Payment Successful!\n\nThank you for your purchase! Your credits have been added to your account.\n\n**Next steps:**\n- Your credit balance will update automatically\n- You can now use your credits to generate documents\n- For subscriptions, you'll receive monthly credits on your billing date\n\nIf you have any questions, contact us at **blake@fitzgeraldhr.com.au**`);
-        }, 500);
+        if (pendingPurchase) {
+            try {
+                const purchase = JSON.parse(pendingPurchase);
+                
+                // Allocate credits based on purchase type
+                if (purchase.type === 'subscription') {
+                    // Update tier and add initial credits
+                    userCredits.tier = purchase.tier;
+                    userCredits.subscriptionCredits = purchase.credits;
+                    saveUserCredits();
+                    
+                    showNotification(`🎉 Welcome to ${purchase.tierName}! ${purchase.credits} credits added.`, 'success');
+                    
+                    setTimeout(() => {
+                        addMessage('assistant', `## 🎉 Welcome to Fitz ${purchase.tierName}!\n\nYour subscription is now active!\n\n**Your benefits:**\n- ✅ **${purchase.credits} credits** added to your account\n- ✅ **Unlimited AI chat** (no more prompt limits!)\n- ✅ **Monthly credit refresh** on your billing date\n\nYour credit balance and plan have been updated in the header above.\n\nQuestions? Contact **blake@fitzgeraldhr.com.au**`);
+                    }, 500);
+                    
+                } else if (purchase.type === 'credits') {
+                    // Add purchased credits (these never expire)
+                    userCredits.purchasedCredits += purchase.credits;
+                    saveUserCredits();
+                    
+                    showNotification(`🎉 ${purchase.credits} credits added to your account!`, 'success');
+                    
+                    setTimeout(() => {
+                        addMessage('assistant', `## 🎉 Credits Added!\n\n**${purchase.credits} credits** have been added to your account.\n\nThese credits never expire and can be used for any document type.\n\nYour new balance: **${getTotalCredits()} credits**`);
+                    }, 500);
+                    
+                } else if (purchase.type === 'topup') {
+                    // Add bonus prompts
+                    userCredits.bonusPrompts = (userCredits.bonusPrompts || 0) + purchase.prompts;
+                    saveUserCredits();
+                    
+                    showNotification(`🎉 ${purchase.prompts} prompts added!`, 'success');
+                    
+                    setTimeout(() => {
+                        addMessage('assistant', `## 🎉 Chat Top-Up Added!\n\n**${purchase.prompts} extra prompts** have been added to your account for this month.\n\nKeep chatting!`);
+                    }, 500);
+                }
+                
+                // Clear the pending purchase
+                localStorage.removeItem('pendingPurchase');
+                
+            } catch (e) {
+                console.error('Error processing payment return:', e);
+                showNotification('Payment successful! Please refresh if credits don\'t appear.', 'success');
+            }
+        } else {
+            // No pending purchase found - might be a page refresh
+            showNotification('🎉 Payment successful!', 'success');
+        }
         
         // Clean up URL
         window.history.replaceState({}, document.title, window.location.pathname);
     }
     
     if (paymentStatus === 'cancelled') {
+        // Clear pending purchase on cancel
+        localStorage.removeItem('pendingPurchase');
         showNotification('Payment cancelled', 'info');
         window.history.replaceState({}, document.title, window.location.pathname);
     }
