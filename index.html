@@ -5618,10 +5618,10 @@ Be as specific as possible!"></textarea>
                     <p class="text-slate-400 text-xs mb-2">Use your 1 free credit on any of these (click to try):</p>
                     <ul class="space-y-1">
                         <li>
-                            <button onclick="closeCreditsModal(); openProbationCheckIn();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
+                            <button onclick="closeCreditsModal(); openPositionDescriptionBuilder();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
                                 <div class="flex items-center gap-2 text-sm">
                                     <span class="text-amber-400">📋</span>
-                                    <span class="text-white group-hover:text-amber-400 transition-colors">Probation Check-In</span>
+                                    <span class="text-white group-hover:text-amber-400 transition-colors">Position Description</span>
                                     <span class="text-slate-500 text-xs">(1 credit)</span>
                                 </div>
                                 <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Try →</span>
@@ -5630,8 +5630,18 @@ Be as specific as possible!"></textarea>
                         <li>
                             <button onclick="closeCreditsModal(); openJobDescriptionBuilder();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
                                 <div class="flex items-center gap-2 text-sm">
+                                    <span class="text-amber-400">📢</span>
+                                    <span class="text-white group-hover:text-amber-400 transition-colors">Job Advertisement</span>
+                                    <span class="text-slate-500 text-xs">(1 credit)</span>
+                                </div>
+                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Try →</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button onclick="closeCreditsModal(); openProbationCheckIn();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
+                                <div class="flex items-center gap-2 text-sm">
                                     <span class="text-amber-400">📝</span>
-                                    <span class="text-white group-hover:text-amber-400 transition-colors">Job Description</span>
+                                    <span class="text-white group-hover:text-amber-400 transition-colors">Probation Check-In</span>
                                     <span class="text-slate-500 text-xs">(1 credit)</span>
                                 </div>
                                 <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Try →</span>
@@ -8283,9 +8293,11 @@ function detectDocumentGenerationRequest(message) {
         'employment contract': { tool: 'New Employee Toolkit', action: 'openNewEmployeeToolkit()', icon: '👤', specific: 'Employment Contract' },
         
         // Job/Position Description
-        'job description': { tool: 'Job Description Builder', action: 'openJobDescriptionBuilder()', icon: '📝', specific: 'Job Description' },
-        'position description': { tool: 'Job Description Builder', action: 'openJobDescriptionBuilder()', icon: '📝', specific: 'Position Description' },
-        'description': { tool: 'Job Description Builder', action: 'openJobDescriptionBuilder()', icon: '📝', specific: 'Job Description' },
+        'job description': { tool: 'Job Advertisement Builder', action: 'openJobDescriptionBuilder()', icon: '📢', specific: 'Job Advertisement' },
+        'job ad': { tool: 'Job Advertisement Builder', action: 'openJobDescriptionBuilder()', icon: '📢', specific: 'Job Advertisement' },
+        'job advertisement': { tool: 'Job Advertisement Builder', action: 'openJobDescriptionBuilder()', icon: '📢', specific: 'Job Advertisement' },
+        'position description': { tool: 'Position Description Builder', action: 'openPositionDescriptionBuilder()', icon: '📋', specific: 'Position Description' },
+        'pd': { tool: 'Position Description Builder', action: 'openPositionDescriptionBuilder()', icon: '📋', specific: 'Position Description' },
         
         // Onboarding
         'onboarding': { tool: 'Onboarding Checklist', action: 'openOnboardingChecklist()', icon: '✅', specific: 'Onboarding Checklist' },
@@ -16251,7 +16263,7 @@ function closeRecruitmentToolkit() {
     if (modal) modal.classList.add('hidden');
 }
 
-// Job Description Builder
+// Job Advertisement Builder (formerly Job Description Builder)
 let jdCurrentStep = 1;
 let jdData = {
     jobTitle: '',
@@ -16433,9 +16445,9 @@ async function generateJobDescription() {
     document.getElementById('jdGenerating').classList.remove('hidden');
     
     try {
-        const prompt = `Create a professional job description for:
+        const prompt = `Create a professional, engaging JOB ADVERTISEMENT for external posting on job boards (Seek, Indeed, LinkedIn):
                     
-Job Title: ${jdData.jobTitle}
+Position Title: ${jdData.jobTitle}
 Experience Level: ${jdData.experienceLevel}
 
 Key Responsibilities:
@@ -16444,7 +16456,15 @@ ${jdData.responsibilities}
 Required Qualifications:
 ${jdData.qualifications}
 
-Format as a complete, professional job description with sections for: Position Overview, Key Responsibilities, Required Qualifications, Desired Skills, and Benefits. Make it engaging and specific to Australian hospitality.`;
+IMPORTANT INSTRUCTIONS:
+- This is an EXTERNAL job advertisement to attract candidates
+- Use engaging, marketing-style language that sells the opportunity
+- DO NOT include any salary, pay rate, or remuneration information
+- DO NOT include hourly rates or annual salary figures
+- Include sections for: About the Role, Key Responsibilities, What You'll Bring, Why Join Us
+- Make it specific to Australian hospitality industry
+- Keep it concise and compelling - suitable for job board posting
+- End with a call to action to apply`;
 
         const response = await fetch('/.netlify/functions/recruitment-ai', {
             method: 'POST',
@@ -16460,7 +16480,7 @@ Format as a complete, professional job description with sections for: Position O
         const result = await response.json();
         
         if (!response.ok || !result.success) {
-            throw new Error(result.error || 'Failed to generate job description');
+            throw new Error(result.error || 'Failed to generate job advertisement');
         }
         
         // Get the content directly from the response
@@ -16469,7 +16489,7 @@ Format as a complete, professional job description with sections for: Position O
         // Store for download
         jdData.generatedContent = content;
         
-        // Close job description builder modal
+        // Close job advertisement builder modal
         closeJobDescriptionBuilder();
         
         // Show preview
@@ -16478,12 +16498,12 @@ Format as a complete, professional job description with sections for: Position O
         
         // Apply blur overlay (user must unlock to download)
         setTimeout(() => {
-            applyUniversalBlur('jdPreviewContent', 'jobDescription', 'Job Description', 'jdActionsContainer');
+            applyUniversalBlur('jdPreviewContent', 'jobDescription', 'Job Advertisement', 'jdActionsContainer');
         }, 100);
         
-        trackEvent('job_description_generated', { jobTitle: jdData.jobTitle, experienceLevel: jdData.experienceLevel });
+        trackEvent('job_advertisement_generated', { jobTitle: jdData.jobTitle, experienceLevel: jdData.experienceLevel });
     } catch (error) {
-        showToast('Error generating job description', 'error');
+        showToast('Error generating job advertisement', 'error');
         
         // Show wizard steps again on error
         document.getElementById('jdGenerating').classList.add('hidden');
@@ -16584,7 +16604,348 @@ function resetJobDescription() {
     // Open builder
     openJobDescriptionBuilder();
     
-    showToast('Ready to create a new job description!', 'success');
+    showToast('Ready to create a new job advertisement!', 'success');
+}
+
+// ========================================
+// POSITION DESCRIPTION BUILDER
+// ========================================
+let pdCurrentStep = 1;
+let pdData = {
+    positionTitle: '',
+    reportsTo: '',
+    department: '',
+    employmentType: 'full-time',
+    primaryPurpose: '',
+    responsibilities: '',
+    kpis: '',
+    qualifications: '',
+    generatedContent: ''
+};
+
+function openPositionDescriptionBuilder() {
+    trackToolUsage('positionDescriptionBuilder');
+    pdCurrentStep = 1;
+    pdData = { 
+        positionTitle: '', 
+        reportsTo: '', 
+        department: '', 
+        employmentType: 'full-time',
+        primaryPurpose: '',
+        responsibilities: '', 
+        kpis: '',
+        qualifications: '',
+        generatedContent: ''
+    };
+    
+    // Reset form fields
+    document.getElementById('pdPositionTitle').value = '';
+    document.getElementById('pdReportsTo').value = '';
+    document.getElementById('pdDepartment').value = '';
+    document.getElementById('pdEmploymentType').value = 'full-time';
+    document.getElementById('pdPrimaryPurpose').value = '';
+    document.getElementById('pdResponsibilities').value = '';
+    document.getElementById('pdKPIs').value = '';
+    document.getElementById('pdQualifications').value = '';
+    
+    updatePDStep();
+    var modal = document.getElementById('positionDescriptionBuilderModal');
+    if (modal) modal.classList.remove('hidden');
+}
+
+function closePositionDescriptionBuilder() {
+    var modal = document.getElementById('positionDescriptionBuilderModal');
+    if (modal) modal.classList.add('hidden');
+    
+    // Reset loading screen state
+    document.getElementById('pdGenerating').classList.add('hidden');
+    document.getElementById('pdBuilderSteps').classList.remove('hidden');
+}
+
+function updatePDStep() {
+    // Hide all steps
+    for (let i = 1; i <= 5; i++) {
+        const step = document.getElementById('pdStep' + i);
+        if (step) step.classList.add('hidden');
+    }
+    
+    // Show current step
+    const currentStepEl = document.getElementById('pdStep' + pdCurrentStep);
+    if (currentStepEl) currentStepEl.classList.remove('hidden');
+    
+    // Update step counter
+    document.getElementById('pdStep').textContent = pdCurrentStep;
+    
+    // Update buttons
+    document.getElementById('pdBackBtn').classList.toggle('hidden', pdCurrentStep === 1);
+    document.getElementById('pdNextBtn').classList.toggle('hidden', pdCurrentStep === 5);
+    document.getElementById('pdGenerateBtn').classList.toggle('hidden', pdCurrentStep !== 5);
+}
+
+function pdNextStep() {
+    // Validate current step
+    if (pdCurrentStep === 1) {
+        const positionTitle = document.getElementById('pdPositionTitle').value.trim();
+        if (!positionTitle) {
+            showAlert('Please enter a position title');
+            return;
+        }
+        pdData.positionTitle = positionTitle;
+        pdData.reportsTo = document.getElementById('pdReportsTo').value.trim();
+        pdData.department = document.getElementById('pdDepartment').value.trim();
+        pdData.employmentType = document.getElementById('pdEmploymentType').value;
+    }
+    
+    if (pdCurrentStep === 2) {
+        pdData.primaryPurpose = document.getElementById('pdPrimaryPurpose').value.trim();
+    }
+    
+    // Move to next step
+    pdCurrentStep++;
+    updatePDStep();
+    
+    // Generate AI responsibilities when entering step 3
+    if (pdCurrentStep === 3) {
+        generatePDResponsibilities();
+    }
+}
+
+function pdPreviousStep() {
+    if (pdCurrentStep > 1) {
+        pdCurrentStep--;
+        updatePDStep();
+    }
+}
+
+async function generatePDResponsibilities() {
+    const loading = document.getElementById('pdResponsibilitiesLoading');
+    const textarea = document.getElementById('pdResponsibilities');
+    const help = document.getElementById('pdResponsibilitiesHelp');
+    
+    loading.classList.remove('hidden');
+    textarea.classList.add('hidden');
+    help.classList.add('hidden');
+    
+    try {
+        const prompt = `Generate 8-10 detailed key responsibilities for an internal Position Description for:
+        
+Position: ${pdData.positionTitle}
+Reports To: ${pdData.reportsTo || 'Not specified'}
+Department: ${pdData.department || 'Not specified'}
+Employment Type: ${pdData.employmentType}
+Primary Purpose: ${pdData.primaryPurpose || 'Not specified'}
+
+IMPORTANT: This is an INTERNAL HR document, not a job advertisement.
+- Focus on specific duties and tasks
+- Include operational responsibilities
+- Include compliance and reporting requirements
+- Be detailed and comprehensive
+- Use formal, professional language
+
+Format as bullet points starting with action verbs.`;
+
+        const response = await fetch('/.netlify/functions/recruitment-ai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: prompt, taskType: 'positionDescription' })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || 'Failed to generate responsibilities');
+        }
+        
+        textarea.value = result.content;
+        loading.classList.add('hidden');
+        textarea.classList.remove('hidden');
+        help.classList.remove('hidden');
+    } catch (error) {
+        textarea.value = '• [Add key responsibility]\n• [Add key responsibility]\n• [Add key responsibility]';
+        loading.classList.add('hidden');
+        textarea.classList.remove('hidden');
+        help.classList.remove('hidden');
+    }
+}
+
+async function generatePositionDescription() {
+    // Collect all data
+    pdData.responsibilities = document.getElementById('pdResponsibilities').value;
+    pdData.kpis = document.getElementById('pdKPIs').value;
+    pdData.qualifications = document.getElementById('pdQualifications').value;
+    
+    // Hide wizard steps, show loading
+    document.getElementById('pdBuilderSteps').classList.add('hidden');
+    document.getElementById('pdGenerating').classList.remove('hidden');
+    
+    try {
+        const prompt = `Create a formal, comprehensive INTERNAL POSITION DESCRIPTION document:
+                    
+POSITION DETAILS:
+Position Title: ${pdData.positionTitle}
+Reports To: ${pdData.reportsTo || 'To be advised'}
+Department: ${pdData.department || 'To be advised'}
+Employment Type: ${pdData.employmentType}
+
+PRIMARY PURPOSE:
+${pdData.primaryPurpose || 'To be advised'}
+
+KEY RESPONSIBILITIES:
+${pdData.responsibilities}
+
+KEY PERFORMANCE INDICATORS (KPIs) & ACCOUNTABILITIES:
+${pdData.kpis || 'To be developed with manager'}
+
+QUALIFICATIONS & REQUIREMENTS:
+${pdData.qualifications}
+
+IMPORTANT INSTRUCTIONS:
+- This is an INTERNAL HR document for employee files and performance management
+- NOT a job advertisement - do not use marketing language
+- Use formal, professional tone throughout
+- Include clear section headings
+- Structure as a proper Position Description document with sections for:
+  * Position Details (title, reports to, department, employment type)
+  * Primary Purpose
+  * Key Responsibilities
+  * Key Performance Indicators & Accountabilities
+  * Essential Qualifications
+  * Desirable Qualifications
+  * Working Conditions (if applicable)
+- DO NOT include salary or remuneration information
+- Include a signature/acknowledgement section at the end for employee and manager`;
+
+        const response = await fetch('/.netlify/functions/recruitment-ai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: prompt, taskType: 'positionDescription' })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || 'Failed to generate position description');
+        }
+        
+        pdData.generatedContent = result.content;
+        
+        // Close builder modal
+        closePositionDescriptionBuilder();
+        
+        // Show preview
+        document.getElementById('pdPreviewContent').innerHTML = '<pre class="whitespace-pre-wrap text-slate-200">' + result.content + '</pre>';
+        document.getElementById('positionDescriptionPreviewModal').classList.remove('hidden');
+        
+        // Apply blur overlay (user must unlock to download)
+        setTimeout(() => {
+            applyUniversalBlur('pdPreviewContent', 'positionDescription', 'Position Description', 'pdActionsContainer');
+        }, 100);
+        
+        trackEvent('position_description_generated', { positionTitle: pdData.positionTitle });
+    } catch (error) {
+        showToast('Error generating position description', 'error');
+        
+        // Show wizard steps again on error
+        document.getElementById('pdGenerating').classList.add('hidden');
+        document.getElementById('pdBuilderSteps').classList.remove('hidden');
+    }
+}
+
+function closePositionDescriptionPreview() {
+    document.getElementById('positionDescriptionPreviewModal').classList.add('hidden');
+    
+    // Reset builder state
+    document.getElementById('pdGenerating').classList.add('hidden');
+    document.getElementById('pdBuilderSteps').classList.remove('hidden');
+}
+
+async function downloadPositionDescription(format = 'pdf') {
+    if (!pdData.generatedContent) {
+        showToast('No position description to download', 'error');
+        return;
+    }
+    
+    // Check if this document is unlocked (blur removed)
+    const previewContent = document.getElementById('pdPreviewContent');
+    const unlockPrompt = document.getElementById('pdPreviewContent_unlockPrompt');
+    
+    if (unlockPrompt) {
+        // Document is still locked - trigger unlock flow
+        showToast('Please unlock the document first', 'info');
+        return;
+    }
+    
+    showToast(`Preparing ${format.toUpperCase()} download...`, 'info');
+    
+    try {
+        const response = await fetch('/.netlify/functions/generate-document', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                content: pdData.generatedContent,
+                format: format,
+                filename: `Position_Description_${pdData.positionTitle.replace(/\s+/g, '_')}`,
+                documentType: 'position_description'
+            })
+        });
+        
+        if (!response.ok) throw new Error('Download failed');
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Position_Description_${pdData.positionTitle.replace(/\s+/g, '_')}.${format}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        showToast(`Position description downloaded as ${format.toUpperCase()}!`, 'success');
+        trackEvent('position_description_downloaded', { format: format, positionTitle: pdData.positionTitle });
+    } catch (error) {
+        showToast('Error downloading document. Please try again.', 'error');
+    }
+}
+
+function resetPositionDescription() {
+    pdCurrentStep = 1;
+    pdData = { 
+        positionTitle: '', 
+        reportsTo: '', 
+        department: '', 
+        employmentType: 'full-time',
+        primaryPurpose: '',
+        responsibilities: '', 
+        kpis: '',
+        qualifications: '',
+        generatedContent: ''
+    };
+    
+    // Reset form fields
+    document.getElementById('pdPositionTitle').value = '';
+    document.getElementById('pdReportsTo').value = '';
+    document.getElementById('pdDepartment').value = '';
+    document.getElementById('pdEmploymentType').value = 'full-time';
+    document.getElementById('pdPrimaryPurpose').value = '';
+    document.getElementById('pdResponsibilities').value = '';
+    document.getElementById('pdKPIs').value = '';
+    document.getElementById('pdQualifications').value = '';
+    
+    // Close preview
+    closePositionDescriptionPreview();
+    
+    // Reset loading/steps state
+    document.getElementById('pdBuilderSteps').classList.remove('hidden');
+    document.getElementById('pdGenerating').classList.add('hidden');
+    
+    // Update step display
+    updatePDStep();
+    
+    // Open builder
+    openPositionDescriptionBuilder();
+    
+    showToast('Ready to create a new position description!', 'success');
 }
 
 // Interview Questions Generator
@@ -23026,13 +23387,13 @@ function resetAIImport() {
     </div>
 </div>
 
-<!-- Job Description Builder Modal -->
+<!-- Job Advertisement Builder Modal -->
 <div id="jobDescriptionBuilderModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
     <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
-                    <span>📝</span> Job Description Builder
+                    <span>📢</span> Job Advertisement Builder
                 </h2>
                 <p class="text-slate-400 text-sm">Step <span id="jdStep">1</span> of 4</p>
             </div>
@@ -23042,7 +23403,7 @@ function resetAIImport() {
         <!-- Loading Screen -->
         <div id="jdGenerating" class="hidden text-center py-12">
             <div class="text-6xl mb-4 animate-bounce">🤖</div>
-            <h3 class="text-amber-400 font-bold text-xl mb-2">Fitz is generating your job description...</h3>
+            <h3 class="text-amber-400 font-bold text-xl mb-2">Fitz is generating your job advertisement...</h3>
             <p class="text-slate-400 text-sm">This may take 10-20 seconds</p>
             <div class="mt-6 flex justify-center gap-2">
                 <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
@@ -23055,10 +23416,19 @@ function resetAIImport() {
         <div id="jdBuilderSteps">
         <!-- Step 1: Job Title -->
         <div id="jdStep1" class="step-content">
-            <h3 class="text-xl font-semibold text-white mb-4">What's the job title?</h3>
+            <h3 class="text-xl font-semibold text-white mb-4">What's the position title?</h3>
             <input type="text" id="jdJobTitle" placeholder="e.g., Head Chef, Restaurant Manager, Bartender" 
                    class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500">
-            <p class="text-slate-400 text-sm mt-2">💡 Be specific - AI will tailor the description to this role</p>
+            <p class="text-slate-400 text-sm mt-2">💡 Be specific - AI will tailor the advertisement to this role</p>
+            
+            <!-- Position Description Link -->
+            <div class="mt-4 p-4 bg-slate-700/50 rounded-lg border border-slate-600">
+                <p class="text-slate-300 text-sm mb-2">📋 Have a Position Description for this role?</p>
+                <p class="text-slate-400 text-xs mb-3">If you have an existing Position Description, you can paste key details in the next steps to help generate a better job ad.</p>
+                <button onclick="closeJobDescriptionBuilder(); openPositionDescriptionBuilder();" class="text-amber-400 hover:text-amber-300 text-sm font-medium">
+                    Don't have one? Create a Position Description first →
+                </button>
+            </div>
         </div>
 
         <!-- Step 2: Experience Level -->
@@ -23107,7 +23477,7 @@ function resetAIImport() {
                 Next Step →
             </button>
             <button onclick="generateJobDescription()" id="jdGenerateBtn" class="hidden w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
-                ✨ Generate Job Description
+                ✨ Generate Job Advertisement
             </button>
             <button onclick="jdPreviousStep()" id="jdBackBtn" class="hidden w-full px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
                 ← Back
@@ -23118,11 +23488,11 @@ function resetAIImport() {
     </div>
 </div>
 
-<!-- Job Description Preview Modal -->
+<!-- Job Advertisement Preview Modal -->
 <div id="jobDescriptionPreviewModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
     <div class="bg-slate-800 rounded-2xl p-8 max-w-4xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-amber-500">📝 Your Job Description</h2>
+            <h2 class="text-2xl font-bold text-amber-500">📢 Your Job Advertisement</h2>
             <button onclick="closeJobDescriptionPreview()" class="text-slate-400 hover:text-white text-2xl">×</button>
         </div>
 
@@ -23141,10 +23511,171 @@ function resetAIImport() {
         
         <div class="flex gap-3 mt-3">
             <button onclick="resetJobDescription()" class="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
-                ➕ Create New Job Description
+                ➕ Create New Job Advertisement
             </button>
             <button onclick="closeJobDescriptionPreview(); openJobDescriptionBuilder();" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
                 ← Back to Edit
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Position Description Builder Modal -->
+<div id="positionDescriptionBuilderModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                    <span>📋</span> Position Description Builder
+                </h2>
+                <p class="text-slate-400 text-sm">Step <span id="pdStep">1</span> of 5</p>
+            </div>
+            <button onclick="closePositionDescriptionBuilder()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+
+        <!-- Info Banner -->
+        <div class="mb-6 p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+            <p class="text-blue-400 text-sm">
+                <span class="font-semibold">📋 Internal Document:</span> This creates a formal Position Description for HR records, performance reviews, and role clarity - not for external job advertising.
+            </p>
+        </div>
+
+        <!-- Loading Screen -->
+        <div id="pdGenerating" class="hidden text-center py-12">
+            <div class="text-6xl mb-4 animate-bounce">🤖</div>
+            <h3 class="text-amber-400 font-bold text-xl mb-2">Fitz is generating your position description...</h3>
+            <p class="text-slate-400 text-sm">This may take 10-20 seconds</p>
+            <div class="mt-6 flex justify-center gap-2">
+                <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                <div class="w-3 h-3 bg-amber-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+            </div>
+        </div>
+
+        <!-- Steps Container -->
+        <div id="pdBuilderSteps">
+            <!-- Step 1: Position Title & Reporting -->
+            <div id="pdStep1" class="step-content">
+                <h3 class="text-xl font-semibold text-white mb-4">Position Details</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-slate-300 text-sm mb-2">Position Title *</label>
+                        <input type="text" id="pdPositionTitle" placeholder="e.g., Head Chef, Restaurant Manager, Bartender" 
+                               class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 text-sm mb-2">Reports To</label>
+                        <input type="text" id="pdReportsTo" placeholder="e.g., General Manager, Operations Director" 
+                               class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 text-sm mb-2">Department/Team</label>
+                        <input type="text" id="pdDepartment" placeholder="e.g., Kitchen, Front of House, Management" 
+                               class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-300 text-sm mb-2">Employment Type</label>
+                        <select id="pdEmploymentType" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            <option value="full-time">Full-time</option>
+                            <option value="part-time">Part-time</option>
+                            <option value="casual">Casual</option>
+                            <option value="contract">Fixed-term Contract</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Primary Purpose -->
+            <div id="pdStep2" class="step-content hidden">
+                <h3 class="text-xl font-semibold text-white mb-4">Primary Purpose of the Role</h3>
+                <p class="text-slate-400 text-sm mb-4">Describe the main objective of this position in 2-3 sentences:</p>
+                <textarea id="pdPrimaryPurpose" placeholder="e.g., The Head Chef is responsible for overseeing all kitchen operations, ensuring food quality and safety standards, and leading the culinary team to deliver exceptional dining experiences." 
+                          class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500" rows="4"></textarea>
+                <p class="text-slate-400 text-sm mt-2">💡 This appears at the top of the document and summarises why the role exists</p>
+            </div>
+
+            <!-- Step 3: Key Responsibilities -->
+            <div id="pdStep3" class="step-content hidden">
+                <h3 class="text-xl font-semibold text-white mb-4">Key Responsibilities</h3>
+                <p class="text-slate-400 text-sm mb-4">AI has suggested these responsibilities. Edit as needed:</p>
+                <div id="pdResponsibilitiesLoading" class="text-center py-8">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+                    <p class="text-slate-400 mt-4">AI is generating key responsibilities...</p>
+                </div>
+                <textarea id="pdResponsibilities" class="hidden w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500" rows="8"></textarea>
+                <p class="text-slate-400 text-sm mt-2 hidden" id="pdResponsibilitiesHelp">✏️ Edit, add, or remove responsibilities as needed</p>
+            </div>
+
+            <!-- Step 4: KPIs & Accountabilities -->
+            <div id="pdStep4" class="step-content hidden">
+                <h3 class="text-xl font-semibold text-white mb-4">KPIs & Accountabilities</h3>
+                <p class="text-slate-400 text-sm mb-4">What measurable outcomes is this role accountable for?</p>
+                <textarea id="pdKPIs" placeholder="e.g.,&#10;- Maintain food cost percentage below 30%&#10;- Achieve customer satisfaction rating of 4.5+ stars&#10;- Zero critical food safety violations&#10;- Staff turnover rate below industry average&#10;- Complete weekly stock takes on time" 
+                          class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500" rows="6"></textarea>
+                <p class="text-slate-400 text-sm mt-2">💡 Include specific, measurable targets where possible</p>
+            </div>
+
+            <!-- Step 5: Qualifications & Requirements -->
+            <div id="pdStep5" class="step-content hidden">
+                <h3 class="text-xl font-semibold text-white mb-4">Qualifications & Requirements</h3>
+                <p class="text-slate-400 text-sm mb-4">What qualifications, skills, and experience are required?</p>
+                <textarea id="pdQualifications" placeholder="e.g.,&#10;Essential:&#10;- Certificate III in Commercial Cookery (or equivalent)&#10;- Minimum 5 years experience in a similar role&#10;- Current Food Safety Supervisor certificate&#10;&#10;Desirable:&#10;- Certificate IV in Kitchen Management&#10;- Experience with menu costing and development" 
+                          class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500" rows="8"></textarea>
+                <p class="text-slate-400 text-sm mt-2">💡 Separate essential and desirable qualifications</p>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="mt-6 space-y-3">
+                <button onclick="pdNextStep()" id="pdNextBtn" class="w-full px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white font-semibold rounded-lg transition-colors">
+                    Next Step →
+                </button>
+                <button onclick="generatePositionDescription()" id="pdGenerateBtn" class="hidden w-full px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
+                    ✨ Generate Position Description
+                </button>
+                <button onclick="pdPreviousStep()" id="pdBackBtn" class="hidden w-full px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
+                    ← Back
+                </button>
+            </div>
+        </div><!-- End pdBuilderSteps -->
+
+    </div>
+</div>
+
+<!-- Position Description Preview Modal -->
+<div id="positionDescriptionPreviewModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-4xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-amber-500">📋 Your Position Description</h2>
+            <button onclick="closePositionDescriptionPreview()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+
+        <div id="pdPreviewContent" class="bg-slate-900 rounded-lg p-6 mb-6 prose prose-invert max-w-none">
+            <!-- AI-generated content will appear here -->
+        </div>
+
+        <div id="pdActionsContainer" class="flex gap-3">
+            <button onclick="downloadPositionDescription('docx')" class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                📄 Download DOCX
+            </button>
+            <button onclick="downloadPositionDescription('pdf')" class="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                📕 Download PDF
+            </button>
+        </div>
+        
+        <div class="flex gap-3 mt-3">
+            <button onclick="resetPositionDescription()" class="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
+                ➕ Create New Position Description
+            </button>
+            <button onclick="closePositionDescriptionPreview(); openPositionDescriptionBuilder();" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
+                ← Back to Edit
+            </button>
+        </div>
+        
+        <!-- Cross-link to Job Advertisement -->
+        <div class="mt-4 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg text-center">
+            <p class="text-amber-400 text-sm mb-2">📢 Ready to advertise this role?</p>
+            <button onclick="closePositionDescriptionPreview(); openJobDescriptionBuilder();" class="text-amber-400 hover:text-amber-300 font-medium">
+                Create a Job Advertisement →
             </button>
         </div>
     </div>
@@ -23165,21 +23696,39 @@ function resetAIImport() {
 
         <!-- Sub-tools Grid -->
         <div class="grid grid-cols-1 gap-4">
-            <button onclick="openJobDescriptionBuilder(); closeRecruitmentToolkit();" class="text-left p-6 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
+            <!-- Position Description Builder -->
+            <button onclick="openPositionDescriptionBuilder(); closeRecruitmentToolkit();" class="text-left p-6 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
                 <div class="flex items-start gap-4">
-                    <span class="text-4xl">📝</span>
+                    <span class="text-4xl">📋</span>
                     <div>
-                        <div class="font-semibold text-white text-lg mb-2">Job Description Builder</div>
-                        <div class="text-sm text-slate-400 mb-3">Create professional job descriptions with AI-powered content, award-based salary ranges, and downloadable formats</div>
+                        <div class="font-semibold text-white text-lg mb-2">Position Description Builder</div>
+                        <div class="text-sm text-slate-400 mb-3">Create internal position descriptions with key responsibilities, KPIs, and accountabilities for HR records</div>
                         <div class="flex flex-wrap gap-2">
                             <span class="text-xs bg-amber-500/20 text-amber-400 px-2 py-1 rounded">AI-Powered</span>
-                            <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">Award Integration</span>
+                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">Internal Document</span>
                             <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">DOCX/PDF</span>
                         </div>
                     </div>
                 </div>
             </button>
             
+            <!-- Job Advertisement Builder -->
+            <button onclick="openJobDescriptionBuilder(); closeRecruitmentToolkit();" class="text-left p-6 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-4">
+                    <span class="text-4xl">📢</span>
+                    <div>
+                        <div class="font-semibold text-white text-lg mb-2">Job Advertisement Builder</div>
+                        <div class="text-sm text-slate-400 mb-3">Create engaging job ads for Seek, Indeed, and LinkedIn to attract quality candidates</div>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="text-xs bg-amber-500/20 text-amber-400 px-2 py-1 rounded">AI-Powered</span>
+                            <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">External Posting</span>
+                            <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">DOCX/PDF</span>
+                        </div>
+                    </div>
+                </div>
+            </button>
+            
+            <!-- Interview Questions Generator -->
             <button onclick="openInterviewQuestionsGenerator(); closeRecruitmentToolkit();" class="text-left p-6 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
                 <div class="flex items-start gap-4">
                     <span class="text-4xl">💬</span>
@@ -23195,9 +23744,10 @@ function resetAIImport() {
                 </div>
             </button>
             
+            <!-- Reference Check Form -->
             <button onclick="openReferenceCheckForm(); closeRecruitmentToolkit();" class="text-left p-6 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
                 <div class="flex items-start gap-4">
-                    <span class="text-4xl">📋</span>
+                    <span class="text-4xl">📞</span>
                     <div>
                         <div class="font-semibold text-white text-lg mb-2">Reference Check Form</div>
                         <div class="text-sm text-slate-400 mb-3">Professional reference check form with standard questions, rating scales, and compliance notes</div>
@@ -27966,10 +28516,10 @@ function getStep0Template() {
         </div>
         
         <div class="info-box">
-            <div class="info-box-title">📝 Position Description</div>
+            <div class="info-box-title">📋 Position Description</div>
             <div class="info-box-content">
                 <p>Having a clear position description makes creating contracts easier. Need help creating one?</p>
-                <button class="btn btn-link" onclick="openJobDescriptionFromContract(); return false;">Use Job Description Builder →</button>
+                <button class="btn btn-link" onclick="openPositionDescriptionFromContract(); return false;">Use Position Description Builder →</button>
             </div>
         </div>
         
@@ -28054,11 +28604,11 @@ function openAwardWizardFromContract() {
     }
 }
 
-function openJobDescriptionFromContract() {
+function openPositionDescriptionFromContract() {
     // Show confirmation dialog
     const confirmed = confirm(
         '⚠️ Navigate Away?\n\n' +
-        'This will close the Employment Contract Builder and take you to the Job Description Builder.\n\n' +
+        'This will close the Employment Contract Builder and take you to the Position Description Builder.\n\n' +
         'Your current progress will be saved, but you will need to return to continue building your contract.\n\n' +
         'Are you sure you want to leave?'
     );
@@ -28074,11 +28624,39 @@ function openJobDescriptionFromContract() {
     // Close contract builder
     closeEmploymentContract();
     
-    // Open Job Description Builder (using existing function)  
+    // Open Position Description Builder
+    if (typeof openPositionDescriptionBuilder === 'function') {
+        openPositionDescriptionBuilder();
+    } else {
+        showAlert('Position Description Builder is not available. Please contact support.');
+    }
+}
+
+function openJobDescriptionFromContract() {
+    // Show confirmation dialog
+    const confirmed = confirm(
+        '⚠️ Navigate Away?\n\n' +
+        'This will close the Employment Contract Builder and take you to the Job Advertisement Builder.\n\n' +
+        'Your current progress will be saved, but you will need to return to continue building your contract.\n\n' +
+        'Are you sure you want to leave?'
+    );
+    
+    if (!confirmed) {
+        return; // User cancelled
+    }
+    
+    // Save current progress before leaving
+    saveCurrentStepData();
+    saveContractProgress();
+    
+    // Close contract builder
+    closeEmploymentContract();
+    
+    // Open Job Advertisement Builder (using existing function)  
     if (typeof openJobDescriptionBuilder === 'function') {
         openJobDescriptionBuilder();
     } else {
-        showAlert('Job Description Builder is not available. Please contact support.');
+        showAlert('Job Advertisement Builder is not available. Please contact support.');
     }
 }
 
