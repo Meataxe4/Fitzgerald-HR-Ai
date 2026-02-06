@@ -5597,6 +5597,26 @@ Be as specific as possible!"></textarea>
                     <p id="modalPromptsRemaining" class="text-slate-400 text-xs mt-1">20/20 prompts remaining</p>
                 </div>
             </div>
+            
+            <!-- Free Document Status (for free tier) -->
+            <div id="freeDocumentStatus" class="hidden mt-4 pt-4 border-t border-amber-500/30">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-green-400">🎁</span>
+                        <span class="text-green-400 font-semibold">Free Document Available</span>
+                    </div>
+                    <span class="text-slate-400 text-sm">1 low-risk document/month</span>
+                </div>
+            </div>
+            <div id="freeDocumentUsedStatus" class="hidden mt-4 pt-4 border-t border-amber-500/30">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="text-slate-500">✓</span>
+                        <span class="text-slate-500">Free Document Used</span>
+                    </div>
+                    <span class="text-slate-500 text-sm">Resets next month</span>
+                </div>
+            </div>
         </div>
 
         <!-- Credit Packs -->
@@ -12024,10 +12044,43 @@ const CALENDLY_CONFIG = {
  * Open the credits management modal
  */
 function openCreditsModal() {
-    // Update the modal with current values
-    document.getElementById('modalCreditsBalance').textContent = getTotalCredits();
+    const totalCredits = getTotalCredits();
+    const modalCreditsBalance = document.getElementById('modalCreditsBalance');
+    const freeDocStatus = document.getElementById('freeDocumentStatus');
+    const freeDocUsedStatus = document.getElementById('freeDocumentUsedStatus');
+    
+    // Update tier display
     document.getElementById('modalCurrentTier').textContent = CONFIG.CREDITS.TIERS[userCredits.tier]?.name || 'Free';
     
+    // Update credits balance - show "1 free" for free tier with unused free doc
+    if (userCredits.tier === 'free' && !userCredits.freeDocumentUsed && totalCredits === 0) {
+        modalCreditsBalance.textContent = '1 free';
+        modalCreditsBalance.classList.remove('text-amber-400');
+        modalCreditsBalance.classList.add('text-green-400');
+    } else {
+        modalCreditsBalance.textContent = totalCredits;
+        modalCreditsBalance.classList.remove('text-green-400');
+        modalCreditsBalance.classList.add('text-amber-400');
+    }
+    
+    // Show/hide free document status for free tier
+    if (freeDocStatus && freeDocUsedStatus) {
+        if (userCredits.tier === 'free') {
+            if (!userCredits.freeDocumentUsed) {
+                freeDocStatus.classList.remove('hidden');
+                freeDocUsedStatus.classList.add('hidden');
+            } else {
+                freeDocStatus.classList.add('hidden');
+                freeDocUsedStatus.classList.remove('hidden');
+            }
+        } else {
+            // Hide both for paid tiers
+            freeDocStatus.classList.add('hidden');
+            freeDocUsedStatus.classList.add('hidden');
+        }
+    }
+    
+    // Update prompts remaining
     if (userCredits.tier === 'free') {
         const remaining = getRemainingPrompts();
         document.getElementById('modalPromptsRemaining').textContent = `${remaining}/${CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS} prompts remaining`;
