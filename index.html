@@ -12203,14 +12203,21 @@ function restorePendingDocument() {
             previewModal.classList.remove('hidden');
             
             // Check if user can now afford the document
-            if (pendingDoc.docType && !canAffordDocument(pendingDoc.docType)) {
+            if (pendingDoc.docType && canAffordDocument(pendingDoc.docType)) {
+                // Can afford now - deduct credits and show unlocked
+                const deducted = deductCreditsForDocument(pendingDoc.docType);
+                
+                if (deducted) {
+                    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[pendingDoc.docType];
+                    showNotification(`🎉 Document unlocked! ${cost?.credits || 1} credit used.`, 'success');
+                } else {
+                    showNotification('🎉 Your document is ready to download!', 'success');
+                }
+            } else {
                 // Still can't afford - reapply blur
                 setTimeout(() => {
                     applyDocumentBlur(pendingDoc.docType, pendingDoc.docName);
                 }, 100);
-            } else {
-                // Can afford now - show unlocked
-                showNotification('🎉 Your document is ready to download!', 'success');
             }
             
             // Clear the pending document
