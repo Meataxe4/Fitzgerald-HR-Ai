@@ -12351,35 +12351,72 @@ function showNotification(message, type = 'info') {
 
 /**
  * Apply blur to document preview (for unpaid documents)
+ * Shows first ~15-20 lines clearly, then blurs the rest
  */
 function applyDocumentBlur() {
     const previewContent = document.getElementById('documentPreviewContent');
     if (!previewContent) return;
     
-    // Add blur overlay
+    // Make preview container relative for absolute positioning
+    const previewContainer = previewContent.parentElement;
+    previewContainer.style.position = 'relative';
+    previewContainer.style.overflow = 'hidden';
+    
+    // Calculate visible area - approximately 15-20 lines (around 300px)
+    const visibleHeight = 300;
+    
+    // Create blur overlay that starts AFTER the visible preview area
     const blurOverlay = document.createElement('div');
     blurOverlay.id = 'documentBlurOverlay';
-    blurOverlay.className = 'absolute inset-0 pointer-events-none';
     blurOverlay.style.cssText = `
+        position: absolute;
+        top: ${visibleHeight}px;
+        left: 0;
+        right: 0;
+        bottom: 0;
         background: linear-gradient(to bottom, 
-            transparent 0%, 
-            transparent 15%, 
-            rgba(255,255,255,0.5) 20%,
-            rgba(255,255,255,0.95) 35%,
-            white 50%
+            rgba(255,255,255,0) 0%,
+            rgba(255,255,255,0.7) 30px,
+            rgba(255,255,255,0.95) 80px,
+            rgba(255,255,255,1) 150px
         );
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        pointer-events: none;
+        z-index: 5;
     `;
+    previewContainer.appendChild(blurOverlay);
     
-    // Make preview container relative for absolute positioning
-    previewContent.parentElement.style.position = 'relative';
-    previewContent.parentElement.appendChild(blurOverlay);
+    // Add a gradient fade at the transition point for smoother effect
+    const fadeGradient = document.createElement('div');
+    fadeGradient.id = 'documentFadeGradient';
+    fadeGradient.style.cssText = `
+        position: absolute;
+        top: ${visibleHeight - 50}px;
+        left: 0;
+        right: 0;
+        height: 100px;
+        background: linear-gradient(to bottom, 
+            rgba(255,255,255,0) 0%,
+            rgba(255,255,255,0.3) 50%,
+            rgba(255,255,255,0.6) 100%
+        );
+        pointer-events: none;
+        z-index: 4;
+    `;
+    previewContainer.appendChild(fadeGradient);
     
-    // Add unlock prompt
+    // Add unlock prompt - positioned in the blurred area
     const unlockPrompt = document.createElement('div');
     unlockPrompt.id = 'documentUnlockPrompt';
-    unlockPrompt.className = 'absolute bottom-1/3 left-1/2 transform -translate-x-1/2 text-center z-10';
+    unlockPrompt.style.cssText = `
+        position: absolute;
+        top: ${visibleHeight + 80}px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        text-align: center;
+    `;
     unlockPrompt.innerHTML = `
         <div class="bg-slate-800 border-2 border-amber-500 rounded-xl p-6 shadow-2xl">
             <div class="text-4xl mb-3">🔒</div>
@@ -12389,9 +12426,18 @@ function applyDocumentBlur() {
                     class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-6 rounded-lg transition-all">
                 Unlock Document
             </button>
+            <p class="text-slate-400 text-xs mt-3">1 credit to unlock • Free tier: 1 free document</p>
         </div>
     `;
-    previewContent.parentElement.appendChild(unlockPrompt);
+    previewContainer.appendChild(unlockPrompt);
+    
+    // Disable download buttons while blurred
+    const downloadBtns = document.querySelectorAll('#documentPreviewModal button[onclick*="download"]');
+    downloadBtns.forEach(btn => {
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+        btn.title = 'Unlock document to download';
+    });
 }
 
 /**
@@ -12399,10 +12445,20 @@ function applyDocumentBlur() {
  */
 function removeDocumentBlur() {
     const blurOverlay = document.getElementById('documentBlurOverlay');
+    const fadeGradient = document.getElementById('documentFadeGradient');
     const unlockPrompt = document.getElementById('documentUnlockPrompt');
     
     if (blurOverlay) blurOverlay.remove();
+    if (fadeGradient) fadeGradient.remove();
     if (unlockPrompt) unlockPrompt.remove();
+    
+    // Re-enable download buttons
+    const downloadBtns = document.querySelectorAll('#documentPreviewModal button[onclick*="download"]');
+    downloadBtns.forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        btn.title = '';
+    });
 }
 
 /**
