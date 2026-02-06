@@ -2898,6 +2898,10 @@ input, textarea, select {
     animation: creditPulse 2s ease-in-out infinite;
 }
     </style>
+    
+    <!-- Calendly Styles & Script -->
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
 <!-- SYNC DEBUG PANEL - ADD THIS TO THE HEADER -->
@@ -3607,6 +3611,13 @@ function continueWithEmail() {
                         class="px-3 py-2 md:px-4 md:py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold rounded-lg transition-all flex items-center gap-2 touch-manipulation">
                     <span class="text-lg md:text-xl">🚨</span>
                     <span class="hidden sm:inline">URGENT</span>
+                </button>
+                
+                <!-- Book Expert Button -->
+                <button onclick="openConsultationBookingModal()" 
+                        class="px-3 py-2 md:px-4 md:py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold rounded-lg transition-all flex items-center gap-2 touch-manipulation shadow-lg shadow-purple-500/20">
+                    <span class="text-lg md:text-xl">📞</span>
+                    <span class="hidden sm:inline">Book Expert</span>
                 </button>
                 
                 <!-- Divider (hidden on mobile) -->
@@ -5837,128 +5848,7 @@ function setBilling(billing) {
 <!-- ========================================== -->
 <!-- CONSULTATION BOOKING MODAL -->
 <!-- ========================================== -->
-<div id="consultationBookingModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-    <div class="bg-slate-800 rounded-2xl p-8 max-w-xl w-full border-2 border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <h2 class="text-2xl font-bold text-amber-400">📞 Book a Consultation</h2>
-                <p class="text-slate-400 text-sm">Speak with a senior HR professional</p>
-            </div>
-            <button onclick="closeConsultationBookingModal()" class="text-slate-400 hover:text-white text-2xl">×</button>
-        </div>
-
-        <!-- Consultation Type Selection -->
-        <div id="consultationTypeSelect" class="mb-6">
-            <h3 class="text-white font-bold mb-4">What's this consultation about?</h3>
-            <div class="space-y-3">
-                <button onclick="selectConsultationType('terminationReview')" 
-                        class="w-full bg-slate-700 hover:bg-slate-600 rounded-lg p-4 text-left transition-all border border-slate-600 hover:border-amber-500 consultation-type-btn">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-white font-bold">Termination Review</p>
-                            <p class="text-slate-400 text-sm">Review your case before proceeding with termination</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-amber-400 font-bold">7 credits</p>
-                            <p class="text-green-400 text-xs">Includes letter if approved</p>
-                        </div>
-                    </div>
-                </button>
-                
-                <button onclick="selectConsultationType('redundancyReview')" 
-                        class="w-full bg-slate-700 hover:bg-slate-600 rounded-lg p-4 text-left transition-all border border-slate-600 hover:border-amber-500 consultation-type-btn">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-white font-bold">Redundancy Review</p>
-                            <p class="text-slate-400 text-sm">Guidance on redundancy process and compliance</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-amber-400 font-bold">7 credits</p>
-                            <p class="text-green-400 text-xs">Includes letters if approved</p>
-                        </div>
-                    </div>
-                </button>
-                
-                <button onclick="selectConsultationType('investigationReview')" 
-                        class="w-full bg-slate-700 hover:bg-slate-600 rounded-lg p-4 text-left transition-all border border-slate-600 hover:border-amber-500 consultation-type-btn">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-white font-bold">Investigation Review</p>
-                            <p class="text-slate-400 text-sm">Complex workplace investigation guidance</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-amber-400 font-bold">8 credits</p>
-                            <p class="text-green-400 text-xs">Includes report if needed</p>
-                        </div>
-                    </div>
-                </button>
-                
-                <button onclick="selectConsultationType('generalConsultation')" 
-                        class="w-full bg-slate-700 hover:bg-slate-600 rounded-lg p-4 text-left transition-all border border-slate-600 hover:border-amber-500 consultation-type-btn">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-white font-bold">General HR Consultation</p>
-                            <p class="text-slate-400 text-sm">Any HR matter requiring expert guidance</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-amber-400 font-bold">5 credits</p>
-                            <p class="text-slate-400 text-xs">30 minutes</p>
-                        </div>
-                    </div>
-                </button>
-            </div>
-        </div>
-
-        <!-- Urgent Option -->
-        <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
-            <div class="flex items-center gap-3">
-                <input type="checkbox" id="urgentConsultation" class="w-5 h-5 rounded">
-                <div class="flex-1">
-                    <label for="urgentConsultation" class="text-white font-bold cursor-pointer">⚡ Urgent — Same Day</label>
-                    <p class="text-red-300 text-sm">+$100 for same-day consultation</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Booking Button -->
-        <div id="consultationBookingAction" class="hidden">
-            <div class="bg-slate-900 rounded-lg p-4 mb-4">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-slate-400 text-sm">Selected:</p>
-                        <p id="selectedConsultationType" class="text-white font-bold">—</p>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-slate-400 text-sm">Total:</p>
-                        <p id="consultationTotalCredits" class="text-2xl font-bold text-amber-400">0 credits</p>
-                    </div>
-                </div>
-            </div>
-            
-            <button onclick="proceedWithConsultationBooking()" 
-                    class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2">
-                <span>📅</span>
-                <span>Proceed to Book Consultation</span>
-            </button>
-            
-            <p class="text-center text-slate-500 text-xs mt-3">
-                You'll be taken to our booking calendar to select a time.
-            </p>
-        </div>
-
-        <!-- Not enough credits message -->
-        <div id="consultationInsufficientCredits" class="hidden">
-            <div class="bg-red-500/10 border border-red-500 rounded-lg p-4 text-center">
-                <p class="text-red-400 font-bold mb-2">Insufficient Credits</p>
-                <p class="text-slate-300 text-sm mb-4">You need <span id="creditsNeeded" class="text-amber-400 font-bold">0</span> credits for this consultation.</p>
-                <button onclick="openCreditsModal(); closeConsultationBookingModal();" 
-                        class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-6 rounded-lg transition-all">
-                    Get More Credits
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
+<!-- Old consultationBookingModal removed - using new enhanced version below -->
 
 <!-- ========================================== -->
 <!-- DOCUMENT UNLOCK MODAL (Preview & Unlock) -->
@@ -6033,7 +5923,7 @@ function setBilling(billing) {
 </div>
 
 <!-- ========================================== -->
-<!-- CONSULTATION REQUIRED MODAL -->
+<!-- CONSULTATION REQUIRED MODAL (for gated docs) -->
 <!-- ========================================== -->
 <div id="consultationRequiredModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
     <div class="bg-slate-800 rounded-2xl p-8 max-w-lg w-full border-4 border-red-500 fade-in">
@@ -6075,10 +5965,10 @@ function setBilling(billing) {
 
         <div class="space-y-3">
             <button onclick="openConsultationBookingFromRequired()" 
-                    class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2">
+                    class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg">
                 <span>📞</span>
                 <span>Book Consultation</span>
-                <span class="bg-slate-900 text-amber-400 text-sm px-2 py-1 rounded ml-2" id="requiredConsultationCredits">7 credits</span>
+                <span class="bg-white/20 text-white text-sm px-2 py-1 rounded ml-2" id="requiredConsultationCredits">7 credits</span>
             </button>
             
             <button onclick="closeConsultationRequiredModal()" 
@@ -6090,6 +5980,237 @@ function setBilling(billing) {
         <p class="text-center text-slate-500 text-xs mt-4">
             Questions? Call us: <a href="tel:+61400211014" class="text-amber-400">+61 400 211 014</a>
         </p>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- CONSULTATION BOOKING MODAL (Main booking flow) -->
+<!-- ========================================== -->
+<div id="consultationBookingModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50 overflow-y-auto">
+    <div class="bg-slate-800 rounded-2xl max-w-2xl w-full border border-purple-500/50 fade-in my-4">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-t-2xl p-6 text-center relative">
+            <button onclick="closeConsultationBookingModal()" class="absolute top-4 right-4 text-white/70 hover:text-white text-2xl">×</button>
+            <div class="text-5xl mb-3">👩‍💼</div>
+            <h2 class="text-2xl font-bold text-white mb-1">Book an HR Expert</h2>
+            <p class="text-purple-200 text-sm">30-minute consultation with a senior HR professional</p>
+        </div>
+        
+        <!-- Content -->
+        <div class="p-6">
+            
+            <!-- Step 1: Select Consultation Type -->
+            <div id="bookingStep1">
+                <h3 class="text-white font-bold mb-4 flex items-center gap-2">
+                    <span class="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-sm">1</span>
+                    Select Consultation Type
+                </h3>
+                
+                <div class="grid gap-3" id="consultationTypeGrid">
+                    <!-- Termination Review -->
+                    <button onclick="selectConsultationType('terminationReview')" 
+                            class="consultation-type-btn p-4 bg-slate-900 hover:bg-slate-700 border-2 border-slate-600 hover:border-purple-500 rounded-xl text-left transition-all group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">🚪</span>
+                                <div>
+                                    <p class="text-white font-semibold group-hover:text-purple-400 transition-colors">Termination Review</p>
+                                    <p class="text-slate-400 text-xs">Includes termination letter if approved</p>
+                                </div>
+                            </div>
+                            <span class="bg-purple-600/30 text-purple-300 px-3 py-1 rounded-full text-sm font-bold">7 credits</span>
+                        </div>
+                    </button>
+                    
+                    <!-- Redundancy Review -->
+                    <button onclick="selectConsultationType('redundancyReview')" 
+                            class="consultation-type-btn p-4 bg-slate-900 hover:bg-slate-700 border-2 border-slate-600 hover:border-purple-500 rounded-xl text-left transition-all group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">📉</span>
+                                <div>
+                                    <p class="text-white font-semibold group-hover:text-purple-400 transition-colors">Redundancy Review</p>
+                                    <p class="text-slate-400 text-xs">Includes redundancy letters if approved</p>
+                                </div>
+                            </div>
+                            <span class="bg-purple-600/30 text-purple-300 px-3 py-1 rounded-full text-sm font-bold">7 credits</span>
+                        </div>
+                    </button>
+                    
+                    <!-- Investigation Review -->
+                    <button onclick="selectConsultationType('investigationReview')" 
+                            class="consultation-type-btn p-4 bg-slate-900 hover:bg-slate-700 border-2 border-slate-600 hover:border-purple-500 rounded-xl text-left transition-all group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">🔍</span>
+                                <div>
+                                    <p class="text-white font-semibold group-hover:text-purple-400 transition-colors">Investigation Review</p>
+                                    <p class="text-slate-400 text-xs">Includes investigation report</p>
+                                </div>
+                            </div>
+                            <span class="bg-purple-600/30 text-purple-300 px-3 py-1 rounded-full text-sm font-bold">8 credits</span>
+                        </div>
+                    </button>
+                    
+                    <!-- Settlement Review -->
+                    <button onclick="selectConsultationType('settlementReview')" 
+                            class="consultation-type-btn p-4 bg-slate-900 hover:bg-slate-700 border-2 border-slate-600 hover:border-purple-500 rounded-xl text-left transition-all group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">🤝</span>
+                                <div>
+                                    <p class="text-white font-semibold group-hover:text-purple-400 transition-colors">Settlement Review</p>
+                                    <p class="text-slate-400 text-xs">Includes deed of settlement draft</p>
+                                </div>
+                            </div>
+                            <span class="bg-purple-600/30 text-purple-300 px-3 py-1 rounded-full text-sm font-bold">8 credits</span>
+                        </div>
+                    </button>
+                    
+                    <!-- Unfair Dismissal Response -->
+                    <button onclick="selectConsultationType('unfairDismissalResponse')" 
+                            class="consultation-type-btn p-4 bg-slate-900 hover:bg-slate-700 border-2 border-slate-600 hover:border-purple-500 rounded-xl text-left transition-all group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">⚖️</span>
+                                <div>
+                                    <p class="text-white font-semibold group-hover:text-purple-400 transition-colors">Unfair Dismissal Response</p>
+                                    <p class="text-slate-400 text-xs">Includes response draft for Fair Work</p>
+                                </div>
+                            </div>
+                            <span class="bg-purple-600/30 text-purple-300 px-3 py-1 rounded-full text-sm font-bold">8 credits</span>
+                        </div>
+                    </button>
+                    
+                    <!-- General Consultation -->
+                    <button onclick="selectConsultationType('generalConsultation')" 
+                            class="consultation-type-btn p-4 bg-slate-900 hover:bg-slate-700 border-2 border-slate-600 hover:border-purple-500 rounded-xl text-left transition-all group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">💬</span>
+                                <div>
+                                    <p class="text-white font-semibold group-hover:text-purple-400 transition-colors">General HR Consultation</p>
+                                    <p class="text-slate-400 text-xs">Expert advice on any HR matter</p>
+                                </div>
+                            </div>
+                            <span class="bg-purple-600/30 text-purple-300 px-3 py-1 rounded-full text-sm font-bold">5 credits</span>
+                        </div>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Select Meeting Type & Book -->
+            <div id="bookingStep2" class="hidden">
+                <button onclick="goBackToStep1()" class="text-purple-400 hover:text-purple-300 text-sm mb-4 flex items-center gap-1">
+                    ← Back to consultation types
+                </button>
+                
+                <h3 class="text-white font-bold mb-4 flex items-center gap-2">
+                    <span class="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-sm">2</span>
+                    Choose Meeting Type
+                </h3>
+                
+                <!-- Selected consultation summary -->
+                <div id="selectedConsultationSummary" class="bg-purple-600/20 border border-purple-500 rounded-xl p-4 mb-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <span id="selectedConsultationIcon" class="text-2xl">💬</span>
+                            <div>
+                                <p id="selectedConsultationName" class="text-white font-semibold">General HR Consultation</p>
+                                <p id="selectedConsultationIncludes" class="text-purple-300 text-xs">Expert advice on any HR matter</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p id="selectedConsultationCredits" class="text-2xl font-bold text-purple-400">5</p>
+                            <p class="text-purple-300 text-xs">credits</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Meeting Type Selection -->
+                <div class="grid grid-cols-2 gap-3 mb-4">
+                    <button onclick="selectMeetingType('zoom')" id="meetingTypeZoom"
+                            class="meeting-type-btn p-4 bg-slate-900 hover:bg-slate-700 border-2 border-slate-600 rounded-xl text-center transition-all">
+                        <span class="text-3xl block mb-2">📹</span>
+                        <p class="text-white font-semibold">Zoom Meeting</p>
+                        <p class="text-slate-400 text-xs">Video call with screen share</p>
+                    </button>
+                    <button onclick="selectMeetingType('phone')" id="meetingTypePhone"
+                            class="meeting-type-btn p-4 bg-slate-900 hover:bg-slate-700 border-2 border-slate-600 rounded-xl text-center transition-all">
+                        <span class="text-3xl block mb-2">📞</span>
+                        <p class="text-white font-semibold">Phone Call</p>
+                        <p class="text-slate-400 text-xs">We'll call you</p>
+                    </button>
+                </div>
+                
+                <!-- Credit Check & Book Button -->
+                <div id="bookingCreditCheck" class="mb-4">
+                    <div class="flex items-center justify-between text-sm mb-2">
+                        <span class="text-slate-400">Your credit balance:</span>
+                        <span id="bookingCurrentCredits" class="text-white font-bold">0 credits</span>
+                    </div>
+                    <div class="flex items-center justify-between text-sm">
+                        <span class="text-slate-400">After booking:</span>
+                        <span id="bookingCreditsAfter" class="text-green-400 font-bold">0 credits</span>
+                    </div>
+                </div>
+                
+                <!-- Insufficient Credits Warning -->
+                <div id="bookingInsufficientCredits" class="hidden bg-red-500/20 border border-red-500 rounded-xl p-4 mb-4">
+                    <p class="text-red-400 font-semibold mb-2">⚠️ Not enough credits</p>
+                    <p class="text-red-300 text-sm mb-3">You need more credits to book this consultation.</p>
+                    <button onclick="getCreditsFromBooking()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 rounded-lg transition-all">
+                        Get More Credits
+                    </button>
+                </div>
+                
+                <!-- Book Now Button -->
+                <button id="proceedToCalendlyBtn" onclick="proceedToCalendly()" 
+                        class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed">
+                    <span>📅</span>
+                    <span>Select Time Slot</span>
+                </button>
+                
+                <p class="text-slate-500 text-xs text-center mt-3">
+                    Credits will be deducted when you confirm your booking
+                </p>
+            </div>
+            
+            <!-- Step 3: Calendly Embed -->
+            <div id="bookingStep3" class="hidden">
+                <button onclick="goBackToStep2()" class="text-purple-400 hover:text-purple-300 text-sm mb-4 flex items-center gap-1">
+                    ← Back to meeting type
+                </button>
+                
+                <h3 class="text-white font-bold mb-4 flex items-center gap-2">
+                    <span class="w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center text-sm">3</span>
+                    Select Your Time Slot
+                </h3>
+                
+                <!-- Calendly Container -->
+                <div id="calendlyContainer" class="bg-white rounded-xl overflow-hidden" style="min-height: 600px;">
+                    <!-- Calendly inline widget will be loaded here -->
+                    <div id="calendlyPlaceholder" class="flex items-center justify-center h-96 bg-slate-100">
+                        <div class="text-center">
+                            <div class="animate-spin text-4xl mb-4">⏳</div>
+                            <p class="text-slate-600">Loading calendar...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        
+        <!-- Footer -->
+        <div class="bg-slate-900 rounded-b-2xl p-4 flex items-center justify-between">
+            <p class="text-slate-500 text-xs">
+                Questions? <a href="tel:+61400211014" class="text-purple-400 hover:text-purple-300">+61 400 211 014</a>
+            </p>
+            <p class="text-slate-500 text-xs">
+                <a href="mailto:blake@fitzgeraldhr.com.au" class="text-purple-400 hover:text-purple-300">blake@fitzgeraldhr.com.au</a>
+            </p>
+        </div>
     </div>
 </div>
 
@@ -11834,6 +11955,70 @@ function resetDocumentBuilder() {
 
 // Track selected consultation type
 let selectedConsultation = null;
+let selectedMeetingType = null;
+
+// Consultation types configuration
+const CONSULTATION_TYPES = {
+    terminationReview: {
+        name: 'Termination Review',
+        icon: '🚪',
+        credits: 7,
+        includes: 'Includes termination letter if approved',
+        calendlyZoom: 'CALENDLY_TERMINATION_ZOOM_URL',
+        calendlyPhone: 'CALENDLY_TERMINATION_PHONE_URL'
+    },
+    redundancyReview: {
+        name: 'Redundancy Review',
+        icon: '📉',
+        credits: 7,
+        includes: 'Includes redundancy letters if approved',
+        calendlyZoom: 'CALENDLY_REDUNDANCY_ZOOM_URL',
+        calendlyPhone: 'CALENDLY_REDUNDANCY_PHONE_URL'
+    },
+    investigationReview: {
+        name: 'Investigation Review',
+        icon: '🔍',
+        credits: 8,
+        includes: 'Includes investigation report',
+        calendlyZoom: 'CALENDLY_INVESTIGATION_ZOOM_URL',
+        calendlyPhone: 'CALENDLY_INVESTIGATION_PHONE_URL'
+    },
+    settlementReview: {
+        name: 'Settlement Review',
+        icon: '🤝',
+        credits: 8,
+        includes: 'Includes deed of settlement draft',
+        calendlyZoom: 'CALENDLY_SETTLEMENT_ZOOM_URL',
+        calendlyPhone: 'CALENDLY_SETTLEMENT_PHONE_URL'
+    },
+    unfairDismissalResponse: {
+        name: 'Unfair Dismissal Response',
+        icon: '⚖️',
+        credits: 8,
+        includes: 'Includes response draft for Fair Work',
+        calendlyZoom: 'CALENDLY_UNFAIR_DISMISSAL_ZOOM_URL',
+        calendlyPhone: 'CALENDLY_UNFAIR_DISMISSAL_PHONE_URL'
+    },
+    generalConsultation: {
+        name: 'General HR Consultation',
+        icon: '💬',
+        credits: 5,
+        includes: 'Expert advice on any HR matter',
+        calendlyZoom: 'CALENDLY_GENERAL_ZOOM_URL',
+        calendlyPhone: 'CALENDLY_GENERAL_PHONE_URL'
+    }
+};
+
+// ============================================
+// CALENDLY CONFIGURATION
+// ============================================
+const CALENDLY_CONFIG = {
+    baseUrl: 'https://calendly.com/blakefitzgerald4',
+    events: {
+        zoom: 'hr-consultation-zoom',
+        phone: '30min'
+    }
+};
 
 /**
  * Open the credits management modal
@@ -11877,22 +12062,34 @@ function closePromptLimitModal() {
 /**
  * Open the consultation booking modal
  */
-function openConsultationBookingModal() {
-    // Reset selection
+function openConsultationBookingModal(preselectedType = null) {
+    // Reset state
     selectedConsultation = null;
+    selectedMeetingType = null;
+    
+    // Reset all button states
     document.querySelectorAll('.consultation-type-btn').forEach(btn => {
-        btn.classList.remove('border-amber-500', 'border-2');
+        btn.classList.remove('border-purple-500', 'border-2', 'bg-slate-700');
         btn.classList.add('border-slate-600');
     });
     
-    // Hide action section
-    document.getElementById('consultationBookingAction').classList.add('hidden');
-    document.getElementById('consultationInsufficientCredits').classList.add('hidden');
+    document.querySelectorAll('.meeting-type-btn').forEach(btn => {
+        btn.classList.remove('border-purple-500', 'border-2', 'bg-slate-700');
+        btn.classList.add('border-slate-600');
+    });
     
-    // Reset urgent checkbox
-    document.getElementById('urgentConsultation').checked = false;
+    // Show step 1, hide others
+    document.getElementById('bookingStep1').classList.remove('hidden');
+    document.getElementById('bookingStep2').classList.add('hidden');
+    document.getElementById('bookingStep3').classList.add('hidden');
     
+    // Show modal
     document.getElementById('consultationBookingModal').classList.remove('hidden');
+    
+    // If preselected type, auto-select it
+    if (preselectedType && CONSULTATION_TYPES[preselectedType]) {
+        setTimeout(() => selectConsultationType(preselectedType), 100);
+    }
 }
 
 /**
@@ -11900,113 +12097,19 @@ function openConsultationBookingModal() {
  */
 function closeConsultationBookingModal() {
     document.getElementById('consultationBookingModal').classList.add('hidden');
-}
-
-/**
- * Select a consultation type
- */
-function selectConsultationType(type) {
-    selectedConsultation = type;
-    const config = CONFIG.CREDITS.CONSULTATION_GATED[type];
     
-    if (!config) return;
-    
-    // Update button styles
-    document.querySelectorAll('.consultation-type-btn').forEach(btn => {
-        btn.classList.remove('border-amber-500', 'border-2');
-        btn.classList.add('border-slate-600');
-    });
-    event.currentTarget.classList.remove('border-slate-600');
-    event.currentTarget.classList.add('border-amber-500', 'border-2');
-    
-    // Calculate total credits
-    const isUrgent = document.getElementById('urgentConsultation').checked;
-    const urgentPremiumCredits = isUrgent ? 0 : 0; // Urgent is cash, not credits
-    const totalCredits = config.credits;
-    
-    // Update display
-    document.getElementById('selectedConsultationType').textContent = config.name;
-    document.getElementById('consultationTotalCredits').textContent = `${totalCredits} credits`;
-    
-    // Check if user can afford
-    const canAfford = getTotalCredits() >= totalCredits;
-    
-    if (canAfford) {
-        document.getElementById('consultationBookingAction').classList.remove('hidden');
-        document.getElementById('consultationInsufficientCredits').classList.add('hidden');
-    } else {
-        document.getElementById('consultationBookingAction').classList.add('hidden');
-        document.getElementById('consultationInsufficientCredits').classList.remove('hidden');
-        document.getElementById('creditsNeeded').textContent = totalCredits;
+    // Clean up any Calendly widget
+    const calendlyContainer = document.getElementById('calendlyContainer');
+    if (calendlyContainer) {
+        calendlyContainer.innerHTML = `
+            <div id="calendlyPlaceholder" class="flex items-center justify-center h-96 bg-slate-100">
+                <div class="text-center">
+                    <div class="animate-spin text-4xl mb-4">⏳</div>
+                    <p class="text-slate-600">Loading calendar...</p>
+                </div>
+            </div>
+        `;
     }
-}
-
-/**
- * Handle urgent checkbox change
- */
-document.addEventListener('DOMContentLoaded', () => {
-    const urgentCheckbox = document.getElementById('urgentConsultation');
-    if (urgentCheckbox) {
-        urgentCheckbox.addEventListener('change', () => {
-            if (selectedConsultation) {
-                // Re-trigger selection to update display
-                const selectedBtn = document.querySelector('.consultation-type-btn.border-amber-500');
-                if (selectedBtn) {
-                    selectConsultationType(selectedConsultation);
-                }
-            }
-        });
-    }
-});
-
-/**
- * Proceed with consultation booking
- */
-function proceedWithConsultationBooking() {
-    if (!selectedConsultation) return;
-    
-    const config = CONFIG.CREDITS.CONSULTATION_GATED[selectedConsultation];
-    const isUrgent = document.getElementById('urgentConsultation').checked;
-    
-    // Deduct credits
-    const creditsNeeded = config.credits;
-    
-    if (getTotalCredits() < creditsNeeded) {
-        alert('Insufficient credits. Please purchase more credits.');
-        openCreditsModal();
-        return;
-    }
-    
-    // Deduct from purchased credits first, then subscription
-    if (userCredits.purchasedCredits >= creditsNeeded) {
-        userCredits.purchasedCredits -= creditsNeeded;
-    } else {
-        const remaining = creditsNeeded - userCredits.purchasedCredits;
-        userCredits.purchasedCredits = 0;
-        userCredits.subscriptionCredits -= remaining;
-    }
-    
-    saveUserCredits();
-    
-    // Close modal
-    closeConsultationBookingModal();
-    
-    // Build booking URL with consultation type
-    let bookingUrl = 'https://calendly.com/fitzgeraldhr/consultation';
-    
-    // If urgent, we'd handle the +$100 payment separately (Stripe checkout)
-    if (isUrgent) {
-        // For now, alert that urgent requires additional payment
-        alert(`Your ${config.name} has been reserved. You'll be redirected to book a time.\n\nNote: Urgent same-day consultations require an additional $100 payment, which will be collected during booking.`);
-    } else {
-        alert(`Your ${config.name} has been reserved (${creditsNeeded} credits deducted). You'll be redirected to book a time.`);
-    }
-    
-    // In production, this would open Calendly or your booking system
-    // window.open(bookingUrl, '_blank');
-    
-    // For now, show a confirmation message
-    addMessage('assistant', `✅ **Consultation Booked!**\n\nYour **${config.name}** has been scheduled. ${creditsNeeded} credits have been deducted from your account.\n\n📅 **Next Steps:**\n1. Check your email for the booking confirmation\n2. Prepare any relevant documentation\n3. We'll call you at the scheduled time\n\n${isUrgent ? '⚡ **Urgent booking:** Our team will contact you within 2 hours to confirm a same-day time slot.' : ''}\n\nQuestions? Call us: **+61 400 211 014**`);
 }
 
 /**
@@ -12014,7 +12117,11 @@ function proceedWithConsultationBooking() {
  */
 function openConsultationBookingFromRequired() {
     closeConsultationRequiredModal();
-    openConsultationBookingModal();
+    
+    // Get the required consultation type from context
+    const requiredType = document.getElementById('consultationRequiredModal').dataset.consultationType || 'terminationReview';
+    
+    openConsultationBookingModal(requiredType);
 }
 
 /**
@@ -12022,6 +12129,341 @@ function openConsultationBookingFromRequired() {
  */
 function closeConsultationRequiredModal() {
     document.getElementById('consultationRequiredModal').classList.add('hidden');
+}
+
+/**
+ * Select a consultation type
+ */
+function selectConsultationType(type) {
+    const config = CONSULTATION_TYPES[type];
+    if (!config) return;
+    
+    selectedConsultation = type;
+    
+    // Update button styles
+    document.querySelectorAll('.consultation-type-btn').forEach(btn => {
+        btn.classList.remove('border-purple-500', 'border-2', 'bg-slate-700');
+        btn.classList.add('border-slate-600');
+    });
+    
+    // Find and highlight the selected button
+    const buttons = document.querySelectorAll('.consultation-type-btn');
+    buttons.forEach(btn => {
+        if (btn.onclick && btn.onclick.toString().includes(type)) {
+            btn.classList.remove('border-slate-600');
+            btn.classList.add('border-purple-500', 'border-2', 'bg-slate-700');
+        }
+    });
+    
+    // Move to step 2
+    goToStep2();
+}
+
+/**
+ * Navigate to step 2 (meeting type selection)
+ */
+function goToStep2() {
+    const config = CONSULTATION_TYPES[selectedConsultation];
+    if (!config) return;
+    
+    // Update summary
+    document.getElementById('selectedConsultationIcon').textContent = config.icon;
+    document.getElementById('selectedConsultationName').textContent = config.name;
+    document.getElementById('selectedConsultationIncludes').textContent = config.includes;
+    document.getElementById('selectedConsultationCredits').textContent = config.credits;
+    
+    // Update credit display
+    const currentCredits = getTotalCredits();
+    const creditsAfter = Math.max(0, currentCredits - config.credits);
+    
+    document.getElementById('bookingCurrentCredits').textContent = `${currentCredits} credits`;
+    document.getElementById('bookingCreditsAfter').textContent = `${creditsAfter} credits`;
+    
+    // Check if user can afford
+    const canAfford = currentCredits >= config.credits;
+    
+    if (canAfford) {
+        document.getElementById('bookingInsufficientCredits').classList.add('hidden');
+        document.getElementById('proceedToCalendlyBtn').classList.remove('hidden');
+        document.getElementById('proceedToCalendlyBtn').disabled = true; // Enable after meeting type selected
+        document.getElementById('bookingCreditsAfter').className = creditsAfter <= 2 ? 'text-red-400 font-bold' : 'text-green-400 font-bold';
+    } else {
+        document.getElementById('bookingInsufficientCredits').classList.remove('hidden');
+        document.getElementById('proceedToCalendlyBtn').classList.add('hidden');
+        document.getElementById('bookingCreditsAfter').textContent = 'Not enough credits';
+        document.getElementById('bookingCreditsAfter').className = 'text-red-400 font-bold';
+    }
+    
+    // Reset meeting type selection
+    selectedMeetingType = null;
+    document.querySelectorAll('.meeting-type-btn').forEach(btn => {
+        btn.classList.remove('border-purple-500', 'border-2', 'bg-slate-700');
+        btn.classList.add('border-slate-600');
+    });
+    
+    // Switch views
+    document.getElementById('bookingStep1').classList.add('hidden');
+    document.getElementById('bookingStep2').classList.remove('hidden');
+    document.getElementById('bookingStep3').classList.add('hidden');
+}
+
+/**
+ * Go back to step 1
+ */
+function goBackToStep1() {
+    selectedConsultation = null;
+    selectedMeetingType = null;
+    
+    document.getElementById('bookingStep1').classList.remove('hidden');
+    document.getElementById('bookingStep2').classList.add('hidden');
+    document.getElementById('bookingStep3').classList.add('hidden');
+}
+
+/**
+ * Go back to step 2
+ */
+function goBackToStep2() {
+    document.getElementById('bookingStep1').classList.add('hidden');
+    document.getElementById('bookingStep2').classList.remove('hidden');
+    document.getElementById('bookingStep3').classList.add('hidden');
+}
+
+/**
+ * Select meeting type (Zoom or Phone)
+ */
+function selectMeetingType(type) {
+    selectedMeetingType = type;
+    
+    // Update button styles
+    document.querySelectorAll('.meeting-type-btn').forEach(btn => {
+        btn.classList.remove('border-purple-500', 'border-2', 'bg-slate-700');
+        btn.classList.add('border-slate-600');
+    });
+    
+    const selectedBtn = document.getElementById(type === 'zoom' ? 'meetingTypeZoom' : 'meetingTypePhone');
+    if (selectedBtn) {
+        selectedBtn.classList.remove('border-slate-600');
+        selectedBtn.classList.add('border-purple-500', 'border-2', 'bg-slate-700');
+    }
+    
+    // Enable proceed button
+    const proceedBtn = document.getElementById('proceedToCalendlyBtn');
+    if (proceedBtn) {
+        proceedBtn.disabled = false;
+    }
+}
+
+/**
+ * Get credits from booking flow (save state and open credits modal)
+ */
+function getCreditsFromBooking() {
+    // Save booking state to localStorage so we can restore after purchase
+    const bookingState = {
+        consultationType: selectedConsultation,
+        meetingType: selectedMeetingType,
+        timestamp: Date.now()
+    };
+    localStorage.setItem('pendingConsultationBooking', JSON.stringify(bookingState));
+    
+    closeConsultationBookingModal();
+    openCreditsModal();
+}
+
+/**
+ * Proceed to Calendly booking
+ */
+function proceedToCalendly() {
+    if (!selectedConsultation || !selectedMeetingType) {
+        showNotification('Please select a meeting type', 'error');
+        return;
+    }
+    
+    const config = CONSULTATION_TYPES[selectedConsultation];
+    if (!config) return;
+    
+    // Check credits one more time
+    if (getTotalCredits() < config.credits) {
+        showNotification('Insufficient credits', 'error');
+        return;
+    }
+    
+    // Store booking intent for credit deduction after Calendly completes
+    const bookingIntent = {
+        consultationType: selectedConsultation,
+        meetingType: selectedMeetingType,
+        credits: config.credits,
+        timestamp: Date.now()
+    };
+    localStorage.setItem('pendingCalendlyBooking', JSON.stringify(bookingIntent));
+    
+    // Move to step 3
+    document.getElementById('bookingStep1').classList.add('hidden');
+    document.getElementById('bookingStep2').classList.add('hidden');
+    document.getElementById('bookingStep3').classList.remove('hidden');
+    
+    // Load Calendly
+    loadCalendlyWidget();
+}
+
+/**
+ * Load Calendly inline widget
+ */
+function loadCalendlyWidget() {
+    const container = document.getElementById('calendlyContainer');
+    if (!container) return;
+    
+    const config = CONSULTATION_TYPES[selectedConsultation];
+    if (!config) return;
+    
+    // Build Calendly URL
+    const eventSlug = selectedMeetingType === 'zoom' ? CALENDLY_CONFIG.events.zoom : CALENDLY_CONFIG.events.phone;
+    const calendlyUrl = `${CALENDLY_CONFIG.baseUrl}/${eventSlug}`;
+    
+    // Prefill user data if available
+    const prefillData = {};
+    if (currentUser?.email) {
+        prefillData.email = currentUser.email;
+    }
+    if (currentUser?.displayName) {
+        prefillData.name = currentUser.displayName;
+    }
+    
+    // Build prefill query string
+    const prefillParams = new URLSearchParams();
+    if (prefillData.email) prefillParams.set('email', prefillData.email);
+    if (prefillData.name) prefillParams.set('name', prefillData.name);
+    
+    const fullUrl = prefillParams.toString() ? `${calendlyUrl}?${prefillParams.toString()}` : calendlyUrl;
+    
+    // Check if Calendly script is loaded
+    if (typeof Calendly !== 'undefined') {
+        container.innerHTML = '';
+        Calendly.initInlineWidget({
+            url: fullUrl,
+            parentElement: container,
+            prefill: prefillData,
+            utm: {
+                utmSource: 'fitz-hr-app',
+                utmMedium: 'consultation-booking',
+                utmCampaign: selectedConsultation
+            }
+        });
+    } else {
+        // Show manual booking fallback
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center h-96 bg-slate-100 rounded-xl p-6">
+                <div class="text-5xl mb-4">📅</div>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">Book Your Consultation</h3>
+                <p class="text-slate-600 text-center mb-6">Click the button below to select your preferred time slot.</p>
+                <a href="${fullUrl}" target="_blank" rel="noopener noreferrer"
+                   onclick="handleCalendlyRedirect()"
+                   class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-8 rounded-xl transition-all inline-flex items-center gap-2">
+                    <span>📅</span>
+                    <span>Open Calendar</span>
+                </a>
+                <p class="text-slate-500 text-sm mt-4">
+                    ${config.credits} credits will be deducted when you confirm your booking
+                </p>
+            </div>
+        `;
+    }
+}
+
+/**
+ * Handle Calendly redirect (for fallback mode)
+ */
+function handleCalendlyRedirect() {
+    showNotification('Complete your booking in the new tab. Credits will be deducted upon confirmation.', 'info');
+}
+
+/**
+ * Handle Calendly event scheduled (called via Calendly webhook or postMessage)
+ */
+function handleCalendlyEventScheduled(eventData) {
+    console.log('📅 Calendly event scheduled:', eventData);
+    
+    // Get pending booking
+    const pendingBooking = localStorage.getItem('pendingCalendlyBooking');
+    if (!pendingBooking) return;
+    
+    try {
+        const booking = JSON.parse(pendingBooking);
+        
+        // Deduct credits
+        const config = CONSULTATION_TYPES[booking.consultationType];
+        if (config) {
+            // Deduct from purchased credits first, then subscription
+            if (userCredits.purchasedCredits >= config.credits) {
+                userCredits.purchasedCredits -= config.credits;
+            } else {
+                const remaining = config.credits - userCredits.purchasedCredits;
+                userCredits.purchasedCredits = 0;
+                userCredits.subscriptionCredits -= remaining;
+            }
+            
+            saveUserCredits();
+            
+            showNotification(`🎉 Consultation booked! ${config.credits} credits used.`, 'success');
+            
+            // Add confirmation message to chat
+            addMessage('assistant', `## 📅 Consultation Booked!\n\nYour **${config.name}** has been scheduled.\n\n**Meeting type:** ${booking.meetingType === 'zoom' ? '📹 Zoom Video Call' : '📞 Phone Call'}\n**Credits used:** ${config.credits}\n\nYou'll receive a calendar invite shortly with all the details.\n\n${config.includes}`);
+        }
+        
+        // Clear pending booking
+        localStorage.removeItem('pendingCalendlyBooking');
+        
+        // Close modal
+        closeConsultationBookingModal();
+        
+    } catch (e) {
+        console.error('Error processing Calendly booking:', e);
+    }
+}
+
+// Listen for Calendly events via postMessage
+window.addEventListener('message', function(e) {
+    if (e.origin === 'https://calendly.com') {
+        if (e.data.event && e.data.event === 'calendly.event_scheduled') {
+            handleCalendlyEventScheduled(e.data.payload);
+        }
+    }
+});
+
+/**
+ * Check for pending consultation booking after credits purchase
+ */
+function checkPendingConsultationBooking() {
+    const pendingBooking = localStorage.getItem('pendingConsultationBooking');
+    if (!pendingBooking) return false;
+    
+    try {
+        const booking = JSON.parse(pendingBooking);
+        
+        // Check if booking is less than 1 hour old
+        if (Date.now() - booking.timestamp > 3600000) {
+            localStorage.removeItem('pendingConsultationBooking');
+            return false;
+        }
+        
+        // Restore booking modal
+        localStorage.removeItem('pendingConsultationBooking');
+        openConsultationBookingModal(booking.consultationType);
+        
+        // If meeting type was selected, restore that too
+        if (booking.meetingType) {
+            setTimeout(() => {
+                selectMeetingType(booking.meetingType);
+            }, 500);
+        }
+        
+        showNotification('Continue booking your consultation!', 'info');
+        return true;
+        
+    } catch (e) {
+        console.error('Error restoring consultation booking:', e);
+        localStorage.removeItem('pendingConsultationBooking');
+        return false;
+    }
 }
 
 /**
@@ -12427,11 +12869,15 @@ function handlePaymentReturn() {
                 // ✅ Check if there's a pending document to restore
                 const hasPendingDocument = localStorage.getItem('pendingDocument') !== null;
                 
+                // ✅ Check if there's a pending consultation booking to restore
+                const hasPendingConsultation = localStorage.getItem('pendingConsultationBooking') !== null;
+                
                 setTimeout(() => {
                     const documentRestored = restorePendingDocument();
+                    const consultationRestored = checkPendingConsultationBooking();
                     
-                    if (!documentRestored) {
-                        // No pending document - show normal success message
+                    if (!documentRestored && !consultationRestored) {
+                        // No pending document or consultation - show normal success message
                         if (purchase.type === 'subscription') {
                             addMessage('assistant', `## 🎉 Welcome to Fitz ${purchase.tierName}!\n\nYour subscription is now active!\n\n**Your benefits:**\n- ✅ **${purchase.credits} credits** added to your account\n- ✅ **Unlimited AI chat** (no more prompt limits!)\n- ✅ **Monthly credit refresh** on your billing date\n\nYour credit balance and plan have been updated in the header above.\n\nQuestions? Contact **blake@fitzgeraldhr.com.au**`);
                         } else if (purchase.type === 'credits') {
@@ -12442,16 +12888,15 @@ function handlePaymentReturn() {
                     }
                 }, 500);
                 
-                // Only refresh from Firebase if there was NO pending document
-                // If there was a pending document, we already deducted credits locally
-                // and we don't want Firebase to overwrite that
-                if (!hasPendingDocument) {
+                // Only refresh from Firebase if there was NO pending document or consultation
+                // If there was a pending item, we handle credits locally
+                if (!hasPendingDocument && !hasPendingConsultation) {
                     setTimeout(async () => {
                         console.log('🔄 Refreshing credits from Firebase after payment...');
                         await loadCreditsFromFirebase();
                     }, 3000);
                 } else {
-                    console.log('📄 Skipping delayed Firebase refresh - document was restored and credits deducted locally');
+                    console.log('📄 Skipping delayed Firebase refresh - pending item was restored');
                     // Instead, sync our local credits TO Firebase
                     setTimeout(async () => {
                         console.log('📄 Syncing local credits to Firebase...');
