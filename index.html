@@ -11945,7 +11945,7 @@ async function initiateStripeCheckout(priceKey) {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                priceKey: priceKey,
+                productKey: priceKey,
                 userId: userKey,
                 userEmail: userEmail,
                 successUrl: window.location.origin + '/?payment=success',
