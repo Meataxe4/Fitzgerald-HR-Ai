@@ -6670,32 +6670,73 @@ function saveUserCredits() {
     }
 }
 
-// Sync credits to Firebase
+// Load credits from Firebase
+async function loadCreditsFromFirebase() {
+    if (!currentUser?.uid) return false;
+    
+    try {
+        console.log('🔄 Loading credits from Firebase for:', currentUser.uid);
+        const userRef = db.collection('users').doc(currentUser.uid);
+        const doc = await userRef.get();
+        
+        if (doc.exists && doc.data().credits) {
+            const firebaseCredits = doc.data().credits;
+            
+            // Merge Firebase data with local (Firebase is source of truth)
+            userCredits = {
+                ...userCredits,
+                tier: firebaseCredits.tier || 'free',
+                subscriptionCredits: firebaseCredits.subscriptionCredits || 0,
+                purchasedCredits: firebaseCredits.purchasedCredits || 0,
+                bonusPrompts: firebaseCredits.bonusPrompts || 0,
+                monthlyPromptsUsed: firebaseCredits.monthlyPromptsUsed || 0,
+                monthlyPromptsReset: firebaseCredits.monthlyPromptsReset || new Date().toISOString(),
+                freeDocumentUsed: firebaseCredits.freeDocumentUsed || false,
+                lastCreditRefresh: firebaseCredits.lastCreditRefresh || null,
+                stripeCustomerId: firebaseCredits.stripeCustomerId || null
+            };
+            
+            // Save to localStorage as cache
+            const userKey = currentUser.uid;
+            localStorage.setItem('fitzCredits_' + userKey, JSON.stringify(userCredits));
+            
+            console.log('✅ Credits loaded from Firebase:', userCredits);
+            updateCreditsDisplay();
+            return true;
+        } else {
+            console.log('No credits data in Firebase, using defaults');
+            return false;
+        }
+    } catch (e) {
+        console.error('Error loading credits from Firebase:', e);
+        return false;
+    }
+}
+
+/**
+ * Sync local credits to Firebase (called after local changes)
+ */
 async function syncCreditsToFirebase() {
     if (!currentUser?.uid) return;
     
     try {
         const userRef = db.collection('users').doc(currentUser.uid);
-        await userRef.set({ credits: userCredits }, { merge: true });
+        await userRef.set({
+            credits: {
+                tier: userCredits.tier,
+                subscriptionCredits: userCredits.subscriptionCredits,
+                purchasedCredits: userCredits.purchasedCredits,
+                bonusPrompts: userCredits.bonusPrompts || 0,
+                monthlyPromptsUsed: userCredits.monthlyPromptsUsed,
+                monthlyPromptsReset: userCredits.monthlyPromptsReset,
+                freeDocumentUsed: userCredits.freeDocumentUsed,
+                lastCreditRefresh: userCredits.lastCreditRefresh,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            }
+        }, { merge: true });
+        console.log('✅ Credits synced to Firebase');
     } catch (e) {
         console.error('Error syncing credits to Firebase:', e);
-    }
-}
-
-// Load credits from Firebase
-async function loadCreditsFromFirebase() {
-    if (!currentUser?.uid) return;
-    
-    try {
-        const userRef = db.collection('users').doc(currentUser.uid);
-        const doc = await userRef.get();
-        
-        if (doc.exists && doc.data().credits) {
-            userCredits = { ...userCredits, ...doc.data().credits };
-            saveUserCredits(); // Sync to localStorage
-        }
-    } catch (e) {
-        console.error('Error loading credits from Firebase:', e);
     }
 }
 
@@ -12159,13 +12200,29 @@ function handlePaymentReturn() {
                 // Clear the pending purchase
                 localStorage.removeItem('pendingPurchase');
                 
+                // Also refresh from Firebase after webhook has time to process
+                setTimeout(async () => {
+                    console.log('🔄 Refreshing credits from Firebase after payment...');
+                    await loadCreditsFromFirebase();
+                }, 3000); // Wait 3 seconds for webhook to complete
+                
             } catch (e) {
                 console.error('Error processing payment return:', e);
                 showNotification('Payment successful! Please refresh if credits don\'t appear.', 'success');
+                
+                // Try to load from Firebase anyway
+                setTimeout(async () => {
+                    await loadCreditsFromFirebase();
+                }, 3000);
             }
         } else {
-            // No pending purchase found - might be a page refresh
+            // No pending purchase found - might be a page refresh, try loading from Firebase
             showNotification('🎉 Payment successful!', 'success');
+            
+            setTimeout(async () => {
+                console.log('🔄 No pending purchase found, refreshing from Firebase...');
+                await loadCreditsFromFirebase();
+            }, 2000);
         }
         
         // Clean up URL
@@ -29756,6 +29813,9 @@ if (auth) {
             }
             
             await loadAllDataFromFirebase(); // Use new Firebase-first system with retry
+            
+            // Load credits from Firebase (source of truth for subscription status)
+            await loadCreditsFromFirebase();
             
             // Check Firebase for legal acceptance and load last conversation ID
             if (db) {
