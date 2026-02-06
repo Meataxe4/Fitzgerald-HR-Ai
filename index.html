@@ -13256,7 +13256,7 @@ function showNotification(message, type = 'info') {
 
 /**
  * Apply blur to document preview (for unpaid documents)
- * Shows first ~25-30 lines clearly, then blurs the rest
+ * Shows first portion of content with blur overlay for rest
  * @param {string} docType - Document type for unlock modal
  * @param {string} docName - Document name for display
  */
@@ -13271,54 +13271,33 @@ function applyDocumentBlur(docType, docName) {
         previewModal.dataset.docName = docName || 'Document';
     }
     
-    // Make preview container relative for absolute positioning
+    // Make preview container have limited height with blur
     const previewContainer = previewContent.parentElement;
     previewContainer.style.position = 'relative';
     previewContainer.style.overflow = 'hidden';
+    previewContainer.style.maxHeight = '250px';
     
-    // Calculate visible area - approximately 25-30 lines (around 450px)
-    const visibleHeight = 450;
-    
-    // Create blur overlay that starts AFTER the visible preview area
+    // Create blur overlay
     const blurOverlay = document.createElement('div');
     blurOverlay.id = 'documentBlurOverlay';
     blurOverlay.style.cssText = `
         position: absolute;
-        top: ${visibleHeight}px;
+        top: 150px;
         left: 0;
         right: 0;
         bottom: 0;
         background: linear-gradient(to bottom, 
             rgba(255,255,255,0) 0%,
             rgba(255,255,255,0.7) 30px,
-            rgba(255,255,255,0.95) 80px,
-            rgba(255,255,255,1) 150px
+            rgba(255,255,255,0.95) 60px,
+            rgba(255,255,255,1) 100px
         );
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
         pointer-events: none;
         z-index: 5;
     `;
     previewContainer.appendChild(blurOverlay);
-    
-    // Add a gradient fade at the transition point for smoother effect
-    const fadeGradient = document.createElement('div');
-    fadeGradient.id = 'documentFadeGradient';
-    fadeGradient.style.cssText = `
-        position: absolute;
-        top: ${visibleHeight - 50}px;
-        left: 0;
-        right: 0;
-        height: 100px;
-        background: linear-gradient(to bottom, 
-            rgba(255,255,255,0) 0%,
-            rgba(255,255,255,0.3) 50%,
-            rgba(255,255,255,0.6) 100%
-        );
-        pointer-events: none;
-        z-index: 4;
-    `;
-    previewContainer.appendChild(fadeGradient);
     
     // Get the cost for this document type
     const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
@@ -13326,38 +13305,32 @@ function applyDocumentBlur(docType, docName) {
     const currentBalance = getTotalCredits();
     
     // Determine button text and subtitle
-    let buttonText = `Unlock Document (${creditCost} credit${creditCost > 1 ? 's' : ''})`;
-    let subtitle = `Your balance: ${currentBalance} credits`;
+    let buttonText = `🔓 Unlock Document (${creditCost} credit${creditCost > 1 ? 's' : ''})`;
+    let subtitle = `Your balance: ${currentBalance} credit${currentBalance !== 1 ? 's' : ''}`;
     
     if (currentBalance < creditCost) {
-        buttonText = 'Get Credits to Unlock';
-        subtitle = `Need ${creditCost} credits • You have ${currentBalance}`;
+        buttonText = '💳 Get Credits to Unlock';
+        subtitle = `Need ${creditCost} credit${creditCost > 1 ? 's' : ''} • You have ${currentBalance}`;
     }
     
-    // Add unlock prompt - positioned in the blurred area
+    // Create unlock prompt as SIBLING element (after the preview container)
     const unlockPrompt = document.createElement('div');
     unlockPrompt.id = 'documentUnlockPrompt';
-    unlockPrompt.style.cssText = `
-        position: absolute;
-        top: ${visibleHeight + 80}px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 10;
-        text-align: center;
-    `;
     unlockPrompt.innerHTML = `
-        <div class="bg-slate-800 border-2 border-amber-500 rounded-xl p-6 shadow-2xl">
-            <div class="text-4xl mb-3">🔒</div>
-            <h3 class="text-xl font-bold text-white mb-2">Preview Only</h3>
-            <p class="text-slate-300 text-sm mb-4">Confirm to unlock and download this document.</p>
+        <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
+            <div class="text-3xl mb-2">🔒</div>
+            <h3 class="text-lg font-bold text-white mb-2">Preview Only</h3>
+            <p class="text-slate-300 text-sm mb-4">Unlock this document to view the full content and download.</p>
             <button onclick="openDocumentUnlockModal('${docType}', '${docName}')" 
-                    class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-6 rounded-lg transition-all">
+                    class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
                 ${buttonText}
             </button>
             <p class="text-slate-400 text-xs mt-3">${subtitle}</p>
         </div>
     `;
-    previewContainer.appendChild(unlockPrompt);
+    
+    // Insert unlock prompt AFTER the preview container
+    previewContainer.parentNode.insertBefore(unlockPrompt, previewContainer.nextSibling);
     
     // Disable download buttons while blurred
     const downloadBtns = document.querySelectorAll('#documentPreviewModal button[onclick*="download"]');
@@ -13373,12 +13346,18 @@ function applyDocumentBlur(docType, docName) {
  */
 function removeDocumentBlur() {
     const blurOverlay = document.getElementById('documentBlurOverlay');
-    const fadeGradient = document.getElementById('documentFadeGradient');
     const unlockPrompt = document.getElementById('documentUnlockPrompt');
     
     if (blurOverlay) blurOverlay.remove();
-    if (fadeGradient) fadeGradient.remove();
     if (unlockPrompt) unlockPrompt.remove();
+    
+    // Reset container styles
+    const previewContent = document.getElementById('documentPreviewContent');
+    if (previewContent && previewContent.parentElement) {
+        previewContent.parentElement.style.maxHeight = '';
+        previewContent.parentElement.style.overflow = '';
+        previewContent.parentElement.style.position = '';
+    }
     
     // Re-enable download buttons
     const downloadBtns = document.querySelectorAll('#documentPreviewModal button[onclick*="download"]');
@@ -13395,7 +13374,7 @@ function removeDocumentBlur() {
 
 /**
  * Apply blur overlay to any document preview container
- * Shows first 25-30 lines with blur overlay for rest
+ * Shows first portion of content with blur overlay for rest
  * @param {string} containerId - ID of the container to blur
  * @param {string} docType - Document type key for credit lookup
  * @param {string} docName - Human readable document name
@@ -13404,55 +13383,6 @@ function removeDocumentBlur() {
 function applyUniversalBlur(containerId, docType, docName, actionsId = null) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    
-    // Make container relative for positioning
-    container.style.position = 'relative';
-    container.style.overflow = 'hidden';
-    container.style.maxHeight = '600px'; // Limit visible area
-    
-    // Calculate visible area - approximately 25-30 lines
-    const visibleHeight = 400;
-    
-    // Create blur overlay
-    const blurOverlay = document.createElement('div');
-    blurOverlay.id = containerId + '_blurOverlay';
-    blurOverlay.style.cssText = `
-        position: absolute;
-        top: ${visibleHeight}px;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: linear-gradient(to bottom, 
-            rgba(30, 41, 59, 0) 0%,
-            rgba(30, 41, 59, 0.7) 30px,
-            rgba(30, 41, 59, 0.95) 80px,
-            rgba(30, 41, 59, 1) 150px
-        );
-        backdrop-filter: blur(6px);
-        -webkit-backdrop-filter: blur(6px);
-        pointer-events: none;
-        z-index: 5;
-    `;
-    container.appendChild(blurOverlay);
-    
-    // Add fade gradient
-    const fadeGradient = document.createElement('div');
-    fadeGradient.id = containerId + '_fadeGradient';
-    fadeGradient.style.cssText = `
-        position: absolute;
-        top: ${visibleHeight - 50}px;
-        left: 0;
-        right: 0;
-        height: 100px;
-        background: linear-gradient(to bottom, 
-            rgba(30, 41, 59, 0) 0%,
-            rgba(30, 41, 59, 0.3) 50%,
-            rgba(30, 41, 59, 0.6) 100%
-        );
-        pointer-events: none;
-        z-index: 4;
-    `;
-    container.appendChild(fadeGradient);
     
     // Get credit cost
     const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
@@ -13470,32 +13400,55 @@ function applyUniversalBlur(containerId, docType, docName, actionsId = null) {
         buttonAction = 'openCreditsModal()';
     }
     
-    // Add unlock prompt
+    // Store original content for later restoration
+    container.dataset.originalContent = container.innerHTML;
+    
+    // Limit container height and add blur effect
+    container.style.maxHeight = '250px';
+    container.style.overflow = 'hidden';
+    container.style.position = 'relative';
+    
+    // Create blur gradient overlay inside container
+    const blurOverlay = document.createElement('div');
+    blurOverlay.id = containerId + '_blurOverlay';
+    blurOverlay.style.cssText = `
+        position: absolute;
+        top: 150px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, 
+            rgba(30, 41, 59, 0) 0%,
+            rgba(30, 41, 59, 0.7) 30px,
+            rgba(30, 41, 59, 0.95) 60px,
+            rgba(30, 41, 59, 1) 100px
+        );
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        pointer-events: none;
+        z-index: 5;
+    `;
+    container.appendChild(blurOverlay);
+    
+    // Create unlock prompt as SIBLING element (after the container)
     const unlockPrompt = document.createElement('div');
     unlockPrompt.id = containerId + '_unlockPrompt';
-    unlockPrompt.style.cssText = `
-        position: absolute;
-        top: ${visibleHeight + 60}px;
-        left: 50%;
-        transform: translateX(-50%);
-        z-index: 10;
-        text-align: center;
-        width: 90%;
-        max-width: 400px;
-    `;
+    unlockPrompt.className = 'unlock-prompt-box';
     unlockPrompt.innerHTML = `
-        <div class="bg-slate-800 border-2 border-amber-500 rounded-xl p-6 shadow-2xl">
-            <div class="text-4xl mb-3">🔒</div>
-            <h3 class="text-xl font-bold text-white mb-2">Preview Only</h3>
+        <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
+            <div class="text-3xl mb-2">🔒</div>
+            <h3 class="text-lg font-bold text-white mb-2">Preview Only</h3>
             <p class="text-slate-300 text-sm mb-4">Unlock this document to view the full content and download.</p>
             <button onclick="${buttonAction}" 
-                    class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all">
+                    class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
                 ${buttonText}
             </button>
             <p class="text-slate-400 text-xs mt-3">${subtitle}</p>
         </div>
     `;
-    container.appendChild(unlockPrompt);
+    
+    // Insert unlock prompt AFTER the container
+    container.parentNode.insertBefore(unlockPrompt, container.nextSibling);
     
     // Hide action buttons if specified
     if (actionsId) {
@@ -13550,18 +13503,24 @@ function removeUniversalBlur(containerId) {
     const container = document.getElementById(containerId);
     if (!container) return;
     
-    // Remove blur elements
+    // Remove blur overlay
     const blurOverlay = document.getElementById(containerId + '_blurOverlay');
-    const fadeGradient = document.getElementById(containerId + '_fadeGradient');
-    const unlockPrompt = document.getElementById(containerId + '_unlockPrompt');
-    
     if (blurOverlay) blurOverlay.remove();
-    if (fadeGradient) fadeGradient.remove();
+    
+    // Remove unlock prompt (sibling element)
+    const unlockPrompt = document.getElementById(containerId + '_unlockPrompt');
     if (unlockPrompt) unlockPrompt.remove();
+    
+    // Restore original content if saved
+    if (container.dataset.originalContent) {
+        // Content is already there, just remove the blur overlay which we did above
+        delete container.dataset.originalContent;
+    }
     
     // Reset container styles
     container.style.maxHeight = '';
     container.style.overflow = '';
+    container.style.position = '';
 }
 
 /**
