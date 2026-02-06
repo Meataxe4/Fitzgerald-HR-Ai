@@ -6600,6 +6600,9 @@ let userCredits = {
     lastCreditRefresh: null
 };
 
+// Flag to prevent Firebase from overwriting local credits after payment return
+let skipFirebaseCreditsLoad = false;
+
 // Initialize credits from localStorage/Firebase
 function initializeUserCredits() {
     const userKey = currentUser?.uid || currentUser || 'anonymous';
@@ -6673,6 +6676,13 @@ function saveUserCredits() {
 // Load credits from Firebase
 async function loadCreditsFromFirebase() {
     if (!currentUser?.uid) return false;
+    
+    // Skip if we just processed a payment return (local credits are more up-to-date)
+    if (skipFirebaseCreditsLoad) {
+        console.log('⏭️ Skipping Firebase load - payment just processed');
+        skipFirebaseCreditsLoad = false;
+        return false;
+    }
     
     try {
         console.log('🔄 Loading credits from Firebase for:', currentUser.uid);
@@ -12164,8 +12174,16 @@ function savePendingDocumentAndGetCredits() {
             timestamp: Date.now()
         };
         
+        console.log('📄 Saving pending document:', {
+            docType: pendingDoc.docType,
+            docName: pendingDoc.docName,
+            contentLength: pendingDoc.content.length
+        });
+        
         localStorage.setItem('pendingDocument', JSON.stringify(pendingDoc));
         console.log('📄 Saved pending document for after payment');
+    } else {
+        console.log('📄 ERROR: Could not find previewContent or previewModal');
     }
     
     // Close the unlock modal and document preview
@@ -12181,10 +12199,13 @@ function savePendingDocumentAndGetCredits() {
  */
 function restorePendingDocument() {
     const pendingDocStr = localStorage.getItem('pendingDocument');
+    console.log('📄 restorePendingDocument called, pendingDoc exists:', !!pendingDocStr);
+    
     if (!pendingDocStr) return false;
     
     try {
         const pendingDoc = JSON.parse(pendingDocStr);
+        console.log('📄 Pending document:', pendingDoc.docType, pendingDoc.docName);
         
         // Check if document is less than 1 hour old
         if (Date.now() - pendingDoc.timestamp > 3600000) {
@@ -12202,19 +12223,30 @@ function restorePendingDocument() {
             previewModal.dataset.docName = pendingDoc.docName;
             previewModal.classList.remove('hidden');
             
+            // Debug: Check credits state
+            console.log('📄 Current credits:', getTotalCredits());
+            console.log('📄 Can afford:', pendingDoc.docType ? canAffordDocument(pendingDoc.docType) : 'no docType');
+            
             // Check if user can now afford the document
             if (pendingDoc.docType && canAffordDocument(pendingDoc.docType)) {
                 // Can afford now - deduct credits and show unlocked
+                console.log('📄 Attempting to deduct credits for:', pendingDoc.docType);
                 const deducted = deductCreditsForDocument(pendingDoc.docType);
+                console.log('📄 Credits deducted:', deducted);
                 
                 if (deducted) {
                     const cost = CONFIG.CREDITS.DOCUMENT_COSTS[pendingDoc.docType];
+                    console.log('📄 Cost was:', cost?.credits);
                     showNotification(`🎉 Document unlocked! ${cost?.credits || 1} credit used.`, 'success');
+                    
+                    // Update display
+                    updateCreditsDisplay();
                 } else {
                     showNotification('🎉 Your document is ready to download!', 'success');
                 }
             } else {
                 // Still can't afford - reapply blur
+                console.log('📄 Cannot afford, reapplying blur');
                 setTimeout(() => {
                     applyDocumentBlur(pendingDoc.docType, pendingDoc.docName);
                 }, 100);
@@ -12316,6 +12348,9 @@ function handlePaymentReturn() {
     const sessionId = urlParams.get('session_id');
     
     if (paymentStatus === 'success') {
+        // ✅ Set flag to prevent Firebase from overwriting our local credits
+        skipFirebaseCreditsLoad = true;
+        
         // Get the pending purchase from localStorage
         const pendingPurchase = localStorage.getItem('pendingPurchase');
         
