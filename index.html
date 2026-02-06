@@ -6000,7 +6000,7 @@ function setBilling(billing) {
             <!-- Not enough credits -->
             <div id="unlockNeedMoreCredits" class="hidden">
                 <p class="text-red-400 text-center mb-3">You need more credits to unlock this document.</p>
-                <button onclick="openCreditsModal(); closeDocumentUnlockModal();" 
+                <button onclick="savePendingDocumentAndGetCredits()" 
                         class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
                     Get More Credits
                 </button>
@@ -12148,6 +12148,84 @@ async function purchaseChatTopUp() {
 }
 
 /**
+ * Save pending document to localStorage and open credits modal
+ * This preserves the document so it can be restored after Stripe redirect
+ */
+function savePendingDocumentAndGetCredits() {
+    // Get the generated document content
+    const previewContent = document.getElementById('documentPreviewContent');
+    const previewModal = document.getElementById('documentPreviewModal');
+    
+    if (previewContent && previewModal) {
+        const pendingDoc = {
+            content: previewContent.innerHTML,
+            docType: previewModal.dataset.docType || '',
+            docName: previewModal.dataset.docName || 'Document',
+            timestamp: Date.now()
+        };
+        
+        localStorage.setItem('pendingDocument', JSON.stringify(pendingDoc));
+        console.log('📄 Saved pending document for after payment');
+    }
+    
+    // Close the unlock modal and document preview
+    closeDocumentUnlockModal();
+    closeDocumentPreview();
+    
+    // Open credits modal
+    openCreditsModal();
+}
+
+/**
+ * Restore pending document after payment success
+ */
+function restorePendingDocument() {
+    const pendingDocStr = localStorage.getItem('pendingDocument');
+    if (!pendingDocStr) return false;
+    
+    try {
+        const pendingDoc = JSON.parse(pendingDocStr);
+        
+        // Check if document is less than 1 hour old
+        if (Date.now() - pendingDoc.timestamp > 3600000) {
+            localStorage.removeItem('pendingDocument');
+            return false;
+        }
+        
+        // Show the document preview
+        const previewContent = document.getElementById('documentPreviewContent');
+        const previewModal = document.getElementById('documentPreviewModal');
+        
+        if (previewContent && previewModal) {
+            previewContent.innerHTML = pendingDoc.content;
+            previewModal.dataset.docType = pendingDoc.docType;
+            previewModal.dataset.docName = pendingDoc.docName;
+            previewModal.classList.remove('hidden');
+            
+            // Check if user can now afford the document
+            if (pendingDoc.docType && !canAffordDocument(pendingDoc.docType)) {
+                // Still can't afford - reapply blur
+                setTimeout(() => {
+                    applyDocumentBlur(pendingDoc.docType, pendingDoc.docName);
+                }, 100);
+            } else {
+                // Can afford now - show unlocked
+                showNotification('🎉 Your document is ready to download!', 'success');
+            }
+            
+            // Clear the pending document
+            localStorage.removeItem('pendingDocument');
+            return true;
+        }
+    } catch (e) {
+        console.error('Error restoring pending document:', e);
+        localStorage.removeItem('pendingDocument');
+    }
+    
+    return false;
+}
+
+/**
  * Core function to initiate Stripe checkout
  */
 async function initiateStripeCheckout(priceKey) {
@@ -12248,10 +12326,6 @@ function handlePaymentReturn() {
                     
                     showNotification(`🎉 Welcome to ${purchase.tierName}! ${purchase.credits} credits added.`, 'success');
                     
-                    setTimeout(() => {
-                        addMessage('assistant', `## 🎉 Welcome to Fitz ${purchase.tierName}!\n\nYour subscription is now active!\n\n**Your benefits:**\n- ✅ **${purchase.credits} credits** added to your account\n- ✅ **Unlimited AI chat** (no more prompt limits!)\n- ✅ **Monthly credit refresh** on your billing date\n\nYour credit balance and plan have been updated in the header above.\n\nQuestions? Contact **blake@fitzgeraldhr.com.au**`);
-                    }, 500);
-                    
                 } else if (purchase.type === 'credits') {
                     // Add purchased credits (these never expire)
                     userCredits.purchasedCredits += purchase.credits;
@@ -12259,24 +12333,32 @@ function handlePaymentReturn() {
                     
                     showNotification(`🎉 ${purchase.credits} credits added to your account!`, 'success');
                     
-                    setTimeout(() => {
-                        addMessage('assistant', `## 🎉 Credits Added!\n\n**${purchase.credits} credits** have been added to your account.\n\nThese credits never expire and can be used for any document type.\n\nYour new balance: **${getTotalCredits()} credits**`);
-                    }, 500);
-                    
                 } else if (purchase.type === 'topup') {
                     // Add bonus prompts
                     userCredits.bonusPrompts = (userCredits.bonusPrompts || 0) + purchase.prompts;
                     saveUserCredits();
                     
                     showNotification(`🎉 ${purchase.prompts} prompts added!`, 'success');
-                    
-                    setTimeout(() => {
-                        addMessage('assistant', `## 🎉 Chat Top-Up Added!\n\n**${purchase.prompts} extra prompts** have been added to your account for this month.\n\nKeep chatting!`);
-                    }, 500);
                 }
                 
                 // Clear the pending purchase
                 localStorage.removeItem('pendingPurchase');
+                
+                // ✅ Check if there's a pending document to restore
+                setTimeout(() => {
+                    const documentRestored = restorePendingDocument();
+                    
+                    if (!documentRestored) {
+                        // No pending document - show normal success message
+                        if (purchase.type === 'subscription') {
+                            addMessage('assistant', `## 🎉 Welcome to Fitz ${purchase.tierName}!\n\nYour subscription is now active!\n\n**Your benefits:**\n- ✅ **${purchase.credits} credits** added to your account\n- ✅ **Unlimited AI chat** (no more prompt limits!)\n- ✅ **Monthly credit refresh** on your billing date\n\nYour credit balance and plan have been updated in the header above.\n\nQuestions? Contact **blake@fitzgeraldhr.com.au**`);
+                        } else if (purchase.type === 'credits') {
+                            addMessage('assistant', `## 🎉 Credits Added!\n\n**${purchase.credits} credits** have been added to your account.\n\nThese credits never expire and can be used for any document type.\n\nYour new balance: **${getTotalCredits()} credits**`);
+                        } else if (purchase.type === 'topup') {
+                            addMessage('assistant', `## 🎉 Chat Top-Up Added!\n\n**${purchase.prompts} extra prompts** have been added to your account for this month.\n\nKeep chatting!`);
+                        }
+                    }
+                }, 500);
                 
                 // Also refresh from Firebase after webhook has time to process
                 setTimeout(async () => {
@@ -12288,6 +12370,11 @@ function handlePaymentReturn() {
                 console.error('Error processing payment return:', e);
                 showNotification('Payment successful! Please refresh if credits don\'t appear.', 'success');
                 
+                // Try to restore pending document anyway
+                setTimeout(() => {
+                    restorePendingDocument();
+                }, 500);
+                
                 // Try to load from Firebase anyway
                 setTimeout(async () => {
                     await loadCreditsFromFirebase();
@@ -12296,6 +12383,11 @@ function handlePaymentReturn() {
         } else {
             // No pending purchase found - might be a page refresh, try loading from Firebase
             showNotification('🎉 Payment successful!', 'success');
+            
+            // Try to restore pending document
+            setTimeout(() => {
+                restorePendingDocument();
+            }, 500);
             
             setTimeout(async () => {
                 console.log('🔄 No pending purchase found, refreshing from Firebase...');
@@ -12308,10 +12400,15 @@ function handlePaymentReturn() {
     }
     
     if (paymentStatus === 'cancelled') {
-        // Clear pending purchase on cancel
+        // Clear pending purchase on cancel but keep pending document
         localStorage.removeItem('pendingPurchase');
         showNotification('Payment cancelled', 'info');
         window.history.replaceState({}, document.title, window.location.pathname);
+        
+        // Restore the document preview so user can try again
+        setTimeout(() => {
+            restorePendingDocument();
+        }, 500);
     }
 }
 
