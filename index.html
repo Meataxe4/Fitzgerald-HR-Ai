@@ -12387,6 +12387,8 @@ function handlePaymentReturn() {
                 localStorage.removeItem('pendingPurchase');
                 
                 // ✅ Check if there's a pending document to restore
+                const hasPendingDocument = localStorage.getItem('pendingDocument') !== null;
+                
                 setTimeout(() => {
                     const documentRestored = restorePendingDocument();
                     
@@ -12402,39 +12404,61 @@ function handlePaymentReturn() {
                     }
                 }, 500);
                 
-                // Also refresh from Firebase after webhook has time to process
-                setTimeout(async () => {
-                    console.log('🔄 Refreshing credits from Firebase after payment...');
-                    await loadCreditsFromFirebase();
-                }, 3000); // Wait 3 seconds for webhook to complete
+                // Only refresh from Firebase if there was NO pending document
+                // If there was a pending document, we already deducted credits locally
+                // and we don't want Firebase to overwrite that
+                if (!hasPendingDocument) {
+                    setTimeout(async () => {
+                        console.log('🔄 Refreshing credits from Firebase after payment...');
+                        await loadCreditsFromFirebase();
+                    }, 3000);
+                } else {
+                    console.log('📄 Skipping delayed Firebase refresh - document was restored and credits deducted locally');
+                    // Instead, sync our local credits TO Firebase
+                    setTimeout(async () => {
+                        console.log('📄 Syncing local credits to Firebase...');
+                        await syncCreditsToFirebase();
+                    }, 1000);
+                }
                 
             } catch (e) {
                 console.error('Error processing payment return:', e);
                 showNotification('Payment successful! Please refresh if credits don\'t appear.', 'success');
+                
+                // Check if there's a pending document BEFORE restoring
+                const hadPendingDoc = localStorage.getItem('pendingDocument') !== null;
                 
                 // Try to restore pending document anyway
                 setTimeout(() => {
                     restorePendingDocument();
                 }, 500);
                 
-                // Try to load from Firebase anyway
-                setTimeout(async () => {
-                    await loadCreditsFromFirebase();
-                }, 3000);
+                // Only load from Firebase if there was no pending document
+                if (!hadPendingDoc) {
+                    setTimeout(async () => {
+                        await loadCreditsFromFirebase();
+                    }, 3000);
+                }
             }
         } else {
             // No pending purchase found - might be a page refresh, try loading from Firebase
             showNotification('🎉 Payment successful!', 'success');
+            
+            // Check if there's a pending document BEFORE restoring
+            const hadPendingDoc = localStorage.getItem('pendingDocument') !== null;
             
             // Try to restore pending document
             setTimeout(() => {
                 restorePendingDocument();
             }, 500);
             
-            setTimeout(async () => {
-                console.log('🔄 No pending purchase found, refreshing from Firebase...');
-                await loadCreditsFromFirebase();
-            }, 2000);
+            // Only load from Firebase if there was no pending document
+            if (!hadPendingDoc) {
+                setTimeout(async () => {
+                    console.log('🔄 No pending purchase found, refreshing from Firebase...');
+                    await loadCreditsFromFirebase();
+                }, 2000);
+            }
         }
         
         // Clean up URL
