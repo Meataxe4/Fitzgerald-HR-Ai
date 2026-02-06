@@ -12351,7 +12351,7 @@ function showNotification(message, type = 'info') {
 
 /**
  * Apply blur to document preview (for unpaid documents)
- * Shows first ~15-20 lines clearly, then blurs the rest
+ * Shows first ~25-30 lines clearly, then blurs the rest
  */
 function applyDocumentBlur() {
     const previewContent = document.getElementById('documentPreviewContent');
@@ -12362,8 +12362,8 @@ function applyDocumentBlur() {
     previewContainer.style.position = 'relative';
     previewContainer.style.overflow = 'hidden';
     
-    // Calculate visible area - approximately 15-20 lines (around 300px)
-    const visibleHeight = 300;
+    // Calculate visible area - approximately 25-30 lines (around 450px)
+    const visibleHeight = 450;
     
     // Create blur overlay that starts AFTER the visible preview area
     const blurOverlay = document.createElement('div');
