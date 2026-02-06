@@ -366,6 +366,11 @@ header button[onclick*="logout"],
     flex-direction: column;
 }
 
+/* IMPORTANT: Hidden class must override the display: flex above */
+#assistantScreen.hidden {
+    display: none !important;
+}
+
 /* Make header sticky at top - z-index must be BELOW modals (z-50 = 50) */
 #mainHeader {
     position: sticky;
