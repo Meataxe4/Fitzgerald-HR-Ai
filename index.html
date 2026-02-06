@@ -10517,10 +10517,40 @@ function buildDocumentPrompt() {
         `Venue: ${venueProfile.venueName} (${venueProfile.venueType}) in ${venueProfile.city}, ${venueProfile.location}` :
         `Australian hospitality venue`;
     
+    // Universal instruction for ALL document types
+    const universalInstruction = `
+=== CRITICAL INSTRUCTION ===
+You are a professional HR document writer. Your task is to OUTPUT A COMPLETE, READY-TO-USE FORMAL DOCUMENT.
+
+MANDATORY REQUIREMENTS:
+1. Generate the ACTUAL DOCUMENT with real content - NOT a checklist, guide, tips, or advice
+2. Write in formal business letter format with proper structure
+3. Use the specific details provided (names, dates, issues) in the document
+4. The document must be ready to print and give to an employee immediately
+5. DO NOT include instructions on "how to write" the document - just write it
+6. DO NOT include placeholder text like "[insert here]" - use the actual information provided
+7. DO NOT provide a checklist of what to include - provide the actual document content
+
+If you output anything other than a complete, formal document ready for immediate use, you have failed the task.
+=== END CRITICAL INSTRUCTION ===
+
+`;
+    
     let prompt = '';
     
     if (type === 'formalWarning') {
     prompt = `You are generating a FORMAL WARNING LETTER for Australian hospitality HR.
+
+**CRITICAL OUTPUT REQUIREMENT:**
+You MUST generate an ACTUAL FORMAL LETTER - a complete, ready-to-use business letter document.
+DO NOT generate:
+- A checklist
+- A guide or how-to
+- Bullet points of what to include
+- Tips or advice
+- An outline or template with placeholders like "[insert here]"
+
+Generate the ACTUAL LETTER with real content based on the information provided below.
 
 VENUE CONTEXT:
 ${venueContext}
@@ -10930,6 +10960,17 @@ This meeting is ONLY for gathering information. You MUST take time (24-48 hours)
     } else if (type === 'letterOfAllegation') {
     prompt = `You are generating a LETTER OF ALLEGATION for serious workplace misconduct investigation.
 
+**CRITICAL OUTPUT REQUIREMENT:**
+You MUST generate an ACTUAL FORMAL LETTER - a complete, ready-to-use business letter document.
+DO NOT generate:
+- A checklist
+- A guide or how-to
+- Bullet points of what to include
+- Tips or advice
+- An outline or template with placeholders like "[insert here]"
+
+Generate the ACTUAL LETTER with real content based on the information provided below.
+
 ⚠️ THIS IS HIGH-RISK - MUST BE LEGALLY SOUND
 
 VENUE CONTEXT:
@@ -11320,6 +11361,17 @@ DO NOT add fictional details. Expand and contextualise what was provided. DO NOT
     } else if (type === 'performanceImprovementPlan') {
         prompt = `You are generating a PERFORMANCE IMPROVEMENT PLAN (PIP) for Australian hospitality HR.
 
+**CRITICAL OUTPUT REQUIREMENT:**
+You MUST generate an ACTUAL FORMAL DOCUMENT - a complete, ready-to-use Performance Improvement Plan.
+DO NOT generate:
+- A checklist
+- A guide or how-to
+- Bullet points of what to include
+- Tips or advice
+- An outline or template with placeholders like "[insert here]"
+
+Generate the ACTUAL PIP DOCUMENT with real content based on the information provided below.
+
 ⚠️ THIS IS A FORMAL 12-WEEK STRUCTURED PROCESS
 
 VENUE CONTEXT:
@@ -11664,7 +11716,8 @@ DO NOT add fictional details. Use the specific information provided. Expand and 
     
     }
     
-    return prompt;
+    // Prepend universal instruction to ensure proper document output
+    return universalInstruction + prompt;
 }
 
 function showDocumentPreview(generatedDoc) {
