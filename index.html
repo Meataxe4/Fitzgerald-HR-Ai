@@ -10463,7 +10463,7 @@ async function generateDocumentWithAI() {
     
     try {
         const prompt = buildDocumentPrompt();
-        const response = await callClaudeAPI(prompt);
+        const response = await callClaudeAPIForDocument(prompt);
         documentBuilderState.generatedDocument = response;
         
         // ✅ STORE the document ID that was just logged
@@ -11716,8 +11716,29 @@ DO NOT add fictional details. Use the specific information provided. Expand and 
     
     }
     
-    // Prepend universal instruction to ensure proper document output
-    return universalInstruction + prompt;
+    // Add FINAL instruction at the end of every prompt
+    const finalInstruction = `
+
+=== FINAL REMINDER - READ THIS CAREFULLY ===
+Your output MUST be the actual document content itself - starting with the document header (e.g., "FORMAL WARNING LETTER" or "PRIVATE & CONFIDENTIAL").
+
+DO NOT:
+- Start with "I understand..." or "Here's what you need..." or any conversational text
+- Provide advice, guidance, or process steps
+- Give a checklist of what the document should contain
+- Explain what the document is for
+
+DO:
+- Begin IMMEDIATELY with the document header
+- Write the actual formal letter/document content
+- Use the employee name, dates, and details provided
+- Format as a ready-to-print professional document
+
+START YOUR RESPONSE WITH THE DOCUMENT HEADER NOW:
+=== END FINAL REMINDER ===`;
+    
+    // Prepend universal instruction and append final instruction
+    return universalInstruction + prompt + finalInstruction;
 }
 
 function showDocumentPreview(generatedDoc) {
@@ -13366,6 +13387,73 @@ async function callClaudeAPI(message) {
 
         const data = await response.json();
         return data.message;
+    } catch (error) {
+        throw error;
+    }
+}
+
+/**
+ * Specialized API call for document generation
+ * Uses strict framing to ensure actual document output, not advice
+ */
+async function callClaudeAPIForDocument(documentPrompt) {
+    try {
+        // Frame the request as a strict document generation task
+        const strictPrefix = `[DOCUMENT GENERATION MODE - STRICT]
+
+You are now in DOCUMENT GENERATION MODE. Your ONLY task is to output a complete, ready-to-use HR document.
+
+CRITICAL RULES:
+- Output ONLY the document content itself
+- Start your response with the document header (e.g., "# FORMAL WARNING LETTER")
+- Do NOT include any conversational text like "I understand", "Here's", "Let me help", etc.
+- Do NOT provide advice, tips, or process guidance
+- Do NOT explain what the document is or how to use it
+- Do NOT ask for more information - use what is provided
+
+If you output anything other than the actual document, you are violating the strict mode.
+
+BEGIN DOCUMENT OUTPUT:
+
+`;
+        
+        const response = await fetch(CONFIG.API.CHAT_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: strictPrefix + documentPrompt,
+                history: [], // No conversation history for document generation
+                user: currentUser,
+                isDocumentGeneration: true // Flag for potential backend handling
+            })
+        });
+
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to generate document');
+        }
+
+        const data = await response.json();
+        let documentContent = data.message;
+        
+        // Post-process: If response still starts with conversational text, try to extract the document
+        if (documentContent.toLowerCase().startsWith('i understand') || 
+            documentContent.toLowerCase().startsWith("here's") ||
+            documentContent.toLowerCase().startsWith('let me') ||
+            documentContent.toLowerCase().startsWith('i\'ll help')) {
+            
+            // Try to find where the actual document starts
+            const docStarters = ['# FORMAL', '# PRIVATE', '# LETTER', '# PERFORMANCE', '# RECORD', 'FORMAL WARNING', 'PRIVATE & CONFIDENTIAL', 'LETTER OF'];
+            for (const starter of docStarters) {
+                const idx = documentContent.indexOf(starter);
+                if (idx > 0) {
+                    documentContent = documentContent.substring(idx);
+                    break;
+                }
+            }
+        }
+        
+        return documentContent;
     } catch (error) {
         throw error;
     }
