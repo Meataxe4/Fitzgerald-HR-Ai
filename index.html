@@ -5968,7 +5968,7 @@ function setBilling(billing) {
         <div class="text-center mb-6">
             <div class="text-6xl mb-4">🔒</div>
             <h2 class="text-2xl font-bold text-amber-400 mb-2">Unlock Your Document</h2>
-            <p class="text-slate-300">Your document is ready! Unlock it to download.</p>
+            <p class="text-slate-300">Your document is ready! Confirm to unlock and download.</p>
         </div>
 
         <div class="bg-slate-900 rounded-lg p-6 mb-6">
@@ -5983,18 +5983,37 @@ function setBilling(billing) {
                 </div>
             </div>
             
-            <div class="flex items-center justify-between py-2 border-t border-slate-700">
-                <span class="text-slate-400">Your balance:</span>
-                <span id="unlockCurrentBalance" class="text-white font-bold">0 credits</span>
+            <div class="border-t border-slate-700 pt-4 space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-400">Your balance:</span>
+                    <span id="unlockCurrentBalance" class="text-white font-bold">0 credits</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-slate-400">After unlock:</span>
+                    <span id="unlockBalanceAfter" class="text-green-400 font-bold">0 credits</span>
+                </div>
             </div>
         </div>
 
         <div id="unlockActions" class="space-y-3">
+            <!-- Free document message (for free tier first doc) -->
+            <div id="unlockFreeDocument" class="hidden">
+                <div class="bg-green-500/20 border border-green-500 rounded-lg p-4 mb-4">
+                    <p class="text-green-400 text-center font-semibold">🎉 This is your FREE document!</p>
+                    <p class="text-green-300 text-center text-sm">Free tier includes 1 free low-risk document per month.</p>
+                </div>
+                <button onclick="unlockDocument()" 
+                        class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2">
+                    <span>🔓</span>
+                    <span>Unlock Free Document</span>
+                </button>
+            </div>
+            
             <!-- Unlock Button (if enough credits) -->
             <button id="unlockDocumentBtn" onclick="unlockDocument()" 
                     class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2">
                 <span>🔓</span>
-                <span>Unlock Document</span>
+                <span>Yes, Unlock Document</span>
             </button>
             
             <!-- Not enough credits -->
@@ -12045,22 +12064,53 @@ function openDocumentUnlockModal(docType, docName) {
     const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
     if (!cost) return;
     
+    const currentBalance = getTotalCredits();
+    const balanceAfter = Math.max(0, currentBalance - cost.credits);
+    
     document.getElementById('unlockDocumentName').textContent = docName || cost.name;
     document.getElementById('unlockDocumentCost').textContent = `${cost.credits} credits`;
-    document.getElementById('unlockCurrentBalance').textContent = `${getTotalCredits()} credits`;
+    document.getElementById('unlockCurrentBalance').textContent = `${currentBalance} credits`;
+    document.getElementById('unlockBalanceAfter').textContent = `${balanceAfter} credits`;
     
     // Store doc type for unlock action
     document.getElementById('documentUnlockModal').dataset.docType = docType;
     
-    // Check if user can afford
+    // Check if this is a free document for free tier
+    const isFreeDocument = userCredits.tier === 'free' && 
+                           !userCredits.freeDocumentUsed && 
+                           CONFIG.CREDITS.FREE_TIER.ALLOWED_FREE_DOCS.includes(docType);
+    
+    // Check if user can afford (either free doc or has credits)
     const canAfford = canAffordDocument(docType);
     
-    if (canAfford) {
+    // Hide all options first
+    document.getElementById('unlockFreeDocument').classList.add('hidden');
+    document.getElementById('unlockDocumentBtn').classList.add('hidden');
+    document.getElementById('unlockNeedMoreCredits').classList.add('hidden');
+    
+    if (isFreeDocument) {
+        // Show free document option
+        document.getElementById('unlockFreeDocument').classList.remove('hidden');
+        document.getElementById('unlockDocumentCost').textContent = 'FREE';
+        document.getElementById('unlockBalanceAfter').textContent = `${currentBalance} credits`;
+    } else if (canAfford) {
+        // Show paid unlock option
         document.getElementById('unlockDocumentBtn').classList.remove('hidden');
-        document.getElementById('unlockNeedMoreCredits').classList.add('hidden');
+        
+        // Update balance after color based on remaining
+        const balanceAfterEl = document.getElementById('unlockBalanceAfter');
+        if (balanceAfter <= 2) {
+            balanceAfterEl.className = 'text-red-400 font-bold';
+        } else if (balanceAfter <= 5) {
+            balanceAfterEl.className = 'text-amber-400 font-bold';
+        } else {
+            balanceAfterEl.className = 'text-green-400 font-bold';
+        }
     } else {
-        document.getElementById('unlockDocumentBtn').classList.add('hidden');
+        // Show need more credits option
         document.getElementById('unlockNeedMoreCredits').classList.remove('hidden');
+        document.getElementById('unlockBalanceAfter').textContent = 'Not enough credits';
+        document.getElementById('unlockBalanceAfter').className = 'text-red-400 font-bold';
     }
     
     document.getElementById('documentUnlockModal').classList.remove('hidden');
@@ -12196,6 +12246,7 @@ function savePendingDocumentAndGetCredits() {
 
 /**
  * Restore pending document after payment success
+ * Document is shown with blur - user must confirm unlock to spend credits
  */
 function restorePendingDocument() {
     const pendingDocStr = localStorage.getItem('pendingDocument');
@@ -12227,30 +12278,17 @@ function restorePendingDocument() {
             console.log('📄 Current credits:', getTotalCredits());
             console.log('📄 Can afford:', pendingDoc.docType ? canAffordDocument(pendingDoc.docType) : 'no docType');
             
-            // Check if user can now afford the document
-            if (pendingDoc.docType && canAffordDocument(pendingDoc.docType)) {
-                // Can afford now - deduct credits and show unlocked
-                console.log('📄 Attempting to deduct credits for:', pendingDoc.docType);
-                const deducted = deductCreditsForDocument(pendingDoc.docType);
-                console.log('📄 Credits deducted:', deducted);
+            // Always apply blur - user must confirm to unlock
+            setTimeout(() => {
+                applyDocumentBlur(pendingDoc.docType, pendingDoc.docName);
                 
-                if (deducted) {
-                    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[pendingDoc.docType];
-                    console.log('📄 Cost was:', cost?.credits);
-                    showNotification(`🎉 Document unlocked! ${cost?.credits || 1} credit used.`, 'success');
-                    
-                    // Update display
-                    updateCreditsDisplay();
+                // If user can now afford it, show helpful notification
+                if (pendingDoc.docType && canAffordDocument(pendingDoc.docType)) {
+                    showNotification('🎉 You now have enough credits! Click "Unlock Document" to download.', 'success');
                 } else {
-                    showNotification('🎉 Your document is ready to download!', 'success');
+                    showNotification('Document restored. You still need more credits to unlock.', 'info');
                 }
-            } else {
-                // Still can't afford - reapply blur
-                console.log('📄 Cannot afford, reapplying blur');
-                setTimeout(() => {
-                    applyDocumentBlur(pendingDoc.docType, pendingDoc.docName);
-                }, 100);
-            }
+            }, 100);
             
             // Clear the pending document
             localStorage.removeItem('pendingDocument');
@@ -12582,6 +12620,28 @@ function applyDocumentBlur(docType, docName) {
     `;
     previewContainer.appendChild(fadeGradient);
     
+    // Get the cost for this document type
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    const creditCost = cost ? cost.credits : 1;
+    const currentBalance = getTotalCredits();
+    
+    // Check if this is a free document for free tier
+    const isFreeDocument = userCredits.tier === 'free' && 
+                           !userCredits.freeDocumentUsed && 
+                           CONFIG.CREDITS.FREE_TIER.ALLOWED_FREE_DOCS.includes(docType);
+    
+    // Determine button text and subtitle
+    let buttonText = `Unlock Document (${creditCost} credits)`;
+    let subtitle = `Your balance: ${currentBalance} credits`;
+    
+    if (isFreeDocument) {
+        buttonText = 'Unlock Free Document';
+        subtitle = '🎉 This is your free document for this month!';
+    } else if (currentBalance < creditCost) {
+        buttonText = 'Get Credits to Unlock';
+        subtitle = `Need ${creditCost} credits • You have ${currentBalance}`;
+    }
+    
     // Add unlock prompt - positioned in the blurred area
     const unlockPrompt = document.createElement('div');
     unlockPrompt.id = 'documentUnlockPrompt';
@@ -12597,12 +12657,12 @@ function applyDocumentBlur(docType, docName) {
         <div class="bg-slate-800 border-2 border-amber-500 rounded-xl p-6 shadow-2xl">
             <div class="text-4xl mb-3">🔒</div>
             <h3 class="text-xl font-bold text-white mb-2">Preview Only</h3>
-            <p class="text-slate-300 text-sm mb-4">Unlock this document to view the full content and download.</p>
+            <p class="text-slate-300 text-sm mb-4">Confirm to unlock and download this document.</p>
             <button onclick="openDocumentUnlockModal('${docType}', '${docName}')" 
                     class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-6 rounded-lg transition-all">
-                Unlock Document
+                ${buttonText}
             </button>
-            <p class="text-slate-400 text-xs mt-3">1 credit to unlock • Free tier: 1 free document</p>
+            <p class="text-slate-400 text-xs mt-3">${subtitle}</p>
         </div>
     `;
     previewContainer.appendChild(unlockPrompt);
@@ -12641,19 +12701,9 @@ function removeDocumentBlur() {
  * Check if document should be blurred (user hasn't paid)
  */
 function shouldBlurDocument(docType) {
-    // Check if user can afford the document
-    if (canAffordDocument(docType)) {
-        return false; // Don't blur, they can afford it
-    }
-    
-    // Check if it's a free document for free tier
-    if (userCredits.tier === 'free' && !userCredits.freeDocumentUsed) {
-        if (CONFIG.CREDITS.FREE_TIER.ALLOWED_FREE_DOCS.includes(docType)) {
-            return false; // Don't blur, it's their free document
-        }
-    }
-    
-    return true; // Blur the document
+    // ALWAYS blur documents - user must confirm they want to spend credits
+    // The unlock modal will handle checking if they can afford it
+    return true;
 }
 
 // ========================================
