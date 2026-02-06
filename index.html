@@ -5528,7 +5528,7 @@ Be as specific as possible!"></textarea>
 <!-- ========================================== -->
 <!-- PROMPT LIMIT MODAL -->
 <!-- ========================================== -->
-<div id="promptLimitModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+<div id="promptLimitModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-[60]">
     <div class="bg-slate-800 rounded-2xl p-8 max-w-lg w-full border-2 border-amber-500 fade-in">
         <div class="text-center mb-6">
             <div class="text-6xl mb-4">💬</div>
@@ -5573,7 +5573,7 @@ Be as specific as possible!"></textarea>
 <!-- ========================================== -->
 <!-- CREDITS MODAL -->
 <!-- ========================================== -->
-<div id="creditsModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+<div id="creditsModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-[60]">
     <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border-2 border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
             <div>
@@ -5764,7 +5764,7 @@ Be as specific as possible!"></textarea>
 <!-- ========================================== -->
 <!-- SUBSCRIPTION SELECTION MODAL -->
 <!-- ========================================== -->
-<div id="subscriptionModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+<div id="subscriptionModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-[60]">
     <div class="bg-slate-800 rounded-2xl p-8 max-w-4xl w-full border-2 border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
             <div>
@@ -5930,7 +5930,7 @@ function setBilling(billing) {
 <!-- ========================================== -->
 <!-- DOCUMENT UNLOCK MODAL (Preview & Unlock) -->
 <!-- ========================================== -->
-<div id="documentUnlockModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+<div id="documentUnlockModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-[60]">
     <div class="bg-slate-800 rounded-2xl p-8 max-w-lg w-full border-2 border-amber-500 fade-in">
         <div class="text-center mb-6">
             <div class="text-6xl mb-4">🔒</div>
@@ -13304,13 +13304,15 @@ function applyDocumentBlur(docType, docName) {
     const creditCost = cost ? cost.credits : 1;
     const currentBalance = getTotalCredits();
     
-    // Determine button text and subtitle
+    // Determine button text, subtitle AND action based on balance
     let buttonText = `🔓 Unlock Document (${creditCost} credit${creditCost > 1 ? 's' : ''})`;
     let subtitle = `Your balance: ${currentBalance} credit${currentBalance !== 1 ? 's' : ''}`;
+    let buttonAction = `openDocumentUnlockModal('${docType}', '${docName}')`;
     
     if (currentBalance < creditCost) {
         buttonText = '💳 Get Credits to Unlock';
         subtitle = `Need ${creditCost} credit${creditCost > 1 ? 's' : ''} • You have ${currentBalance}`;
+        buttonAction = 'openCreditsModal()';  // ← CRITICAL: Opens Stripe checkout
     }
     
     // Create unlock prompt as SIBLING element (after the preview container)
@@ -13321,7 +13323,7 @@ function applyDocumentBlur(docType, docName) {
             <div class="text-3xl mb-2">🔒</div>
             <h3 class="text-lg font-bold text-white mb-2">Preview Only</h3>
             <p class="text-slate-300 text-sm mb-4">Unlock this document to view the full content and download.</p>
-            <button onclick="openDocumentUnlockModal('${docType}', '${docName}')" 
+            <button onclick="${buttonAction}" 
                     class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
                 ${buttonText}
             </button>
