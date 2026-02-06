@@ -16704,6 +16704,11 @@ function pdNextStep() {
     pdCurrentStep++;
     updatePDStep();
     
+    // Generate AI primary purpose when entering step 2
+    if (pdCurrentStep === 2) {
+        generatePDPrimaryPurpose();
+    }
+    
     // Generate AI responsibilities when entering step 3
     if (pdCurrentStep === 3) {
         generatePDResponsibilities();
@@ -16714,6 +16719,61 @@ function pdPreviousStep() {
     if (pdCurrentStep > 1) {
         pdCurrentStep--;
         updatePDStep();
+    }
+}
+
+async function generatePDPrimaryPurpose() {
+    const loading = document.getElementById('pdPrimaryPurposeLoading');
+    const textarea = document.getElementById('pdPrimaryPurpose');
+    const help = document.getElementById('pdPrimaryPurposeHelp');
+    
+    loading.classList.remove('hidden');
+    textarea.classList.add('hidden');
+    help.classList.add('hidden');
+    
+    try {
+        const prompt = `Write a concise Primary Purpose statement (2-3 sentences) for an internal Position Description for:
+        
+Position: ${pdData.positionTitle}
+Reports To: ${pdData.reportsTo || 'Not specified'}
+Department: ${pdData.department || 'Not specified'}
+Employment Type: ${pdData.employmentType}
+
+IMPORTANT INSTRUCTIONS:
+- This is for an INTERNAL HR document, not a job advertisement
+- Write in formal, professional language
+- Explain WHY this role exists and its main objective
+- Focus on the core function and value the role provides
+- Keep it to 2-3 sentences maximum
+- Start with "The [Position Title] is responsible for..." or similar
+- Do NOT include any bullet points or lists
+- Do NOT include salary information
+
+Example format:
+"The Head Chef is responsible for overseeing all kitchen operations and ensuring the delivery of high-quality food in accordance with health and safety standards. This role leads the culinary team, manages food costs, and maintains consistency in menu execution while driving continuous improvement in kitchen efficiency."`;
+
+        const response = await fetch('/.netlify/functions/recruitment-ai', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: prompt, taskType: 'positionDescription' })
+        });
+        
+        const result = await response.json();
+        
+        if (!response.ok || !result.success) {
+            throw new Error(result.error || 'Failed to generate primary purpose');
+        }
+        
+        textarea.value = result.content;
+        loading.classList.add('hidden');
+        textarea.classList.remove('hidden');
+        help.classList.remove('hidden');
+    } catch (error) {
+        // Fallback placeholder if AI fails
+        textarea.value = `The ${pdData.positionTitle} is responsible for [describe main function]. This role [explain key objective] while ensuring [key outcome or standard].`;
+        loading.classList.add('hidden');
+        textarea.classList.remove('hidden');
+        help.classList.remove('hidden');
     }
 }
 
@@ -23588,10 +23648,13 @@ function resetAIImport() {
             <!-- Step 2: Primary Purpose -->
             <div id="pdStep2" class="step-content hidden">
                 <h3 class="text-xl font-semibold text-white mb-4">Primary Purpose of the Role</h3>
-                <p class="text-slate-400 text-sm mb-4">Describe the main objective of this position in 2-3 sentences:</p>
-                <textarea id="pdPrimaryPurpose" placeholder="e.g., The Head Chef is responsible for overseeing all kitchen operations, ensuring food quality and safety standards, and leading the culinary team to deliver exceptional dining experiences." 
-                          class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500" rows="4"></textarea>
-                <p class="text-slate-400 text-sm mt-2">💡 This appears at the top of the document and summarises why the role exists</p>
+                <p class="text-slate-400 text-sm mb-4">AI has drafted the main objective. Review and edit as needed:</p>
+                <div id="pdPrimaryPurposeLoading" class="text-center py-8">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+                    <p class="text-slate-400 mt-4">AI is drafting the primary purpose...</p>
+                </div>
+                <textarea id="pdPrimaryPurpose" class="hidden w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500" rows="4"></textarea>
+                <p class="text-slate-400 text-sm mt-2 hidden" id="pdPrimaryPurposeHelp">✏️ Edit this to match your specific needs. This appears at the top of the document.</p>
             </div>
 
             <!-- Step 3: Key Responsibilities -->
