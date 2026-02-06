@@ -31,6 +31,9 @@
     
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+    
+    <!-- Stripe.js for Payments -->
+    <script src="https://js.stripe.com/v3/"></script>
  
  <style>
 
@@ -2732,6 +2735,139 @@ input, textarea, select {
         width: 100%;
     }
 }
+
+/* ========================================
+   FITZ CREDITS SYSTEM STYLES
+   ======================================== */
+
+/* Credits display in header */
+#creditsDisplay {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Prompts counter styling */
+#promptsDisplay {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Credit balance color states */
+.credits-high { color: #10B981; } /* green */
+.credits-medium { color: #F59E0B; } /* amber */
+.credits-low { color: #EF4444; } /* red */
+
+/* Document blur overlay */
+#documentBlurOverlay {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+    background: linear-gradient(to bottom, 
+        transparent 0%, 
+        transparent 12%, 
+        rgba(255,255,255,0.3) 18%,
+        rgba(255,255,255,0.7) 25%,
+        rgba(255,255,255,0.95) 35%,
+        white 50%
+    );
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+/* Unlock prompt on blurred document */
+#documentUnlockPrompt {
+    position: absolute;
+    bottom: 35%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Notification toast styles */
+.notification-toast {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Consultation type button selection */
+.consultation-type-btn.selected,
+.consultation-type-btn.border-amber-500 {
+    border-color: #F59E0B !important;
+    border-width: 2px !important;
+    background: rgba(245, 158, 11, 0.1) !important;
+}
+
+/* Modal transitions */
+#promptLimitModal,
+#creditsModal,
+#consultationBookingModal,
+#documentUnlockModal,
+#consultationRequiredModal {
+    animation: fadeIn 0.2s ease-out;
+}
+
+#promptLimitModal > div,
+#creditsModal > div,
+#consultationBookingModal > div,
+#documentUnlockModal > div,
+#consultationRequiredModal > div {
+    animation: scaleIn 0.2s ease-out;
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Credit pack hover effect */
+#creditsModal button[onclick^="purchaseCreditPack"]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+/* Pulse animation for low credits warning */
+@keyframes creditPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.credits-warning {
+    animation: creditPulse 2s ease-in-out infinite;
+}
     </style>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
@@ -3419,6 +3555,24 @@ function continueWithEmail() {
 
             <!-- Right: Simplified Buttons -->
             <div id="headerRight" class="flex items-center gap-2 text-sm">
+                
+                <!-- Credits Display -->
+                <div id="creditsDisplay" class="hidden flex items-center gap-2 bg-slate-700/50 rounded-lg px-3 py-2">
+                    <div class="flex items-center gap-1">
+                        <span class="text-amber-400">💳</span>
+                        <span id="creditsBalance" class="font-bold text-green-400">0</span>
+                        <span class="text-slate-400 text-xs">credits</span>
+                    </div>
+                    <div id="promptsDisplay" class="hidden border-l border-slate-600 pl-2 ml-1">
+                        <span class="text-slate-400 text-xs">Prompts: </span>
+                        <span class="text-blue-400 text-xs font-medium">20/20</span>
+                    </div>
+                    <button onclick="openCreditsModal()" class="text-amber-400 hover:text-amber-300 ml-1" title="Manage Credits">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                    </button>
+                </div>
                 
                 <!-- Crisis Mode Button -->
                 <button onclick="activateCrisisMode()" 
@@ -5330,11 +5484,567 @@ Be as specific as possible!"></textarea>
         </div>
     </div>
 </div>
+<!-- ↑ END of terminationConsultantModal -->
 
-html        </div>
+<!-- ========================================== -->
+<!-- PROMPT LIMIT MODAL -->
+<!-- ========================================== -->
+<div id="promptLimitModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-lg w-full border-2 border-amber-500 fade-in">
+        <div class="text-center mb-6">
+            <div class="text-6xl mb-4">💬</div>
+            <h2 class="text-2xl font-bold text-amber-400 mb-2">You've Used Your Free Prompts</h2>
+            <p class="text-slate-300">You've used all 20 free prompts for this month.</p>
+        </div>
+
+        <div class="bg-slate-900 rounded-lg p-6 mb-6">
+            <h3 class="text-white font-bold mb-4">Continue the Conversation:</h3>
+            <div class="space-y-4">
+                <!-- Subscribe Option -->
+                <button onclick="showSubscriptionOptions()" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-4 px-6 rounded-lg transition-all flex items-center justify-center gap-3">
+                    <span class="text-2xl">⭐</span>
+                    <div class="text-left">
+                        <p class="text-lg">Subscribe from $59/month</p>
+                        <p class="text-xs opacity-75">Unlimited chat + 5-25 document credits</p>
+                    </div>
+                </button>
+                
+                <!-- Top-Up Option -->
+                <button onclick="purchaseChatTopUp()" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all flex items-center justify-center gap-3">
+                    <span class="text-xl">💳</span>
+                    <div class="text-left">
+                        <p>Chat Top-Up — $19</p>
+                        <p class="text-xs opacity-75">30 additional prompts this month</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <p class="text-slate-400 text-sm mb-4">Your prompts reset on the 1st of each month.</p>
+            <button onclick="closePromptLimitModal()" class="text-slate-400 hover:text-white text-sm underline">
+                Maybe Later
+            </button>
+        </div>
     </div>
 </div>
-<!-- ↑ END of terminationConsultantModal -->
+
+<!-- ========================================== -->
+<!-- CREDITS MODAL -->
+<!-- ========================================== -->
+<div id="creditsModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border-2 border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-amber-400">💳 Fitz Credits</h2>
+                <p class="text-slate-400 text-sm">Manage your credits and subscription</p>
+            </div>
+            <button onclick="closeCreditsModal()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+
+        <!-- Current Balance -->
+        <div class="bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-xl p-6 mb-6 border border-amber-500/30">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-slate-400 text-sm">Current Balance</p>
+                    <p id="modalCreditsBalance" class="text-4xl font-bold text-amber-400">0</p>
+                    <p class="text-slate-400 text-xs mt-1">Fitz Credits</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-slate-400 text-sm">Your Plan</p>
+                    <p id="modalCurrentTier" class="text-xl font-bold text-white">Free</p>
+                    <p id="modalPromptsRemaining" class="text-slate-400 text-xs mt-1">20/20 prompts remaining</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Credit Packs -->
+        <div class="mb-6">
+            <h3 class="text-white font-bold mb-4">Buy Credit Packs</h3>
+            <div class="grid grid-cols-3 gap-3">
+                <button onclick="purchaseCreditPack('small')" class="bg-slate-700 hover:bg-slate-600 rounded-lg p-4 text-center transition-all border border-slate-600 hover:border-amber-500">
+                    <p class="text-2xl font-bold text-amber-400">5</p>
+                    <p class="text-slate-300 text-sm">Credits</p>
+                    <p class="text-white font-bold mt-2">$79</p>
+                    <p class="text-slate-500 text-xs">$15.80/credit</p>
+                </button>
+                <button onclick="purchaseCreditPack('medium')" class="bg-slate-700 hover:bg-slate-600 rounded-lg p-4 text-center transition-all border-2 border-amber-500 relative">
+                    <span class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-amber-500 text-slate-900 text-xs font-bold px-2 py-0.5 rounded">POPULAR</span>
+                    <p class="text-2xl font-bold text-amber-400">10</p>
+                    <p class="text-slate-300 text-sm">Credits</p>
+                    <p class="text-white font-bold mt-2">$149</p>
+                    <p class="text-slate-500 text-xs">$14.90/credit</p>
+                </button>
+                <button onclick="purchaseCreditPack('large')" class="bg-slate-700 hover:bg-slate-600 rounded-lg p-4 text-center transition-all border border-slate-600 hover:border-amber-500">
+                    <p class="text-2xl font-bold text-amber-400">20</p>
+                    <p class="text-slate-300 text-sm">Credits</p>
+                    <p class="text-white font-bold mt-2">$249</p>
+                    <p class="text-slate-500 text-xs">$12.45/credit</p>
+                </button>
+            </div>
+            <p class="text-slate-500 text-xs mt-2 text-center">Pack credits never expire</p>
+        </div>
+
+        <!-- Subscription Upgrade -->
+        <div class="bg-slate-900 rounded-lg p-4 mb-6">
+            <h3 class="text-white font-bold mb-3">💡 Save with a Subscription</h3>
+            <p class="text-slate-400 text-sm mb-4">Get more credits at a lower per-credit rate, plus unlimited chat.</p>
+            <div class="grid grid-cols-3 gap-2 text-center text-sm">
+                <div class="bg-slate-800 rounded-lg p-3">
+                    <p class="text-white font-bold">Starter</p>
+                    <p class="text-amber-400 font-bold">5 credits</p>
+                    <p class="text-slate-400">$59/mo</p>
+                    <p class="text-green-400 text-xs">$11.80/credit</p>
+                </div>
+                <div class="bg-slate-800 rounded-lg p-3 border border-amber-500">
+                    <p class="text-amber-400 font-bold">Professional ⭐</p>
+                    <p class="text-amber-400 font-bold">14 credits</p>
+                    <p class="text-slate-400">$149/mo</p>
+                    <p class="text-green-400 text-xs">$10.64/credit</p>
+                </div>
+                <div class="bg-slate-800 rounded-lg p-3">
+                    <p class="text-white font-bold">Enterprise</p>
+                    <p class="text-amber-400 font-bold">25 credits</p>
+                    <p class="text-slate-400">$349/mo</p>
+                    <p class="text-green-400 text-xs">$13.96/credit</p>
+                </div>
+            </div>
+            <button onclick="showSubscriptionOptions()" class="w-full mt-4 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 rounded-lg transition-all">
+                View Subscription Plans
+            </button>
+        </div>
+
+        <!-- Credit Costs Reference -->
+        <details class="bg-slate-900 rounded-lg p-4">
+            <summary class="text-white font-bold cursor-pointer">📋 Document Credit Costs</summary>
+            <div class="mt-4 space-y-2 text-sm">
+                <div class="flex justify-between text-slate-300">
+                    <span>Low-risk documents (Check-In, PD, etc.)</span>
+                    <span class="text-amber-400 font-bold">1 credit</span>
+                </div>
+                <div class="flex justify-between text-slate-300">
+                    <span>Moderate-risk (ROD, PIP, etc.)</span>
+                    <span class="text-amber-400 font-bold">2 credits</span>
+                </div>
+                <div class="flex justify-between text-slate-300">
+                    <span>Significant-risk (Contracts, Warnings)</span>
+                    <span class="text-amber-400 font-bold">3 credits</span>
+                </div>
+                <div class="flex justify-between text-slate-300 border-t border-slate-700 pt-2 mt-2">
+                    <span>Termination Review (consultation)</span>
+                    <span class="text-red-400 font-bold">7 credits</span>
+                </div>
+                <div class="flex justify-between text-slate-300">
+                    <span>Investigation Review (consultation)</span>
+                    <span class="text-red-400 font-bold">8 credits</span>
+                </div>
+            </div>
+        </details>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- SUBSCRIPTION SELECTION MODAL -->
+<!-- ========================================== -->
+<div id="subscriptionModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-4xl w-full border-2 border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-amber-400">⭐ Choose Your Plan</h2>
+                <p class="text-slate-400 text-sm">Unlimited chat + monthly document credits</p>
+            </div>
+            <button onclick="closeSubscriptionModal()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+
+        <!-- Billing Toggle -->
+        <div class="flex justify-center mb-6">
+            <div class="bg-slate-900 rounded-lg p-1 flex">
+                <button id="billingMonthly" onclick="setBilling('monthly')" 
+                        class="px-4 py-2 rounded-md text-sm font-medium transition-all bg-amber-500 text-slate-900">
+                    Monthly
+                </button>
+                <button id="billingAnnual" onclick="setBilling('annual')" 
+                        class="px-4 py-2 rounded-md text-sm font-medium transition-all text-slate-400 hover:text-white">
+                    Annual <span class="text-green-400 text-xs">(Save ~17%)</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Plan Cards -->
+        <div class="grid md:grid-cols-3 gap-4 mb-6">
+            <!-- Starter -->
+            <div class="bg-slate-900 rounded-xl p-6 border border-slate-700 hover:border-amber-500 transition-all">
+                <h3 class="text-xl font-bold text-white mb-2">Starter</h3>
+                <p class="text-slate-400 text-sm mb-4">For small venues with occasional HR needs</p>
+                
+                <div class="mb-4">
+                    <span id="starterPrice" class="text-3xl font-bold text-white">$59</span>
+                    <span id="starterBilling" class="text-slate-400">/month</span>
+                </div>
+                
+                <ul class="text-slate-300 text-sm space-y-2 mb-6">
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 5 credits/month</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Unlimited AI chat</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> All document types</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 1 month rollover</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Email support (48hr)</li>
+                </ul>
+                
+                <button onclick="purchaseSubscription('starter', currentBilling)" 
+                        class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-lg transition-all">
+                    Choose Starter
+                </button>
+            </div>
+
+            <!-- Professional (Recommended) -->
+            <div class="bg-gradient-to-b from-amber-500/20 to-slate-900 rounded-xl p-6 border-2 border-amber-500 relative">
+                <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-amber-500 text-slate-900 text-xs font-bold px-3 py-1 rounded-full">
+                    BEST VALUE
+                </div>
+                
+                <h3 class="text-xl font-bold text-amber-400 mb-2">Professional</h3>
+                <p class="text-slate-400 text-sm mb-4">For busy venues with regular HR needs</p>
+                
+                <div class="mb-4">
+                    <span id="professionalPrice" class="text-3xl font-bold text-white">$149</span>
+                    <span id="professionalBilling" class="text-slate-400">/month</span>
+                </div>
+                
+                <ul class="text-slate-300 text-sm space-y-2 mb-6">
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>14 credits/month</strong></li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Unlimited AI chat</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> All document types</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 3 month rollover</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Email support (24hr)</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 3 user logins</li>
+                </ul>
+                
+                <button onclick="purchaseSubscription('professional', currentBilling)" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+                    Choose Professional
+                </button>
+                
+                <p class="text-center text-green-400 text-xs mt-2">$10.64/credit — Best rate!</p>
+            </div>
+
+            <!-- Enterprise -->
+            <div class="bg-slate-900 rounded-xl p-6 border border-slate-700 hover:border-amber-500 transition-all">
+                <h3 class="text-xl font-bold text-white mb-2">Enterprise</h3>
+                <p class="text-slate-400 text-sm mb-4">For multi-venue or high-turnover operations</p>
+                
+                <div class="mb-4">
+                    <span id="enterprisePrice" class="text-3xl font-bold text-white">$349</span>
+                    <span id="enterpriseBilling" class="text-slate-400">/month</span>
+                </div>
+                
+                <ul class="text-slate-300 text-sm space-y-2 mb-6">
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>25 credits/month</strong></li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Unlimited AI chat</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> All document types</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 6 month rollover</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Priority support (4hr)</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 10 user logins</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 5 venue profiles</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Quarterly strategy call</li>
+                </ul>
+                
+                <button onclick="purchaseSubscription('enterprise', currentBilling)" 
+                        class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-lg transition-all">
+                    Choose Enterprise
+                </button>
+            </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="text-center text-slate-400 text-sm">
+            <p>All plans include a 14-day money-back guarantee. Cancel anytime.</p>
+            <p class="mt-2">Questions? Contact <a href="mailto:blake@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">blake@fitzgeraldhr.com.au</a></p>
+        </div>
+    </div>
+</div>
+
+<script>
+// Billing toggle state
+let currentBilling = 'monthly';
+
+function setBilling(billing) {
+    currentBilling = billing;
+    
+    // Update toggle buttons
+    const monthlyBtn = document.getElementById('billingMonthly');
+    const annualBtn = document.getElementById('billingAnnual');
+    
+    if (billing === 'monthly') {
+        monthlyBtn.classList.add('bg-amber-500', 'text-slate-900');
+        monthlyBtn.classList.remove('text-slate-400');
+        annualBtn.classList.remove('bg-amber-500', 'text-slate-900');
+        annualBtn.classList.add('text-slate-400');
+        
+        // Update prices
+        document.getElementById('starterPrice').textContent = '$59';
+        document.getElementById('starterBilling').textContent = '/month';
+        document.getElementById('professionalPrice').textContent = '$149';
+        document.getElementById('professionalBilling').textContent = '/month';
+        document.getElementById('enterprisePrice').textContent = '$349';
+        document.getElementById('enterpriseBilling').textContent = '/month';
+    } else {
+        annualBtn.classList.add('bg-amber-500', 'text-slate-900');
+        annualBtn.classList.remove('text-slate-400');
+        monthlyBtn.classList.remove('bg-amber-500', 'text-slate-900');
+        monthlyBtn.classList.add('text-slate-400');
+        
+        // Update prices (annual = monthly * 10, billed yearly)
+        document.getElementById('starterPrice').textContent = '$49';
+        document.getElementById('starterBilling').textContent = '/mo (billed $588/yr)';
+        document.getElementById('professionalPrice').textContent = '$125';
+        document.getElementById('professionalBilling').textContent = '/mo (billed $1,500/yr)';
+        document.getElementById('enterprisePrice').textContent = '$290';
+        document.getElementById('enterpriseBilling').textContent = '/mo (billed $3,480/yr)';
+    }
+}
+</script>
+
+<!-- ========================================== -->
+<!-- CONSULTATION BOOKING MODAL -->
+<!-- ========================================== -->
+<div id="consultationBookingModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-xl w-full border-2 border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-2xl font-bold text-amber-400">📞 Book a Consultation</h2>
+                <p class="text-slate-400 text-sm">Speak with a senior HR professional</p>
+            </div>
+            <button onclick="closeConsultationBookingModal()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+
+        <!-- Consultation Type Selection -->
+        <div id="consultationTypeSelect" class="mb-6">
+            <h3 class="text-white font-bold mb-4">What's this consultation about?</h3>
+            <div class="space-y-3">
+                <button onclick="selectConsultationType('terminationReview')" 
+                        class="w-full bg-slate-700 hover:bg-slate-600 rounded-lg p-4 text-left transition-all border border-slate-600 hover:border-amber-500 consultation-type-btn">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-white font-bold">Termination Review</p>
+                            <p class="text-slate-400 text-sm">Review your case before proceeding with termination</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-amber-400 font-bold">7 credits</p>
+                            <p class="text-green-400 text-xs">Includes letter if approved</p>
+                        </div>
+                    </div>
+                </button>
+                
+                <button onclick="selectConsultationType('redundancyReview')" 
+                        class="w-full bg-slate-700 hover:bg-slate-600 rounded-lg p-4 text-left transition-all border border-slate-600 hover:border-amber-500 consultation-type-btn">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-white font-bold">Redundancy Review</p>
+                            <p class="text-slate-400 text-sm">Guidance on redundancy process and compliance</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-amber-400 font-bold">7 credits</p>
+                            <p class="text-green-400 text-xs">Includes letters if approved</p>
+                        </div>
+                    </div>
+                </button>
+                
+                <button onclick="selectConsultationType('investigationReview')" 
+                        class="w-full bg-slate-700 hover:bg-slate-600 rounded-lg p-4 text-left transition-all border border-slate-600 hover:border-amber-500 consultation-type-btn">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-white font-bold">Investigation Review</p>
+                            <p class="text-slate-400 text-sm">Complex workplace investigation guidance</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-amber-400 font-bold">8 credits</p>
+                            <p class="text-green-400 text-xs">Includes report if needed</p>
+                        </div>
+                    </div>
+                </button>
+                
+                <button onclick="selectConsultationType('generalConsultation')" 
+                        class="w-full bg-slate-700 hover:bg-slate-600 rounded-lg p-4 text-left transition-all border border-slate-600 hover:border-amber-500 consultation-type-btn">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-white font-bold">General HR Consultation</p>
+                            <p class="text-slate-400 text-sm">Any HR matter requiring expert guidance</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-amber-400 font-bold">5 credits</p>
+                            <p class="text-slate-400 text-xs">30 minutes</p>
+                        </div>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Urgent Option -->
+        <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
+            <div class="flex items-center gap-3">
+                <input type="checkbox" id="urgentConsultation" class="w-5 h-5 rounded">
+                <div class="flex-1">
+                    <label for="urgentConsultation" class="text-white font-bold cursor-pointer">⚡ Urgent — Same Day</label>
+                    <p class="text-red-300 text-sm">+$100 for same-day consultation</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Booking Button -->
+        <div id="consultationBookingAction" class="hidden">
+            <div class="bg-slate-900 rounded-lg p-4 mb-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-slate-400 text-sm">Selected:</p>
+                        <p id="selectedConsultationType" class="text-white font-bold">—</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-slate-400 text-sm">Total:</p>
+                        <p id="consultationTotalCredits" class="text-2xl font-bold text-amber-400">0 credits</p>
+                    </div>
+                </div>
+            </div>
+            
+            <button onclick="proceedWithConsultationBooking()" 
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2">
+                <span>📅</span>
+                <span>Proceed to Book Consultation</span>
+            </button>
+            
+            <p class="text-center text-slate-500 text-xs mt-3">
+                You'll be taken to our booking calendar to select a time.
+            </p>
+        </div>
+
+        <!-- Not enough credits message -->
+        <div id="consultationInsufficientCredits" class="hidden">
+            <div class="bg-red-500/10 border border-red-500 rounded-lg p-4 text-center">
+                <p class="text-red-400 font-bold mb-2">Insufficient Credits</p>
+                <p class="text-slate-300 text-sm mb-4">You need <span id="creditsNeeded" class="text-amber-400 font-bold">0</span> credits for this consultation.</p>
+                <button onclick="openCreditsModal(); closeConsultationBookingModal();" 
+                        class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-6 rounded-lg transition-all">
+                    Get More Credits
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- DOCUMENT UNLOCK MODAL (Preview & Unlock) -->
+<!-- ========================================== -->
+<div id="documentUnlockModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-lg w-full border-2 border-amber-500 fade-in">
+        <div class="text-center mb-6">
+            <div class="text-6xl mb-4">🔒</div>
+            <h2 class="text-2xl font-bold text-amber-400 mb-2">Unlock Your Document</h2>
+            <p class="text-slate-300">Your document is ready! Unlock it to download.</p>
+        </div>
+
+        <div class="bg-slate-900 rounded-lg p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <p class="text-slate-400 text-sm">Document:</p>
+                    <p id="unlockDocumentName" class="text-white font-bold">—</p>
+                </div>
+                <div class="text-right">
+                    <p class="text-slate-400 text-sm">Cost:</p>
+                    <p id="unlockDocumentCost" class="text-2xl font-bold text-amber-400">0 credits</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center justify-between py-2 border-t border-slate-700">
+                <span class="text-slate-400">Your balance:</span>
+                <span id="unlockCurrentBalance" class="text-white font-bold">0 credits</span>
+            </div>
+        </div>
+
+        <div id="unlockActions" class="space-y-3">
+            <!-- Unlock Button (if enough credits) -->
+            <button id="unlockDocumentBtn" onclick="unlockDocument()" 
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2">
+                <span>🔓</span>
+                <span>Unlock Document</span>
+            </button>
+            
+            <!-- Not enough credits -->
+            <div id="unlockNeedMoreCredits" class="hidden">
+                <p class="text-red-400 text-center mb-3">You need more credits to unlock this document.</p>
+                <button onclick="openCreditsModal(); closeDocumentUnlockModal();" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+                    Get More Credits
+                </button>
+            </div>
+        </div>
+
+        <button onclick="closeDocumentUnlockModal()" class="w-full mt-4 text-slate-400 hover:text-white text-sm">
+            Cancel
+        </button>
+    </div>
+</div>
+
+<!-- ========================================== -->
+<!-- CONSULTATION REQUIRED MODAL -->
+<!-- ========================================== -->
+<div id="consultationRequiredModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-lg w-full border-4 border-red-500 fade-in">
+        <div class="text-center mb-6">
+            <div class="text-6xl mb-4">🚨</div>
+            <h2 class="text-2xl font-bold text-red-400 mb-2">Consultation Required</h2>
+            <p class="text-slate-300">This document requires a professional review before generation.</p>
+        </div>
+
+        <div class="bg-red-500/10 border border-red-500 rounded-lg p-4 mb-6">
+            <p class="text-red-300 text-sm">
+                <strong>Why?</strong> Termination and other high-risk documents carry significant legal exposure 
+                ($20,000–$80,000+ in potential claims). All termination letters must be reviewed by a senior HR 
+                professional to ensure proper process has been followed.
+            </p>
+        </div>
+
+        <div class="bg-slate-900 rounded-lg p-4 mb-6">
+            <h3 class="text-white font-bold mb-3">What's included:</h3>
+            <ul class="text-slate-300 text-sm space-y-2">
+                <li class="flex items-center gap-2">
+                    <span class="text-green-400">✓</span>
+                    <span>30-minute consultation with senior HR professional</span>
+                </li>
+                <li class="flex items-center gap-2">
+                    <span class="text-green-400">✓</span>
+                    <span>Review of your specific situation</span>
+                </li>
+                <li class="flex items-center gap-2">
+                    <span class="text-green-400">✓</span>
+                    <span>Document generated <em>if approved</em></span>
+                </li>
+                <li class="flex items-center gap-2">
+                    <span class="text-green-400">✓</span>
+                    <span>Guidance on correct approach if not approved</span>
+                </li>
+            </ul>
+        </div>
+
+        <div class="space-y-3">
+            <button onclick="openConsultationBookingFromRequired()" 
+                    class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2">
+                <span>📞</span>
+                <span>Book Consultation</span>
+                <span class="bg-slate-900 text-amber-400 text-sm px-2 py-1 rounded ml-2" id="requiredConsultationCredits">7 credits</span>
+            </button>
+            
+            <button onclick="closeConsultationRequiredModal()" 
+                    class="w-full bg-slate-700 hover:bg-slate-600 text-white py-3 rounded-lg transition-all">
+                Go Back
+            </button>
+        </div>
+
+        <p class="text-center text-slate-500 text-xs mt-4">
+            Questions? Call us: <a href="tel:+61400211014" class="text-amber-400">+61 400 211 014</a>
+        </p>
+    </div>
+</div>
 
 <!-- ========================================== -->
 <!-- TERMS OF SERVICE MODAL -->
@@ -5712,7 +6422,103 @@ const CONFIG = {
     DEBOUNCE_DELAY: 150,
     RETRY_DELAY: 1000,
     MAX_RETRIES: 3,
-    ERROR_DISPLAY_TIME: 5000
+    ERROR_DISPLAY_TIME: 5000,
+    
+    // ========================================
+    // FITZ CREDITS SYSTEM
+    // ========================================
+    CREDITS: {
+        // Free tier limits
+        FREE_TIER: {
+            MONTHLY_PROMPTS: 20,
+            FREE_DOCUMENT_CREDIT: 1, // One-time, low-risk only
+            ALLOWED_FREE_DOCS: ['probationCheckIn', 'letterOfConcern', 'positionDescription', 'changeOfHours', 'referenceCheck']
+        },
+        
+        // Subscription tiers
+        TIERS: {
+            free: { name: 'Free', monthlyCredits: 0, rolloverMonths: 0, maxBanked: 0 },
+            starter: { name: 'Starter', monthlyCredits: 5, rolloverMonths: 1, maxBanked: 10, price: 59 },
+            professional: { name: 'Professional', monthlyCredits: 14, rolloverMonths: 3, maxBanked: 42, price: 149 },
+            enterprise: { name: 'Enterprise', monthlyCredits: 25, rolloverMonths: 6, maxBanked: 75, price: 349 }
+        },
+        
+        // Document credit costs
+        DOCUMENT_COSTS: {
+            // 1 Credit - Low Risk
+            probationCheckIn: { credits: 1, risk: 'low', name: 'Probation Check-In' },
+            letterOfConcern: { credits: 1, risk: 'low', name: 'Letter of Concern' },
+            positionDescription: { credits: 1, risk: 'low', name: 'Position Description' },
+            changeOfHours: { credits: 1, risk: 'low', name: 'Change of Hours Letter' },
+            referenceCheck: { credits: 1, risk: 'low', name: 'Reference Check Form' },
+            
+            // 2 Credits - Moderate Risk
+            recordOfDiscussion: { credits: 2, risk: 'moderate', name: 'Record of Discussion' },
+            pip: { credits: 2, risk: 'moderate', name: 'Performance Improvement Plan' },
+            casualConversion: { credits: 2, risk: 'moderate', name: 'Casual Conversion Letter' },
+            probationExtension: { credits: 2, risk: 'moderate', name: 'Probation Extension Letter' },
+            
+            // 3 Credits - Significant Risk (Expert Review Included)
+            employmentContract: { credits: 3, risk: 'significant', name: 'Employment Contract' },
+            formalWarning: { credits: 3, risk: 'significant', name: 'Formal Warning' },
+            firstWarning: { credits: 3, risk: 'significant', name: 'First Written Warning' },
+            finalWarning: { credits: 3, risk: 'significant', name: 'Final Written Warning' },
+            formalProbationReview: { credits: 3, risk: 'significant', name: 'Formal Probation Review' },
+            showCause: { credits: 3, risk: 'significant', name: 'Show Cause Letter' },
+            letterOfAllegation: { credits: 3, risk: 'significant', name: 'Letter of Allegation' }
+        },
+        
+        // Consultation-gated documents (require booking, cannot self-serve)
+        CONSULTATION_GATED: {
+            terminationReview: { credits: 7, name: 'Termination Review', includes: 'Termination Letter' },
+            redundancyReview: { credits: 7, name: 'Redundancy Review', includes: 'Redundancy Letters' },
+            investigationReview: { credits: 8, name: 'Investigation Review', includes: 'Investigation Report' },
+            settlementReview: { credits: 8, name: 'Settlement Review', includes: 'Deed of Settlement Draft' },
+            unfairDismissalResponse: { credits: 8, name: 'Unfair Dismissal Response', includes: 'Response Draft' },
+            generalConsultation: { credits: 5, name: 'General HR Consultation', includes: 'Expert advice' }
+        },
+        
+        // Process bundles
+        BUNDLES: {
+            probationDocumentation: { 
+                credits: 3, 
+                savings: '25%', 
+                includes: ['probationCheckIn', 'formalProbationReview'],
+                name: 'Probation Documentation Bundle'
+            },
+            performanceManagement: { 
+                credits: 6, 
+                savings: '25%', 
+                includes: ['pip', 'firstWarning', 'finalWarning'],
+                name: 'Performance Management Bundle'
+            },
+            misconductDocumentation: { 
+                credits: 4, 
+                savings: '20%', 
+                includes: ['recordOfDiscussion', 'showCause'],
+                name: 'Misconduct Documentation Bundle'
+            },
+            newHire: { 
+                credits: 4, 
+                savings: '20%', 
+                includes: ['employmentContract', 'positionDescription', 'probationCheckIn'],
+                name: 'New Hire Bundle'
+            }
+        },
+        
+        // Credit packs
+        PACKS: {
+            small: { credits: 5, price: 79, perCredit: 15.80 },
+            medium: { credits: 10, price: 149, perCredit: 14.90 },
+            large: { credits: 20, price: 249, perCredit: 12.45 }
+        },
+        
+        // Chat top-up
+        CHAT_TOPUP: { prompts: 30, price: 19 },
+        
+        // Urgent consultation premium
+        URGENT_PREMIUM: 100
+    }
 };
 
 // ========================================
@@ -5750,6 +6556,193 @@ let wizardData = {};
 let currentWizardStep = 1;
 let recognition = null;
 let isListening = false;
+
+// ========================================
+// FITZ CREDITS - GLOBAL STATE
+// ========================================
+let userCredits = {
+    balance: 0,
+    tier: 'free',
+    monthlyPromptsUsed: 0,
+    monthlyPromptsReset: null,
+    freeDocumentUsed: false,
+    activeBundles: [],
+    purchasedCredits: 0, // Never expire
+    subscriptionCredits: 0, // Subject to rollover
+    lastCreditRefresh: null
+};
+
+// Initialize credits from localStorage/Firebase
+function initializeUserCredits() {
+    const userKey = currentUser?.uid || currentUser || 'anonymous';
+    const stored = localStorage.getItem('fitzCredits_' + userKey);
+    
+    if (stored) {
+        try {
+            const parsed = JSON.parse(stored);
+            userCredits = { ...userCredits, ...parsed };
+            
+            // Check if monthly prompts need reset (new month)
+            const now = new Date();
+            const resetDate = userCredits.monthlyPromptsReset ? new Date(userCredits.monthlyPromptsReset) : null;
+            
+            if (!resetDate || now.getMonth() !== resetDate.getMonth() || now.getFullYear() !== resetDate.getFullYear()) {
+                userCredits.monthlyPromptsUsed = 0;
+                userCredits.monthlyPromptsReset = now.toISOString();
+                saveUserCredits();
+            }
+        } catch (e) {
+            console.error('Error parsing credits:', e);
+        }
+    }
+    
+    updateCreditsDisplay();
+}
+
+// Save credits to localStorage
+function saveUserCredits() {
+    const userKey = currentUser?.uid || currentUser || 'anonymous';
+    localStorage.setItem('fitzCredits_' + userKey, JSON.stringify(userCredits));
+    updateCreditsDisplay();
+    
+    // Also sync to Firebase if user is logged in
+    if (currentUser?.uid) {
+        syncCreditsToFirebase();
+    }
+}
+
+// Sync credits to Firebase
+async function syncCreditsToFirebase() {
+    if (!currentUser?.uid) return;
+    
+    try {
+        const userRef = db.collection('users').doc(currentUser.uid);
+        await userRef.set({ credits: userCredits }, { merge: true });
+    } catch (e) {
+        console.error('Error syncing credits to Firebase:', e);
+    }
+}
+
+// Load credits from Firebase
+async function loadCreditsFromFirebase() {
+    if (!currentUser?.uid) return;
+    
+    try {
+        const userRef = db.collection('users').doc(currentUser.uid);
+        const doc = await userRef.get();
+        
+        if (doc.exists && doc.data().credits) {
+            userCredits = { ...userCredits, ...doc.data().credits };
+            saveUserCredits(); // Sync to localStorage
+        }
+    } catch (e) {
+        console.error('Error loading credits from Firebase:', e);
+    }
+}
+
+// Get total available credits
+function getTotalCredits() {
+    return userCredits.purchasedCredits + userCredits.subscriptionCredits;
+}
+
+// Check if user can afford a document
+function canAffordDocument(docType) {
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    if (!cost) return false;
+    
+    // Check if it's a free document for free tier
+    if (userCredits.tier === 'free' && !userCredits.freeDocumentUsed) {
+        if (CONFIG.CREDITS.FREE_TIER.ALLOWED_FREE_DOCS.includes(docType)) {
+            return true;
+        }
+    }
+    
+    return getTotalCredits() >= cost.credits;
+}
+
+// Deduct credits for a document
+function deductCreditsForDocument(docType) {
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    if (!cost) return false;
+    
+    // Check if using free document credit
+    if (userCredits.tier === 'free' && !userCredits.freeDocumentUsed) {
+        if (CONFIG.CREDITS.FREE_TIER.ALLOWED_FREE_DOCS.includes(docType)) {
+            userCredits.freeDocumentUsed = true;
+            saveUserCredits();
+            return true;
+        }
+    }
+    
+    // Deduct from purchased credits first (they don't expire)
+    if (userCredits.purchasedCredits >= cost.credits) {
+        userCredits.purchasedCredits -= cost.credits;
+    } else {
+        // Use combination of purchased and subscription credits
+        const remaining = cost.credits - userCredits.purchasedCredits;
+        userCredits.purchasedCredits = 0;
+        userCredits.subscriptionCredits -= remaining;
+    }
+    
+    saveUserCredits();
+    return true;
+}
+
+// Check if user has prompts remaining
+function hasPromptsRemaining() {
+    // Paid subscribers have unlimited prompts
+    if (userCredits.tier !== 'free') return true;
+    
+    return userCredits.monthlyPromptsUsed < CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS;
+}
+
+// Use a prompt
+function usePrompt() {
+    if (userCredits.tier === 'free') {
+        userCredits.monthlyPromptsUsed++;
+        saveUserCredits();
+    }
+}
+
+// Get remaining prompts for free tier
+function getRemainingPrompts() {
+    if (userCredits.tier !== 'free') return Infinity;
+    return CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS - userCredits.monthlyPromptsUsed;
+}
+
+// Update the credits display in the header
+function updateCreditsDisplay() {
+    const creditsDisplay = document.getElementById('creditsDisplay');
+    const creditsBalance = document.getElementById('creditsBalance');
+    const promptsDisplay = document.getElementById('promptsDisplay');
+    
+    if (creditsDisplay) {
+        creditsDisplay.classList.remove('hidden');
+    }
+    
+    if (creditsBalance) {
+        const total = getTotalCredits();
+        creditsBalance.textContent = total;
+        
+        // Color code based on balance
+        creditsBalance.classList.remove('text-green-400', 'text-amber-400', 'text-red-400');
+        if (total >= 10) {
+            creditsBalance.classList.add('text-green-400');
+        } else if (total >= 3) {
+            creditsBalance.classList.add('text-amber-400');
+        } else {
+            creditsBalance.classList.add('text-red-400');
+        }
+    }
+    
+    if (promptsDisplay && userCredits.tier === 'free') {
+        const remaining = getRemainingPrompts();
+        promptsDisplay.textContent = `${remaining}/${CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS}`;
+        promptsDisplay.classList.remove('hidden');
+    } else if (promptsDisplay) {
+        promptsDisplay.classList.add('hidden');
+    }
+}
 
 // ========================================
 // DARK MODE SYSTEM
@@ -9309,6 +10302,17 @@ function docWizardGoBack() {
 }
 
 async function generateDocumentWithAI() {
+    const docType = documentBuilderState.currentType;
+    
+    // ✅ CHECK IF DOCUMENT IS CONSULTATION-GATED
+    if (isConsultationGated(docType)) {
+        // Close the document builder
+        closeToolModal('documentBuilderModal');
+        // Show consultation required modal
+        showConsultationRequiredModal(docType);
+        return;
+    }
+    
     // Hide wizard, show loading
     document.getElementById('documentWizardSteps').classList.add('hidden');
     document.getElementById('documentGenerating').classList.remove('hidden');
@@ -9332,13 +10336,24 @@ async function generateDocumentWithAI() {
         // Close document builder modal
         closeToolModal('documentBuilderModal');
         
+        // ✅ CHECK IF USER CAN AFFORD - Apply blur if not
+        const shouldBlur = shouldBlurDocument(docType);
+        
         // Show preview modal
         showDocumentPreview(response);
+        
+        // Apply blur after preview is shown
+        if (shouldBlur) {
+            setTimeout(() => {
+                applyDocumentBlur();
+            }, 100);
+        }
         
         trackEvent('document_generated_ai', {
             user: currentUser,
             type: documentBuilderState.currentType,
-            employeeName: documentBuilderState.data.employeeName
+            employeeName: documentBuilderState.data.employeeName,
+            blurred: shouldBlur
         });
         
     } catch (error) {
@@ -10564,8 +11579,595 @@ function resetDocumentBuilder() {
     resetDocumentBuilderSilent();
 }
 
+// ========================================
+// FITZ CREDITS MODAL FUNCTIONS
+// ========================================
+
+// Track selected consultation type
+let selectedConsultation = null;
+
+/**
+ * Open the credits management modal
+ */
+function openCreditsModal() {
+    // Update the modal with current values
+    document.getElementById('modalCreditsBalance').textContent = getTotalCredits();
+    document.getElementById('modalCurrentTier').textContent = CONFIG.CREDITS.TIERS[userCredits.tier]?.name || 'Free';
+    
+    if (userCredits.tier === 'free') {
+        const remaining = getRemainingPrompts();
+        document.getElementById('modalPromptsRemaining').textContent = `${remaining}/${CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS} prompts remaining`;
+    } else {
+        document.getElementById('modalPromptsRemaining').textContent = 'Unlimited prompts';
+    }
+    
+    document.getElementById('creditsModal').classList.remove('hidden');
+}
+
+/**
+ * Close the credits modal
+ */
+function closeCreditsModal() {
+    document.getElementById('creditsModal').classList.add('hidden');
+}
+
+/**
+ * Open the prompt limit modal (shown when free user hits 20 prompts)
+ */
+function openPromptLimitModal() {
+    document.getElementById('promptLimitModal').classList.remove('hidden');
+}
+
+/**
+ * Close the prompt limit modal
+ */
+function closePromptLimitModal() {
+    document.getElementById('promptLimitModal').classList.add('hidden');
+}
+
+/**
+ * Open the consultation booking modal
+ */
+function openConsultationBookingModal() {
+    // Reset selection
+    selectedConsultation = null;
+    document.querySelectorAll('.consultation-type-btn').forEach(btn => {
+        btn.classList.remove('border-amber-500', 'border-2');
+        btn.classList.add('border-slate-600');
+    });
+    
+    // Hide action section
+    document.getElementById('consultationBookingAction').classList.add('hidden');
+    document.getElementById('consultationInsufficientCredits').classList.add('hidden');
+    
+    // Reset urgent checkbox
+    document.getElementById('urgentConsultation').checked = false;
+    
+    document.getElementById('consultationBookingModal').classList.remove('hidden');
+}
+
+/**
+ * Close consultation booking modal
+ */
+function closeConsultationBookingModal() {
+    document.getElementById('consultationBookingModal').classList.add('hidden');
+}
+
+/**
+ * Select a consultation type
+ */
+function selectConsultationType(type) {
+    selectedConsultation = type;
+    const config = CONFIG.CREDITS.CONSULTATION_GATED[type];
+    
+    if (!config) return;
+    
+    // Update button styles
+    document.querySelectorAll('.consultation-type-btn').forEach(btn => {
+        btn.classList.remove('border-amber-500', 'border-2');
+        btn.classList.add('border-slate-600');
+    });
+    event.currentTarget.classList.remove('border-slate-600');
+    event.currentTarget.classList.add('border-amber-500', 'border-2');
+    
+    // Calculate total credits
+    const isUrgent = document.getElementById('urgentConsultation').checked;
+    const urgentPremiumCredits = isUrgent ? 0 : 0; // Urgent is cash, not credits
+    const totalCredits = config.credits;
+    
+    // Update display
+    document.getElementById('selectedConsultationType').textContent = config.name;
+    document.getElementById('consultationTotalCredits').textContent = `${totalCredits} credits`;
+    
+    // Check if user can afford
+    const canAfford = getTotalCredits() >= totalCredits;
+    
+    if (canAfford) {
+        document.getElementById('consultationBookingAction').classList.remove('hidden');
+        document.getElementById('consultationInsufficientCredits').classList.add('hidden');
+    } else {
+        document.getElementById('consultationBookingAction').classList.add('hidden');
+        document.getElementById('consultationInsufficientCredits').classList.remove('hidden');
+        document.getElementById('creditsNeeded').textContent = totalCredits;
+    }
+}
+
+/**
+ * Handle urgent checkbox change
+ */
+document.addEventListener('DOMContentLoaded', () => {
+    const urgentCheckbox = document.getElementById('urgentConsultation');
+    if (urgentCheckbox) {
+        urgentCheckbox.addEventListener('change', () => {
+            if (selectedConsultation) {
+                // Re-trigger selection to update display
+                const selectedBtn = document.querySelector('.consultation-type-btn.border-amber-500');
+                if (selectedBtn) {
+                    selectConsultationType(selectedConsultation);
+                }
+            }
+        });
+    }
+});
+
+/**
+ * Proceed with consultation booking
+ */
+function proceedWithConsultationBooking() {
+    if (!selectedConsultation) return;
+    
+    const config = CONFIG.CREDITS.CONSULTATION_GATED[selectedConsultation];
+    const isUrgent = document.getElementById('urgentConsultation').checked;
+    
+    // Deduct credits
+    const creditsNeeded = config.credits;
+    
+    if (getTotalCredits() < creditsNeeded) {
+        alert('Insufficient credits. Please purchase more credits.');
+        openCreditsModal();
+        return;
+    }
+    
+    // Deduct from purchased credits first, then subscription
+    if (userCredits.purchasedCredits >= creditsNeeded) {
+        userCredits.purchasedCredits -= creditsNeeded;
+    } else {
+        const remaining = creditsNeeded - userCredits.purchasedCredits;
+        userCredits.purchasedCredits = 0;
+        userCredits.subscriptionCredits -= remaining;
+    }
+    
+    saveUserCredits();
+    
+    // Close modal
+    closeConsultationBookingModal();
+    
+    // Build booking URL with consultation type
+    let bookingUrl = 'https://calendly.com/fitzgeraldhr/consultation';
+    
+    // If urgent, we'd handle the +$100 payment separately (Stripe checkout)
+    if (isUrgent) {
+        // For now, alert that urgent requires additional payment
+        alert(`Your ${config.name} has been reserved. You'll be redirected to book a time.\n\nNote: Urgent same-day consultations require an additional $100 payment, which will be collected during booking.`);
+    } else {
+        alert(`Your ${config.name} has been reserved (${creditsNeeded} credits deducted). You'll be redirected to book a time.`);
+    }
+    
+    // In production, this would open Calendly or your booking system
+    // window.open(bookingUrl, '_blank');
+    
+    // For now, show a confirmation message
+    addMessage('assistant', `✅ **Consultation Booked!**\n\nYour **${config.name}** has been scheduled. ${creditsNeeded} credits have been deducted from your account.\n\n📅 **Next Steps:**\n1. Check your email for the booking confirmation\n2. Prepare any relevant documentation\n3. We'll call you at the scheduled time\n\n${isUrgent ? '⚡ **Urgent booking:** Our team will contact you within 2 hours to confirm a same-day time slot.' : ''}\n\nQuestions? Call us: **+61 400 211 014**`);
+}
+
+/**
+ * Open consultation booking from "Consultation Required" modal
+ */
+function openConsultationBookingFromRequired() {
+    closeConsultationRequiredModal();
+    openConsultationBookingModal();
+}
+
+/**
+ * Close consultation required modal
+ */
+function closeConsultationRequiredModal() {
+    document.getElementById('consultationRequiredModal').classList.add('hidden');
+}
+
+/**
+ * Show consultation required modal for gated documents
+ */
+function showConsultationRequiredModal(docType) {
+    // Determine which consultation is needed
+    let consultationType = 'terminationReview';
+    let credits = 7;
+    
+    if (docType === 'terminationLetter' || docType === 'termination') {
+        consultationType = 'terminationReview';
+        credits = 7;
+    } else if (docType === 'redundancy') {
+        consultationType = 'redundancyReview';
+        credits = 7;
+    } else if (docType === 'investigation') {
+        consultationType = 'investigationReview';
+        credits = 8;
+    } else if (docType === 'settlement') {
+        consultationType = 'settlementReview';
+        credits = 8;
+    } else if (docType === 'unfairDismissal') {
+        consultationType = 'unfairDismissalResponse';
+        credits = 8;
+    }
+    
+    document.getElementById('requiredConsultationCredits').textContent = `${credits} credits`;
+    document.getElementById('consultationRequiredModal').classList.remove('hidden');
+    
+    // Store the doc type for when they proceed
+    document.getElementById('consultationRequiredModal').dataset.docType = docType;
+    document.getElementById('consultationRequiredModal').dataset.consultationType = consultationType;
+}
+
+/**
+ * Open document unlock modal
+ */
+function openDocumentUnlockModal(docType, docName) {
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    if (!cost) return;
+    
+    document.getElementById('unlockDocumentName').textContent = docName || cost.name;
+    document.getElementById('unlockDocumentCost').textContent = `${cost.credits} credits`;
+    document.getElementById('unlockCurrentBalance').textContent = `${getTotalCredits()} credits`;
+    
+    // Store doc type for unlock action
+    document.getElementById('documentUnlockModal').dataset.docType = docType;
+    
+    // Check if user can afford
+    const canAfford = canAffordDocument(docType);
+    
+    if (canAfford) {
+        document.getElementById('unlockDocumentBtn').classList.remove('hidden');
+        document.getElementById('unlockNeedMoreCredits').classList.add('hidden');
+    } else {
+        document.getElementById('unlockDocumentBtn').classList.add('hidden');
+        document.getElementById('unlockNeedMoreCredits').classList.remove('hidden');
+    }
+    
+    document.getElementById('documentUnlockModal').classList.remove('hidden');
+}
+
+/**
+ * Close document unlock modal
+ */
+function closeDocumentUnlockModal() {
+    document.getElementById('documentUnlockModal').classList.add('hidden');
+}
+
+/**
+ * Unlock the document (deduct credits and show full preview)
+ */
+function unlockDocument() {
+    const modal = document.getElementById('documentUnlockModal');
+    const docType = modal.dataset.docType;
+    
+    if (!docType) return;
+    
+    // Deduct credits
+    const success = deductCreditsForDocument(docType);
+    
+    if (success) {
+        closeDocumentUnlockModal();
+        
+        // Remove blur from document preview
+        removeDocumentBlur();
+        
+        // Show success message
+        showNotification('Document unlocked! You can now download it.', 'success');
+    } else {
+        alert('Failed to deduct credits. Please try again.');
+    }
+}
+
+/**
+ * Show subscription options
+ */
+function showSubscriptionOptions() {
+    // Close any open modals
+    closeCreditsModal();
+    closePromptLimitModal();
+    
+    // Open subscription modal
+    openSubscriptionModal();
+}
+
+/**
+ * Open the subscription selection modal
+ */
+function openSubscriptionModal() {
+    document.getElementById('subscriptionModal').classList.remove('hidden');
+}
+
+/**
+ * Close the subscription modal
+ */
+function closeSubscriptionModal() {
+    document.getElementById('subscriptionModal').classList.add('hidden');
+}
+
+/**
+ * Initiate Stripe checkout for a subscription
+ */
+async function purchaseSubscription(tier, billing = 'monthly') {
+    const priceKey = `${tier}_${billing}`;
+    await initiateStripeCheckout(priceKey);
+}
+
+/**
+ * Purchase a credit pack via Stripe checkout
+ */
+async function purchaseCreditPack(size) {
+    const priceKeys = {
+        'small': 'credits_5',
+        'medium': 'credits_10',
+        'large': 'credits_20'
+    };
+    
+    const priceKey = priceKeys[size];
+    if (!priceKey) return;
+    
+    await initiateStripeCheckout(priceKey);
+    closeCreditsModal();
+}
+
+/**
+ * Purchase chat top-up via Stripe checkout
+ */
+async function purchaseChatTopUp() {
+    await initiateStripeCheckout('chat_topup');
+    closePromptLimitModal();
+}
+
+/**
+ * Core function to initiate Stripe checkout
+ */
+async function initiateStripeCheckout(priceKey) {
+    try {
+        showNotification('Redirecting to checkout...', 'info');
+        
+        // Get user info
+        const userKey = currentUser?.uid || currentUser || 'anonymous';
+        const userEmail = currentUser?.email || null;
+        
+        // Call our Netlify function to create checkout session
+        const response = await fetch('/.netlify/functions/stripe-checkout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                priceKey: priceKey,
+                userId: userKey,
+                userEmail: userEmail,
+                successUrl: window.location.origin + '/?payment=success',
+                cancelUrl: window.location.origin + '/?payment=cancelled'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        
+        // Redirect to Stripe checkout
+        if (data.url) {
+            window.location.href = data.url;
+        } else {
+            throw new Error('No checkout URL returned');
+        }
+        
+    } catch (error) {
+        console.error('Checkout error:', error);
+        showNotification('Checkout failed: ' + error.message, 'error');
+    }
+}
+
+/**
+ * Handle payment success/cancel from URL params
+ */
+function handlePaymentReturn() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentStatus = urlParams.get('payment');
+    
+    if (paymentStatus === 'success') {
+        showNotification('🎉 Payment successful! Your credits have been added.', 'success');
+        
+        // Refresh credits display (in production, this would fetch from Firebase)
+        setTimeout(() => {
+            // For now, show a message to refresh
+            addMessage('assistant', `## 🎉 Payment Successful!\n\nThank you for your purchase! Your credits have been added to your account.\n\n**Next steps:**\n- Your credit balance will update automatically\n- You can now use your credits to generate documents\n- For subscriptions, you'll receive monthly credits on your billing date\n\nIf you have any questions, contact us at **blake@fitzgeraldhr.com.au**`);
+        }, 500);
+        
+        // Clean up URL
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+    
+    if (paymentStatus === 'cancelled') {
+        showNotification('Payment cancelled', 'info');
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }
+}
+
+// Check for payment return on page load
+document.addEventListener('DOMContentLoaded', handlePaymentReturn);
+
+/**
+ * Show notification toast
+ */
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-y-full opacity-0`;
+    
+    if (type === 'success') {
+        notification.classList.add('bg-green-600', 'text-white');
+    } else if (type === 'error') {
+        notification.classList.add('bg-red-600', 'text-white');
+    } else {
+        notification.classList.add('bg-slate-700', 'text-white');
+    }
+    
+    notification.innerHTML = `<span>${message}</span>`;
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.classList.remove('translate-y-full', 'opacity-0');
+    }, 10);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.classList.add('translate-y-full', 'opacity-0');
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// ========================================
+// DOCUMENT BLUR (Preview & Unlock)
+// ========================================
+
+/**
+ * Apply blur to document preview (for unpaid documents)
+ */
+function applyDocumentBlur() {
+    const previewContent = document.getElementById('documentPreviewContent');
+    if (!previewContent) return;
+    
+    // Add blur overlay
+    const blurOverlay = document.createElement('div');
+    blurOverlay.id = 'documentBlurOverlay';
+    blurOverlay.className = 'absolute inset-0 pointer-events-none';
+    blurOverlay.style.cssText = `
+        background: linear-gradient(to bottom, 
+            transparent 0%, 
+            transparent 15%, 
+            rgba(255,255,255,0.5) 20%,
+            rgba(255,255,255,0.95) 35%,
+            white 50%
+        );
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+    `;
+    
+    // Make preview container relative for absolute positioning
+    previewContent.parentElement.style.position = 'relative';
+    previewContent.parentElement.appendChild(blurOverlay);
+    
+    // Add unlock prompt
+    const unlockPrompt = document.createElement('div');
+    unlockPrompt.id = 'documentUnlockPrompt';
+    unlockPrompt.className = 'absolute bottom-1/3 left-1/2 transform -translate-x-1/2 text-center z-10';
+    unlockPrompt.innerHTML = `
+        <div class="bg-slate-800 border-2 border-amber-500 rounded-xl p-6 shadow-2xl">
+            <div class="text-4xl mb-3">🔒</div>
+            <h3 class="text-xl font-bold text-white mb-2">Preview Only</h3>
+            <p class="text-slate-300 text-sm mb-4">Unlock this document to view the full content and download.</p>
+            <button onclick="openDocumentUnlockModal('${documentBuilderState.currentType}', '${CONFIG.CREDITS.DOCUMENT_COSTS[documentBuilderState.currentType]?.name || 'Document'}')" 
+                    class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-6 rounded-lg transition-all">
+                Unlock Document
+            </button>
+        </div>
+    `;
+    previewContent.parentElement.appendChild(unlockPrompt);
+}
+
+/**
+ * Remove blur from document preview
+ */
+function removeDocumentBlur() {
+    const blurOverlay = document.getElementById('documentBlurOverlay');
+    const unlockPrompt = document.getElementById('documentUnlockPrompt');
+    
+    if (blurOverlay) blurOverlay.remove();
+    if (unlockPrompt) unlockPrompt.remove();
+}
+
+/**
+ * Check if document should be blurred (user hasn't paid)
+ */
+function shouldBlurDocument(docType) {
+    // Check if user can afford the document
+    if (canAffordDocument(docType)) {
+        return false; // Don't blur, they can afford it
+    }
+    
+    // Check if it's a free document for free tier
+    if (userCredits.tier === 'free' && !userCredits.freeDocumentUsed) {
+        if (CONFIG.CREDITS.FREE_TIER.ALLOWED_FREE_DOCS.includes(docType)) {
+            return false; // Don't blur, it's their free document
+        }
+    }
+    
+    return true; // Blur the document
+}
+
+// ========================================
+// CONSULTATION-GATED DOCUMENT CHECK
+// ========================================
+
+/**
+ * Check if a document type requires consultation
+ */
+function isConsultationGated(docType) {
+    const gatedTypes = [
+        'terminationLetter',
+        'termination',
+        'redundancy',
+        'redundancyLetter',
+        'investigation',
+        'investigationReport',
+        'settlement',
+        'deedOfSettlement',
+        'unfairDismissal',
+        'unfairDismissalResponse'
+    ];
+    
+    return gatedTypes.includes(docType);
+}
+
+/**
+ * Handle attempt to generate a consultation-gated document
+ */
+function handleConsultationGatedDocument(docType) {
+    showConsultationRequiredModal(docType);
+    return false; // Prevent normal flow
+}
+
 
 async function downloadGeneratedDocument(format = 'pdf') {
+    const docType = documentBuilderState.currentType;
+    
+    // ✅ CHECK IF DOCUMENT IS BLURRED (needs unlock)
+    const blurOverlay = document.getElementById('documentBlurOverlay');
+    if (blurOverlay) {
+        // Document is locked - show unlock modal instead
+        openDocumentUnlockModal(docType, CONFIG.CREDITS.DOCUMENT_COSTS[docType]?.name || 'Document');
+        return false;
+    }
+    
+    // ✅ DEDUCT CREDITS ON FIRST DOWNLOAD
+    const downloadKey = `doc_downloaded_${documentBuilderState.lastGeneratedDocId}`;
+    const alreadyDownloaded = sessionStorage.getItem(downloadKey);
+    
+    if (!alreadyDownloaded && CONFIG.CREDITS.DOCUMENT_COSTS[docType]) {
+        // First download - deduct credits
+        const success = deductCreditsForDocument(docType);
+        if (success) {
+            sessionStorage.setItem(downloadKey, 'true');
+            showNotification(`${CONFIG.CREDITS.DOCUMENT_COSTS[docType].credits} credit(s) deducted`, 'info');
+        }
+    }
+    
     // ✅ CRITICAL: Confirmation dialog before download
     const userAccepts = confirm(
         "⚠️ CRITICAL LEGAL REMINDER\n\n" +
@@ -11227,6 +12829,12 @@ async function sendMessage() {
         }
     }
     
+    // ✅ CHECK PROMPT LIMIT FOR FREE TIER
+    if (!hasPromptsRemaining()) {
+        openPromptLimitModal();
+        return;
+    }
+    
     // ✅ DETECT TOOL NEEDS (includes document builder, recruitment, integrations, etc.)
     const toolNeeds = detectToolNeeds(message);
     
@@ -11235,6 +12843,9 @@ async function sendMessage() {
     
     addMessage('user', message);
     input.value = '';
+    
+    // ✅ USE A PROMPT (for free tier tracking)
+    usePrompt();
     
     // Show "Fitz is thinking..." indicator
     const thinkingDiv = showThinkingIndicator();
@@ -17837,6 +19448,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize Supabase
     initializeSupabase();
+    
+    // Initialize Fitz Credits system
+    initializeUserCredits();
     
     // ✅ ATTEMPT AUTO-LOGIN BEFORE SHOWING ACCESS SCREEN
     const autoLoginSuccessful = attemptAutoLogin();    
