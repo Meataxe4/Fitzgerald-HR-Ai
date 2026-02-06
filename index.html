@@ -5600,12 +5600,72 @@ Be as specific as possible!"></textarea>
             
             <!-- Free Document Status (for free tier) -->
             <div id="freeDocumentStatus" class="hidden mt-4 pt-4 border-t border-amber-500/30">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="text-green-400">🎁</span>
-                        <span class="text-green-400 font-semibold">Free Document Available</span>
+                <button onclick="toggleFreeDocsDropdown()" class="w-full text-left group">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-green-400">🎁</span>
+                            <span class="text-green-400 font-semibold group-hover:text-green-300 transition-colors">Free Document Available</span>
+                            <svg id="freeDocsChevron" class="w-4 h-4 text-green-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                        <span class="text-slate-400 text-sm">Click to see included docs</span>
                     </div>
-                    <span class="text-slate-400 text-sm">1 low-risk document/month</span>
+                </button>
+                
+                <!-- Expandable list of free documents -->
+                <div id="freeDocsDropdown" class="hidden mt-3 bg-slate-900/50 rounded-lg p-3 border border-green-500/30">
+                    <p class="text-slate-400 text-xs mb-2">Your free monthly document can be any of these — click to try:</p>
+                    <ul class="space-y-1">
+                        <li>
+                            <button onclick="closeCreditsModal(); openProbationCheckIn();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
+                                <div class="flex items-center gap-2 text-sm">
+                                    <span class="text-green-400">✓</span>
+                                    <span class="text-white group-hover:text-amber-400 transition-colors">Probation Check-In Letter</span>
+                                </div>
+                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Open →</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button onclick="closeCreditsModal(); startPositionDescriptionChat();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
+                                <div class="flex items-center gap-2 text-sm">
+                                    <span class="text-green-400">✓</span>
+                                    <span class="text-white group-hover:text-amber-400 transition-colors">Position Description</span>
+                                </div>
+                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Open →</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button onclick="closeCreditsModal(); openReferenceCheckForm();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
+                                <div class="flex items-center gap-2 text-sm">
+                                    <span class="text-green-400">✓</span>
+                                    <span class="text-white group-hover:text-amber-400 transition-colors">Reference Check Form</span>
+                                </div>
+                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Open →</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button onclick="closeCreditsModal(); openOnboardingChecklist();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
+                                <div class="flex items-center gap-2 text-sm">
+                                    <span class="text-green-400">✓</span>
+                                    <span class="text-white group-hover:text-amber-400 transition-colors">Onboarding Checklist</span>
+                                </div>
+                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Open →</span>
+                            </button>
+                        </li>
+                        <li>
+                            <button onclick="closeCreditsModal(); openTrainingPlan();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
+                                <div class="flex items-center gap-2 text-sm">
+                                    <span class="text-green-400">✓</span>
+                                    <span class="text-white group-hover:text-amber-400 transition-colors">Training Plan</span>
+                                </div>
+                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Open →</span>
+                            </button>
+                        </li>
+                    </ul>
+                    <p class="text-slate-500 text-xs mt-3 pt-2 border-t border-slate-700">
+                        💡 Higher-risk documents (warnings, contracts) require credits or a subscription.
+                    </p>
                 </div>
             </div>
             <div id="freeDocumentUsedStatus" class="hidden mt-4 pt-4 border-t border-amber-500/30">
@@ -6620,7 +6680,7 @@ const CONFIG = {
         FREE_TIER: {
             MONTHLY_PROMPTS: 20,
             FREE_DOCUMENT_CREDIT: 1, // One-time, low-risk only
-            ALLOWED_FREE_DOCS: ['probationCheckIn', 'letterOfConcern', 'positionDescription', 'changeOfHours', 'referenceCheck']
+            ALLOWED_FREE_DOCS: ['probationCheckIn', 'positionDescription', 'referenceCheck', 'onboardingChecklist', 'trainingPlan']
         },
         
         // Subscription tiers
@@ -6639,6 +6699,8 @@ const CONFIG = {
             positionDescription: { credits: 1, risk: 'low', name: 'Position Description' },
             changeOfHours: { credits: 1, risk: 'low', name: 'Change of Hours Letter' },
             referenceCheck: { credits: 1, risk: 'low', name: 'Reference Check Form' },
+            onboardingChecklist: { credits: 1, risk: 'low', name: 'Onboarding Checklist' },
+            trainingPlan: { credits: 1, risk: 'low', name: 'Training Plan' },
             
             // 2 Credits - Moderate Risk
             recordOfDiscussion: { credits: 2, risk: 'moderate', name: 'Record of Discussion' },
@@ -12041,6 +12103,38 @@ const CALENDLY_CONFIG = {
 };
 
 /**
+ * Toggle the free documents dropdown in credits modal
+ */
+function toggleFreeDocsDropdown() {
+    const dropdown = document.getElementById('freeDocsDropdown');
+    const chevron = document.getElementById('freeDocsChevron');
+    
+    if (dropdown && chevron) {
+        dropdown.classList.toggle('hidden');
+        chevron.classList.toggle('rotate-180');
+    }
+}
+
+/**
+ * Start a chat to help create a Position Description
+ */
+function startPositionDescriptionChat() {
+    // Add a helpful prompt to the chat input
+    const chatInput = document.getElementById('chatInput');
+    if (chatInput) {
+        chatInput.value = "I need help creating a Position Description for a ";
+        chatInput.focus();
+        // Place cursor at end
+        chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
+    }
+    
+    // Add a helpful message
+    addMessage('assistant', `## 📝 Position Description Generator\n\nI'll help you create a professional Position Description! Just tell me:\n\n1. **Job title** (e.g., Marketing Manager, Sales Associate)\n2. **Department** (e.g., Marketing, Sales, Operations)\n3. **Employment type** (Full-time, Part-time, Casual)\n4. **Key responsibilities** (what will they do day-to-day?)\n\nFor example, you could say:\n\n*"Create a Position Description for a full-time Marketing Coordinator in the Marketing department. They'll manage social media, coordinate campaigns, and report on analytics."*\n\nWhat role would you like to create a Position Description for?`);
+    
+    showNotification('💡 Tell me about the role and I\'ll create the Position Description!', 'info');
+}
+
+/**
  * Open the credits management modal
  */
 function openCreditsModal() {
@@ -12087,6 +12181,12 @@ function openCreditsModal() {
     } else {
         document.getElementById('modalPromptsRemaining').textContent = 'Unlimited prompts';
     }
+    
+    // Reset free docs dropdown state
+    const freeDocsDropdown = document.getElementById('freeDocsDropdown');
+    const freeDocsChevron = document.getElementById('freeDocsChevron');
+    if (freeDocsDropdown) freeDocsDropdown.classList.add('hidden');
+    if (freeDocsChevron) freeDocsChevron.classList.remove('rotate-180');
     
     document.getElementById('creditsModal').classList.remove('hidden');
 }
