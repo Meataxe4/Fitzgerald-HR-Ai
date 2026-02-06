@@ -5628,10 +5628,10 @@ Be as specific as possible!"></textarea>
                             </button>
                         </li>
                         <li>
-                            <button onclick="closeCreditsModal(); startPositionDescriptionChat();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
+                            <button onclick="closeCreditsModal(); openJobDescriptionBuilder();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
                                 <div class="flex items-center gap-2 text-sm">
                                     <span class="text-amber-400">📝</span>
-                                    <span class="text-white group-hover:text-amber-400 transition-colors">Position Description</span>
+                                    <span class="text-white group-hover:text-amber-400 transition-colors">Job Description</span>
                                     <span class="text-slate-500 text-xs">(1 credit)</span>
                                 </div>
                                 <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Try →</span>
@@ -6685,6 +6685,7 @@ const CONFIG = {
             probationCheckIn: { credits: 1, risk: 'low', name: 'Probation Check-In' },
             letterOfConcern: { credits: 1, risk: 'low', name: 'Letter of Concern' },
             positionDescription: { credits: 1, risk: 'low', name: 'Position Description' },
+            jobDescription: { credits: 1, risk: 'low', name: 'Job Description' },
             changeOfHours: { credits: 1, risk: 'low', name: 'Change of Hours Letter' },
             referenceCheck: { credits: 1, risk: 'low', name: 'Reference Check Form' },
             onboardingChecklist: { credits: 1, risk: 'low', name: 'Onboarding Checklist' },
@@ -8227,6 +8228,143 @@ function detectHighRiskTopic(message) {
     }
     
     return null;
+}
+
+/**
+ * Detects if user is trying to generate a document via chat
+ * Redirects them to the appropriate tool instead
+ */
+function detectDocumentGenerationRequest(message) {
+    const lowerMessage = message.toLowerCase();
+    
+    // Document generation trigger phrases
+    const documentTriggers = [
+        // Direct generation requests
+        { patterns: ['write me a', 'write a', 'draft a', 'draft me a', 'create a', 'create me a', 'generate a', 'generate me a', 'make a', 'make me a', 'prepare a', 'prepare me a', 'give me a', 'can you write', 'can you create', 'can you draft', 'can you generate', 'can you make', 'i need a', 'i need you to write', 'i need you to create', 'help me write', 'help me create', 'help me draft'], 
+          documentTypes: ['letter', 'warning', 'contract', 'template', 'document', 'form', 'policy', 'pip', 'performance improvement plan', 'termination', 'redundancy', 'show cause', 'allegation', 'checklist', 'plan', 'description', 'reference check'] 
+        }
+    ];
+    
+    // Document type to tool mapping
+    const documentToolMap = {
+        // Warning letters
+        'warning': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Warning Letters' },
+        'formal warning': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Formal Warning' },
+        'first warning': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'First Warning' },
+        'final warning': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Final Warning' },
+        
+        // Performance
+        'pip': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Performance Improvement Plan' },
+        'performance improvement': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Performance Improvement Plan' },
+        'performance improvement plan': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Performance Improvement Plan' },
+        
+        // Termination/Redundancy - requires consultation
+        'termination': { tool: 'Book Expert Consultation', action: 'openConsultationBookingModal()', icon: '📞', specific: 'Termination Review', requiresConsult: true },
+        'redundancy': { tool: 'Book Expert Consultation', action: 'openConsultationBookingModal()', icon: '📞', specific: 'Redundancy Review', requiresConsult: true },
+        
+        // Show cause/Allegations
+        'show cause': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Show Cause Letter' },
+        'allegation': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Letter of Allegation' },
+        
+        // Contracts
+        'contract': { tool: 'New Employee Toolkit', action: 'openNewEmployeeToolkit()', icon: '👤', specific: 'Employment Contract' },
+        'employment contract': { tool: 'New Employee Toolkit', action: 'openNewEmployeeToolkit()', icon: '👤', specific: 'Employment Contract' },
+        
+        // Job/Position Description
+        'job description': { tool: 'Job Description Builder', action: 'openJobDescriptionBuilder()', icon: '📝', specific: 'Job Description' },
+        'position description': { tool: 'Job Description Builder', action: 'openJobDescriptionBuilder()', icon: '📝', specific: 'Position Description' },
+        'description': { tool: 'Job Description Builder', action: 'openJobDescriptionBuilder()', icon: '📝', specific: 'Job Description' },
+        
+        // Onboarding
+        'onboarding': { tool: 'Onboarding Checklist', action: 'openOnboardingChecklist()', icon: '✅', specific: 'Onboarding Checklist' },
+        'checklist': { tool: 'Onboarding Checklist', action: 'openOnboardingChecklist()', icon: '✅', specific: 'Onboarding Checklist' },
+        
+        // Training
+        'training plan': { tool: 'Training Plan Generator', action: 'openTrainingPlan()', icon: '📚', specific: 'Training Plan' },
+        'training': { tool: 'Training Plan Generator', action: 'openTrainingPlan()', icon: '📚', specific: 'Training Plan' },
+        
+        // Reference check
+        'reference check': { tool: 'Reference Check Form', action: 'openReferenceCheckForm()', icon: '📞', specific: 'Reference Check Form' },
+        'reference': { tool: 'Reference Check Form', action: 'openReferenceCheckForm()', icon: '📞', specific: 'Reference Check Form' },
+        
+        // Probation
+        'probation': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Probation documents' },
+        
+        // Generic document/letter/template
+        'letter': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'HR Letters' },
+        'document': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'HR Documents' },
+        'template': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'HR Templates' },
+        'form': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'HR Forms' },
+        'policy': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'HR Policies' }
+    };
+    
+    // Check for document generation request patterns
+    for (const trigger of documentTriggers) {
+        for (const pattern of trigger.patterns) {
+            if (lowerMessage.includes(pattern)) {
+                // Found a generation pattern, now check for document type
+                for (const docType of trigger.documentTypes) {
+                    if (lowerMessage.includes(docType)) {
+                        // Match found - get the tool mapping
+                        const toolInfo = documentToolMap[docType] || documentToolMap['document'];
+                        return {
+                            requestedDoc: docType,
+                            tool: toolInfo.tool,
+                            action: toolInfo.action,
+                            icon: toolInfo.icon,
+                            specific: toolInfo.specific,
+                            requiresConsult: toolInfo.requiresConsult || false
+                        };
+                    }
+                }
+            }
+        }
+    }
+    
+    return null;
+}
+
+/**
+ * Creates a helpful redirect message when user tries to generate documents in chat
+ */
+function createDocumentRedirectMessage(documentRequest) {
+    const { tool, action, icon, specific, requiresConsult } = documentRequest;
+    
+    if (requiresConsult) {
+        return `## 📞 Expert Consultation Required
+
+I can't generate **${specific}** documents directly in chat — these are high-risk matters that require expert guidance.
+
+<div class="mt-4 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
+    <p class="text-amber-400 font-semibold mb-2">${icon} ${specific}</p>
+    <p class="text-slate-300 text-sm mb-3">Book a consultation with our HR experts to get personalized guidance and compliant documentation.</p>
+    <button onclick="${action}" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-4 rounded-lg transition-all">
+        Book Expert Consultation →
+    </button>
+</div>
+
+**Why consultation?** ${specific} involves significant legal risk. Our experts will review your situation and provide tailored documentation that protects your business.`;
+    }
+    
+    return `## 📄 Use Our Document Tools
+
+I can't generate documents directly in chat, but I can point you to the right tool!
+
+<div class="mt-4 p-4 bg-slate-700/50 border border-amber-500/30 rounded-lg">
+    <p class="text-amber-400 font-semibold mb-2">${icon} ${specific}</p>
+    <p class="text-slate-300 text-sm mb-3">Use our dedicated ${tool} for professional, compliant HR documents.</p>
+    <button onclick="${action}" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-4 rounded-lg transition-all">
+        Open ${tool} →
+    </button>
+</div>
+
+**Why use the tools?**
+- ✅ Professionally formatted documents
+- ✅ Legally compliant templates
+- ✅ Customized to your situation
+- ✅ Download-ready Word/PDF files
+
+**I'm still here to help!** Ask me questions about HR processes, compliance, awards, or best practices — I just can't write the documents directly in chat.`;
 }
 
 /**
@@ -12093,25 +12231,6 @@ function toggleFreeDocsDropdown() {
 }
 
 /**
- * Start a chat to help create a Position Description
- */
-function startPositionDescriptionChat() {
-    // Add a helpful prompt to the chat input
-    const chatInput = document.getElementById('chatInput');
-    if (chatInput) {
-        chatInput.value = "I need help creating a Position Description for a ";
-        chatInput.focus();
-        // Place cursor at end
-        chatInput.setSelectionRange(chatInput.value.length, chatInput.value.length);
-    }
-    
-    // Add a helpful message
-    addMessage('assistant', `## 📝 Position Description Generator\n\nI'll help you create a professional Position Description! Just tell me:\n\n1. **Job title** (e.g., Marketing Manager, Sales Associate)\n2. **Department** (e.g., Marketing, Sales, Operations)\n3. **Employment type** (Full-time, Part-time, Casual)\n4. **Key responsibilities** (what will they do day-to-day?)\n\nFor example, you could say:\n\n*"Create a Position Description for a full-time Marketing Coordinator in the Marketing department. They'll manage social media, coordinate campaigns, and report on analytics."*\n\nWhat role would you like to create a Position Description for?`);
-    
-    showNotification('💡 Tell me about the role and I\'ll create the Position Description!', 'info');
-}
-
-/**
  * Open the credits management modal
  */
 function openCreditsModal() {
@@ -13987,6 +14106,18 @@ async function sendMessage() {
     
     // ✅ CHECK FOR HIGH-RISK TOPICS (only critical: termination, legal, harassment)
     const risk = detectHighRiskTopic(message);
+    
+    // ✅ BLOCK DOCUMENT GENERATION REQUESTS - Redirect to tools
+    const documentRequest = detectDocumentGenerationRequest(message);
+    if (documentRequest) {
+        addMessage('user', message);
+        input.value = '';
+        
+        // Show redirect message without using a prompt
+        const redirectMessage = createDocumentRedirectMessage(documentRequest);
+        addMessage('assistant', redirectMessage);
+        return;
+    }
     
     addMessage('user', message);
     input.value = '';
