@@ -6618,13 +6618,19 @@ function initializeUserCredits() {
                 userCredits.monthlyPromptsUsed = 0;
                 userCredits.monthlyPromptsReset = now.toISOString();
                 
-                // For subscribers, refresh monthly credits
-                if (userCredits.tier !== 'free') {
+                // For subscribers, refresh monthly credits ONLY if lastCreditRefresh was in a previous month
+                // This prevents double-allocation on first subscription
+                const lastRefresh = userCredits.lastCreditRefresh ? new Date(userCredits.lastCreditRefresh) : null;
+                const shouldRefreshCredits = lastRefresh && 
+                    (now.getMonth() !== lastRefresh.getMonth() || now.getFullYear() !== lastRefresh.getFullYear());
+                
+                if (userCredits.tier !== 'free' && shouldRefreshCredits) {
                     const tierConfig = CONFIG.CREDITS.TIERS[userCredits.tier];
                     if (tierConfig) {
                         // Add monthly credits (respecting rollover max)
                         const newCredits = userCredits.subscriptionCredits + tierConfig.monthlyCredits;
                         userCredits.subscriptionCredits = Math.min(newCredits, tierConfig.maxBanked);
+                        userCredits.lastCreditRefresh = now.toISOString();
                     }
                 }
                 
@@ -12118,6 +12124,7 @@ function handlePaymentReturn() {
                     // Update tier and add initial credits
                     userCredits.tier = purchase.tier;
                     userCredits.subscriptionCredits = purchase.credits;
+                    userCredits.lastCreditRefresh = new Date().toISOString(); // Prevent double allocation
                     saveUserCredits();
                     
                     showNotification(`🎉 Welcome to ${purchase.tierName}! ${purchase.credits} credits added.`, 'success');
