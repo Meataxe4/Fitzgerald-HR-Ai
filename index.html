@@ -12830,8 +12830,13 @@ function unlockDocument() {
     if (success) {
         closeDocumentUnlockModal();
         
-        // Remove blur from document preview
+        // Remove blur from document preview (if using documentPreviewModal)
         removeDocumentBlur();
+        
+        // Check if there's a pending download from the protection system
+        if (pendingDocumentDownload.downloadFunction) {
+            completePendingDownload();
+        }
         
         // Show success message
         showNotification('Document unlocked! You can now download it.', 'success');
@@ -13384,6 +13389,181 @@ function removeDocumentBlur() {
     });
 }
 
+// ========================================
+// UNIVERSAL BLUR PREVIEW SYSTEM
+// ========================================
+
+/**
+ * Apply blur overlay to any document preview container
+ * Shows first 25-30 lines with blur overlay for rest
+ * @param {string} containerId - ID of the container to blur
+ * @param {string} docType - Document type key for credit lookup
+ * @param {string} docName - Human readable document name
+ * @param {string} actionsId - ID of the actions/buttons container to hide
+ */
+function applyUniversalBlur(containerId, docType, docName, actionsId = null) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    // Make container relative for positioning
+    container.style.position = 'relative';
+    container.style.overflow = 'hidden';
+    container.style.maxHeight = '600px'; // Limit visible area
+    
+    // Calculate visible area - approximately 25-30 lines
+    const visibleHeight = 400;
+    
+    // Create blur overlay
+    const blurOverlay = document.createElement('div');
+    blurOverlay.id = containerId + '_blurOverlay';
+    blurOverlay.style.cssText = `
+        position: absolute;
+        top: ${visibleHeight}px;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to bottom, 
+            rgba(30, 41, 59, 0) 0%,
+            rgba(30, 41, 59, 0.7) 30px,
+            rgba(30, 41, 59, 0.95) 80px,
+            rgba(30, 41, 59, 1) 150px
+        );
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        pointer-events: none;
+        z-index: 5;
+    `;
+    container.appendChild(blurOverlay);
+    
+    // Add fade gradient
+    const fadeGradient = document.createElement('div');
+    fadeGradient.id = containerId + '_fadeGradient';
+    fadeGradient.style.cssText = `
+        position: absolute;
+        top: ${visibleHeight - 50}px;
+        left: 0;
+        right: 0;
+        height: 100px;
+        background: linear-gradient(to bottom, 
+            rgba(30, 41, 59, 0) 0%,
+            rgba(30, 41, 59, 0.3) 50%,
+            rgba(30, 41, 59, 0.6) 100%
+        );
+        pointer-events: none;
+        z-index: 4;
+    `;
+    container.appendChild(fadeGradient);
+    
+    // Get credit cost
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    const creditCost = cost ? cost.credits : 1;
+    const currentBalance = getTotalCredits();
+    
+    // Determine button text
+    let buttonText = `🔓 Unlock Document (${creditCost} credit${creditCost > 1 ? 's' : ''})`;
+    let subtitle = `Your balance: ${currentBalance} credit${currentBalance !== 1 ? 's' : ''}`;
+    let buttonAction = `unlockUniversalDocument('${containerId}', '${docType}', '${docName}', '${actionsId || ''}')`;
+    
+    if (currentBalance < creditCost) {
+        buttonText = '💳 Get Credits to Unlock';
+        subtitle = `Need ${creditCost} credit${creditCost > 1 ? 's' : ''} • You have ${currentBalance}`;
+        buttonAction = 'openCreditsModal()';
+    }
+    
+    // Add unlock prompt
+    const unlockPrompt = document.createElement('div');
+    unlockPrompt.id = containerId + '_unlockPrompt';
+    unlockPrompt.style.cssText = `
+        position: absolute;
+        top: ${visibleHeight + 60}px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 10;
+        text-align: center;
+        width: 90%;
+        max-width: 400px;
+    `;
+    unlockPrompt.innerHTML = `
+        <div class="bg-slate-800 border-2 border-amber-500 rounded-xl p-6 shadow-2xl">
+            <div class="text-4xl mb-3">🔒</div>
+            <h3 class="text-xl font-bold text-white mb-2">Preview Only</h3>
+            <p class="text-slate-300 text-sm mb-4">Unlock this document to view the full content and download.</p>
+            <button onclick="${buttonAction}" 
+                    class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all">
+                ${buttonText}
+            </button>
+            <p class="text-slate-400 text-xs mt-3">${subtitle}</p>
+        </div>
+    `;
+    container.appendChild(unlockPrompt);
+    
+    // Hide action buttons if specified
+    if (actionsId) {
+        const actionsContainer = document.getElementById(actionsId);
+        if (actionsContainer) {
+            actionsContainer.style.display = 'none';
+        }
+    }
+}
+
+/**
+ * Unlock a document that was blurred with applyUniversalBlur
+ */
+function unlockUniversalDocument(containerId, docType, docName, actionsId) {
+    // Check if user can afford
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    const creditCost = cost ? cost.credits : 1;
+    
+    if (getTotalCredits() < creditCost) {
+        openCreditsModal();
+        return;
+    }
+    
+    // Deduct credits
+    const success = deductCreditsForDocument(docType);
+    
+    if (success) {
+        // Remove blur elements
+        removeUniversalBlur(containerId);
+        
+        // Show action buttons
+        if (actionsId) {
+            const actionsContainer = document.getElementById(actionsId);
+            if (actionsContainer) {
+                actionsContainer.style.display = '';
+            }
+        }
+        
+        // Mark as unlocked
+        unlockedDocuments.add(docType);
+        
+        showNotification('✅ Document unlocked! You can now view and download.', 'success');
+    } else {
+        showAlert('Failed to unlock document. Please try again.');
+    }
+}
+
+/**
+ * Remove universal blur from a container
+ */
+function removeUniversalBlur(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    // Remove blur elements
+    const blurOverlay = document.getElementById(containerId + '_blurOverlay');
+    const fadeGradient = document.getElementById(containerId + '_fadeGradient');
+    const unlockPrompt = document.getElementById(containerId + '_unlockPrompt');
+    
+    if (blurOverlay) blurOverlay.remove();
+    if (fadeGradient) fadeGradient.remove();
+    if (unlockPrompt) unlockPrompt.remove();
+    
+    // Reset container styles
+    container.style.maxHeight = '';
+    container.style.overflow = '';
+}
+
 /**
  * Check if document should be blurred (user hasn't paid)
  */
@@ -13391,6 +13571,165 @@ function shouldBlurDocument(docType) {
     // ALWAYS blur documents - user must confirm they want to spend credits
     // The unlock modal will handle checking if they can afford it
     return true;
+}
+
+// ========================================
+// UNIVERSAL DOCUMENT DOWNLOAD PROTECTION
+// ========================================
+
+/**
+ * Pending document download state
+ * Used to track what document the user wants after unlocking
+ */
+let pendingDocumentDownload = {
+    docType: null,
+    docName: null,
+    downloadFunction: null,
+    format: null,
+    unlocked: false
+};
+
+/**
+ * Check if a document type has been unlocked in this session
+ */
+const unlockedDocuments = new Set();
+
+/**
+ * Require credit payment before allowing document download
+ * @param {string} docType - Document type key (e.g., 'trainingPlan', 'jobDescription')
+ * @param {string} docName - Human readable document name
+ * @param {Function} downloadFn - Function to call after unlock
+ * @param {string} format - Download format (optional)
+ */
+function requireCreditForDownload(docType, docName, downloadFn, format = null) {
+    // Check if already unlocked in this session
+    if (unlockedDocuments.has(docType)) {
+        downloadFn(format);
+        return;
+    }
+    
+    // Check if user can afford
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    if (!cost) {
+        // Unknown document type - allow download (failsafe)
+        console.warn('Unknown document type for credit check:', docType);
+        downloadFn(format);
+        return;
+    }
+    
+    // Store pending download
+    pendingDocumentDownload = {
+        docType: docType,
+        docName: docName,
+        downloadFunction: downloadFn,
+        format: format,
+        unlocked: false
+    };
+    
+    // Show unlock modal
+    openDocumentUnlockModal(docType, docName);
+}
+
+/**
+ * Complete pending document download after unlock
+ */
+function completePendingDownload() {
+    if (pendingDocumentDownload.downloadFunction && !pendingDocumentDownload.unlocked) {
+        pendingDocumentDownload.unlocked = true;
+        
+        // Mark as unlocked for this session
+        unlockedDocuments.add(pendingDocumentDownload.docType);
+        
+        // Execute the download
+        const fn = pendingDocumentDownload.downloadFunction;
+        const format = pendingDocumentDownload.format;
+        
+        // Small delay to let modal close
+        setTimeout(() => {
+            fn(format);
+        }, 300);
+        
+        // Clear pending
+        pendingDocumentDownload = {
+            docType: null,
+            docName: null,
+            downloadFunction: null,
+            format: null,
+            unlocked: false
+        };
+    }
+}
+
+// ========================================
+// PROTECTED DOWNLOAD WRAPPER FUNCTIONS
+// ========================================
+
+/**
+ * Protected Training Plan download
+ */
+function protectedExportTrainingPlanDOCX() {
+    if (!trainingPlanState.plan) {
+        showAlert('Please generate a training plan first');
+        return;
+    }
+    requireCreditForDownload('trainingPlan', 'Training Plan', () => {
+        exportTrainingPlanDOCXUnlocked();
+    });
+}
+
+function protectedExportTrainingPlanPDF() {
+    if (!trainingPlanState.plan) {
+        showAlert('Please generate a training plan first');
+        return;
+    }
+    requireCreditForDownload('trainingPlan', 'Training Plan', () => {
+        exportTrainingPlanPDFUnlocked();
+    });
+}
+
+/**
+ * Protected Onboarding Checklist download
+ */
+function protectedExportChecklistDOCX() {
+    if (!onboardingState.checklist || onboardingState.checklist.length === 0) {
+        showAlert('Please generate a checklist first');
+        return;
+    }
+    requireCreditForDownload('onboardingChecklist', 'Onboarding Checklist', () => {
+        exportChecklistDOCXUnlocked();
+    });
+}
+
+function protectedExportChecklistPDF() {
+    if (!onboardingState.checklist || onboardingState.checklist.length === 0) {
+        showAlert('Please generate a checklist first');
+        return;
+    }
+    requireCreditForDownload('onboardingChecklist', 'Onboarding Checklist', () => {
+        exportChecklistPDFUnlocked();
+    });
+}
+
+/**
+ * Protected Job Description download
+ */
+function protectedDownloadJobDescription(format) {
+    if (!jdData.generatedContent) {
+        showAlert('Please generate a job description first');
+        return;
+    }
+    requireCreditForDownload('jobDescription', 'Job Description', (fmt) => {
+        downloadJobDescriptionUnlocked(fmt);
+    }, format);
+}
+
+/**
+ * Protected Reference Check download
+ */
+function protectedDownloadReferenceCheck(format) {
+    requireCreditForDownload('referenceCheck', 'Reference Check Form', (fmt) => {
+        downloadReferenceCheckUnlocked(fmt);
+    }, format);
 }
 
 // ========================================
@@ -16180,6 +16519,11 @@ Format as a complete, professional job description with sections for: Position O
         document.getElementById('jdPreviewContent').innerHTML = '<pre class="whitespace-pre-wrap text-slate-200">' + content + '</pre>';
         document.getElementById('jobDescriptionPreviewModal').classList.remove('hidden');
         
+        // Apply blur overlay (user must unlock to download)
+        setTimeout(() => {
+            applyUniversalBlur('jdPreviewContent', 'jobDescription', 'Job Description', 'jdActionsContainer');
+        }, 100);
+        
         trackEvent('job_description_generated', { jobTitle: jdData.jobTitle, experienceLevel: jdData.experienceLevel });
     } catch (error) {
         showToast('Error generating job description', 'error');
@@ -16198,7 +16542,13 @@ function closeJobDescriptionPreview() {
     document.getElementById('jdBuilderSteps').classList.remove('hidden');
 }
 
+// Protected download (requires credit payment)
 async function downloadJobDescription(format) {
+    protectedDownloadJobDescription(format);
+}
+
+// Unlocked download (called after credit payment)
+async function downloadJobDescriptionUnlocked(format) {
     const content = jdData.generatedContent || document.getElementById('jdPreviewContent').innerText;
     const filename = `Job_Description_${jdData.jobTitle.replace(/\s+/g, '_')}`;
     
@@ -16680,6 +17030,11 @@ function generateReferenceCheck() {
     document.getElementById('rcPreviewContent').innerHTML = formContent;
     document.getElementById('referenceCheckPreviewModal').classList.remove('hidden');
     
+    // Apply blur overlay (user must unlock to download)
+    setTimeout(() => {
+        applyUniversalBlur('rcPreviewContent', 'referenceCheck', 'Reference Check Form', 'rcActionsContainer');
+    }, 100);
+    
     trackEvent('reference_check_generated', { candidateName: candidateName, position: position });
 }
 
@@ -16687,7 +17042,13 @@ function closeReferenceCheckPreview() {
     document.getElementById('referenceCheckPreviewModal').classList.add('hidden');
 }
 
+// Protected download (requires credit payment)
 async function downloadReferenceCheck(format) {
+    protectedDownloadReferenceCheck(format);
+}
+
+// Unlocked download (called after credit payment)
+async function downloadReferenceCheckUnlocked(format) {
     // Get the content from preview
     const content = document.getElementById('rcPreviewContent').innerHTML;
     const candidateName = document.getElementById('rcCandidateName').value.trim();
@@ -22547,7 +22908,7 @@ function resetAIImport() {
             <!-- Content will appear here -->
         </div>
 
-        <div class="flex gap-3">
+        <div id="rcActionsContainer" class="flex gap-3">
             <button onclick="downloadReferenceCheck('pdf')" class="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
                 📕 Download PDF
             </button>
@@ -22812,7 +23173,7 @@ function resetAIImport() {
             <!-- AI-generated content will appear here -->
         </div>
 
-        <div class="flex gap-3">
+        <div id="jdActionsContainer" class="flex gap-3">
             <button onclick="downloadJobDescription('docx')" class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
                 📄 Download DOCX
             </button>
@@ -23541,7 +23902,7 @@ function resetAIImport() {
 
         <!-- Action Buttons -->
         <div class="p-6 border-t border-slate-700 flex-shrink-0">
-            <div class="flex flex-wrap gap-3 justify-center">
+            <div id="probationActionsContainer" class="flex flex-wrap gap-3 justify-center">
                 <button onclick="downloadProbationDocument('pdf')" 
                         class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold flex items-center gap-2">
                     📕 Download PDF
@@ -24016,7 +24377,7 @@ function resetAIImport() {
         </div>
 
         <!-- Action Buttons -->
-        <div class="mt-6 flex gap-3">
+        <div id="checklistActionsContainer" class="mt-6 flex gap-3">
             <button onclick="saveOnboardingProgress()" 
                     class="flex-1 px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-all">
                 💾 Save Progress
@@ -24520,6 +24881,9 @@ async function generateSmartChecklist() {
         // Show progress bar
         document.getElementById('checklistProgressBar').classList.remove('hidden');
         updateProgress();
+        
+        // Apply blur overlay (user must unlock to download)
+        applyUniversalBlur('checklistSections', 'onboardingChecklist', 'Onboarding Checklist', 'checklistActionsContainer');
         
     } catch (error) {
         showAlert('Failed to generate checklist. Please try again.');
@@ -25213,8 +25577,11 @@ async function generateTrainingPlan() {
         // Display the plan
         displayTrainingPlan(plan);
         
-        // Show action buttons
-        document.getElementById('trainingActions').classList.remove('hidden');
+        // Apply blur overlay (user must unlock to download)
+        // Hide actions until unlocked
+        applyUniversalBlur('trainingPlanDisplay', 'trainingPlan', 'Training Plan', 'trainingActions');
+        
+        // Show coach section (free to use)
         document.getElementById('trainingCoachSection').classList.remove('hidden');
         
     } catch (error) {
@@ -25629,7 +25996,7 @@ function loadTrainingProgress() {
 }
 
 // Export Functions
-function exportTrainingPlanDOCX() {
+function exportTrainingPlanDOCXUnlocked() {
     if (!trainingPlanState.plan) {
         showAlert('Please generate a training plan first');
         return;
@@ -25651,7 +26018,7 @@ function exportTrainingPlanDOCX() {
     }
 }
 
-function exportTrainingPlanPDF() {
+function exportTrainingPlanPDFUnlocked() {
     if (!trainingPlanState.plan) {
         showAlert('Please generate a training plan first');
         return;
@@ -25670,6 +26037,15 @@ function exportTrainingPlanPDF() {
     } catch (error) {
         showAlert('Failed to generate PDF. Please try again.');
     }
+}
+
+// Protected versions that require credit payment
+function exportTrainingPlanDOCX() {
+    protectedExportTrainingPlanDOCX();
+}
+
+function exportTrainingPlanPDF() {
+    protectedExportTrainingPlanPDF();
 }
 
 function printTrainingPlan() {
@@ -26546,9 +26922,22 @@ function showProbationPreview(generatedDoc) {
     
     document.getElementById('probationPreviewContent').innerHTML = formattedHTML;
     document.getElementById('probationPreviewModal').classList.remove('hidden');
+    
+    // Apply blur overlay (user must unlock to download)
+    setTimeout(() => {
+        applyUniversalBlur('probationPreviewContent', 'probationCheckIn', 'Probation Check-In', 'probationActionsContainer');
+    }, 100);
 }
 
+// Protected download (requires credit payment)
 async function downloadProbationDocument(format = 'pdf') {
+    requireCreditForDownload('probationCheckIn', 'Probation Check-In', (fmt) => {
+        downloadProbationDocumentUnlocked(fmt || format);
+    }, format);
+}
+
+// Unlocked download (called after credit payment)
+async function downloadProbationDocumentUnlocked(format = 'pdf') {
     const userAccepts = confirm(
         "📄 PROBATION CHECK-IN DOCUMENT\n\n" +
         "Before finalising this document, please ensure:\n\n" +
@@ -26644,8 +27033,18 @@ async function downloadProbationDocument(format = 'pdf') {
 // ENHANCED CHECKLIST EXPORT FUNCTIONS
 // ========================================
 
-// Export to DOCX
+// Export to DOCX (protected by credit system)
 function exportChecklistDOCX() {
+    protectedExportChecklistDOCX();
+}
+
+// Export to PDF (protected by credit system)
+function exportChecklistPDF() {
+    protectedExportChecklistPDF();
+}
+
+// Unlocked export to DOCX (called after credit payment)
+function exportChecklistDOCXUnlocked() {
     if (!onboardingState.checklist || onboardingState.checklist.length === 0) {
         showAlert('Please generate a checklist first');
         return;
@@ -26666,8 +27065,8 @@ function exportChecklistDOCX() {
     }
 }
 
-// Export to PDF
-function exportChecklistPDF() {
+// Unlocked export to PDF (called after credit payment)
+function exportChecklistPDFUnlocked() {
     if (!onboardingState.checklist || onboardingState.checklist.length === 0) {
         showAlert('Please generate a checklist first');
         return;
@@ -30103,6 +30502,19 @@ function initializeStep8Listeners() {
 // DOCUMENT GENERATION
 // ========================================
 async function generateEmploymentContract() {
+    // Check if user has unlocked Employment Contract
+    if (!unlockedDocuments.has('employmentContract')) {
+        // Show unlock modal
+        requireCreditForDownload('employmentContract', 'Employment Contract', () => {
+            generateEmploymentContractUnlocked();
+        });
+        return;
+    }
+    
+    generateEmploymentContractUnlocked();
+}
+
+async function generateEmploymentContractUnlocked() {
     const format = document.querySelector('input[name="deliveryMethod"]:checked')?.value || 'docx';
     
     // Show loading overlay
