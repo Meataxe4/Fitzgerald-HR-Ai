@@ -5598,85 +5598,82 @@ Be as specific as possible!"></textarea>
                 </div>
             </div>
             
-            <!-- Free Document Status (for free tier) -->
+            <!-- Free Tier Info (for free tier) -->
             <div id="freeDocumentStatus" class="hidden mt-4 pt-4 border-t border-amber-500/30">
                 <button onclick="toggleFreeDocsDropdown()" class="w-full text-left group">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-2">
-                            <span class="text-green-400">🎁</span>
-                            <span class="text-green-400 font-semibold group-hover:text-green-300 transition-colors">Free Document Available</span>
-                            <svg id="freeDocsChevron" class="w-4 h-4 text-green-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <span class="text-amber-400">🎁</span>
+                            <span class="text-amber-400 font-semibold group-hover:text-amber-300 transition-colors">Free Tier: 1 credit/month</span>
+                            <svg id="freeDocsChevron" class="w-4 h-4 text-amber-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                             </svg>
                         </div>
-                        <span class="text-slate-400 text-sm">Click to see included docs</span>
+                        <span class="text-slate-400 text-sm">See what you can create</span>
                     </div>
                 </button>
                 
-                <!-- Expandable list of free documents -->
-                <div id="freeDocsDropdown" class="hidden mt-3 bg-slate-900/50 rounded-lg p-3 border border-green-500/30">
-                    <p class="text-slate-400 text-xs mb-2">Your free monthly document can be any of these — click to try:</p>
+                <!-- Expandable list of 1-credit documents -->
+                <div id="freeDocsDropdown" class="hidden mt-3 bg-slate-900/50 rounded-lg p-3 border border-amber-500/30">
+                    <p class="text-slate-400 text-xs mb-2">Use your 1 free credit on any of these (click to try):</p>
                     <ul class="space-y-1">
                         <li>
                             <button onclick="closeCreditsModal(); openProbationCheckIn();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
                                 <div class="flex items-center gap-2 text-sm">
-                                    <span class="text-green-400">✓</span>
-                                    <span class="text-white group-hover:text-amber-400 transition-colors">Probation Check-In Letter</span>
+                                    <span class="text-amber-400">📋</span>
+                                    <span class="text-white group-hover:text-amber-400 transition-colors">Probation Check-In</span>
+                                    <span class="text-slate-500 text-xs">(1 credit)</span>
                                 </div>
-                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Open →</span>
+                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Try →</span>
                             </button>
                         </li>
                         <li>
                             <button onclick="closeCreditsModal(); startPositionDescriptionChat();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
                                 <div class="flex items-center gap-2 text-sm">
-                                    <span class="text-green-400">✓</span>
+                                    <span class="text-amber-400">📝</span>
                                     <span class="text-white group-hover:text-amber-400 transition-colors">Position Description</span>
+                                    <span class="text-slate-500 text-xs">(1 credit)</span>
                                 </div>
-                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Open →</span>
+                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Try →</span>
                             </button>
                         </li>
                         <li>
                             <button onclick="closeCreditsModal(); openReferenceCheckForm();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
                                 <div class="flex items-center gap-2 text-sm">
-                                    <span class="text-green-400">✓</span>
+                                    <span class="text-amber-400">📞</span>
                                     <span class="text-white group-hover:text-amber-400 transition-colors">Reference Check Form</span>
+                                    <span class="text-slate-500 text-xs">(1 credit)</span>
                                 </div>
-                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Open →</span>
+                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Try →</span>
                             </button>
                         </li>
                         <li>
                             <button onclick="closeCreditsModal(); openOnboardingChecklist();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
                                 <div class="flex items-center gap-2 text-sm">
-                                    <span class="text-green-400">✓</span>
+                                    <span class="text-amber-400">✅</span>
                                     <span class="text-white group-hover:text-amber-400 transition-colors">Onboarding Checklist</span>
+                                    <span class="text-slate-500 text-xs">(1 credit)</span>
                                 </div>
-                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Open →</span>
+                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Try →</span>
                             </button>
                         </li>
                         <li>
                             <button onclick="closeCreditsModal(); openTrainingPlan();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
                                 <div class="flex items-center gap-2 text-sm">
-                                    <span class="text-green-400">✓</span>
+                                    <span class="text-amber-400">📚</span>
                                     <span class="text-white group-hover:text-amber-400 transition-colors">Training Plan</span>
+                                    <span class="text-slate-500 text-xs">(1 credit)</span>
                                 </div>
-                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Open →</span>
+                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Try →</span>
                             </button>
                         </li>
                     </ul>
                     <p class="text-slate-500 text-xs mt-3 pt-2 border-t border-slate-700">
-                        💡 Higher-risk documents (warnings, contracts) require credits or a subscription.
+                        💡 Need more? Upgrade for 5-25 credits/month + unlimited chat.
                     </p>
                 </div>
             </div>
-            <div id="freeDocumentUsedStatus" class="hidden mt-4 pt-4 border-t border-amber-500/30">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="text-slate-500">✓</span>
-                        <span class="text-slate-500">Free Document Used</span>
-                    </div>
-                    <span class="text-slate-500 text-sm">Resets next month</span>
-                </div>
-            </div>
+            <div id="freeDocumentUsedStatus" class="hidden"></div>
         </div>
 
         <!-- Credit Packs -->
@@ -5966,17 +5963,8 @@ function setBilling(billing) {
         </div>
 
         <div id="unlockActions" class="space-y-3">
-            <!-- Free document message (for free tier first doc) -->
+            <!-- This section is hidden - all documents now use credits -->
             <div id="unlockFreeDocument" class="hidden">
-                <div class="bg-green-500/20 border border-green-500 rounded-lg p-4 mb-4">
-                    <p class="text-green-400 text-center font-semibold">🎉 This is your FREE document!</p>
-                    <p class="text-green-300 text-center text-sm">Free tier includes 1 free low-risk document per month.</p>
-                </div>
-                <button onclick="unlockDocument()" 
-                        class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition-all flex items-center justify-center gap-2">
-                    <span>🔓</span>
-                    <span>Unlock Free Document</span>
-                </button>
             </div>
             
             <!-- Unlock Button (if enough credits) -->
@@ -6679,13 +6667,13 @@ const CONFIG = {
         // Free tier limits
         FREE_TIER: {
             MONTHLY_PROMPTS: 20,
-            FREE_DOCUMENT_CREDIT: 1, // One-time, low-risk only
-            ALLOWED_FREE_DOCS: ['probationCheckIn', 'positionDescription', 'referenceCheck', 'onboardingChecklist', 'trainingPlan']
+            MONTHLY_CREDITS: 1  // 1 free credit per month for any document
         },
         
         // Subscription tiers
         TIERS: {
-            free: { name: 'Free', monthlyCredits: 0, rolloverMonths: 0, maxBanked: 0 },
+            // Free tier: 1 credit/month, does NOT accumulate (stays at 1 if unused)
+            free: { name: 'Free', monthlyCredits: 1, rolloverMonths: 0, maxBanked: 1 },
             starter: { name: 'Starter', monthlyCredits: 5, rolloverMonths: 1, maxBanked: 10, price: 59 },
             professional: { name: 'Professional', monthlyCredits: 14, rolloverMonths: 3, maxBanked: 42, price: 149 },
             enterprise: { name: 'Enterprise', monthlyCredits: 25, rolloverMonths: 6, maxBanked: 75, price: 349 }
@@ -6815,10 +6803,9 @@ let userCredits = {
     tier: 'free',
     monthlyPromptsUsed: 0,
     monthlyPromptsReset: null,
-    freeDocumentUsed: false,
     activeBundles: [],
     purchasedCredits: 0, // Never expire
-    subscriptionCredits: 0, // Subject to rollover
+    subscriptionCredits: 1, // Free tier starts with 1 credit
     lastCreditRefresh: null
 };
 
@@ -6835,6 +6822,9 @@ function initializeUserCredits() {
             const parsed = JSON.parse(stored);
             userCredits = { ...userCredits, ...parsed };
             
+            // Remove legacy freeDocumentUsed if present
+            delete userCredits.freeDocumentUsed;
+            
             // Check if monthly prompts need reset (new month)
             const now = new Date();
             const resetDate = userCredits.monthlyPromptsReset ? new Date(userCredits.monthlyPromptsReset) : null;
@@ -6843,39 +6833,50 @@ function initializeUserCredits() {
                 userCredits.monthlyPromptsUsed = 0;
                 userCredits.monthlyPromptsReset = now.toISOString();
                 
-                // For subscribers, refresh monthly credits ONLY if lastCreditRefresh was in a previous month
-                // This prevents double-allocation on first subscription
+                // Refresh monthly credits
                 const lastRefresh = userCredits.lastCreditRefresh ? new Date(userCredits.lastCreditRefresh) : null;
-                const shouldRefreshCredits = lastRefresh && 
+                const shouldRefreshCredits = !lastRefresh || 
                     (now.getMonth() !== lastRefresh.getMonth() || now.getFullYear() !== lastRefresh.getFullYear());
                 
-                if (userCredits.tier !== 'free' && shouldRefreshCredits) {
+                if (shouldRefreshCredits) {
                     const tierConfig = CONFIG.CREDITS.TIERS[userCredits.tier];
                     if (tierConfig) {
-                        // Add monthly credits (respecting rollover max)
-                        const newCredits = userCredits.subscriptionCredits + tierConfig.monthlyCredits;
-                        userCredits.subscriptionCredits = Math.min(newCredits, tierConfig.maxBanked);
+                        if (userCredits.tier === 'free') {
+                            // FREE TIER: Set to 1, don't accumulate (but keep any purchased credits)
+                            userCredits.subscriptionCredits = 1;
+                        } else {
+                            // PAID TIERS: Add monthly credits (respecting rollover max)
+                            const newCredits = userCredits.subscriptionCredits + tierConfig.monthlyCredits;
+                            userCredits.subscriptionCredits = Math.min(newCredits, tierConfig.maxBanked);
+                        }
                         userCredits.lastCreditRefresh = now.toISOString();
                     }
                 }
                 
                 saveUserCredits();
             }
+            
+            // ALWAYS ensure free tier has at least 1 subscription credit
+            // (This catches existing users who have 0)
+            if (userCredits.tier === 'free' && userCredits.subscriptionCredits < 1) {
+                userCredits.subscriptionCredits = 1;
+                saveUserCredits();
+            }
+            
         } catch (e) {
             console.error('Error parsing credits:', e);
         }
     } else {
-        // New user - initialize with free tier defaults
+        // New user - initialize with free tier defaults (1 credit)
         userCredits = {
             balance: 0,
             tier: 'free',
             monthlyPromptsUsed: 0,
             monthlyPromptsReset: new Date().toISOString(),
-            freeDocumentUsed: false,
             activeBundles: [],
             purchasedCredits: 0,
-            subscriptionCredits: 0,
-            lastCreditRefresh: null
+            subscriptionCredits: 1, // Free tier gets 1 credit
+            lastCreditRefresh: new Date().toISOString()
         };
         saveUserCredits();
     }
@@ -6923,7 +6924,6 @@ async function loadCreditsFromFirebase() {
                 bonusPrompts: firebaseCredits.bonusPrompts || 0,
                 monthlyPromptsUsed: firebaseCredits.monthlyPromptsUsed || 0,
                 monthlyPromptsReset: firebaseCredits.monthlyPromptsReset || new Date().toISOString(),
-                freeDocumentUsed: firebaseCredits.freeDocumentUsed || false,
                 lastCreditRefresh: firebaseCredits.lastCreditRefresh || null,
                 stripeCustomerId: firebaseCredits.stripeCustomerId || null
             };
@@ -6961,7 +6961,6 @@ async function syncCreditsToFirebase() {
                 bonusPrompts: userCredits.bonusPrompts || 0,
                 monthlyPromptsUsed: userCredits.monthlyPromptsUsed,
                 monthlyPromptsReset: userCredits.monthlyPromptsReset,
-                freeDocumentUsed: userCredits.freeDocumentUsed,
                 lastCreditRefresh: userCredits.lastCreditRefresh,
                 lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
             }
@@ -6982,13 +6981,6 @@ function canAffordDocument(docType) {
     const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
     if (!cost) return false;
     
-    // Check if it's a free document for free tier
-    if (userCredits.tier === 'free' && !userCredits.freeDocumentUsed) {
-        if (CONFIG.CREDITS.FREE_TIER.ALLOWED_FREE_DOCS.includes(docType)) {
-            return true;
-        }
-    }
-    
     return getTotalCredits() >= cost.credits;
 }
 
@@ -6996,15 +6988,6 @@ function canAffordDocument(docType) {
 function deductCreditsForDocument(docType) {
     const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
     if (!cost) return false;
-    
-    // Check if using free document credit
-    if (userCredits.tier === 'free' && !userCredits.freeDocumentUsed) {
-        if (CONFIG.CREDITS.FREE_TIER.ALLOWED_FREE_DOCS.includes(docType)) {
-            userCredits.freeDocumentUsed = true;
-            saveUserCredits();
-            return true;
-        }
-    }
     
     // Deduct from purchased credits first (they don't expire)
     if (userCredits.purchasedCredits >= cost.credits) {
@@ -7074,24 +7057,18 @@ function updateCreditsDisplay() {
     
     if (creditsBalance) {
         const total = getTotalCredits();
+        creditsBalance.textContent = total;
         
-        // For free tier, show "1 free" if they haven't used their free document
-        if (userCredits.tier === 'free' && !userCredits.freeDocumentUsed && total === 0) {
-            creditsBalance.textContent = '1 free';
-            creditsBalance.classList.remove('text-green-400', 'text-amber-400', 'text-red-400');
+        // Color code based on balance
+        creditsBalance.classList.remove('text-green-400', 'text-amber-400', 'text-red-400');
+        if (total >= 10) {
             creditsBalance.classList.add('text-green-400');
+        } else if (total >= 3) {
+            creditsBalance.classList.add('text-amber-400');
+        } else if (total >= 1) {
+            creditsBalance.classList.add('text-amber-400');
         } else {
-            creditsBalance.textContent = total;
-            
-            // Color code based on balance
-            creditsBalance.classList.remove('text-green-400', 'text-amber-400', 'text-red-400');
-            if (total >= 10) {
-                creditsBalance.classList.add('text-green-400');
-            } else if (total >= 3) {
-                creditsBalance.classList.add('text-amber-400');
-            } else {
-                creditsBalance.classList.add('text-red-400');
-            }
+            creditsBalance.classList.add('text-red-400');
         }
     }
     
@@ -12146,29 +12123,24 @@ function openCreditsModal() {
     // Update tier display
     document.getElementById('modalCurrentTier').textContent = CONFIG.CREDITS.TIERS[userCredits.tier]?.name || 'Free';
     
-    // Update credits balance - show "1 free" for free tier with unused free doc
-    if (userCredits.tier === 'free' && !userCredits.freeDocumentUsed && totalCredits === 0) {
-        modalCreditsBalance.textContent = '1 free';
-        modalCreditsBalance.classList.remove('text-amber-400');
+    // Update credits balance - show actual number
+    modalCreditsBalance.textContent = totalCredits;
+    modalCreditsBalance.classList.remove('text-green-400', 'text-amber-400', 'text-red-400');
+    if (totalCredits >= 5) {
         modalCreditsBalance.classList.add('text-green-400');
-    } else {
-        modalCreditsBalance.textContent = totalCredits;
-        modalCreditsBalance.classList.remove('text-green-400');
+    } else if (totalCredits >= 1) {
         modalCreditsBalance.classList.add('text-amber-400');
+    } else {
+        modalCreditsBalance.classList.add('text-red-400');
     }
     
-    // Show/hide free document status for free tier
+    // Show free tier info or hide for paid tiers
     if (freeDocStatus && freeDocUsedStatus) {
         if (userCredits.tier === 'free') {
-            if (!userCredits.freeDocumentUsed) {
-                freeDocStatus.classList.remove('hidden');
-                freeDocUsedStatus.classList.add('hidden');
-            } else {
-                freeDocStatus.classList.add('hidden');
-                freeDocUsedStatus.classList.remove('hidden');
-            }
+            freeDocStatus.classList.remove('hidden');
+            freeDocUsedStatus.classList.add('hidden');
         } else {
-            // Hide both for paid tiers
+            // Hide for paid tiers
             freeDocStatus.classList.add('hidden');
             freeDocUsedStatus.classList.add('hidden');
         }
@@ -12663,19 +12635,14 @@ function openDocumentUnlockModal(docType, docName) {
     const balanceAfter = Math.max(0, currentBalance - cost.credits);
     
     document.getElementById('unlockDocumentName').textContent = docName || cost.name;
-    document.getElementById('unlockDocumentCost').textContent = `${cost.credits} credits`;
+    document.getElementById('unlockDocumentCost').textContent = `${cost.credits} credit${cost.credits > 1 ? 's' : ''}`;
     document.getElementById('unlockCurrentBalance').textContent = `${currentBalance} credits`;
     document.getElementById('unlockBalanceAfter').textContent = `${balanceAfter} credits`;
     
     // Store doc type for unlock action
     document.getElementById('documentUnlockModal').dataset.docType = docType;
     
-    // Check if this is a free document for free tier
-    const isFreeDocument = userCredits.tier === 'free' && 
-                           !userCredits.freeDocumentUsed && 
-                           CONFIG.CREDITS.FREE_TIER.ALLOWED_FREE_DOCS.includes(docType);
-    
-    // Check if user can afford (either free doc or has credits)
+    // Check if user can afford
     const canAfford = canAffordDocument(docType);
     
     // Hide all options first
@@ -12683,12 +12650,7 @@ function openDocumentUnlockModal(docType, docName) {
     document.getElementById('unlockDocumentBtn').classList.add('hidden');
     document.getElementById('unlockNeedMoreCredits').classList.add('hidden');
     
-    if (isFreeDocument) {
-        // Show free document option
-        document.getElementById('unlockFreeDocument').classList.remove('hidden');
-        document.getElementById('unlockDocumentCost').textContent = 'FREE';
-        document.getElementById('unlockBalanceAfter').textContent = `${currentBalance} credits`;
-    } else if (canAfford) {
+    if (canAfford) {
         // Show paid unlock option
         document.getElementById('unlockDocumentBtn').classList.remove('hidden');
         
@@ -13223,19 +13185,11 @@ function applyDocumentBlur(docType, docName) {
     const creditCost = cost ? cost.credits : 1;
     const currentBalance = getTotalCredits();
     
-    // Check if this is a free document for free tier
-    const isFreeDocument = userCredits.tier === 'free' && 
-                           !userCredits.freeDocumentUsed && 
-                           CONFIG.CREDITS.FREE_TIER.ALLOWED_FREE_DOCS.includes(docType);
-    
     // Determine button text and subtitle
-    let buttonText = `Unlock Document (${creditCost} credits)`;
+    let buttonText = `Unlock Document (${creditCost} credit${creditCost > 1 ? 's' : ''})`;
     let subtitle = `Your balance: ${currentBalance} credits`;
     
-    if (isFreeDocument) {
-        buttonText = 'Unlock Free Document';
-        subtitle = '🎉 This is your free document for this month!';
-    } else if (currentBalance < creditCost) {
+    if (currentBalance < creditCost) {
         buttonText = 'Get Credits to Unlock';
         subtitle = `Need ${creditCost} credits • You have ${currentBalance}`;
     }
