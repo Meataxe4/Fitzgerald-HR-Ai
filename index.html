@@ -6806,7 +6806,7 @@ let userCredits = {
     monthlyPromptsReset: null,
     activeBundles: [],
     purchasedCredits: 0, // Never expire
-    subscriptionCredits: 1, // Free tier starts with 1 credit
+    subscriptionCredits: 0, // Firebase will set correct value on login
     lastCreditRefresh: null
 };
 
@@ -6826,49 +6826,17 @@ function initializeUserCredits() {
             // Remove legacy freeDocumentUsed if present
             delete userCredits.freeDocumentUsed;
             
-            // Check if monthly prompts need reset (new month)
-            const now = new Date();
-            const resetDate = userCredits.monthlyPromptsReset ? new Date(userCredits.monthlyPromptsReset) : null;
+            // NOTE: Monthly reset is now handled ONLY in loadCreditsFromFirebase()
+            // This function just loads the cached localStorage data
+            // Firebase is the source of truth for credit balances
             
-            if (!resetDate || now.getMonth() !== resetDate.getMonth() || now.getFullYear() !== resetDate.getFullYear()) {
-                userCredits.monthlyPromptsUsed = 0;
-                userCredits.monthlyPromptsReset = now.toISOString();
-                
-                // Refresh monthly credits
-                const lastRefresh = userCredits.lastCreditRefresh ? new Date(userCredits.lastCreditRefresh) : null;
-                const shouldRefreshCredits = !lastRefresh || 
-                    (now.getMonth() !== lastRefresh.getMonth() || now.getFullYear() !== lastRefresh.getFullYear());
-                
-                if (shouldRefreshCredits) {
-                    const tierConfig = CONFIG.CREDITS.TIERS[userCredits.tier];
-                    if (tierConfig) {
-                        if (userCredits.tier === 'free') {
-                            // FREE TIER: Set to 1, don't accumulate (but keep any purchased credits)
-                            userCredits.subscriptionCredits = 1;
-                        } else {
-                            // PAID TIERS: Add monthly credits (respecting rollover max)
-                            const newCredits = userCredits.subscriptionCredits + tierConfig.monthlyCredits;
-                            userCredits.subscriptionCredits = Math.min(newCredits, tierConfig.maxBanked);
-                        }
-                        userCredits.lastCreditRefresh = now.toISOString();
-                    }
-                }
-                
-                saveUserCredits();
-            }
-            
-            // ALWAYS ensure free tier has at least 1 subscription credit
-            // (This catches existing users who have 0)
-            if (userCredits.tier === 'free' && userCredits.subscriptionCredits < 1) {
-                userCredits.subscriptionCredits = 1;
-                saveUserCredits();
-            }
+            console.log('📦 Loaded credits from localStorage cache:', userCredits);
             
         } catch (e) {
             console.error('Error parsing credits:', e);
         }
     } else {
-        // New user - initialize with free tier defaults (1 credit)
+        // No localStorage data - use defaults (Firebase will override when user logs in)
         userCredits = {
             balance: 0,
             tier: 'free',
@@ -6876,10 +6844,10 @@ function initializeUserCredits() {
             monthlyPromptsReset: new Date().toISOString(),
             activeBundles: [],
             purchasedCredits: 0,
-            subscriptionCredits: 1, // Free tier gets 1 credit
-            lastCreditRefresh: new Date().toISOString()
+            subscriptionCredits: 0, // Start at 0 - Firebase will set correct value
+            lastCreditRefresh: null
         };
-        saveUserCredits();
+        console.log('📦 No localStorage cache - using defaults');
     }
     
     updateCreditsDisplay();
@@ -6916,11 +6884,11 @@ async function loadCreditsFromFirebase() {
         if (doc.exists && doc.data().credits) {
             const firebaseCredits = doc.data().credits;
             
-            // Merge Firebase data with local (Firebase is source of truth)
+            // Firebase is source of truth - load exactly what's stored
             userCredits = {
                 ...userCredits,
                 tier: firebaseCredits.tier || 'free',
-                subscriptionCredits: firebaseCredits.subscriptionCredits || 0,
+                subscriptionCredits: typeof firebaseCredits.subscriptionCredits === 'number' ? firebaseCredits.subscriptionCredits : 0,
                 purchasedCredits: firebaseCredits.purchasedCredits || 0,
                 bonusPrompts: firebaseCredits.bonusPrompts || 0,
                 monthlyPromptsUsed: firebaseCredits.monthlyPromptsUsed || 0,
@@ -6929,12 +6897,35 @@ async function loadCreditsFromFirebase() {
                 stripeCustomerId: firebaseCredits.stripeCustomerId || null
             };
             
-            // ENSURE free tier always has at least 1 subscription credit
-            if (userCredits.tier === 'free' && userCredits.subscriptionCredits < 1) {
-                userCredits.subscriptionCredits = 1;
+            // Check if it's a new month - refresh credits if so
+            const now = new Date();
+            const lastRefresh = userCredits.lastCreditRefresh ? new Date(userCredits.lastCreditRefresh) : null;
+            const isNewMonth = !lastRefresh || 
+                (now.getMonth() !== lastRefresh.getMonth() || now.getFullYear() !== lastRefresh.getFullYear());
+            
+            if (isNewMonth) {
+                console.log('📅 New month detected - refreshing credits and prompts');
+                // Reset prompts for new month
+                userCredits.monthlyPromptsUsed = 0;
+                userCredits.monthlyPromptsReset = now.toISOString();
+                
+                // Refresh subscription credits
+                if (userCredits.tier === 'free') {
+                    userCredits.subscriptionCredits = 1; // Free tier gets 1 credit per month
+                } else {
+                    const tierConfig = CONFIG.CREDITS.TIERS[userCredits.tier];
+                    if (tierConfig) {
+                        const newCredits = userCredits.subscriptionCredits + tierConfig.monthlyCredits;
+                        userCredits.subscriptionCredits = Math.min(newCredits, tierConfig.maxBanked);
+                    }
+                }
+                userCredits.lastCreditRefresh = now.toISOString();
+                
+                // Save the refreshed credits
+                await syncCreditsToFirebase();
             }
             
-            // Save to localStorage as cache
+            // Save to localStorage as cache (using correct user key)
             const userKey = currentUser.uid;
             localStorage.setItem('fitzCredits_' + userKey, JSON.stringify(userCredits));
             
@@ -6942,8 +6933,8 @@ async function loadCreditsFromFirebase() {
             updateCreditsDisplay();
             return true;
         } else {
-            // No credits in Firebase - initialize with free tier defaults
-            console.log('No credits data in Firebase, initializing with 1 free credit');
+            // No credits in Firebase - this is a NEW user, give them 1 free credit
+            console.log('🆕 New user detected - initializing with 1 free credit');
             userCredits = {
                 ...userCredits,
                 tier: 'free',
@@ -7030,9 +7021,14 @@ function hasPromptsRemaining() {
 
 // Use a prompt
 function usePrompt() {
+    // Only track prompts for free tier users
     if (userCredits.tier === 'free') {
         userCredits.monthlyPromptsUsed++;
+        console.log('📝 Prompt used. Total used:', userCredits.monthlyPromptsUsed, '/', CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS);
         saveUserCredits();
+        
+        // Force display update after save
+        updateCreditsDisplay();
     }
 }
 
