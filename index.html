@@ -6929,6 +6929,11 @@ async function loadCreditsFromFirebase() {
                 stripeCustomerId: firebaseCredits.stripeCustomerId || null
             };
             
+            // ENSURE free tier always has at least 1 subscription credit
+            if (userCredits.tier === 'free' && userCredits.subscriptionCredits < 1) {
+                userCredits.subscriptionCredits = 1;
+            }
+            
             // Save to localStorage as cache
             const userKey = currentUser.uid;
             localStorage.setItem('fitzCredits_' + userKey, JSON.stringify(userCredits));
@@ -6937,7 +6942,18 @@ async function loadCreditsFromFirebase() {
             updateCreditsDisplay();
             return true;
         } else {
-            console.log('No credits data in Firebase, using defaults');
+            // No credits in Firebase - initialize with free tier defaults
+            console.log('No credits data in Firebase, initializing with 1 free credit');
+            userCredits = {
+                ...userCredits,
+                tier: 'free',
+                subscriptionCredits: 1,
+                purchasedCredits: 0,
+                monthlyPromptsUsed: 0,
+                monthlyPromptsReset: new Date().toISOString(),
+                lastCreditRefresh: new Date().toISOString()
+            };
+            saveUserCredits(); // This will also sync to Firebase
             return false;
         }
     } catch (e) {
