@@ -711,13 +711,19 @@ header button[onclick*="logout"],
     #docBackBtn { order: 2 !important; }
     #docStartOverBtn { order: 3 !important; }
     
-    /* FIX 3: MESSAGE INPUT - Taller like Claude's */
+    /* FIX 3: MESSAGE INPUT - Bigger and more readable on mobile */
     #messageInput {
-        min-height: 44px !important;
-        max-height: 200px !important;
-        padding: 14px !important;
+        min-height: 56px !important;
+        max-height: 180px !important;
+        padding: 16px !important;
         font-size: 16px !important;
         line-height: 1.5 !important;
+    }
+    
+    #messageInput::placeholder {
+        font-size: 14px !important;
+        color: #94a3b8 !important;
+        opacity: 1 !important;
     }
     
     /* Send button */
@@ -1410,6 +1416,140 @@ header button[onclick*="logout"],
     #paymentProcessingModal button {
         width: 100% !important;
         padding: 14px 24px !important;
+    }
+    
+    /* ==========================================
+       CREDITS MODAL - Mobile Fixes
+       ========================================== */
+    
+    /* Credits modal - full screen on mobile */
+    #creditsModal {
+        padding: 8px !important;
+    }
+    
+    #creditsModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        max-height: 95vh !important;
+        overflow-y: auto !important;
+        padding: 16px !important;
+        margin: 0 !important;
+        border-radius: 16px !important;
+    }
+    
+    /* Modal heading */
+    #creditsModal h2 {
+        font-size: 1.25rem !important;
+    }
+    
+    /* Credit Packs - Stack vertically on mobile */
+    #creditsModal .grid.grid-cols-3 {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
+    
+    /* Credit pack buttons - keep centered but contained */
+    #creditsModal .grid.grid-cols-3 > button {
+        padding: 14px !important;
+        overflow: hidden !important;
+    }
+    
+    #creditsModal .grid.grid-cols-3 > button > p.text-2xl {
+        font-size: 1.75rem !important;
+    }
+    
+    #creditsModal .grid.grid-cols-3 > button > p.text-sm {
+        font-size: 0.85rem !important;
+    }
+    
+    #creditsModal .grid.grid-cols-3 > button > p.font-bold {
+        font-size: 1rem !important;
+    }
+    
+    /* Per-credit price - make readable */
+    #creditsModal .grid.grid-cols-3 > button > p.text-xs {
+        font-size: 0.75rem !important;
+        white-space: nowrap !important;
+    }
+    
+    /* POPULAR badge */
+    #creditsModal .grid.grid-cols-3 > button > span.absolute {
+        font-size: 10px !important;
+        padding: 2px 8px !important;
+    }
+    
+    /* Subscription section */
+    #creditsModal .bg-slate-900.rounded-lg {
+        padding: 12px !important;
+    }
+    
+    #creditsModal .bg-slate-900.rounded-lg > h3 {
+        font-size: 0.95rem !important;
+    }
+    
+    #creditsModal .bg-slate-900.rounded-lg > p {
+        font-size: 0.8rem !important;
+    }
+    
+    /* Subscription grid - stack on mobile */
+    #creditsModal .bg-slate-900 .grid.grid-cols-3 {
+        grid-template-columns: 1fr !important;
+        gap: 8px !important;
+    }
+    
+    /* Subscription cards */
+    #creditsModal .bg-slate-900 .grid.grid-cols-3 > div {
+        padding: 10px 12px !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 4px !important;
+    }
+    
+    /* Plan name and credits on one line */
+    #creditsModal .bg-slate-900 .grid.grid-cols-3 > div > p:first-child {
+        font-size: 0.85rem !important;
+    }
+    
+    #creditsModal .bg-slate-900 .grid.grid-cols-3 > div > p.text-amber-400 {
+        font-size: 0.85rem !important;
+    }
+    
+    #creditsModal .bg-slate-900 .grid.grid-cols-3 > div > p.text-slate-400 {
+        font-size: 0.8rem !important;
+    }
+    
+    #creditsModal .bg-slate-900 .grid.grid-cols-3 > div > p.text-green-400 {
+        font-size: 0.7rem !important;
+    }
+    
+    /* Document Credit Costs dropdown */
+    #creditsModal details {
+        padding: 12px !important;
+    }
+    
+    #creditsModal details summary {
+        font-size: 0.85rem !important;
+    }
+    
+    #creditsModal details .space-y-2 > div {
+        padding: 6px 0 !important;
+    }
+    
+    #creditsModal details .flex.justify-between {
+        flex-wrap: wrap !important;
+        gap: 2px !important;
+    }
+    
+    #creditsModal details .flex.justify-between span:first-child {
+        font-size: 0.75rem !important;
+        flex: 1 1 60% !important;
+    }
+    
+    #creditsModal details .flex.justify-between span:last-child {
+        font-size: 0.8rem !important;
+        text-align: right !important;
     }
 }
 
