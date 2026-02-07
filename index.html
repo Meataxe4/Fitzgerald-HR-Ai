@@ -2938,6 +2938,142 @@ input, textarea, select {
     <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
+
+<!-- ============================================
+     LAUNCH GATE - Remove or set LAUNCH_MODE = false when ready to go live
+     ============================================ -->
+<div id="launchGate" class="fixed inset-0 bg-slate-900 z-[9999] flex items-center justify-center p-6">
+    <div class="max-w-md w-full text-center">
+        <!-- Logo -->
+        <div class="mb-8">
+            <span class="text-5xl font-extrabold tracking-tight">
+                <span class="text-amber-500">F</span><span class="text-white">ITZ</span>
+            </span>
+        </div>
+        
+        <!-- Coming Soon Message -->
+        <div id="launchGateComingSoon">
+            <h1 class="text-3xl font-bold text-white mb-4">Coming Soon</h1>
+            <p class="text-slate-400 mb-8">We're putting the finishing touches on something great. HR compliance for Australian hospitality, simplified.</p>
+            
+            <!-- Email Signup (optional) -->
+            <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 mb-6">
+                <p class="text-slate-300 text-sm mb-4">Get notified when we launch:</p>
+                <div class="flex gap-2">
+                    <input type="email" id="launchEmailInput" placeholder="Enter your email" 
+                        class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 text-sm">
+                    <button onclick="submitLaunchEmail()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-6 py-3 rounded-xl transition-all">
+                        Notify Me
+                    </button>
+                </div>
+                <p id="launchEmailSuccess" class="hidden text-green-400 text-sm mt-3">✓ You're on the list!</p>
+            </div>
+            
+            <!-- Password Access for Admin/Testers -->
+            <button onclick="showLaunchPassword()" class="text-slate-500 hover:text-slate-400 text-sm underline">
+                Have early access? →
+            </button>
+        </div>
+        
+        <!-- Password Entry (hidden by default) -->
+        <div id="launchGatePassword" class="hidden">
+            <h2 class="text-xl font-bold text-white mb-4">Early Access</h2>
+            <div class="flex gap-2 mb-4">
+                <input type="password" id="launchPasswordInput" placeholder="Enter access password" 
+                    class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 text-sm"
+                    onkeypress="if(event.key === 'Enter') checkLaunchPassword()">
+                <button onclick="checkLaunchPassword()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-6 py-3 rounded-xl transition-all">
+                    Enter
+                </button>
+            </div>
+            <p id="launchPasswordError" class="hidden text-red-400 text-sm mb-4">Incorrect password</p>
+            <button onclick="hideLaunchPassword()" class="text-slate-500 hover:text-slate-400 text-sm">
+                ← Back
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============================================
+// LAUNCH GATE CONFIGURATION
+// ============================================
+// Set to false or remove this entire section when ready to launch publicly
+const LAUNCH_MODE = true;  // ← CHANGE TO false TO DISABLE GATE
+const LAUNCH_PASSWORD = 'fitzlaunch2025';  // ← Your admin password
+
+function initLaunchGate() {
+    if (!LAUNCH_MODE) {
+        // Launch mode disabled - remove gate immediately
+        const gate = document.getElementById('launchGate');
+        if (gate) gate.remove();
+        return;
+    }
+    
+    // Check if user already has access (from previous password entry or admin)
+    const hasAccess = localStorage.getItem('fitz_launch_access') === 'granted';
+    if (hasAccess) {
+        const gate = document.getElementById('launchGate');
+        if (gate) gate.remove();
+    }
+}
+
+function showLaunchPassword() {
+    document.getElementById('launchGateComingSoon').classList.add('hidden');
+    document.getElementById('launchGatePassword').classList.remove('hidden');
+    document.getElementById('launchPasswordInput').focus();
+}
+
+function hideLaunchPassword() {
+    document.getElementById('launchGatePassword').classList.add('hidden');
+    document.getElementById('launchGateComingSoon').classList.remove('hidden');
+}
+
+function checkLaunchPassword() {
+    const input = document.getElementById('launchPasswordInput');
+    const error = document.getElementById('launchPasswordError');
+    
+    if (input.value === LAUNCH_PASSWORD) {
+        // Grant access
+        localStorage.setItem('fitz_launch_access', 'granted');
+        const gate = document.getElementById('launchGate');
+        if (gate) {
+            gate.style.opacity = '0';
+            gate.style.transition = 'opacity 0.3s';
+            setTimeout(() => gate.remove(), 300);
+        }
+    } else {
+        // Wrong password
+        error.classList.remove('hidden');
+        input.classList.add('border-red-500');
+        setTimeout(() => {
+            error.classList.add('hidden');
+            input.classList.remove('border-red-500');
+        }, 3000);
+    }
+}
+
+function submitLaunchEmail() {
+    const email = document.getElementById('launchEmailInput').value.trim();
+    if (email && email.includes('@')) {
+        // Store email (you could also send to a backend/form)
+        const emails = JSON.parse(localStorage.getItem('fitz_launch_emails') || '[]');
+        if (!emails.includes(email)) {
+            emails.push(email);
+            localStorage.setItem('fitz_launch_emails', JSON.stringify(emails));
+        }
+        document.getElementById('launchEmailSuccess').classList.remove('hidden');
+        document.getElementById('launchEmailInput').value = '';
+        
+        // Optionally: Send to Netlify form or your backend
+        // fetch('/api/launch-signup', { method: 'POST', body: JSON.stringify({ email }) });
+    }
+}
+
+// Initialize launch gate immediately
+initLaunchGate();
+</script>
+
 <!-- SYNC DEBUG PANEL - ADD THIS TO THE HEADER -->
 
 <script>
