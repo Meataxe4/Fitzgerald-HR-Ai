@@ -3325,218 +3325,343 @@ async function checkFirestoreData() {
         </div>
     </div>
     
-    <!-- Access Code Screen -->
-<div id="accessScreen" class="min-h-screen flex items-center justify-center p-6">
-    <div class="max-w-6xl w-full">
-        <!-- Logo/Branding -->
-        <div class="text-center mb-8 fade-in">
-            <div class="inline-block bg-gradient-to-r from-amber-500 to-orange-600 p-1 rounded-2xl mb-4">
-                <div class="bg-slate-900 px-8 py-4 rounded-xl">
-                    <h1 class="text-4xl font-bold text-amber-500">FITZ</h1>
-                    <p class="text-slate-400 text-sm mt-1">AI-Powered Hospitality HR Assistant</p>
-                </div>
+    <!-- Access Screen - Smart Landing Page -->
+<div id="accessScreen" class="min-h-screen">
+    
+    <!-- NEW VISITOR VIEW (default) -->
+    <div id="newVisitorView" class="min-h-screen flex flex-col">
+        
+        <!-- Minimal Nav -->
+        <nav class="px-6 py-4 flex items-center justify-between max-w-6xl mx-auto w-full">
+            <div class="flex items-center gap-2">
+                <span class="text-3xl font-extrabold tracking-tight">
+                    <span class="text-amber-500">F</span><span class="text-white">ITZ</span>
+                </span>
             </div>
-            <h2 class="text-3xl font-bold text-white mb-2">HR Compliance. Simplified.</h2>
-            <p class="text-slate-400 text-lg">Automated contracts, onboarding, and award compliance for Australian hospitality</p>
-        </div>
+            <button onclick="showReturningView()" class="text-slate-400 hover:text-white text-sm font-medium transition-colors">
+                Sign In →
+            </button>
+        </nav>
 
-        <div class="grid md:grid-cols-2 gap-8 mb-8">
-            
-            <!-- Left Column: Sign In -->
-            <div class="bg-slate-800 rounded-2xl p-8 shadow-2xl border border-slate-700 fade-in">
-                <h3 class="text-xl font-bold text-white mb-6 text-center">Sign In to Continue</h3>
-                
-                <!-- Google Sign-In -->
-                <button 
-                    onclick="signInWithGoogleFromAccess()"
-                    class="w-full bg-white hover:bg-gray-50 text-gray-800 font-semibold py-3 px-6 rounded-lg transition-all transform hover:scale-105 flex items-center justify-center gap-3 shadow-lg mb-4"
-                >
-                    <svg width="20" height="20" viewBox="0 0 20 20">
-                        <path fill="#4285F4" d="M19.6 10.2c0-.7-.1-1.4-.2-2H10v3.8h5.4c-.2 1.2-1 2.2-2.1 2.9v2.5h3.4c2-1.8 3.1-4.5 3.1-7.2z"/>
-                        <path fill="#34A853" d="M10 20c2.9 0 5.3-1 7.1-2.6l-3.4-2.5c-1 .7-2.2 1.1-3.7 1.1-2.8 0-5.2-1.9-6.1-4.5H.3v2.6C2.1 17.9 5.8 20 10 20z"/>
-                        <path fill="#FBBC05" d="M3.9 11.5c-.4-1.2-.4-2.5 0-3.7V5.2H.3C-1 7.4-1 12.6.3 14.8l3.6-2.6z"/>
-                        <path fill="#EA4335" d="M10 4c1.6 0 3 .5 4.1 1.6l3.1-3.1C15.3.9 12.9 0 10 0 5.8 0 2.1 2.1.3 5.2l3.6 2.6C4.8 5.9 7.2 4 10 4z"/>
-                    </svg>
-                    <span>Continue with Google</span>
-                </button>
-
-                <!-- Divider -->
-                <div class="relative my-6">
-                    <div class="absolute inset-0 flex items-center">
-                        <div class="w-full border-t border-slate-700"></div>
-                    </div>
-                    <div class="relative flex justify-center text-sm">
-                        <span class="px-4 bg-slate-800 text-slate-400">OR</span>
-                    </div>
-                </div>
-
-                <!-- Email Sign-In -->
-                <div id="emailSignInSection">
-                    <input 
-                        type="email" 
-                        id="emailInput"
-                        placeholder="Enter your email"
-                        class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 transition-all mb-3"
-                    />
-                    <button 
-                        onclick="continueWithEmail()"
-                        class="w-full bg-slate-700 hover:bg-slate-600 text-white font-semibold py-3 px-6 rounded-lg transition-all"
-                    >
-                        Continue with email
-                    </button>
-                    <p class="text-slate-500 text-xs mt-3 text-center">
-                        We'll send you a magic link to sign in
-                    </p>
-                </div>
-
-                <div class="mt-6 pt-6 border-t border-slate-700">
-                    <p class="text-slate-400 text-xs text-center">
-                        By continuing, you acknowledge our 
-                        <a href="#" class="text-amber-500 hover:underline">Privacy Policy</a>
-                    </p>
-                </div>
-            </div>
-
-            <!-- Right Column: Meet Fitz -->
-            <div class="space-y-4 fade-in">
-                <!-- Meet Fitz Dropdown -->
-                <div class="bg-slate-800 rounded-xl border border-slate-700">
-                    <button onclick="toggleMeetFitz()" class="w-full p-6 flex items-center justify-between text-left hover:bg-slate-700/50 transition-all rounded-xl">
-                        <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 bg-amber-500/20 rounded-lg flex items-center justify-center text-2xl">
-                                🤖
-                            </div>
-                            <div>
-                                <h3 class="text-white font-bold text-lg">Meet Fitz</h3>
-                                <p class="text-slate-400 text-sm">Your AI-powered HR assistant</p>
-                            </div>
-                        </div>
-                        <svg id="meetFitzChevron" class="w-6 h-6 text-slate-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </button>
-                    <div id="meetFitzContent" class="hidden px-6 pb-6 space-y-3">
-                        <div class="pl-4 border-l-2 border-amber-500">
-                            <p class="text-slate-300 text-sm mb-3">Fitz is powered by advanced AI to help Australian hospitality venues with:</p>
-                            <ul class="space-y-2 text-sm text-slate-400">
-                                <li class="flex items-start gap-2">
-                                    <span class="text-amber-500 mt-0.5">✓</span>
-                                    <span><strong class="text-white">Smart Employment Contracts</strong> - Generate compliant contracts in minutes</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="text-amber-500 mt-0.5">✓</span>
-                                    <span><strong class="text-white">Onboarding Automation</strong> - AI-powered checklists for new hires</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="text-amber-500 mt-0.5">✓</span>
-                                    <span><strong class="text-white">Training Plans</strong> - Role-specific training adapted to experience levels</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="text-amber-500 mt-0.5">✓</span>
-                                    <span><strong class="text-white">24/7 HR Guidance</strong> - Instant answers to workplace questions</span>
-                                </li>
-                                <li class="flex items-start gap-2">
-                                    <span class="text-amber-500 mt-0.5">✓</span>
-                                    <span><strong class="text-white">Award Compliance</strong> - Stay compliant with Australian hospitality awards</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Features -->
-                <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-amber-500/50 transition-all">
-                    <div class="flex items-center gap-4 mb-3">
-                        <div class="w-12 h-12 bg-amber-500/20 rounded-lg flex items-center justify-center text-2xl">
-                            🇦🇺
-                        </div>
-                        <div>
-                            <h3 class="text-white font-bold">Built for Australia</h3>
-                            <p class="text-slate-400 text-sm">Hospitality awards & compliance</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-amber-500/50 transition-all">
-                    <div class="flex items-center gap-4 mb-3">
-                        <div class="w-12 h-12 bg-amber-500/20 rounded-lg flex items-center justify-center text-2xl">
-                            ⚡
-                        </div>
-                        <div>
-                            <h3 class="text-white font-bold">Always Available</h3>
-                            <p class="text-slate-400 text-sm">24/7 instant HR support</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-amber-500/50 transition-all">
-                    <div class="flex items-center gap-4 mb-3">
-                        <div class="w-12 h-12 bg-amber-500/20 rounded-lg flex items-center justify-center text-2xl">
-                            🔒
-                        </div>
-                        <div>
-                            <h3 class="text-white font-bold">Secure & Private</h3>
-                            <p class="text-slate-400 text-sm">Your data synced across devices</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Trust Indicators -->
-        <div class="bg-gradient-to-br from-amber-500/5 to-orange-600/5 border border-amber-500/30 rounded-2xl p-6 fade-in">
-            <div class="text-center mb-4">
-                <p class="text-amber-400 font-bold text-lg">Trusted by Australian Hospitality Venues</p>
-            </div>
-            <div class="grid grid-cols-3 gap-4">
-                <div class="text-center">
-                    <div class="bg-slate-800/50 backdrop-blur-sm rounded-lg p-4 border border-slate-700">
-                        <p class="text-3xl font-bold text-amber-500">$12k</p>
-                        <p class="text-slate-400 text-xs mt-1">Avg. Annual Savings</p>
-                    </div>
-                </div>
-                <div class="text-center">
-                    <div class="bg-slate-800/50 backdrop-blur-sm rounded-lg p-4 border border-slate-700">
-                        <p class="text-3xl font-bold text-amber-500">&lt;90s</p>
-                        <p class="text-slate-400 text-xs mt-1">Avg. Response Time</p>
-                    </div>
-                </div>
-                <div class="text-center">
-                    <div class="bg-slate-800/50 backdrop-blur-sm rounded-lg p-4 border border-slate-700">
-                        <p class="text-3xl font-bold text-amber-500">24/7</p>
-                        <p class="text-slate-400 text-xs mt-1">Always Available</p>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Testimonial -->
-            <div class="mt-6 bg-slate-800/30 backdrop-blur-sm rounded-lg p-6 border border-slate-700/50">
-                <div class="flex items-start gap-4">
-                    <div class="text-3xl flex-shrink-0">⭐⭐⭐⭐⭐</div>
-                    <div class="flex-1">
-                        <p class="text-slate-200 text-base italic leading-relaxed">
-                            "Saved me $300 on a consultant call. Got my answer in 2 minutes instead of waiting days for a callback."
+        <!-- Hero Section -->
+        <div class="flex-1 flex items-center justify-center px-6 py-12">
+            <div class="max-w-5xl w-full">
+                <div class="grid lg:grid-cols-2 gap-12 items-center">
+                    
+                    <!-- Left: Hero Copy -->
+                    <div class="text-center lg:text-left">
+                        <h1 class="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
+                            HR Compliance.<br>
+                            <span class="text-amber-500">Simplified.</span>
+                        </h1>
+                        <p class="text-slate-400 text-lg md:text-xl mb-8 leading-relaxed">
+                            AI-powered HR assistance backed by qualified professionals. Instant answers for everyday questions, expert support when you need it.
                         </p>
-                        <p class="text-slate-500 text-sm mt-3">— Sarah M., Restaurant Owner, Melbourne</p>
+                        
+                        <!-- Stats Row -->
+                        <div class="flex items-center justify-center lg:justify-start gap-8 mb-8">
+                            <div class="text-center">
+                                <p class="text-2xl md:text-3xl font-bold text-amber-500">$12k</p>
+                                <p class="text-slate-500 text-xs">Avg. Savings</p>
+                            </div>
+                            <div class="w-px h-10 bg-slate-700"></div>
+                            <div class="text-center">
+                                <p class="text-2xl md:text-3xl font-bold text-amber-500">&lt;90s</p>
+                                <p class="text-slate-500 text-xs">Response Time</p>
+                            </div>
+                            <div class="w-px h-10 bg-slate-700"></div>
+                            <div class="text-center">
+                                <p class="text-2xl md:text-3xl font-bold text-amber-500">24/7</p>
+                                <p class="text-slate-500 text-xs">Available</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Testimonial -->
+                        <div class="hidden lg:block">
+                            <p class="text-slate-300 text-sm italic">
+                                "Saved me $300 on a consultant call. Got my answer in 2 minutes."
+                            </p>
+                            <p class="text-slate-500 text-xs mt-1">— Sarah M., Restaurant Owner, Melbourne</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Right: Sign In Card -->
+                    <div class="w-full max-w-md mx-auto lg:mx-0">
+                        <div class="bg-slate-800/50 backdrop-blur-sm rounded-2xl p-8 border border-slate-700/50">
+                            <h2 class="text-xl font-semibold text-white mb-6 text-center">Get started free</h2>
+                            
+                            <!-- Google Sign-In -->
+                            <button 
+                                onclick="signInWithGoogleFromAccess()"
+                                class="w-full bg-white hover:bg-gray-50 text-gray-700 font-medium py-3 px-6 rounded-xl transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md mb-4"
+                            >
+                                <svg width="18" height="18" viewBox="0 0 20 20">
+                                    <path fill="#4285F4" d="M19.6 10.2c0-.7-.1-1.4-.2-2H10v3.8h5.4c-.2 1.2-1 2.2-2.1 2.9v2.5h3.4c2-1.8 3.1-4.5 3.1-7.2z"/>
+                                    <path fill="#34A853" d="M10 20c2.9 0 5.3-1 7.1-2.6l-3.4-2.5c-1 .7-2.2 1.1-3.7 1.1-2.8 0-5.2-1.9-6.1-4.5H.3v2.6C2.1 17.9 5.8 20 10 20z"/>
+                                    <path fill="#FBBC05" d="M3.9 11.5c-.4-1.2-.4-2.5 0-3.7V5.2H.3C-1 7.4-1 12.6.3 14.8l3.6-2.6z"/>
+                                    <path fill="#EA4335" d="M10 4c1.6 0 3 .5 4.1 1.6l3.1-3.1C15.3.9 12.9 0 10 0 5.8 0 2.1 2.1.3 5.2l3.6 2.6C4.8 5.9 7.2 4 10 4z"/>
+                                </svg>
+                                <span>Continue with Google</span>
+                            </button>
+
+                            <!-- Divider -->
+                            <div class="relative my-5">
+                                <div class="absolute inset-0 flex items-center">
+                                    <div class="w-full border-t border-slate-700"></div>
+                                </div>
+                                <div class="relative flex justify-center text-xs">
+                                    <span class="px-3 bg-slate-800/50 text-slate-500">or</span>
+                                </div>
+                            </div>
+
+                            <!-- Email Sign-In -->
+                            <input 
+                                type="email" 
+                                id="emailInput"
+                                placeholder="Enter your email"
+                                class="w-full bg-slate-900/50 border border-slate-700 rounded-xl px-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:border-amber-500/50 focus:ring-1 focus:ring-amber-500/20 transition-all mb-3 text-sm"
+                            />
+                            <button 
+                                onclick="continueWithEmail()"
+                                class="w-full bg-slate-700 hover:bg-slate-600 text-white font-medium py-3 px-6 rounded-xl transition-all text-sm"
+                            >
+                                Continue with email
+                            </button>
+                            
+                            <p class="text-slate-500 text-xs mt-4 text-center">
+                                By continuing, you agree to our 
+                                <a href="#" onclick="showTermsOfService(); return false;" class="text-amber-500/80 hover:text-amber-500">Terms</a> & 
+                                <a href="#" onclick="showPrivacyPolicy(); return false;" class="text-amber-500/80 hover:text-amber-500">Privacy Policy</a>
+                            </p>
+                        </div>
+                        
+                        <!-- Trust Badge: Human Support -->
+                        <div class="mt-4 flex items-center justify-center gap-2 text-slate-400">
+                            <div class="flex items-center justify-center w-8 h-8 bg-amber-500/10 rounded-full">
+                                <span class="text-sm">👤</span>
+                            </div>
+                            <p class="text-xs">Backed by qualified HR professionals for complex situations</p>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
+        
+        <!-- Scroll Indicator -->
+        <div class="text-center pb-6">
+            <button onclick="document.getElementById('featuresSection').scrollIntoView({behavior: 'smooth'})" class="text-slate-500 hover:text-slate-400 transition-colors">
+                <span class="text-xs block mb-1">Learn more</span>
+                <svg class="w-5 h-5 mx-auto animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <!-- RETURNING VISITOR VIEW (hidden by default) -->
+    <div id="returningVisitorView" class="hidden min-h-screen flex items-center justify-center px-6">
+        <div class="w-full max-w-sm text-center">
+            <!-- Logo -->
+            <div class="mb-8">
+                <span class="text-4xl font-extrabold tracking-tight">
+                    <span class="text-amber-500">F</span><span class="text-white">ITZ</span>
+                </span>
+            </div>
+            
+            <h1 class="text-2xl font-semibold text-white mb-8">Welcome back 👋</h1>
+            
+            <!-- Google Sign-In -->
+            <button 
+                onclick="signInWithGoogleFromAccess()"
+                class="w-full bg-white hover:bg-gray-50 text-gray-700 font-medium py-3.5 px-6 rounded-xl transition-all flex items-center justify-center gap-3 shadow-sm hover:shadow-md mb-4"
+            >
+                <svg width="18" height="18" viewBox="0 0 20 20">
+                    <path fill="#4285F4" d="M19.6 10.2c0-.7-.1-1.4-.2-2H10v3.8h5.4c-.2 1.2-1 2.2-2.1 2.9v2.5h3.4c2-1.8 3.1-4.5 3.1-7.2z"/>
+                    <path fill="#34A853" d="M10 20c2.9 0 5.3-1 7.1-2.6l-3.4-2.5c-1 .7-2.2 1.1-3.7 1.1-2.8 0-5.2-1.9-6.1-4.5H.3v2.6C2.1 17.9 5.8 20 10 20z"/>
+                    <path fill="#FBBC05" d="M3.9 11.5c-.4-1.2-.4-2.5 0-3.7V5.2H.3C-1 7.4-1 12.6.3 14.8l3.6-2.6z"/>
+                    <path fill="#EA4335" d="M10 4c1.6 0 3 .5 4.1 1.6l3.1-3.1C15.3.9 12.9 0 10 0 5.8 0 2.1 2.1.3 5.2l3.6 2.6C4.8 5.9 7.2 4 10 4z"/>
+                </svg>
+                <span>Continue with Google</span>
+            </button>
+            
+            <!-- Email option -->
+            <button 
+                onclick="showNewVisitorView()"
+                class="w-full bg-slate-800 hover:bg-slate-700 text-white font-medium py-3.5 px-6 rounded-xl transition-all border border-slate-700 text-sm"
+            >
+                Sign in with email
+            </button>
+            
+            <p class="text-slate-500 text-sm mt-8">
+                New here? <button onclick="showNewVisitorView()" class="text-amber-500 hover:text-amber-400">Learn more →</button>
+            </p>
+        </div>
+    </div>
+    
+    <!-- SEO CONTENT (Below the fold) -->
+    <div id="featuresSection" class="bg-slate-900/50 border-t border-slate-800">
+        <div class="max-w-5xl mx-auto px-6 py-20">
+            
+            <!-- Features Grid -->
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold text-white mb-4">Everything you need for HR compliance</h2>
+                <p class="text-slate-400 max-w-2xl mx-auto">Built specifically for Australian hospitality venues. Save time, stay compliant, and focus on what matters.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-3 gap-8 mb-20">
+                <div class="text-center p-6">
+                    <div class="w-14 h-14 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl">📝</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Smart Contracts</h3>
+                    <p class="text-slate-400 text-sm">Generate compliant employment contracts in minutes, not hours. Award-integrated and legally reviewed.</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="w-14 h-14 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl">✅</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Onboarding Automation</h3>
+                    <p class="text-slate-400 text-sm">AI-powered checklists tailored to each role. Never miss a compliance step again.</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="w-14 h-14 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl">🎓</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Training Plans</h3>
+                    <p class="text-slate-400 text-sm">Role-specific training programs adapted to experience levels. Track progress effortlessly.</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="w-14 h-14 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl">👤</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">AI + Human Support</h3>
+                    <p class="text-slate-400 text-sm">Fitz handles everyday questions instantly. Complex issues get escalated to qualified HR professionals for review.</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="w-14 h-14 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl">⚖️</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Award Compliance</h3>
+                    <p class="text-slate-400 text-sm">Stay compliant with Restaurant, Hospitality, and Fast Food Awards. Auto-calculated rates.</p>
+                </div>
+                <div class="text-center p-6">
+                    <div class="w-14 h-14 bg-amber-500/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <span class="text-2xl">🇦🇺</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-white mb-2">Built for Australia</h3>
+                    <p class="text-slate-400 text-sm">Designed specifically for Australian hospitality. Fair Work compliant, locally relevant.</p>
+                </div>
+            </div>
+            
+            <!-- FAQ Section (Good for SEO) -->
+            <div class="max-w-3xl mx-auto">
+                <h2 class="text-2xl font-bold text-white mb-8 text-center">Frequently asked questions</h2>
+                
+                <div class="space-y-4">
+                    <details class="group bg-slate-800/50 rounded-xl border border-slate-700/50">
+                        <summary class="flex items-center justify-between p-5 cursor-pointer text-white font-medium">
+                            What is Fitz?
+                            <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </summary>
+                        <div class="px-5 pb-5 text-slate-400 text-sm">
+                            Fitz is an AI-powered HR assistant built specifically for Australian hospitality venues. It helps you generate employment contracts, onboarding checklists, training plans, and provides 24/7 guidance on workplace compliance.
+                        </div>
+                    </details>
+                    
+                    <details class="group bg-slate-800/50 rounded-xl border border-slate-700/50">
+                        <summary class="flex items-center justify-between p-5 cursor-pointer text-white font-medium">
+                            Is it free to try?
+                            <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </summary>
+                        <div class="px-5 pb-5 text-slate-400 text-sm">
+                            Yes! The free plan includes 1 document credit per month and 20 chat prompts. Perfect for trying out Fitz before upgrading.
+                        </div>
+                    </details>
+                    
+                    <details class="group bg-slate-800/50 rounded-xl border border-slate-700/50">
+                        <summary class="flex items-center justify-between p-5 cursor-pointer text-white font-medium">
+                            Is it compliant with Australian workplace laws?
+                            <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </summary>
+                        <div class="px-5 pb-5 text-slate-400 text-sm">
+                            Fitz is designed with Australian hospitality awards and Fair Work requirements in mind. However, all documents are provided as templates and should be reviewed by a qualified professional before use.
+                        </div>
+                    </details>
+                    
+                    <details class="group bg-slate-800/50 rounded-xl border border-slate-700/50">
+                        <summary class="flex items-center justify-between p-5 cursor-pointer text-white font-medium">
+                            Can I talk to a real HR expert?
+                            <svg class="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </summary>
+                        <div class="px-5 pb-5 text-slate-400 text-sm">
+                            Absolutely! Fitz includes a "Book Expert" feature that connects you directly with qualified HR professionals for complex situations that need human expertise.
+                        </div>
+                    </details>
+                </div>
+            </div>
+            
+            <!-- CTA -->
+            <div class="text-center mt-16 pt-16 border-t border-slate-800">
+                <h2 class="text-2xl font-bold text-white mb-4">Ready to simplify your HR?</h2>
+                <p class="text-slate-400 mb-6">Join Australian hospitality venues saving time and staying compliant.</p>
+                <button 
+                    onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+                    class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold py-3 px-8 rounded-xl transition-all"
+                >
+                    Get started free →
+                </button>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <footer class="border-t border-slate-800 py-8 px-6">
+            <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl font-extrabold">
+                        <span class="text-amber-500">F</span><span class="text-white">ITZ</span>
+                    </span>
+                    <span class="text-slate-500 text-sm">© 2025</span>
+                </div>
+                <div class="flex items-center gap-6 text-sm">
+                    <a href="#" onclick="showTermsOfService(); return false;" class="text-slate-400 hover:text-white transition-colors">Terms</a>
+                    <a href="#" onclick="showPrivacyPolicy(); return false;" class="text-slate-400 hover:text-white transition-colors">Privacy</a>
+                    <a href="mailto:hello@fitzhr.com" class="text-slate-400 hover:text-white transition-colors">Contact</a>
+                </div>
+            </div>
+        </footer>
     </div>
 </div>
 
 <script>
-function toggleMeetFitz() {
-    const content = document.getElementById('meetFitzContent');
-    const chevron = document.getElementById('meetFitzChevron');
+// Smart view switching based on returning user
+function initAccessScreen() {
+    const isReturning = localStorage.getItem('fitzhr_returning') === 'true' || 
+                        localStorage.getItem('fitzhr_google_auth') === 'true' ||
+                        localStorage.getItem('fitzhr_last_login');
     
-    if (content.classList.contains('hidden')) {
-        content.classList.remove('hidden');
-        chevron.style.transform = 'rotate(180deg)';
-    } else {
-        content.classList.add('hidden');
-        chevron.style.transform = 'rotate(0deg)';
+    if (isReturning) {
+        showReturningView();
     }
+}
+
+function showReturningView() {
+    document.getElementById('newVisitorView').classList.add('hidden');
+    document.getElementById('returningVisitorView').classList.remove('hidden');
+    document.getElementById('featuresSection').classList.add('hidden');
+}
+
+function showNewVisitorView() {
+    document.getElementById('returningVisitorView').classList.add('hidden');
+    document.getElementById('newVisitorView').classList.remove('hidden');
+    document.getElementById('featuresSection').classList.remove('hidden');
 }
 
 function continueWithEmail() {
@@ -3552,17 +3677,19 @@ function continueWithEmail() {
         return;
     }
     
-    // For now, show a message (you can implement magic link later)
-    showAlert('Email sign-in coming soon! Please use "Continue with Google" for now.');
+    // Mark as returning user for next visit
+    localStorage.setItem('fitzhr_returning', 'true');
     
-    // TODO: Implement Firebase email link authentication
-    // firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings)
+    // For now, show a message
+    showAlert('Email sign-in coming soon! Please use "Continue with Google" for now.');
 }
-</script>
 
-        </div>
-    </div>
-</div>
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+    // Small delay to ensure DOM is ready
+    setTimeout(initAccessScreen, 100);
+});
+</script>
 
     <!-- Main Assistant Screen (Hidden Initially) -->
     <div id="assistantScreen" class="hidden flex flex-col">
