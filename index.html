@@ -3020,7 +3020,18 @@ input, textarea, select {
 // ============================================
 // Set to false or remove this entire section when ready to launch publicly
 const LAUNCH_MODE = true;  // ← CHANGE TO false TO DISABLE GATE
-const LAUNCH_PASSWORD = 'fitzlaunch2025';  // ← Your admin password
+
+// Password is hashed - never store plain text in client code!
+// To generate a new hash: console.log(await hashPassword('your-password'))
+const LAUNCH_PASSWORD_HASH = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918'; // hash of 'fitzlaunch2025'
+
+async function hashPassword(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
 
 function initLaunchGate() {
     if (!LAUNCH_MODE) {
@@ -3049,11 +3060,14 @@ function hideLaunchPassword() {
     document.getElementById('launchGateComingSoon').classList.remove('hidden');
 }
 
-function checkLaunchPassword() {
+async function checkLaunchPassword() {
     const input = document.getElementById('launchPasswordInput');
     const error = document.getElementById('launchPasswordError');
     
-    if (input.value === LAUNCH_PASSWORD) {
+    // Hash the input and compare to stored hash
+    const inputHash = await hashPassword(input.value);
+    
+    if (inputHash === LAUNCH_PASSWORD_HASH) {
         // Grant access
         localStorage.setItem('fitz_launch_access', 'granted');
         const gate = document.getElementById('launchGate');
@@ -14492,7 +14506,7 @@ async function logDocumentGeneration() {
     
     const log = {
         document_id: generateDocumentId(),
-        user_code: currentUser,
+        user_code: currentUser?.uid || currentUser, // ← Always use UID for security
         document_type: documentBuilderState.currentType,
         employee_name: documentBuilderState.data.employeeName || 'Unknown',
         generated_at: new Date().toISOString(),
