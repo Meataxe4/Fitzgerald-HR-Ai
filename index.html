@@ -194,6 +194,26 @@ body.light-mode {
     font-weight: 700 !important;
 }
 
+/* FITZ LOGO - Keep consistent font-weight in both modes */
+.light-mode #headerTitle h1,
+.light-mode #headerTitle h1 span,
+.light-mode .font-extrabold,
+.light-mode .font-extrabold span {
+    font-weight: 800 !important;
+}
+
+/* Preserve amber color for the F in FITZ logo everywhere */
+.light-mode #headerTitle h1 .text-amber-500,
+.light-mode .font-extrabold .text-amber-500 {
+    color: #f59e0b !important;
+    font-weight: 800 !important;
+}
+
+/* Keep ITZ white/dark text consistent weight in logo */
+.light-mode .font-extrabold .text-white {
+    font-weight: 800 !important;
+}
+
 .light-mode .text-green-300,
 .light-mode .text-green-400,
 .light-mode .text-green-500 {
