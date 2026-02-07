@@ -1336,6 +1336,35 @@ input, textarea, select {
             animation: slideOutRight 0.3s ease-in;
         }
         
+        /* Payment success confetti */
+        @keyframes confetti-fall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            top: -10px;
+            animation: confetti-fall linear forwards;
+        }
+        
+        @keyframes success-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        #paymentSuccessState .bg-gradient-to-br {
+            animation: success-pulse 2s ease-in-out infinite;
+        }
+        
         /* Scroll to bottom button - Claude-style floating button */
         #scrollToBottomBtn {
             display: flex;
@@ -3917,6 +3946,61 @@ document.addEventListener('DOMContentLoaded', function() {
         <textarea name="improve"></textarea>
         <input type="text" name="willPay">
     </form>
+
+    <!-- Payment Processing Modal -->
+    <div id="paymentProcessingModal" class="hidden fixed inset-0 bg-slate-900/95 backdrop-blur-sm flex items-center justify-center p-6 z-[100]">
+        <div class="text-center max-w-md w-full">
+            <!-- Processing State -->
+            <div id="paymentProcessingState" class="fade-in">
+                <div class="relative w-20 h-20 mx-auto mb-6">
+                    <!-- Spinner -->
+                    <div class="absolute inset-0 border-4 border-slate-700 rounded-full"></div>
+                    <div class="absolute inset-0 border-4 border-amber-500 rounded-full border-t-transparent animate-spin"></div>
+                    <!-- Icon -->
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <span class="text-2xl">💳</span>
+                    </div>
+                </div>
+                <h2 class="text-2xl font-bold text-white mb-2">Processing Payment</h2>
+                <p class="text-slate-400 mb-4">Confirming your purchase...</p>
+                <div class="flex items-center justify-center gap-2 text-sm text-slate-500">
+                    <div class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+                    <span id="paymentProcessingStatus">Verifying with Stripe</span>
+                </div>
+            </div>
+            
+            <!-- Success State -->
+            <div id="paymentSuccessState" class="hidden fade-in">
+                <div class="relative w-24 h-24 mx-auto mb-6">
+                    <!-- Success circle animation -->
+                    <div class="absolute inset-0 bg-green-500/20 rounded-full animate-ping"></div>
+                    <div class="absolute inset-0 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
+                        <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                </div>
+                <h2 class="text-3xl font-bold text-white mb-2">Payment Successful!</h2>
+                <p id="paymentSuccessMessage" class="text-slate-300 text-lg mb-6">Credits added to your account</p>
+                
+                <!-- Credit display -->
+                <div class="bg-slate-800/50 border border-slate-700 rounded-2xl p-6 mb-6">
+                    <p class="text-slate-400 text-sm mb-2">Your new balance</p>
+                    <div class="flex items-center justify-center gap-2">
+                        <span class="text-4xl font-bold text-amber-500" id="paymentNewBalance">0</span>
+                        <span class="text-slate-400 text-lg">credits</span>
+                    </div>
+                </div>
+                
+                <button onclick="closePaymentProcessingModal()" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-8 py-3 rounded-xl transition-all">
+                    Start Using Credits →
+                </button>
+            </div>
+        </div>
+        
+        <!-- Confetti container -->
+        <div id="confettiContainer" class="fixed inset-0 pointer-events-none overflow-hidden"></div>
+    </div>
 
     <!-- Feedback Modal -->
     <div id="feedbackModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
@@ -13222,6 +13306,9 @@ function handlePaymentReturn() {
     const sessionId = urlParams.get('session_id');
     
     if (paymentStatus === 'success') {
+        // Show processing modal immediately
+        showPaymentProcessingModal();
+        
         // ✅ Set flag to prevent Firebase from overwriting our local credits
         skipFirebaseCreditsLoad = true;
         
@@ -13232,110 +13319,83 @@ function handlePaymentReturn() {
             try {
                 const purchase = JSON.parse(pendingPurchase);
                 
+                // Update status
+                updatePaymentStatus('Adding credits to your account...');
+                
                 // Allocate credits based on purchase type
                 if (purchase.type === 'subscription') {
-                    // Update tier and add initial credits
                     userCredits.tier = purchase.tier;
                     userCredits.subscriptionCredits = purchase.credits;
-                    userCredits.lastCreditRefresh = new Date().toISOString(); // Prevent double allocation
+                    userCredits.lastCreditRefresh = new Date().toISOString();
                     saveUserCredits();
-                    
-                    showNotification(`🎉 Welcome to ${purchase.tierName}! ${purchase.credits} credits added.`, 'success');
-                    
                 } else if (purchase.type === 'credits') {
-                    // Add purchased credits (these never expire)
                     userCredits.purchasedCredits += purchase.credits;
                     saveUserCredits();
-                    
-                    showNotification(`🎉 ${purchase.credits} credits added to your account!`, 'success');
-                    
                 } else if (purchase.type === 'topup') {
-                    // Add bonus prompts
                     userCredits.bonusPrompts = (userCredits.bonusPrompts || 0) + purchase.prompts;
                     saveUserCredits();
-                    
-                    showNotification(`🎉 ${purchase.prompts} prompts added!`, 'success');
                 }
                 
                 // Clear the pending purchase
                 localStorage.removeItem('pendingPurchase');
                 
-                // ✅ Check if there's a pending document to restore
+                // Check for pending items
                 const hasPendingDocument = localStorage.getItem('pendingDocument') !== null;
-                
-                // ✅ Check if there's a pending consultation booking to restore
                 const hasPendingConsultation = localStorage.getItem('pendingConsultationBooking') !== null;
                 
+                // Show success after short delay
                 setTimeout(() => {
-                    const documentRestored = restorePendingDocument();
-                    const consultationRestored = checkPendingConsultationBooking();
-                    
-                    if (!documentRestored && !consultationRestored) {
-                        // No pending document or consultation - show normal success message
-                        if (purchase.type === 'subscription') {
-                            addMessage('assistant', `## 🎉 Welcome to Fitz ${purchase.tierName}!\n\nYour subscription is now active!\n\n**Your benefits:**\n- ✅ **${purchase.credits} credits** added to your account\n- ✅ **Unlimited AI chat** (no more prompt limits!)\n- ✅ **Monthly credit refresh** on your billing date\n\nYour credit balance and plan have been updated in the header above.\n\nQuestions? Contact **blake@fitzgeraldhr.com.au**`);
-                        } else if (purchase.type === 'credits') {
-                            addMessage('assistant', `## 🎉 Credits Added!\n\n**${purchase.credits} credits** have been added to your account.\n\nThese credits never expire and can be used for any document type.\n\nYour new balance: **${getTotalCredits()} credits**`);
-                        } else if (purchase.type === 'topup') {
-                            addMessage('assistant', `## 🎉 Chat Top-Up Added!\n\n**${purchase.prompts} extra prompts** have been added to your account for this month.\n\nKeep chatting!`);
-                        }
-                    }
+                    updatePaymentStatus('Confirming...');
                 }, 500);
                 
-                // Only refresh from Firebase if there was NO pending document or consultation
-                // If there was a pending item, we handle credits locally
+                setTimeout(() => {
+                    // Show success state
+                    showPaymentSuccess(purchase);
+                    
+                    // Handle pending documents/consultations after modal closes
+                    setTimeout(() => {
+                        const documentRestored = restorePendingDocument();
+                        const consultationRestored = checkPendingConsultationBooking();
+                        
+                        if (!documentRestored && !consultationRestored) {
+                            if (purchase.type === 'subscription') {
+                                addMessage('assistant', `## 🎉 Welcome to Fitz ${purchase.tierName}!\n\nYour subscription is now active!\n\n**Your benefits:**\n- ✅ **${purchase.credits} credits** added to your account\n- ✅ **Unlimited AI chat** (no more prompt limits!)\n- ✅ **Monthly credit refresh** on your billing date\n\nQuestions? Contact **blake@fitzgeraldhr.com.au**`);
+                            } else if (purchase.type === 'credits') {
+                                addMessage('assistant', `## 🎉 Credits Added!\n\n**${purchase.credits} credits** have been added to your account.\n\nThese credits never expire and can be used for any document type.\n\nYour new balance: **${getTotalCredits()} credits**`);
+                            } else if (purchase.type === 'topup') {
+                                addMessage('assistant', `## 🎉 Chat Top-Up Added!\n\n**${purchase.prompts} extra prompts** have been added to your account for this month.\n\nKeep chatting!`);
+                            }
+                        }
+                    }, 3500);
+                }, 1500);
+                
+                // Sync to Firebase
                 if (!hasPendingDocument && !hasPendingConsultation) {
                     setTimeout(async () => {
-                        console.log('🔄 Refreshing credits from Firebase after payment...');
                         await loadCreditsFromFirebase();
-                    }, 3000);
+                    }, 4000);
                 } else {
-                    console.log('📄 Skipping delayed Firebase refresh - pending item was restored');
-                    // Instead, sync our local credits TO Firebase
                     setTimeout(async () => {
-                        console.log('📄 Syncing local credits to Firebase...');
                         await syncCreditsToFirebase();
-                    }, 1000);
+                    }, 2000);
                 }
                 
             } catch (e) {
                 console.error('Error processing payment return:', e);
+                hidePaymentProcessingModal();
                 showNotification('Payment successful! Please refresh if credits don\'t appear.', 'success');
                 
-                // Check if there's a pending document BEFORE restoring
                 const hadPendingDoc = localStorage.getItem('pendingDocument') !== null;
+                setTimeout(() => restorePendingDocument(), 500);
                 
-                // Try to restore pending document anyway
-                setTimeout(() => {
-                    restorePendingDocument();
-                }, 500);
-                
-                // Only load from Firebase if there was no pending document
                 if (!hadPendingDoc) {
-                    setTimeout(async () => {
-                        await loadCreditsFromFirebase();
-                    }, 3000);
+                    setTimeout(async () => await loadCreditsFromFirebase(), 3000);
                 }
             }
         } else {
-            // No pending purchase found - might be a page refresh, try loading from Firebase
-            showNotification('🎉 Payment successful!', 'success');
-            
-            // Check if there's a pending document BEFORE restoring
-            const hadPendingDoc = localStorage.getItem('pendingDocument') !== null;
-            
-            // Try to restore pending document
-            setTimeout(() => {
-                restorePendingDocument();
-            }, 500);
-            
-            // Only load from Firebase if there was no pending document
-            if (!hadPendingDoc) {
-                setTimeout(async () => {
-                    console.log('🔄 No pending purchase found, refreshing from Firebase...');
-                    await loadCreditsFromFirebase();
-                }, 2000);
-            }
+            // No pending purchase - poll Firebase for credits
+            updatePaymentStatus('Confirming with server...');
+            pollForCreditsUpdate();
         }
         
         // Clean up URL
@@ -13343,16 +13403,139 @@ function handlePaymentReturn() {
     }
     
     if (paymentStatus === 'cancelled') {
-        // Clear pending purchase on cancel but keep pending document
         localStorage.removeItem('pendingPurchase');
         showNotification('Payment cancelled', 'info');
         window.history.replaceState({}, document.title, window.location.pathname);
-        
-        // Restore the document preview so user can try again
-        setTimeout(() => {
-            restorePendingDocument();
-        }, 500);
+        setTimeout(() => restorePendingDocument(), 500);
     }
+}
+
+// Payment processing modal functions
+function showPaymentProcessingModal() {
+    const modal = document.getElementById('paymentProcessingModal');
+    const processingState = document.getElementById('paymentProcessingState');
+    const successState = document.getElementById('paymentSuccessState');
+    
+    if (modal) {
+        modal.classList.remove('hidden');
+        processingState.classList.remove('hidden');
+        successState.classList.add('hidden');
+    }
+}
+
+function hidePaymentProcessingModal() {
+    const modal = document.getElementById('paymentProcessingModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+function closePaymentProcessingModal() {
+    hidePaymentProcessingModal();
+    // Clear confetti
+    const confettiContainer = document.getElementById('confettiContainer');
+    if (confettiContainer) confettiContainer.innerHTML = '';
+}
+
+function updatePaymentStatus(status) {
+    const statusEl = document.getElementById('paymentProcessingStatus');
+    if (statusEl) statusEl.textContent = status;
+}
+
+function showPaymentSuccess(purchase) {
+    const processingState = document.getElementById('paymentProcessingState');
+    const successState = document.getElementById('paymentSuccessState');
+    const messageEl = document.getElementById('paymentSuccessMessage');
+    const balanceEl = document.getElementById('paymentNewBalance');
+    
+    if (processingState) processingState.classList.add('hidden');
+    if (successState) successState.classList.remove('hidden');
+    
+    // Set message based on purchase type
+    if (purchase.type === 'subscription') {
+        messageEl.textContent = `Welcome to ${purchase.tierName}! ${purchase.credits} credits added.`;
+    } else if (purchase.type === 'credits') {
+        messageEl.textContent = `${purchase.credits} credits added to your account!`;
+    } else if (purchase.type === 'topup') {
+        messageEl.textContent = `${purchase.prompts} prompts added!`;
+    }
+    
+    // Update balance
+    if (balanceEl) balanceEl.textContent = getTotalCredits();
+    
+    // Update header display
+    updateCreditsDisplay();
+    
+    // Trigger confetti!
+    launchConfetti();
+}
+
+function launchConfetti() {
+    const container = document.getElementById('confettiContainer');
+    if (!container) return;
+    
+    const colors = ['#f59e0b', '#22c55e', '#3b82f6', '#ec4899', '#8b5cf6', '#ffffff'];
+    const shapes = ['square', 'circle'];
+    
+    for (let i = 0; i < 100; i++) {
+        setTimeout(() => {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.borderRadius = shapes[Math.floor(Math.random() * shapes.length)] === 'circle' ? '50%' : '2px';
+            confetti.style.width = (Math.random() * 10 + 5) + 'px';
+            confetti.style.height = (Math.random() * 10 + 5) + 'px';
+            confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            confetti.style.animationDelay = (Math.random() * 0.5) + 's';
+            
+            container.appendChild(confetti);
+            
+            // Remove after animation
+            setTimeout(() => confetti.remove(), 4000);
+        }, i * 20);
+    }
+}
+
+function pollForCreditsUpdate() {
+    const startCredits = getTotalCredits();
+    let attempts = 0;
+    const maxAttempts = 15; // 15 seconds max
+    
+    const poll = async () => {
+        attempts++;
+        updatePaymentStatus(`Confirming... (${attempts}s)`);
+        
+        try {
+            await loadCreditsFromFirebase();
+            const newCredits = getTotalCredits();
+            
+            if (newCredits > startCredits) {
+                // Credits updated!
+                const creditsAdded = newCredits - startCredits;
+                showPaymentSuccess({
+                    type: 'credits',
+                    credits: creditsAdded
+                });
+                return;
+            }
+        } catch (e) {
+            console.error('Poll error:', e);
+        }
+        
+        if (attempts < maxAttempts) {
+            setTimeout(poll, 1000);
+        } else {
+            // Timeout - show success anyway (Stripe confirmed payment)
+            hidePaymentProcessingModal();
+            showNotification('🎉 Payment successful! Credits may take a moment to appear.', 'success');
+            
+            // Try to restore pending document
+            setTimeout(() => restorePendingDocument(), 500);
+        }
+    };
+    
+    setTimeout(poll, 1000);
 }
 
 // Check for payment return on page load
