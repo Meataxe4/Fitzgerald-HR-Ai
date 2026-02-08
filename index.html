@@ -14031,96 +14031,40 @@ function handlePaymentReturn() {
     const sessionId = urlParams.get('session_id');
     
     if (paymentStatus === 'success') {
+        // Store that we have a pending payment success to process
+        // This will be picked up by processPaymentAfterAuth() when auth completes
+        const pendingPurchase = localStorage.getItem('pendingPurchase');
+        if (pendingPurchase) {
+            localStorage.setItem('paymentSuccessPending', 'true');
+        }
+        
         // Show processing modal immediately
         showPaymentProcessingModal();
         
         // ✅ Set flag to prevent Firebase from overwriting our local credits
         skipFirebaseCreditsLoad = true;
         
-        // Get the pending purchase from localStorage
-        const pendingPurchase = localStorage.getItem('pendingPurchase');
-        
-        if (pendingPurchase) {
-            try {
-                const purchase = JSON.parse(pendingPurchase);
-                
-                // Update status
-                updatePaymentStatus('Adding credits to your account...');
-                
-                // Allocate credits based on purchase type
-                if (purchase.type === 'subscription') {
-                    userCredits.tier = purchase.tier;
-                    userCredits.subscriptionCredits = purchase.credits;
-                    userCredits.lastCreditRefresh = new Date().toISOString();
-                    saveUserCredits();
-                } else if (purchase.type === 'credits') {
-                    userCredits.purchasedCredits += purchase.credits;
-                    saveUserCredits();
-                } else if (purchase.type === 'topup') {
-                    userCredits.bonusPrompts = (userCredits.bonusPrompts || 0) + purchase.prompts;
-                    saveUserCredits();
-                }
-                
-                // Clear the pending purchase
-                localStorage.removeItem('pendingPurchase');
-                
-                // Check for pending items
-                const hasPendingDocument = localStorage.getItem('pendingDocument') !== null;
-                const hasPendingConsultation = localStorage.getItem('pendingConsultationBooking') !== null;
-                
-                // Show success after short delay
-                setTimeout(() => {
-                    updatePaymentStatus('Confirming...');
-                }, 500);
-                
-                setTimeout(() => {
-                    // Show success state
-                    showPaymentSuccess(purchase);
-                    
-                    // Handle pending documents/consultations after modal closes
-                    setTimeout(() => {
-                        const documentRestored = restorePendingDocument();
-                        const consultationRestored = checkPendingConsultationBooking();
-                        
-                        if (!documentRestored && !consultationRestored) {
-                            if (purchase.type === 'subscription') {
-                                addMessage('assistant', `## 🎉 Welcome to Fitz ${purchase.tierName}!\n\nYour subscription is now active!\n\n**Your benefits:**\n- ✅ **${purchase.credits} credits** added to your account\n- ✅ **Unlimited AI chat** (no more prompt limits!)\n- ✅ **Monthly credit refresh** on your billing date\n\nQuestions? Contact **blake@fitzgeraldhr.com.au**`);
-                            } else if (purchase.type === 'credits') {
-                                addMessage('assistant', `## 🎉 Credits Added!\n\n**${purchase.credits} credits** have been added to your account.\n\nThese credits never expire and can be used for any document type.\n\nYour new balance: **${getTotalCredits()} credits**`);
-                            } else if (purchase.type === 'topup') {
-                                addMessage('assistant', `## 🎉 Chat Top-Up Added!\n\n**${purchase.prompts} extra prompts** have been added to your account for this month.\n\nKeep chatting!`);
-                            }
-                        }
-                    }, 3500);
-                }, 1500);
-                
-                // Sync to Firebase
-                if (!hasPendingDocument && !hasPendingConsultation) {
-                    setTimeout(async () => {
-                        await loadCreditsFromFirebase();
-                    }, 4000);
-                } else {
-                    setTimeout(async () => {
-                        await syncCreditsToFirebase();
-                    }, 2000);
-                }
-                
-            } catch (e) {
-                console.error('Error processing payment return:', e);
-                hidePaymentProcessingModal();
-                showNotification('Payment successful! Please refresh if credits don\'t appear.', 'success');
-                
-                const hadPendingDoc = localStorage.getItem('pendingDocument') !== null;
-                setTimeout(() => restorePendingDocument(), 500);
-                
-                if (!hadPendingDoc) {
-                    setTimeout(async () => await loadCreditsFromFirebase(), 3000);
-                }
-            }
+        // If user is already authenticated, process immediately
+        if (currentUser?.uid) {
+            processPaymentSuccess();
         } else {
-            // No pending purchase - poll Firebase for credits
-            updatePaymentStatus('Confirming with server...');
-            pollForCreditsUpdate();
+            // Wait for auth to complete, then process
+            updatePaymentStatus('Verifying your account...');
+            
+            // Poll for auth to be ready (max 10 seconds)
+            let authCheckCount = 0;
+            const authCheckInterval = setInterval(() => {
+                authCheckCount++;
+                if (currentUser?.uid) {
+                    clearInterval(authCheckInterval);
+                    processPaymentSuccess();
+                } else if (authCheckCount > 20) {
+                    // Timeout - try to process anyway
+                    clearInterval(authCheckInterval);
+                    console.warn('Auth timeout - processing payment anyway');
+                    processPaymentSuccess();
+                }
+            }, 500);
         }
         
         // Clean up URL
@@ -14129,9 +14073,107 @@ function handlePaymentReturn() {
     
     if (paymentStatus === 'cancelled') {
         localStorage.removeItem('pendingPurchase');
+        localStorage.removeItem('paymentSuccessPending');
         showNotification('Payment cancelled', 'info');
         window.history.replaceState({}, document.title, window.location.pathname);
         setTimeout(() => restorePendingDocument(), 500);
+    }
+}
+
+/**
+ * Process payment success after auth is ready
+ */
+function processPaymentSuccess() {
+    const pendingPurchase = localStorage.getItem('pendingPurchase');
+    
+    if (pendingPurchase) {
+        try {
+            const purchase = JSON.parse(pendingPurchase);
+            
+            // Update status
+            updatePaymentStatus('Adding credits to your account...');
+            
+            // Allocate credits based on purchase type
+            console.log('🛒 Processing purchase:', purchase);
+            console.log('📊 Current credits before:', JSON.stringify(userCredits));
+            console.log('👤 Current user:', currentUser?.uid || 'anonymous');
+            
+            if (purchase.type === 'subscription') {
+                userCredits.tier = purchase.tier;
+                userCredits.subscriptionCredits = purchase.credits;
+                userCredits.lastCreditRefresh = new Date().toISOString();
+                saveUserCredits();
+            } else if (purchase.type === 'credits') {
+                // Ensure purchasedCredits is a number before adding
+                userCredits.purchasedCredits = (userCredits.purchasedCredits || 0) + purchase.credits;
+                console.log('💰 New purchasedCredits:', userCredits.purchasedCredits);
+                saveUserCredits();
+                
+                // Force immediate display update
+                updateCreditsDisplay();
+            } else if (purchase.type === 'topup') {
+                userCredits.bonusPrompts = (userCredits.bonusPrompts || 0) + purchase.prompts;
+                saveUserCredits();
+            }
+            
+            console.log('📊 Credits after purchase:', JSON.stringify(userCredits));
+            
+            // Clear the pending purchase flags
+            localStorage.removeItem('pendingPurchase');
+            localStorage.removeItem('paymentSuccessPending');
+            
+            // Check for pending items
+            const hasPendingDocument = localStorage.getItem('pendingDocument') !== null;
+            const hasPendingConsultation = localStorage.getItem('pendingConsultationBooking') !== null;
+            
+            // Show success after short delay
+            setTimeout(() => {
+                updatePaymentStatus('Confirming...');
+            }, 500);
+            
+            setTimeout(() => {
+                // Show success state
+                showPaymentSuccess(purchase);
+                
+                // Handle pending documents/consultations after modal closes
+                setTimeout(() => {
+                    const documentRestored = restorePendingDocument();
+                    const consultationRestored = checkPendingConsultationBooking();
+                    
+                    if (!documentRestored && !consultationRestored) {
+                        if (purchase.type === 'subscription') {
+                            addMessage('assistant', `## 🎉 Welcome to Fitz ${purchase.tierName}!\n\nYour subscription is now active!\n\n**Your benefits:**\n- ✅ **${purchase.credits} credits** added to your account\n- ✅ **Unlimited AI chat** (no more prompt limits!)\n- ✅ **Monthly credit refresh** on your billing date\n\nQuestions? Contact **blake@fitzgeraldhr.com.au**`);
+                        } else if (purchase.type === 'credits') {
+                            addMessage('assistant', `## 🎉 Credits Added!\n\n**${purchase.credits} credits** have been added to your account.\n\nThese credits never expire and can be used for any document type.\n\nYour new balance: **${getTotalCredits()} credits**`);
+                        } else if (purchase.type === 'topup') {
+                            addMessage('assistant', `## 🎉 Chat Top-Up Added!\n\n**${purchase.prompts} extra prompts** have been added to your account for this month.\n\nKeep chatting!`);
+                        }
+                    }
+                }, 3500);
+            }, 1500);
+            
+            // Sync credits TO Firebase (not load FROM - that would overwrite the purchase!)
+            setTimeout(async () => {
+                await syncCreditsToFirebase();
+                console.log('✅ Credits synced to Firebase after purchase');
+            }, 2000);
+            
+        } catch (e) {
+            console.error('Error processing payment return:', e);
+            hidePaymentProcessingModal();
+            showNotification('Payment successful! Please refresh if credits don\'t appear.', 'success');
+            
+            localStorage.removeItem('paymentSuccessPending');
+            setTimeout(() => restorePendingDocument(), 500);
+            
+            // Still try to sync whatever we have
+            setTimeout(async () => await syncCreditsToFirebase(), 3000);
+        }
+    } else {
+        // No pending purchase - poll Firebase for credits
+        updatePaymentStatus('Confirming with server...');
+        localStorage.removeItem('paymentSuccessPending');
+        pollForCreditsUpdate();
     }
 }
 
@@ -19770,6 +19812,18 @@ function completeOnboarding() {
     setTimeout(() => {
         updateCreditsDisplay();
     }, 100);
+    
+    // Clear the messages container (remove loading skeleton) and prepare for fresh chat
+    const msgContainer = document.getElementById('messagesContainer');
+    if (msgContainer) {
+        msgContainer.innerHTML = '<div class="max-w-5xl mx-auto space-y-6"></div>';
+    }
+    
+    // Initialize daily tip banner for Google users
+    setTimeout(() => {
+        updateDailyTipBanner();
+        startDailyTipRotation();
+    }, 300);
     
     document.getElementById('venueOnboardingModal').classList.add('hidden');
     
@@ -32973,6 +33027,14 @@ if (auth) {
             }
             updateUIForAuthenticatedUser(user);
             
+            // Check for pending payment that was waiting for auth
+            const paymentPending = localStorage.getItem('paymentSuccessPending');
+            if (paymentPending === 'true') {
+                console.log('🔄 Found pending payment - processing now that auth is ready');
+                // Don't load from Firebase - the payment handler will process and sync
+                skipFirebaseCreditsLoad = true;
+            }
+            
             // Show admin button for admin email
             const adminEmails = ['blakefitzgerald4@gmail.com'];
             if (adminEmails.includes(user.email)) {
@@ -33100,6 +33162,10 @@ if (auth) {
                                     showToast('Welcome back! Your conversation has been restored.', 'success', 3000);
                                 }
                             }
+                            
+                            // Initialize daily tip banner for returning Google users
+                            updateDailyTipBanner();
+                            startDailyTipRotation();
                             
                             // Ensure we scroll to bottom after everything is loaded
                             // Multiple timeouts to handle varying load times
