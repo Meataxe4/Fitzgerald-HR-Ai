@@ -9207,32 +9207,48 @@ function detectDocumentGenerationRequest(message) {
         }
     ];
     
-    // Document type to tool mapping
+    // Document type to tool mapping - ALL use specific document type functions
     const documentToolMap = {
-        // Warning letters
-        'warning': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Warning Letters' },
-        'formal warning': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Formal Warning' },
-        'first warning': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'First Warning' },
-        'final warning': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Final Warning' },
+        // Warning letters - specific types
+        'warning': { tool: 'Document Builder', action: "openDocumentBuilderFor('formalWarning')", icon: '📄', specific: 'Warning Letter' },
+        'formal warning': { tool: 'Document Builder', action: "openDocumentBuilderFor('formalWarning')", icon: '📄', specific: 'Formal Warning' },
+        'first warning': { tool: 'Document Builder', action: "openDocumentBuilderFor('firstWarning')", icon: '📄', specific: 'First Written Warning' },
+        'final warning': { tool: 'Document Builder', action: "openDocumentBuilderFor('finalWarning')", icon: '📄', specific: 'Final Written Warning' },
+        'written warning': { tool: 'Document Builder', action: "openDocumentBuilderFor('formalWarning')", icon: '📄', specific: 'Written Warning' },
         
-        // Performance
-        'pip': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Performance Improvement Plan' },
-        'performance improvement': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Performance Improvement Plan' },
-        'performance improvement plan': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Performance Improvement Plan' },
+        // Performance documents
+        'pip': { tool: 'Document Builder', action: "openDocumentBuilderFor('pip')", icon: '📄', specific: 'Performance Improvement Plan' },
+        'performance improvement': { tool: 'Document Builder', action: "openDocumentBuilderFor('pip')", icon: '📄', specific: 'Performance Improvement Plan' },
+        'performance improvement plan': { tool: 'Document Builder', action: "openDocumentBuilderFor('pip')", icon: '📄', specific: 'Performance Improvement Plan' },
+        'record of discussion': { tool: 'Document Builder', action: "openDocumentBuilderFor('recordOfDiscussion')", icon: '📄', specific: 'Record of Discussion' },
         
         // Termination/Redundancy - requires consultation
         'termination': { tool: 'Book Expert Consultation', action: 'openConsultationBookingModal()', icon: '📞', specific: 'Termination Review', requiresConsult: true },
         'redundancy': { tool: 'Book Expert Consultation', action: 'openConsultationBookingModal()', icon: '📞', specific: 'Redundancy Review', requiresConsult: true },
         
         // Show cause/Allegations
-        'show cause': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Show Cause Letter' },
-        'allegation': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Letter of Allegation' },
+        'show cause': { tool: 'Document Builder', action: "openDocumentBuilderFor('showCause')", icon: '📄', specific: 'Show Cause Letter' },
+        'allegation': { tool: 'Document Builder', action: "openDocumentBuilderFor('letterOfAllegation')", icon: '📄', specific: 'Letter of Allegation' },
+        'letter of allegation': { tool: 'Document Builder', action: "openDocumentBuilderFor('letterOfAllegation')", icon: '📄', specific: 'Letter of Allegation' },
         
-        // Contracts
+        // Probation documents
+        'probation': { tool: 'Probation Check-In Builder', action: 'openProbationCheckIn()', icon: '🔄', specific: 'Probation Check-In' },
+        'probation check': { tool: 'Probation Check-In Builder', action: 'openProbationCheckIn()', icon: '🔄', specific: 'Probation Check-In' },
+        'probation check-in': { tool: 'Probation Check-In Builder', action: 'openProbationCheckIn()', icon: '🔄', specific: 'Probation Check-In' },
+        'probation review': { tool: 'Document Builder', action: "openDocumentBuilderFor('formalProbationReview')", icon: '📄', specific: 'Formal Probation Review' },
+        'probation extension': { tool: 'Document Builder', action: "openDocumentBuilderFor('probationExtension')", icon: '📄', specific: 'Probation Extension Letter' },
+        
+        // Other specific documents
+        'letter of concern': { tool: 'Document Builder', action: "openDocumentBuilderFor('letterOfConcern')", icon: '📄', specific: 'Letter of Concern' },
+        'concern': { tool: 'Document Builder', action: "openDocumentBuilderFor('letterOfConcern')", icon: '📄', specific: 'Letter of Concern' },
+        'casual conversion': { tool: 'Document Builder', action: "openDocumentBuilderFor('casualConversion')", icon: '📄', specific: 'Casual Conversion Letter' },
+        'change of hours': { tool: 'Document Builder', action: "openDocumentBuilderFor('changeOfHours')", icon: '📄', specific: 'Change of Hours Letter' },
+        
+        // Contracts - New Employee Toolkit
         'contract': { tool: 'New Employee Toolkit', action: 'openNewEmployeeToolkit()', icon: '👤', specific: 'Employment Contract' },
         'employment contract': { tool: 'New Employee Toolkit', action: 'openNewEmployeeToolkit()', icon: '👤', specific: 'Employment Contract' },
         
-        // Job/Position Description
+        // Job/Position Description - Separate builders
         'job description': { tool: 'Job Advertisement Builder', action: 'openJobDescriptionBuilder()', icon: '📢', specific: 'Job Advertisement' },
         'job ad': { tool: 'Job Advertisement Builder', action: 'openJobDescriptionBuilder()', icon: '📢', specific: 'Job Advertisement' },
         'job advertisement': { tool: 'Job Advertisement Builder', action: 'openJobDescriptionBuilder()', icon: '📢', specific: 'Job Advertisement' },
@@ -9242,6 +9258,7 @@ function detectDocumentGenerationRequest(message) {
         // Onboarding
         'onboarding': { tool: 'Onboarding Checklist', action: 'openOnboardingChecklist()', icon: '✅', specific: 'Onboarding Checklist' },
         'checklist': { tool: 'Onboarding Checklist', action: 'openOnboardingChecklist()', icon: '✅', specific: 'Onboarding Checklist' },
+        'onboarding checklist': { tool: 'Onboarding Checklist', action: 'openOnboardingChecklist()', icon: '✅', specific: 'Onboarding Checklist' },
         
         // Training
         'training plan': { tool: 'Training Plan Generator', action: 'openTrainingPlan()', icon: '📚', specific: 'Training Plan' },
@@ -9251,10 +9268,7 @@ function detectDocumentGenerationRequest(message) {
         'reference check': { tool: 'Reference Check Form', action: 'openReferenceCheckForm()', icon: '📞', specific: 'Reference Check Form' },
         'reference': { tool: 'Reference Check Form', action: 'openReferenceCheckForm()', icon: '📞', specific: 'Reference Check Form' },
         
-        // Probation
-        'probation': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'Probation documents' },
-        
-        // Generic document/letter/template
+        // Generic fallbacks - go to Document Builder main page
         'letter': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'HR Letters' },
         'document': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'HR Documents' },
         'template': { tool: 'Document Builder', action: 'openDocumentBuilder()', icon: '📄', specific: 'HR Templates' },
