@@ -11113,6 +11113,9 @@ function selectDocumentType(type) {
     // Show first step
     showDocumentStep(1);
     
+    // Track specific document type in Recent Tools
+    trackToolUsage('doc_' + type);
+    
     trackEvent('document_type_selected', { user: currentUser, type: type });
 }
 
@@ -16544,16 +16547,40 @@ function initConversationSystem() {
 var bookmarks = [];
 var recentTools = []; // Track recently used tools
 
-// Tool metadata
+// Tool metadata - maps tool IDs to display info and open functions
 const toolMetadata = {
-    'documentBuilderModal': { name: 'Document Builder', icon: '📝' },
-    'awardCalculatorModal': { name: 'Award Calculator', icon: '💰' },
-    'scenarioAnalysisModal': { name: 'Scenario Analysis', icon: '🎯' },
-    'rosterStressTesterModal': { name: 'Roster Stress Test', icon: '💥' },
-    'awardWizardModal': { name: 'Award Wizard', icon: '🧙' },
-    'rosterOptimizerModal': { name: 'Roster Optimizer', icon: '📅' },
-    'complianceCalendarModal': { name: 'Compliance Calendar', icon: '📆' },
-    'terminationRiskModal': { name: 'Termination Risk', icon: '⚠️' }
+    // Document & Performance Tools
+    'documentBuilderModal': { name: 'Document Builder', icon: '📝', modalId: 'documentBuilderModal' },
+    'awardCalculatorModal': { name: 'Award Calculator', icon: '💰', modalId: 'awardCalculatorModal' },
+    'scenarioAnalysisModal': { name: 'Scenario Analysis', icon: '🎯', modalId: 'scenarioAnalysisModal' },
+    'rosterStressTesterModal': { name: 'Roster Stress Test', icon: '💥', modalId: 'rosterStressTesterModal' },
+    'awardWizardModal': { name: 'Award Wizard', icon: '🧙', modalId: 'awardWizardModal' },
+    'rosterOptimizerModal': { name: 'Roster Optimizer', icon: '📅', modalId: 'rosterOptimizerModal' },
+    'complianceCalendarModal': { name: 'Compliance Calendar', icon: '📆', modalId: 'complianceCalendarModal' },
+    'terminationRiskModal': { name: 'Termination Risk', icon: '⚠️', modalId: 'terminationRiskModal' },
+    
+    // Document Builder - Specific Document Types
+    'doc_recordOfDiscussion': { name: 'Record of Discussion', icon: '📋', docType: 'recordOfDiscussion' },
+    'doc_formalWarning': { name: 'Formal Warning', icon: '⚠️', docType: 'formalWarning' },
+    'doc_performanceImprovementPlan': { name: 'Performance Improvement Plan', icon: '📊', docType: 'performanceImprovementPlan' },
+    'doc_letterOfAllegation': { name: 'Letter of Allegation', icon: '🔍', docType: 'letterOfAllegation' },
+    'doc_formalProbationReview': { name: 'Formal Probation Review', icon: '📑', docType: 'formalProbationReview' },
+    
+    // Recruitment Tools
+    'recruitmentToolkitModal': { name: 'Recruitment Toolkit', icon: '👥', modalId: 'recruitmentToolkitModal' },
+    'jobDescriptionBuilder': { name: 'Job Ad Builder', icon: '📢', openFunc: 'openJobDescriptionBuilder' },
+    'positionDescriptionBuilder': { name: 'Position Description', icon: '📋', openFunc: 'openPositionDescriptionBuilder' },
+    'interviewQuestionsGenerator': { name: 'Interview Questions', icon: '🎤', openFunc: 'openInterviewQuestionsGenerator' },
+    'referenceCheckForm': { name: 'Reference Check', icon: '📞', openFunc: 'openReferenceCheckForm' },
+    
+    // New Employee Tools
+    'newEmployeeToolkit': { name: 'New Employee Toolkit', icon: '👤', openFunc: 'openNewEmployeeToolkit' },
+    'onboardingChecklist': { name: 'Onboarding Checklist', icon: '✅', openFunc: 'openOnboardingChecklist' },
+    'trainingPlanGenerator': { name: 'Training Plan', icon: '📚', openFunc: 'openTrainingPlan' },
+    'employmentContractBuilder': { name: 'Employment Contract', icon: '📄', openFunc: 'openNewEmployeeToolkit' },
+    
+    // Probation Tools
+    'probationCheckIn': { name: 'Probation Check-In', icon: '🔄', openFunc: 'openProbationCheckIn' }
 };
 
 
@@ -16772,6 +16799,11 @@ function loadRecentTools() {
 function saveRecentTools() {
     try {
         localStorage.setItem('fitz_recent_tools', JSON.stringify(recentTools));
+        
+        // Trigger debounced Firebase sync so it persists across devices
+        if (typeof debouncedSync === 'function') {
+            debouncedSync();
+        }
     } catch (e) {
     }
 }
@@ -16823,12 +16855,35 @@ function updateSidebarRecentTools() {
 }
 
 function openToolById(toolId) {
-    trackToolUsage(toolId);
+    const tool = toolMetadata[toolId];
+    if (!tool) {
+        console.warn('Unknown tool:', toolId);
+        return;
+    }
     
-    var modal = document.getElementById(toolId);
+    // Check if this is a document type (opens Document Builder with specific doc selected)
+    if (tool.docType) {
+        openDocumentBuilderFor(tool.docType);
+        closeToolsMenu();
+        return;
+    }
+    
+    // Check if tool has a custom open function
+    if (tool.openFunc && typeof window[tool.openFunc] === 'function') {
+        window[tool.openFunc]();
+        closeToolsMenu();
+        return;
+    }
+    
+    // Otherwise, open by modal ID
+    const modalId = tool.modalId || toolId;
+    const modal = document.getElementById(modalId);
     if (modal) {
         modal.classList.remove('hidden');
+        trackToolUsage(toolId);
         closeToolsMenu();
+    } else {
+        console.warn('Modal not found:', modalId);
     }
 }
 
@@ -26466,9 +26521,7 @@ function openNewEmployeeToolkit() {
     if (modal) {
         modal.classList.remove('hidden');
     }
-    if (typeof trackToolUsage === 'function') {
-        trackToolUsage('newEmployeeToolkit');
-    }
+    trackToolUsage('newEmployeeToolkit');
 }
 
 function closeNewEmployeeToolkit() {
@@ -26509,9 +26562,7 @@ function openOnboardingChecklist() {
     // Try to load saved progress
     loadOnboardingProgress();
     
-    if (typeof trackToolUsage === 'function') {
-        trackToolUsage('onboardingChecklist');
-    }
+    trackToolUsage('onboardingChecklist');
 }
 
 function closeOnboardingChecklist() {
@@ -27171,9 +27222,7 @@ function openTrainingPlan() {
     
     loadTrainingProgress();
     
-    if (typeof trackToolUsage === 'function') {
-        trackToolUsage('trainingPlanGenerator');
-    }
+    trackToolUsage('trainingPlanGenerator');
 }
 
 function closeTrainingPlan() {
@@ -28088,9 +28137,7 @@ function openProbationCheckIn() {
     
     showProbationStep(1);
     
-    if (typeof trackToolUsage === 'function') {
-        trackToolUsage('probationCheckIn');
-    }
+    trackToolUsage('probationCheckIn');
 }
 
 function closeProbationCheckIn() {
@@ -29066,9 +29113,7 @@ function openEmploymentContractBuilder() {
     loadContractProgress();
     renderContractStep(contractBuilderState.currentStep);
     
-    if (typeof trackToolUsage === 'function') {
-        trackToolUsage('employmentContractBuilder');
-    }
+    trackToolUsage('employmentContractBuilder');
 }
 
 
@@ -29148,9 +29193,7 @@ function openEmploymentContract() {
     loadContractProgress();
     renderContractStep(contractBuilderState.currentStep);
     
-    if (typeof trackToolUsage === 'function') {
-        trackToolUsage('employmentContractBuilder');
-    }
+    trackToolUsage('employmentContractBuilder');
 }
 
 function closeEmploymentContract() {
@@ -33452,6 +33495,22 @@ async function refreshAllUI() {
             if (typeof updateSidebarChats === 'function') {
                 updateSidebarChats();
             }
+        }
+        
+        // Refresh Recent Tools from localStorage (which was just loaded from Firebase)
+        if (typeof loadRecentTools === 'function') {
+            loadRecentTools();
+        }
+        if (typeof updateSidebarRecentTools === 'function') {
+            updateSidebarRecentTools();
+        }
+        
+        // Refresh bookmarks
+        if (typeof loadBookmarks === 'function') {
+            loadBookmarks();
+        }
+        if (typeof updateSidebarBookmarks === 'function') {
+            updateSidebarBookmarks();
         }
         
         // Trigger a page state update
