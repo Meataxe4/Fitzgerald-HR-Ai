@@ -7871,7 +7871,23 @@ async function loadCreditsFromFirebase() {
                 monthlyPromptsReset: new Date().toISOString(),
                 lastCreditRefresh: new Date().toISOString()
             };
-            saveUserCredits(); // This will also sync to Firebase
+            
+            // Save to localStorage immediately
+            const userKey = currentUser.uid;
+            localStorage.setItem('fitzCredits_' + userKey, JSON.stringify(userCredits));
+            
+            // Update display immediately
+            updateCreditsDisplay();
+            
+            // Then sync to Firebase
+            await syncCreditsToFirebase();
+            
+            // Force another display update after a short delay to ensure UI is ready
+            setTimeout(() => {
+                updateCreditsDisplay();
+                console.log('🔄 Forced display update for new user');
+            }, 500);
+            
             return false;
         }
     } catch (e) {
@@ -7952,10 +7968,17 @@ function usePrompt() {
     if (userCredits.tier === 'free') {
         userCredits.monthlyPromptsUsed++;
         console.log('📝 Prompt used. Total used:', userCredits.monthlyPromptsUsed, '/', CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS);
+        
+        // Update display IMMEDIATELY before async operations
+        updateCreditsDisplay();
+        
+        // Then save to localStorage and Firebase
         saveUserCredits();
         
-        // Force display update after save
-        updateCreditsDisplay();
+        // Force another display update after save completes
+        setTimeout(() => {
+            updateCreditsDisplay();
+        }, 100);
     }
 }
 
@@ -19737,8 +19760,16 @@ function completeOnboarding() {
         });
     }
     
-    // Update sidebar with new venue name
+    // Update sidebar with new venue name - call immediately AND with delay for reliability
     updateSidebarVenueName();
+    setTimeout(() => {
+        updateSidebarVenueName();
+    }, 500);
+    
+    // Also force refresh the credits display in case it wasn't showing
+    setTimeout(() => {
+        updateCreditsDisplay();
+    }, 100);
     
     document.getElementById('venueOnboardingModal').classList.add('hidden');
     
@@ -22796,6 +22827,9 @@ async function acceptLegalTerms() {
     
     // Close modal
     document.getElementById('legalAcceptanceModal').classList.add('hidden');
+    
+    // Force refresh credits display - this ensures new users see their credits
+    updateCreditsDisplay();
     
     // Track acceptance
     trackEvent('legal_terms_accepted', { 
@@ -32965,6 +32999,9 @@ if (auth) {
             // Load credits from Firebase (source of truth for subscription status)
             await loadCreditsFromFirebase();
             
+            // Force credits display update after data is loaded
+            updateCreditsDisplay();
+            
             // Check Firebase for legal acceptance and load last conversation ID
             if (db) {
                 try {
@@ -33004,6 +33041,8 @@ if (auth) {
             if (savedVenueProfile) {
                 try {
                     venueProfile = JSON.parse(savedVenueProfile);
+                    // Update immediately and with delay for reliability
+                    updateSidebarVenueName();
                     setTimeout(() => {
                         updateSidebarVenueName();
                     }, 500);
