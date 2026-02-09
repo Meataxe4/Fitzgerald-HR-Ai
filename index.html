@@ -7773,44 +7773,47 @@ async function loadCreditsFromFirebase() {
             const firebaseCredits = doc.data().credits;
             
             // Firebase is source of truth - load exactly what's stored
+            // Support both old and new field names during migration
             userCredits = {
                 ...userCredits,
-                tier: firebaseCredits.tier || 'free',
-                subscriptionCredits: typeof firebaseCredits.subscriptionCredits === 'number' ? firebaseCredits.subscriptionCredits : 0,
+                subscriptionTier: firebaseCredits.subscriptionTier || firebaseCredits.tier || 'free',
+                reviewCreditsUsed: firebaseCredits.reviewCreditsUsed || 0,
                 purchasedCredits: firebaseCredits.purchasedCredits || 0,
+                lowRiskDocsUsed: firebaseCredits.lowRiskDocsUsed || 0,
                 bonusPrompts: firebaseCredits.bonusPrompts || 0,
                 monthlyPromptsUsed: firebaseCredits.monthlyPromptsUsed || 0,
                 monthlyPromptsReset: firebaseCredits.monthlyPromptsReset || new Date().toISOString(),
-                lastCreditRefresh: firebaseCredits.lastCreditRefresh || null,
-                stripeCustomerId: firebaseCredits.stripeCustomerId || null
+                subscriptionStartDate: firebaseCredits.subscriptionStartDate || null,
+                lastUpdated: firebaseCredits.lastUpdated || null
             };
             
-            // Check if it's a new month - refresh credits if so
+            // Check if it's a new month - reset prompts for free tier
             const now = new Date();
-            const lastRefresh = userCredits.lastCreditRefresh ? new Date(userCredits.lastCreditRefresh) : null;
-            const isNewMonth = !lastRefresh || 
-                (now.getMonth() !== lastRefresh.getMonth() || now.getFullYear() !== lastRefresh.getFullYear());
+            const lastReset = userCredits.monthlyPromptsReset ? new Date(userCredits.monthlyPromptsReset) : null;
+            const isNewMonth = !lastReset || 
+                (now.getMonth() !== lastReset.getMonth() || now.getFullYear() !== lastReset.getFullYear());
             
             if (isNewMonth) {
-                console.log('📅 New month detected - refreshing credits and prompts');
-                // Reset prompts for new month
+                console.log('📅 New month detected - resetting prompts');
                 userCredits.monthlyPromptsUsed = 0;
                 userCredits.monthlyPromptsReset = now.toISOString();
                 
-                // Refresh subscription credits
-                if (userCredits.tier === 'free') {
-                    userCredits.subscriptionCredits = 1; // Free tier gets 1 credit per month
-                } else {
-                    const tierConfig = CONFIG.CREDITS.TIERS[userCredits.tier];
-                    if (tierConfig) {
-                        const newCredits = userCredits.subscriptionCredits + tierConfig.monthlyCredits;
-                        userCredits.subscriptionCredits = Math.min(newCredits, tierConfig.maxBanked);
-                    }
-                }
-                userCredits.lastCreditRefresh = now.toISOString();
-                
-                // Save the refreshed credits
+                // Save the refreshed data
                 await syncCreditsToFirebase();
+            }
+            
+            // Check if it's a new subscription year - reset review credits used
+            if (userCredits.subscriptionStartDate) {
+                const subStart = new Date(userCredits.subscriptionStartDate);
+                const monthsSinceStart = (now.getFullYear() - subStart.getFullYear()) * 12 + (now.getMonth() - subStart.getMonth());
+                
+                // If 12+ months since subscription start, it's a new year
+                if (monthsSinceStart >= 12) {
+                    console.log('📅 New subscription year - resetting review credits');
+                    userCredits.reviewCreditsUsed = 0;
+                    userCredits.subscriptionStartDate = now.toISOString();
+                    await syncCreditsToFirebase();
+                }
             }
             
             // Save to localStorage as cache (using correct user key)
@@ -7821,16 +7824,18 @@ async function loadCreditsFromFirebase() {
             updateCreditsDisplay();
             return true;
         } else {
-            // No credits in Firebase - this is a NEW user, give them 1 free credit
-            console.log('🆕 New user detected - initializing with 1 free credit');
+            // No credits in Firebase - this is a NEW user
+            console.log('🆕 New user detected - initializing free tier');
             userCredits = {
                 ...userCredits,
-                tier: 'free',
-                subscriptionCredits: 1,
+                subscriptionTier: 'free',
+                reviewCreditsUsed: 0,
                 purchasedCredits: 0,
+                lowRiskDocsUsed: 0,
                 monthlyPromptsUsed: 0,
                 monthlyPromptsReset: new Date().toISOString(),
-                lastCreditRefresh: new Date().toISOString()
+                subscriptionStartDate: null,
+                lastUpdated: new Date().toISOString()
             };
             
             // Save to localStorage immediately
@@ -7867,13 +7872,14 @@ async function syncCreditsToFirebase() {
         const userRef = db.collection('users').doc(currentUser.uid);
         await userRef.set({
             credits: {
-                tier: userCredits.tier,
-                subscriptionCredits: userCredits.subscriptionCredits,
-                purchasedCredits: userCredits.purchasedCredits,
+                subscriptionTier: userCredits.subscriptionTier || userCredits.tier || 'free',
+                reviewCreditsUsed: userCredits.reviewCreditsUsed || 0,
+                purchasedCredits: userCredits.purchasedCredits || 0,
+                lowRiskDocsUsed: userCredits.lowRiskDocsUsed || 0,
                 bonusPrompts: userCredits.bonusPrompts || 0,
-                monthlyPromptsUsed: userCredits.monthlyPromptsUsed,
+                monthlyPromptsUsed: userCredits.monthlyPromptsUsed || 0,
                 monthlyPromptsReset: userCredits.monthlyPromptsReset,
-                lastCreditRefresh: userCredits.lastCreditRefresh,
+                subscriptionStartDate: userCredits.subscriptionStartDate,
                 lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
             }
         }, { merge: true });
@@ -7882,10 +7888,15 @@ async function syncCreditsToFirebase() {
         console.error('Error syncing credits to Firebase:', e);
     }
 }
-
-// Get total available credits
+// Get total available review credits
 function getTotalCredits() {
-    return userCredits.purchasedCredits + userCredits.subscriptionCredits;
+    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
+    const tierConfig = CONFIG.CREDITS.TIERS[tier] || CONFIG.CREDITS.TIERS.free;
+    const totalReviewCredits = tierConfig.reviewCredits || 0;
+    const usedCredits = userCredits.reviewCreditsUsed || 0;
+    const purchasedCredits = userCredits.purchasedCredits || 0;
+    
+    return Math.max(0, totalReviewCredits - usedCredits) + purchasedCredits;
 }
 
 // Check if user can afford a document
@@ -7893,7 +7904,24 @@ function canAffordDocument(docType) {
     const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
     if (!cost) return false;
     
-    return getTotalCredits() >= cost.credits;
+    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
+    
+    // Low-risk documents (templates) are free for paid tiers
+    if (cost.category === 'template' && tier !== 'free') {
+        return true;
+    }
+    
+    // Free tier: check if they have their 1 free low-risk doc
+    if (tier === 'free' && cost.category === 'template') {
+        return (userCredits.lowRiskDocsUsed || 0) < 1;
+    }
+    
+    // For review-required docs, check review credits
+    if (cost.credits > 0) {
+        return getTotalCredits() >= cost.credits;
+    }
+    
+    return true;
 }
 
 // Deduct credits for a document
@@ -7901,32 +7929,58 @@ function deductCreditsForDocument(docType) {
     const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
     if (!cost) return false;
     
-    // Deduct from purchased credits first (they don't expire)
-    if (userCredits.purchasedCredits >= cost.credits) {
-        userCredits.purchasedCredits -= cost.credits;
-    } else {
-        // Use combination of purchased and subscription credits
-        const remaining = cost.credits - userCredits.purchasedCredits;
-        userCredits.purchasedCredits = 0;
-        userCredits.subscriptionCredits -= remaining;
+    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
+    
+    // Low-risk documents (templates) - no credits for paid tiers
+    if (cost.category === 'template' && tier !== 'free') {
+        console.log('📄 Template document - no credits deducted (unlimited with subscription)');
+        return true;
     }
     
-    saveUserCredits();
+    // Free tier using their 1 free template
+    if (tier === 'free' && cost.category === 'template') {
+        userCredits.lowRiskDocsUsed = (userCredits.lowRiskDocsUsed || 0) + 1;
+        saveUserCredits();
+        console.log('📄 Free tier template used. Total used:', userCredits.lowRiskDocsUsed);
+        return true;
+    }
+    
+    // For review-required docs, deduct review credits
+    if (cost.credits > 0) {
+        // Deduct from purchased credits first (they don't expire)
+        if (userCredits.purchasedCredits >= cost.credits) {
+            userCredits.purchasedCredits -= cost.credits;
+            console.log('💳 Deducted', cost.credits, 'from purchased credits. Remaining:', userCredits.purchasedCredits);
+        } else {
+            // Use combination of purchased and subscription credits
+            const fromPurchased = userCredits.purchasedCredits || 0;
+            const remaining = cost.credits - fromPurchased;
+            userCredits.purchasedCredits = 0;
+            userCredits.reviewCreditsUsed = (userCredits.reviewCreditsUsed || 0) + remaining;
+            console.log('💳 Deducted', fromPurchased, 'purchased +', remaining, 'subscription credits');
+        }
+        
+        saveUserCredits();
+        updateCreditsDisplay();
+    }
+    
     return true;
 }
 
 // Check if user has prompts remaining
 function hasPromptsRemaining() {
+    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
     // Paid subscribers have unlimited prompts
-    if (userCredits.tier !== 'free') return true;
+    if (tier !== 'free') return true;
     
     return userCredits.monthlyPromptsUsed < CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS;
 }
 
 // Use a prompt
 function usePrompt() {
+    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
     // Only track prompts for free tier users
-    if (userCredits.tier === 'free') {
+    if (tier === 'free') {
         userCredits.monthlyPromptsUsed++;
         console.log('📝 Prompt used. Total used:', userCredits.monthlyPromptsUsed, '/', CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS);
         
@@ -7945,7 +7999,8 @@ function usePrompt() {
 
 // Get remaining prompts for free tier
 function getRemainingPrompts() {
-    if (userCredits.tier !== 'free') return Infinity;
+    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
+    if (tier !== 'free') return Infinity;
     return CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS - userCredits.monthlyPromptsUsed;
 }
 
@@ -7957,22 +8012,25 @@ function updateCreditsDisplay() {
     const promptsCounter = document.getElementById('promptsCounter');
     const userTierDisplay = document.getElementById('userTierDisplay');
     
+    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
+    
     if (creditsDisplay) {
         creditsDisplay.classList.remove('hidden');
     }
     
     // Update tier display in header
     if (userTierDisplay) {
-        const tierName = CONFIG.CREDITS.TIERS[userCredits.tier]?.name || 'Free';
+        const tierConfig = CONFIG.CREDITS.TIERS[tier];
+        const tierName = tierConfig ? tierConfig.name : 'Free';
         userTierDisplay.textContent = tierName;
         
         // Color code by tier
         userTierDisplay.classList.remove('text-slate-400', 'text-blue-400', 'text-amber-400', 'text-purple-400');
-        if (userCredits.tier === 'enterprise') {
+        if (tier === 'business') {
             userTierDisplay.classList.add('text-purple-400');
-        } else if (userCredits.tier === 'professional') {
+        } else if (tier === 'pro') {
             userTierDisplay.classList.add('text-amber-400');
-        } else if (userCredits.tier === 'starter') {
+        } else if (tier === 'starter') {
             userTierDisplay.classList.add('text-blue-400');
         } else {
             userTierDisplay.classList.add('text-slate-400');
@@ -7998,7 +8056,7 @@ function updateCreditsDisplay() {
     
     // Update prompts display for free tier
     if (promptsDisplay && promptsCounter) {
-        if (userCredits.tier === 'free') {
+        if (tier === 'free') {
             const remaining = getRemainingPrompts();
             promptsCounter.textContent = `${remaining}/${CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS}`;
             promptsDisplay.classList.remove('hidden');
@@ -14074,17 +14132,29 @@ function processPaymentSuccess() {
             console.log('👤 Current user:', currentUser?.uid || 'anonymous');
             
             if (purchase.type === 'subscription') {
-                userCredits.tier = purchase.tier;
-                userCredits.subscriptionCredits = purchase.credits;
-                userCredits.lastCreditRefresh = new Date().toISOString();
+                // New pricing model - subscription gives review credits
+                userCredits.subscriptionTier = purchase.tier;
+                userCredits.reviewCreditsUsed = 0; // Reset for new subscription
+                userCredits.subscriptionStartDate = new Date().toISOString();
+                userCredits.lastUpdated = new Date().toISOString();
                 saveUserCredits();
-            } else if (purchase.type === 'credits') {
-                // Ensure purchasedCredits is a number before adding
+            } else if (purchase.type === 'reviewCredits') {
+                // Purchased review credits (never expire)
                 userCredits.purchasedCredits = (userCredits.purchasedCredits || 0) + purchase.credits;
                 console.log('💰 New purchasedCredits:', userCredits.purchasedCredits);
                 saveUserCredits();
                 
                 // Force immediate display update
+                updateCreditsDisplay();
+            } else if (purchase.type === 'consultation') {
+                // Consultation booking - no credits to add, just confirm
+                console.log('📞 Consultation booked');
+            }
+            
+            // Legacy support for old credit types
+            if (purchase.type === 'credits') {
+                userCredits.purchasedCredits = (userCredits.purchasedCredits || 0) + purchase.credits;
+                saveUserCredits();
                 updateCreditsDisplay();
             } else if (purchase.type === 'topup') {
                 userCredits.bonusPrompts = (userCredits.bonusPrompts || 0) + purchase.prompts;
@@ -14117,9 +14187,13 @@ function processPaymentSuccess() {
                     
                     if (!documentRestored && !consultationRestored) {
                         if (purchase.type === 'subscription') {
-                            addMessage('assistant', `## 🎉 Welcome to Fitz ${purchase.tierName}!\n\nYour subscription is now active!\n\n**Your benefits:**\n- ✅ **${purchase.credits} credits** added to your account\n- ✅ **Unlimited AI chat** (no more prompt limits!)\n- ✅ **Monthly credit refresh** on your billing date\n\nQuestions? Contact **blake@fitzgeraldhr.com.au**`);
-                        } else if (purchase.type === 'credits') {
-                            addMessage('assistant', `## 🎉 Credits Added!\n\n**${purchase.credits} credits** have been added to your account.\n\nThese credits never expire and can be used for any document type.\n\nYour new balance: **${getTotalCredits()} credits**`);
+                            const tierConfig = CONFIG.CREDITS.TIERS[purchase.tier];
+                            const reviewCredits = tierConfig ? tierConfig.reviewCredits : 0;
+                            addMessage('assistant', `## 🎉 Welcome to Fitz ${purchase.tierName}!\n\nYour subscription is now active!\n\n**Your benefits:**\n- ✅ **Unlimited HR templates** (Position Descriptions, Job Ads, Onboarding, etc.)\n- ✅ **${reviewCredits} expert-reviewed documents/year** (Warnings, PIPs, etc.)\n- ✅ **Unlimited AI chat**\n- ✅ **24hr review turnaround**\n\nQuestions? Contact **blake@fitzgeraldhr.com.au**`);
+                        } else if (purchase.type === 'reviewCredits' || purchase.type === 'credits') {
+                            addMessage('assistant', `## 🎉 Review Credits Added!\n\n**${purchase.credits} review credit${purchase.credits > 1 ? 's' : ''}** added to your account.\n\nThese credits never expire and can be used for expert-reviewed documents.\n\nYour new balance: **${getTotalCredits()} review credits**`);
+                        } else if (purchase.type === 'consultation') {
+                            addMessage('assistant', `## 🎉 Consultation Booked!\n\nYour HR consultation has been confirmed.\n\nBlake will be in touch within 24 hours to schedule a time.\n\nQuestions? Contact **blake@fitzgeraldhr.com.au**`);
                         } else if (purchase.type === 'topup') {
                             addMessage('assistant', `## 🎉 Chat Top-Up Added!\n\n**${purchase.prompts} extra prompts** have been added to your account for this month.\n\nKeep chatting!`);
                         }
@@ -14195,9 +14269,13 @@ function showPaymentSuccess(purchase) {
     
     // Set message based on purchase type
     if (purchase.type === 'subscription') {
-        messageEl.textContent = `Welcome to ${purchase.tierName}! ${purchase.credits} credits added.`;
-    } else if (purchase.type === 'credits') {
-        messageEl.textContent = `${purchase.credits} credits added to your account!`;
+        const tierConfig = CONFIG.CREDITS.TIERS[purchase.tier];
+        const reviewCredits = tierConfig ? tierConfig.reviewCredits : 0;
+        messageEl.textContent = `Welcome to ${purchase.tierName}! ${reviewCredits} review credits + unlimited templates.`;
+    } else if (purchase.type === 'reviewCredits' || purchase.type === 'credits') {
+        messageEl.textContent = `${purchase.credits} review credit${purchase.credits > 1 ? 's' : ''} added to your account!`;
+    } else if (purchase.type === 'consultation') {
+        messageEl.textContent = `Consultation booked! We'll be in touch within 24 hours.`;
     } else if (purchase.type === 'topup') {
         messageEl.textContent = `${purchase.prompts} prompts added!`;
     }
