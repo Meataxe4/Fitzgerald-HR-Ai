@@ -4704,6 +4704,129 @@ document.addEventListener('DOMContentLoaded', function() {
         <div id="confettiContainer" class="fixed inset-0 pointer-events-none overflow-hidden"></div>
     </div>
 
+    <!-- Expert Review Request Modal -->
+    <div id="reviewRequestModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[70]">
+        <div class="bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-700 fade-in">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-amber-500 to-amber-600 p-6 rounded-t-2xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900">🛡️ Request Expert Review</h2>
+                        <p id="reviewDocName" class="text-slate-800 mt-1">Document Name</p>
+                    </div>
+                    <button onclick="closeReviewRequestModal()" class="text-slate-800 hover:text-slate-900 text-2xl">&times;</button>
+                </div>
+            </div>
+            
+            <div class="p-6 space-y-6">
+                <!-- Warning for Formal Process -->
+                <div id="formalProcessWarning" class="hidden bg-red-500/10 border border-red-500 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        <span class="text-xl">⚠️</span>
+                        <div>
+                            <h4 class="text-red-400 font-bold">Formal Process Document</h4>
+                            <p class="text-red-300 text-sm mt-1">This document carries significant legal risk. Please ensure you have followed proper process and provide all supporting documentation.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Employee Details -->
+                <div class="bg-slate-700/50 rounded-lg p-4">
+                    <h3 class="text-white font-semibold mb-3">👷 Employee Details</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-slate-400 text-sm mb-1">Employee Name *</label>
+                            <input type="text" id="reviewEmployeeName" 
+                                   class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
+                                   placeholder="e.g. John Smith">
+                        </div>
+                        <div>
+                            <label class="block text-slate-400 text-sm mb-1">Role/Position *</label>
+                            <input type="text" id="reviewEmployeeRole" 
+                                   class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
+                                   placeholder="e.g. Bar Manager">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Issue Description -->
+                <div class="bg-slate-700/50 rounded-lg p-4">
+                    <h3 class="text-white font-semibold mb-3">📝 Issue Description</h3>
+                    <label class="block text-slate-400 text-sm mb-1">Briefly describe the issue or reason for this document *</label>
+                    <textarea id="reviewIssueDescription" rows="3"
+                              class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none resize-none"
+                              placeholder="e.g. Employee has been consistently late for shifts over the past 3 weeks despite verbal warnings..."></textarea>
+                </div>
+                
+                <!-- Previous Steps (for Formal Process) -->
+                <div id="previousStepsSection" class="hidden bg-slate-700/50 rounded-lg p-4">
+                    <h3 class="text-white font-semibold mb-3">📋 Previous Steps Taken</h3>
+                    <label class="block text-slate-400 text-sm mb-1">What previous discussions/warnings have been given? *</label>
+                    <textarea id="reviewPreviousWarnings" rows="2"
+                              class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none resize-none"
+                              placeholder="e.g. Verbal warning on 15/01, Record of Discussion on 22/01..."></textarea>
+                </div>
+                
+                <!-- Supporting Documentation -->
+                <div class="bg-slate-700/50 rounded-lg p-4">
+                    <h3 class="text-white font-semibold mb-3">📎 Supporting Documentation</h3>
+                    <p class="text-slate-400 text-sm mb-3">Please paste or describe any supporting evidence (previous Record of Discussion, emails, incident reports, etc.)</p>
+                    <textarea id="reviewSupportingDocs" rows="4"
+                              class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none resize-none font-mono text-sm"
+                              placeholder="Paste previous document content, email threads, or incident details here..."></textarea>
+                </div>
+                
+                <!-- Employee Response -->
+                <div class="bg-slate-700/50 rounded-lg p-4">
+                    <h3 class="text-white font-semibold mb-3">💬 Employee Response</h3>
+                    <p class="text-slate-400 text-sm mb-3">If you've already discussed this with the employee, what was their response?</p>
+                    <textarea id="reviewEmployeeResponse" rows="3"
+                              class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none resize-none"
+                              placeholder="e.g. Employee acknowledged the issue and said they've been having transport problems..."></textarea>
+                </div>
+                
+                <!-- Review Info -->
+                <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-4">
+                    <div class="flex items-start gap-3">
+                        <span class="text-xl">⏱️</span>
+                        <div>
+                            <h4 class="text-blue-400 font-semibold">What happens next?</h4>
+                            <ul class="text-blue-300 text-sm mt-2 space-y-1">
+                                <li>• Your document and information will be reviewed within <strong>24 hours</strong></li>
+                                <li>• You'll receive the approved document via email at <strong id="reviewUserEmail">your email</strong></li>
+                                <li>• If changes are needed, we'll contact you to discuss</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Credit Cost -->
+                <div class="flex items-center justify-between bg-slate-700/30 rounded-lg p-4">
+                    <div>
+                        <p class="text-slate-300">Review Credit Cost</p>
+                        <p class="text-slate-400 text-sm">Your balance: <span id="reviewCreditBalance">0</span> credits</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-2xl font-bold text-amber-400" id="reviewCreditCost">1</p>
+                        <p class="text-slate-400 text-sm">credit(s)</p>
+                    </div>
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex gap-3">
+                    <button onclick="closeReviewRequestModal()" 
+                            class="flex-1 px-6 py-3 bg-slate-600 hover:bg-slate-500 text-white font-semibold rounded-lg transition-all">
+                        Cancel
+                    </button>
+                    <button onclick="submitReviewRequest()" 
+                            class="flex-1 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-lg transition-all flex items-center justify-center gap-2">
+                        <span>🛡️</span> Submit for Review
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Feedback Modal -->
     <div id="feedbackModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
         <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border border-slate-700 fade-in">
@@ -14452,14 +14575,148 @@ function applyDocumentBlur(docType, docName) {
         }
     }
     
-    // Apply blur for documents that require credits
-    // Make preview container have limited height with blur
+    // Check document category for different handling
+    const category = cost ? cost.category : 'template';
+    const reviewType = cost ? cost.reviewType : null;
+    const creditCost = cost ? cost.credits : 0;
+    const currentBalance = getTotalCredits();
     const previewContainer = previewContent.parentElement;
+    
+    // ===== PEOPLE MANAGEMENT (Optional Review) - Show full preview with recommendation =====
+    if (category === 'people_management' && reviewType === 'optional') {
+        if (isPaidUser || currentBalance >= creditCost) {
+            console.log('📋 People Management doc - showing review recommendation');
+            
+            // Show recommendation banner (no blur)
+            const reviewBanner = document.createElement('div');
+            reviewBanner.id = 'documentReviewBanner';
+            reviewBanner.innerHTML = `
+                <div class="bg-slate-700 border-2 border-blue-500 rounded-xl p-5 mx-auto max-w-lg mt-4">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">🛡️</span>
+                        <div class="flex-1">
+                            <h4 class="text-white font-bold mb-1">Expert Review Recommended</h4>
+                            <p class="text-slate-300 text-sm mb-3">This document involves employee performance. We recommend having a consultant review it before use for added protection.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-3">
+                        <button onclick="downloadDocWithoutReview('${docType}')" 
+                                class="flex-1 px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-all text-sm">
+                            Download Anyway
+                        </button>
+                        <button onclick="requestDocExpertReview('${docType}', '${docName}')" 
+                                class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all text-sm">
+                            Request Expert Review
+                        </button>
+                    </div>
+                    <p class="text-slate-400 text-xs mt-2 text-center">Review uses ${creditCost} of your ${currentBalance} review credits</p>
+                </div>
+            `;
+            previewContainer.parentNode.insertBefore(reviewBanner, previewContainer.nextSibling);
+            
+            // Disable normal download buttons
+            const downloadBtns = document.querySelectorAll('#documentPreviewModal button[onclick*="download"]');
+            downloadBtns.forEach(btn => {
+                btn.style.display = 'none';
+            });
+            return;
+        }
+    }
+    
+    // ===== FORMAL PROCESS (Pay 2 credits, then choose: download or review) =====
+    if (category === 'formal_process') {
+        console.log('⚠️ Formal Process doc - requires credits to unlock');
+        
+        // Check if already unlocked
+        if (unlockedDocuments.has(docType)) {
+            // Already paid - show download/review options (no blur)
+            showDocPreviewFormalOptions(docType, docName);
+            return;
+        }
+        
+        // Not paid yet - BLUR the document
+        previewContainer.style.position = 'relative';
+        previewContainer.style.overflow = 'hidden';
+        previewContainer.style.maxHeight = '250px';
+        
+        const blurOverlay = document.createElement('div');
+        blurOverlay.id = 'documentBlurOverlay';
+        blurOverlay.style.cssText = `
+            position: absolute;
+            top: 150px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, 
+                rgba(255,255,255,0) 0%,
+                rgba(255,255,255,0.7) 30px,
+                rgba(255,255,255,0.95) 60px,
+                rgba(255,255,255,1) 100px
+            );
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            pointer-events: none;
+            z-index: 5;
+        `;
+        previewContainer.appendChild(blurOverlay);
+        
+        let buttonHtml = '';
+        if (currentBalance >= creditCost) {
+            buttonHtml = `
+                <button onclick="unlockDocPreviewFormal('${docType}', '${docName}')" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
+                    🔓 Unlock Document (${creditCost} credits)
+                </button>
+                <p class="text-slate-400 text-xs mt-2">Your balance: ${currentBalance} credits</p>
+            `;
+        } else {
+            buttonHtml = `
+                <button onclick="openCreditsModal()" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
+                    💳 Get Review Credits
+                </button>
+                <p class="text-slate-400 text-xs mt-2">Need ${creditCost} credits • You have ${currentBalance}</p>
+            `;
+        }
+        
+        const unlockPrompt = document.createElement('div');
+        unlockPrompt.id = 'documentUnlockPrompt';
+        unlockPrompt.innerHTML = `
+            <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl mx-auto max-w-md mt-4">
+                <div class="text-center mb-4">
+                    <span class="text-3xl">⚠️</span>
+                    <h3 class="text-lg font-bold text-white mt-2">High-Risk Document</h3>
+                </div>
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4">
+                    <p class="text-amber-200 text-sm">
+                        This formal document carries <strong>significant legal risk</strong>. 
+                        Unlock to view, download, or request expert review.
+                    </p>
+                </div>
+                <p class="text-slate-300 text-sm mb-4 text-center">
+                    Includes option for <strong>free expert review</strong> within 24 hours
+                </p>
+                ${buttonHtml}
+            </div>
+        `;
+        
+        previewContainer.parentNode.insertBefore(unlockPrompt, previewContainer.nextSibling);
+        
+        // Disable download buttons until unlocked
+        const downloadBtns = document.querySelectorAll('#documentPreviewModal button[onclick*="download"]');
+        downloadBtns.forEach(btn => {
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+            btn.title = 'Unlock document first';
+        });
+        return;
+    }
+    
+    // ===== DEFAULT: Standard blur for upgrade prompt =====
     previewContainer.style.position = 'relative';
     previewContainer.style.overflow = 'hidden';
     previewContainer.style.maxHeight = '250px';
     
-    // Create blur overlay
     const blurOverlay = document.createElement('div');
     blurOverlay.id = 'documentBlurOverlay';
     blurOverlay.style.cssText = `
@@ -14481,46 +14738,27 @@ function applyDocumentBlur(docType, docName) {
     `;
     previewContainer.appendChild(blurOverlay);
     
-    // Get the cost for this document type
-    const creditCost = cost ? cost.credits : 1;
-    const currentBalance = getTotalCredits();
-    
-    // Determine button text, subtitle AND action based on balance
-    let buttonText = `🔓 Unlock Document (${creditCost} credit${creditCost > 1 ? 's' : ''})`;
-    let subtitle = `Your balance: ${currentBalance} credit${currentBalance !== 1 ? 's' : ''}`;
-    let buttonAction = `openDocumentUnlockModal('${docType}', '${docName}')`;
-    
-    if (currentBalance < creditCost) {
-        buttonText = '💳 Get Credits to Unlock';
-        subtitle = `Need ${creditCost} credit${creditCost > 1 ? 's' : ''} • You have ${currentBalance}`;
-        buttonAction = 'openCreditsModal()';  // ← CRITICAL: Opens Stripe checkout
-    }
-    
-    // Create unlock prompt as SIBLING element (after the preview container)
     const unlockPrompt = document.createElement('div');
     unlockPrompt.id = 'documentUnlockPrompt';
     unlockPrompt.innerHTML = `
         <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
             <div class="text-3xl mb-2">🔒</div>
-            <h3 class="text-lg font-bold text-white mb-2">Preview Only</h3>
-            <p class="text-slate-300 text-sm mb-4">Unlock this document to view the full content and download.</p>
-            <button onclick="${buttonAction}" 
+            <h3 class="text-lg font-bold text-white mb-2">Upgrade Required</h3>
+            <p class="text-slate-300 text-sm mb-4">Upgrade to a paid plan for unlimited templates and expert-reviewed documents.</p>
+            <button onclick="showSubscriptionOptions()" 
                     class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
-                ${buttonText}
+                View Plans
             </button>
-            <p class="text-slate-400 text-xs mt-3">${subtitle}</p>
         </div>
     `;
     
-    // Insert unlock prompt AFTER the preview container
     previewContainer.parentNode.insertBefore(unlockPrompt, previewContainer.nextSibling);
     
-    // Disable download buttons while blurred
     const downloadBtns = document.querySelectorAll('#documentPreviewModal button[onclick*="download"]');
     downloadBtns.forEach(btn => {
         btn.disabled = true;
         btn.classList.add('opacity-50', 'cursor-not-allowed');
-        btn.title = 'Unlock document to download';
+        btn.title = 'Upgrade to download';
     });
 }
 
@@ -14531,10 +14769,12 @@ function removeDocumentBlur() {
     const blurOverlay = document.getElementById('documentBlurOverlay');
     const unlockPrompt = document.getElementById('documentUnlockPrompt');
     const includedBadge = document.getElementById('documentIncludedBadge');
+    const reviewBanner = document.getElementById('documentReviewBanner');
     
     if (blurOverlay) blurOverlay.remove();
     if (unlockPrompt) unlockPrompt.remove();
     if (includedBadge) includedBadge.remove();
+    if (reviewBanner) reviewBanner.remove();
     
     // Reset container styles
     const previewContent = document.getElementById('documentPreviewContent');
@@ -14544,6 +14784,188 @@ function removeDocumentBlur() {
         previewContent.parentElement.style.position = '';
     }
     
+    // Re-enable and show download buttons
+    const downloadBtns = document.querySelectorAll('#documentPreviewModal button[onclick*="download"]');
+    downloadBtns.forEach(btn => {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        btn.title = '';
+        btn.style.display = '';
+    });
+}
+
+/**
+ * Download document without expert review (for People Management docs)
+ */
+function downloadDocWithoutReview(docType) {
+    // Remove the review banner
+    const reviewBanner = document.getElementById('documentReviewBanner');
+    if (reviewBanner) reviewBanner.remove();
+    
+    // Re-enable download buttons
+    const downloadBtns = document.querySelectorAll('#documentPreviewModal button[onclick*="download"]');
+    downloadBtns.forEach(btn => {
+        btn.style.display = '';
+    });
+    
+    // Mark as unlocked
+    unlockedDocuments.add(docType);
+    
+    showNotification('📄 Document ready for download. Consider expert review for important documents.', 'info');
+}
+
+/**
+ * Request expert review for document in preview modal
+ * Opens the review request modal
+ */
+function requestDocExpertReview(docType, docName) {
+    openReviewRequestModal(null, docType, docName, null, true);
+}
+
+/**
+ * Unlock Formal Process document in preview modal (pay credits, then choose)
+ */
+function unlockDocPreviewFormal(docType, docName) {
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    const creditCost = cost ? cost.credits : 2;
+    
+    if (getTotalCredits() < creditCost) {
+        openCreditsModal();
+        return;
+    }
+    
+    // Deduct credits
+    const success = deductCreditsForDocument(docType);
+    if (!success) {
+        showNotification('Failed to unlock document. Please try again.', 'error');
+        return;
+    }
+    
+    // Mark as unlocked
+    unlockedDocuments.add(docType);
+    
+    // Remove the blur and unlock prompt
+    removeDocumentBlur();
+    
+    // Show options
+    showDocPreviewFormalOptions(docType, docName);
+    
+    showNotification('✅ Document unlocked! Choose to download or request expert review.', 'success');
+}
+
+/**
+ * Show Formal Process options in document preview modal
+ */
+function showDocPreviewFormalOptions(docType, docName) {
+    // Remove any existing prompts
+    const existingPrompt = document.getElementById('documentUnlockPrompt');
+    if (existingPrompt) existingPrompt.remove();
+    
+    const existingOptions = document.getElementById('documentOptionsPrompt');
+    if (existingOptions) existingOptions.remove();
+    
+    const previewContent = document.getElementById('documentPreviewContent');
+    if (!previewContent) return;
+    
+    const optionsPrompt = document.createElement('div');
+    optionsPrompt.id = 'documentOptionsPrompt';
+    optionsPrompt.innerHTML = `
+        <div class="bg-slate-700 border-2 border-green-500 rounded-xl p-6 shadow-2xl mx-auto max-w-lg mt-4">
+            <div class="text-center mb-4">
+                <span class="text-3xl">✅</span>
+                <h3 class="text-lg font-bold text-white mt-2">Document Unlocked</h3>
+                <p class="text-slate-400 text-sm">Choose how you'd like to proceed</p>
+            </div>
+            
+            <!-- Option 1: Request Expert Review -->
+            <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-4 mb-3">
+                <div class="flex items-start gap-3">
+                    <span class="text-xl">🛡️</span>
+                    <div class="flex-1">
+                        <h4 class="text-blue-400 font-semibold">Request Expert Review</h4>
+                        <p class="text-slate-300 text-sm mt-1">Have a consultant review before you use it. Reviewed within 24 hours.</p>
+                        <p class="text-green-400 text-xs mt-1 font-medium">✓ Included free with your unlock</p>
+                    </div>
+                </div>
+                <button onclick="requestDocExpertReviewAfterUnlock('${docType}', '${docName}')" 
+                        class="w-full mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all">
+                    🛡️ Request Expert Review
+                </button>
+            </div>
+            
+            <!-- Option 2: Download Anyway -->
+            <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-4">
+                <div class="flex items-start gap-3">
+                    <span class="text-xl">⚠️</span>
+                    <div class="flex-1">
+                        <h4 class="text-amber-400 font-semibold">Download Without Review</h4>
+                        <p class="text-slate-300 text-sm mt-1">Download now and take full responsibility for the document's accuracy.</p>
+                    </div>
+                </div>
+                
+                <!-- Disclaimer checkbox -->
+                <div class="mt-3 bg-slate-800 rounded-lg p-3">
+                    <label class="flex items-start gap-2 cursor-pointer">
+                        <input type="checkbox" id="docPreviewDisclaimer" class="mt-1 w-4 h-4 rounded border-slate-500 text-amber-500 focus:ring-amber-500">
+                        <span class="text-slate-300 text-xs">
+                            I understand this document carries <strong>significant legal risk</strong>. 
+                            By downloading without expert review, I accept <strong>full responsibility</strong> for its accuracy and any consequences from its use. 
+                            I waive any liability against Fitz HR.
+                        </span>
+                    </label>
+                </div>
+                
+                <button onclick="downloadDocPreviewWithDisclaimer('${docType}')" 
+                        class="w-full mt-3 px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-all">
+                    Download Anyway
+                </button>
+            </div>
+            
+            <p class="text-slate-500 text-xs text-center mt-4">
+                💬 Have questions? Ask the AI assistant before deciding.
+            </p>
+        </div>
+    `;
+    
+    previewContent.parentElement.parentNode.insertBefore(optionsPrompt, previewContent.parentElement.nextSibling);
+    
+    // Keep download buttons disabled until they choose
+    const downloadBtns = document.querySelectorAll('#documentPreviewModal button[onclick*="download"]');
+    downloadBtns.forEach(btn => {
+        if (!btn.closest('#documentOptionsPrompt')) {
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+    });
+}
+
+/**
+ * Request expert review after unlocking in preview modal (no additional credits)
+ */
+function requestDocExpertReviewAfterUnlock(docType, docName) {
+    // Remove the options prompt
+    const optionsPrompt = document.getElementById('documentOptionsPrompt');
+    if (optionsPrompt) optionsPrompt.remove();
+    
+    // Open review modal (already paid)
+    openReviewRequestModal(null, docType, docName, null, true, true);
+}
+
+/**
+ * Download from preview modal with disclaimer
+ */
+function downloadDocPreviewWithDisclaimer(docType) {
+    const checkbox = document.getElementById('docPreviewDisclaimer');
+    if (!checkbox || !checkbox.checked) {
+        showNotification('⚠️ Please accept the disclaimer to download.', 'error');
+        checkbox?.focus();
+        return;
+    }
+    
+    // Remove the options prompt
+    const optionsPrompt = document.getElementById('documentOptionsPrompt');
+    if (optionsPrompt) optionsPrompt.remove();
+    
     // Re-enable download buttons
     const downloadBtns = document.querySelectorAll('#documentPreviewModal button[onclick*="download"]');
     downloadBtns.forEach(btn => {
@@ -14551,6 +14973,8 @@ function removeDocumentBlur() {
         btn.classList.remove('opacity-50', 'cursor-not-allowed');
         btn.title = '';
     });
+    
+    showNotification('📄 Document ready for download. Please review carefully before use.', 'info');
 }
 
 // ========================================
@@ -14569,33 +14993,34 @@ function applyUniversalBlur(containerId, docType, docName, actionsId = null) {
     const container = document.getElementById(containerId);
     if (!container) return;
     
-    // Check if this is a free template for paid users
+    // Check user tier and document category
     const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
     const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
-    const isTemplate = cost && cost.category === 'template';
+    const category = cost ? cost.category : 'template';
+    const reviewType = cost ? cost.reviewType : null;
     const isPaidUser = tier !== 'free';
+    const creditCost = cost ? cost.credits : 0;
+    const currentBalance = getTotalCredits();
     
-    // Paid users get templates free - no blur needed
-    if (isPaidUser && isTemplate) {
-        console.log('✅ Template document - no blur for paid user');
-        // Add "Included with plan" badge instead
-        const includedBadge = document.createElement('div');
-        includedBadge.id = containerId + '_includedBadge';
-        includedBadge.innerHTML = `
-            <div class="bg-green-500/20 border border-green-500 rounded-lg px-4 py-2 text-center mt-4 mx-auto max-w-md">
-                <span class="text-green-400 font-medium">✓ Included with your ${CONFIG.CREDITS.TIERS[tier]?.name || 'plan'}</span>
-            </div>
-        `;
-        container.parentNode.insertBefore(includedBadge, container.nextSibling);
-        return; // Don't apply blur
-    }
-    
-    // Free tier - check if they have their 1 free template
-    if (tier === 'free' && isTemplate) {
+    // ===== TEMPLATES (Low Risk) - Free for paid users =====
+    if (category === 'template') {
+        if (isPaidUser) {
+            console.log('✅ Template document - no blur for paid user');
+            const includedBadge = document.createElement('div');
+            includedBadge.id = containerId + '_includedBadge';
+            includedBadge.innerHTML = `
+                <div class="bg-green-500/20 border border-green-500 rounded-lg px-4 py-2 text-center mt-4 mx-auto max-w-md">
+                    <span class="text-green-400 font-medium">✓ Included with your ${CONFIG.CREDITS.TIERS[tier]?.name || 'plan'}</span>
+                </div>
+            `;
+            container.parentNode.insertBefore(includedBadge, container.nextSibling);
+            return;
+        }
+        
+        // Free tier - check if they have their 1 free template
         const lowRiskDocsUsed = userCredits.lowRiskDocsUsed || 0;
         if (lowRiskDocsUsed < 1) {
             console.log('🎁 Free template available for free tier user');
-            // Show "Use your free template" message instead of blur
             const freeTemplateBadge = document.createElement('div');
             freeTemplateBadge.id = containerId + '_includedBadge';
             freeTemplateBadge.innerHTML = `
@@ -14604,34 +15029,152 @@ function applyUniversalBlur(containerId, docType, docName, actionsId = null) {
                 </div>
             `;
             container.parentNode.insertBefore(freeTemplateBadge, container.nextSibling);
-            return; // Don't apply blur for free users with their 1 free doc
+            return;
         }
     }
     
-    // Get credit cost
-    const creditCost = cost ? cost.credits : 1;
-    const currentBalance = getTotalCredits();
-    
-    // Determine button text
-    let buttonText = `🔓 Unlock Document (${creditCost} review credit${creditCost > 1 ? 's' : ''})`;
-    let subtitle = `Your balance: ${currentBalance} review credit${currentBalance !== 1 ? 's' : ''}`;
-    let buttonAction = `unlockUniversalDocument('${containerId}', '${docType}', '${docName}', '${actionsId || ''}')`;
-    
-    if (currentBalance < creditCost) {
-        buttonText = '💳 Get Review Credits to Unlock';
-        subtitle = `Need ${creditCost} credit${creditCost > 1 ? 's' : ''} • You have ${currentBalance}`;
-        buttonAction = 'openCreditsModal()';
+    // ===== PEOPLE MANAGEMENT (Optional Review) - Show full preview with recommendation =====
+    if (category === 'people_management' && reviewType === 'optional') {
+        if (isPaidUser || currentBalance >= creditCost) {
+            console.log('📋 People Management doc - showing review recommendation');
+            
+            // Don't blur, but show recommendation banner
+            const reviewBanner = document.createElement('div');
+            reviewBanner.id = containerId + '_reviewBanner';
+            reviewBanner.innerHTML = `
+                <div class="bg-slate-700 border-2 border-blue-500 rounded-xl p-5 mx-auto max-w-lg mt-4">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">🛡️</span>
+                        <div class="flex-1">
+                            <h4 class="text-white font-bold mb-1">Expert Review Recommended</h4>
+                            <p class="text-slate-300 text-sm mb-3">This document involves employee performance. We recommend having a consultant review it before use for added protection.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 mt-3">
+                        <button onclick="downloadWithoutReview('${containerId}', '${docType}', '${docName}', '${actionsId || ''}')" 
+                                class="flex-1 px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-all text-sm">
+                            Download Anyway
+                        </button>
+                        <button onclick="requestExpertReview('${containerId}', '${docType}', '${docName}', '${actionsId || ''}')" 
+                                class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all text-sm">
+                            Request Expert Review
+                        </button>
+                    </div>
+                    <p class="text-slate-400 text-xs mt-2 text-center">Review uses ${creditCost} of your ${currentBalance} review credits</p>
+                </div>
+            `;
+            container.parentNode.insertBefore(reviewBanner, container.nextSibling);
+            
+            // Hide normal action buttons (we have our own now)
+            if (actionsId) {
+                const actionsContainer = document.getElementById(actionsId);
+                if (actionsContainer) {
+                    actionsContainer.style.display = 'none';
+                }
+            }
+            return;
+        }
     }
     
-    // Store original content for later restoration
-    container.dataset.originalContent = container.innerHTML;
+    // ===== FORMAL PROCESS (Pay 2 credits, then choose: download or review) =====
+    if (category === 'formal_process') {
+        console.log('⚠️ Formal Process doc - requires credits to unlock');
+        
+        // Check if already unlocked
+        if (unlockedDocuments.has(docType)) {
+            // Already paid - show download/review options (no blur)
+            showFormalProcessOptions(containerId, docType, docName, actionsId);
+            return;
+        }
+        
+        // Not paid yet - BLUR the document
+        container.dataset.originalContent = container.innerHTML;
+        container.style.maxHeight = '250px';
+        container.style.overflow = 'hidden';
+        container.style.position = 'relative';
+        
+        const blurOverlay = document.createElement('div');
+        blurOverlay.id = containerId + '_blurOverlay';
+        blurOverlay.style.cssText = `
+            position: absolute;
+            top: 150px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, 
+                rgba(30, 41, 59, 0) 0%,
+                rgba(30, 41, 59, 0.7) 30px,
+                rgba(30, 41, 59, 0.95) 60px,
+                rgba(30, 41, 59, 1) 100px
+            );
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            pointer-events: none;
+            z-index: 5;
+        `;
+        container.appendChild(blurOverlay);
+        
+        // Create unlock prompt
+        const unlockPrompt = document.createElement('div');
+        unlockPrompt.id = containerId + '_unlockPrompt';
+        unlockPrompt.className = 'unlock-prompt-box';
+        
+        let buttonHtml = '';
+        if (currentBalance >= creditCost) {
+            buttonHtml = `
+                <button onclick="unlockFormalProcess('${containerId}', '${docType}', '${docName}', '${actionsId || ''}')" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
+                    🔓 Unlock Document (${creditCost} credits)
+                </button>
+                <p class="text-slate-400 text-xs mt-2">Your balance: ${currentBalance} credits</p>
+            `;
+        } else {
+            buttonHtml = `
+                <button onclick="openCreditsModal()" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
+                    💳 Get Review Credits
+                </button>
+                <p class="text-slate-400 text-xs mt-2">Need ${creditCost} credits • You have ${currentBalance}</p>
+            `;
+        }
+        
+        unlockPrompt.innerHTML = `
+            <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl mx-auto max-w-md mt-4">
+                <div class="text-center mb-4">
+                    <span class="text-3xl">⚠️</span>
+                    <h3 class="text-lg font-bold text-white mt-2">High-Risk Document</h3>
+                </div>
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4">
+                    <p class="text-amber-200 text-sm">
+                        This formal document carries <strong>significant legal risk</strong>. 
+                        Unlock to view, download, or request expert review.
+                    </p>
+                </div>
+                <p class="text-slate-300 text-sm mb-4 text-center">
+                    Includes option for <strong>free expert review</strong> within 24 hours
+                </p>
+                ${buttonHtml}
+            </div>
+        `;
+        
+        container.parentNode.insertBefore(unlockPrompt, container.nextSibling);
+        
+        // Hide action buttons until unlocked
+        if (actionsId) {
+            const actionsContainer = document.getElementById(actionsId);
+            if (actionsContainer) {
+                actionsContainer.style.display = 'none';
+            }
+        }
+        return;
+    }
     
-    // Limit container height and add blur effect
+    // ===== DEFAULT: Standard blur for anything else =====
+    container.dataset.originalContent = container.innerHTML;
     container.style.maxHeight = '250px';
     container.style.overflow = 'hidden';
     container.style.position = 'relative';
     
-    // Create blur gradient overlay inside container
     const blurOverlay = document.createElement('div');
     blurOverlay.id = containerId + '_blurOverlay';
     blurOverlay.style.cssText = `
@@ -14653,27 +15196,30 @@ function applyUniversalBlur(containerId, docType, docName, actionsId = null) {
     `;
     container.appendChild(blurOverlay);
     
-    // Create unlock prompt as SIBLING element (after the container)
+    let buttonText = `🔓 Unlock (${creditCost} credit${creditCost > 1 ? 's' : ''})`;
+    let buttonAction = `unlockUniversalDocument('${containerId}', '${docType}', '${docName}', '${actionsId || ''}')`;
+    
+    if (currentBalance < creditCost) {
+        buttonText = '💳 Get Credits';
+        buttonAction = 'openCreditsModal()';
+    }
+    
     const unlockPrompt = document.createElement('div');
     unlockPrompt.id = containerId + '_unlockPrompt';
-    unlockPrompt.className = 'unlock-prompt-box';
     unlockPrompt.innerHTML = `
         <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
             <div class="text-3xl mb-2">🔒</div>
-            <h3 class="text-lg font-bold text-white mb-2">Expert Review Required</h3>
-            <p class="text-slate-300 text-sm mb-4">This document requires expert review before download.</p>
-            <button onclick="${buttonAction}" 
+            <h3 class="text-lg font-bold text-white mb-2">Upgrade Required</h3>
+            <p class="text-slate-300 text-sm mb-4">Upgrade to a paid plan for unlimited templates and expert-reviewed documents.</p>
+            <button onclick="showSubscriptionOptions()" 
                     class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
-                ${buttonText}
+                View Plans
             </button>
-            <p class="text-slate-400 text-xs mt-3">${subtitle}</p>
         </div>
     `;
     
-    // Insert unlock prompt AFTER the container
     container.parentNode.insertBefore(unlockPrompt, container.nextSibling);
     
-    // Hide action buttons if specified
     if (actionsId) {
         const actionsContainer = document.getElementById(actionsId);
         if (actionsContainer) {
@@ -14738,6 +15284,10 @@ function removeUniversalBlur(containerId) {
     const includedBadge = document.getElementById(containerId + '_includedBadge');
     if (includedBadge) includedBadge.remove();
     
+    // Remove review banner (for people management docs)
+    const reviewBanner = document.getElementById(containerId + '_reviewBanner');
+    if (reviewBanner) reviewBanner.remove();
+    
     // Restore original content if saved
     if (container.dataset.originalContent) {
         // Content is already there, just remove the blur overlay which we did above
@@ -14748,6 +15298,614 @@ function removeUniversalBlur(containerId) {
     container.style.maxHeight = '';
     container.style.overflow = '';
     container.style.position = '';
+}
+
+/**
+ * Download a People Management document without expert review
+ * User accepts responsibility for the document
+ */
+function downloadWithoutReview(containerId, docType, docName, actionsId) {
+    // Remove the review banner
+    const reviewBanner = document.getElementById(containerId + '_reviewBanner');
+    if (reviewBanner) reviewBanner.remove();
+    
+    // Show the action buttons
+    if (actionsId) {
+        const actionsContainer = document.getElementById(actionsId);
+        if (actionsContainer) {
+            actionsContainer.style.display = '';
+        }
+    }
+    
+    // Mark as unlocked (no credits deducted for download-only)
+    unlockedDocuments.add(docType);
+    
+    showNotification('📄 Document ready for download. Consider expert review for important documents.', 'info');
+}
+
+// Store current review request context
+let pendingReviewRequest = {
+    containerId: null,
+    docType: null,
+    docName: null,
+    actionsId: null,
+    documentContent: null,
+    isFromPreviewModal: false,
+    alreadyPaid: false
+};
+
+/**
+ * Open the review request modal
+ * @param {boolean} alreadyPaid - If true, don't show/deduct credits (for Formal Process after unlock)
+ */
+function openReviewRequestModal(containerId, docType, docName, actionsId, isFromPreviewModal = false, alreadyPaid = false) {
+    const modal = document.getElementById('reviewRequestModal');
+    if (!modal) return;
+    
+    // Get document content
+    let documentContent = '';
+    if (isFromPreviewModal) {
+        const previewContent = document.getElementById('documentPreviewContent');
+        documentContent = previewContent ? (previewContent.innerText || previewContent.textContent || '') : '';
+    } else {
+        const container = document.getElementById(containerId);
+        documentContent = container ? (container.innerText || container.textContent || '') : '';
+    }
+    
+    // Store context
+    pendingReviewRequest = {
+        containerId,
+        docType,
+        docName,
+        actionsId,
+        documentContent,
+        isFromPreviewModal,
+        alreadyPaid
+    };
+    
+    // Update modal content
+    document.getElementById('reviewDocName').textContent = docName;
+    document.getElementById('reviewUserEmail').textContent = currentUser?.email || 'your registered email';
+    
+    // Get credit info
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    const creditCost = cost ? cost.credits : 1;
+    
+    // Update credit display based on whether already paid
+    const creditCostEl = document.getElementById('reviewCreditCost');
+    const creditBalanceEl = document.getElementById('reviewCreditBalance');
+    
+    if (alreadyPaid) {
+        creditCostEl.textContent = '0';
+        creditCostEl.parentElement.querySelector('p').innerHTML = '<span class="text-green-400">✓ Included with unlock</span>';
+    } else {
+        creditCostEl.textContent = creditCost;
+        creditBalanceEl.textContent = getTotalCredits();
+    }
+    
+    // Show/hide formal process warning and previous steps
+    const isFormalProcess = cost && cost.category === 'formal_process';
+    document.getElementById('formalProcessWarning').classList.toggle('hidden', !isFormalProcess);
+    document.getElementById('previousStepsSection').classList.toggle('hidden', !isFormalProcess);
+    
+    // Clear form fields
+    document.getElementById('reviewEmployeeName').value = '';
+    document.getElementById('reviewEmployeeRole').value = '';
+    document.getElementById('reviewIssueDescription').value = '';
+    document.getElementById('reviewPreviousWarnings').value = '';
+    document.getElementById('reviewSupportingDocs').value = '';
+    document.getElementById('reviewEmployeeResponse').value = '';
+    
+    // Show modal
+    modal.classList.remove('hidden');
+}
+
+/**
+ * Close the review request modal
+ */
+function closeReviewRequestModal() {
+    const modal = document.getElementById('reviewRequestModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+/**
+ * Submit the review request
+ */
+async function submitReviewRequest() {
+    const { containerId, docType, docName, actionsId, documentContent, isFromPreviewModal, alreadyPaid } = pendingReviewRequest;
+    
+    // Validate required fields
+    const employeeName = document.getElementById('reviewEmployeeName').value.trim();
+    const employeeRole = document.getElementById('reviewEmployeeRole').value.trim();
+    const issueDescription = document.getElementById('reviewIssueDescription').value.trim();
+    
+    if (!employeeName || !employeeRole || !issueDescription) {
+        showNotification('Please fill in all required fields (Employee Name, Role, and Issue Description)', 'error');
+        return;
+    }
+    
+    // Only check/deduct credits if not already paid
+    if (!alreadyPaid) {
+        // Check credits
+        const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+        const creditCost = cost ? cost.credits : 1;
+        
+        if (getTotalCredits() < creditCost) {
+            closeReviewRequestModal();
+            openCreditsModal();
+            return;
+        }
+        
+        // Deduct credits
+        const success = deductCreditsForDocument(docType);
+        if (!success) {
+            showNotification('Failed to process review request. Please try again.', 'error');
+            return;
+        }
+    }
+    
+    // Generate reference number
+    const refNumber = 'REV-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-6);
+    
+    // Gather all form data
+    const reviewData = {
+        docType,
+        docName,
+        documentContent,
+        employeeName,
+        employeeRole,
+        issueDescription,
+        previousWarnings: document.getElementById('reviewPreviousWarnings').value.trim(),
+        supportingDocs: document.getElementById('reviewSupportingDocs').value.trim(),
+        employeeResponse: document.getElementById('reviewEmployeeResponse').value.trim(),
+        userEmail: currentUser?.email || 'Unknown',
+        userName: venueProfile.contactName || currentUser?.displayName || 'Unknown',
+        venueName: venueProfile.venueName || 'Unknown Venue',
+        phoneNumber: venueProfile.phoneNumber || '',
+        refNumber: refNumber
+    };
+    
+    // Show loading state
+    const submitBtn = document.querySelector('#reviewRequestModal button[onclick="submitReviewRequest()"]');
+    const originalBtnText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<span class="animate-spin">⏳</span> Sending...';
+    submitBtn.disabled = true;
+    
+    try {
+        // Try to send via Netlify function first
+        const response = await fetch('/.netlify/functions/send-review-request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reviewData)
+        });
+        
+        if (response.ok) {
+            console.log('✅ Review request sent via Netlify function');
+        } else {
+            // Fallback: Open mailto link
+            console.log('⚠️ Netlify function failed, falling back to mailto');
+            openReviewEmailFallback(reviewData);
+        }
+    } catch (error) {
+        console.error('Error sending review request:', error);
+        // Fallback: Open mailto link
+        openReviewEmailFallback(reviewData);
+    }
+    
+    // Close the review request modal
+    closeReviewRequestModal();
+    
+    // Determine if this is a formal process doc (needs supporting docs)
+    const isFormalProcess = cost && cost.category === 'formal_process';
+    
+    // Show the attachment prompt modal
+    showAttachmentPromptModal(refNumber, employeeName, isFormalProcess, reviewData.userEmail);
+    
+    // Update UI to show pending state
+    if (isFromPreviewModal) {
+        removeDocumentBlur();
+        const previewModal = document.getElementById('documentPreviewModal');
+        const footerButtons = previewModal?.querySelector('.flex.gap-3');
+        if (footerButtons) {
+            footerButtons.innerHTML = `
+                <div class="flex-1 bg-blue-500/20 border border-blue-500 rounded-lg p-4 text-center">
+                    <div class="flex items-center justify-center gap-2 mb-2">
+                        <span class="text-xl">⏳</span>
+                        <span class="text-blue-400 font-semibold">Review Submitted</span>
+                    </div>
+                    <p class="text-slate-300 text-sm">Reference: ${refNumber}</p>
+                </div>
+                <button onclick="closeDocumentPreviewModal()" class="px-6 py-3 bg-slate-600 hover:bg-slate-500 text-white font-semibold rounded-lg transition-all">
+                    Close
+                </button>
+            `;
+        }
+    } else {
+        // Remove any blur or options prompts
+        removeUniversalBlur(containerId);
+        const optionsPrompt = document.getElementById(containerId + '_optionsPrompt');
+        if (optionsPrompt) optionsPrompt.remove();
+        
+        if (actionsId) {
+            const actionsContainer = document.getElementById(actionsId);
+            if (actionsContainer) {
+                actionsContainer.innerHTML = `
+                    <div class="bg-blue-500/20 border border-blue-500 rounded-lg p-4 text-center">
+                        <div class="flex items-center justify-center gap-2 mb-2">
+                            <span class="text-xl">⏳</span>
+                            <span class="text-blue-400 font-semibold">Review Submitted</span>
+                        </div>
+                        <p class="text-slate-300 text-sm mb-1">Reference: ${refNumber}</p>
+                        <p class="text-slate-400 text-xs">Check your email for next steps.</p>
+                    </div>
+                `;
+                actionsContainer.style.display = '';
+            }
+        }
+    }
+    
+    // Mark document as pending review
+    unlockedDocuments.add(docType + '_pending_review');
+    
+    // Reset button
+    submitBtn.innerHTML = originalBtnText;
+    submitBtn.disabled = false;
+}
+
+/**
+ * Show attachment prompt modal after review submission
+ */
+function showAttachmentPromptModal(refNumber, employeeName, isFormalProcess, userEmail) {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('attachmentPromptModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'attachmentPromptModal';
+        modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[80]';
+        document.body.appendChild(modal);
+    }
+    
+    const formalDocsNote = isFormalProcess ? `
+        <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-3 mb-4">
+            <p class="text-amber-300 text-sm">
+                <strong>⚠️ Important for Formal Process documents:</strong><br>
+                Please include all previous Records of Discussion, warnings, and PIPs related to this employee.
+            </p>
+        </div>
+    ` : '';
+    
+    modal.innerHTML = `
+        <div class="bg-slate-800 rounded-2xl max-w-lg w-full border border-slate-700 fade-in">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-6 rounded-t-2xl">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                        <span class="text-2xl">✅</span>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Review Request Submitted</h2>
+                        <p class="text-green-100">Reference: ${refNumber}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6">
+                ${formalDocsNote}
+                
+                <div class="bg-slate-700/50 rounded-lg p-4 mb-4">
+                    <div class="flex items-start gap-3">
+                        <span class="text-2xl">📎</span>
+                        <div>
+                            <h3 class="text-white font-semibold mb-2">Please email supporting documents to:</h3>
+                            <div class="bg-slate-600 rounded-lg p-3 flex items-center justify-between">
+                                <span class="text-amber-400 font-mono">blake@fitzgeraldhr.com.au</span>
+                                <button onclick="copyToClipboard('blake@fitzgeraldhr.com.au')" 
+                                        class="text-slate-400 hover:text-white transition-colors">
+                                    📋
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-slate-700/30 rounded-lg p-4 mb-4">
+                    <h4 class="text-slate-300 font-medium mb-2">Include in your email:</h4>
+                    <ul class="text-slate-400 text-sm space-y-1">
+                        <li>📄 Previous Record of Discussion (if any)</li>
+                        <li>📄 Previous warnings or PIPs</li>
+                        <li>💬 Employee's written response (if any)</li>
+                        <li>📧 Relevant email threads</li>
+                        <li>📋 Any other supporting evidence</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-3 mb-6">
+                    <p class="text-blue-300 text-sm">
+                        <strong>Subject line:</strong> ${refNumber} - ${employeeName}
+                    </p>
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex gap-3">
+                    <button onclick="closeAttachmentPromptModal()" 
+                            class="flex-1 px-4 py-3 bg-slate-600 hover:bg-slate-500 text-white font-semibold rounded-lg transition-all">
+                        I'll do it later
+                    </button>
+                    <button onclick="openAttachmentEmail('${refNumber}', '${employeeName}')" 
+                            class="flex-1 px-4 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-lg transition-all flex items-center justify-center gap-2">
+                        <span>📧</span> Open Email
+                    </button>
+                </div>
+                
+                <p class="text-slate-500 text-xs text-center mt-4">
+                    You'll receive the reviewed document within 24 hours at ${userEmail}
+                </p>
+            </div>
+        </div>
+    `;
+    
+    modal.classList.remove('hidden');
+}
+
+/**
+ * Close attachment prompt modal
+ */
+function closeAttachmentPromptModal() {
+    const modal = document.getElementById('attachmentPromptModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+    showNotification('✅ Don\'t forget to email supporting documents for faster review!', 'info');
+}
+
+/**
+ * Open email client for attachments
+ */
+function openAttachmentEmail(refNumber, employeeName) {
+    const subject = encodeURIComponent(`${refNumber} - ${employeeName} - Supporting Documents`);
+    const body = encodeURIComponent(`Hi Blake,
+
+Please find attached the supporting documents for review request ${refNumber} (${employeeName}).
+
+Attached:
+• [List your attachments here]
+
+Thanks!
+`);
+    
+    window.open(`mailto:blake@fitzgeraldhr.com.au?subject=${subject}&body=${body}`, '_blank');
+    closeAttachmentPromptModal();
+    showNotification('📧 Email client opened. Attach your documents and send!', 'success');
+}
+
+/**
+ * Copy text to clipboard
+ */
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showNotification('📋 Copied to clipboard!', 'success');
+    }).catch(() => {
+        showNotification('Failed to copy', 'error');
+    });
+}
+
+/**
+ * Fallback: Open email client with review request
+ */
+function openReviewEmailFallback(data) {
+    const subject = encodeURIComponent(`[${data.refNumber}] Document Review Request: ${data.docName} - ${data.employeeName} (${data.venueName})`);
+    
+    const body = encodeURIComponent(`
+DOCUMENT REVIEW REQUEST
+=======================
+Reference: ${data.refNumber}
+
+Document: ${data.docName}
+Document Type: ${data.docType}
+
+REQUESTOR INFORMATION
+---------------------
+Business: ${data.venueName}
+Contact: ${data.userName}
+Email: ${data.userEmail}
+Phone: ${data.phoneNumber}
+
+EMPLOYEE DETAILS
+----------------
+Name: ${data.employeeName}
+Role: ${data.employeeRole}
+
+ISSUE DESCRIPTION
+-----------------
+${data.issueDescription}
+
+${data.previousWarnings ? `PREVIOUS STEPS TAKEN
+--------------------
+${data.previousWarnings}` : ''}
+
+${data.supportingDocs ? `SUPPORTING DOCUMENTATION
+------------------------
+${data.supportingDocs}` : ''}
+
+${data.employeeResponse ? `EMPLOYEE RESPONSE
+-----------------
+${data.employeeResponse}` : ''}
+
+DOCUMENT CONTENT
+----------------
+${data.documentContent ? data.documentContent.substring(0, 3000) : 'See attached'}
+${data.documentContent && data.documentContent.length > 3000 ? '\n\n[Document truncated - full content available in system]' : ''}
+
+---
+Reference: ${data.refNumber}
+Submitted: ${new Date().toLocaleString('en-AU')}
+    `);
+    
+    window.open(`mailto:blake@fitzgeraldhr.com.au?subject=${subject}&body=${body}`, '_blank');
+}
+
+/**
+ * Request expert review - opens the modal
+ * Called from applyUniversalBlur buttons
+ */
+function requestExpertReview(containerId, docType, docName, actionsId) {
+    openReviewRequestModal(containerId, docType, docName, actionsId, false);
+}
+
+/**
+ * Unlock a Formal Process document (pay credits, then choose download or review)
+ */
+function unlockFormalProcess(containerId, docType, docName, actionsId) {
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    const creditCost = cost ? cost.credits : 2;
+    
+    // Check if user has enough credits
+    if (getTotalCredits() < creditCost) {
+        openCreditsModal();
+        return;
+    }
+    
+    // Deduct credits
+    const success = deductCreditsForDocument(docType);
+    if (!success) {
+        showNotification('Failed to unlock document. Please try again.', 'error');
+        return;
+    }
+    
+    // Mark as unlocked
+    unlockedDocuments.add(docType);
+    
+    // Remove the blur and unlock prompt
+    removeUniversalBlur(containerId);
+    
+    // Show the download/review options
+    showFormalProcessOptions(containerId, docType, docName, actionsId);
+    
+    showNotification('✅ Document unlocked! Choose to download or request expert review.', 'success');
+}
+
+/**
+ * Show Formal Process options: Download with disclaimer OR Request expert review (free)
+ */
+function showFormalProcessOptions(containerId, docType, docName, actionsId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    // Remove any existing prompts
+    const existingPrompt = document.getElementById(containerId + '_unlockPrompt');
+    if (existingPrompt) existingPrompt.remove();
+    
+    // Create options prompt
+    const optionsPrompt = document.createElement('div');
+    optionsPrompt.id = containerId + '_optionsPrompt';
+    optionsPrompt.innerHTML = `
+        <div class="bg-slate-700 border-2 border-green-500 rounded-xl p-6 shadow-2xl mx-auto max-w-lg mt-4">
+            <div class="text-center mb-4">
+                <span class="text-3xl">✅</span>
+                <h3 class="text-lg font-bold text-white mt-2">Document Unlocked</h3>
+                <p class="text-slate-400 text-sm">Choose how you'd like to proceed</p>
+            </div>
+            
+            <!-- Option 1: Request Expert Review -->
+            <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-4 mb-3">
+                <div class="flex items-start gap-3">
+                    <span class="text-xl">🛡️</span>
+                    <div class="flex-1">
+                        <h4 class="text-blue-400 font-semibold">Request Expert Review</h4>
+                        <p class="text-slate-300 text-sm mt-1">Have a consultant review before you use it. Reviewed within 24 hours.</p>
+                        <p class="text-green-400 text-xs mt-1 font-medium">✓ Included free with your unlock</p>
+                    </div>
+                </div>
+                <button onclick="requestExpertReviewAfterUnlock('${containerId}', '${docType}', '${docName}', '${actionsId || ''}')" 
+                        class="w-full mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all">
+                    🛡️ Request Expert Review
+                </button>
+            </div>
+            
+            <!-- Option 2: Download Anyway -->
+            <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-4">
+                <div class="flex items-start gap-3">
+                    <span class="text-xl">⚠️</span>
+                    <div class="flex-1">
+                        <h4 class="text-amber-400 font-semibold">Download Without Review</h4>
+                        <p class="text-slate-300 text-sm mt-1">Download now and take full responsibility for the document's accuracy.</p>
+                    </div>
+                </div>
+                
+                <!-- Disclaimer checkbox -->
+                <div class="mt-3 bg-slate-800 rounded-lg p-3">
+                    <label class="flex items-start gap-2 cursor-pointer">
+                        <input type="checkbox" id="${containerId}_disclaimer" class="mt-1 w-4 h-4 rounded border-slate-500 text-amber-500 focus:ring-amber-500">
+                        <span class="text-slate-300 text-xs">
+                            I understand this document carries <strong>significant legal risk</strong>. 
+                            By downloading without expert review, I accept <strong>full responsibility</strong> for its accuracy and any consequences from its use. 
+                            I waive any liability against Fitz HR.
+                        </span>
+                    </label>
+                </div>
+                
+                <button onclick="downloadFormalWithDisclaimer('${containerId}', '${docType}', '${docName}', '${actionsId || ''}')" 
+                        class="w-full mt-3 px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-all">
+                    Download Anyway
+                </button>
+            </div>
+            
+            <p class="text-slate-500 text-xs text-center mt-4">
+                💬 Have questions? Ask the AI assistant before deciding.
+            </p>
+        </div>
+    `;
+    
+    container.parentNode.insertBefore(optionsPrompt, container.nextSibling);
+    
+    // Keep action buttons hidden until they make a choice
+    if (actionsId) {
+        const actionsContainer = document.getElementById(actionsId);
+        if (actionsContainer) {
+            actionsContainer.style.display = 'none';
+        }
+    }
+}
+
+/**
+ * Request expert review after already unlocking (no additional credits)
+ */
+function requestExpertReviewAfterUnlock(containerId, docType, docName, actionsId) {
+    // Remove the options prompt
+    const optionsPrompt = document.getElementById(containerId + '_optionsPrompt');
+    if (optionsPrompt) optionsPrompt.remove();
+    
+    // Open the review request modal (credits already paid)
+    openReviewRequestModal(containerId, docType, docName, actionsId, false, true); // true = already paid
+}
+
+/**
+ * Download Formal Process document with disclaimer acceptance
+ */
+function downloadFormalWithDisclaimer(containerId, docType, docName, actionsId) {
+    // Check if disclaimer is checked
+    const checkbox = document.getElementById(containerId + '_disclaimer');
+    if (!checkbox || !checkbox.checked) {
+        showNotification('⚠️ Please accept the disclaimer to download.', 'error');
+        checkbox?.focus();
+        return;
+    }
+    
+    // Remove the options prompt
+    const optionsPrompt = document.getElementById(containerId + '_optionsPrompt');
+    if (optionsPrompt) optionsPrompt.remove();
+    
+    // Show action buttons
+    if (actionsId) {
+        const actionsContainer = document.getElementById(actionsId);
+        if (actionsContainer) {
+            actionsContainer.style.display = '';
+        }
+    }
+    
+    showNotification('📄 Document ready for download. Please review carefully before use.', 'info');
 }
 
 /**
