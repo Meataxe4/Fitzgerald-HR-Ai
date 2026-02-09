@@ -4708,42 +4708,45 @@ document.addEventListener('DOMContentLoaded', function() {
     <div id="reviewRequestModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[70]">
         <div class="bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-700 fade-in">
             <!-- Header -->
-            <div class="bg-gradient-to-r from-amber-500 to-amber-600 p-6 rounded-t-2xl">
+            <div class="bg-gradient-to-r from-amber-500 to-amber-600 p-5 rounded-t-2xl">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-2xl font-bold text-slate-900">🛡️ Request Expert Review</h2>
-                        <p id="reviewDocName" class="text-slate-800 mt-1">Document Name</p>
+                        <h2 class="text-xl font-bold text-slate-900">🛡️ Request Expert Review</h2>
+                        <p id="reviewDocName" class="text-slate-800 text-sm mt-1">Document Name</p>
                     </div>
                     <button onclick="closeReviewRequestModal()" class="text-slate-800 hover:text-slate-900 text-2xl">&times;</button>
                 </div>
             </div>
             
-            <div class="p-6 space-y-6">
+            <div class="p-5 space-y-4">
+                <!-- Pre-filled Notice -->
+                <div class="bg-green-500/10 border border-green-500 rounded-lg p-3 flex items-center gap-2">
+                    <span class="text-green-400">✓</span>
+                    <p class="text-green-300 text-sm">Details pre-filled from your document. Please verify and add any additional context.</p>
+                </div>
+                
                 <!-- Warning for Formal Process -->
-                <div id="formalProcessWarning" class="hidden bg-red-500/10 border border-red-500 rounded-lg p-4">
-                    <div class="flex items-start gap-3">
-                        <span class="text-xl">⚠️</span>
-                        <div>
-                            <h4 class="text-red-400 font-bold">Formal Process Document</h4>
-                            <p class="text-red-300 text-sm mt-1">This document carries significant legal risk. Please ensure you have followed proper process and provide all supporting documentation.</p>
-                        </div>
+                <div id="formalProcessWarning" class="hidden bg-red-500/10 border border-red-500 rounded-lg p-3">
+                    <div class="flex items-start gap-2">
+                        <span>⚠️</span>
+                        <p class="text-red-300 text-sm"><strong>Formal Process Document:</strong> Please ensure you have followed proper process and provide supporting documentation.</p>
                     </div>
                 </div>
                 
-                <!-- Employee Details -->
+                <!-- Employee Details - Compact -->
                 <div class="bg-slate-700/50 rounded-lg p-4">
-                    <h3 class="text-white font-semibold mb-3">👷 Employee Details</h3>
-                    <div class="grid grid-cols-2 gap-4">
+                    <h3 class="text-white font-semibold mb-2 text-sm">👷 Employee Details</h3>
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-slate-400 text-sm mb-1">Employee Name *</label>
+                            <label class="block text-slate-400 text-xs mb-1">Employee Name *</label>
                             <input type="text" id="reviewEmployeeName" 
-                                   class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
+                                   class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm focus:border-amber-500 focus:outline-none"
                                    placeholder="e.g. John Smith">
                         </div>
                         <div>
-                            <label class="block text-slate-400 text-sm mb-1">Role/Position *</label>
+                            <label class="block text-slate-400 text-xs mb-1">Role/Position *</label>
                             <input type="text" id="reviewEmployeeRole" 
-                                   class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
+                                   class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm focus:border-amber-500 focus:outline-none"
                                    placeholder="e.g. Bar Manager">
                         </div>
                     </div>
@@ -4751,75 +4754,59 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 <!-- Issue Description -->
                 <div class="bg-slate-700/50 rounded-lg p-4">
-                    <h3 class="text-white font-semibold mb-3">📝 Issue Description</h3>
-                    <label class="block text-slate-400 text-sm mb-1">Briefly describe the issue or reason for this document *</label>
-                    <textarea id="reviewIssueDescription" rows="3"
-                              class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none resize-none"
-                              placeholder="e.g. Employee has been consistently late for shifts over the past 3 weeks despite verbal warnings..."></textarea>
+                    <label class="block text-slate-400 text-xs mb-1">📝 Issue Description *</label>
+                    <textarea id="reviewIssueDescription" rows="2"
+                              class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm focus:border-amber-500 focus:outline-none resize-none"
+                              placeholder="Brief description of the issue..."></textarea>
                 </div>
                 
                 <!-- Previous Steps (for Formal Process) -->
                 <div id="previousStepsSection" class="hidden bg-slate-700/50 rounded-lg p-4">
-                    <h3 class="text-white font-semibold mb-3">📋 Previous Steps Taken</h3>
-                    <label class="block text-slate-400 text-sm mb-1">What previous discussions/warnings have been given? *</label>
+                    <label class="block text-slate-400 text-xs mb-1">📋 Previous Steps Taken *</label>
                     <textarea id="reviewPreviousWarnings" rows="2"
-                              class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none resize-none"
+                              class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm focus:border-amber-500 focus:outline-none resize-none"
                               placeholder="e.g. Verbal warning on 15/01, Record of Discussion on 22/01..."></textarea>
                 </div>
                 
-                <!-- Supporting Documentation -->
+                <!-- Additional Context (Combined supporting docs + employee response) -->
                 <div class="bg-slate-700/50 rounded-lg p-4">
-                    <h3 class="text-white font-semibold mb-3">📎 Supporting Documentation</h3>
-                    <p class="text-slate-400 text-sm mb-3">Please paste or describe any supporting evidence (previous Record of Discussion, emails, incident reports, etc.)</p>
-                    <textarea id="reviewSupportingDocs" rows="4"
-                              class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none resize-none font-mono text-sm"
-                              placeholder="Paste previous document content, email threads, or incident details here..."></textarea>
+                    <label class="block text-slate-400 text-xs mb-1">📎 Additional Context (Optional)</label>
+                    <p class="text-slate-500 text-xs mb-2">Any additional information, previous documents, or employee response</p>
+                    <textarea id="reviewSupportingDocs" rows="3"
+                              class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm focus:border-amber-500 focus:outline-none resize-none"
+                              placeholder="Paste previous document content, relevant emails, or employee's response here..."></textarea>
                 </div>
                 
-                <!-- Employee Response -->
-                <div class="bg-slate-700/50 rounded-lg p-4">
-                    <h3 class="text-white font-semibold mb-3">💬 Employee Response</h3>
-                    <p class="text-slate-400 text-sm mb-3">If you've already discussed this with the employee, what was their response?</p>
-                    <textarea id="reviewEmployeeResponse" rows="3"
-                              class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none resize-none"
-                              placeholder="e.g. Employee acknowledged the issue and said they've been having transport problems..."></textarea>
+                <!-- Hidden field for employee response (still needed for backend) -->
+                <input type="hidden" id="reviewEmployeeResponse" value="">
+                
+                <!-- Review Info - Compact -->
+                <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-3">
+                    <p class="text-blue-300 text-sm">
+                        <strong>⏱️ 24-hour turnaround:</strong> Reviewed document sent to <strong id="reviewUserEmail">your email</strong>
+                    </p>
                 </div>
                 
-                <!-- Review Info -->
-                <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-4">
-                    <div class="flex items-start gap-3">
-                        <span class="text-xl">⏱️</span>
-                        <div>
-                            <h4 class="text-blue-400 font-semibold">What happens next?</h4>
-                            <ul class="text-blue-300 text-sm mt-2 space-y-1">
-                                <li>• Your document and information will be reviewed within <strong>24 hours</strong></li>
-                                <li>• You'll receive the approved document via email at <strong id="reviewUserEmail">your email</strong></li>
-                                <li>• If changes are needed, we'll contact you to discuss</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Credit Cost -->
-                <div class="flex items-center justify-between bg-slate-700/30 rounded-lg p-4">
+                <!-- Credit Cost - Compact -->
+                <div class="flex items-center justify-between bg-slate-700/30 rounded-lg p-3">
                     <div>
-                        <p class="text-slate-300">Review Credit Cost</p>
-                        <p class="text-slate-400 text-sm">Your balance: <span id="reviewCreditBalance">0</span> credits</p>
+                        <p class="text-slate-300 text-sm">Review Credit Cost</p>
+                        <p class="text-slate-400 text-xs">Balance: <span id="reviewCreditBalance">0</span> credits</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-2xl font-bold text-amber-400" id="reviewCreditCost">1</p>
-                        <p class="text-slate-400 text-sm">credit(s)</p>
+                        <p class="text-xl font-bold text-amber-400" id="reviewCreditCost">1</p>
+                        <p class="text-slate-400 text-xs">credit(s)</p>
                     </div>
                 </div>
                 
                 <!-- Actions -->
                 <div class="flex gap-3">
                     <button onclick="closeReviewRequestModal()" 
-                            class="flex-1 px-6 py-3 bg-slate-600 hover:bg-slate-500 text-white font-semibold rounded-lg transition-all">
+                            class="flex-1 px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-semibold rounded-lg transition-all text-sm">
                         Cancel
                     </button>
                     <button onclick="submitReviewRequest()" 
-                            class="flex-1 px-6 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-lg transition-all flex items-center justify-center gap-2">
+                            class="flex-1 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-lg transition-all flex items-center justify-center gap-2 text-sm">
                         <span>🛡️</span> Submit for Review
                     </button>
                 </div>
@@ -14888,54 +14875,30 @@ function showDocPreviewFormalOptions(docType, docName) {
         previewContent.parentElement.style.position = '';
     }
     
-    // Hide the footer download buttons and warning
+    // Replace footer with compact options
     const modalFooter = document.querySelector('#documentPreviewModal .p-6.border-t');
     if (modalFooter) {
+        modalFooter.className = 'p-4 border-t border-slate-700 bg-slate-800';
         modalFooter.innerHTML = `
-            <div class="bg-slate-700 border-2 border-green-500 rounded-xl p-4">
-                <div class="text-center mb-3">
-                    <span class="text-2xl">✅</span>
-                    <h3 class="text-lg font-bold text-white mt-1">Document Unlocked</h3>
-                    <p class="text-slate-400 text-sm">Choose how you'd like to proceed</p>
+            <div class="flex items-center gap-3">
+                <div class="flex-1 flex items-center gap-2 text-green-400">
+                    <span>✅</span>
+                    <span class="font-semibold text-sm">Document Unlocked</span>
                 </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <!-- Option 1: Request Expert Review -->
-                    <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-3">
-                        <div class="flex items-start gap-2 mb-2">
-                            <span class="text-lg">🛡️</span>
-                            <div class="flex-1">
-                                <h4 class="text-blue-400 font-semibold text-sm">Request Expert Review</h4>
-                                <p class="text-slate-300 text-xs mt-1">Consultant reviews within 24 hours.</p>
-                                <p class="text-green-400 text-xs font-medium">✓ Included free</p>
-                            </div>
-                        </div>
-                        <button onclick="requestDocExpertReviewAfterUnlock('${docType}', '${docName}')" 
-                                class="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all text-sm">
-                            🛡️ Request Expert Review
-                        </button>
-                    </div>
-                    
-                    <!-- Option 2: Download Anyway -->
-                    <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-3">
-                        <div class="flex items-start gap-2 mb-2">
-                            <span class="text-lg">⚠️</span>
-                            <div class="flex-1">
-                                <h4 class="text-amber-400 font-semibold text-sm">Download Without Review</h4>
-                                <p class="text-slate-300 text-xs mt-1">Take full responsibility.</p>
-                            </div>
-                        </div>
-                        <div class="bg-slate-800 rounded p-2 mb-2">
-                            <label class="flex items-start gap-2 cursor-pointer">
-                                <input type="checkbox" id="docPreviewDisclaimer" class="mt-0.5 w-4 h-4">
-                                <span class="text-slate-300 text-xs">I accept full responsibility and waive liability.</span>
-                            </label>
-                        </div>
-                        <button onclick="downloadDocPreviewWithDisclaimer('${docType}')" 
-                                class="w-full px-3 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-all text-sm">
-                            Download Anyway
-                        </button>
-                    </div>
+                <button onclick="requestDocExpertReviewAfterUnlock('${docType}', '${docName}')" 
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all text-sm flex items-center gap-2">
+                    🛡️ Request Expert Review
+                    <span class="text-blue-200 text-xs">(Free)</span>
+                </button>
+                <div class="flex items-center gap-2">
+                    <label class="flex items-center gap-1 cursor-pointer">
+                        <input type="checkbox" id="docPreviewDisclaimer" class="w-4 h-4">
+                        <span class="text-slate-400 text-xs">I accept responsibility</span>
+                    </label>
+                    <button onclick="downloadDocPreviewWithDisclaimer('${docType}')" 
+                            class="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-all text-sm">
+                        ⚠️ Download Anyway
+                    </button>
                 </div>
             </div>
         `;
@@ -15399,11 +15362,52 @@ function openReviewRequestModal(containerId, docType, docName, actionsId, isFrom
     document.getElementById('formalProcessWarning').classList.toggle('hidden', !isFormalProcess);
     document.getElementById('previousStepsSection').classList.toggle('hidden', !isFormalProcess);
     
-    // Clear form fields
-    document.getElementById('reviewEmployeeName').value = '';
-    document.getElementById('reviewEmployeeRole').value = '';
-    document.getElementById('reviewIssueDescription').value = '';
-    document.getElementById('reviewPreviousWarnings').value = '';
+    // PRE-POPULATE fields from documentBuilderState if available
+    const builderData = documentBuilderState?.data || {};
+    
+    // Employee Name
+    const employeeNameField = document.getElementById('reviewEmployeeName');
+    if (employeeNameField) {
+        employeeNameField.value = builderData.employeeName || '';
+    }
+    
+    // Employee Role/Position
+    const employeeRoleField = document.getElementById('reviewEmployeeRole');
+    if (employeeRoleField) {
+        employeeRoleField.value = builderData.position || builderData.role || '';
+    }
+    
+    // Issue Description - combine relevant fields
+    const issueDescField = document.getElementById('reviewIssueDescription');
+    if (issueDescField) {
+        let issueText = '';
+        if (builderData.issueDescription) {
+            issueText = builderData.issueDescription;
+        } else if (builderData.incidentDetails) {
+            issueText = builderData.incidentDetails;
+        } else if (builderData.concerns) {
+            issueText = builderData.concerns;
+        } else if (builderData.performanceIssues) {
+            issueText = builderData.performanceIssues;
+        }
+        issueDescField.value = issueText;
+    }
+    
+    // Previous warnings/steps
+    const previousWarningsField = document.getElementById('reviewPreviousWarnings');
+    if (previousWarningsField) {
+        let prevSteps = '';
+        if (builderData.previousWarnings) {
+            prevSteps = builderData.previousWarnings;
+        } else if (builderData.priorDiscipline) {
+            prevSteps = builderData.priorDiscipline;
+        } else if (builderData.priorWarnings) {
+            prevSteps = builderData.priorWarnings;
+        }
+        previousWarningsField.value = prevSteps;
+    }
+    
+    // Clear optional fields that shouldn't be pre-populated
     document.getElementById('reviewSupportingDocs').value = '';
     document.getElementById('reviewEmployeeResponse').value = '';
     
