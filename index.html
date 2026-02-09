@@ -6494,8 +6494,8 @@ Be as specific as possible!"></textarea>
     <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border-2 border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h2 class="text-2xl font-bold text-amber-400">💳 Fitz Credits</h2>
-                <p class="text-slate-400 text-sm">Manage your credits and subscription</p>
+                <h2 class="text-2xl font-bold text-amber-400">💳 Review Credits</h2>
+                <p class="text-slate-400 text-sm">Manage your expert review credits</p>
             </div>
             <button onclick="closeCreditsModal()" class="text-slate-400 hover:text-white text-2xl">×</button>
         </div>
@@ -6504,9 +6504,9 @@ Be as specific as possible!"></textarea>
         <div class="bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-xl p-6 mb-6 border border-amber-500/30">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-slate-400 text-sm">Current Balance</p>
+                    <p class="text-slate-400 text-sm">Review Credits</p>
                     <p id="modalCreditsBalance" class="text-4xl font-bold text-amber-400">0</p>
-                    <p class="text-slate-400 text-xs mt-1">Fitz Credits</p>
+                    <p class="text-slate-400 text-xs mt-1">remaining this year</p>
                 </div>
                 <div class="text-right">
                     <p class="text-slate-400 text-sm">Your Plan</p>
@@ -6515,143 +6515,58 @@ Be as specific as possible!"></textarea>
                 </div>
             </div>
             
-            <!-- Free Tier Info (for free tier) -->
+            <!-- Free Tier Info -->
             <div id="freeDocumentStatus" class="hidden mt-4 pt-4 border-t border-amber-500/30">
-                <button onclick="toggleFreeDocsDropdown()" class="w-full text-left group">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="text-amber-400">🎁</span>
-                            <span class="text-amber-400 font-semibold group-hover:text-amber-300 transition-colors">Free Tier: 1 credit/month</span>
-                            <svg id="freeDocsChevron" class="w-4 h-4 text-amber-400 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </div>
-                        <span class="text-slate-400 text-sm">See what you can create</span>
-                    </div>
-                </button>
-                
-                <!-- Expandable list of 1-credit documents -->
-                <div id="freeDocsDropdown" class="hidden mt-3 bg-slate-900/50 rounded-lg p-3 border border-amber-500/30">
-                    <p class="text-slate-400 text-xs mb-2">Use your 1 free credit on any of these (click to try):</p>
-                    <ul class="space-y-1">
-                        <li>
-                            <button onclick="closeCreditsModal(); openPositionDescriptionBuilder();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
-                                <div class="flex items-center gap-2 text-sm">
-                                    <span class="text-amber-400">📋</span>
-                                    <span class="text-white group-hover:text-amber-400 transition-colors">Position Description</span>
-                                    <span class="text-slate-500 text-xs">(1 credit)</span>
-                                </div>
-                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Try →</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button onclick="closeCreditsModal(); openJobDescriptionBuilder();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
-                                <div class="flex items-center gap-2 text-sm">
-                                    <span class="text-amber-400">📢</span>
-                                    <span class="text-white group-hover:text-amber-400 transition-colors">Job Advertisement</span>
-                                    <span class="text-slate-500 text-xs">(1 credit)</span>
-                                </div>
-                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Try →</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button onclick="closeCreditsModal(); openProbationCheckIn();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
-                                <div class="flex items-center gap-2 text-sm">
-                                    <span class="text-amber-400">📝</span>
-                                    <span class="text-white group-hover:text-amber-400 transition-colors">Probation Check-In</span>
-                                    <span class="text-slate-500 text-xs">(1 credit)</span>
-                                </div>
-                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Try →</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button onclick="closeCreditsModal(); openReferenceCheckForm();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
-                                <div class="flex items-center gap-2 text-sm">
-                                    <span class="text-amber-400">📞</span>
-                                    <span class="text-white group-hover:text-amber-400 transition-colors">Reference Check Form</span>
-                                    <span class="text-slate-500 text-xs">(1 credit)</span>
-                                </div>
-                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Try →</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button onclick="closeCreditsModal(); openOnboardingChecklist();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
-                                <div class="flex items-center gap-2 text-sm">
-                                    <span class="text-amber-400">✅</span>
-                                    <span class="text-white group-hover:text-amber-400 transition-colors">Onboarding Checklist</span>
-                                    <span class="text-slate-500 text-xs">(1 credit)</span>
-                                </div>
-                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Try →</span>
-                            </button>
-                        </li>
-                        <li>
-                            <button onclick="closeCreditsModal(); openTrainingPlan();" class="w-full flex items-center justify-between p-2 rounded-lg hover:bg-slate-800 transition-colors group text-left">
-                                <div class="flex items-center gap-2 text-sm">
-                                    <span class="text-amber-400">📚</span>
-                                    <span class="text-white group-hover:text-amber-400 transition-colors">Training Plan</span>
-                                    <span class="text-slate-500 text-xs">(1 credit)</span>
-                                </div>
-                                <span class="text-amber-400 text-xs opacity-0 group-hover:opacity-100 transition-opacity">Try →</span>
-                            </button>
-                        </li>
-                    </ul>
-                    <p class="text-slate-500 text-xs mt-3 pt-2 border-t border-slate-700">
-                        💡 Need more? Upgrade for 5-25 credits/month + unlimited chat.
-                    </p>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-amber-400">🎁</span>
+                    <span class="text-amber-400 font-semibold">Free Tier: 1 template document</span>
                 </div>
+                <p class="text-slate-400 text-sm">
+                    Try any template document free. Upgrade for unlimited templates + expert-reviewed documents.
+                </p>
             </div>
-            <div id="freeDocumentUsedStatus" class="hidden"></div>
         </div>
 
-        <!-- Credit Packs -->
+        <!-- Review Credit Packs -->
         <div class="mb-6">
-            <h3 class="text-white font-bold mb-4">Buy Credit Packs</h3>
-            <div class="grid grid-cols-3 gap-3">
-                <button onclick="purchaseCreditPack('small')" class="bg-slate-700 hover:bg-slate-600 rounded-lg p-4 text-center transition-all border border-slate-600 hover:border-amber-500">
+            <h3 class="text-white font-bold mb-2">Buy Extra Review Credits</h3>
+            <p class="text-slate-400 text-sm mb-4">For expert-reviewed documents (warnings, allegations, etc.)</p>
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="purchaseReviewCredits('single')" class="bg-slate-700 hover:bg-slate-600 rounded-lg p-4 text-center transition-all border border-slate-600 hover:border-amber-500">
+                    <p class="text-2xl font-bold text-amber-400">1</p>
+                    <p class="text-slate-300 text-sm">Review Credit</p>
+                    <p class="text-white font-bold mt-2">$29</p>
+                    <p class="text-slate-500 text-xs">For a single document</p>
+                </button>
+                <button onclick="purchaseReviewCredits('pack')" class="bg-slate-700 hover:bg-slate-600 rounded-lg p-4 text-center transition-all border-2 border-amber-500 relative">
+                    <span class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-amber-500 text-slate-900 text-xs font-bold px-2 py-0.5 rounded">SAVE 18%</span>
                     <p class="text-2xl font-bold text-amber-400">5</p>
-                    <p class="text-slate-300 text-sm">Credits</p>
-                    <p class="text-white font-bold mt-2">$79</p>
-                    <p class="text-slate-500 text-xs">$15.80/credit</p>
-                </button>
-                <button onclick="purchaseCreditPack('medium')" class="bg-slate-700 hover:bg-slate-600 rounded-lg p-4 text-center transition-all border-2 border-amber-500 relative">
-                    <span class="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-amber-500 text-slate-900 text-xs font-bold px-2 py-0.5 rounded">POPULAR</span>
-                    <p class="text-2xl font-bold text-amber-400">10</p>
-                    <p class="text-slate-300 text-sm">Credits</p>
-                    <p class="text-white font-bold mt-2">$149</p>
-                    <p class="text-slate-500 text-xs">$14.90/credit</p>
-                </button>
-                <button onclick="purchaseCreditPack('large')" class="bg-slate-700 hover:bg-slate-600 rounded-lg p-4 text-center transition-all border border-slate-600 hover:border-amber-500">
-                    <p class="text-2xl font-bold text-amber-400">20</p>
-                    <p class="text-slate-300 text-sm">Credits</p>
-                    <p class="text-white font-bold mt-2">$249</p>
-                    <p class="text-slate-500 text-xs">$12.45/credit</p>
+                    <p class="text-slate-300 text-sm">Review Credits</p>
+                    <p class="text-white font-bold mt-2">$119</p>
+                    <p class="text-slate-500 text-xs">$23.80/credit</p>
                 </button>
             </div>
-            <p class="text-slate-500 text-xs mt-2 text-center">Pack credits never expire</p>
         </div>
 
         <!-- Subscription Upgrade -->
         <div class="bg-slate-900 rounded-lg p-4 mb-6">
-            <h3 class="text-white font-bold mb-3">💡 Save with a Subscription</h3>
-            <p class="text-slate-400 text-sm mb-4">Get more credits at a lower per-credit rate, plus unlimited chat.</p>
+            <h3 class="text-white font-bold mb-3">💡 Better Value with a Subscription</h3>
+            <p class="text-slate-400 text-sm mb-4">Get unlimited templates + review credits included.</p>
             <div class="grid grid-cols-3 gap-2 text-center text-sm">
                 <div class="bg-slate-800 rounded-lg p-3">
                     <p class="text-white font-bold">Starter</p>
-                    <p class="text-amber-400 font-bold">5 credits</p>
-                    <p class="text-slate-400">$59/mo</p>
-                    <p class="text-green-400 text-xs">$11.80/credit</p>
+                    <p class="text-amber-400 font-bold">8 reviews</p>
+                    <p class="text-slate-400">$249/yr</p>
                 </div>
                 <div class="bg-slate-800 rounded-lg p-3 border border-amber-500">
-                    <p class="text-amber-400 font-bold">Professional ⭐</p>
-                    <p class="text-amber-400 font-bold">14 credits</p>
-                    <p class="text-slate-400">$149/mo</p>
-                    <p class="text-green-400 text-xs">$10.64/credit</p>
+                    <p class="text-amber-400 font-bold">Pro ⭐</p>
+                    <p class="text-amber-400 font-bold">20 reviews</p>
+                    <p class="text-slate-400">$449/yr</p>
                 </div>
                 <div class="bg-slate-800 rounded-lg p-3">
-                    <p class="text-white font-bold">Enterprise</p>
-                    <p class="text-amber-400 font-bold">25 credits</p>
-                    <p class="text-slate-400">$349/mo</p>
-                    <p class="text-green-400 text-xs">$13.96/credit</p>
+                    <p class="text-white font-bold">Business</p>
+                    <p class="text-amber-400 font-bold">50 reviews</p>
+                    <p class="text-slate-400">$899/yr</p>
                 </div>
             </div>
             <button onclick="showSubscriptionOptions()" class="w-full mt-4 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 rounded-lg transition-all">
@@ -6659,29 +6574,27 @@ Be as specific as possible!"></textarea>
             </button>
         </div>
 
-        <!-- Credit Costs Reference -->
+        <!-- Document Categories Reference -->
         <details class="bg-slate-900 rounded-lg p-4">
-            <summary class="text-white font-bold cursor-pointer">📋 Document Credit Costs</summary>
-            <div class="mt-4 space-y-2 text-sm">
-                <div class="flex justify-between text-slate-300">
-                    <span>Low-risk documents (Check-In, PD, etc.)</span>
-                    <span class="text-amber-400 font-bold">1 credit</span>
+            <summary class="text-white font-bold cursor-pointer">📋 What Uses Review Credits?</summary>
+            <div class="mt-4 space-y-4 text-sm">
+                <div>
+                    <p class="text-green-400 font-semibold mb-2">✅ Templates (Unlimited with any paid plan)</p>
+                    <p class="text-slate-400">Position Descriptions, Job Ads, Onboarding Checklists, Training Plans, Reference Checks</p>
                 </div>
-                <div class="flex justify-between text-slate-300">
-                    <span>Moderate-risk (ROD, PIP, etc.)</span>
-                    <span class="text-amber-400 font-bold">2 credits</span>
+                <div>
+                    <p class="text-amber-400 font-semibold mb-2">📋 People Management (1 review credit)</p>
+                    <p class="text-slate-400">Record of Discussion, PIP, Probation Review, Letter of Concern</p>
+                    <p class="text-slate-500 text-xs mt-1">Expert review recommended but optional</p>
                 </div>
-                <div class="flex justify-between text-slate-300">
-                    <span>Significant-risk (Contracts, Warnings)</span>
-                    <span class="text-amber-400 font-bold">3 credits</span>
+                <div>
+                    <p class="text-orange-400 font-semibold mb-2">⚠️ Formal Process (2 review credits)</p>
+                    <p class="text-slate-400">Formal Warning, Letter of Allegation, Show Cause</p>
+                    <p class="text-slate-500 text-xs mt-1">Expert review required before download</p>
                 </div>
-                <div class="flex justify-between text-slate-300 border-t border-slate-700 pt-2 mt-2">
-                    <span>Termination Review (consultation)</span>
-                    <span class="text-red-400 font-bold">7 credits</span>
-                </div>
-                <div class="flex justify-between text-slate-300">
-                    <span>Investigation Review (consultation)</span>
-                    <span class="text-red-400 font-bold">8 credits</span>
+                <div class="border-t border-slate-700 pt-3">
+                    <p class="text-red-400 font-semibold mb-2">🔒 Consultation Only ($150)</p>
+                    <p class="text-slate-400">Termination, Redundancy — requires booking a consultation</p>
                 </div>
             </div>
         </details>
@@ -6696,22 +6609,23 @@ Be as specific as possible!"></textarea>
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-2xl font-bold text-amber-400">⭐ Choose Your Plan</h2>
-                <p class="text-slate-400 text-sm">Unlimited chat + monthly document credits</p>
+                <p class="text-slate-400 text-sm">Unlimited templates + expert-reviewed documents</p>
             </div>
             <button onclick="closeSubscriptionModal()" class="text-slate-400 hover:text-white text-2xl">×</button>
         </div>
 
-        <!-- Billing Toggle -->
+        <!-- Billing Toggle - Canva Style (Annual Default) -->
         <div class="flex justify-center mb-6">
-            <div class="bg-slate-900 rounded-lg p-1 flex">
+            <div class="bg-slate-900 rounded-lg p-1 flex items-center">
                 <button id="billingMonthly" onclick="setBilling('monthly')" 
-                        class="px-4 py-2 rounded-md text-sm font-medium transition-all bg-amber-500 text-slate-900">
+                        class="px-4 py-2 rounded-md text-sm font-medium transition-all text-slate-400 hover:text-white">
                     Monthly
                 </button>
                 <button id="billingAnnual" onclick="setBilling('annual')" 
-                        class="px-4 py-2 rounded-md text-sm font-medium transition-all text-slate-400 hover:text-white">
-                    Annual <span class="text-green-400 text-xs">(Save ~17%)</span>
+                        class="px-4 py-2 rounded-md text-sm font-medium transition-all bg-amber-500 text-slate-900">
+                    Yearly
                 </button>
+                <span class="ml-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">Save 20%</span>
             </div>
         </div>
 
@@ -6723,16 +6637,17 @@ Be as specific as possible!"></textarea>
                 <p class="text-slate-400 text-sm mb-4">For small venues with occasional HR needs</p>
                 
                 <div class="mb-4">
-                    <span id="starterPrice" class="text-3xl font-bold text-white">$59</span>
-                    <span id="starterBilling" class="text-slate-400">/month</span>
+                    <span id="starterPrice" class="text-3xl font-bold text-white">$249</span>
+                    <span id="starterBilling" class="text-slate-400">/year</span>
                 </div>
+                <p id="starterMonthlyEquiv" class="text-green-400 text-sm mb-4">Just $21/month</p>
                 
                 <ul class="text-slate-300 text-sm space-y-2 mb-6">
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 5 credits/month</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR templates</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>8</strong> expert-reviewed docs/year</li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Unlimited AI chat</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> All document types</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 1 month rollover</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Email support (48hr)</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 24hr review turnaround</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Email support</li>
                 </ul>
                 
                 <button onclick="purchaseSubscription('starter', currentBilling)" 
@@ -6741,63 +6656,66 @@ Be as specific as possible!"></textarea>
                 </button>
             </div>
 
-            <!-- Professional (Recommended) -->
+            <!-- Pro (Recommended) -->
             <div class="bg-gradient-to-b from-amber-500/20 to-slate-900 rounded-xl p-6 border-2 border-amber-500 relative">
                 <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-amber-500 text-slate-900 text-xs font-bold px-3 py-1 rounded-full">
-                    BEST VALUE
+                    MOST POPULAR
                 </div>
                 
-                <h3 class="text-xl font-bold text-amber-400 mb-2">Professional</h3>
+                <h3 class="text-xl font-bold text-amber-400 mb-2">Pro</h3>
                 <p class="text-slate-400 text-sm mb-4">For busy venues with regular HR needs</p>
                 
                 <div class="mb-4">
-                    <span id="professionalPrice" class="text-3xl font-bold text-white">$149</span>
-                    <span id="professionalBilling" class="text-slate-400">/month</span>
+                    <span id="proPrice" class="text-3xl font-bold text-white">$449</span>
+                    <span id="proBilling" class="text-slate-400">/year</span>
                 </div>
+                <p id="proMonthlyEquiv" class="text-green-400 text-sm mb-4">Just $37/month</p>
                 
                 <ul class="text-slate-300 text-sm space-y-2 mb-6">
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>14 credits/month</strong></li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR templates</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>20</strong> expert-reviewed docs/year</li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Unlimited AI chat</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> All document types</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 3 month rollover</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Email support (24hr)</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 3 user logins</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 24hr review turnaround</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Priority email support</li>
                 </ul>
                 
-                <button onclick="purchaseSubscription('professional', currentBilling)" 
+                <button onclick="purchaseSubscription('pro', currentBilling)" 
                         class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
-                    Choose Professional
+                    Choose Pro
                 </button>
-                
-                <p class="text-center text-green-400 text-xs mt-2">$10.64/credit — Best rate!</p>
             </div>
 
-            <!-- Enterprise -->
+            <!-- Business -->
             <div class="bg-slate-900 rounded-xl p-6 border border-slate-700 hover:border-amber-500 transition-all">
-                <h3 class="text-xl font-bold text-white mb-2">Enterprise</h3>
+                <h3 class="text-xl font-bold text-white mb-2">Business</h3>
                 <p class="text-slate-400 text-sm mb-4">For multi-venue or high-turnover operations</p>
                 
                 <div class="mb-4">
-                    <span id="enterprisePrice" class="text-3xl font-bold text-white">$349</span>
-                    <span id="enterpriseBilling" class="text-slate-400">/month</span>
+                    <span id="businessPrice" class="text-3xl font-bold text-white">$899</span>
+                    <span id="businessBilling" class="text-slate-400">/year</span>
                 </div>
+                <p id="businessMonthlyEquiv" class="text-green-400 text-sm mb-4">Just $75/month</p>
                 
                 <ul class="text-slate-300 text-sm space-y-2 mb-6">
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>25 credits/month</strong></li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR templates</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>50</strong> expert-reviewed docs/year</li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Unlimited AI chat</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> All document types</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 6 month rollover</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Priority support (4hr)</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 10 user logins</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 5 venue profiles</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Quarterly strategy call</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Priority</strong> review turnaround</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Phone support</li>
                 </ul>
                 
-                <button onclick="purchaseSubscription('enterprise', currentBilling)" 
+                <button onclick="purchaseSubscription('business', currentBilling)" 
                         class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-lg transition-all">
-                    Choose Enterprise
+                    Choose Business
                 </button>
             </div>
+        </div>
+
+        <!-- What's Included -->
+        <div class="bg-slate-900/50 rounded-lg p-4 mb-4">
+            <p class="text-slate-300 text-sm text-center">
+                <span class="text-amber-400 font-semibold">Every reviewed document</span> is checked by a qualified HR consultant before you download — included in your subscription.
+            </p>
         </div>
 
         <!-- FAQ -->
@@ -6809,8 +6727,8 @@ Be as specific as possible!"></textarea>
 </div>
 
 <script>
-// Billing toggle state
-let currentBilling = 'monthly';
+// Billing toggle state - DEFAULT TO ANNUAL
+let currentBilling = 'annual';
 
 function setBilling(billing) {
     currentBilling = billing;
@@ -6825,26 +6743,48 @@ function setBilling(billing) {
         annualBtn.classList.remove('bg-amber-500', 'text-slate-900');
         annualBtn.classList.add('text-slate-400');
         
-        // Update prices
-        document.getElementById('starterPrice').textContent = '$59';
+        // Update prices to monthly
+        document.getElementById('starterPrice').textContent = '$29';
         document.getElementById('starterBilling').textContent = '/month';
-        document.getElementById('professionalPrice').textContent = '$149';
-        document.getElementById('professionalBilling').textContent = '/month';
-        document.getElementById('enterprisePrice').textContent = '$349';
-        document.getElementById('enterpriseBilling').textContent = '/month';
+        document.getElementById('starterMonthlyEquiv').textContent = '$348/year billed monthly';
+        document.getElementById('starterMonthlyEquiv').classList.remove('text-green-400');
+        document.getElementById('starterMonthlyEquiv').classList.add('text-slate-500');
+        
+        document.getElementById('proPrice').textContent = '$49';
+        document.getElementById('proBilling').textContent = '/month';
+        document.getElementById('proMonthlyEquiv').textContent = '$588/year billed monthly';
+        document.getElementById('proMonthlyEquiv').classList.remove('text-green-400');
+        document.getElementById('proMonthlyEquiv').classList.add('text-slate-500');
+        
+        document.getElementById('businessPrice').textContent = '$99';
+        document.getElementById('businessBilling').textContent = '/month';
+        document.getElementById('businessMonthlyEquiv').textContent = '$1,188/year billed monthly';
+        document.getElementById('businessMonthlyEquiv').classList.remove('text-green-400');
+        document.getElementById('businessMonthlyEquiv').classList.add('text-slate-500');
     } else {
         annualBtn.classList.add('bg-amber-500', 'text-slate-900');
         annualBtn.classList.remove('text-slate-400');
         monthlyBtn.classList.remove('bg-amber-500', 'text-slate-900');
         monthlyBtn.classList.add('text-slate-400');
         
-        // Update prices (annual = monthly * 10, billed yearly)
-        document.getElementById('starterPrice').textContent = '$49';
-        document.getElementById('starterBilling').textContent = '/mo (billed $588/yr)';
-        document.getElementById('professionalPrice').textContent = '$125';
-        document.getElementById('professionalBilling').textContent = '/mo (billed $1,500/yr)';
-        document.getElementById('enterprisePrice').textContent = '$290';
-        document.getElementById('enterpriseBilling').textContent = '/mo (billed $3,480/yr)';
+        // Update prices to annual
+        document.getElementById('starterPrice').textContent = '$249';
+        document.getElementById('starterBilling').textContent = '/year';
+        document.getElementById('starterMonthlyEquiv').textContent = 'Just $21/month';
+        document.getElementById('starterMonthlyEquiv').classList.add('text-green-400');
+        document.getElementById('starterMonthlyEquiv').classList.remove('text-slate-500');
+        
+        document.getElementById('proPrice').textContent = '$449';
+        document.getElementById('proBilling').textContent = '/year';
+        document.getElementById('proMonthlyEquiv').textContent = 'Just $37/month';
+        document.getElementById('proMonthlyEquiv').classList.add('text-green-400');
+        document.getElementById('proMonthlyEquiv').classList.remove('text-slate-500');
+        
+        document.getElementById('businessPrice').textContent = '$899';
+        document.getElementById('businessBilling').textContent = '/year';
+        document.getElementById('businessMonthlyEquiv').textContent = 'Just $75/month';
+        document.getElementById('businessMonthlyEquiv').classList.add('text-green-400');
+        document.getElementById('businessMonthlyEquiv').classList.remove('text-slate-500');
     }
 }
 </script>
@@ -7588,102 +7528,121 @@ const CONFIG = {
     ERROR_DISPLAY_TIME: 5000,
     
     // ========================================
-    // FITZ CREDITS SYSTEM
+    // FITZ CREDITS SYSTEM - February 2025 Model
     // ========================================
     CREDITS: {
         // Free tier limits
         FREE_TIER: {
             MONTHLY_PROMPTS: 20,
-            MONTHLY_CREDITS: 1  // 1 free credit per month for any document
+            LOW_RISK_DOCS: 1  // 1 low-risk document total (not per month)
         },
         
-        // Subscription tiers
+        // Subscription tiers - Review Credits (annual billing default)
+        // Low-risk docs are UNLIMITED for all paid tiers
         TIERS: {
-            // Free tier: 1 credit/month, does NOT accumulate (stays at 1 if unused)
-            free: { name: 'Free', monthlyCredits: 1, rolloverMonths: 0, maxBanked: 1 },
-            starter: { name: 'Starter', monthlyCredits: 5, rolloverMonths: 1, maxBanked: 10, price: 59 },
-            professional: { name: 'Professional', monthlyCredits: 14, rolloverMonths: 3, maxBanked: 42, price: 149 },
-            enterprise: { name: 'Enterprise', monthlyCredits: 25, rolloverMonths: 6, maxBanked: 75, price: 349 }
-        },
-        
-        // Document credit costs
-        DOCUMENT_COSTS: {
-            // 1 Credit - Low Risk
-            probationCheckIn: { credits: 1, risk: 'low', name: 'Probation Check-In' },
-            letterOfConcern: { credits: 1, risk: 'low', name: 'Letter of Concern' },
-            positionDescription: { credits: 1, risk: 'low', name: 'Position Description' },
-            jobDescription: { credits: 1, risk: 'low', name: 'Job Description' },
-            changeOfHours: { credits: 1, risk: 'low', name: 'Change of Hours Letter' },
-            referenceCheck: { credits: 1, risk: 'low', name: 'Reference Check Form' },
-            onboardingChecklist: { credits: 1, risk: 'low', name: 'Onboarding Checklist' },
-            trainingPlan: { credits: 1, risk: 'low', name: 'Training Plan' },
-            
-            // 2 Credits - Moderate Risk
-            recordOfDiscussion: { credits: 2, risk: 'moderate', name: 'Record of Discussion' },
-            pip: { credits: 2, risk: 'moderate', name: 'Performance Improvement Plan' },
-            casualConversion: { credits: 2, risk: 'moderate', name: 'Casual Conversion Letter' },
-            probationExtension: { credits: 2, risk: 'moderate', name: 'Probation Extension Letter' },
-            
-            // 3 Credits - Significant Risk (Expert Review Included)
-            employmentContract: { credits: 3, risk: 'significant', name: 'Employment Contract' },
-            formalWarning: { credits: 3, risk: 'significant', name: 'Formal Warning' },
-            firstWarning: { credits: 3, risk: 'significant', name: 'First Written Warning' },
-            finalWarning: { credits: 3, risk: 'significant', name: 'Final Written Warning' },
-            formalProbationReview: { credits: 3, risk: 'significant', name: 'Formal Probation Review' },
-            showCause: { credits: 3, risk: 'significant', name: 'Show Cause Letter' },
-            letterOfAllegation: { credits: 3, risk: 'significant', name: 'Letter of Allegation' }
-        },
-        
-        // Consultation-gated documents (require booking, cannot self-serve)
-        CONSULTATION_GATED: {
-            terminationReview: { credits: 7, name: 'Termination Review', includes: 'Termination Letter' },
-            redundancyReview: { credits: 7, name: 'Redundancy Review', includes: 'Redundancy Letters' },
-            investigationReview: { credits: 8, name: 'Investigation Review', includes: 'Investigation Report' },
-            settlementReview: { credits: 8, name: 'Settlement Review', includes: 'Deed of Settlement Draft' },
-            unfairDismissalResponse: { credits: 8, name: 'Unfair Dismissal Response', includes: 'Response Draft' },
-            generalConsultation: { credits: 5, name: 'General HR Consultation', includes: 'Expert advice' }
-        },
-        
-        // Process bundles
-        BUNDLES: {
-            probationDocumentation: { 
-                credits: 3, 
-                savings: '25%', 
-                includes: ['probationCheckIn', 'formalProbationReview'],
-                name: 'Probation Documentation Bundle'
+            free: { 
+                name: 'Free', 
+                reviewCredits: 0, 
+                lowRiskDocs: 1,  // 1 total, not monthly
+                monthlyPrompts: 20,
+                price: { annual: 0, monthly: 0 }
             },
-            performanceManagement: { 
-                credits: 6, 
-                savings: '25%', 
-                includes: ['pip', 'firstWarning', 'finalWarning'],
-                name: 'Performance Management Bundle'
+            starter: { 
+                name: 'Starter', 
+                reviewCredits: 8,  // Per year
+                lowRiskDocs: 'unlimited',
+                monthlyPrompts: 'unlimited',
+                price: { annual: 249, monthly: 29 }
             },
-            misconductDocumentation: { 
-                credits: 4, 
-                savings: '20%', 
-                includes: ['recordOfDiscussion', 'showCause'],
-                name: 'Misconduct Documentation Bundle'
+            pro: { 
+                name: 'Pro', 
+                reviewCredits: 20,  // Per year
+                lowRiskDocs: 'unlimited',
+                monthlyPrompts: 'unlimited',
+                price: { annual: 449, monthly: 49 }
             },
-            newHire: { 
-                credits: 4, 
-                savings: '20%', 
-                includes: ['employmentContract', 'positionDescription', 'probationCheckIn'],
-                name: 'New Hire Bundle'
+            business: { 
+                name: 'Business', 
+                reviewCredits: 50,  // Per year
+                lowRiskDocs: 'unlimited',
+                monthlyPrompts: 'unlimited',
+                price: { annual: 899, monthly: 99 },
+                priorityReview: true
             }
         },
         
-        // Credit packs
-        PACKS: {
-            small: { credits: 5, price: 79, perCredit: 15.80 },
-            medium: { credits: 10, price: 149, perCredit: 14.90 },
-            large: { credits: 20, price: 249, perCredit: 12.45 }
+        // Document categories
+        // LOW RISK (Templates) - Unlimited for paid tiers, no review needed
+        LOW_RISK_DOCS: {
+            positionDescription: { name: 'Position Description', icon: '📋' },
+            jobDescription: { name: 'Job Advertisement', icon: '📢' },
+            onboardingChecklist: { name: 'Onboarding Checklist', icon: '✅' },
+            trainingPlan: { name: 'Training Plan', icon: '📚' },
+            referenceCheck: { name: 'Reference Check Form', icon: '📞' },
+            interviewQuestions: { name: 'Interview Questions', icon: '🎤' }
         },
         
-        // Chat top-up
-        CHAT_TOPUP: { prompts: 30, price: 19 },
+        // PEOPLE MANAGEMENT - Uses 1 review credit, optional expert review (recommended)
+        PEOPLE_MANAGEMENT_DOCS: {
+            recordOfDiscussion: { reviewCredits: 1, name: 'Record of Discussion', icon: '📋', reviewType: 'optional' },
+            pip: { reviewCredits: 1, name: 'Performance Improvement Plan', icon: '📊', reviewType: 'optional' },
+            probationReview: { reviewCredits: 1, name: 'Probation Review', icon: '📑', reviewType: 'optional' },
+            letterOfConcern: { reviewCredits: 1, name: 'Letter of Concern', icon: '📝', reviewType: 'optional' },
+            casualConversion: { reviewCredits: 1, name: 'Casual Conversion Letter', icon: '📄', reviewType: 'optional' },
+            probationExtension: { reviewCredits: 1, name: 'Probation Extension Letter', icon: '📄', reviewType: 'optional' }
+        },
         
-        // Urgent consultation premium
-        URGENT_PREMIUM: 100
+        // FORMAL PROCESS - Uses 2 review credits, mandatory expert review
+        FORMAL_PROCESS_DOCS: {
+            formalWarning: { reviewCredits: 2, name: 'Formal Warning', icon: '⚠️', reviewType: 'mandatory' },
+            letterOfAllegation: { reviewCredits: 2, name: 'Letter of Allegation', icon: '🔍', reviewType: 'mandatory' },
+            showCause: { reviewCredits: 2, name: 'Show Cause Letter', icon: '⚠️', reviewType: 'mandatory' },
+            firstWarning: { reviewCredits: 2, name: 'First Written Warning', icon: '⚠️', reviewType: 'mandatory' },
+            finalWarning: { reviewCredits: 2, name: 'Final Written Warning', icon: '🚨', reviewType: 'mandatory' }
+        },
+        
+        // CONSULTATION ONLY - Not self-serve, requires booking
+        CONSULTATION_ONLY: {
+            termination: { price: 150, name: 'Termination', includes: 'Consultation + Letter' },
+            redundancy: { price: 150, name: 'Redundancy', includes: 'Consultation + Letters' }
+        },
+        
+        // Review credit packs (one-time purchase)
+        REVIEW_CREDIT_PACKS: {
+            single: { credits: 1, price: 29, perCredit: 29 },
+            pack: { credits: 5, price: 119, perCredit: 23.80 }
+        },
+        
+        // Legacy document cost mapping (for backward compatibility)
+        DOCUMENT_COSTS: {
+            // Low risk - 0 credits (unlimited for paid)
+            positionDescription: { credits: 0, risk: 'low', name: 'Position Description', category: 'template' },
+            jobDescription: { credits: 0, risk: 'low', name: 'Job Advertisement', category: 'template' },
+            onboardingChecklist: { credits: 0, risk: 'low', name: 'Onboarding Checklist', category: 'template' },
+            trainingPlan: { credits: 0, risk: 'low', name: 'Training Plan', category: 'template' },
+            referenceCheck: { credits: 0, risk: 'low', name: 'Reference Check Form', category: 'template' },
+            interviewQuestions: { credits: 0, risk: 'low', name: 'Interview Questions', category: 'template' },
+            probationCheckIn: { credits: 0, risk: 'low', name: 'Probation Check-In', category: 'template' },
+            
+            // People Management - 1 review credit
+            recordOfDiscussion: { credits: 1, risk: 'moderate', name: 'Record of Discussion', category: 'people_management', reviewType: 'optional' },
+            pip: { credits: 1, risk: 'moderate', name: 'Performance Improvement Plan', category: 'people_management', reviewType: 'optional' },
+            formalProbationReview: { credits: 1, risk: 'moderate', name: 'Formal Probation Review', category: 'people_management', reviewType: 'optional' },
+            letterOfConcern: { credits: 1, risk: 'moderate', name: 'Letter of Concern', category: 'people_management', reviewType: 'optional' },
+            casualConversion: { credits: 1, risk: 'moderate', name: 'Casual Conversion Letter', category: 'people_management', reviewType: 'optional' },
+            probationExtension: { credits: 1, risk: 'moderate', name: 'Probation Extension Letter', category: 'people_management', reviewType: 'optional' },
+            changeOfHours: { credits: 1, risk: 'moderate', name: 'Change of Hours Letter', category: 'people_management', reviewType: 'optional' },
+            
+            // Formal Process - 2 review credits
+            formalWarning: { credits: 2, risk: 'significant', name: 'Formal Warning', category: 'formal_process', reviewType: 'mandatory' },
+            firstWarning: { credits: 2, risk: 'significant', name: 'First Written Warning', category: 'formal_process', reviewType: 'mandatory' },
+            finalWarning: { credits: 2, risk: 'significant', name: 'Final Written Warning', category: 'formal_process', reviewType: 'mandatory' },
+            letterOfAllegation: { credits: 2, risk: 'significant', name: 'Letter of Allegation', category: 'formal_process', reviewType: 'mandatory' },
+            showCause: { credits: 2, risk: 'significant', name: 'Show Cause Letter', category: 'formal_process', reviewType: 'mandatory' },
+            
+            // Employment Contract - special handling
+            employmentContract: { credits: 0, risk: 'low', name: 'Employment Contract', category: 'template' }
+        }
     }
 };
 
@@ -7727,14 +7686,14 @@ let isListening = false;
 // FITZ CREDITS - GLOBAL STATE
 // ========================================
 let userCredits = {
-    balance: 0,
-    tier: 'free',
-    monthlyPromptsUsed: 0,
+    subscriptionTier: 'free',
+    reviewCreditsUsed: 0,      // How many review credits used this year
+    purchasedCredits: 0,       // Extra purchased review credits (never expire)
+    monthlyPromptsUsed: 0,     // For free tier only
     monthlyPromptsReset: null,
-    activeBundles: [],
-    purchasedCredits: 0, // Never expire
-    subscriptionCredits: 0, // Firebase will set correct value on login
-    lastCreditRefresh: null
+    lowRiskDocsUsed: 0,        // For free tier only (they get 1 total)
+    subscriptionStartDate: null,
+    lastUpdated: null
 };
 
 // Flag to prevent Firebase from overwriting local credits after payment return
@@ -7750,12 +7709,14 @@ function initializeUserCredits() {
             const parsed = JSON.parse(stored);
             userCredits = { ...userCredits, ...parsed };
             
-            // Remove legacy freeDocumentUsed if present
-            delete userCredits.freeDocumentUsed;
-            
-            // NOTE: Monthly reset is now handled ONLY in loadCreditsFromFirebase()
-            // This function just loads the cached localStorage data
-            // Firebase is the source of truth for credit balances
+            // Migrate old fields if present
+            if (parsed.tier) {
+                userCredits.subscriptionTier = parsed.tier;
+            }
+            if (parsed.subscriptionCredits !== undefined) {
+                // Old model had subscriptionCredits, map to new model
+                userCredits.reviewCreditsUsed = 0; // Reset for new model
+            }
             
             console.log('📦 Loaded credits from localStorage cache:', userCredits);
             
@@ -7765,14 +7726,14 @@ function initializeUserCredits() {
     } else {
         // No localStorage data - use defaults (Firebase will override when user logs in)
         userCredits = {
-            balance: 0,
-            tier: 'free',
+            subscriptionTier: 'free',
+            reviewCreditsUsed: 0,
+            purchasedCredits: 0,
             monthlyPromptsUsed: 0,
             monthlyPromptsReset: new Date().toISOString(),
-            activeBundles: [],
-            purchasedCredits: 0,
-            subscriptionCredits: 0, // Start at 0 - Firebase will set correct value
-            lastCreditRefresh: null
+            lowRiskDocsUsed: 0,
+            subscriptionStartDate: null,
+            lastUpdated: null
         };
         console.log('📦 No localStorage cache - using defaults');
     }
@@ -13845,13 +13806,12 @@ async function purchaseSubscription(tier, billing = 'monthly') {
 }
 
 /**
- * Purchase a credit pack via Stripe checkout
+ * Purchase review credits via Stripe checkout
  */
-async function purchaseCreditPack(size) {
+async function purchaseReviewCredits(size) {
     const priceKeys = {
-        'small': 'credits_5',
-        'medium': 'credits_10',
-        'large': 'credits_20'
+        'single': 'credits_1',
+        'pack': 'credits_5'
     };
     
     const priceKey = priceKeys[size];
@@ -13862,11 +13822,10 @@ async function purchaseCreditPack(size) {
 }
 
 /**
- * Purchase chat top-up via Stripe checkout
+ * Book a consultation via Stripe checkout
  */
-async function purchaseChatTopUp() {
-    await initiateStripeCheckout('chat_topup');
-    closePromptLimitModal();
+async function bookConsultation() {
+    await initiateStripeCheckout('consultation');
 }
 
 /**
@@ -14019,21 +13978,20 @@ async function initiateStripeCheckout(priceKey) {
  */
 function getPurchaseInfo(priceKey) {
     const purchaseMap = {
-        // Subscriptions
-        starter_monthly: { type: 'subscription', tier: 'starter', tierName: 'Starter', credits: 5 },
-        starter_annual: { type: 'subscription', tier: 'starter', tierName: 'Starter', credits: 5 },
-        professional_monthly: { type: 'subscription', tier: 'professional', tierName: 'Professional', credits: 14 },
-        professional_annual: { type: 'subscription', tier: 'professional', tierName: 'Professional', credits: 14 },
-        enterprise_monthly: { type: 'subscription', tier: 'enterprise', tierName: 'Enterprise', credits: 25 },
-        enterprise_annual: { type: 'subscription', tier: 'enterprise', tierName: 'Enterprise', credits: 25 },
+        // Subscriptions - New tiers (Feb 2025)
+        starter_monthly: { type: 'subscription', tier: 'starter', tierName: 'Starter', reviewCredits: 8 },
+        starter_annual: { type: 'subscription', tier: 'starter', tierName: 'Starter', reviewCredits: 8 },
+        pro_monthly: { type: 'subscription', tier: 'pro', tierName: 'Pro', reviewCredits: 20 },
+        pro_annual: { type: 'subscription', tier: 'pro', tierName: 'Pro', reviewCredits: 20 },
+        business_monthly: { type: 'subscription', tier: 'business', tierName: 'Business', reviewCredits: 50 },
+        business_annual: { type: 'subscription', tier: 'business', tierName: 'Business', reviewCredits: 50 },
         
-        // Credit packs
-        credits_5: { type: 'credits', credits: 5 },
-        credits_10: { type: 'credits', credits: 10 },
-        credits_20: { type: 'credits', credits: 20 },
+        // Review credit packs
+        credits_1: { type: 'reviewCredits', credits: 1 },
+        credits_5: { type: 'reviewCredits', credits: 5 },
         
-        // Chat top-up
-        chat_topup: { type: 'topup', prompts: 30 }
+        // Consultation
+        consultation: { type: 'consultation', price: 150 }
     };
     
     return purchaseMap[priceKey] || { type: 'unknown' };
@@ -17036,6 +16994,39 @@ function openProfileMenu() {
         
         document.getElementById('profileVenueName').textContent = venueName;
         document.getElementById('profileUserCode').textContent = userDisplay;
+        
+        // Update subscription info
+        var tier = userCredits.subscriptionTier || 'free';
+        var tierConfig = CONFIG.CREDITS.TIERS[tier] || CONFIG.CREDITS.TIERS.free;
+        var tierName = tierConfig.name || 'Free';
+        
+        document.getElementById('profileSubscriptionTier').textContent = tierName;
+        
+        // Update subscription status text
+        var statusEl = document.getElementById('profileSubscriptionStatus');
+        var upgradeBtn = statusEl.parentElement.querySelector('button');
+        
+        if (tier === 'free') {
+            statusEl.textContent = 'Upgrade for unlimited templates';
+            upgradeBtn.textContent = 'Upgrade';
+            upgradeBtn.classList.remove('hidden');
+        } else {
+            statusEl.textContent = 'Annual subscription';
+            upgradeBtn.textContent = 'Manage';
+            upgradeBtn.classList.remove('hidden');
+        }
+        
+        // Update review credits
+        var reviewCreditsUsed = userCredits.reviewCreditsUsed || 0;
+        var totalReviewCredits = tierConfig.reviewCredits || 0;
+        var remainingCredits = Math.max(0, totalReviewCredits - reviewCreditsUsed) + (userCredits.purchasedCredits || 0);
+        
+        document.getElementById('profileReviewCredits').textContent = remainingCredits;
+        document.getElementById('profileTotalCredits').textContent = totalReviewCredits + (userCredits.purchasedCredits || 0);
+        
+        // Update progress bar
+        var percentage = totalReviewCredits > 0 ? Math.min(100, (remainingCredits / totalReviewCredits) * 100) : 0;
+        document.getElementById('profileCreditsBar').style.width = percentage + '%';
     }
 }
 
@@ -24159,14 +24150,15 @@ function resetAIImport() {
 
 <!-- Profile Modal -->
 <div id="profileMenu" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50" onclick="if(event.target === this) closeProfileMenu();">
-    <div class="bg-slate-800 rounded-2xl p-6 max-w-sm w-full border border-amber-500 fade-in">
+    <div class="bg-slate-800 rounded-2xl p-6 max-w-md w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
-            <h2 class="text-xl font-bold text-amber-500">Profile</h2>
+            <h2 class="text-xl font-bold text-amber-500">👤 Your Profile</h2>
             <button onclick="closeProfileMenu()" class="text-slate-400 hover:text-white text-2xl">×</button>
         </div>
         
-        <!-- Venue Info -->
+        <!-- Account Info -->
         <div class="mb-4 p-4 bg-slate-700/50 rounded-lg">
+            <p class="text-slate-400 text-xs uppercase tracking-wide mb-2">Account</p>
             <div class="flex items-center gap-3">
                 <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
                     <span class="text-2xl">🏨</span>
@@ -24178,6 +24170,36 @@ function resetAIImport() {
             </div>
         </div>
         
+        <!-- Subscription Info -->
+        <div class="mb-4 p-4 bg-slate-700/50 rounded-lg">
+            <p class="text-slate-400 text-xs uppercase tracking-wide mb-2">Subscription</p>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p id="profileSubscriptionTier" class="text-lg font-bold text-amber-400">Free</p>
+                    <p id="profileSubscriptionStatus" class="text-xs text-slate-400">Upgrade for unlimited templates</p>
+                </div>
+                <button onclick="closeProfileMenu(); showSubscriptionOptions();" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-slate-900 text-sm font-semibold rounded-lg transition-colors">
+                    Upgrade
+                </button>
+            </div>
+        </div>
+        
+        <!-- Review Credits -->
+        <div class="mb-4 p-4 bg-slate-700/50 rounded-lg">
+            <p class="text-slate-400 text-xs uppercase tracking-wide mb-2">Review Credits</p>
+            <div class="flex items-center justify-between mb-2">
+                <p id="profileReviewCredits" class="text-2xl font-bold text-amber-400">0</p>
+                <p class="text-sm text-slate-400">of <span id="profileTotalCredits">0</span> remaining</p>
+            </div>
+            <div class="w-full bg-slate-600 rounded-full h-2 mb-2">
+                <div id="profileCreditsBar" class="bg-amber-500 h-2 rounded-full transition-all" style="width: 0%"></div>
+            </div>
+            <button onclick="closeProfileMenu(); openCreditsModal();" class="text-amber-400 hover:text-amber-300 text-sm font-medium">
+                Buy more credits →
+            </button>
+        </div>
+        
+        <!-- Menu Options -->
         <div class="space-y-2">
             <button onclick="showVenueSettings(); closeProfileMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
                 <span class="text-xl">⚙️</span>
@@ -24218,6 +24240,15 @@ function resetAIImport() {
                 <div>
                     <div class="font-semibold">Privacy Policy</div>
                     <div class="text-xs text-slate-400">How we protect your data</div>
+                </div>
+            </button>
+            
+            <div class="border-t border-slate-700 my-2"></div>
+            
+            <button onclick="signOutUser(); closeProfileMenu();" class="w-full text-left px-4 py-3 hover:bg-red-900/30 rounded-lg text-red-400 flex items-center gap-3 transition-colors">
+                <span class="text-xl">🚪</span>
+                <div>
+                    <div class="font-semibold">Sign Out</div>
                 </div>
             </button>
         </div>
