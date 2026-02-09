@@ -14844,10 +14844,23 @@ function unlockDocPreviewFormal(docType, docName) {
     // Mark as unlocked
     unlockedDocuments.add(docType);
     
-    // Remove the blur and unlock prompt
-    removeDocumentBlur();
+    // Remove the blur overlay
+    const blurOverlay = document.getElementById('documentBlurOverlay');
+    if (blurOverlay) blurOverlay.remove();
     
-    // Show options
+    // Remove the unlock prompt
+    const unlockPrompt = document.getElementById('documentUnlockPrompt');
+    if (unlockPrompt) unlockPrompt.remove();
+    
+    // Reset preview container to show full document
+    const previewContent = document.getElementById('documentPreviewContent');
+    if (previewContent && previewContent.parentElement) {
+        previewContent.parentElement.style.maxHeight = '';
+        previewContent.parentElement.style.overflow = '';
+        previewContent.parentElement.style.position = '';
+    }
+    
+    // Show options in the footer
     showDocPreviewFormalOptions(docType, docName);
     
     showNotification('✅ Document unlocked! Choose to download or request expert review.', 'success');
@@ -14864,89 +14877,75 @@ function showDocPreviewFormalOptions(docType, docName) {
     const existingOptions = document.getElementById('documentOptionsPrompt');
     if (existingOptions) existingOptions.remove();
     
+    const existingBlur = document.getElementById('documentBlurOverlay');
+    if (existingBlur) existingBlur.remove();
+    
+    // Reset preview container styles to show full document
     const previewContent = document.getElementById('documentPreviewContent');
-    if (!previewContent) return;
+    if (previewContent && previewContent.parentElement) {
+        previewContent.parentElement.style.maxHeight = '';
+        previewContent.parentElement.style.overflow = '';
+        previewContent.parentElement.style.position = '';
+    }
     
-    const optionsPrompt = document.createElement('div');
-    optionsPrompt.id = 'documentOptionsPrompt';
-    optionsPrompt.innerHTML = `
-        <div class="bg-slate-700 border-2 border-green-500 rounded-xl p-6 shadow-2xl mx-auto max-w-lg mt-4">
-            <div class="text-center mb-4">
-                <span class="text-3xl">✅</span>
-                <h3 class="text-lg font-bold text-white mt-2">Document Unlocked</h3>
-                <p class="text-slate-400 text-sm">Choose how you'd like to proceed</p>
-            </div>
-            
-            <!-- Option 1: Request Expert Review -->
-            <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-4 mb-3">
-                <div class="flex items-start gap-3">
-                    <span class="text-xl">🛡️</span>
-                    <div class="flex-1">
-                        <h4 class="text-blue-400 font-semibold">Request Expert Review</h4>
-                        <p class="text-slate-300 text-sm mt-1">Have a consultant review before you use it. Reviewed within 24 hours.</p>
-                        <p class="text-green-400 text-xs mt-1 font-medium">✓ Included free with your unlock</p>
-                    </div>
-                </div>
-                <button onclick="requestDocExpertReviewAfterUnlock('${docType}', '${docName}')" 
-                        class="w-full mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all">
-                    🛡️ Request Expert Review
-                </button>
-            </div>
-            
-            <!-- Option 2: Download Anyway -->
-            <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-4">
-                <div class="flex items-start gap-3">
-                    <span class="text-xl">⚠️</span>
-                    <div class="flex-1">
-                        <h4 class="text-amber-400 font-semibold">Download Without Review</h4>
-                        <p class="text-slate-300 text-sm mt-1">Download now and take full responsibility for the document's accuracy.</p>
-                    </div>
+    // Hide the footer download buttons and warning
+    const modalFooter = document.querySelector('#documentPreviewModal .p-6.border-t');
+    if (modalFooter) {
+        modalFooter.innerHTML = `
+            <div class="bg-slate-700 border-2 border-green-500 rounded-xl p-4">
+                <div class="text-center mb-3">
+                    <span class="text-2xl">✅</span>
+                    <h3 class="text-lg font-bold text-white mt-1">Document Unlocked</h3>
+                    <p class="text-slate-400 text-sm">Choose how you'd like to proceed</p>
                 </div>
                 
-                <!-- Disclaimer checkbox -->
-                <div class="mt-3 bg-slate-800 rounded-lg p-3">
-                    <label class="flex items-start gap-2 cursor-pointer">
-                        <input type="checkbox" id="docPreviewDisclaimer" class="mt-1 w-4 h-4 rounded border-slate-500 text-amber-500 focus:ring-amber-500">
-                        <span class="text-slate-300 text-xs">
-                            I understand this document carries <strong>significant legal risk</strong>. 
-                            By downloading without expert review, I accept <strong>full responsibility</strong> for its accuracy and any consequences from its use. 
-                            I waive any liability against Fitz HR.
-                        </span>
-                    </label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <!-- Option 1: Request Expert Review -->
+                    <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-3">
+                        <div class="flex items-start gap-2 mb-2">
+                            <span class="text-lg">🛡️</span>
+                            <div class="flex-1">
+                                <h4 class="text-blue-400 font-semibold text-sm">Request Expert Review</h4>
+                                <p class="text-slate-300 text-xs mt-1">Consultant reviews within 24 hours.</p>
+                                <p class="text-green-400 text-xs font-medium">✓ Included free</p>
+                            </div>
+                        </div>
+                        <button onclick="requestDocExpertReviewAfterUnlock('${docType}', '${docName}')" 
+                                class="w-full px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all text-sm">
+                            🛡️ Request Expert Review
+                        </button>
+                    </div>
+                    
+                    <!-- Option 2: Download Anyway -->
+                    <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-3">
+                        <div class="flex items-start gap-2 mb-2">
+                            <span class="text-lg">⚠️</span>
+                            <div class="flex-1">
+                                <h4 class="text-amber-400 font-semibold text-sm">Download Without Review</h4>
+                                <p class="text-slate-300 text-xs mt-1">Take full responsibility.</p>
+                            </div>
+                        </div>
+                        <div class="bg-slate-800 rounded p-2 mb-2">
+                            <label class="flex items-start gap-2 cursor-pointer">
+                                <input type="checkbox" id="docPreviewDisclaimer" class="mt-0.5 w-4 h-4">
+                                <span class="text-slate-300 text-xs">I accept full responsibility and waive liability.</span>
+                            </label>
+                        </div>
+                        <button onclick="downloadDocPreviewWithDisclaimer('${docType}')" 
+                                class="w-full px-3 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-all text-sm">
+                            Download Anyway
+                        </button>
+                    </div>
                 </div>
-                
-                <button onclick="downloadDocPreviewWithDisclaimer('${docType}')" 
-                        class="w-full mt-3 px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-all">
-                    Download Anyway
-                </button>
             </div>
-            
-            <p class="text-slate-500 text-xs text-center mt-4">
-                💬 Have questions? Ask the AI assistant before deciding.
-            </p>
-        </div>
-    `;
-    
-    previewContent.parentElement.parentNode.insertBefore(optionsPrompt, previewContent.parentElement.nextSibling);
-    
-    // Keep download buttons disabled until they choose
-    const downloadBtns = document.querySelectorAll('#documentPreviewModal button[onclick*="download"]');
-    downloadBtns.forEach(btn => {
-        if (!btn.closest('#documentOptionsPrompt')) {
-            btn.disabled = true;
-            btn.classList.add('opacity-50', 'cursor-not-allowed');
-        }
-    });
+        `;
+    }
 }
 
 /**
  * Request expert review after unlocking in preview modal (no additional credits)
  */
 function requestDocExpertReviewAfterUnlock(docType, docName) {
-    // Remove the options prompt
-    const optionsPrompt = document.getElementById('documentOptionsPrompt');
-    if (optionsPrompt) optionsPrompt.remove();
-    
     // Open review modal (already paid)
     openReviewRequestModal(null, docType, docName, null, true, true);
 }
@@ -14962,19 +14961,31 @@ function downloadDocPreviewWithDisclaimer(docType) {
         return;
     }
     
-    // Remove the options prompt
-    const optionsPrompt = document.getElementById('documentOptionsPrompt');
-    if (optionsPrompt) optionsPrompt.remove();
+    // Restore the footer with download buttons
+    const modalFooter = document.querySelector('#documentPreviewModal .p-6.border-t');
+    if (modalFooter) {
+        modalFooter.innerHTML = `
+            <div class="flex gap-3 mb-4 flex-wrap">
+                <div class="flex gap-2 flex-1">
+                    <button onclick="downloadGeneratedDocument('pdf')" 
+                            class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2">
+                        <span>📄</span>
+                        <span>Download PDF</span>
+                    </button>
+                    <button onclick="downloadGeneratedDocument('docx')" 
+                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2">
+                        <span>📝</span>
+                        <span>Download Word</span>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-3 text-center">
+                <p class="text-amber-300 text-sm">⚠️ You've chosen to download without expert review. Please review carefully before use.</p>
+            </div>
+        `;
+    }
     
-    // Re-enable download buttons
-    const downloadBtns = document.querySelectorAll('#documentPreviewModal button[onclick*="download"]');
-    downloadBtns.forEach(btn => {
-        btn.disabled = false;
-        btn.classList.remove('opacity-50', 'cursor-not-allowed');
-        btn.title = '';
-    });
-    
-    showNotification('📄 Document ready for download. Please review carefully before use.', 'info');
+    showNotification('📄 Document ready for download.', 'success');
 }
 
 // ========================================
@@ -15505,21 +15516,21 @@ async function submitReviewRequest() {
     
     // Update UI to show pending state
     if (isFromPreviewModal) {
-        removeDocumentBlur();
-        const previewModal = document.getElementById('documentPreviewModal');
-        const footerButtons = previewModal?.querySelector('.flex.gap-3');
-        if (footerButtons) {
-            footerButtons.innerHTML = `
-                <div class="flex-1 bg-blue-500/20 border border-blue-500 rounded-lg p-4 text-center">
+        // Update the modal footer to show pending state
+        const modalFooter = document.querySelector('#documentPreviewModal .p-6.border-t');
+        if (modalFooter) {
+            modalFooter.innerHTML = `
+                <div class="bg-blue-500/20 border border-blue-500 rounded-lg p-4 text-center">
                     <div class="flex items-center justify-center gap-2 mb-2">
                         <span class="text-xl">⏳</span>
                         <span class="text-blue-400 font-semibold">Review Submitted</span>
                     </div>
-                    <p class="text-slate-300 text-sm">Reference: ${refNumber}</p>
+                    <p class="text-slate-300 text-sm mb-1">Reference: ${refNumber}</p>
+                    <p class="text-slate-400 text-xs mb-3">Check your email for next steps.</p>
+                    <button onclick="closeDocumentPreview()" class="px-6 py-2 bg-slate-600 hover:bg-slate-500 text-white font-semibold rounded-lg transition-all">
+                        Close
+                    </button>
                 </div>
-                <button onclick="closeDocumentPreviewModal()" class="px-6 py-3 bg-slate-600 hover:bg-slate-500 text-white font-semibold rounded-lg transition-all">
-                    Close
-                </button>
             `;
         }
     } else {
@@ -15797,64 +15808,67 @@ function showFormalProcessOptions(containerId, docType, docName, actionsId) {
     const existingPrompt = document.getElementById(containerId + '_unlockPrompt');
     if (existingPrompt) existingPrompt.remove();
     
+    const existingOptions = document.getElementById(containerId + '_optionsPrompt');
+    if (existingOptions) existingOptions.remove();
+    
+    // Reset container styles to show full document
+    container.style.maxHeight = '';
+    container.style.overflow = '';
+    container.style.position = '';
+    
     // Create options prompt
     const optionsPrompt = document.createElement('div');
     optionsPrompt.id = containerId + '_optionsPrompt';
     optionsPrompt.innerHTML = `
-        <div class="bg-slate-700 border-2 border-green-500 rounded-xl p-6 shadow-2xl mx-auto max-w-lg mt-4">
-            <div class="text-center mb-4">
-                <span class="text-3xl">✅</span>
-                <h3 class="text-lg font-bold text-white mt-2">Document Unlocked</h3>
+        <div class="bg-slate-700 border-2 border-green-500 rounded-xl p-5 mx-auto max-w-lg mt-4">
+            <div class="text-center mb-3">
+                <span class="text-2xl">✅</span>
+                <h3 class="text-lg font-bold text-white mt-1">Document Unlocked</h3>
                 <p class="text-slate-400 text-sm">Choose how you'd like to proceed</p>
             </div>
             
             <!-- Option 1: Request Expert Review -->
-            <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-4 mb-3">
-                <div class="flex items-start gap-3">
-                    <span class="text-xl">🛡️</span>
+            <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-3 mb-2">
+                <div class="flex items-start gap-2">
+                    <span class="text-lg">🛡️</span>
                     <div class="flex-1">
-                        <h4 class="text-blue-400 font-semibold">Request Expert Review</h4>
-                        <p class="text-slate-300 text-sm mt-1">Have a consultant review before you use it. Reviewed within 24 hours.</p>
+                        <h4 class="text-blue-400 font-semibold text-sm">Request Expert Review</h4>
+                        <p class="text-slate-300 text-xs mt-1">Have a consultant review before you use it. Reviewed within 24 hours.</p>
                         <p class="text-green-400 text-xs mt-1 font-medium">✓ Included free with your unlock</p>
                     </div>
                 </div>
                 <button onclick="requestExpertReviewAfterUnlock('${containerId}', '${docType}', '${docName}', '${actionsId || ''}')" 
-                        class="w-full mt-3 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all">
+                        class="w-full mt-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all text-sm">
                     🛡️ Request Expert Review
                 </button>
             </div>
             
             <!-- Option 2: Download Anyway -->
-            <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-4">
-                <div class="flex items-start gap-3">
-                    <span class="text-xl">⚠️</span>
+            <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-3">
+                <div class="flex items-start gap-2">
+                    <span class="text-lg">⚠️</span>
                     <div class="flex-1">
-                        <h4 class="text-amber-400 font-semibold">Download Without Review</h4>
-                        <p class="text-slate-300 text-sm mt-1">Download now and take full responsibility for the document's accuracy.</p>
+                        <h4 class="text-amber-400 font-semibold text-sm">Download Without Review</h4>
+                        <p class="text-slate-300 text-xs mt-1">Download now and take full responsibility for the document's accuracy.</p>
                     </div>
                 </div>
                 
                 <!-- Disclaimer checkbox -->
-                <div class="mt-3 bg-slate-800 rounded-lg p-3">
+                <div class="mt-2 bg-slate-800 rounded-lg p-2">
                     <label class="flex items-start gap-2 cursor-pointer">
-                        <input type="checkbox" id="${containerId}_disclaimer" class="mt-1 w-4 h-4 rounded border-slate-500 text-amber-500 focus:ring-amber-500">
+                        <input type="checkbox" id="${containerId}_disclaimer" class="mt-0.5 w-4 h-4 rounded border-slate-500 text-amber-500 focus:ring-amber-500">
                         <span class="text-slate-300 text-xs">
                             I understand this document carries <strong>significant legal risk</strong>. 
-                            By downloading without expert review, I accept <strong>full responsibility</strong> for its accuracy and any consequences from its use. 
-                            I waive any liability against Fitz HR.
+                            I accept <strong>full responsibility</strong> and waive any liability against Fitz HR.
                         </span>
                     </label>
                 </div>
                 
                 <button onclick="downloadFormalWithDisclaimer('${containerId}', '${docType}', '${docName}', '${actionsId || ''}')" 
-                        class="w-full mt-3 px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-all">
+                        class="w-full mt-2 px-3 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-all text-sm">
                     Download Anyway
                 </button>
             </div>
-            
-            <p class="text-slate-500 text-xs text-center mt-4">
-                💬 Have questions? Ask the AI assistant before deciding.
-            </p>
         </div>
     `;
     
