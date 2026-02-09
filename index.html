@@ -4720,7 +4720,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             <div class="p-5 space-y-4">
                 <!-- Pre-filled Notice -->
-                <div class="bg-green-500/10 border border-green-500 rounded-lg p-3 flex items-center gap-2">
+                <div id="prefilledNotice" class="hidden bg-green-500/10 border border-green-500 rounded-lg p-3 flex items-center gap-2">
                     <span class="text-green-400">✓</span>
                     <p class="text-green-300 text-sm">Details pre-filled from your document. Please verify and add any additional context.</p>
                 </div>
@@ -10683,6 +10683,9 @@ const documentBuilderState = {
     lastGeneratedDocId: null
 };
 
+// Store the last generated document's data (preserved after builder modal closes)
+let lastGeneratedDocumentData = {};
+
 // Document template configurations
 const documentWizardSteps = {
 formalWarning: [
@@ -11911,6 +11914,10 @@ async function generateDocumentWithAI() {
         showConsultationRequiredModal(docType);
         return;
     }
+    
+    // ✅ PRESERVE the form data BEFORE anything else (so it survives modal close)
+    lastGeneratedDocumentData = { ...documentBuilderState.data };
+    console.log('📋 Preserved document data:', lastGeneratedDocumentData);
     
     // Hide wizard, show loading
     document.getElementById('documentWizardSteps').classList.add('hidden');
@@ -15362,54 +15369,73 @@ function openReviewRequestModal(containerId, docType, docName, actionsId, isFrom
     document.getElementById('formalProcessWarning').classList.toggle('hidden', !isFormalProcess);
     document.getElementById('previousStepsSection').classList.toggle('hidden', !isFormalProcess);
     
-    // PRE-POPULATE fields from documentBuilderState if available
-    const builderData = documentBuilderState?.data || {};
+    // PRE-POPULATE fields from preserved document data
+    console.log('📋 Last Generated Document Data:', lastGeneratedDocumentData);
+    
+    const builderData = lastGeneratedDocumentData || {};
     
     // Employee Name
     const employeeNameField = document.getElementById('reviewEmployeeName');
-    if (employeeNameField) {
-        employeeNameField.value = builderData.employeeName || '';
+    if (employeeNameField && builderData.employeeName) {
+        employeeNameField.value = builderData.employeeName;
+        console.log('✅ Pre-filled employeeName:', builderData.employeeName);
+    } else {
+        employeeNameField.value = '';
+        console.log('❌ No employeeName found in builderData');
     }
     
     // Employee Role/Position
     const employeeRoleField = document.getElementById('reviewEmployeeRole');
-    if (employeeRoleField) {
+    if (employeeRoleField && (builderData.position || builderData.role)) {
         employeeRoleField.value = builderData.position || builderData.role || '';
+        console.log('✅ Pre-filled position:', builderData.position || builderData.role);
+    } else {
+        employeeRoleField.value = '';
+        console.log('❌ No position found in builderData');
     }
     
-    // Issue Description - combine relevant fields
+    // Issue Description - check multiple possible field names
     const issueDescField = document.getElementById('reviewIssueDescription');
     if (issueDescField) {
-        let issueText = '';
-        if (builderData.issueDescription) {
-            issueText = builderData.issueDescription;
-        } else if (builderData.incidentDetails) {
-            issueText = builderData.incidentDetails;
-        } else if (builderData.concerns) {
-            issueText = builderData.concerns;
-        } else if (builderData.performanceIssues) {
-            issueText = builderData.performanceIssues;
-        }
+        const issueText = builderData.issueDescription || 
+                         builderData.incidentDetails || 
+                         builderData.concerns || 
+                         builderData.performanceIssues ||
+                         builderData.description || '';
         issueDescField.value = issueText;
+        console.log('✅ Pre-filled issueDescription:', issueText || '(empty)');
     }
     
-    // Previous warnings/steps
+    // Previous warnings/steps - check multiple possible field names
     const previousWarningsField = document.getElementById('reviewPreviousWarnings');
     if (previousWarningsField) {
         let prevSteps = '';
+        // Build from available data
+        if (builderData.hadVerbalWarnings === 'Yes') {
+            prevSteps += `Verbal warnings given (${builderData.verbalWarningCount || 'multiple'}). `;
+        }
+        if (builderData.warningLevel) {
+            prevSteps += `This is the ${builderData.warningLevel}. `;
+        }
         if (builderData.previousWarnings) {
-            prevSteps = builderData.previousWarnings;
-        } else if (builderData.priorDiscipline) {
-            prevSteps = builderData.priorDiscipline;
-        } else if (builderData.priorWarnings) {
-            prevSteps = builderData.priorWarnings;
+            prevSteps += builderData.previousWarnings;
+        }
+        if (builderData.priorDiscipline) {
+            prevSteps += builderData.priorDiscipline;
         }
         previousWarningsField.value = prevSteps;
+        console.log('✅ Pre-filled previousWarnings:', prevSteps || '(empty)');
     }
     
-    // Clear optional fields that shouldn't be pre-populated
+    // Clear optional fields
     document.getElementById('reviewSupportingDocs').value = '';
-    document.getElementById('reviewEmployeeResponse').value = '';
+    
+    // Show/hide pre-filled notice based on whether we have data
+    const prefilledNotice = document.getElementById('prefilledNotice');
+    if (prefilledNotice) {
+        const hasPrefilledData = builderData.employeeName || builderData.position || builderData.issueDescription;
+        prefilledNotice.classList.toggle('hidden', !hasPrefilledData);
+    }
     
     // Show modal
     modal.classList.remove('hidden');
