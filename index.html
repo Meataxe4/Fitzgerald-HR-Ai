@@ -16996,37 +16996,45 @@ function openProfileMenu() {
         document.getElementById('profileUserCode').textContent = userDisplay;
         
         // Update subscription info
-        var tier = userCredits.subscriptionTier || 'free';
+        var tier = userCredits.subscriptionTier || userCredits.tier || 'free';
         var tierConfig = CONFIG.CREDITS.TIERS[tier] || CONFIG.CREDITS.TIERS.free;
-        var tierName = tierConfig.name || 'Free';
+        var tierName = tierConfig ? tierConfig.name : 'Free';
         
-        document.getElementById('profileSubscriptionTier').textContent = tierName;
-        
-        // Update subscription status text
+        var tierEl = document.getElementById('profileSubscriptionTier');
         var statusEl = document.getElementById('profileSubscriptionStatus');
-        var upgradeBtn = statusEl.parentElement.querySelector('button');
+        var upgradeBtn = document.getElementById('profileUpgradeBtn');
         
-        if (tier === 'free') {
-            statusEl.textContent = 'Upgrade for unlimited templates';
-            upgradeBtn.textContent = 'Upgrade';
-            upgradeBtn.classList.remove('hidden');
-        } else {
-            statusEl.textContent = 'Annual subscription';
-            upgradeBtn.textContent = 'Manage';
-            upgradeBtn.classList.remove('hidden');
+        if (tierEl) tierEl.textContent = tierName;
+        
+        if (statusEl && upgradeBtn) {
+            if (tier === 'free') {
+                statusEl.textContent = 'Upgrade for unlimited templates';
+                upgradeBtn.textContent = 'Upgrade';
+            } else {
+                statusEl.textContent = 'Annual subscription';
+                upgradeBtn.textContent = 'Manage';
+            }
         }
         
         // Update review credits
         var reviewCreditsUsed = userCredits.reviewCreditsUsed || 0;
-        var totalReviewCredits = tierConfig.reviewCredits || 0;
-        var remainingCredits = Math.max(0, totalReviewCredits - reviewCreditsUsed) + (userCredits.purchasedCredits || 0);
+        var totalReviewCredits = tierConfig && tierConfig.reviewCredits ? tierConfig.reviewCredits : 0;
+        var purchasedCredits = userCredits.purchasedCredits || 0;
+        var remainingCredits = Math.max(0, totalReviewCredits - reviewCreditsUsed) + purchasedCredits;
         
-        document.getElementById('profileReviewCredits').textContent = remainingCredits;
-        document.getElementById('profileTotalCredits').textContent = totalReviewCredits + (userCredits.purchasedCredits || 0);
+        var creditsEl = document.getElementById('profileReviewCredits');
+        var totalEl = document.getElementById('profileTotalCredits');
+        var barEl = document.getElementById('profileCreditsBar');
+        
+        if (creditsEl) creditsEl.textContent = remainingCredits;
+        if (totalEl) totalEl.textContent = totalReviewCredits + purchasedCredits;
         
         // Update progress bar
-        var percentage = totalReviewCredits > 0 ? Math.min(100, (remainingCredits / totalReviewCredits) * 100) : 0;
-        document.getElementById('profileCreditsBar').style.width = percentage + '%';
+        if (barEl) {
+            var maxCredits = totalReviewCredits + purchasedCredits;
+            var percentage = maxCredits > 0 ? Math.min(100, (remainingCredits / maxCredits) * 100) : 0;
+            barEl.style.width = percentage + '%';
+        }
     }
 }
 
@@ -24178,7 +24186,7 @@ function resetAIImport() {
                     <p id="profileSubscriptionTier" class="text-lg font-bold text-amber-400">Free</p>
                     <p id="profileSubscriptionStatus" class="text-xs text-slate-400">Upgrade for unlimited templates</p>
                 </div>
-                <button onclick="closeProfileMenu(); showSubscriptionOptions();" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-slate-900 text-sm font-semibold rounded-lg transition-colors">
+                <button id="profileUpgradeBtn" onclick="closeProfileMenu(); showSubscriptionOptions();" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-slate-900 text-sm font-semibold rounded-lg transition-colors">
                     Upgrade
                 </button>
             </div>
