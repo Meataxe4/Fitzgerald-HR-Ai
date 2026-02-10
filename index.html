@@ -15467,26 +15467,6 @@ async function submitReviewRequest() {
         return;
     }
     
-    // Only check/deduct credits if not already paid
-    if (!alreadyPaid) {
-        // Check credits
-        const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
-        const creditCost = cost ? cost.credits : 1;
-        
-        if (getTotalCredits() < creditCost) {
-            closeReviewRequestModal();
-            openCreditsModal();
-            return;
-        }
-        
-        // Deduct credits
-        const success = deductCreditsForDocument(docType);
-        if (!success) {
-            showNotification('Failed to process review request. Please try again.', 'error');
-            return;
-        }
-    }
-    
     // Generate reference number
     const refNumber = 'REV-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-6);
     
@@ -15514,6 +15494,13 @@ async function submitReviewRequest() {
     submitBtn.innerHTML = '<span class="animate-spin">⏳</span> Sending...';
     submitBtn.disabled = true;
     
+    // Determine if this is a formal process doc
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    const isFormalProcess = cost && cost.category === 'formal_process';
+    
+    let submissionSuccessful = false;
+    let usedFallback = false;
+    
     try {
         // Try to send via Netlify function first
         const response = await fetch('/.netlify/functions/send-review-request', {
@@ -15524,39 +15511,78 @@ async function submitReviewRequest() {
         
         if (response.ok) {
             console.log('✅ Review request sent via Netlify function');
+            submissionSuccessful = true;
         } else {
-            // Fallback: Open mailto link
-            console.log('⚠️ Netlify function failed, falling back to mailto');
-            openReviewEmailFallback(reviewData);
+            throw new Error('Server returned ' + response.status);
         }
     } catch (error) {
         console.error('Error sending review request:', error);
-        // Fallback: Open mailto link
-        openReviewEmailFallback(reviewData);
+        
+        // Reset button for potential retry
+        submitBtn.innerHTML = originalBtnText;
+        submitBtn.disabled = false;
+        
+        // Show error with options
+        const useEmail = await showReviewSubmissionError(refNumber, reviewData);
+        
+        if (useEmail) {
+            // User chose to use email fallback
+            openReviewEmailFallback(reviewData);
+            submissionSuccessful = true;
+            usedFallback = true;
+        } else {
+            // User chose to retry - exit and let them try again
+            return;
+        }
+    }
+    
+    // Only proceed if submission was successful (either via API or email)
+    if (!submissionSuccessful) {
+        return;
+    }
+    
+    // NOW deduct credits (only after confirmed submission)
+    if (!alreadyPaid) {
+        const creditCost = cost ? cost.credits : 1;
+        
+        if (getTotalCredits() < creditCost) {
+            closeReviewRequestModal();
+            openCreditsModal();
+            return;
+        }
+        
+        const success = deductCreditsForDocument(docType);
+        if (!success) {
+            showNotification('Review sent but failed to update credits. Please contact support.', 'warning');
+        }
     }
     
     // Close the review request modal
     closeReviewRequestModal();
     
-    // Determine if this is a formal process doc (needs supporting docs)
-    const isFormalProcess = cost && cost.category === 'formal_process';
-    
     // Show the attachment prompt modal
     showAttachmentPromptModal(refNumber, employeeName, isFormalProcess, reviewData.userEmail);
     
-    // Update UI to show pending state
+    // Update UI to show success state (different message if used fallback)
+    const successMessage = usedFallback 
+        ? 'Email Draft Opened' 
+        : 'Review Submitted';
+    const successIcon = usedFallback ? '📧' : '✅';
+    const successNote = usedFallback 
+        ? 'Please send the email that opened to complete your submission.'
+        : 'Our HR experts will review within 24-48 hours.';
+    
     if (isFromPreviewModal) {
-        // Update the modal footer to show pending state
         const modalFooter = document.querySelector('#documentPreviewModal .p-6.border-t');
         if (modalFooter) {
             modalFooter.innerHTML = `
-                <div class="bg-blue-500/20 border border-blue-500 rounded-lg p-4 text-center">
+                <div class="bg-green-500/20 border border-green-500 rounded-lg p-4 text-center">
                     <div class="flex items-center justify-center gap-2 mb-2">
-                        <span class="text-xl">⏳</span>
-                        <span class="text-blue-400 font-semibold">Review Submitted</span>
+                        <span class="text-xl">${successIcon}</span>
+                        <span class="text-green-400 font-semibold">${successMessage}</span>
                     </div>
                     <p class="text-slate-300 text-sm mb-1">Reference: ${refNumber}</p>
-                    <p class="text-slate-400 text-xs mb-3">Check your email for next steps.</p>
+                    <p class="text-slate-400 text-xs mb-3">${successNote}</p>
                     <button onclick="closeDocumentPreview()" class="px-6 py-2 bg-slate-600 hover:bg-slate-500 text-white font-semibold rounded-lg transition-all">
                         Close
                     </button>
@@ -15564,7 +15590,6 @@ async function submitReviewRequest() {
             `;
         }
     } else {
-        // Remove any blur or options prompts
         removeUniversalBlur(containerId);
         const optionsPrompt = document.getElementById(containerId + '_optionsPrompt');
         if (optionsPrompt) optionsPrompt.remove();
@@ -15573,13 +15598,13 @@ async function submitReviewRequest() {
             const actionsContainer = document.getElementById(actionsId);
             if (actionsContainer) {
                 actionsContainer.innerHTML = `
-                    <div class="bg-blue-500/20 border border-blue-500 rounded-lg p-4 text-center">
+                    <div class="bg-green-500/20 border border-green-500 rounded-lg p-4 text-center">
                         <div class="flex items-center justify-center gap-2 mb-2">
-                            <span class="text-xl">⏳</span>
-                            <span class="text-blue-400 font-semibold">Review Submitted</span>
+                            <span class="text-xl">${successIcon}</span>
+                            <span class="text-green-400 font-semibold">${successMessage}</span>
                         </div>
                         <p class="text-slate-300 text-sm mb-1">Reference: ${refNumber}</p>
-                        <p class="text-slate-400 text-xs">Check your email for next steps.</p>
+                        <p class="text-slate-400 text-xs">${successNote}</p>
                     </div>
                 `;
                 actionsContainer.style.display = '';
@@ -15593,6 +15618,52 @@ async function submitReviewRequest() {
     // Reset button
     submitBtn.innerHTML = originalBtnText;
     submitBtn.disabled = false;
+    
+    // Show success toast
+    showToast(usedFallback ? 'Email opened - please send to complete' : 'Review request submitted successfully!', 'success', 4000);
+}
+
+/**
+ * Show error modal when review submission fails
+ * Returns true if user chooses email fallback, false to retry
+ */
+function showReviewSubmissionError(refNumber, reviewData) {
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.id = 'reviewErrorModal';
+        modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[80]';
+        modal.innerHTML = `
+            <div class="bg-slate-800 rounded-2xl max-w-md w-full p-6 border border-red-500/50">
+                <div class="text-center mb-4">
+                    <span class="text-4xl">⚠️</span>
+                    <h3 class="text-xl font-bold text-white mt-2">Submission Issue</h3>
+                </div>
+                
+                <p class="text-slate-300 text-center mb-6">
+                    We couldn't send your review request automatically. This might be a temporary network issue.
+                </p>
+                
+                <div class="space-y-3">
+                    <button onclick="document.getElementById('reviewErrorModal').remove(); window.reviewErrorResolve(false);" 
+                            class="w-full px-4 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-lg transition-all">
+                        🔄 Try Again
+                    </button>
+                    
+                    <button onclick="document.getElementById('reviewErrorModal').remove(); window.reviewErrorResolve(true);" 
+                            class="w-full px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-all">
+                        📧 Send via Email Instead
+                    </button>
+                </div>
+                
+                <p class="text-slate-500 text-xs text-center mt-4">
+                    Reference: ${refNumber}
+                </p>
+            </div>
+        `;
+        
+        window.reviewErrorResolve = resolve;
+        document.body.appendChild(modal);
+    });
 }
 
 /**
