@@ -7751,7 +7751,7 @@ const CONFIG = {
             showCause: { credits: 2, risk: 'significant', name: 'Show Cause Letter', category: 'formal_process', reviewType: 'mandatory' },
             
             // Employment Contract - special handling
-            employmentContract: { credits: 0, risk: 'low', name: 'Employment Contract', category: 'template' }
+            employmentContract: { credits: 2, risk: 'significant', name: 'Employment Contract', category: 'formal_process', reviewType: 'mandatory' }
         }
     }
 };
@@ -14634,45 +14634,92 @@ function applyDocumentBlur(docType, docName) {
     const currentBalance = getTotalCredits();
     const previewContainer = previewContent.parentElement;
     
-    // ===== PEOPLE MANAGEMENT (Optional Review) - Show full preview with recommendation =====
+    // ===== PEOPLE MANAGEMENT (Optional Review) - Requires unlock, then choice =====
     if (category === 'people_management' && reviewType === 'optional') {
-        if (isPaidUser || currentBalance >= creditCost) {
-            console.log('📋 People Management doc - showing review recommendation');
-            
-            // Show recommendation banner (no blur)
-            const reviewBanner = document.createElement('div');
-            reviewBanner.id = 'documentReviewBanner';
-            reviewBanner.innerHTML = `
-                <div class="bg-slate-700 border-2 border-blue-500 rounded-xl p-5 mx-auto max-w-lg mt-4">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">🛡️</span>
-                        <div class="flex-1">
-                            <h4 class="text-white font-bold mb-1">Expert Review Recommended</h4>
-                            <p class="text-slate-300 text-sm mb-3">This document involves employee performance. We recommend having a consultant review it before use for added protection.</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-3 mt-3">
-                        <button onclick="downloadDocWithoutReview('${docType}')" 
-                                class="flex-1 px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-all text-sm">
-                            Download Anyway
-                        </button>
-                        <button onclick="requestDocExpertReview('${docType}', '${docName}')" 
-                                class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all text-sm">
-                            Request Expert Review
-                        </button>
-                    </div>
-                    <p class="text-slate-400 text-xs mt-2 text-center">Review uses ${creditCost} of your ${currentBalance} review credits</p>
-                </div>
-            `;
-            previewContainer.parentNode.insertBefore(reviewBanner, previewContainer.nextSibling);
-            
-            // Disable normal download buttons
-            const downloadBtns = document.querySelectorAll('#documentPreviewModal button[onclick*="download"]');
-            downloadBtns.forEach(btn => {
-                btn.style.display = 'none';
-            });
+        console.log('📋 People Management doc - checking if unlocked');
+        
+        // Check if already unlocked
+        if (unlockedDocuments.has(docType)) {
+            console.log('✅ Already unlocked - showing options');
+            showPeopleManagementOptions(docType, docName, creditCost, currentBalance);
             return;
         }
+        
+        // Not unlocked yet - BLUR the document and require payment
+        console.log('🔒 Not unlocked - applying blur');
+        previewContainer.style.position = 'relative';
+        previewContainer.style.overflow = 'hidden';
+        previewContainer.style.maxHeight = '250px';
+        
+        const blurOverlay = document.createElement('div');
+        blurOverlay.id = 'documentBlurOverlay';
+        blurOverlay.style.cssText = `
+            position: absolute;
+            top: 150px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, 
+                rgba(30, 41, 59, 0) 0%,
+                rgba(30, 41, 59, 0.7) 30px,
+                rgba(30, 41, 59, 0.95) 60px,
+                rgba(30, 41, 59, 1) 100px
+            );
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            pointer-events: none;
+            z-index: 5;
+        `;
+        previewContainer.appendChild(blurOverlay);
+        
+        // Show unlock prompt
+        const unlockPrompt = document.createElement('div');
+        unlockPrompt.id = 'documentUnlockPrompt';
+        
+        if (currentBalance >= creditCost) {
+            // Can afford - show unlock button
+            unlockPrompt.innerHTML = `
+                <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
+                    <div class="text-3xl mb-2">🔒</div>
+                    <h3 class="text-lg font-bold text-white mb-2">Unlock Document</h3>
+                    <p class="text-slate-300 text-sm mb-4">This document requires ${creditCost} credit to unlock.</p>
+                    <button onclick="unlockPeopleManagementDoc('${docType}', '${docName}')" 
+                            class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
+                        🔓 Unlock (${creditCost} credit)
+                    </button>
+                    <p class="text-slate-400 text-xs mt-2">You have ${currentBalance} credits</p>
+                </div>
+            `;
+        } else {
+            // Can't afford - show get credits
+            unlockPrompt.innerHTML = `
+                <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
+                    <div class="text-3xl mb-2">🔒</div>
+                    <h3 class="text-lg font-bold text-white mb-2">Upgrade Required</h3>
+                    <p class="text-slate-300 text-sm mb-4">Upgrade for more features and additional review credits.</p>
+                    <div class="space-y-2">
+                        <button onclick="showSubscriptionOptions()" 
+                                class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
+                            View Plans
+                        </button>
+                        <button onclick="savePendingDocumentAndGetCredits()" 
+                                class="w-full bg-slate-600 hover:bg-slate-500 text-white font-semibold py-2 px-6 rounded-lg transition-all text-sm">
+                            💳 Buy Credits Instead
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        previewContainer.parentNode.insertBefore(unlockPrompt, previewContainer.nextSibling);
+        
+        // Disable download buttons
+        const downloadBtns = document.querySelectorAll('#documentPreviewModal button[onclick*="download"]');
+        downloadBtns.forEach(btn => {
+            btn.disabled = true;
+            btn.classList.add('opacity-50', 'cursor-not-allowed');
+        });
+        return;
     }
     
     // ===== FORMAL PROCESS (Pay 2 credits, then choose: download or review) =====
@@ -14723,7 +14770,7 @@ function applyDocumentBlur(docType, docName) {
             `;
         } else {
             buttonHtml = `
-                <button onclick="openCreditsModal()" 
+                <button onclick="savePendingDocumentAndGetCredits()" 
                         class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
                     💳 Get Review Credits
                 </button>
@@ -14925,8 +14972,87 @@ function unlockDocPreviewFormal(docType, docName) {
 }
 
 /**
- * Show Formal Process options in document preview modal
+ * Unlock a People Management document (1 credit) and show options
  */
+function unlockPeopleManagementDoc(docType, docName) {
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    const creditCost = cost ? cost.credits : 1;
+    
+    // Check credits
+    if (getTotalCredits() < creditCost) {
+        showNotification('Not enough credits. Please purchase more.', 'error');
+        openCreditsModal();
+        return;
+    }
+    
+    // Deduct credits
+    const success = deductCreditsForDocument(docType);
+    if (!success) {
+        showNotification('Failed to process. Please try again.', 'error');
+        return;
+    }
+    
+    // Mark as unlocked
+    unlockedDocuments.add(docType);
+    
+    // Remove blur and show options
+    showPeopleManagementOptions(docType, docName, creditCost, getTotalCredits());
+    
+    showNotification('✅ Document unlocked! Choose to request expert review or download.', 'success');
+}
+
+/**
+ * Show options after People Management document is unlocked
+ */
+function showPeopleManagementOptions(docType, docName, creditCost, currentBalance) {
+    // Remove any existing prompts and blur
+    const existingPrompt = document.getElementById('documentUnlockPrompt');
+    if (existingPrompt) existingPrompt.remove();
+    
+    const existingBlur = document.getElementById('documentBlurOverlay');
+    if (existingBlur) existingBlur.remove();
+    
+    const existingBanner = document.getElementById('documentReviewBanner');
+    if (existingBanner) existingBanner.remove();
+    
+    // Reset preview container styles to show full document
+    const previewContent = document.getElementById('documentPreviewContent');
+    if (previewContent && previewContent.parentElement) {
+        previewContent.parentElement.style.maxHeight = '';
+        previewContent.parentElement.style.overflow = '';
+        previewContent.parentElement.style.position = '';
+    }
+    
+    // Replace footer with options
+    const modalFooter = document.querySelector('#documentPreviewModal .p-6.border-t');
+    if (modalFooter) {
+        modalFooter.className = 'p-4 border-t border-slate-700 bg-slate-800';
+        modalFooter.innerHTML = `
+            <div class="flex items-center gap-3 flex-wrap">
+                <div class="flex-1 flex items-center gap-2 text-green-400">
+                    <span>✅</span>
+                    <span class="font-semibold text-sm">Document Unlocked</span>
+                </div>
+                <button onclick="requestDocExpertReviewAfterUnlock('${docType}', '${docName}')" 
+                        class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all text-sm flex items-center gap-2">
+                    🛡️ Request Expert Review
+                    <span class="text-blue-200 text-xs">(Optional)</span>
+                </button>
+                <div class="flex items-center gap-2">
+                    <label class="flex items-center gap-1 cursor-pointer">
+                        <input type="checkbox" id="docPreviewDisclaimer" class="w-4 h-4">
+                        <span class="text-slate-400 text-xs">I accept responsibility</span>
+                    </label>
+                    <button onclick="downloadDocPreviewWithDisclaimer('${docType}')" 
+                            class="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-all text-sm">
+                        📥 Download
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+}
+
 function showDocPreviewFormalOptions(docType, docName) {
     // Remove any existing prompts
     const existingPrompt = document.getElementById('documentUnlockPrompt');
@@ -15074,47 +15200,94 @@ function applyUniversalBlur(containerId, docType, docName, actionsId = null) {
         }
     }
     
-    // ===== PEOPLE MANAGEMENT (Optional Review) - Show full preview with recommendation =====
+    // ===== PEOPLE MANAGEMENT (Optional Review) - Requires unlock, then choice =====
     if (category === 'people_management' && reviewType === 'optional') {
-        if (isPaidUser || currentBalance >= creditCost) {
-            console.log('📋 People Management doc - showing review recommendation');
-            
-            // Don't blur, but show recommendation banner
-            const reviewBanner = document.createElement('div');
-            reviewBanner.id = containerId + '_reviewBanner';
-            reviewBanner.innerHTML = `
-                <div class="bg-slate-700 border-2 border-blue-500 rounded-xl p-5 mx-auto max-w-lg mt-4">
-                    <div class="flex items-start gap-3">
-                        <span class="text-2xl">🛡️</span>
-                        <div class="flex-1">
-                            <h4 class="text-white font-bold mb-1">Expert Review Recommended</h4>
-                            <p class="text-slate-300 text-sm mb-3">This document involves employee performance. We recommend having a consultant review it before use for added protection.</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-3 mt-3">
-                        <button onclick="downloadWithoutReview('${containerId}', '${docType}', '${docName}', '${actionsId || ''}')" 
-                                class="flex-1 px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-all text-sm">
-                            Download Anyway
-                        </button>
-                        <button onclick="requestExpertReview('${containerId}', '${docType}', '${docName}', '${actionsId || ''}')" 
-                                class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-all text-sm">
-                            Request Expert Review
-                        </button>
-                    </div>
-                    <p class="text-slate-400 text-xs mt-2 text-center">Review uses ${creditCost} of your ${currentBalance} review credits</p>
-                </div>
-            `;
-            container.parentNode.insertBefore(reviewBanner, container.nextSibling);
-            
-            // Hide normal action buttons (we have our own now)
-            if (actionsId) {
-                const actionsContainer = document.getElementById(actionsId);
-                if (actionsContainer) {
-                    actionsContainer.style.display = 'none';
-                }
-            }
+        console.log('📋 People Management doc - checking if unlocked');
+        
+        // Check if already unlocked
+        if (unlockedDocuments.has(docType)) {
+            console.log('✅ Already unlocked - showing options');
+            showPeopleManagementInChatOptions(containerId, docType, docName, actionsId);
             return;
         }
+        
+        // Not unlocked yet - BLUR the document and require payment
+        console.log('🔒 Not unlocked - applying blur');
+        container.dataset.originalContent = container.innerHTML;
+        container.style.maxHeight = '250px';
+        container.style.overflow = 'hidden';
+        container.style.position = 'relative';
+        
+        const blurOverlay = document.createElement('div');
+        blurOverlay.id = containerId + '_blurOverlay';
+        blurOverlay.style.cssText = `
+            position: absolute;
+            top: 150px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, 
+                rgba(30, 41, 59, 0) 0%,
+                rgba(30, 41, 59, 0.7) 30px,
+                rgba(30, 41, 59, 0.95) 60px,
+                rgba(30, 41, 59, 1) 100px
+            );
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            pointer-events: none;
+            z-index: 5;
+        `;
+        container.appendChild(blurOverlay);
+        
+        // Show unlock prompt
+        const unlockPrompt = document.createElement('div');
+        unlockPrompt.id = containerId + '_unlockPrompt';
+        
+        if (currentBalance >= creditCost) {
+            // Can afford - show unlock button
+            unlockPrompt.innerHTML = `
+                <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
+                    <div class="text-3xl mb-2">🔒</div>
+                    <h3 class="text-lg font-bold text-white mb-2">Unlock Document</h3>
+                    <p class="text-slate-300 text-sm mb-4">This document requires ${creditCost} credit to unlock.</p>
+                    <button onclick="unlockPeopleManagementInChat('${containerId}', '${docType}', '${docName}', '${actionsId || ''}')" 
+                            class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
+                        🔓 Unlock (${creditCost} credit)
+                    </button>
+                    <p class="text-slate-400 text-xs mt-2">You have ${currentBalance} credits</p>
+                </div>
+            `;
+        } else {
+            // Can't afford - show get credits
+            unlockPrompt.innerHTML = `
+                <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
+                    <div class="text-3xl mb-2">🔒</div>
+                    <h3 class="text-lg font-bold text-white mb-2">Upgrade Required</h3>
+                    <p class="text-slate-300 text-sm mb-4">Upgrade for more features and additional review credits.</p>
+                    <div class="space-y-2">
+                        <button onclick="showSubscriptionOptions()" 
+                                class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
+                            View Plans
+                        </button>
+                        <button onclick="saveInChatDocumentAndGetCredits('${containerId}', '${docType}', '${docName}')" 
+                                class="w-full bg-slate-600 hover:bg-slate-500 text-white font-semibold py-2 px-6 rounded-lg transition-all text-sm">
+                            💳 Buy Credits Instead
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        container.parentNode.insertBefore(unlockPrompt, container.nextSibling);
+        
+        // Hide action buttons until unlocked
+        if (actionsId) {
+            const actionsContainer = document.getElementById(actionsId);
+            if (actionsContainer) {
+                actionsContainer.style.display = 'none';
+            }
+        }
+        return;
     }
     
     // ===== FORMAL PROCESS (Pay 2 credits, then choose: download or review) =====
@@ -15171,7 +15344,7 @@ function applyUniversalBlur(containerId, docType, docName, actionsId = null) {
             `;
         } else {
             buttonHtml = `
-                <button onclick="openCreditsModal()" 
+                <button onclick="saveInChatDocumentAndGetCredits('${containerId}', '${docType}', '${docName}')" 
                         class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
                     💳 Get Review Credits
                 </button>
@@ -15930,6 +16103,116 @@ Submitted: ${new Date().toLocaleString('en-AU')}
  */
 function requestExpertReview(containerId, docType, docName, actionsId) {
     openReviewRequestModal(containerId, docType, docName, actionsId, false);
+}
+
+/**
+ * Unlock a People Management document in chat (1 credit) and show options
+ */
+function unlockPeopleManagementInChat(containerId, docType, docName, actionsId) {
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    const creditCost = cost ? cost.credits : 1;
+    
+    // Check credits
+    if (getTotalCredits() < creditCost) {
+        showNotification('Not enough credits. Please purchase more.', 'error');
+        openCreditsModal();
+        return;
+    }
+    
+    // Deduct credits
+    const success = deductCreditsForDocument(docType);
+    if (!success) {
+        showNotification('Failed to process. Please try again.', 'error');
+        return;
+    }
+    
+    // Mark as unlocked
+    unlockedDocuments.add(docType);
+    
+    // Remove blur and show options
+    removeUniversalBlur(containerId);
+    showPeopleManagementInChatOptions(containerId, docType, docName, actionsId);
+    
+    showNotification('✅ Document unlocked! Choose to request expert review or download.', 'success');
+}
+
+/**
+ * Show People Management options in chat after unlock
+ */
+function showPeopleManagementInChatOptions(containerId, docType, docName, actionsId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    // Remove any existing prompts
+    const existingPrompt = document.getElementById(containerId + '_unlockPrompt');
+    if (existingPrompt) existingPrompt.remove();
+    
+    const existingBanner = document.getElementById(containerId + '_reviewBanner');
+    if (existingBanner) existingBanner.remove();
+    
+    // Show options prompt
+    const optionsPrompt = document.createElement('div');
+    optionsPrompt.id = containerId + '_optionsPrompt';
+    optionsPrompt.innerHTML = `
+        <div class="bg-slate-700 border border-slate-600 rounded-xl p-4 mt-4 mx-auto max-w-lg">
+            <div class="flex items-center gap-2 text-green-400 mb-3">
+                <span>✅</span>
+                <span class="font-semibold">Document Unlocked</span>
+            </div>
+            <div class="flex gap-3 flex-wrap">
+                <button onclick="requestExpertReview('${containerId}', '${docType}', '${docName}', '${actionsId || ''}')" 
+                        class="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all text-sm flex items-center justify-center gap-2">
+                    🛡️ Request Expert Review
+                    <span class="text-blue-200 text-xs">(Optional)</span>
+                </button>
+                <div class="flex items-center gap-2">
+                    <label class="flex items-center gap-1 cursor-pointer">
+                        <input type="checkbox" id="${containerId}_disclaimer" class="w-4 h-4">
+                        <span class="text-slate-400 text-xs">I accept responsibility</span>
+                    </label>
+                    <button onclick="downloadPeopleManagementWithDisclaimer('${containerId}', '${docType}', '${docName}', '${actionsId || ''}')" 
+                            class="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-all text-sm">
+                        📥 Download
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    container.parentNode.insertBefore(optionsPrompt, container.nextSibling);
+    
+    // Show download buttons if actionsId provided
+    if (actionsId) {
+        const actionsContainer = document.getElementById(actionsId);
+        if (actionsContainer) {
+            actionsContainer.style.display = 'none'; // Keep hidden, we have our own buttons
+        }
+    }
+}
+
+/**
+ * Download People Management document with disclaimer
+ */
+function downloadPeopleManagementWithDisclaimer(containerId, docType, docName, actionsId) {
+    const checkbox = document.getElementById(containerId + '_disclaimer');
+    if (!checkbox || !checkbox.checked) {
+        showNotification('⚠️ Please tick the checkbox to accept responsibility before downloading.', 'error');
+        checkbox?.focus();
+        return;
+    }
+    
+    // Remove options prompt
+    const optionsPrompt = document.getElementById(containerId + '_optionsPrompt');
+    if (optionsPrompt) optionsPrompt.remove();
+    
+    // Show action buttons
+    if (actionsId) {
+        const actionsContainer = document.getElementById(actionsId);
+        if (actionsContainer) {
+            actionsContainer.style.display = '';
+        }
+    }
+    
+    showNotification('📥 Document ready for download. Please review carefully before use.', 'success');
 }
 
 /**
