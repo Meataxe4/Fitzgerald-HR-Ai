@@ -6661,7 +6661,7 @@ Be as specific as possible!"></textarea>
         <!-- Subscription Upgrade -->
         <div class="bg-slate-900 rounded-lg p-4 mb-6">
             <h3 class="text-white font-bold mb-3">💡 Better Value with a Subscription</h3>
-            <p class="text-slate-400 text-sm mb-4">Get unlimited templates + review credits included.</p>
+            <p class="text-slate-400 text-sm mb-4">Get all templates + review credits included.</p>
             <div class="grid grid-cols-3 gap-2 text-center text-sm">
                 <div class="bg-slate-800 rounded-lg p-3">
                     <p class="text-white font-bold">Starter</p>
@@ -6719,7 +6719,7 @@ Be as specific as possible!"></textarea>
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-2xl font-bold text-amber-400">⭐ Choose Your Plan</h2>
-                <p class="text-slate-400 text-sm">Unlimited templates + expert-reviewed documents</p>
+                <p class="text-slate-400 text-sm">Full template access + expert-reviewed documents</p>
             </div>
             <button onclick="closeSubscriptionModal()" class="text-slate-400 hover:text-white text-2xl">×</button>
         </div>
@@ -6753,7 +6753,7 @@ Be as specific as possible!"></textarea>
                 <p id="starterMonthlyEquiv" class="text-green-400 text-sm mb-4">Just $21/month</p>
                 
                 <ul class="text-slate-300 text-sm space-y-2 mb-6">
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR templates</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>All</strong> HR templates</li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>8</strong> expert-reviewed docs/year</li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Unlimited AI chat</li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 24hr review turnaround</li>
@@ -6782,7 +6782,7 @@ Be as specific as possible!"></textarea>
                 <p id="proMonthlyEquiv" class="text-green-400 text-sm mb-4">Just $37/month</p>
                 
                 <ul class="text-slate-300 text-sm space-y-2 mb-6">
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR templates</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>All</strong> HR templates</li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>20</strong> expert-reviewed docs/year</li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Unlimited AI chat</li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 24hr review turnaround</li>
@@ -6807,7 +6807,7 @@ Be as specific as possible!"></textarea>
                 <p id="businessMonthlyEquiv" class="text-green-400 text-sm mb-4">Just $75/month</p>
                 
                 <ul class="text-slate-300 text-sm space-y-2 mb-6">
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR templates</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>All</strong> HR templates</li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>50</strong> expert-reviewed docs/year</li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Unlimited AI chat</li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Priority</strong> review turnaround</li>
@@ -14041,6 +14041,42 @@ function savePendingDocumentAndGetCredits() {
 }
 
 /**
+ * Save in-chat document to localStorage and open credits modal
+ * For documents shown in chat (not preview modal)
+ */
+function saveInChatDocumentAndGetCredits(containerId, docType, docName) {
+    const container = document.getElementById(containerId);
+    
+    if (container) {
+        // Get original content (stored when blur was applied)
+        const content = container.dataset.originalContent || container.innerHTML;
+        
+        const pendingDoc = {
+            content: content,
+            docType: docType || '',
+            docName: docName || 'Document',
+            inChat: true,
+            containerId: containerId,
+            timestamp: Date.now()
+        };
+        
+        console.log('📄 Saving in-chat document:', {
+            docType: pendingDoc.docType,
+            docName: pendingDoc.docName,
+            containerId: containerId
+        });
+        
+        localStorage.setItem('pendingDocument', JSON.stringify(pendingDoc));
+        
+        // Also save current conversation to ensure it's not lost
+        saveCurrentConversation();
+    }
+    
+    // Open credits modal
+    openCreditsModal();
+}
+
+/**
  * Restore pending document after payment success
  * Document is shown with blur - user must confirm unlock to spend credits
  */
@@ -14060,7 +14096,29 @@ function restorePendingDocument() {
             return false;
         }
         
-        // Show the document preview
+        // If this was an in-chat document, just notify user and restore conversation
+        if (pendingDoc.inChat) {
+            console.log('📄 In-chat document - restoring conversation');
+            
+            // Make sure conversation is restored
+            if (typeof restoreLastConversation === 'function') {
+                restoreLastConversation();
+            }
+            
+            // Show notification
+            setTimeout(() => {
+                if (pendingDoc.docType && canAffordDocument(pendingDoc.docType)) {
+                    showNotification('🎉 You now have credits! Scroll to your document and click Unlock.', 'success', 5000);
+                } else {
+                    showNotification('Your conversation has been restored.', 'info');
+                }
+            }, 1000);
+            
+            localStorage.removeItem('pendingDocument');
+            return true;
+        }
+        
+        // Show the document in preview modal
         const previewContent = document.getElementById('documentPreviewContent');
         const previewModal = document.getElementById('documentPreviewModal');
         
@@ -14306,7 +14364,7 @@ function processPaymentSuccess() {
                         if (purchase.type === 'subscription') {
                             const tierConfig = CONFIG.CREDITS.TIERS[purchase.tier];
                             const reviewCredits = tierConfig ? tierConfig.reviewCredits : 0;
-                            addMessage('assistant', `## 🎉 Welcome to Fitz ${purchase.tierName}!\n\nYour subscription is now active!\n\n**Your benefits:**\n- ✅ **Unlimited HR templates** (Position Descriptions, Job Ads, Onboarding, etc.)\n- ✅ **${reviewCredits} expert-reviewed documents/year** (Warnings, PIPs, etc.)\n- ✅ **Unlimited AI chat**\n- ✅ **24hr review turnaround**\n\nQuestions? Contact **blake@fitzgeraldhr.com.au**`);
+                            addMessage('assistant', `## 🎉 Welcome to Fitz ${purchase.tierName}!\n\nYour subscription is now active!\n\n**Your benefits:**\n- ✅ **All HR templates** (Position Descriptions, Job Ads, Onboarding, etc.)\n- ✅ **${reviewCredits} expert-reviewed documents/year** (Warnings, PIPs, etc.)\n- ✅ **Unlimited AI chat**\n- ✅ **24hr review turnaround**\n\nQuestions? Contact **blake@fitzgeraldhr.com.au**`);
                         } else if (purchase.type === 'reviewCredits' || purchase.type === 'credits') {
                             addMessage('assistant', `## 🎉 Review Credits Added!\n\n**${purchase.credits} review credit${purchase.credits > 1 ? 's' : ''}** added to your account.\n\nThese credits never expire and can be used for expert-reviewed documents.\n\nYour new balance: **${getTotalCredits()} review credits**`);
                         } else if (purchase.type === 'consultation') {
@@ -14388,7 +14446,7 @@ function showPaymentSuccess(purchase) {
     if (purchase.type === 'subscription') {
         const tierConfig = CONFIG.CREDITS.TIERS[purchase.tier];
         const reviewCredits = tierConfig ? tierConfig.reviewCredits : 0;
-        messageEl.textContent = `Welcome to ${purchase.tierName}! ${reviewCredits} review credits + unlimited templates.`;
+        messageEl.textContent = `Welcome to ${purchase.tierName}! ${reviewCredits} review credits + all templates.`;
     } else if (purchase.type === 'reviewCredits' || purchase.type === 'credits') {
         messageEl.textContent = `${purchase.credits} review credit${purchase.credits > 1 ? 's' : ''} added to your account!`;
     } else if (purchase.type === 'consultation') {
@@ -14744,7 +14802,7 @@ function applyDocumentBlur(docType, docName) {
                         class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
                     View Plans
                 </button>
-                <button onclick="openCreditsModal()" 
+                <button onclick="savePendingDocumentAndGetCredits()" 
                         class="w-full bg-slate-600 hover:bg-slate-500 text-white font-semibold py-2 px-6 rounded-lg transition-all text-sm">
                     💳 Buy Credits Instead
                 </button>
@@ -14932,36 +14990,32 @@ function requestDocExpertReviewAfterUnlock(docType, docName) {
 function downloadDocPreviewWithDisclaimer(docType) {
     const checkbox = document.getElementById('docPreviewDisclaimer');
     if (!checkbox || !checkbox.checked) {
-        showNotification('⚠️ Please accept the disclaimer to download.', 'error');
+        showNotification('⚠️ Please tick the checkbox to accept responsibility before downloading.', 'error');
         checkbox?.focus();
         return;
     }
     
-    // Restore the footer with download buttons
+    // Directly download Word document
+    showNotification('📝 Preparing your download...', 'info');
+    downloadGeneratedDocument('docx');
+    
+    // Update footer to show success
     const modalFooter = document.querySelector('#documentPreviewModal .p-6.border-t');
     if (modalFooter) {
         modalFooter.innerHTML = `
-            <div class="flex gap-3 mb-4 flex-wrap">
-                <div class="flex gap-2 flex-1">
-                    <button onclick="downloadGeneratedDocument('pdf')" 
-                            class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2">
-                        <span>📄</span>
-                        <span>Download PDF</span>
-                    </button>
-                    <button onclick="downloadGeneratedDocument('docx')" 
-                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-all flex items-center justify-center gap-2">
-                        <span>📝</span>
-                        <span>Download Word</span>
-                    </button>
+            <div class="bg-green-500/20 border border-green-500 rounded-lg p-4 text-center">
+                <div class="flex items-center justify-center gap-2 mb-3">
+                    <span class="text-xl">✅</span>
+                    <span class="text-green-400 font-semibold">Word Document Downloaded!</span>
                 </div>
-            </div>
-            <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-3 text-center">
-                <p class="text-amber-300 text-sm">⚠️ You've chosen to download without expert review. Please review carefully before use.</p>
+                <p class="text-slate-300 text-sm mb-3">Need a different format?</p>
+                <button onclick="downloadGeneratedDocument('pdf')" 
+                        class="px-6 py-2 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-all">
+                    📄 Also Download PDF
+                </button>
             </div>
         `;
     }
-    
-    showNotification('📄 Document ready for download.', 'success');
 }
 
 // ========================================
@@ -15188,7 +15242,7 @@ function applyUniversalBlur(containerId, docType, docName, actionsId = null) {
     
     if (currentBalance < creditCost) {
         buttonText = '💳 Get Credits';
-        buttonAction = 'openCreditsModal()';
+        buttonAction = `saveInChatDocumentAndGetCredits('${containerId}', '${docType}', '${docName}')`;
     }
     
     const unlockPrompt = document.createElement('div');
