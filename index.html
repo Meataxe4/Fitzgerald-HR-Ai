@@ -4219,7 +4219,7 @@ async function checkFirestoreData() {
                 <div class="flex items-center gap-6 text-sm">
                     <a href="#" onclick="showTermsOfService(); return false;" class="text-slate-400 hover:text-white transition-colors">Terms</a>
                     <a href="#" onclick="showPrivacyPolicy(); return false;" class="text-slate-400 hover:text-white transition-colors">Privacy</a>
-                    <a href="/cdn-cgi/l/email-protection#2d45484141426d4b445957455f034e4240" class="text-slate-400 hover:text-white transition-colors">Contact</a>
+                    <a href="/cdn-cgi/l/email-protection#38505d545457785e514c42504a165b5755" class="text-slate-400 hover:text-white transition-colors">Contact</a>
                 </div>
             </div>
         </footer>
@@ -6831,7 +6831,7 @@ Be as specific as possible!"></textarea>
         <!-- FAQ -->
         <div class="text-center text-slate-400 text-sm">
             <p>All plans include a 14-day money-back guarantee. Cancel anytime.</p>
-            <p class="mt-2">Questions? Contact <a href="/cdn-cgi/l/email-protection#bad8d6dbd1dffadcd3cec0dddfc8dbd6ded2c894d9d5d794dbcf" class="text-amber-400 hover:underline"><span class="__cf_email__" data-cfemail="294b4548424c694f405d534e4c5b48454d415b074a464407485c">[email&#160;protected]</span></a></p>
+            <p class="mt-2">Questions? Contact <a href="/cdn-cgi/l/email-protection#a0c2ccc1cbc5e0c6c9d4dac7c5d2c1ccc4c8d28ec3cfcd8ec1d5" class="text-amber-400 hover:underline"><span class="__cf_email__" data-cfemail="b5d7d9d4ded0f5d3dcc1cfd2d0c7d4d9d1ddc79bd6dad89bd4c0">[email&#160;protected]</span></a></p>
         </div>
     </div>
 </div>
@@ -7253,7 +7253,7 @@ function setBilling(billing) {
                 Questions? <a href="tel:+61400211014" class="text-purple-400 hover:text-purple-300">+61 400 211 014</a>
             </p>
             <p class="text-slate-500 text-xs">
-                <a href="/cdn-cgi/l/email-protection#11737d707a74517778656b767463707d7579633f727e7c3f7064" class="text-purple-400 hover:text-purple-300"><span class="__cf_email__" data-cfemail="d4b6b8b5bfb194b2bda0aeb3b1a6b5b8b0bca6fab7bbb9fab5a1">[email&#160;protected]</span></a>
+                <a href="/cdn-cgi/l/email-protection#ff9d939e949abf99968b85989a8d9e939b978dd19c9092d19e8a" class="text-purple-400 hover:text-purple-300"><span class="__cf_email__" data-cfemail="cba9a7aaa0ae8bada2bfb1acaeb9aaa7afa3b9e5a8a4a6e5aabe">[email&#160;protected]</span></a>
             </p>
         </div>
     </div>
@@ -21283,9 +21283,12 @@ function completeOnboarding() {
 
 I now know you run a **${venueType}** in **${venueProfile.city || venueProfile.location}** with **${venueProfile.staffCount}** staff.
 
-All my advice will be tailored for your venue. Update these anytime in ⚙️ Settings.
-
-**Try asking:** "What should I pay a casual waiter?" • "How do I write a warning letter?" • "What are the penalty rates for weekends?"`);
+All my advice will be tailored for your venue. Update these anytime in ⚙️ Settings.`);
+    
+    // Show quick action prompts after short delay
+    setTimeout(function() {
+        showQuickActionPrompts();
+    }, 400);
     
     trackEvent('onboarding_completed', venueProfile);
 }
@@ -21294,6 +21297,97 @@ function skipOnboarding() {
     if (confirm('Skip onboarding? You can complete it later in Settings.')) {
         document.getElementById('venueOnboardingModal').classList.add('hidden');
         addMessage('assistant', 'No problem! Set up your venue profile anytime in ⚙️ Settings. What can I help you with?');
+    }
+}
+
+// Quick Action Prompts - shown after onboarding
+function showQuickActionPrompts() {
+    var container = document.getElementById('messagesContainer');
+    if (!container) return;
+    
+    var innerContainer = container.querySelector('.space-y-6');
+    if (!innerContainer) return;
+    
+    var challenge = venueProfile.mainChallenge || 'general';
+    var staffCount = venueProfile.staffCount || '1-5';
+    
+    // Build prompts based on profile
+    var prompts = [];
+    
+    // Challenge-specific prompts
+    if (challenge === 'performance') {
+        prompts.push({icon: '⚠️', label: 'Staff always late', text: 'I have a staff member who is always late. What should I do?'});
+        prompts.push({icon: '📝', label: 'Write a warning', text: 'Can you help me write a warning letter for an employee?'});
+    } else if (challenge === 'awards') {
+        prompts.push({icon: '💰', label: 'Check pay rates', text: 'What should I pay a casual waiter under the Hospitality Award?'});
+        prompts.push({icon: '🌙', label: 'Penalty rates', text: 'What are the penalty rates for weekend and public holiday work?'});
+    } else if (challenge === 'rostering') {
+        prompts.push({icon: '📅', label: 'Roster rules', text: 'What are the minimum shift length rules under the Hospitality Award?'});
+        prompts.push({icon: '⏰', label: 'Overtime rules', text: 'When does overtime kick in for hospitality workers?'});
+    }
+    
+    // Common prompts for everyone
+    prompts.push({icon: '👋', label: 'Hiring new staff', text: 'What do I need to do when hiring a new employee?'});
+    prompts.push({icon: '🏥', label: 'Sick leave question', text: 'How does sick leave work for casual employees?'});
+    
+    // Staff size specific
+    if (staffCount === '30+' || staffCount === '16-30') {
+        prompts.push({icon: '📊', label: 'Redundancy process', text: 'What is the process for making someone redundant?'});
+    } else {
+        prompts.push({icon: '📋', label: 'Casual conversion', text: 'When do I need to offer casual conversion to my staff?'});
+    }
+    
+    // Limit to 5 prompts
+    prompts = prompts.slice(0, 5);
+    
+    // Create the prompts container
+    var promptsDiv = document.createElement('div');
+    promptsDiv.id = 'quickActionPrompts';
+    promptsDiv.className = 'px-4 pb-4';
+    
+    var html = '<p class="text-slate-400 text-sm mb-3">💡 Quick start — click any question:</p>';
+    html += '<div class="flex flex-wrap gap-2">';
+    
+    for (var i = 0; i < prompts.length; i++) {
+        html += '<button onclick="useQuickPrompt(' + i + ')" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 border border-slate-600 hover:border-amber-500 text-slate-200 rounded-full text-sm transition-all">';
+        html += prompts[i].icon + ' ' + prompts[i].label;
+        html += '</button>';
+    }
+    
+    html += '</div>';
+    promptsDiv.innerHTML = html;
+    
+    // Store prompts for click handler
+    window.quickPromptsList = prompts;
+    
+    innerContainer.appendChild(promptsDiv);
+    container.scrollTop = container.scrollHeight;
+}
+
+// Handle quick prompt click
+function useQuickPrompt(index) {
+    var prompts = window.quickPromptsList;
+    if (!prompts || !prompts[index]) return;
+    
+    var text = prompts[index].text;
+    
+    // Remove the prompts container
+    var promptsDiv = document.getElementById('quickActionPrompts');
+    if (promptsDiv) {
+        promptsDiv.style.opacity = '0';
+        promptsDiv.style.transition = 'opacity 0.3s';
+        setTimeout(function() {
+            if (promptsDiv.parentNode) {
+                promptsDiv.parentNode.removeChild(promptsDiv);
+            }
+        }, 300);
+    }
+    
+    // Set input and send
+    var input = document.getElementById('userInput');
+    if (input) {
+        input.value = text;
+        sendMessage();
     }
 }
 
@@ -35202,8 +35296,6 @@ async function loadAllDataFromFirebase() {
     } catch (error) {
     }
 }
-
 </script>
 </body>
 </html>
-
