@@ -3412,19 +3412,35 @@ function continueWithEmail() {
                     <span class="text-xl">🏨</span>
                 </div>
                 <div id="headerTitle">
-                    <h1 class="text-lg md:text-xl font-bold text-white">Fitz</h1>
-                    <p class="text-xs text-slate-400">Beta - <span id="userCode"></span></p>
+                    <h1 class="text-lg md:text-xl font-bold text-white tracking-wide">FITZ</h1>
+                    <p class="text-xs text-slate-400" id="userPlanDisplay">Free Plan</p>
                 </div>
             </div>
 
-            <!-- Right: Simplified Buttons -->
+            <!-- Right: Action Buttons -->
             <div id="headerRight" class="flex items-center gap-2 text-sm">
+                
+                <!-- Credits Display -->
+                <button onclick="openCreditsModal()" 
+                        class="px-3 py-2 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-lg transition-all flex items-center gap-2 touch-manipulation">
+                    <span class="text-amber-400">💳</span>
+                    <span id="headerCreditsCount">0</span>
+                    <span class="text-slate-400">credits</span>
+                    <span class="text-amber-400 font-bold">+</span>
+                </button>
                 
                 <!-- Crisis Mode Button -->
                 <button onclick="activateCrisisMode()" 
                         class="px-3 py-2 md:px-4 md:py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold rounded-lg transition-all flex items-center gap-2 touch-manipulation">
                     <span class="text-lg md:text-xl">🚨</span>
                     <span class="hidden sm:inline">URGENT</span>
+                </button>
+                
+                <!-- Book Expert Button -->
+                <button onclick="openBookExpertModal()" 
+                        class="px-3 py-2 md:px-4 md:py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg transition-all flex items-center gap-2 touch-manipulation">
+                    <span class="text-lg">📞</span>
+                    <span class="hidden sm:inline">Book Expert</span>
                 </button>
                 
                 <!-- Divider (hidden on mobile) -->
@@ -3448,14 +3464,6 @@ function continueWithEmail() {
                             <span class="hidden sm:inline">Tools</span>
                         </button>
                     </div>
-                </div>
-                
-                <!-- Divider (hidden on mobile) -->
-                <div class="hidden md:block h-6 w-px bg-slate-600"></div>
-                
-                <!-- Account Actions -->
-                <div class="flex items-center gap-2">
-                    
                 </div>
                 
             </div>
@@ -14600,6 +14608,241 @@ function exportDetailedAnalytics() {
 // WEEK 2: LOADING STATES, TOASTS, & POLISH
 // ===================
 
+// ========================================
+// HEADER DISPLAY FUNCTIONS
+// ========================================
+
+/**
+ * Update header with user's plan and credits
+ */
+function updateHeaderDisplay() {
+    const planDisplay = document.getElementById('userPlanDisplay');
+    const creditsCount = document.getElementById('headerCreditsCount');
+    
+    // Get tier info
+    const tier = (typeof userCredits !== 'undefined' && userCredits) 
+        ? (userCredits.subscriptionTier || userCredits.tier || 'free') 
+        : 'free';
+    
+    // Plan names mapping
+    const planNames = {
+        'free': 'Free Plan',
+        'starter': 'Starter Plan',
+        'professional': 'Pro Plan',
+        'pro': 'Pro Plan',
+        'business': 'Business Plan',
+        'enterprise': 'Enterprise'
+    };
+    
+    // Update plan display
+    if (planDisplay) {
+        planDisplay.textContent = planNames[tier] || 'Free Plan';
+    }
+    
+    // Update credits count
+    if (creditsCount) {
+        const credits = (typeof getTotalCredits === 'function') ? getTotalCredits() : 0;
+        creditsCount.textContent = credits;
+    }
+}
+
+/**
+ * Open credits purchase modal
+ */
+function openCreditsModal() {
+    // Check if credits modal exists, if not create it
+    let modal = document.getElementById('creditsModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'creditsModal';
+        modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[70]';
+        modal.innerHTML = `
+            <div class="bg-slate-800 rounded-2xl max-w-lg w-full p-6 border border-slate-700 max-h-[90vh] overflow-y-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-white">💳 Get Review Credits</h2>
+                    <button onclick="closeCreditsModal()" class="text-slate-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                
+                <p class="text-slate-300 mb-6">Review credits are used for expert-reviewed documents like warnings, termination letters, and formal processes.</p>
+                
+                <div class="space-y-4">
+                    <!-- Single Credit -->
+                    <div class="bg-slate-700/50 border border-slate-600 rounded-xl p-4 hover:border-amber-500 transition-all cursor-pointer" onclick="purchaseCredits('credits_1')">
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="text-white font-semibold">1 Review Credit</h3>
+                                <p class="text-slate-400 text-sm">For occasional document reviews</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-2xl font-bold text-amber-400">$29</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 5 Credit Pack -->
+                    <div class="bg-slate-700/50 border-2 border-amber-500 rounded-xl p-4 hover:bg-slate-700 transition-all cursor-pointer relative" onclick="purchaseCredits('credits_5')">
+                        <div class="absolute -top-2 -right-2 bg-amber-500 text-slate-900 text-xs font-bold px-2 py-1 rounded-full">SAVE 18%</div>
+                        <div class="flex justify-between items-center">
+                            <div>
+                                <h3 class="text-white font-semibold">5 Review Credits</h3>
+                                <p class="text-slate-400 text-sm">Best value for regular use</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-2xl font-bold text-amber-400">$119</span>
+                                <p class="text-slate-500 text-xs line-through">$145</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-6 pt-4 border-t border-slate-700">
+                    <p class="text-slate-400 text-sm text-center">
+                        Or <a href="#" onclick="openSubscriptionModal(); closeCreditsModal();" class="text-amber-400 hover:text-amber-300 underline">upgrade your plan</a> for included credits each year
+                    </p>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    modal.classList.remove('hidden');
+}
+
+function closeCreditsModal() {
+    const modal = document.getElementById('creditsModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+/**
+ * Purchase credits via Stripe
+ */
+async function purchaseCredits(productKey) {
+    showToast('Redirecting to checkout...', 'info', 2000);
+    
+    try {
+        const response = await fetch('/.netlify/functions/stripe-checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                productKey: productKey,
+                userId: currentUser?.uid || 'anonymous',
+                userEmail: currentUser?.email || null,
+                successUrl: window.location.origin + '/?payment=success',
+                cancelUrl: window.location.origin + '/?payment=cancelled'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.url) {
+            window.location.href = data.url;
+        } else {
+            showToast('Could not start checkout. Please try again.', 'error');
+        }
+    } catch (err) {
+        console.error('Checkout error:', err);
+        showToast('Checkout failed. Please try again.', 'error');
+    }
+}
+
+/**
+ * Open book expert consultation modal
+ */
+function openBookExpertModal() {
+    let modal = document.getElementById('bookExpertModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'bookExpertModal';
+        modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[70]';
+        modal.innerHTML = `
+            <div class="bg-slate-800 rounded-2xl max-w-lg w-full p-6 border border-slate-700">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-bold text-white">📞 Book Expert Consultation</h2>
+                    <button onclick="closeBookExpertModal()" class="text-slate-400 hover:text-white text-2xl">&times;</button>
+                </div>
+                
+                <div class="text-center mb-6">
+                    <div class="w-20 h-20 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="text-4xl">👨‍💼</span>
+                    </div>
+                    <h3 class="text-white font-semibold text-lg">Speak with an HR Expert</h3>
+                    <p class="text-slate-400 mt-2">Get personalized advice from a qualified HR professional for complex situations.</p>
+                </div>
+                
+                <div class="bg-slate-700/50 rounded-xl p-4 mb-6">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h4 class="text-white font-medium">30-Minute Consultation</h4>
+                            <p class="text-slate-400 text-sm">Phone or video call</p>
+                        </div>
+                        <span class="text-2xl font-bold text-purple-400">$150</span>
+                    </div>
+                </div>
+                
+                <div class="space-y-3 mb-6 text-sm text-slate-300">
+                    <div class="flex items-start gap-2">
+                        <span class="text-green-400">✓</span>
+                        <span>Discuss complex employee situations</span>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        <span class="text-green-400">✓</span>
+                        <span>Get advice on Fair Work compliance</span>
+                    </div>
+                    <div class="flex items-start gap-2">
+                        <span class="text-green-400">✓</span>
+                        <span>Review your approach before taking action</span>
+                    </div>
+                </div>
+                
+                <button onclick="bookExpertConsultation()" 
+                        class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-all">
+                    Book Consultation - $150
+                </button>
+                
+                <p class="text-slate-500 text-xs text-center mt-4">
+                    Or call directly: <a href="tel:+61400211014" class="text-purple-400">+61 400 211 014</a>
+                </p>
+            </div>
+        `;
+        document.body.appendChild(modal);
+    }
+    modal.classList.remove('hidden');
+}
+
+function closeBookExpertModal() {
+    const modal = document.getElementById('bookExpertModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+async function bookExpertConsultation() {
+    showToast('Redirecting to booking...', 'info', 2000);
+    
+    try {
+        const response = await fetch('/.netlify/functions/stripe-checkout', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                productKey: 'consultation',
+                userId: currentUser?.uid || 'anonymous',
+                userEmail: currentUser?.email || null,
+                successUrl: window.location.origin + '/?booking=success',
+                cancelUrl: window.location.origin + '/?booking=cancelled'
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.url) {
+            window.location.href = data.url;
+        } else {
+            // Fallback to direct contact
+            window.location.href = 'mailto:blake@fitzgeraldhr.com.au?subject=Expert%20Consultation%20Request';
+        }
+    } catch (err) {
+        // Fallback to direct contact
+        window.location.href = 'mailto:blake@fitzgeraldhr.com.au?subject=Expert%20Consultation%20Request';
+    }
+}
+
 /**
  * Show a toast notification
  * @param {string} message - Message to display
@@ -15147,16 +15390,67 @@ function completeOnboarding() {
     // Update sidebar with new venue name
     updateSidebarVenueName();
     
+    // Hide onboarding modal
     document.getElementById('venueOnboardingModal').classList.add('hidden');
     
-    const venueType = getVenueTypeLabel(venueProfile.venueType);
-    addMessage('assistant', `✅ **Great! I've got your venue details saved.**
-
-I now know you run a **${venueType}** in **${venueProfile.city || venueProfile.location}** with **${venueProfile.staffCount}** staff.
-
-All my advice will be tailored for your venue. Update these anytime in ⚙️ Settings.
-
-What can I help you with?`);
+    // Clear the messages container (removes any skeleton)
+    if (DOM.messagesContainer) {
+        DOM.messagesContainer.innerHTML = '<div class="max-w-5xl mx-auto space-y-6"></div>';
+    }
+    
+    // Create a new conversation if needed
+    if (!currentConversationId) {
+        createNewConversation();
+    } else {
+        // Add the personalized onboarding complete message
+        const venueType = getVenueTypeLabel(venueProfile.venueType);
+        const welcomeHtml = `
+            <p class="text-slate-100 leading-relaxed text-lg font-medium">
+                ✅ Great! I've got your venue details saved.
+            </p>
+            <p class="text-slate-300 leading-relaxed mt-2">
+                I now know you run a <strong>${venueType}</strong> in <strong>${venueProfile.city || venueProfile.location}</strong> with <strong>${venueProfile.staffCount}</strong> staff.
+            </p>
+            <p class="text-slate-300 leading-relaxed mt-2">
+                All my advice will be tailored for <strong>${venueProfile.venueName || 'your venue'}</strong>. Update these anytime in ⚙️ Settings.
+            </p>
+            <p class="text-slate-100 leading-relaxed mt-4">
+                <strong>What can I help you with today?</strong>
+            </p>
+        `;
+        
+        // Display the message
+        var displayContainer = DOM.messagesContainer.querySelector('.space-y-6');
+        if (displayContainer) {
+            var messageDiv = document.createElement('div');
+            messageDiv.className = 'flex justify-start fade-in';
+            var messageId = 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+            messageDiv.setAttribute('data-message-id', messageId);
+            messageDiv.innerHTML = '<div class="max-w-3xl bg-slate-800 text-slate-100 border border-slate-700 rounded-2xl px-6 py-4 relative">' +
+                '<span class="bookmark-star absolute top-3 right-3" data-message-id="' + messageId + '" onclick="toggleBookmark(\'' + messageId + '\')" title="Bookmark this">☆</span>' +
+                '<div class="leading-relaxed">' + welcomeHtml + '</div>' +
+                '</div>';
+            displayContainer.appendChild(messageDiv);
+            
+            // Add quick action prompts
+            addQuickActionPrompts(displayContainer);
+        }
+        
+        // Save to conversation history
+        const plainWelcome = `✅ Great! I've got your venue details saved.\n\nI now know you run a ${venueType} in ${venueProfile.city || venueProfile.location} with ${venueProfile.staffCount} staff.\n\nAll my advice will be tailored for ${venueProfile.venueName || 'your venue'}. Update these anytime in ⚙️ Settings.\n\nWhat can I help you with today?`;
+        conversationHistory.push({ role: 'assistant', content: plainWelcome });
+        saveCurrentConversation();
+    }
+    
+    // Load daily tip
+    if (typeof updateDailyTipBanner === 'function') {
+        updateDailyTipBanner();
+    }
+    
+    // Update header with plan and credits
+    if (typeof updateHeaderDisplay === 'function') {
+        updateHeaderDisplay();
+    }
     
     trackEvent('onboarding_completed', venueProfile);
 }
@@ -18220,6 +18514,16 @@ async function acceptLegalTerms() {
         setTimeout(() => {
             restoreLastConversation();
             updateSidebarChats();
+            
+            // Load daily tip
+            if (typeof updateDailyTipBanner === 'function') {
+                updateDailyTipBanner();
+            }
+            
+            // Update header with plan and credits
+            if (typeof updateHeaderDisplay === 'function') {
+                updateHeaderDisplay();
+            }
         }, 500);
     }
 }
@@ -28183,6 +28487,16 @@ if (auth) {
                             // Now restore the conversation
                             const restored = restoreLastConversation();
                             updateSidebarChats();
+                            
+                            // Load daily tip
+                            if (typeof updateDailyTipBanner === 'function') {
+                                updateDailyTipBanner();
+                            }
+                            
+                            // Update header with plan and credits
+                            if (typeof updateHeaderDisplay === 'function') {
+                                updateHeaderDisplay();
+                            }
                             
                             // Show welcome back message if conversation was restored
                             if (restored && conversations.length > 0) {
