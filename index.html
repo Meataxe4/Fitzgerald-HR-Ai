@@ -41,329 +41,243 @@
    DARK MODE SYSTEM
    ======================================== */
 
-/* CSS Variables for Theme Colors */
 :root {
-    /* Dark Mode (Default) */
-    --bg-primary: #0f172a;      /* slate-900 */
-    --bg-secondary: #1e293b;    /* slate-800 */
-    --bg-tertiary: #334155;     /* slate-700 */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-tertiary: #334155;
+    --bg-elevated: #1e293b;
+    --bg-surface: rgba(30, 41, 59, 0.8);
+    --bg-input: #0f172a;
     --text-primary: #ffffff;
-    --text-secondary: #cbd5e1;  /* slate-300 */
-    --text-tertiary: #94a3b8;   /* slate-400 */
-    --border-color: #475569;    /* slate-600 */
-    --accent-color: #f59e0b;    /* amber-500 */
-    --accent-hover: #d97706;    /* amber-600 */
+    --text-secondary: #cbd5e1;
+    --text-tertiary: #94a3b8;
+    --text-inverse: #0f172a;
+    --border-primary: #475569;
+    --border-secondary: #334155;
+    --border-focus: #f59e0b;
+    --accent: #f59e0b;
+    --accent-hover: #d97706;
+    --accent-subtle: rgba(245, 158, 11, 0.1);
+    --danger: #ef4444;
+    --danger-subtle: rgba(239, 68, 68, 0.1);
+    --success: #22c55e;
+    --success-subtle: rgba(34, 197, 94, 0.1);
+    --info: #3b82f6;
+    --info-subtle: rgba(59, 130, 246, 0.1);
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.25rem;
+    --transition-fast: 150ms ease;
+    --transition-normal: 250ms ease;
+    --transition-slow: 350ms ease;
+    --border-color: var(--border-primary);
+    --accent-color: var(--accent);
 }
 
-/* Light Mode Variables */
 .light-mode {
-    --bg-primary: #f8fafc;      /* slate-50 */
-    --bg-secondary: #f1f5f9;    /* slate-100 */
-    --bg-tertiary: #e2e8f0;     /* slate-200 */
-    --text-primary: #0f172a;    /* slate-900 */
-    --text-secondary: #334155;  /* slate-700 */
-    --text-tertiary: #64748b;   /* slate-500 */
-    --border-color: #cbd5e1;    /* slate-300 */
-    --accent-color: #f59e0b;    /* amber-500 */
-    --accent-hover: #d97706;    /* amber-600 */
+    --bg-primary: #f8fafc;
+    --bg-secondary: #ffffff;
+    --bg-tertiary: #f1f5f9;
+    --bg-elevated: #ffffff;
+    --bg-surface: rgba(255, 255, 255, 0.92);
+    --bg-input: #ffffff;
+    --text-primary: #0f172a;
+    --text-secondary: #334155;
+    --text-tertiary: #64748b;
+    --text-inverse: #ffffff;
+    --border-primary: #cbd5e1;
+    --border-secondary: #e2e8f0;
+    --border-focus: #f59e0b;
+    --accent: #f59e0b;
+    --accent-hover: #d97706;
+    --accent-subtle: rgba(245, 158, 11, 0.08);
+    --danger: #dc2626;
+    --danger-subtle: rgba(220, 38, 38, 0.08);
+    --success: #16a34a;
+    --success-subtle: rgba(22, 163, 74, 0.08);
+    --info: #2563eb;
+    --info-subtle: rgba(37, 99, 235, 0.08);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+    --border-color: var(--border-primary);
+    --accent-color: var(--accent);
 }
 
-/* Smooth transitions for theme changes */
-body, 
-.bg-slate-900, .bg-slate-800, .bg-slate-700,
-.text-white, .text-slate-300, .text-slate-400,
-.border-slate-700, .border-slate-600 {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
+/* ========================================
+   LIGHT MODE - Clean Targeted Overrides
+   ======================================== */
 
-/* Light mode overrides for body */
+body, body * {
+    transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+}
 body.light-mode {
-    background: linear-gradient(to bottom right, #f8fafc, #f1f5f9, #f8fafc) !important;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%) !important;
 }
 
-/* Light mode text adjustments - ULTRA BOLD & CLEAR */
-.light-mode .text-white { color: #000000 !important; font-weight: 500; }
-.light-mode .text-slate-100 { color: #000000 !important; font-weight: 500; }
-.light-mode .text-slate-200 { color: #000000 !important; font-weight: 500; }
-.light-mode .text-slate-300 { color: #000000 !important; font-weight: 500; }
-.light-mode .text-slate-400 { color: #1f2937 !important; font-weight: 500; }
-.light-mode .text-slate-500 { color: #374151 !important; }
-.light-mode .text-slate-600 { color: #1f2937 !important; }
+/* Surface colors */
+.light-mode .bg-slate-900 { background-color: var(--bg-primary) !important; }
+.light-mode .bg-slate-800 { background-color: var(--bg-secondary) !important; border-color: var(--border-primary) !important; box-shadow: var(--shadow-sm); }
+.light-mode .bg-slate-700 { background-color: var(--bg-tertiary) !important; }
+.light-mode .bg-slate-600 { background-color: #e2e8f0 !important; }
+.light-mode .bg-slate-800\/80 { background-color: var(--bg-surface) !important; border-color: var(--border-primary) !important; backdrop-filter: blur(12px); box-shadow: var(--shadow-sm); }
 
-/* Light mode backgrounds - CRISP WHITE */
-.light-mode .bg-slate-900 { 
-    background-color: #ffffff !important;
-}
-.light-mode .bg-slate-800 { 
-    background-color: #ffffff !important; 
-    border: 2px solid #d1d5db !important;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
-}
-.light-mode .bg-slate-700 { 
-    background-color: #f9fafb !important;
-    border: 2px solid #e5e7eb !important;
-}
-.light-mode .bg-slate-600 { background-color: #e5e7eb !important; }
+/* Text colors */
+.light-mode .text-white { color: var(--text-primary) !important; }
+.light-mode .text-slate-100, .light-mode .text-slate-200, .light-mode .text-slate-300 { color: var(--text-secondary) !important; }
+.light-mode .text-slate-400, .light-mode .text-slate-500 { color: var(--text-tertiary) !important; }
 
-/* Light mode borders - STRONG & VISIBLE */
-.light-mode .border-slate-700 { border-color: #9ca3af !important; border-width: 2px !important; }
-.light-mode .border-slate-600 { border-color: #d1d5db !important; border-width: 2px !important; }
+/* Borders */
+.light-mode .border-slate-700, .light-mode .border-slate-600 { border-color: var(--border-primary) !important; }
 
-/* Chat messages - CRYSTAL CLEAR */
-.light-mode #messagesContainer .bg-slate-700 {
-    background-color: #ffffff !important;
-    border: 2px solid #d1d5db !important;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
+/* Chat messages */
+.light-mode #messagesContainer .bg-slate-700 { background-color: var(--bg-secondary) !important; border: 1px solid var(--border-primary) !important; box-shadow: var(--shadow-sm); }
+.light-mode #messagesContainer .bg-slate-800 { background-color: var(--bg-tertiary) !important; border: 1px solid var(--border-secondary) !important; }
+.light-mode #messagesContainer, .light-mode #messagesContainer p, .light-mode #messagesContainer span,
+.light-mode #messagesContainer div, .light-mode #messagesContainer li { color: var(--text-primary) !important; }
+
+/* Info/alert boxes */
+.light-mode .bg-amber-500\/10, .light-mode .bg-yellow-500\/10 { background-color: var(--accent-subtle) !important; border: 1px solid var(--accent) !important; }
+.light-mode .bg-blue-500\/10 { background-color: var(--info-subtle) !important; border: 1px solid var(--info) !important; }
+.light-mode .bg-red-500\/10 { background-color: var(--danger-subtle) !important; border: 1px solid var(--danger) !important; }
+.light-mode .bg-green-500\/10 { background-color: var(--success-subtle) !important; border: 1px solid var(--success) !important; }
+
+/* Colored text */
+.light-mode .text-red-300, .light-mode .text-red-400 { color: var(--danger) !important; }
+.light-mode .text-amber-400, .light-mode .text-amber-500 { color: var(--accent) !important; }
+.light-mode .text-green-300, .light-mode .text-green-400, .light-mode .text-green-500 { color: var(--success) !important; }
+.light-mode .text-blue-300, .light-mode .text-blue-400, .light-mode .text-blue-500 { color: var(--info) !important; }
+
+/* Logo */
+.light-mode .font-extrabold, .light-mode .font-extrabold span { font-weight: 800 !important; }
+.light-mode .font-extrabold .text-amber-500 { color: var(--accent) !important; font-weight: 800 !important; }
+
+/* Form inputs */
+.light-mode input, .light-mode textarea, .light-mode select {
+    background-color: var(--bg-input) !important; color: var(--text-primary) !important; border: 1px solid var(--border-primary) !important;
 }
-
-.light-mode #messagesContainer .bg-slate-800 {
-    background-color: #f9fafb !important;
-    border: 2px solid #e5e7eb !important;
+.light-mode input:focus, .light-mode textarea:focus, .light-mode select:focus {
+    border-color: var(--border-focus) !important; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15) !important; outline: none;
 }
+.light-mode input::placeholder, .light-mode textarea::placeholder { color: var(--text-tertiary) !important; }
 
-/* Force ALL text to be BOLD BLACK */
-.light-mode #messagesContainer,
-.light-mode #messagesContainer p,
-.light-mode #messagesContainer span,
-.light-mode #messagesContainer div,
-.light-mode #messagesContainer li,
-.light-mode #messagesContainer strong {
-    color: #000000 !important;
-    font-weight: 500 !important;
+/* Neutral buttons */
+.light-mode button:not(.bg-red-600):not(.bg-blue-600):not(.bg-purple-600):not(.bg-green-600):not(.bg-amber-500):not(.bg-orange-600):not([class*="bg-gradient"]) {
+    background-color: var(--bg-tertiary) !important; color: var(--text-primary) !important; border: 1px solid var(--border-primary) !important;
 }
+.light-mode .bg-amber-500 { box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3) !important; }
 
-/* REDESIGNED: VIBRANT suggestion boxes - CLEAR & BOLD */
-.light-mode .bg-amber-500\/10,
-.light-mode .bg-yellow-500\/10,
-.light-mode .bg-amber-100 {
-    background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%) !important;
-    border: 2px solid #3b82f6 !important;
-    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1), 0 2px 4px 0 rgba(0, 0, 0, 0.05);
-    padding: 16px !important;
+/* Credits & header */
+.light-mode #creditsDisplay { background-color: var(--bg-tertiary) !important; border-color: var(--border-primary) !important; }
+.light-mode #messageInput { background-color: var(--bg-input) !important; border: 1px solid var(--border-primary) !important; color: var(--text-primary) !important; }
+.light-mode #messageInput:focus { border-color: var(--border-focus) !important; box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15) !important; }
+
+/* Links */
+.light-mode a { color: var(--info) !important; }
+.light-mode a:hover { color: #1d4ed8 !important; }
+
+/* Modal overlays */
+.light-mode .bg-black\/90, .light-mode .bg-black\/80 { background-color: rgba(0, 0, 0, 0.6) !important; backdrop-filter: blur(8px); }
+
+
+
+/* ========================================
+   ACCESSIBILITY & UX UTILITIES
+   ======================================== */
+
+*:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+*:focus:not(:focus-visible) { outline: none; }
+
+.skip-link {
+    position: absolute; top: -100%; left: 50%; transform: translateX(-50%);
+    background: var(--accent); color: var(--text-inverse); padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-md); font-weight: 600; z-index: 10000; transition: top 0.15s ease;
 }
+.skip-link:focus { top: 1rem; }
 
-/* BOLD blue text in suggestion boxes */
-.light-mode .bg-amber-500\/10 *,
-.light-mode .bg-yellow-500\/10 * {
-    color: #1e3a8a !important;
-    font-weight: 600 !important;
-    font-size: 0.95rem !important;
-}
-
-/* VIBRANT Daily Tip Bar - IMPOSSIBLE TO MISS */
-.light-mode .bg-blue-500\/10 {
-    background: linear-gradient(135deg, #dbeafe 0%, #93c5fd 100%) !important;
-    border: 2px solid #2563eb !important;
-    border-left: 6px solid #2563eb !important;
-    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15), 0 2px 4px 0 rgba(0, 0, 0, 0.1);
-}
-
-/* Daily Tip text - BOLD & CLEAR */
-.light-mode .bg-blue-500\/10 * {
-    color: #1e3a8a !important;
-    font-weight: 600 !important;
-}
-
-/* Professional alert boxes - VIBRANT */
-.light-mode .bg-red-500\/10 {
-    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%) !important;
-    border: 2px solid #ef4444 !important;
-    border-left: 6px solid #ef4444 !important;
-    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+.sr-only {
+    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+    overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
 
-.light-mode .bg-green-500\/10 {
-    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%) !important;
-    border: 2px solid #10b981 !important;
-    border-left: 6px solid #10b981 !important;
-    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+/* Loading states */
+.skeleton {
+    background: linear-gradient(90deg, var(--bg-tertiary) 25%, var(--bg-secondary) 50%, var(--bg-tertiary) 75%);
+    background-size: 200% 100%; animation: skeleton-shimmer 1.5s ease-in-out infinite; border-radius: var(--radius-sm);
 }
+@keyframes skeleton-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-/* VIBRANT colored text - BOLD & CLEAR */
-.light-mode .text-red-300,
-.light-mode .text-red-400 {
-    color: #dc2626 !important;
-    font-weight: 700 !important;
+.spinner {
+    width: 20px; height: 20px; border: 2px solid var(--border-primary);
+    border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite;
 }
+.spinner-lg { width: 32px; height: 32px; border-width: 3px; }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-.light-mode .text-amber-400,
-.light-mode .text-amber-500,
-.light-mode .text-orange-400,
-.light-mode .text-orange-500 {
-    color: #ea580c !important;
-    font-weight: 700 !important;
-}
+.toast-enter { animation: toast-slide-in 0.3s ease-out; }
+.toast-exit { animation: toast-slide-out 0.3s ease-in forwards; }
+@keyframes toast-slide-in { from { transform: translateY(-100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes toast-slide-out { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-100%); opacity: 0; } }
 
-/* FITZ LOGO - Keep consistent font-weight in both modes */
-.light-mode #headerTitle h1,
-.light-mode #headerTitle h1 span,
-.light-mode .font-extrabold,
-.light-mode .font-extrabold span {
-    font-weight: 800 !important;
-}
+/* Step indicators for document flow */
+.step-indicator { display: flex; align-items: center; gap: 0.5rem; padding: 1rem 0; }
+.step-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border-primary); transition: all 0.25s ease; }
+.step-dot.active { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-subtle); }
+.step-dot.completed { background: var(--success); }
+.step-line { flex: 1; height: 2px; background: var(--border-primary); }
+.step-line.completed { background: var(--success); }
 
-/* Preserve amber color for the F in FITZ logo everywhere */
-.light-mode #headerTitle h1 .text-amber-500,
-.light-mode .font-extrabold .text-amber-500 {
-    color: #f59e0b !important;
-    font-weight: 800 !important;
-}
+/* ========================================
+   WELCOME SCREEN
+   ======================================== */
 
-/* Keep ITZ white/dark text consistent weight in logo */
-.light-mode .font-extrabold .text-white {
-    font-weight: 800 !important;
-}
+.welcome-container { max-width: 800px; margin: 0 auto; padding: 2rem 1rem; animation: welcome-fade 0.6s ease-out; }
+@keyframes welcome-fade { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.welcome-logo { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.025em; margin-bottom: 0.5rem; }
+.welcome-greeting { font-size: 1.5rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem; }
+.welcome-subtitle { color: var(--text-tertiary); font-size: 1rem; margin-bottom: 2rem; }
 
-.light-mode .text-green-300,
-.light-mode .text-green-400,
-.light-mode .text-green-500 {
-    color: #16a34a !important;
-    font-weight: 700 !important;
-}
+.quick-actions-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; margin-bottom: 2rem; }
+@media (max-width: 640px) { .quick-actions-grid { grid-template-columns: 1fr; } }
 
-.light-mode .text-blue-300,
-.light-mode .text-blue-400,
-.light-mode .text-blue-500 {
-    color: #2563eb !important;
-    font-weight: 600 !important;
+.quick-action-card {
+    display: flex; align-items: flex-start; gap: 0.75rem; padding: 1rem;
+    background: var(--bg-secondary); border: 1px solid var(--border-secondary); border-radius: var(--radius-lg);
+    cursor: pointer; transition: all 0.15s ease; text-align: left;
 }
+.quick-action-card:hover { border-color: var(--accent); background: var(--accent-subtle); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.quick-action-icon {
+    font-size: 1.5rem; flex-shrink: 0; width: 2.5rem; height: 2.5rem;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent-subtle); border-radius: var(--radius-md);
+}
+.quick-action-title { font-weight: 600; color: var(--text-primary); font-size: 0.875rem; margin-bottom: 2px; }
+.quick-action-desc { color: var(--text-tertiary); font-size: 0.75rem; line-height: 1.4; }
 
-/* BOLD links */
-.light-mode a {
-    color: #2563eb !important;
-    text-decoration: none;
-    font-weight: 600 !important;
-    border-bottom: 2px solid #2563eb;
+.suggested-prompts { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem; }
+.suggested-prompt-chip {
+    display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.5rem 0.875rem;
+    background: var(--bg-tertiary); border: 1px solid var(--border-secondary); border-radius: 999px;
+    color: var(--text-secondary); font-size: 0.8125rem; cursor: pointer; transition: all 0.15s ease; white-space: nowrap;
 }
+.suggested-prompt-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-subtle); }
 
-.light-mode a:hover {
-    color: #1d4ed8 !important;
-    border-bottom-color: #1d4ed8;
+/* Next step suggestions */
+.next-step-card {
+    background: var(--info-subtle); border: 1px solid var(--info); border-radius: var(--radius-lg); padding: 1rem; margin-top: 1rem;
 }
-
-/* Modal overlay - CLEAR */
-.light-mode .bg-black\/90 {
-    background-color: rgba(0, 0, 0, 0.75) !important;
-    backdrop-filter: blur(8px);
+.next-step-card h4 { color: var(--info); font-weight: 600; font-size: 0.875rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+.next-step-card p { color: var(--text-secondary); font-size: 0.8125rem; margin-bottom: 0.75rem; }
+.next-step-action {
+    display: inline-flex; align-items: center; gap: 0.375rem; padding: 0.375rem 0.875rem;
+    background: var(--info); color: white; border-radius: var(--radius-sm);
+    font-size: 0.8125rem; font-weight: 600; cursor: pointer; transition: all 0.15s ease; border: none;
 }
-
-/* PROFESSIONAL input fields - THICK BORDERS */
-.light-mode input,
-.light-mode textarea,
-.light-mode select {
-    background-color: #ffffff !important;
-    color: #000000 !important;
-    border: 2px solid #9ca3af !important;
-    box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    transition: all 0.2s;
-    font-weight: 500 !important;
-}
-
-.light-mode input:focus,
-.light-mode textarea:focus,
-.light-mode select:focus {
-    border-color: #f59e0b !important;
-    border-width: 3px !important;
-    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2), inset 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    outline: none;
-}
-
-.light-mode input::placeholder,
-.light-mode textarea::placeholder {
-    color: #6b7280 !important;
-    font-weight: 400 !important;
-}
-
-/* Button styling - CLEAR HIERARCHY */
-.light-mode button:not(.bg-red-600):not(.bg-blue-600):not(.bg-purple-600):not(.bg-green-600):not(.bg-amber-500):not(.bg-orange-600) {
-    background-color: #f3f4f6 !important;
-    color: #1f2937 !important;
-    border: 2px solid #d1d5db !important;
-    font-weight: 600 !important;
-}
-
-.light-mode button:not(.bg-red-600):not(.bg-blue-600):not(.bg-purple-600):not(.bg-green-600):not(.bg-amber-500):not(.bg-orange-600):hover {
-    background-color: #e5e7eb !important;
-    border-color: #9ca3af !important;
-}
-
-/* BOLD header */
-.light-mode .bg-slate-800\/80 {
-    background-color: #ffffff !important;
-    border-bottom: 3px solid #d1d5db !important;
-    backdrop-filter: blur(12px);
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.06);
-}
-
-/* Credits display in header - LIGHT MODE */
-.light-mode #creditsDisplay {
-    background-color: #f1f5f9 !important;
-    border: 2px solid #cbd5e1 !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.light-mode #creditsDisplay span.text-slate-300 {
-    color: #475569 !important;
-}
-
-.light-mode #creditsDisplay span.text-amber-400 {
-    color: #d97706 !important;
-}
-
-.light-mode #promptsCounter {
-    background-color: #2563eb !important;
-    color: #ffffff !important;
-    font-weight: 600 !important;
-}
-
-.light-mode #promptsCounter.bg-amber-600 {
-    background-color: #d97706 !important;
-}
-
-.light-mode #promptsCounter.bg-red-600 {
-    background-color: #dc2626 !important;
-}
-
-/* Message input box - ULTRA CLEAR */
-.light-mode #messageInput {
-    background-color: #ffffff !important;
-    border: 2px solid #9ca3af !important;
-    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.08);
-    color: #000000 !important;
-    font-weight: 500 !important;
-}
-
-.light-mode #messageInput:focus {
-    border-color: #f59e0b !important;
-    border-width: 3px !important;
-    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.08);
-}
-
-/* Send button - VIBRANT */
-.light-mode .bg-amber-500,
-.light-mode .bg-orange-600 {
-    box-shadow: 0 2px 8px 0 rgba(245, 158, 11, 0.4) !important;
-    font-weight: 700 !important;
-}
-
-.light-mode .bg-amber-500:hover,
-.light-mode .bg-orange-600:hover {
-    box-shadow: 0 4px 12px 0 rgba(245, 158, 11, 0.5) !important;
-    transform: translateY(-1px);
-}
-
-/* Icon improvements */
-.light-mode .bg-amber-500\/10 span,
-.light-mode .bg-blue-500\/10 span {
-    font-size: 1.1em !important;
-}
-
-/* Warning icon */
-.light-mode .text-amber-500 {
-    color: #f59e0b !important;
-    font-size: 1.2em !important;
-    font-weight: 700 !important;
-}
+.next-step-action:hover { filter: brightness(1.1); transform: translateY(-1px); }
 
 /* HIDE LOGOUT BUTTON FROM HEADER ONLY - It's in sidebar now */
 header button[onclick*="logout"],
@@ -3340,6 +3254,11 @@ input, textarea, select {
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
 
+<!-- Skip to content -->
+<a href="#messagesContainer" class="skip-link">Skip to main content</a>
+<!-- Screen reader announcements -->
+<div id="liveAnnouncer" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
 <!-- ============================================
      LAUNCH GATE - Remove or set LAUNCH_MODE = false when ready to go live
      ============================================ -->
@@ -3805,7 +3724,7 @@ async function checkFirestoreData() {
     </div>
     
     <!-- Sidebar Overlay (for mobile) -->
-    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()" role="presentation" aria-hidden="true"></div>
     
     
     <!-- WEEK 3: Search Modal -->
@@ -4219,14 +4138,14 @@ async function checkFirestoreData() {
                 <div class="flex items-center gap-6 text-sm">
                     <a href="#" onclick="showTermsOfService(); return false;" class="text-slate-400 hover:text-white transition-colors">Terms</a>
                     <a href="#" onclick="showPrivacyPolicy(); return false;" class="text-slate-400 hover:text-white transition-colors">Privacy</a>
-                    <a href="mailto:hello@fitzhr.com" class="text-slate-400 hover:text-white transition-colors">Contact</a>
+                    <a href="/cdn-cgi/l/email-protection#6f070a0303002f09061b15071d410c0002" class="text-slate-400 hover:text-white transition-colors">Contact</a>
                 </div>
             </div>
         </footer>
     </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // Smart view switching based on returning user
 function initAccessScreen() {
     const isReturning = localStorage.getItem('fitzhr_returning') === 'true' || 
@@ -4423,9 +4342,9 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
     <!-- Main Assistant Screen (Hidden Initially) -->
-    <div id="assistantScreen" class="hidden flex flex-col">
+    <div id="assistantScreen" class="hidden flex flex-col" role="main">
         <!-- Header -->
-        <div id="mainHeader" class="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700 px-4 md:px-6 py-3 md:py-4">
+        <header id="mainHeader" class="bg-slate-800/80 backdrop-blur-sm border-b border-slate-700 px-4 md:px-6 py-3 md:py-4" role="banner">
     <div class="max-w-5xl mx-auto">
         
         <!-- Mobile: Stacked Layout, Desktop: Side-by-side -->
@@ -4434,7 +4353,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <!-- Left: Sidebar Toggle + Logo & Title -->
             <div id="headerLeft" class="flex items-center gap-3">
                 <!-- Sidebar Toggle Button -->
-                <button onclick="toggleSidebar()" class="sidebar-toggle-btn-header p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
+                <button onclick="toggleSidebar()" aria-label="Toggle navigation" aria-expanded="false" class="sidebar-toggle-btn-header p-2 bg-slate-700 hover:bg-slate-600 rounded-lg transition-colors">
                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
@@ -4469,7 +4388,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 
                 <!-- Crisis Mode Button -->
-                <button onclick="activateCrisisMode()" 
+                <button onclick="activateCrisisMode()" aria-label="Activate urgent crisis mode" 
                         class="px-3 py-2 md:px-4 md:py-2 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold rounded-lg transition-all flex items-center gap-2 touch-manipulation">
                     <span class="text-lg md:text-xl">🚨</span>
                     <span class="hidden sm:inline">URGENT</span>
@@ -4516,7 +4435,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>
     </div>
-</div>
+</header>
 
         <!-- Daily Tip Banner -->
 <div id="dailyTipBanner" class="bg-blue-500/10 border-b border-blue-500/20 px-6 py-3 cursor-pointer hover:bg-blue-500/15 transition-all" onclick="rotateTipManually()">
@@ -4542,14 +4461,14 @@ document.addEventListener('DOMContentLoaded', function() {
     </svg>
 </button>
 
-<div id="messagesContainer" class="flex-1 overflow-y-auto px-6 py-6">
+<div id="messagesContainer" class="flex-1 overflow-y-auto px-6 py-6" role="log" aria-label="Chat messages" aria-live="polite">
     <div class="max-w-5xl mx-auto space-y-6">
         <!-- Messages will be added here dynamically -->
     </div>
 </div>
 
-<!-- Chat Input Area (ChatGPT Style) -->
-<div class="bg-slate-800/80 backdrop-blur-sm border-t border-slate-700/50 px-6 py-4">
+<!-- Chat Input Area -->
+<div class="bg-slate-800/80 backdrop-blur-sm border-t border-slate-700/50 px-4 md:px-6 py-3 md:py-4" role="form" aria-label="Chat input">
     <div class="max-w-3xl mx-auto">
         <div class="flex gap-2 items-end">
             <!-- Upload Button (+) -->
@@ -4583,7 +4502,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             <!-- Text Input -->
             <textarea id="messageInput" 
-                placeholder="Ask about HR, contracts, compliance..." 
+                placeholder="Ask about HR, contracts, compliance..." aria-label="Type your HR question" 
                 rows="1"
                 class="flex-1 bg-slate-900 text-slate-100 border border-slate-700 rounded-xl px-4 py-3 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none min-h-[44px] max-h-[200px]"
                 onkeypress="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
@@ -4600,7 +4519,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </button>
             
             <!-- Send Button -->
-            <button id="sendButton" onclick="sendMessage()" 
+            <button id="sendButton" onclick="sendMessage()" aria-label="Send message" 
                     class="p-3 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-slate-900 rounded-lg transition-all touch-manipulation">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
@@ -4705,7 +4624,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <!-- Expert Review Request Modal -->
-    <div id="reviewRequestModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[70]">
+    <div id="reviewRequestModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[70]" role="dialog" aria-modal="true" aria-label="Expert review request">
         <div class="bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-700 fade-in">
             <!-- Header -->
             <div class="bg-gradient-to-r from-amber-500 to-amber-600 p-5 rounded-t-2xl">
@@ -6213,7 +6132,7 @@ Be as specific as possible!"></textarea>
 </div>
 
 <!-- Document Builder Modal -->
-<div id="documentBuilderModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+<div id="documentBuilderModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50" role="dialog" aria-modal="true" aria-label="Document builder">
     <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
             <div>
@@ -6381,7 +6300,7 @@ Be as specific as possible!"></textarea>
 </div>
 
 <!-- Document Preview Modal -->
-<div id="documentPreviewModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+<div id="documentPreviewModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50" role="dialog" aria-modal="true" aria-label="Document preview">
     <div class="bg-slate-800 rounded-2xl max-w-5xl w-full border-2 border-amber-500 fade-in max-h-[90vh] flex flex-col">
         
         <!-- Header -->
@@ -6831,12 +6750,12 @@ Be as specific as possible!"></textarea>
         <!-- FAQ -->
         <div class="text-center text-slate-400 text-sm">
             <p>All plans include a 14-day money-back guarantee. Cancel anytime.</p>
-            <p class="mt-2">Questions? Contact <a href="mailto:blake@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">blake@fitzgeraldhr.com.au</a></p>
+            <p class="mt-2">Questions? Contact <a href="/cdn-cgi/l/email-protection#294b4548424c694f405d534e4c5b48454d415b074a464407485c" class="text-amber-400 hover:underline"><span class="__cf_email__" data-cfemail="680a0409030d280e011c120f0d1a09040c001a460b070546091d">[email&#160;protected]</span></a></p>
         </div>
     </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // Billing toggle state - DEFAULT TO ANNUAL
 let currentBilling = 'annual';
 
@@ -7253,7 +7172,7 @@ function setBilling(billing) {
                 Questions? <a href="tel:+61400211014" class="text-purple-400 hover:text-purple-300">+61 400 211 014</a>
             </p>
             <p class="text-slate-500 text-xs">
-                <a href="mailto:blake@fitzgeraldhr.com.au" class="text-purple-400 hover:text-purple-300">blake@fitzgeraldhr.com.au</a>
+                <a href="/cdn-cgi/l/email-protection#52303e33393712343b2628353720333e363a207c313d3f7c3327" class="text-purple-400 hover:text-purple-300"><span class="__cf_email__" data-cfemail="5b39373a303e1b3d322f213c3e293a373f332975383436753a2e">[email&#160;protected]</span></a>
             </p>
         </div>
     </div>
@@ -7572,7 +7491,7 @@ function setBilling(billing) {
     </div>
 </div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ========================================
 // CONFIGURATION & GLOBALS
 // ========================================
@@ -15437,8 +15356,10 @@ function openReviewRequestModal(containerId, docType, docName, actionsId, isFrom
         prefilledNotice.classList.toggle('hidden', !hasPrefilledData);
     }
     
-    // Show modal
+    // Show modal with focus management
     modal.classList.remove('hidden');
+    trapFocus(modal);
+    announce('Expert review request form opened');
 }
 
 /**
@@ -15447,6 +15368,7 @@ function openReviewRequestModal(containerId, docType, docName, actionsId, isFrom
 function closeReviewRequestModal() {
     const modal = document.getElementById('reviewRequestModal');
     if (modal) {
+        releaseFocus(modal);
         modal.classList.add('hidden');
     }
 }
@@ -15524,6 +15446,7 @@ async function submitReviewRequest() {
         
         if (response.ok) {
             console.log('✅ Review request sent via Netlify function');
+            announce('Review request submitted successfully');
         } else {
             // Fallback: Open mailto link
             console.log('⚠️ Netlify function failed, falling back to mailto');
@@ -15590,6 +15513,9 @@ async function submitReviewRequest() {
     // Mark document as pending review
     unlockedDocuments.add(docType + '_pending_review');
     
+    // Show contextual next-step suggestion
+    setTimeout(function() { renderNextStepSuggestion(docType); }, 500);
+    
     // Reset button
     submitBtn.innerHTML = originalBtnText;
     submitBtn.disabled = false;
@@ -15605,6 +15531,9 @@ function showAttachmentPromptModal(refNumber, employeeName, isFormalProcess, use
         modal = document.createElement('div');
         modal.id = 'attachmentPromptModal';
         modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[80]';
+        modal.setAttribute('role', 'dialog');
+        modal.setAttribute('aria-modal', 'true');
+        modal.setAttribute('aria-label', 'Supporting documents prompt');
         document.body.appendChild(modal);
     }
     
@@ -16838,6 +16767,9 @@ function attemptAutoLogin() {
  * @returns {Promise<void>}
  */
 async function sendMessage() {
+    // Remove welcome screen
+    var welcomeEl = document.getElementById('welcomeScreen');
+    if (welcomeEl) welcomeEl.remove();
     const input = DOM.messageInput;
     const message = input.value.trim();
     
@@ -17589,44 +17521,11 @@ function createNewConversation() {
     // Reset conversation history
     conversationHistory = [];
     
-    // Add FULL welcome message with HTML formatting (matching Image 1)
-    const welcomeMessage = `
-        <p class="text-slate-100 leading-relaxed">
-            👋 G'day! I'm Fitz, your hospitality HR assistant.
-        </p>
-        <p class="text-slate-100 leading-relaxed mt-3">
-            Ask me anything about awards, compliance, or employment law.
-        </p>
-        <p class="text-red-400 font-semibold mt-4 mb-2">🚨 Urgent/Critical Situations:</p>
-        <p class="text-slate-100 text-sm">
-            Use the red URGENT button above for immediate crisis response.
-        </p>
-        <p class="text-slate-100 leading-relaxed mt-4">
-            What HR topic would you like to learn about today?
-        </p>
-    `;
+    // Show rich welcome screen with quick actions
+    showWelcomeScreen();
     
-    // For display - reuse container already declared above
-    var displayContainer = DOM.messagesContainer.querySelector('.space-y-6');
-    if (!displayContainer) {
-        DOM.messagesContainer.innerHTML = '<div class="max-w-5xl mx-auto space-y-6"></div>';
-        displayContainer = DOM.messagesContainer.querySelector('.space-y-6');
-    }
-    
-    if (displayContainer) {
-        var messageDiv = document.createElement('div');
-        messageDiv.className = 'flex justify-start fade-in';
-        var messageId = 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-        messageDiv.setAttribute('data-message-id', messageId);
-        messageDiv.innerHTML = '<div class="max-w-3xl bg-slate-800 text-slate-100 border border-slate-700 rounded-2xl px-6 py-4 relative">' +
-            '<span class="bookmark-star absolute top-3 right-3" data-message-id="' + messageId + '" onclick="toggleBookmark(\'' + messageId + '\')" title="Bookmark this">☆</span>' +
-            '<div class="leading-relaxed">' + welcomeMessage + '</div>' +
-            '</div>';
-        displayContainer.appendChild(messageDiv);
-    }
-    
-    // For storage - save plain text version
-    var plainWelcome = '👋 G\'day! I\'m Fitz, your hospitality HR assistant.\n\nAsk me anything about awards, compliance, or employment law.\n\n🚨 Urgent/Critical Situations:\nUse the red URGENT button above for immediate crisis response.\n\nWhat HR topic would you like to learn about today?';
+    // For storage
+    var plainWelcome = "G'day! I'm Fitz, your hospitality HR assistant. Ask me anything about awards, compliance, or employment law.";
     conversationHistory.push({ role: 'assistant', content: plainWelcome });
     
     // Save and update UI - FIXED: Use saveCurrentConversation to update messages
@@ -17635,6 +17534,169 @@ function createNewConversation() {
     showToast('New chat started', 'success', 2000);
     
 }
+
+
+// ============================================================
+// ENHANCEMENT: Rich Welcome Screen
+// ============================================================
+function showWelcomeScreen() {
+    var displayContainer = DOM.messagesContainer.querySelector('.space-y-6');
+    if (!displayContainer) {
+        DOM.messagesContainer.innerHTML = '<div class="max-w-5xl mx-auto space-y-6"></div>';
+        displayContainer = DOM.messagesContainer.querySelector('.space-y-6');
+    }
+    if (!displayContainer) return;
+
+    var userName = '';
+    try { userName = (venueProfile && venueProfile.contactName) ? venueProfile.contactName.split(' ')[0] : ''; } catch(e) {}
+    var greeting = userName ? ("G'day, " + userName + "!") : "G'day!";
+    var hour = new Date().getHours();
+    var timeGreeting = hour < 12 ? 'Good morning,' : hour < 17 ? 'Good afternoon,' : 'Good evening,';
+
+    var welcomeDiv = document.createElement('div');
+    welcomeDiv.className = 'welcome-container fade-in';
+    welcomeDiv.id = 'welcomeScreen';
+    welcomeDiv.innerHTML = 
+        '<div class="text-center mb-6">' +
+            '<div class="welcome-logo"><span class="text-amber-500">F</span><span class="text-white">ITZ</span></div>' +
+            '<h2 class="welcome-greeting">' + timeGreeting + ' ' + greeting + '</h2>' +
+            '<p class="welcome-subtitle">Your AI-powered HR assistant for Australian hospitality</p>' +
+        '</div>' +
+        '<div class="quick-actions-grid" role="list" aria-label="Quick actions">' +
+            '<button class="quick-action-card" role="listitem" onclick="fillAndSend(\'I need to write a formal warning for an employee\')">' +
+                '<div class="quick-action-icon">📄</div>' +
+                '<div><div class="quick-action-title">Create a Document</div>' +
+                '<div class="quick-action-desc">Warnings, PIPs, contracts, position descriptions & more</div></div>' +
+            '</button>' +
+            '<button class="quick-action-card" role="listitem" onclick="fillAndSend(\'What are my obligations under the Fair Work Act for casual employees?\')">' +
+                '<div class="quick-action-icon">⚖️</div>' +
+                '<div><div class="quick-action-title">Compliance Question</div>' +
+                '<div class="quick-action-desc">Fair Work, awards, NES, leave entitlements & regulations</div></div>' +
+            '</button>' +
+            '<button class="quick-action-card" role="listitem" onclick="fillAndSend(\'An employee has been consistently late. What steps should I take?\')">' +
+                '<div class="quick-action-icon">📋</div>' +
+                '<div><div class="quick-action-title">Performance Issue</div>' +
+                '<div class="quick-action-desc">Managing underperformance, misconduct & disciplinary steps</div></div>' +
+            '</button>' +
+            '<button class="quick-action-card" role="listitem" onclick="fillAndSend(\'I need to hire a new bartender. What should I know about award rates?\')">' +
+                '<div class="quick-action-icon">👥</div>' +
+                '<div><div class="quick-action-title">Hiring & Onboarding</div>' +
+                '<div class="quick-action-desc">Job ads, award rates, contracts, probation & induction</div></div>' +
+            '</button>' +
+        '</div>' +
+        '<div class="text-center">' +
+            '<p class="text-slate-400 text-xs mb-3">Or try one of these:</p>' +
+            '<div class="suggested-prompts" style="justify-content:center">' +
+                '<button class="suggested-prompt-chip" onclick="fillAndSend(\'What penalty rates apply on a Sunday?\')">💰 Sunday penalty rates</button>' +
+                '<button class="suggested-prompt-chip" onclick="fillAndSend(\'How do I terminate an employee fairly?\')">⚠️ Fair termination</button>' +
+                '<button class="suggested-prompt-chip" onclick="fillAndSend(\'What are casual conversion rules?\')">🔄 Casual conversion</button>' +
+            '</div>' +
+        '</div>' +
+        '<div class="mt-6 bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-center max-w-md mx-auto">' +
+            '<p class="text-red-400 text-sm font-medium">🚨 Urgent situation? Use the <strong>URGENT</strong> button above for immediate crisis response.</p>' +
+        '</div>';
+    
+    displayContainer.appendChild(welcomeDiv);
+}
+
+function fillAndSend(text) {
+    var welcome = document.getElementById('welcomeScreen');
+    if (welcome) welcome.remove();
+    var input = document.getElementById('messageInput');
+    if (input) {
+        input.value = text;
+        input.focus();
+        if (typeof autoResizeTextarea === 'function') autoResizeTextarea(input);
+        sendMessage();
+    }
+}
+
+// ============================================================
+// ENHANCEMENT: Screen Reader Announcements
+// ============================================================
+function announce(message) {
+    var el = document.getElementById('liveAnnouncer');
+    if (el) { el.textContent = ''; setTimeout(function() { el.textContent = message; }, 50); }
+}
+
+// ============================================================
+// ENHANCEMENT: Focus Trapping for Modals
+// ============================================================
+function trapFocus(modal) {
+    if (!modal) return;
+    var focusable = modal.querySelectorAll('button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])');
+    if (focusable.length === 0) return;
+    var first = focusable[0], last = focusable[focusable.length - 1];
+    modal._prevFocus = document.activeElement;
+    setTimeout(function() { first.focus(); }, 50);
+    modal._trapHandler = function(e) {
+        if (e.key === 'Tab') {
+            if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+            else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+        if (e.key === 'Escape') {
+            releaseFocus(modal);
+            var closeBtn = modal.querySelector('button[onclick*="close"], button[onclick*="Close"]');
+            if (closeBtn) closeBtn.click();
+        }
+    };
+    modal.addEventListener('keydown', modal._trapHandler);
+}
+
+function releaseFocus(modal) {
+    if (!modal) return;
+    if (modal._trapHandler) { modal.removeEventListener('keydown', modal._trapHandler); delete modal._trapHandler; }
+    if (modal._prevFocus && modal._prevFocus.focus) { setTimeout(function() { modal._prevFocus.focus(); }, 50); }
+}
+
+// ============================================================
+// ENHANCEMENT: Contextual Next-Step Suggestions
+// ============================================================
+function getNextStepSuggestion(docType) {
+    var map = {
+        recordOfDiscussion: { icon: '📊', title: 'What comes next?', text: 'If the issue continues, the recommended next step is a Performance Improvement Plan (PIP) or Letter of Concern.', action: 'Create a PIP', fn: "fillAndSend('I need to create a Performance Improvement Plan')" },
+        letterOfConcern: { icon: '📊', title: 'What comes next?', text: 'If the employee does not improve, consider creating a PIP with measurable goals.', action: 'Create a PIP', fn: "fillAndSend('I need to create a Performance Improvement Plan')" },
+        pip: { icon: '⚠️', title: 'What comes next?', text: 'If PIP objectives are not met, the next step is typically a First Written Warning.', action: 'Create First Warning', fn: "fillAndSend('I need to create a first written warning')" },
+        firstWarning: { icon: '🚨', title: 'What comes next?', text: 'If conduct does not improve, a Final Written Warning is the next step. Retain all documentation.', action: 'Create Final Warning', fn: "fillAndSend('I need to create a final written warning')" },
+        finalWarning: { icon: '📞', title: 'Consider expert consultation', text: 'After a final warning, termination may follow. This is high-risk \u2014 we strongly recommend consulting Blake.', action: 'Book Consultation', fn: "openConsultationBookingModal()" },
+        formalWarning: { icon: '📋', title: 'What comes next?', text: 'Keep a signed copy. If the issue recurs, escalate to a final warning. Set a review date.', action: 'Learn more', fn: "fillAndSend('How should I follow up after issuing a formal warning?')" },
+        positionDescription: { icon: '📢', title: 'Ready to advertise?', text: 'Now create a job advertisement to start recruiting for this role.', action: 'Create Job Ad', fn: "fillAndSend('I need to create a job advertisement')" },
+        jobDescription: { icon: '✅', title: 'Prepare for onboarding', text: 'Once you select a candidate, create an onboarding checklist for a smooth first week.', action: 'Create Onboarding Checklist', fn: "fillAndSend('I need to create an onboarding checklist')" },
+        onboardingChecklist: { icon: '📚', title: 'Set up training', text: 'With your checklist ready, create a training plan for the new hire.', action: 'Create Training Plan', fn: "fillAndSend('I need to create a training plan')" },
+        showCause: { icon: '📞', title: 'Expert review essential', text: 'Show cause letters have strict legal requirements. Expert review is strongly recommended.', action: 'Book Consultation', fn: "openConsultationBookingModal()" }
+    };
+    return map[docType] || null;
+}
+
+function renderNextStepSuggestion(docType, containerId) {
+    var s = getNextStepSuggestion(docType);
+    if (!s) return;
+    var container = containerId ? document.getElementById(containerId) : null;
+    if (!container) container = DOM.messagesContainer ? DOM.messagesContainer.querySelector('.space-y-6') : null;
+    if (!container) return;
+    var card = document.createElement('div');
+    card.className = 'flex justify-start fade-in';
+    card.innerHTML = '<div class="max-w-3xl w-full"><div class="next-step-card">' +
+        '<h4>' + s.icon + ' ' + s.title + '</h4><p>' + s.text + '</p>' +
+        '<button class="next-step-action" onclick="' + s.fn + '">' + s.action + ' →</button>' +
+        '</div></div>';
+    container.appendChild(card);
+    announce('Suggestion: ' + s.title);
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', function(e) {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'b') { e.preventDefault(); if (typeof toggleSidebar === 'function') toggleSidebar(); }
+    if (e.key === 'Escape') {
+        var modals = document.querySelectorAll('[role="dialog"]:not(.hidden)');
+        if (modals.length > 0) {
+            var top = modals[modals.length - 1];
+            var btn = top.querySelector('button[onclick*="close"], button[onclick*="Close"]');
+            if (btn) btn.click();
+        }
+    }
+});
+
 
 // Save current conversation
 function saveCurrentConversation() {
@@ -35176,30 +35238,3 @@ async function loadTrainingPlansFromFirebase() {
 async function loadAllDataFromFirebase() {
     if (!currentUser || !db) {
         return;
-    }
-    
-    try {
-        // Load all data types
-        await Promise.all([
-            loadConversationsFromFirebase(),
-            loadContractsFromFirebase(),
-            loadChecklistsFromFirebase(),
-            loadTrainingPlansFromFirebase(),
-            loadBookmarksFromFirebase()
-        ]);
-        
-        // Update sidebar with loaded data
-        if (typeof updateSidebarChats === 'function') {
-            updateSidebarChats();
-        }
-        if (typeof updateSidebarBookmarks === 'function') {
-            updateSidebarBookmarks();
-        }
-        
-    } catch (error) {
-    }
-}
-
-</script>
-</body>
-</html>
