@@ -14364,8 +14364,19 @@ function processPaymentSuccess() {
                 
                 // Handle pending documents/consultations after modal closes
                 setTimeout(() => {
-                    const documentRestored = restorePendingDocument();
-                    const consultationRestored = checkPendingConsultationBooking();
+                    // Only restore document if this was a credit/subscription purchase (not consultation)
+                    let documentRestored = false;
+                    let consultationRestored = false;
+                    
+                    if (purchase.type === 'consultation') {
+                        // If they purchased a consultation, check for pending consultation booking
+                        consultationRestored = checkPendingConsultationBooking();
+                    } else {
+                        // For credits/subscriptions, restore pending document
+                        // Also clear any stale consultation bookings to prevent them opening
+                        localStorage.removeItem('pendingConsultationBooking');
+                        documentRestored = restorePendingDocument();
+                    }
                     
                     if (!documentRestored && !consultationRestored) {
                         if (purchase.type === 'subscription') {
