@@ -3333,123 +3333,59 @@ input, textarea, select {
     animation: creditPulse 2s ease-in-out infinite;
 }
 
-/* ========================================
-   FITZ ENHANCED THEME VARIABLES
-   ======================================== */
-:root {
-    --fitz-bg-elevated: #1e293b;
-    --fitz-bg-surface: rgba(30, 41, 59, 0.8);
-    --fitz-bg-input: #0f172a;
-    --fitz-text-inverse: #0f172a;
-    --fitz-border-secondary: #334155;
-    --fitz-border-focus: #f59e0b;
-    --fitz-accent-subtle: rgba(245, 158, 11, 0.1);
-    --fitz-danger: #ef4444;
-    --fitz-danger-subtle: rgba(239, 68, 68, 0.1);
-    --fitz-success: #22c55e;
-    --fitz-success-subtle: rgba(34, 197, 94, 0.1);
-    --fitz-info: #3b82f6;
-    --fitz-info-subtle: rgba(59, 130, 246, 0.1);
-    --fitz-shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
-    --fitz-shadow-md: 0 4px 12px rgba(0,0,0,0.4);
-    --fitz-radius-sm: 0.5rem;
-    --fitz-radius-md: 0.75rem;
-    --fitz-radius-lg: 1rem;
+/* ── FITZ UX ENHANCEMENTS ────────────────────────── */
+:root{
+  --fz-accent-s:rgba(245,158,11,.1);
+  --fz-info:#3b82f6; --fz-info-s:rgba(59,130,246,.1);
+  --fz-danger:#ef4444; --fz-success:#22c55e;
+  --fz-shad:0 4px 12px rgba(0,0,0,.4);
 }
-.light-mode {
-    --fitz-bg-elevated: #ffffff;
-    --fitz-bg-surface: rgba(255, 255, 255, 0.92);
-    --fitz-bg-input: #ffffff;
-    --fitz-text-inverse: #ffffff;
-    --fitz-border-secondary: #e2e8f0;
-    --fitz-accent-subtle: rgba(245, 158, 11, 0.08);
-    --fitz-danger: #dc2626;
-    --fitz-danger-subtle: rgba(220, 38, 38, 0.08);
-    --fitz-success: #16a34a;
-    --fitz-success-subtle: rgba(22, 163, 74, 0.08);
-    --fitz-info: #2563eb;
-    --fitz-info-subtle: rgba(37, 99, 235, 0.08);
-    --fitz-shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-    --fitz-shadow-md: 0 4px 12px rgba(0,0,0,0.1);
+.light-mode{
+  --fz-accent-s:rgba(245,158,11,.06);
+  --fz-info:#2563eb; --fz-info-s:rgba(37,99,235,.08);
+  --fz-danger:#dc2626; --fz-success:#16a34a;
+  --fz-shad:0 4px 12px rgba(0,0,0,.1);
 }
+.light-mode .bg-slate-800\/80{backdrop-filter:blur(12px)}
+.light-mode input:focus,.light-mode textarea:focus{box-shadow:0 0 0 3px rgba(245,158,11,.15)!important}
+.light-mode .bg-amber-500{box-shadow:0 2px 8px rgba(245,158,11,.3)!important}
 
-/* Enhanced light mode */
-.light-mode .bg-slate-800\/80 { backdrop-filter: blur(12px); box-shadow: var(--fitz-shadow-sm); }
-.light-mode #messagesContainer .bg-slate-700 { box-shadow: var(--fitz-shadow-sm); }
-.light-mode #messagesContainer .bg-slate-800 { border-color: var(--fitz-border-secondary) !important; }
-.light-mode .bg-amber-500\/10, .light-mode .bg-yellow-500\/10 { border: 1px solid var(--accent-color) !important; }
-.light-mode .bg-blue-500\/10 { border: 1px solid var(--fitz-info) !important; }
-.light-mode .bg-red-500\/10 { border: 1px solid var(--fitz-danger) !important; }
-.light-mode .bg-green-500\/10 { border: 1px solid var(--fitz-success) !important; }
-.light-mode input:focus, .light-mode textarea:focus, .light-mode select:focus { box-shadow: 0 0 0 3px rgba(245,158,11,0.15) !important; }
-.light-mode .bg-amber-500 { box-shadow: 0 2px 8px rgba(245,158,11,0.3) !important; }
-.light-mode .font-extrabold, .light-mode .font-extrabold span { font-weight: 800 !important; }
+*:focus-visible{outline:2px solid var(--accent-color,#f59e0b);outline-offset:2px;border-radius:4px}
+*:focus:not(:focus-visible){outline:none}
+.fz-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.fz-skip{position:fixed;top:-60px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#0f172a;padding:.75rem 1.5rem;border-radius:.75rem;font-weight:600;z-index:9998;transition:top .2s;text-decoration:none;font-size:.875rem}
+.fz-skip:focus{top:1rem}
 
-/* Accessibility */
-*:focus-visible { outline: 2px solid var(--accent-color, #f59e0b); outline-offset: 2px; border-radius: 4px; }
-*:focus:not(:focus-visible) { outline: none; }
-.fitz-sr-only { position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0; }
-.fitz-skip-link {
-    position:fixed;top:-50px;left:50%;transform:translateX(-50%);
-    background:#f59e0b;color:#0f172a;padding:0.75rem 1.5rem;
-    border-radius:0.75rem;font-weight:600;z-index:9998;transition:top 0.15s ease;text-decoration:none;
-}
-.fitz-skip-link:focus { top:1rem; }
+.fz-skel{background:linear-gradient(90deg,#334155 25%,#1e293b 50%,#334155 75%);background-size:200% 100%;animation:fzShim 1.5s ease-in-out infinite;border-radius:.5rem}
+@keyframes fzShim{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.fz-spin{width:20px;height:20px;border:2px solid #475569;border-top-color:#f59e0b;border-radius:50%;animation:fzSp .6s linear infinite;display:inline-block}
+@keyframes fzSp{to{transform:rotate(360deg)}}
 
-/* Loading states */
-.fitz-skeleton {
-    background:linear-gradient(90deg,#334155 25%,#1e293b 50%,#334155 75%);
-    background-size:200% 100%;animation:fitz-shimmer 1.5s ease-in-out infinite;border-radius:0.5rem;
-}
-@keyframes fitz-shimmer { 0%{background-position:200% 0}100%{background-position:-200% 0} }
-.fitz-spinner { width:20px;height:20px;border:2px solid #475569;border-top-color:#f59e0b;border-radius:50%;animation:fitz-spin 0.6s linear infinite;display:inline-block; }
-@keyframes fitz-spin { to{transform:rotate(360deg)} }
+.fz-wel{max-width:800px;margin:0 auto;padding:2rem 1rem;animation:fzUp .6s ease-out}
+@keyframes fzUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.fz-wel-logo{font-size:2.5rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.5rem}
+.fz-wel-hi{font-size:1.5rem;font-weight:600;color:#fff;margin-bottom:.25rem}
+.light-mode .fz-wel-hi{color:#0f172a}
+.fz-wel-sub{color:#94a3b8;font-size:1rem;margin-bottom:2rem}
 
-/* Welcome screen */
-.fitz-welcome { max-width:800px;margin:0 auto;padding:2rem 1rem;animation:fitz-welcome-in 0.6s ease-out; }
-@keyframes fitz-welcome-in { from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)} }
-.fitz-welcome-logo { font-size:2.5rem;font-weight:800;letter-spacing:-0.025em;margin-bottom:0.5rem; }
-.fitz-welcome-greeting { font-size:1.5rem;font-weight:600;color:#fff;margin-bottom:0.25rem; }
-.light-mode .fitz-welcome-greeting { color:#0f172a; }
-.fitz-welcome-sub { color:#94a3b8;font-size:1rem;margin-bottom:2rem; }
-.fitz-quick-grid { display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem;margin-bottom:2rem; }
-@media(max-width:640px){.fitz-quick-grid{grid-template-columns:1fr;}}
-.fitz-quick-card {
-    display:flex;align-items:flex-start;gap:0.75rem;padding:1rem;
-    background:var(--bg-secondary,#1e293b);border:1px solid var(--fitz-border-secondary,#334155);
-    border-radius:1rem;cursor:pointer;transition:all 0.15s ease;text-align:left;color:inherit;
-}
-.fitz-quick-card:hover { border-color:var(--accent-color,#f59e0b);background:var(--fitz-accent-subtle);transform:translateY(-1px);box-shadow:var(--fitz-shadow-md); }
-.fitz-quick-icon { font-size:1.5rem;flex-shrink:0;width:2.5rem;height:2.5rem;display:flex;align-items:center;justify-content:center;background:var(--fitz-accent-subtle);border-radius:0.75rem; }
-.fitz-quick-title { font-weight:600;color:var(--text-primary,#fff);font-size:0.875rem;margin-bottom:2px; }
-.fitz-quick-desc { color:var(--text-tertiary,#94a3b8);font-size:0.75rem;line-height:1.4; }
-.fitz-prompt-chips { display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1.5rem;justify-content:center; }
-.fitz-chip {
-    display:inline-flex;align-items:center;gap:0.375rem;padding:0.5rem 0.875rem;
-    background:var(--bg-tertiary,#334155);border:1px solid var(--fitz-border-secondary,#334155);
-    border-radius:999px;color:var(--text-secondary,#cbd5e1);font-size:0.8125rem;
-    cursor:pointer;transition:all 0.15s ease;white-space:nowrap;
-}
-.fitz-chip:hover { border-color:var(--accent-color,#f59e0b);color:var(--accent-color,#f59e0b);background:var(--fitz-accent-subtle); }
+.fz-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:2rem}
+@media(max-width:640px){.fz-grid{grid-template-columns:1fr}}
+.fz-card{display:flex;align-items:flex-start;gap:.75rem;padding:1rem;background:var(--bg-secondary,#1e293b);border:1px solid var(--border-color,#475569);border-radius:1rem;cursor:pointer;transition:all .15s;text-align:left;color:inherit;width:100%}
+.fz-card:hover{border-color:var(--accent-color,#f59e0b);background:var(--fz-accent-s);transform:translateY(-2px);box-shadow:var(--fz-shad)}
+.fz-card:active{transform:translateY(0)}
+.fz-ic{font-size:1.5rem;flex-shrink:0;width:2.5rem;height:2.5rem;display:flex;align-items:center;justify-content:center;background:var(--fz-accent-s);border-radius:.75rem}
+.fz-ct{font-weight:600;color:var(--text-primary,#fff);font-size:.875rem;margin-bottom:2px}
+.fz-cd{color:var(--text-tertiary,#94a3b8);font-size:.75rem;line-height:1.4}
 
-/* Next-step suggestions */
-.fitz-next-step { background:var(--fitz-info-subtle);border:1px solid var(--fitz-info);border-radius:1rem;padding:1rem;margin-top:1rem; }
-.fitz-next-step h4 { color:var(--fitz-info);font-weight:600;font-size:0.875rem;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.5rem; }
-.fitz-next-step p { color:var(--text-secondary,#cbd5e1);font-size:0.8125rem;margin-bottom:0.75rem; }
-.fitz-next-btn {
-    display:inline-flex;align-items:center;gap:0.375rem;padding:0.375rem 0.875rem;
-    background:var(--fitz-info);color:white;border-radius:0.5rem;font-size:0.8125rem;
-    font-weight:600;cursor:pointer;transition:all 0.15s ease;border:none;
-}
-.fitz-next-btn:hover { filter:brightness(1.1);transform:translateY(-1px); }
+.fz-chips{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center}
+.fz-chip{display:inline-flex;align-items:center;gap:.375rem;padding:.5rem .875rem;background:var(--bg-tertiary,#334155);border:1px solid var(--border-color,#475569);border-radius:999px;color:var(--text-secondary,#cbd5e1);font-size:.8125rem;cursor:pointer;transition:all .15s;white-space:nowrap}
+.fz-chip:hover{border-color:var(--accent-color,#f59e0b);color:var(--accent-color,#f59e0b);background:var(--fz-accent-s)}
 
-/* Step progress */
-.fitz-steps { display:flex;align-items:center;gap:0.5rem;padding:1rem 0; }
-.fitz-step-dot { width:10px;height:10px;border-radius:50%;background:#475569;transition:all 0.25s ease; }
-.fitz-step-dot.active { background:#f59e0b;box-shadow:0 0 0 3px rgba(245,158,11,0.2); }
-.fitz-step-dot.done { background:#22c55e; }
-.fitz-step-line { flex:1;height:2px;background:#475569; }
-.fitz-step-line.done { background:#22c55e; }
+.fz-ns{background:var(--fz-info-s);border:1px solid var(--fz-info);border-radius:1rem;padding:1rem;margin-top:1rem}
+.fz-ns h4{color:var(--fz-info);font-weight:600;font-size:.875rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
+.fz-ns p{color:var(--text-secondary,#cbd5e1);font-size:.8125rem;margin-bottom:.75rem}
+.fz-ns-btn{display:inline-flex;align-items:center;gap:.375rem;padding:.375rem .875rem;background:var(--fz-info);color:#fff;border-radius:.5rem;font-size:.8125rem;font-weight:600;cursor:pointer;transition:all .15s;border:none}
+.fz-ns-btn:hover{filter:brightness(1.1);transform:translateY(-1px)}
 
     </style>
     
@@ -3458,6 +3394,8 @@ input, textarea, select {
     <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
+<a href="#messagesContainer" class="fz-skip">Skip to main content</a>
+<div id="fzAnnounce" class="fz-sr" aria-live="polite" aria-atomic="true"></div>
 
 <!-- ============================================
      LAUNCH GATE - Remove or set LAUNCH_MODE = false when ready to go live
@@ -3607,10 +3545,6 @@ function submitLaunchEmail() {
 // Initialize launch gate immediately
 initLaunchGate();
 </script>
-
-<!-- Accessibility -->
-<a href="#messagesContainer" class="fitz-skip-link" tabindex="0">Skip to main content</a>
-<div id="fitzAnnouncer" class="fitz-sr-only" aria-live="polite" aria-atomic="true"></div>
 
 <!-- SYNC DEBUG PANEL - ADD THIS TO THE HEADER -->
 
@@ -17712,20 +17646,21 @@ function createNewConversation() {
     // Reset conversation history
     conversationHistory = [];
     
-    // Show rich welcome screen (with fallback)
+    // Enhanced welcome screen with quick-action cards
     if (typeof fitzShowWelcome === 'function') {
-        fitzShowWelcome();
-    } else {
-        var fc = DOM.messagesContainer.querySelector('.space-y-6');
-        if (!fc) { DOM.messagesContainer.innerHTML = '<div class="max-w-5xl mx-auto space-y-6"></div>'; fc = DOM.messagesContainer.querySelector('.space-y-6'); }
-        if (fc) {
-            var md = document.createElement('div');
-            md.className = 'flex justify-start fade-in';
-            md.innerHTML = '<div class="max-w-3xl bg-slate-800 text-slate-100 border border-slate-700 rounded-2xl px-6 py-4"><p>\ud83d\udc4b G\'day! I\'m Fitz, your hospitality HR assistant. Ask me anything about awards, compliance, or employment law.</p></div>';
-            fc.appendChild(md);
+        try { fitzShowWelcome(); } catch(e) { console.warn('Welcome error:', e); }
+    }
+    // Fallback if enhancement JS hasn't loaded yet
+    if (!document.getElementById('fzWelcome')) {
+        var _fc = DOM.messagesContainer.querySelector('.space-y-6');
+        if (!_fc) { DOM.messagesContainer.innerHTML = '<div class="max-w-5xl mx-auto space-y-6"></div>'; _fc = DOM.messagesContainer.querySelector('.space-y-6'); }
+        if (_fc) {
+            var _md = document.createElement('div');
+            _md.className = 'flex justify-start fade-in';
+            _md.innerHTML = '<div class="max-w-3xl bg-slate-800 text-slate-100 border border-slate-700 rounded-2xl px-6 py-4"><p>👋 G\'day! I\'m Fitz, your hospitality HR assistant. Ask me anything about awards, compliance, or employment law.</p></div>';
+            _fc.appendChild(_md);
         }
     }
-    
     var plainWelcome = "G'day! I'm Fitz, your hospitality HR assistant. Ask me anything about awards, compliance, or employment law.";
     conversationHistory.push({ role: 'assistant', content: plainWelcome });
     
@@ -35278,254 +35213,200 @@ async function loadAllDataFromFirebase() {
         return;
 
 
-<!-- ============================================
-     FITZ ENHANCEMENTS - Additive JS Block
-     ============================================ -->
-<script>
-(function() {
-    'use strict';
+// ╔═══════════════════════════════════════════════════╗
+// ║  FITZ UX ENHANCEMENTS                            ║
+// ╚═══════════════════════════════════════════════════╝
 
-    // ========== WELCOME SCREEN ==========
-    window.fitzShowWelcome = function() {
-        var mc = document.getElementById('messagesContainer');
-        if (!mc) return;
-        var container = mc.querySelector('.space-y-6');
-        if (!container) {
-            mc.innerHTML = '<div class="max-w-5xl mx-auto space-y-6"></div>';
-            container = mc.querySelector('.space-y-6');
+function fitzShowWelcome() {
+    var mc = document.getElementById('messagesContainer');
+    if (!mc) return;
+    var c = mc.querySelector('.space-y-6');
+    if (!c) { mc.innerHTML = '<div class="max-w-5xl mx-auto space-y-6"></div>'; c = mc.querySelector('.space-y-6'); }
+    if (!c) return;
+
+    var name = '';
+    try { if (typeof venueProfile!=='undefined' && venueProfile && venueProfile.contactName) name = venueProfile.contactName.split(' ')[0]; } catch(e){}
+    var hi = name ? ("G'day, "+name+"!") : "G'day!";
+    var h = new Date().getHours();
+    var t = h<12?'Good morning,':h<17?'Good afternoon,':'Good evening,';
+
+    var d = document.createElement('div');
+    d.className = 'fz-wel fade-in';
+    d.id = 'fzWelcome';
+    d.innerHTML =
+        '<div class="text-center mb-6">'+
+            '<div class="fz-wel-logo"><span class="text-amber-500">F</span><span class="text-white">ITZ</span></div>'+
+            '<h2 class="fz-wel-hi">'+t+' '+hi+'</h2>'+
+            '<p class="fz-wel-sub">Your AI-powered HR assistant for Australian hospitality</p>'+
+        '</div>'+
+        '<div class="fz-grid">'+
+            '<button class="fz-card" onclick="fzSend(\'I need to write a formal warning for an employee\')">'+
+                '<div class="fz-ic">&#x1F4C4;</div>'+
+                '<div><div class="fz-ct">Create a Document</div>'+
+                '<div class="fz-cd">Warnings, PIPs, contracts, position descriptions &amp; more</div></div>'+
+            '</button>'+
+            '<button class="fz-card" onclick="fzSend(\'What are my obligations under the Fair Work Act for casual employees?\')">'+
+                '<div class="fz-ic">&#x2696;&#xFE0F;</div>'+
+                '<div><div class="fz-ct">Compliance Question</div>'+
+                '<div class="fz-cd">Fair Work, awards, NES, leave entitlements &amp; regulations</div></div>'+
+            '</button>'+
+            '<button class="fz-card" onclick="fzSend(\'An employee has been consistently late. What steps should I take?\')">'+
+                '<div class="fz-ic">&#x1F4CB;</div>'+
+                '<div><div class="fz-ct">Performance Issue</div>'+
+                '<div class="fz-cd">Managing underperformance, misconduct &amp; disciplinary steps</div></div>'+
+            '</button>'+
+            '<button class="fz-card" onclick="fzSend(\'I need to hire a new bartender. What should I know about award rates?\')">'+
+                '<div class="fz-ic">&#x1F465;</div>'+
+                '<div><div class="fz-ct">Hiring &amp; Onboarding</div>'+
+                '<div class="fz-cd">Job ads, award rates, contracts, probation &amp; induction</div></div>'+
+            '</button>'+
+        '</div>'+
+        '<div class="text-center">'+
+            '<p class="text-slate-400 text-xs mb-3">Or try one of these:</p>'+
+            '<div class="fz-chips">'+
+                '<button class="fz-chip" onclick="fzSend(\'What penalty rates apply on a Sunday?\')">&#x1F4B0; Sunday penalty rates</button>'+
+                '<button class="fz-chip" onclick="fzSend(\'How do I terminate an employee fairly?\')">&#x26A0;&#xFE0F; Fair termination</button>'+
+                '<button class="fz-chip" onclick="fzSend(\'What are casual conversion rules?\')">&#x1F504; Casual conversion</button>'+
+            '</div>'+
+        '</div>'+
+        '<div class="mt-6 bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-center max-w-md mx-auto">'+
+            '<p class="text-red-400 text-sm font-medium">&#x1F6A8; Urgent situation? Use the <strong>URGENT</strong> button above for immediate crisis response.</p>'+
+        '</div>';
+    c.appendChild(d);
+}
+
+function fzSend(text) {
+    var w = document.getElementById('fzWelcome');
+    if (w) w.remove();
+    var inp = document.getElementById('messageInput');
+    if (inp) {
+        inp.value = text;
+        inp.focus();
+        if (typeof autoResizeTextarea==='function') autoResizeTextarea(inp);
+        if (typeof sendMessage==='function') sendMessage();
+    }
+}
+
+function fzAnnounce(msg) {
+    var el = document.getElementById('fzAnnounce');
+    if (el) { el.textContent=''; setTimeout(function(){el.textContent=msg;},50); }
+}
+
+function fzTrap(modal) {
+    if (!modal) return;
+    var s='button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])';
+    var items=modal.querySelectorAll(s);
+    if (!items.length) return;
+    var first=items[0],last=items[items.length-1];
+    modal._fzPrev=document.activeElement;
+    setTimeout(function(){first.focus();},50);
+    modal._fzTrap=function(e){
+        if(e.key==='Tab'){
+            if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
+            else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
         }
-        if (!container) return;
-
-        var userName = '';
-        try {
-            if (typeof venueProfile !== 'undefined' && venueProfile && venueProfile.contactName) {
-                userName = venueProfile.contactName.split(' ')[0];
-            }
-        } catch(e) {}
-        
-        var greeting = userName ? ("G'day, " + userName + "!") : "G'day!";
-        var hour = new Date().getHours();
-        var timeGreet = hour < 12 ? 'Good morning,' : hour < 17 ? 'Good afternoon,' : 'Good evening,';
-
-        var div = document.createElement('div');
-        div.className = 'fitz-welcome fade-in';
-        div.id = 'fitzWelcomeScreen';
-        div.innerHTML = 
-            '<div class="text-center mb-6">' +
-                '<div class="fitz-welcome-logo"><span class="text-amber-500">F</span><span class="text-white">ITZ</span></div>' +
-                '<h2 class="fitz-welcome-greeting">' + timeGreet + ' ' + greeting + '</h2>' +
-                '<p class="fitz-welcome-sub">Your AI-powered HR assistant for Australian hospitality</p>' +
-            '</div>' +
-            '<div class="fitz-quick-grid">' +
-                '<button class="fitz-quick-card" onclick="fitzQuickSend(this, 'I need to write a formal warning for an employee')">' +
-                    '<div class="fitz-quick-icon">📄</div>' +
-                    '<div><div class="fitz-quick-title">Create a Document</div>' +
-                    '<div class="fitz-quick-desc">Warnings, PIPs, contracts, position descriptions & more</div></div>' +
-                '</button>' +
-                '<button class="fitz-quick-card" onclick="fitzQuickSend(this, 'What are my obligations under the Fair Work Act for casual employees?')">' +
-                    '<div class="fitz-quick-icon">⚖️</div>' +
-                    '<div><div class="fitz-quick-title">Compliance Question</div>' +
-                    '<div class="fitz-quick-desc">Fair Work, awards, NES, leave entitlements & regulations</div></div>' +
-                '</button>' +
-                '<button class="fitz-quick-card" onclick="fitzQuickSend(this, 'An employee has been consistently late. What steps should I take?')">' +
-                    '<div class="fitz-quick-icon">📋</div>' +
-                    '<div><div class="fitz-quick-title">Performance Issue</div>' +
-                    '<div class="fitz-quick-desc">Managing underperformance, misconduct & disciplinary steps</div></div>' +
-                '</button>' +
-                '<button class="fitz-quick-card" onclick="fitzQuickSend(this, 'I need to hire a new bartender. What should I know about award rates?')">' +
-                    '<div class="fitz-quick-icon">👥</div>' +
-                    '<div><div class="fitz-quick-title">Hiring & Onboarding</div>' +
-                    '<div class="fitz-quick-desc">Job ads, award rates, contracts, probation & induction</div></div>' +
-                '</button>' +
-            '</div>' +
-            '<div class="text-center">' +
-                '<p class="text-slate-400 text-xs mb-3">Or try one of these:</p>' +
-                '<div class="fitz-prompt-chips">' +
-                    '<button class="fitz-chip" onclick="fitzQuickSend(this, 'What penalty rates apply on a Sunday?')">💰 Sunday penalty rates</button>' +
-                    '<button class="fitz-chip" onclick="fitzQuickSend(this, 'How do I terminate an employee fairly?')">⚠️ Fair termination</button>' +
-                    '<button class="fitz-chip" onclick="fitzQuickSend(this, 'What are casual conversion rules?')">🔄 Casual conversion</button>' +
-                '</div>' +
-            '</div>' +
-            '<div class="mt-6 bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-center max-w-md mx-auto">' +
-                '<p class="text-red-400 text-sm font-medium">🚨 Urgent situation? Use the <strong>URGENT</strong> button above for immediate crisis response.</p>' +
-            '</div>';
-        
-        container.appendChild(div);
-    };
-
-    // ========== QUICK SEND ==========
-    window.fitzQuickSend = function(el, text) {
-        var welcome = document.getElementById('fitzWelcomeScreen');
-        if (welcome) welcome.remove();
-        
-        var input = document.getElementById('messageInput');
-        if (input) {
-            input.value = text;
-            input.focus();
-            if (typeof autoResizeTextarea === 'function') autoResizeTextarea(input);
-            if (typeof sendMessage === 'function') sendMessage();
+        if(e.key==='Escape'){
+            fzRelease(modal);
+            var b=modal.querySelector('button[onclick*="close"],button[onclick*="Close"]');
+            if(b)b.click();
         }
     };
+    modal.addEventListener('keydown',modal._fzTrap);
+}
+function fzRelease(modal){
+    if(!modal)return;
+    if(modal._fzTrap){modal.removeEventListener('keydown',modal._fzTrap);delete modal._fzTrap;}
+    if(modal._fzPrev&&modal._fzPrev.focus)setTimeout(function(){modal._fzPrev.focus();},50);
+}
 
-    // ========== SCREEN READER ==========
-    window.fitzAnnounce = function(msg) {
-        var el = document.getElementById('fitzAnnouncer');
-        if (el) { el.textContent = ''; setTimeout(function() { el.textContent = msg; }, 50); }
-    };
+var _fzNS={
+    recordOfDiscussion:{ic:'&#x1F4CA;',t:'What comes next?',p:'If the issue continues, consider a Performance Improvement Plan (PIP) or Letter of Concern.',b:'Create a PIP',m:'I need to create a Performance Improvement Plan'},
+    letterOfConcern:{ic:'&#x1F4CA;',t:'What comes next?',p:'If the employee does not improve, create a PIP with measurable goals.',b:'Create a PIP',m:'I need to create a Performance Improvement Plan'},
+    pip:{ic:'&#x26A0;&#xFE0F;',t:'What comes next?',p:'If PIP objectives are not met, the next step is typically a First Written Warning.',b:'Create First Warning',m:'I need to create a first written warning'},
+    firstWarning:{ic:'&#x1F6A8;',t:'What comes next?',p:'If conduct does not improve, a Final Written Warning is the next step.',b:'Create Final Warning',m:'I need to create a final written warning'},
+    finalWarning:{ic:'&#x1F4DE;',t:'Consider expert consultation',p:'After a final warning, termination may follow. This is high-risk — we strongly recommend consulting Blake.',b:'Book Consultation',m:'__c__'},
+    formalWarning:{ic:'&#x1F4CB;',t:'What comes next?',p:'Keep a signed copy. If the issue recurs, escalate to a final warning.',b:'Learn more',m:'How should I follow up after issuing a formal warning?'},
+    positionDescription:{ic:'&#x1F4E2;',t:'Ready to advertise?',p:'Create a job advertisement to start recruiting for this role.',b:'Create Job Ad',m:'I need to create a job advertisement'},
+    jobDescription:{ic:'&#x2705;',t:'Prepare for onboarding',p:'Create an onboarding checklist for a smooth first week.',b:'Create Onboarding Checklist',m:'I need to create an onboarding checklist'},
+    onboardingChecklist:{ic:'&#x1F4DA;',t:'Set up training',p:'Create a training plan for the new hire.',b:'Create Training Plan',m:'I need to create a training plan'},
+    showCause:{ic:'&#x1F4DE;',t:'Expert review essential',p:'Show cause letters have strict legal requirements. Expert review is strongly recommended.',b:'Book Consultation',m:'__c__'}
+};
 
-    // ========== FOCUS TRAP ==========
-    window.fitzTrapFocus = function(modal) {
-        if (!modal) return;
-        var sel = 'button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])';
-        var items = modal.querySelectorAll(sel);
-        if (items.length === 0) return;
-        var first = items[0], last = items[items.length - 1];
-        modal._fitzPrev = document.activeElement;
-        setTimeout(function() { first.focus(); }, 50);
-        modal._fitzTrap = function(e) {
-            if (e.key === 'Tab') {
-                if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
-                else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
-            }
-            if (e.key === 'Escape') {
-                fitzReleaseFocus(modal);
-                var btn = modal.querySelector('button[onclick*="close"],button[onclick*="Close"]');
-                if (btn) btn.click();
-            }
-        };
-        modal.addEventListener('keydown', modal._fitzTrap);
-    };
-    window.fitzReleaseFocus = function(modal) {
-        if (!modal) return;
-        if (modal._fitzTrap) { modal.removeEventListener('keydown', modal._fitzTrap); delete modal._fitzTrap; }
-        if (modal._fitzPrev && modal._fitzPrev.focus) { setTimeout(function() { modal._fitzPrev.focus(); }, 50); }
-    };
+function fzNextStep(docType){
+    var s=_fzNS[docType]; if(!s)return;
+    var mc=document.getElementById('messagesContainer'); if(!mc)return;
+    var c=mc.querySelector('.space-y-6'); if(!c)return;
+    var el=document.createElement('div');
+    el.className='flex justify-start fade-in';
+    var btn = s.m==='__c__'
+        ? '<button class="fz-ns-btn" onclick="if(typeof openConsultationBookingModal===\'function\')openConsultationBookingModal()">'+s.b+' &#x2192;</button>'
+        : '<button class="fz-ns-btn" onclick="fzSend(\''+s.m.replace(/'/g,"\\'")+'\')">'+s.b+' &#x2192;</button>';
+    el.innerHTML='<div class="max-w-3xl w-full"><div class="fz-ns"><h4>'+s.ic+' '+s.t+'</h4><p>'+s.p+'</p>'+btn+'</div></div>';
+    c.appendChild(el);
+    fzAnnounce('Suggestion: '+s.t);
+}
 
-    // ========== NEXT-STEP SUGGESTIONS ==========
-    var nextSteps = {
-        recordOfDiscussion: { icon: '📊', title: 'What comes next?', text: 'If the issue continues, the recommended next step is a Performance Improvement Plan (PIP) or Letter of Concern.', btn: 'Create a PIP', msg: 'I need to create a Performance Improvement Plan' },
-        letterOfConcern: { icon: '📊', title: 'What comes next?', text: 'If the employee does not improve, consider creating a PIP with measurable goals.', btn: 'Create a PIP', msg: 'I need to create a Performance Improvement Plan' },
-        pip: { icon: '⚠️', title: 'What comes next?', text: 'If PIP objectives are not met, the next step is typically a First Written Warning.', btn: 'Create First Warning', msg: 'I need to create a first written warning' },
-        firstWarning: { icon: '🚨', title: 'What comes next?', text: 'If conduct does not improve, a Final Written Warning is the next step.', btn: 'Create Final Warning', msg: 'I need to create a final written warning' },
-        finalWarning: { icon: '📞', title: 'Consider expert consultation', text: 'After a final warning, termination may follow. This is high-risk. We strongly recommend consulting Blake.', btn: 'Book Consultation', msg: '__consultation__' },
-        formalWarning: { icon: '📋', title: 'What comes next?', text: 'Keep a signed copy. If the issue recurs, escalate to a final warning. Set a review date.', btn: 'Learn more', msg: 'How should I follow up after issuing a formal warning?' },
-        positionDescription: { icon: '📢', title: 'Ready to advertise?', text: 'Now create a job advertisement to start recruiting for this role.', btn: 'Create Job Ad', msg: 'I need to create a job advertisement' },
-        jobDescription: { icon: '✅', title: 'Prepare for onboarding', text: 'Once you select a candidate, create an onboarding checklist for a smooth first week.', btn: 'Create Onboarding Checklist', msg: 'I need to create an onboarding checklist' },
-        onboardingChecklist: { icon: '📚', title: 'Set up training', text: 'With your checklist ready, create a training plan for the new hire.', btn: 'Create Training Plan', msg: 'I need to create a training plan' },
-        showCause: { icon: '📞', title: 'Expert review essential', text: 'Show cause letters have strict legal requirements. Expert review is strongly recommended.', btn: 'Book Consultation', msg: '__consultation__' }
-    };
-
-    window.fitzNextStep = function(docType) {
-        var s = nextSteps[docType];
-        if (!s) return;
-        var mc = document.getElementById('messagesContainer');
-        if (!mc) return;
-        var container = mc.querySelector('.space-y-6');
-        if (!container) return;
-
-        var card = document.createElement('div');
-        card.className = 'flex justify-start fade-in';
-
-        if (s.msg === '__consultation__') {
-            card.innerHTML = '<div class="max-w-3xl w-full"><div class="fitz-next-step">' +
-                '<h4>' + s.icon + ' ' + s.title + '</h4>' +
-                '<p>' + s.text + '</p>' +
-                '<button class="fitz-next-btn" onclick="if(typeof openConsultationBookingModal===\'function\')openConsultationBookingModal()">' + s.btn + ' →</button>' +
-                '</div></div>';
-        } else {
-            card.innerHTML = '<div class="max-w-3xl w-full"><div class="fitz-next-step">' +
-                '<h4>' + s.icon + ' ' + s.title + '</h4>' +
-                '<p>' + s.text + '</p>' +
-                '<button class="fitz-next-btn" onclick="fitzQuickSend(this,\'' + s.msg.replace("'", "\\'") + '\')">' + s.btn + ' →</button>' +
-                '</div></div>';
-        }
-
-        container.appendChild(card);
-        fitzAnnounce('Suggestion: ' + s.title);
-    };
-
-    // ========== KEYBOARD SHORTCUTS ==========
-    document.addEventListener('keydown', function(e) {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'b') {
-            e.preventDefault();
-            if (typeof toggleSidebar === 'function') toggleSidebar();
-        }
-        if (e.key === 'Escape') {
-            var modals = document.querySelectorAll('.fixed:not(.hidden)[class*="bg-black"],.fixed:not(.hidden)[class*="bg-slate-900"]');
-            for (var i = modals.length - 1; i >= 0; i--) {
-                var m = modals[i];
-                if (m.id === 'launchGate' || m.id === 'sidebarOverlay') continue;
-                var btn = m.querySelector('button[onclick*="close"],button[onclick*="Close"]');
-                if (btn) { btn.click(); break; }
-            }
-        }
-    });
-
-    // ========== REMOVE WELCOME ON SEND ==========
-    var _patchAttempts = 0;
-    function patchSendMessage() {
-        if (typeof window.sendMessage === 'function' && !window.sendMessage._fitzPatched) {
-            var orig = window.sendMessage;
-            window.sendMessage = function() {
-                var w = document.getElementById('fitzWelcomeScreen');
-                if (w) w.remove();
-                return orig.apply(this, arguments);
-            };
-            window.sendMessage._fitzPatched = true;
-        } else if (_patchAttempts < 10) {
-            _patchAttempts++;
-            setTimeout(patchSendMessage, 500);
+// Keyboard shortcuts
+document.addEventListener('keydown',function(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==='b'){e.preventDefault();if(typeof toggleSidebar==='function')toggleSidebar();}
+    if(e.key==='Escape'){
+        var ms=document.querySelectorAll('.fixed:not(.hidden)');
+        for(var i=ms.length-1;i>=0;i--){
+            var m=ms[i];
+            if(!m.id||m.id==='launchGate'||m.id==='sidebarOverlay')continue;
+            if(m.id.indexOf('Modal')===-1&&m.id.indexOf('modal')===-1)continue;
+            var b=m.querySelector('button[onclick*="close"],button[onclick*="Close"]');
+            if(b){b.click();break;}
         }
     }
-    setTimeout(patchSendMessage, 100);
+});
 
-    // ========== AUTO-ARIA ON MODALS ==========
-    var obs = new MutationObserver(function(muts) {
-        muts.forEach(function(m) {
-            if (m.type === 'attributes' && m.attributeName === 'class') {
-                var el = m.target;
-                if (el.classList.contains('fixed') && !el.classList.contains('hidden') && el.id && el.id.indexOf('Modal') > -1) {
-                    if (!el.getAttribute('role')) {
-                        el.setAttribute('role', 'dialog');
-                        el.setAttribute('aria-modal', 'true');
-                    }
-                    fitzTrapFocus(el);
-                } else if (el.classList.contains('hidden') && el.getAttribute('role') === 'dialog') {
-                    fitzReleaseFocus(el);
-                }
-            }
-        });
-    });
-    
-    function initModalObserver() {
-        var modals = document.querySelectorAll('.fixed[id*="Modal"],.fixed[id*="modal"]');
-        modals.forEach(function(el) { obs.observe(el, { attributes: true, attributeFilter: ['class'] }); });
+// Patch sendMessage to remove welcome
+(function(){
+    var n=0;
+    function p(){
+        if(typeof sendMessage==='function'&&!sendMessage._fzP){
+            var o=sendMessage;
+            sendMessage=async function(){var w=document.getElementById('fzWelcome');if(w)w.remove();return o.apply(this,arguments);};
+            sendMessage._fzP=true;
+        }else if(n<20){n++;setTimeout(p,300);}
     }
-    if (document.readyState === 'complete' || document.readyState === 'interactive') {
-        setTimeout(initModalObserver, 100);
-    } else {
-        document.addEventListener('DOMContentLoaded', initModalObserver);
-    }
-
-    // ========== ENHANCE REVIEW SUBMIT ==========
-    function patchReviewSubmit() {
-        if (typeof window.submitReviewRequest === 'function' && !window.submitReviewRequest._fitzPatched) {
-            var origSubmit = window.submitReviewRequest;
-            window.submitReviewRequest = async function() {
-                try {
-                    await origSubmit.apply(this, arguments);
-                    fitzAnnounce('Review request submitted successfully');
-                } catch(err) {
-                    fitzAnnounce('There was an issue submitting your review');
-                    if (typeof showToast === 'function') showToast('Submission issue - please try again', 'error', 5000);
-                }
-            };
-            window.submitReviewRequest._fitzPatched = true;
-        } else {
-            setTimeout(patchReviewSubmit, 1000);
-        }
-    }
-    setTimeout(patchReviewSubmit, 500);
-
+    setTimeout(p,200);
 })();
-</script>
+
+// Auto-ARIA + focus trap on modals
+(function(){
+    function init(){
+        var ob=new MutationObserver(function(muts){
+            muts.forEach(function(m){
+                if(m.type!=='attributes'||m.attributeName!=='class')return;
+                var el=m.target;
+                if(!el.id||(el.id.indexOf('Modal')===-1&&el.id.indexOf('modal')===-1))return;
+                if(el.classList.contains('fixed')&&!el.classList.contains('hidden')){
+                    if(!el.getAttribute('role')){el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');}
+                    fzTrap(el);
+                }else if(el.classList.contains('hidden')){fzRelease(el);}
+            });
+        });
+        document.querySelectorAll('.fixed[id*="Modal"],.fixed[id*="modal"]').forEach(function(el){
+            ob.observe(el,{attributes:true,attributeFilter:['class']});
+        });
+    }
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);
+    else setTimeout(init,500);
+})();
+
+// Enhanced review submit error handling
+(function(){
+    function p(){
+        if(typeof submitReviewRequest==='function'&&!submitReviewRequest._fzP){
+            var o=submitReviewRequest;
+            submitReviewRequest=async function(){
+                try{await o.apply(this,arguments);fzAnnounce('Review request submitted successfully');}
+                catch(e){console.error('Review error:',e);fzAnnounce('Issue submitting review');if(typeof showToast==='function')showToast('Submission issue - please try again','error',6000);}
+            };
+            submitReviewRequest._fzP=true;
+        }else{setTimeout(p,1000);}
+    }
+    setTimeout(p,500);
+})();
