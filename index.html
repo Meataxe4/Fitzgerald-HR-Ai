@@ -6632,7 +6632,7 @@ Be as specific as possible!"></textarea>
                     <span class="text-amber-400 font-semibold">Free Tier: 1 template document</span>
                 </div>
                 <p class="text-slate-400 text-sm">
-                    Try any template document free. Upgrade for unlimited templates + expert-reviewed documents.
+                    Try any template document free. Upgrade for more features and review credits.
                 </p>
             </div>
         </div>
@@ -14738,11 +14738,17 @@ function applyDocumentBlur(docType, docName) {
         <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
             <div class="text-3xl mb-2">🔒</div>
             <h3 class="text-lg font-bold text-white mb-2">Upgrade Required</h3>
-            <p class="text-slate-300 text-sm mb-4">Upgrade to a paid plan for unlimited templates and expert-reviewed documents.</p>
-            <button onclick="showSubscriptionOptions()" 
-                    class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
-                View Plans
-            </button>
+            <p class="text-slate-300 text-sm mb-4">Upgrade for more features and additional review credits.</p>
+            <div class="space-y-2">
+                <button onclick="showSubscriptionOptions()" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
+                    View Plans
+                </button>
+                <button onclick="openCreditsModal()" 
+                        class="w-full bg-slate-600 hover:bg-slate-500 text-white font-semibold py-2 px-6 rounded-lg transition-all text-sm">
+                    💳 Buy Credits Instead
+                </button>
+            </div>
         </div>
     `;
     
@@ -15191,11 +15197,17 @@ function applyUniversalBlur(containerId, docType, docName, actionsId = null) {
         <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
             <div class="text-3xl mb-2">🔒</div>
             <h3 class="text-lg font-bold text-white mb-2">Upgrade Required</h3>
-            <p class="text-slate-300 text-sm mb-4">Upgrade to a paid plan for unlimited templates and expert-reviewed documents.</p>
-            <button onclick="showSubscriptionOptions()" 
-                    class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
-                View Plans
-            </button>
+            <p class="text-slate-300 text-sm mb-4">Upgrade for more features and additional review credits.</p>
+            <div class="space-y-2">
+                <button onclick="showSubscriptionOptions()" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
+                    View Plans
+                </button>
+                <button onclick="openCreditsModal()" 
+                        class="w-full bg-slate-600 hover:bg-slate-500 text-white font-semibold py-2 px-6 rounded-lg transition-all text-sm">
+                    💳 Buy Credits Instead
+                </button>
+            </div>
         </div>
     `;
     
@@ -18472,7 +18484,7 @@ function openProfileMenu() {
         
         if (statusEl && upgradeBtn) {
             if (tier === 'free') {
-                statusEl.textContent = 'Upgrade for unlimited templates';
+                statusEl.textContent = 'Upgrade for more features';
                 upgradeBtn.textContent = 'Upgrade';
             } else {
                 statusEl.textContent = 'Annual subscription';
@@ -25808,7 +25820,7 @@ function resetAIImport() {
             <div class="flex items-center justify-between">
                 <div>
                     <p id="profileSubscriptionTier" class="text-lg font-bold text-amber-400">Free</p>
-                    <p id="profileSubscriptionStatus" class="text-xs text-slate-400">Upgrade for unlimited templates</p>
+                    <p id="profileSubscriptionStatus" class="text-xs text-slate-400">Upgrade for more features</p>
                 </div>
                 <button id="profileUpgradeBtn" onclick="closeProfileMenu(); showSubscriptionOptions();" class="px-3 py-1 bg-amber-500 hover:bg-amber-600 text-slate-900 text-sm font-semibold rounded-lg transition-colors">
                     Upgrade
