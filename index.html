@@ -11952,6 +11952,13 @@ async function generateDocumentWithAI() {
         // Show preview modal
         showDocumentPreview(response);
         
+        // ✅ Store docType in modal dataset IMMEDIATELY (before blur timeout)
+        const previewModal = document.getElementById('documentPreviewModal');
+        if (previewModal) {
+            previewModal.dataset.docType = currentDocType;
+            previewModal.dataset.docName = currentDocName;
+        }
+        
         // Apply blur after preview is shown (pass stored values)
         if (shouldBlur) {
             setTimeout(() => {
@@ -15114,6 +15121,16 @@ function requestDocExpertReviewAfterUnlock(docType, docName) {
  * Download from preview modal with disclaimer
  */
 function downloadDocPreviewWithDisclaimer(docType) {
+    // ✅ CHECK: Verify document has been unlocked (credits paid)
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    if (cost && cost.credits > 0) {
+        if (!unlockedDocuments.has(docType)) {
+            showNotification('⚠️ Please unlock this document first.', 'error');
+            applyDocumentBlur(docType, cost.name || 'Document');
+            return;
+        }
+    }
+    
     const checkbox = document.getElementById('docPreviewDisclaimer');
     if (!checkbox || !checkbox.checked) {
         showNotification('⚠️ Please tick the checkbox to accept responsibility before downloading.', 'error');
@@ -16193,6 +16210,14 @@ function showPeopleManagementInChatOptions(containerId, docType, docName, action
  * Download People Management document with disclaimer
  */
 function downloadPeopleManagementWithDisclaimer(containerId, docType, docName, actionsId) {
+    // ✅ CHECK: Verify document has been unlocked (credits paid)
+    if (!unlockedDocuments.has(docType)) {
+        showNotification('⚠️ Please unlock this document first.', 'error');
+        // Re-apply blur
+        applyUniversalBlur(containerId, docType, docName, actionsId);
+        return;
+    }
+    
     const checkbox = document.getElementById(containerId + '_disclaimer');
     if (!checkbox || !checkbox.checked) {
         showNotification('⚠️ Please tick the checkbox to accept responsibility before downloading.', 'error');
@@ -16349,6 +16374,14 @@ function requestExpertReviewAfterUnlock(containerId, docType, docName, actionsId
  * Download Formal Process document with disclaimer acceptance
  */
 function downloadFormalWithDisclaimer(containerId, docType, docName, actionsId) {
+    // ✅ CHECK: Verify document has been unlocked (credits paid)
+    if (!unlockedDocuments.has(docType)) {
+        showNotification('⚠️ Please unlock this document first.', 'error');
+        // Re-apply blur
+        applyUniversalBlur(containerId, docType, docName, actionsId);
+        return;
+    }
+    
     // Check if disclaimer is checked
     const checkbox = document.getElementById(containerId + '_disclaimer');
     if (!checkbox || !checkbox.checked) {
@@ -16591,28 +16624,59 @@ function handleConsultationGatedDocument(docType) {
 
 
 async function downloadGeneratedDocument(format = 'pdf') {
-    const docType = documentBuilderState.currentType;
+    const docType = document.getElementById('documentPreviewModal')?.dataset?.docType || documentBuilderState.currentType;
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
     
-    // ✅ CHECK IF DOCUMENT IS BLURRED (needs unlock)
+    console.log('📥 downloadGeneratedDocument called:', {
+        docType,
+        cost,
+        hasBlurOverlay: !!document.getElementById('documentBlurOverlay'),
+        isUnlocked: unlockedDocuments.has(docType),
+        credits: getTotalCredits()
+    });
+    
+    // ✅ CHECK 1: Is there a blur overlay? (UI check)
     const blurOverlay = document.getElementById('documentBlurOverlay');
     if (blurOverlay) {
+        console.log('❌ Download blocked: blur overlay present');
         // Document is locked - show unlock modal instead
-        openDocumentUnlockModal(docType, CONFIG.CREDITS.DOCUMENT_COSTS[docType]?.name || 'Document');
+        openDocumentUnlockModal(docType, cost?.name || 'Document');
         return false;
     }
     
-    // ✅ DEDUCT CREDITS ON FIRST DOWNLOAD
-    const downloadKey = `doc_downloaded_${documentBuilderState.lastGeneratedDocId}`;
-    const alreadyDownloaded = sessionStorage.getItem(downloadKey);
-    
-    if (!alreadyDownloaded && CONFIG.CREDITS.DOCUMENT_COSTS[docType]) {
-        // First download - deduct credits
-        const success = deductCreditsForDocument(docType);
-        if (success) {
-            sessionStorage.setItem(downloadKey, 'true');
-            showNotification(`${CONFIG.CREDITS.DOCUMENT_COSTS[docType].credits} credit(s) deducted`, 'info');
+    // ✅ CHECK 2: Does this document type require credits? (Data check)
+    if (cost && cost.credits > 0) {
+        const category = cost.category;
+        
+        // People Management and Formal Process require unlock first
+        if (category === 'people_management' || category === 'formal_process') {
+            // Check if document has been unlocked
+            if (!unlockedDocuments.has(docType)) {
+                console.log('❌ Download blocked: document not unlocked');
+                showNotification('⚠️ Please unlock this document first.', 'error');
+                // Re-apply blur if somehow it was removed
+                applyDocumentBlur(docType, cost.name || 'Document');
+                return false;
+            }
         }
     }
+    
+    // ✅ CHECK 3: Free tier limit for templates
+    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
+    if (tier === 'free' && cost?.category === 'template') {
+        const lowRiskDocsUsed = userCredits.lowRiskDocsUsed || 0;
+        if (lowRiskDocsUsed >= 1) {
+            console.log('❌ Download blocked: free tier limit reached');
+            showNotification('⚠️ Free template limit reached. Please upgrade.', 'error');
+            applyDocumentBlur(docType, cost?.name || 'Document');
+            return false;
+        }
+        // Mark free template as used
+        userCredits.lowRiskDocsUsed = 1;
+        saveUserCredits();
+    }
+    
+    console.log('✅ Download allowed, proceeding...');
     
     // ✅ CRITICAL: Confirmation dialog before download
     const userAccepts = confirm(
@@ -17717,6 +17781,29 @@ function addDocumentDownloadButtons(messageDiv, documentType) {
 }
 
 function downloadDocument(documentType, format) {
+    // ✅ CHECK: Template document credit protection
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[documentType];
+    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
+    
+    // Check if free tier user has exhausted their free template
+    if (tier === 'free') {
+        if (cost?.category === 'template') {
+            const lowRiskDocsUsed = userCredits.lowRiskDocsUsed || 0;
+            if (lowRiskDocsUsed >= 1) {
+                showNotification('⚠️ Free template limit reached. Please upgrade.', 'error');
+                showSubscriptionOptions();
+                return;
+            }
+        } else if (cost && cost.credits > 0) {
+            // Non-template document requires credits
+            if (getTotalCredits() < cost.credits) {
+                showNotification('⚠️ Not enough credits. Please purchase more.', 'error');
+                openCreditsModal();
+                return;
+            }
+        }
+    }
+    
     const confirmed = confirm(
         "⚠️ IMPORTANT: This is a TEMPLATE only.\n\n" +
         "You MUST have it reviewed by a Fitzgerald HR consultant.\n\n" +
@@ -19887,14 +19974,29 @@ async function downloadPositionDescription(format = 'pdf') {
         return;
     }
     
-    // Check if this document is unlocked (blur removed)
-    const previewContent = document.getElementById('pdPreviewContent');
-    const unlockPrompt = document.getElementById('pdPreviewContent_unlockPrompt');
+    // ✅ CHECK: Template document credit protection
+    const docType = 'positionDescription';
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
     
+    // Check if document is still locked (blur present)
+    const unlockPrompt = document.getElementById('pdPreviewContent_unlockPrompt');
     if (unlockPrompt) {
-        // Document is still locked - trigger unlock flow
         showToast('Please unlock the document first', 'info');
         return;
+    }
+    
+    // Check if free tier user has exhausted their free template
+    if (tier === 'free' && cost?.category === 'template') {
+        const lowRiskDocsUsed = userCredits.lowRiskDocsUsed || 0;
+        if (lowRiskDocsUsed >= 1) {
+            showNotification('⚠️ Free template limit reached. Please upgrade.', 'error');
+            showSubscriptionOptions();
+            return;
+        }
+        // Mark free template as used
+        userCredits.lowRiskDocsUsed = 1;
+        saveUserCredits();
     }
     
     showToast(`Preparing ${format.toUpperCase()} download...`, 'info');
@@ -20158,6 +20260,24 @@ function closeInterviewQuestionsPreview() {
 }
 
 async function downloadInterviewQuestions(format) {
+    // ✅ CHECK: Template document credit protection
+    const docType = 'interviewQuestions';
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
+    
+    // Check if document should be blocked
+    if (tier === 'free' && cost?.category === 'template') {
+        const lowRiskDocsUsed = userCredits.lowRiskDocsUsed || 0;
+        if (lowRiskDocsUsed >= 1) {
+            showNotification('⚠️ Free template limit reached. Please upgrade.', 'error');
+            showSubscriptionOptions();
+            return;
+        }
+        // Mark free template as used
+        userCredits.lowRiskDocsUsed = 1;
+        saveUserCredits();
+    }
+    
     const content = iqData.generatedContent || document.getElementById('iqPreviewContent').innerText;
     const filename = `Interview_Questions_${iqData.jobTitle.replace(/\s+/g, '_')}`;
     
