@@ -35179,3 +35179,31 @@ async function loadTrainingPlansFromFirebase() {
 async function loadAllDataFromFirebase() {
     if (!currentUser || !db) {
         return;
+    }
+    
+    try {
+        // Load all data types
+        await Promise.all([
+            loadConversationsFromFirebase(),
+            loadContractsFromFirebase(),
+            loadChecklistsFromFirebase(),
+            loadTrainingPlansFromFirebase(),
+            loadBookmarksFromFirebase()
+        ]);
+        
+        // Update sidebar with loaded data
+        if (typeof updateSidebarChats === 'function') {
+            updateSidebarChats();
+        }
+        if (typeof updateSidebarBookmarks === 'function') {
+            updateSidebarBookmarks();
+        }
+        
+    } catch (error) {
+    }
+}
+
+</script>
+</body>
+</html>
+
