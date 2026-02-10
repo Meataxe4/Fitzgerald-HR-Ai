@@ -17642,6 +17642,11 @@ function createNewConversation() {
     
     showToast('New chat started', 'success', 2000);
     
+    // Show random quick prompts after brief delay
+    setTimeout(function() {
+        showRandomQuickPrompts();
+    }, 400);
+    
 }
 
 // Save current conversation
