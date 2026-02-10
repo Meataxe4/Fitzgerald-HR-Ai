@@ -3333,54 +3333,30 @@ input, textarea, select {
     animation: creditPulse 2s ease-in-out infinite;
 }
 
-/* ── FITZ UX ENHANCEMENTS ────────────────────────── */
-:root{
-  --fz-accent-s:rgba(245,158,11,.1);
-  --fz-info:#3b82f6; --fz-info-s:rgba(59,130,246,.1);
-  --fz-danger:#ef4444; --fz-success:#22c55e;
-  --fz-shad:0 4px 12px rgba(0,0,0,.4);
-}
-.light-mode{
-  --fz-accent-s:rgba(245,158,11,.06);
-  --fz-info:#2563eb; --fz-info-s:rgba(37,99,235,.08);
-  --fz-danger:#dc2626; --fz-success:#16a34a;
-  --fz-shad:0 4px 12px rgba(0,0,0,.1);
-}
-.light-mode .bg-slate-800\/80{backdrop-filter:blur(12px)}
+/* ── FITZ UX ENHANCEMENTS ─────────────────────────── */
+:root{--fz-as:rgba(245,158,11,.1);--fz-info:#3b82f6;--fz-info-s:rgba(59,130,246,.1);--fz-shad:0 4px 12px rgba(0,0,0,.4)}
+.light-mode{--fz-as:rgba(245,158,11,.06);--fz-info:#2563eb;--fz-info-s:rgba(37,99,235,.08);--fz-shad:0 4px 12px rgba(0,0,0,.1)}
 .light-mode input:focus,.light-mode textarea:focus{box-shadow:0 0 0 3px rgba(245,158,11,.15)!important}
-.light-mode .bg-amber-500{box-shadow:0 2px 8px rgba(245,158,11,.3)!important}
-
 *:focus-visible{outline:2px solid var(--accent-color,#f59e0b);outline-offset:2px;border-radius:4px}
 *:focus:not(:focus-visible){outline:none}
 .fz-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-.fz-skip{position:fixed;top:-60px;left:50%;transform:translateX(-50%);background:#f59e0b;color:#0f172a;padding:.75rem 1.5rem;border-radius:.75rem;font-weight:600;z-index:9998;transition:top .2s;text-decoration:none;font-size:.875rem}
-.fz-skip:focus{top:1rem}
-
-.fz-skel{background:linear-gradient(90deg,#334155 25%,#1e293b 50%,#334155 75%);background-size:200% 100%;animation:fzShim 1.5s ease-in-out infinite;border-radius:.5rem}
-@keyframes fzShim{0%{background-position:200% 0}100%{background-position:-200% 0}}
-.fz-spin{width:20px;height:20px;border:2px solid #475569;border-top-color:#f59e0b;border-radius:50%;animation:fzSp .6s linear infinite;display:inline-block}
-@keyframes fzSp{to{transform:rotate(360deg)}}
-
 .fz-wel{max-width:800px;margin:0 auto;padding:2rem 1rem;animation:fzUp .6s ease-out}
 @keyframes fzUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .fz-wel-logo{font-size:2.5rem;font-weight:800;letter-spacing:-.02em;margin-bottom:.5rem}
 .fz-wel-hi{font-size:1.5rem;font-weight:600;color:#fff;margin-bottom:.25rem}
 .light-mode .fz-wel-hi{color:#0f172a}
 .fz-wel-sub{color:#94a3b8;font-size:1rem;margin-bottom:2rem}
-
 .fz-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem;margin-bottom:2rem}
 @media(max-width:640px){.fz-grid{grid-template-columns:1fr}}
 .fz-card{display:flex;align-items:flex-start;gap:.75rem;padding:1rem;background:var(--bg-secondary,#1e293b);border:1px solid var(--border-color,#475569);border-radius:1rem;cursor:pointer;transition:all .15s;text-align:left;color:inherit;width:100%}
-.fz-card:hover{border-color:var(--accent-color,#f59e0b);background:var(--fz-accent-s);transform:translateY(-2px);box-shadow:var(--fz-shad)}
+.fz-card:hover{border-color:var(--accent-color,#f59e0b);background:var(--fz-as);transform:translateY(-2px);box-shadow:var(--fz-shad)}
 .fz-card:active{transform:translateY(0)}
-.fz-ic{font-size:1.5rem;flex-shrink:0;width:2.5rem;height:2.5rem;display:flex;align-items:center;justify-content:center;background:var(--fz-accent-s);border-radius:.75rem}
+.fz-ic{font-size:1.5rem;flex-shrink:0;width:2.5rem;height:2.5rem;display:flex;align-items:center;justify-content:center;background:var(--fz-as);border-radius:.75rem}
 .fz-ct{font-weight:600;color:var(--text-primary,#fff);font-size:.875rem;margin-bottom:2px}
 .fz-cd{color:var(--text-tertiary,#94a3b8);font-size:.75rem;line-height:1.4}
-
 .fz-chips{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center}
 .fz-chip{display:inline-flex;align-items:center;gap:.375rem;padding:.5rem .875rem;background:var(--bg-tertiary,#334155);border:1px solid var(--border-color,#475569);border-radius:999px;color:var(--text-secondary,#cbd5e1);font-size:.8125rem;cursor:pointer;transition:all .15s;white-space:nowrap}
-.fz-chip:hover{border-color:var(--accent-color,#f59e0b);color:var(--accent-color,#f59e0b);background:var(--fz-accent-s)}
-
+.fz-chip:hover{border-color:var(--accent-color,#f59e0b);color:var(--accent-color,#f59e0b);background:var(--fz-as)}
 .fz-ns{background:var(--fz-info-s);border:1px solid var(--fz-info);border-radius:1rem;padding:1rem;margin-top:1rem}
 .fz-ns h4{color:var(--fz-info);font-weight:600;font-size:.875rem;margin-bottom:.5rem;display:flex;align-items:center;gap:.5rem}
 .fz-ns p{color:var(--text-secondary,#cbd5e1);font-size:.8125rem;margin-bottom:.75rem}
@@ -3394,8 +3370,6 @@ input, textarea, select {
     <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
-<a href="#messagesContainer" class="fz-skip">Skip to main content</a>
-<div id="fzAnnounce" class="fz-sr" aria-live="polite" aria-atomic="true"></div>
 
 <!-- ============================================
      LAUNCH GATE - Remove or set LAUNCH_MODE = false when ready to go live
@@ -17646,22 +17620,44 @@ function createNewConversation() {
     // Reset conversation history
     conversationHistory = [];
     
-    // Enhanced welcome screen with quick-action cards
-    if (typeof fitzShowWelcome === 'function') {
-        try { fitzShowWelcome(); } catch(e) { console.warn('Welcome error:', e); }
+    // Add FULL welcome message with HTML formatting (matching Image 1)
+    const welcomeMessage = `
+        <p class="text-slate-100 leading-relaxed">
+            👋 G'day! I'm Fitz, your hospitality HR assistant.
+        </p>
+        <p class="text-slate-100 leading-relaxed mt-3">
+            Ask me anything about awards, compliance, or employment law.
+        </p>
+        <p class="text-red-400 font-semibold mt-4 mb-2">🚨 Urgent/Critical Situations:</p>
+        <p class="text-slate-100 text-sm">
+            Use the red URGENT button above for immediate crisis response.
+        </p>
+        <p class="text-slate-100 leading-relaxed mt-4">
+            What HR topic would you like to learn about today?
+        </p>
+    `;
+    
+    // For display - reuse container already declared above
+    var displayContainer = DOM.messagesContainer.querySelector('.space-y-6');
+    if (!displayContainer) {
+        DOM.messagesContainer.innerHTML = '<div class="max-w-5xl mx-auto space-y-6"></div>';
+        displayContainer = DOM.messagesContainer.querySelector('.space-y-6');
     }
-    // Fallback if enhancement JS hasn't loaded yet
-    if (!document.getElementById('fzWelcome')) {
-        var _fc = DOM.messagesContainer.querySelector('.space-y-6');
-        if (!_fc) { DOM.messagesContainer.innerHTML = '<div class="max-w-5xl mx-auto space-y-6"></div>'; _fc = DOM.messagesContainer.querySelector('.space-y-6'); }
-        if (_fc) {
-            var _md = document.createElement('div');
-            _md.className = 'flex justify-start fade-in';
-            _md.innerHTML = '<div class="max-w-3xl bg-slate-800 text-slate-100 border border-slate-700 rounded-2xl px-6 py-4"><p>👋 G\'day! I\'m Fitz, your hospitality HR assistant. Ask me anything about awards, compliance, or employment law.</p></div>';
-            _fc.appendChild(_md);
-        }
+    
+    if (displayContainer) {
+        var messageDiv = document.createElement('div');
+        messageDiv.className = 'flex justify-start fade-in';
+        var messageId = 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        messageDiv.setAttribute('data-message-id', messageId);
+        messageDiv.innerHTML = '<div class="max-w-3xl bg-slate-800 text-slate-100 border border-slate-700 rounded-2xl px-6 py-4 relative">' +
+            '<span class="bookmark-star absolute top-3 right-3" data-message-id="' + messageId + '" onclick="toggleBookmark(\'' + messageId + '\')" title="Bookmark this">☆</span>' +
+            '<div class="leading-relaxed">' + welcomeMessage + '</div>' +
+            '</div>';
+        displayContainer.appendChild(messageDiv);
     }
-    var plainWelcome = "G'day! I'm Fitz, your hospitality HR assistant. Ask me anything about awards, compliance, or employment law.";
+    
+    // For storage - save plain text version
+    var plainWelcome = '👋 G\'day! I\'m Fitz, your hospitality HR assistant.\n\nAsk me anything about awards, compliance, or employment law.\n\n🚨 Urgent/Critical Situations:\nUse the red URGENT button above for immediate crisis response.\n\nWhat HR topic would you like to learn about today?';
     conversationHistory.push({ role: 'assistant', content: plainWelcome });
     
     // Save and update UI - FIXED: Use saveCurrentConversation to update messages
@@ -35213,49 +35209,66 @@ async function loadAllDataFromFirebase() {
         return;
 
 
-// ╔═══════════════════════════════════════════════════╗
-// ║  FITZ UX ENHANCEMENTS                            ║
-// ╚═══════════════════════════════════════════════════╝
+// ── FITZ UX ENHANCEMENTS ────────────────────────────
 
-function fitzShowWelcome() {
-    var mc = document.getElementById('messagesContainer');
-    if (!mc) return;
-    var c = mc.querySelector('.space-y-6');
-    if (!c) { mc.innerHTML = '<div class="max-w-5xl mx-auto space-y-6"></div>'; c = mc.querySelector('.space-y-6'); }
-    if (!c) return;
+// Announcer element (injected at runtime, not in HTML)
+(function(){
+    var a=document.createElement('div');
+    a.id='fzAnn';a.className='fz-sr';
+    a.setAttribute('aria-live','polite');
+    a.setAttribute('aria-atomic','true');
+    document.body.appendChild(a);
+})();
 
-    var name = '';
-    try { if (typeof venueProfile!=='undefined' && venueProfile && venueProfile.contactName) name = venueProfile.contactName.split(' ')[0]; } catch(e){}
-    var hi = name ? ("G'day, "+name+"!") : "G'day!";
-    var h = new Date().getHours();
-    var t = h<12?'Good morning,':h<17?'Good afternoon,':'Good evening,';
+function fzAnnounce(msg){
+    var el=document.getElementById('fzAnn');
+    if(el){el.textContent='';setTimeout(function(){el.textContent=msg;},50);}
+}
 
-    var d = document.createElement('div');
-    d.className = 'fz-wel fade-in';
-    d.id = 'fzWelcome';
-    d.innerHTML =
+function fzSend(text){
+    var w=document.getElementById('fzWelcome');
+    if(w)w.remove();
+    var inp=document.getElementById('messageInput');
+    if(inp){
+        inp.value=text;
+        inp.focus();
+        if(typeof autoResizeTextarea==='function')autoResizeTextarea(inp);
+        if(typeof sendMessage==='function')sendMessage();
+    }
+}
+
+function fzBuildWelcome(){
+    var name='';
+    try{if(typeof venueProfile!=='undefined'&&venueProfile&&venueProfile.contactName)name=venueProfile.contactName.split(' ')[0];}catch(e){}
+    var hi=name?("G'day, "+name+"!"):"G'day!";
+    var h=new Date().getHours();
+    var t=h<12?'Good morning,':h<17?'Good afternoon,':'Good evening,';
+    var d=document.createElement('div');
+    d.className='fz-wel fade-in';
+    d.id='fzWelcome';
+    d.innerHTML=
         '<div class="text-center mb-6">'+
             '<div class="fz-wel-logo"><span class="text-amber-500">F</span><span class="text-white">ITZ</span></div>'+
             '<h2 class="fz-wel-hi">'+t+' '+hi+'</h2>'+
             '<p class="fz-wel-sub">Your AI-powered HR assistant for Australian hospitality</p>'+
         '</div>'+
         '<div class="fz-grid">'+
-            '<button class="fz-card" onclick="fzSend(\'I need to write a formal warning for an employee\')">'+
+            '<button class="fz-card" onclick="fzSend(this.dataset.m)" data-m="I need to write a formal warning for an employee">'+
                 '<div class="fz-ic">&#x1F4C4;</div>'+
                 '<div><div class="fz-ct">Create a Document</div>'+
                 '<div class="fz-cd">Warnings, PIPs, contracts, position descriptions &amp; more</div></div>'+
             '</button>'+
-            '<button class="fz-card" onclick="fzSend(\'What are my obligations under the Fair Work Act for casual employees?\')">'+
+            '<button class="fz-card" onclick="fzSend(this.dataset.m)" data-m="What are my obligations under the Fair Work Act for casual employees?">'+
                 '<div class="fz-ic">&#x2696;&#xFE0F;</div>'+
                 '<div><div class="fz-ct">Compliance Question</div>'+
                 '<div class="fz-cd">Fair Work, awards, NES, leave entitlements &amp; regulations</div></div>'+
             '</button>'+
-            '<button class="fz-card" onclick="fzSend(\'An employee has been consistently late. What steps should I take?\')">'+
+            '<button class="fz-card" onclick="fzSend(this.dataset.m)" data-m="An employee has been consistently late. What steps should I take?">'+
                 '<div class="fz-ic">&#x1F4CB;</div>'+
                 '<div><div class="fz-ct">Performance Issue</div>'+
                 '<div class="fz-cd">Managing underperformance, misconduct &amp; disciplinary steps</div></div>'+
             '</button>'+
-            '<button class="fz-card" onclick="fzSend(\'I need to hire a new bartender. What should I know about award rates?\')">'+
+            '<button class="fz-card" onclick="fzSend(this.dataset.m)" data-m="I need to hire a new bartender. What should I know about award rates?">'+
                 '<div class="fz-ic">&#x1F465;</div>'+
                 '<div><div class="fz-ct">Hiring &amp; Onboarding</div>'+
                 '<div class="fz-cd">Job ads, award rates, contracts, probation &amp; induction</div></div>'+
@@ -35264,43 +35277,78 @@ function fitzShowWelcome() {
         '<div class="text-center">'+
             '<p class="text-slate-400 text-xs mb-3">Or try one of these:</p>'+
             '<div class="fz-chips">'+
-                '<button class="fz-chip" onclick="fzSend(\'What penalty rates apply on a Sunday?\')">&#x1F4B0; Sunday penalty rates</button>'+
-                '<button class="fz-chip" onclick="fzSend(\'How do I terminate an employee fairly?\')">&#x26A0;&#xFE0F; Fair termination</button>'+
-                '<button class="fz-chip" onclick="fzSend(\'What are casual conversion rules?\')">&#x1F504; Casual conversion</button>'+
+                '<button class="fz-chip" onclick="fzSend(this.dataset.m)" data-m="What penalty rates apply on a Sunday?">&#x1F4B0; Sunday penalty rates</button>'+
+                '<button class="fz-chip" onclick="fzSend(this.dataset.m)" data-m="How do I terminate an employee fairly?">&#x26A0;&#xFE0F; Fair termination</button>'+
+                '<button class="fz-chip" onclick="fzSend(this.dataset.m)" data-m="What are casual conversion rules?">&#x1F504; Casual conversion</button>'+
             '</div>'+
         '</div>'+
         '<div class="mt-6 bg-red-500/10 border border-red-500/30 rounded-xl p-3 text-center max-w-md mx-auto">'+
-            '<p class="text-red-400 text-sm font-medium">&#x1F6A8; Urgent situation? Use the <strong>URGENT</strong> button above for immediate crisis response.</p>'+
+            '<p class="text-red-400 text-sm font-medium">&#x1F6A8; Urgent? Use the <strong>URGENT</strong> button above for crisis response.</p>'+
         '</div>';
-    c.appendChild(d);
+    return d;
 }
 
-function fzSend(text) {
-    var w = document.getElementById('fzWelcome');
-    if (w) w.remove();
-    var inp = document.getElementById('messageInput');
-    if (inp) {
-        inp.value = text;
-        inp.focus();
-        if (typeof autoResizeTextarea==='function') autoResizeTextarea(inp);
-        if (typeof sendMessage==='function') sendMessage();
+// Override createNewConversation's welcome at RUNTIME
+// Wait for it to exist, then wrap it
+(function(){
+    var attempts=0;
+    function patch(){
+        if(typeof createNewConversation==='function' && !createNewConversation._fzPatched){
+            var orig=createNewConversation;
+            createNewConversation=function(){
+                // Call original (which builds the plain welcome)
+                orig.apply(this,arguments);
+                // Now replace the plain welcome with our rich one
+                var mc=document.getElementById('messagesContainer');
+                if(!mc)return;
+                var container=mc.querySelector('.space-y-6');
+                if(!container)return;
+                // Remove the original welcome message (last child)
+                var msgs=container.querySelectorAll('.flex.justify-start');
+                if(msgs.length===1){
+                    msgs[0].remove();
+                    container.appendChild(fzBuildWelcome());
+                }
+            };
+            createNewConversation._fzPatched=true;
+        }else if(attempts<30){
+            attempts++;
+            setTimeout(patch,300);
+        }
     }
-}
+    setTimeout(patch,200);
+})();
 
-function fzAnnounce(msg) {
-    var el = document.getElementById('fzAnnounce');
-    if (el) { el.textContent=''; setTimeout(function(){el.textContent=msg;},50); }
-}
+// Patch sendMessage to remove welcome
+(function(){
+    var attempts=0;
+    function patch(){
+        if(typeof sendMessage==='function' && !sendMessage._fzSendPatched){
+            var orig=sendMessage;
+            sendMessage=async function(){
+                var w=document.getElementById('fzWelcome');
+                if(w)w.remove();
+                return orig.apply(this,arguments);
+            };
+            sendMessage._fzSendPatched=true;
+        }else if(attempts<30){
+            attempts++;
+            setTimeout(patch,300);
+        }
+    }
+    setTimeout(patch,200);
+})();
 
-function fzTrap(modal) {
-    if (!modal) return;
+// Focus trapping
+function fzTrap(modal){
+    if(!modal)return;
     var s='button:not([disabled]),input:not([disabled]),textarea:not([disabled]),select:not([disabled]),a[href],[tabindex]:not([tabindex="-1"])';
     var items=modal.querySelectorAll(s);
-    if (!items.length) return;
+    if(!items.length)return;
     var first=items[0],last=items[items.length-1];
     modal._fzPrev=document.activeElement;
     setTimeout(function(){first.focus();},50);
-    modal._fzTrap=function(e){
+    modal._fzHandler=function(e){
         if(e.key==='Tab'){
             if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}
             else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
@@ -35311,36 +35359,37 @@ function fzTrap(modal) {
             if(b)b.click();
         }
     };
-    modal.addEventListener('keydown',modal._fzTrap);
+    modal.addEventListener('keydown',modal._fzHandler);
 }
 function fzRelease(modal){
     if(!modal)return;
-    if(modal._fzTrap){modal.removeEventListener('keydown',modal._fzTrap);delete modal._fzTrap;}
+    if(modal._fzHandler){modal.removeEventListener('keydown',modal._fzHandler);delete modal._fzHandler;}
     if(modal._fzPrev&&modal._fzPrev.focus)setTimeout(function(){modal._fzPrev.focus();},50);
 }
 
+// Next-step suggestions
 var _fzNS={
-    recordOfDiscussion:{ic:'&#x1F4CA;',t:'What comes next?',p:'If the issue continues, consider a Performance Improvement Plan (PIP) or Letter of Concern.',b:'Create a PIP',m:'I need to create a Performance Improvement Plan'},
-    letterOfConcern:{ic:'&#x1F4CA;',t:'What comes next?',p:'If the employee does not improve, create a PIP with measurable goals.',b:'Create a PIP',m:'I need to create a Performance Improvement Plan'},
-    pip:{ic:'&#x26A0;&#xFE0F;',t:'What comes next?',p:'If PIP objectives are not met, the next step is typically a First Written Warning.',b:'Create First Warning',m:'I need to create a first written warning'},
-    firstWarning:{ic:'&#x1F6A8;',t:'What comes next?',p:'If conduct does not improve, a Final Written Warning is the next step.',b:'Create Final Warning',m:'I need to create a final written warning'},
-    finalWarning:{ic:'&#x1F4DE;',t:'Consider expert consultation',p:'After a final warning, termination may follow. This is high-risk — we strongly recommend consulting Blake.',b:'Book Consultation',m:'__c__'},
-    formalWarning:{ic:'&#x1F4CB;',t:'What comes next?',p:'Keep a signed copy. If the issue recurs, escalate to a final warning.',b:'Learn more',m:'How should I follow up after issuing a formal warning?'},
-    positionDescription:{ic:'&#x1F4E2;',t:'Ready to advertise?',p:'Create a job advertisement to start recruiting for this role.',b:'Create Job Ad',m:'I need to create a job advertisement'},
+    recordOfDiscussion:{ic:'&#x1F4CA;',t:'What comes next?',p:'If the issue continues, consider a PIP or Letter of Concern.',b:'Create a PIP',m:'I need to create a Performance Improvement Plan'},
+    letterOfConcern:{ic:'&#x1F4CA;',t:'What comes next?',p:'If no improvement, create a PIP with measurable goals.',b:'Create a PIP',m:'I need to create a Performance Improvement Plan'},
+    pip:{ic:'&#x26A0;&#xFE0F;',t:'What comes next?',p:'If PIP objectives are not met, a First Written Warning is next.',b:'Create First Warning',m:'I need to create a first written warning'},
+    firstWarning:{ic:'&#x1F6A8;',t:'What comes next?',p:'If conduct does not improve, a Final Written Warning follows.',b:'Create Final Warning',m:'I need to create a final written warning'},
+    finalWarning:{ic:'&#x1F4DE;',t:'Consider expert consultation',p:'After a final warning, termination may follow. Consult Blake.',b:'Book Consultation',m:'__c__'},
+    formalWarning:{ic:'&#x1F4CB;',t:'What comes next?',p:'Keep a signed copy. If the issue recurs, escalate to final warning.',b:'Learn more',m:'How should I follow up after issuing a formal warning?'},
+    positionDescription:{ic:'&#x1F4E2;',t:'Ready to advertise?',p:'Create a job advertisement to recruit for this role.',b:'Create Job Ad',m:'I need to create a job advertisement'},
     jobDescription:{ic:'&#x2705;',t:'Prepare for onboarding',p:'Create an onboarding checklist for a smooth first week.',b:'Create Onboarding Checklist',m:'I need to create an onboarding checklist'},
     onboardingChecklist:{ic:'&#x1F4DA;',t:'Set up training',p:'Create a training plan for the new hire.',b:'Create Training Plan',m:'I need to create a training plan'},
-    showCause:{ic:'&#x1F4DE;',t:'Expert review essential',p:'Show cause letters have strict legal requirements. Expert review is strongly recommended.',b:'Book Consultation',m:'__c__'}
+    showCause:{ic:'&#x1F4DE;',t:'Expert review essential',p:'Show cause letters have strict legal requirements.',b:'Book Consultation',m:'__c__'}
 };
 
 function fzNextStep(docType){
-    var s=_fzNS[docType]; if(!s)return;
-    var mc=document.getElementById('messagesContainer'); if(!mc)return;
-    var c=mc.querySelector('.space-y-6'); if(!c)return;
+    var s=_fzNS[docType];if(!s)return;
+    var mc=document.getElementById('messagesContainer');if(!mc)return;
+    var c=mc.querySelector('.space-y-6');if(!c)return;
     var el=document.createElement('div');
     el.className='flex justify-start fade-in';
-    var btn = s.m==='__c__'
-        ? '<button class="fz-ns-btn" onclick="if(typeof openConsultationBookingModal===\'function\')openConsultationBookingModal()">'+s.b+' &#x2192;</button>'
-        : '<button class="fz-ns-btn" onclick="fzSend(\''+s.m.replace(/'/g,"\\'")+'\')">'+s.b+' &#x2192;</button>';
+    var btn=s.m==='__c__'
+        ?'<button class="fz-ns-btn" onclick="if(typeof openConsultationBookingModal===\'function\')openConsultationBookingModal()">'+s.b+' &#x2192;</button>'
+        :'<button class="fz-ns-btn" onclick="fzSend(\''+s.m.replace(/'/g,"\\'")+'\')">'+s.b+' &#x2192;</button>';
     el.innerHTML='<div class="max-w-3xl w-full"><div class="fz-ns"><h4>'+s.ic+' '+s.t+'</h4><p>'+s.p+'</p>'+btn+'</div></div>';
     c.appendChild(el);
     fzAnnounce('Suggestion: '+s.t);
@@ -35361,26 +35410,13 @@ document.addEventListener('keydown',function(e){
     }
 });
 
-// Patch sendMessage to remove welcome
-(function(){
-    var n=0;
-    function p(){
-        if(typeof sendMessage==='function'&&!sendMessage._fzP){
-            var o=sendMessage;
-            sendMessage=async function(){var w=document.getElementById('fzWelcome');if(w)w.remove();return o.apply(this,arguments);};
-            sendMessage._fzP=true;
-        }else if(n<20){n++;setTimeout(p,300);}
-    }
-    setTimeout(p,200);
-})();
-
 // Auto-ARIA + focus trap on modals
 (function(){
     function init(){
         var ob=new MutationObserver(function(muts){
-            muts.forEach(function(m){
-                if(m.type!=='attributes'||m.attributeName!=='class')return;
-                var el=m.target;
+            muts.forEach(function(mut){
+                if(mut.type!=='attributes'||mut.attributeName!=='class')return;
+                var el=mut.target;
                 if(!el.id||(el.id.indexOf('Modal')===-1&&el.id.indexOf('modal')===-1))return;
                 if(el.classList.contains('fixed')&&!el.classList.contains('hidden')){
                     if(!el.getAttribute('role')){el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');}
@@ -35396,17 +35432,17 @@ document.addEventListener('keydown',function(e){
     else setTimeout(init,500);
 })();
 
-// Enhanced review submit error handling
+// Enhanced review submit
 (function(){
-    function p(){
+    function patch(){
         if(typeof submitReviewRequest==='function'&&!submitReviewRequest._fzP){
-            var o=submitReviewRequest;
+            var orig=submitReviewRequest;
             submitReviewRequest=async function(){
-                try{await o.apply(this,arguments);fzAnnounce('Review request submitted successfully');}
-                catch(e){console.error('Review error:',e);fzAnnounce('Issue submitting review');if(typeof showToast==='function')showToast('Submission issue - please try again','error',6000);}
+                try{await orig.apply(this,arguments);fzAnnounce('Review request submitted successfully');}
+                catch(e){fzAnnounce('Issue submitting review');if(typeof showToast==='function')showToast('Submission issue - please try again','error',6000);}
             };
             submitReviewRequest._fzP=true;
-        }else{setTimeout(p,1000);}
+        }else{setTimeout(patch,1000);}
     }
-    setTimeout(p,500);
+    setTimeout(patch,500);
 })();
