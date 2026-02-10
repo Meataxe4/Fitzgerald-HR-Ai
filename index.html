@@ -4188,7 +4188,7 @@ async function checkFirestoreData() {
                             </svg>
                         </summary>
                         <div class="px-5 pb-5 text-slate-400 text-sm">
-                            Absolutely! Fitz includes a "Book Expert" feature that connects you directly with qualified HR professionals for complex situations that need human expertise.
+                            Absolutely! Fitz includes a "Talk to a Consultant" feature that connects you directly with qualified HR professionals for complex situations that need human expertise.
                         </div>
                     </details>
                 </div>
@@ -4475,11 +4475,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span class="hidden sm:inline">URGENT</span>
                 </button>
                 
-                <!-- Book Expert Button -->
+                <!-- Talk to Consultant Button -->
                 <button onclick="openConsultationBookingModal()" 
                         class="px-3 py-2 md:px-4 md:py-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold rounded-lg transition-all flex items-center gap-2 touch-manipulation shadow-lg shadow-purple-500/20">
                     <span class="text-lg md:text-xl">📞</span>
-                    <span class="hidden sm:inline">Book Expert</span>
+                    <span class="hidden sm:inline">Consultant</span>
                 </button>
                 
                 <!-- Divider (hidden on mobile) -->
@@ -5045,9 +5045,9 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="flex items-center justify-between mb-6">
                 <div>
                     <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
-    		<span>📋</span> Roster Cost Optimizer
+    		<span>📋</span> Roster Cost Optimiser
 		</h2>
-                    <p class="text-slate-400 text-sm">Upload roster to analyze costs and optimize scheduling</p>
+                    <p class="text-slate-400 text-sm">Upload roster to analyse costs and optimise scheduling</p>
                 </div>
                 <button onclick="closeToolModal('rosterOptimizerModal')" class="text-slate-400 hover:text-white text-2xl">×</button>
             </div>
@@ -5087,10 +5087,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
 
                     <div class="bg-slate-900 border border-amber-500 rounded-lg p-6">
-                        <h3 class="text-amber-500 font-bold text-lg mb-4">✨ Optimized Roster:</h3>
+                        <h3 class="text-amber-500 font-bold text-lg mb-4">✨ Optimised Roster:</h3>
                         <div class="grid grid-cols-2 gap-4 mb-4">
                             <div class="bg-slate-800 p-4 rounded">
-                                <p class="text-slate-400 text-sm">Optimized Cost</p>
+                                <p class="text-slate-400 text-sm">Optimised Cost</p>
                                 <p class="text-2xl font-bold text-green-400" id="rosterOptimizedCost">$3,875</p>
                             </div>
                             <div class="bg-slate-800 p-4 rounded">
@@ -5102,7 +5102,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         
                         <button onclick="downloadOptimizedRoster()" 
                                 class="w-full mt-4 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
-                            📥 Download Optimized Roster
+                            📥 Download Optimised Roster
                         </button>
                     </div>
                 </div>
@@ -5704,7 +5704,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span class="text-2xl">🎯</span>
                     <div>
                         <div class="font-semibold">Scenario Analysis</div>
-                        <div class="text-sm text-slate-400">Analyze HR scenarios</div>
+                        <div class="text-sm text-slate-400">Analyse HR scenarios</div>
                     </div>
                 </button>
                 
@@ -7038,7 +7038,7 @@ function setBilling(billing) {
         <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-t-2xl p-6 text-center relative">
             <button onclick="closeConsultationBookingModal()" class="absolute top-4 right-4 text-white/70 hover:text-white text-2xl">×</button>
             <div class="text-5xl mb-3">👩‍💼</div>
-            <h2 class="text-2xl font-bold text-white mb-1">Book an HR Expert</h2>
+            <h2 class="text-2xl font-bold text-white mb-1">Book a HR Consultant</h2>
             <p class="text-purple-200 text-sm">30-minute consultation with a senior HR professional</p>
         </div>
         
@@ -7053,6 +7053,21 @@ function setBilling(billing) {
                 </h3>
                 
                 <div class="grid gap-3" id="consultationTypeGrid">
+                    <!-- General Consultation - FIRST -->
+                    <button onclick="selectConsultationType('generalConsultation')" 
+                            class="consultation-type-btn p-4 bg-slate-900 hover:bg-slate-700 border-2 border-slate-600 hover:border-purple-500 rounded-xl text-left transition-all group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-2xl">💬</span>
+                                <div>
+                                    <p class="text-white font-semibold group-hover:text-purple-400 transition-colors">General HR Consultation</p>
+                                    <p class="text-slate-400 text-xs">Expert advice on any HR matter</p>
+                                </div>
+                            </div>
+                            <span class="bg-purple-600/30 text-purple-300 px-3 py-1 rounded-full text-sm font-bold">5 credits</span>
+                        </div>
+                    </button>
+                    
                     <!-- Termination Review -->
                     <button onclick="selectConsultationType('terminationReview')" 
                             class="consultation-type-btn p-4 bg-slate-900 hover:bg-slate-700 border-2 border-slate-600 hover:border-purple-500 rounded-xl text-left transition-all group">
@@ -7125,21 +7140,6 @@ function setBilling(billing) {
                                 </div>
                             </div>
                             <span class="bg-purple-600/30 text-purple-300 px-3 py-1 rounded-full text-sm font-bold">8 credits</span>
-                        </div>
-                    </button>
-                    
-                    <!-- General Consultation -->
-                    <button onclick="selectConsultationType('generalConsultation')" 
-                            class="consultation-type-btn p-4 bg-slate-900 hover:bg-slate-700 border-2 border-slate-600 hover:border-purple-500 rounded-xl text-left transition-all group">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center gap-3">
-                                <span class="text-2xl">💬</span>
-                                <div>
-                                    <p class="text-white font-semibold group-hover:text-purple-400 transition-colors">General HR Consultation</p>
-                                    <p class="text-slate-400 text-xs">Expert advice on any HR matter</p>
-                                </div>
-                            </div>
-                            <span class="bg-purple-600/30 text-purple-300 px-3 py-1 rounded-full text-sm font-bold">5 credits</span>
                         </div>
                     </button>
                 </div>
@@ -9352,8 +9352,8 @@ function detectDocumentGenerationRequest(message) {
         'record of discussion': { tool: 'Document Builder', action: "openDocumentBuilderFor('recordOfDiscussion')", icon: '📄', specific: 'Record of Discussion' },
         
         // Termination/Redundancy - requires consultation
-        'termination': { tool: 'Book Expert Consultation', action: 'openConsultationBookingModal()', icon: '📞', specific: 'Termination Review', requiresConsult: true },
-        'redundancy': { tool: 'Book Expert Consultation', action: 'openConsultationBookingModal()', icon: '📞', specific: 'Redundancy Review', requiresConsult: true },
+        'termination': { tool: 'Talk to a Consultant', action: 'openConsultationBookingModal()', icon: '📞', specific: 'Termination Review', requiresConsult: true },
+        'redundancy': { tool: 'Talk to a Consultant', action: 'openConsultationBookingModal()', icon: '📞', specific: 'Redundancy Review', requiresConsult: true },
         
         // Show cause/Allegations
         'show cause': { tool: 'Document Builder', action: "openDocumentBuilderFor('showCause')", icon: '📄', specific: 'Show Cause Letter' },
@@ -9444,13 +9444,13 @@ I can't generate **${specific}** documents directly in chat — these are high-r
 
 <div class="mt-4 p-4 bg-amber-500/10 border border-amber-500/30 rounded-lg">
     <p class="text-amber-400 font-semibold mb-2">${icon} ${specific}</p>
-    <p class="text-slate-300 text-sm mb-3">Book a consultation with our HR experts to get personalized guidance and compliant documentation.</p>
+    <p class="text-slate-300 text-sm mb-3">Book a consultation with our HR consultants to get personalised guidance and compliant documentation.</p>
     <button onclick="${action}" class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 px-4 rounded-lg transition-all">
-        Book Expert Consultation →
+        Talk to a Consultant →
     </button>
 </div>
 
-**Why consultation?** ${specific} involves significant legal risk. Our experts will review your situation and provide tailored documentation that protects your business.`;
+**Why consultation?** ${specific} involves significant legal risk. Our consultants will review your situation and provide tailored documentation that protects your business.`;
     }
     
     return `## 📄 Use Our Document Tools
@@ -12143,6 +12143,8 @@ Failure to meet these expectations may result in:
 - [Consequence 2]
 - Termination of employment
 
+**IMPORTANT: Do NOT list "reduction in rostered hours" or "reduced shifts" as a consequence. This is not an appropriate disciplinary outcome, particularly for full-time employees.**
+
 ## WARNING RETENTION
 
 This warning will remain on your employee file for 12 months from the date of this letter.
@@ -12349,7 +12351,7 @@ ________________________________________________________________________________
 
 ### EMPLOYEE'S RESPONSE SUMMARY
 
-*Summarize the key points of what the employee said in response:*
+*Summarise the key points of what the employee said in response:*
 ________________________________________________________________________________
 ________________________________________________________________________________
 ________________________________________________________________________________
@@ -12922,7 +12924,7 @@ REQUIREMENTS:
 3. **Use a supportive but clear tone** - this is to help the employee succeed, not punish them
 4. **Make goals SMART** - expand on the brief goals provided with more specific detail
 5. **Weekly check-in template** - provide a simple weekly check-in form at the end
-6. **Be specific about consequences** but frame as progressive steps
+6. **Be specific about consequences** but frame as progressive steps. **Do NOT include "reduction in rostered hours" or "reduced shifts" as a consequence - this is not appropriate, particularly for full-time employees.**
 7. **Include measurement criteria** for each goal
 
 Example structure:
@@ -17058,7 +17060,7 @@ const dailyTips = [
     { icon: "🔐", tip: "Store employee personal information securely - privacy laws apply" },
     { icon: "📊", tip: "Review your payroll monthly - catch errors before they compound" },
     { icon: "🤝", tip: "Consider offering unpaid trial shifts (max 1-2 hours for assessment)" },
-    { icon: "🌟", tip: "Recognize good performance regularly - it reduces turnover" },
+    { icon: "🌟", tip: "Recognise good performance regularly - it reduces turnover" },
     { icon: "📱", tip: "Use the tools menu (🛠️) to access specialised calculators" }
 ];
 
@@ -24245,7 +24247,7 @@ async function performLogout(loggedOutUser, type) {
                     <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
                         <p class="text-slate-100 leading-relaxed">
                             👋 G'day! I'm Fitz, your AI-powered HR knowledge companion from Fitzgerald HR, 
-                            specializing in hospitality HR for Australian venues.
+                            specialising in hospitality HR for Australian venues.
                         </p>
 
                         <p class="text-slate-100 leading-relaxed mt-3">
@@ -24261,7 +24263,7 @@ async function performLogout(loggedOutUser, type) {
                         </div>
 
                         <p class="text-slate-100 text-sm mt-4">
-                            💡 <strong>Tip:</strong> I have 8 specialized tools (click 🛠️ above). 
+                            💡 <strong>Tip:</strong> I have 8 specialised tools (click 🛠️ above). 
                             I'll suggest the right ones as we talk, or browse them anytime.
                         </p>
 
@@ -26417,7 +26419,7 @@ function resetAIImport() {
                     <span class="text-3xl">🎯</span>
                     <div>
                         <div class="font-semibold text-white mb-1">Scenario Analysis</div>
-                        <div class="text-sm text-slate-400">Analyze complex HR scenarios</div>
+                        <div class="text-sm text-slate-400">Analyse complex HR scenarios</div>
                     </div>
                 </div>
             </button>
@@ -27105,7 +27107,7 @@ function resetAIImport() {
                     <span class="text-4xl">💬</span>
                     <div>
                         <div class="font-semibold text-white text-lg mb-2">Interview Questions Generator</div>
-                        <div class="text-sm text-slate-400 mb-3">Generate customized interview questions with STAR method examples, red flags, and what to look for in answers</div>
+                        <div class="text-sm text-slate-400 mb-3">Generate customised interview questions with STAR method examples, red flags, and what to look for in answers</div>
                         <div class="flex flex-wrap gap-2">
                             <span class="text-xs bg-amber-500/20 text-amber-400 px-2 py-1 rounded">AI-Powered</span>
                             <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">STAR Method</span>
@@ -28717,7 +28719,7 @@ async function generateSmartChecklist() {
     onboardingState.checklistId = 'onboarding_' + Date.now();
     
     // Show loading
-    showAIThinking('Analyzing role and generating personalized checklist...');
+    showAIThinking('Analysing role and generating personalised checklist...');
     
     try {
         // Get AI insights
@@ -29446,7 +29448,7 @@ function showTrainingAIThinking() {
     const insightsBox = document.getElementById('trainingAIInsights');
     const content = document.getElementById('trainingAIContent');
     
-    content.innerHTML = '<div class="ai-thinking-training">🤖 Analyzing role requirements and generating personalized training plan</div>';
+    content.innerHTML = '<div class="ai-thinking-training">🤖 Analysing role requirements and generating personalised training plan</div>';
     insightsBox.classList.remove('hidden');
 }
 
@@ -29456,7 +29458,7 @@ async function getTrainingAIInsights() {
     const prompt = `As an Australian hospitality training expert, provide 3 key insights for training a ${trainingPlanState.experience} ${positionName} over ${trainingPlanState.duration} weeks. ${trainingPlanState.focusAreas ? 'Focus areas: ' + trainingPlanState.focusAreas : ''}
 
 Provide:
-1. Critical skills to prioritize
+1. Critical skills to prioritise
 2. Common training challenges for this role
 3. Success indicators
 
