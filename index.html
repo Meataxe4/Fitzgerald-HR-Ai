@@ -21385,8 +21385,8 @@ function useQuickPrompt(index) {
         promptsDiv.remove();
     }
     
-    // Set input value and send after brief delay to ensure DOM is ready
-    var input = document.getElementById('userInput');
+    // Set input value using correct ID (messageInput, not userInput)
+    var input = document.getElementById('messageInput');
     if (input) {
         input.value = text;
         input.focus();
