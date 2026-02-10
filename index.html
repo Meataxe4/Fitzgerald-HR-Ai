@@ -16715,6 +16715,10 @@ function checkAccess() {
                     setTimeout(() => {
                         restoreLastConversation();
                         updateSidebarChats();
+                        // Show random quick prompts for returning users
+                        setTimeout(() => {
+                            showRandomQuickPrompts();
+                        }, 500);
                     }, 300);
                 }
             }
@@ -16808,6 +16812,10 @@ function attemptAutoLogin() {
                 setTimeout(() => {
                     restoreLastConversation();
                     updateSidebarChats();
+                    // Show random quick prompts for returning users
+                    setTimeout(() => {
+                        showRandomQuickPrompts();
+                    }, 500);
                 }, 300);
             }
         }
@@ -21391,6 +21399,67 @@ function useQuickPrompt(index) {
     }
 }
 
+// Random Quick Prompts for returning users - pool of 15-20 general HR questions
+function showRandomQuickPrompts() {
+    var container = document.getElementById('messagesContainer');
+    if (!container) return;
+    
+    var innerContainer = container.querySelector('.space-y-6');
+    if (!innerContainer) return;
+    
+    // Don't show if prompts already exist
+    if (document.getElementById('quickActionPrompts')) return;
+    
+    // Pool of 15-20 general HR prompts
+    var allPrompts = [
+        {icon: '💰', label: 'Casual pay rates', text: 'What should I pay a casual employee under the Hospitality Award?'},
+        {icon: '🌙', label: 'Penalty rates', text: 'What are the penalty rates for weekend and public holiday work?'},
+        {icon: '📝', label: 'Write a warning', text: 'Can you help me write a warning letter for an employee?'},
+        {icon: '⚠️', label: 'Late employee', text: 'I have a staff member who is always late. What should I do?'},
+        {icon: '👋', label: 'Hiring checklist', text: 'What do I need to do when hiring a new employee?'},
+        {icon: '🏥', label: 'Sick leave', text: 'How does sick leave work for casual employees?'},
+        {icon: '📅', label: 'Minimum shifts', text: 'What is the minimum shift length under the Hospitality Award?'},
+        {icon: '⏰', label: 'Overtime rules', text: 'When does overtime kick in for hospitality workers?'},
+        {icon: '📋', label: 'Casual conversion', text: 'When do I need to offer casual conversion to my staff?'},
+        {icon: '📊', label: 'Redundancy', text: 'What is the process for making someone redundant?'},
+        {icon: '🔥', label: 'Termination', text: 'What is the correct process to terminate an employee?'},
+        {icon: '📄', label: 'Employment contract', text: 'What should be included in an employment contract?'},
+        {icon: '🤒', label: 'Medical certificate', text: 'When can I ask for a medical certificate from staff?'},
+        {icon: '🏖️', label: 'Annual leave', text: 'How does annual leave work for part-time employees?'},
+        {icon: '☕', label: 'Break entitlements', text: 'What breaks are employees entitled to during a shift?'},
+        {icon: '🚫', label: 'No-show staff', text: 'An employee didnt show up for their shift. What do I do?'},
+        {icon: '💼', label: 'Part-time hours', text: 'What are the rules for part-time employee hours?'},
+        {icon: '📞', label: 'Reference checks', text: 'What can I legally say when giving a reference?'}
+    ];
+    
+    // Shuffle and pick 5 random prompts
+    var shuffled = allPrompts.sort(function() { return 0.5 - Math.random(); });
+    var prompts = shuffled.slice(0, 5);
+    
+    // Create the prompts container
+    var promptsDiv = document.createElement('div');
+    promptsDiv.id = 'quickActionPrompts';
+    promptsDiv.className = 'px-4 pb-4';
+    
+    var html = '<p class="text-slate-400 text-sm mb-3">💡 Quick questions:</p>';
+    html += '<div class="flex flex-wrap gap-2">';
+    
+    for (var i = 0; i < prompts.length; i++) {
+        html += '<button onclick="useQuickPrompt(' + i + ')" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 border border-slate-600 hover:border-amber-500 text-slate-200 rounded-full text-sm transition-all">';
+        html += prompts[i].icon + ' ' + prompts[i].label;
+        html += '</button>';
+    }
+    
+    html += '</div>';
+    promptsDiv.innerHTML = html;
+    
+    // Store prompts for click handler
+    window.quickPromptsList = prompts;
+    
+    innerContainer.appendChild(promptsDiv);
+    container.scrollTop = container.scrollHeight;
+}
+
 function getVenueTypeLabel(type) {
     const labels = { 
         'bakery-cafe': 'bakery café',
@@ -24449,6 +24518,10 @@ async function acceptLegalTerms() {
         setTimeout(() => {
             restoreLastConversation();
             updateSidebarChats();
+            // Show random quick prompts for returning users
+            setTimeout(() => {
+                showRandomQuickPrompts();
+            }, 500);
         }, 500);
     }
 }
@@ -34730,6 +34803,11 @@ if (auth) {
                             setTimeout(() => {
                                 scrollToBottomInstant();
                             }, 800);
+                            
+                            // Show random quick prompts for returning users
+                            setTimeout(() => {
+                                showRandomQuickPrompts();
+                            }, 1000);
                         }, 500);
                     }
                 }
