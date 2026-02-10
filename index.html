@@ -21322,7 +21322,7 @@ function showQuickActionPrompts() {
     // Build prompts based on profile
     var prompts = [];
     
-    // Challenge-specific prompts
+    // Challenge-specific prompts (2 max)
     if (challenge === 'performance') {
         prompts.push({icon: '⚠️', label: 'Staff always late', text: 'I have a staff member who is always late. What should I do?'});
         prompts.push({icon: '📝', label: 'Write a warning', text: 'Can you help me write a warning letter for an employee?'});
@@ -21332,21 +21332,21 @@ function showQuickActionPrompts() {
     } else if (challenge === 'rostering') {
         prompts.push({icon: '📅', label: 'Roster rules', text: 'What are the minimum shift length rules under the Hospitality Award?'});
         prompts.push({icon: '⏰', label: 'Overtime rules', text: 'When does overtime kick in for hospitality workers?'});
+    } else {
+        // Default prompts if no challenge selected
+        prompts.push({icon: '👋', label: 'Hiring new staff', text: 'What do I need to do when hiring a new employee?'});
+        prompts.push({icon: '💰', label: 'Check pay rates', text: 'What should I pay a casual waiter under the Hospitality Award?'});
     }
     
-    // Common prompts for everyone
-    prompts.push({icon: '👋', label: 'Hiring new staff', text: 'What do I need to do when hiring a new employee?'});
-    prompts.push({icon: '🏥', label: 'Sick leave question', text: 'How does sick leave work for casual employees?'});
-    
-    // Staff size specific
+    // Add one more common prompt to make 3 total
     if (staffCount === '30+' || staffCount === '16-30') {
         prompts.push({icon: '📊', label: 'Redundancy process', text: 'What is the process for making someone redundant?'});
     } else {
-        prompts.push({icon: '📋', label: 'Casual conversion', text: 'When do I need to offer casual conversion to my staff?'});
+        prompts.push({icon: '🏥', label: 'Sick leave', text: 'How does sick leave work for casual employees?'});
     }
     
-    // Limit to 5 prompts
-    prompts = prompts.slice(0, 5);
+    // Limit to 3 prompts
+    prompts = prompts.slice(0, 3);
     
     // Create the prompts container
     var promptsDiv = document.createElement('div');
@@ -21379,27 +21379,25 @@ function useQuickPrompt(index) {
     
     var text = prompts[index].text;
     
-    // Remove the prompts container
+    // Remove the prompts container first
     var promptsDiv = document.getElementById('quickActionPrompts');
     if (promptsDiv) {
-        promptsDiv.style.opacity = '0';
-        promptsDiv.style.transition = 'opacity 0.3s';
-        setTimeout(function() {
-            if (promptsDiv.parentNode) {
-                promptsDiv.parentNode.removeChild(promptsDiv);
-            }
-        }, 300);
+        promptsDiv.remove();
     }
     
-    // Set input and send
+    // Set input value and send after brief delay to ensure DOM is ready
     var input = document.getElementById('userInput');
     if (input) {
         input.value = text;
-        sendMessage();
+        input.focus();
+        // Small delay to ensure value is set before sending
+        setTimeout(function() {
+            sendMessage();
+        }, 100);
     }
 }
 
-// Random Quick Prompts for returning users - pool of 15-20 general HR questions
+// Random Quick Prompts for returning users - pool of general HR questions
 function showRandomQuickPrompts() {
     var container = document.getElementById('messagesContainer');
     if (!container) return;
@@ -21410,7 +21408,7 @@ function showRandomQuickPrompts() {
     // Don't show if prompts already exist
     if (document.getElementById('quickActionPrompts')) return;
     
-    // Pool of 15-20 general HR prompts
+    // Pool of general HR prompts
     var allPrompts = [
         {icon: '💰', label: 'Casual pay rates', text: 'What should I pay a casual employee under the Hospitality Award?'},
         {icon: '🌙', label: 'Penalty rates', text: 'What are the penalty rates for weekend and public holiday work?'},
@@ -21432,9 +21430,9 @@ function showRandomQuickPrompts() {
         {icon: '📞', label: 'Reference checks', text: 'What can I legally say when giving a reference?'}
     ];
     
-    // Shuffle and pick 5 random prompts
+    // Shuffle and pick 3 random prompts
     var shuffled = allPrompts.sort(function() { return 0.5 - Math.random(); });
-    var prompts = shuffled.slice(0, 5);
+    var prompts = shuffled.slice(0, 3);
     
     // Create the prompts container
     var promptsDiv = document.createElement('div');
