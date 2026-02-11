@@ -11041,7 +11041,6 @@ formalWarning: [
                 "On track — employee is meeting expectations, continue to support",
                 "On track with development areas — minor concerns addressed with clear action plan",
                 "At risk — significant concerns raised, improvement required within clear timeframe",
-                "Recommend extending probation period (if applicable)",
                 "Recommend confirming employment — probation passed",
                 "Recommend ending employment during probation"
               ],
@@ -11158,7 +11157,7 @@ formalWarning: [
                   options: ["Second Formal Warning for Performance", "Final Written Warning", "Other (specify in notes)"] },
                 { name: "week12Consequence", label: "If no significant improvement by Week 12:", 
                   type: "select", required: true,
-                  options: ["Termination of employment", "Demotion to different role", "Extended PIP (only if substantial progress made)", "Other (specify in notes)"] },
+                  options: ["Termination of employment", "Extended PIP (only if substantial progress made)", "Other (specify in notes)"] },
                 { name: "consequenceNotes", label: "Additional notes on consequences (optional)", 
                   type: "textarea", required: false, rows: 2 }
             ]
@@ -11216,7 +11215,7 @@ formalWarning: [
             title: "Allegation Details",
             fields: [
                 { name: "allegationType", label: "Type of allegation", type: "select",
-                  options: ["Theft", "Harassment", "Bullying", "Serious safety breach", "Fraud", "Violence/threats", "Other serious misconduct"],
+                  options: ["Theft", "Serious safety breach", "Fraud", "Other Misconduct"],
                   required: true },
                 { name: "allegationDescription", label: "Describe the allegation", 
                   type: "textarea", required: true, rows: 4, 
@@ -11241,7 +11240,7 @@ formalWarning: [
             title: "Investigation Process",
             fields: [
                 { name: "investigator", label: "Who will conduct the investigation?", type: "text",
-                  required: true, placeholder: "e.g., HR Manager, External investigator" },
+                  required: true, placeholder: "e.g., Fitz HR Consultant, External investigator" },
                 { name: "suspensionRequired", label: "Suspension during investigation?", type: "select",
                   options: ["No suspension - continue work", "Yes - on full pay", "Yes - without pay (serious misconduct only)"],
                   required: true }
@@ -11252,7 +11251,6 @@ formalWarning: [
             title: "Investigation Meeting",
             fields: [
                 { name: "meetingDate", label: "Meeting date", type: "date", required: true },
-                { name: "meetingTime", label: "Meeting time", type: "time", required: true },
                 { name: "meetingLocation", label: "Meeting location", type: "text", required: true }
             ]
         }
@@ -11616,6 +11614,13 @@ function docWizardNext() {
         }
     }
     
+    // ✅ VALIDATION FOR PERFORMANCE IMPROVEMENT PLAN
+    if (documentBuilderState.currentType === 'performanceImprovementPlan') {
+        if (!validatePIPSupportPerson()) {
+            return;
+        }
+    }
+    
     // Move to next step or generate
     if (documentBuilderState.currentStep < documentBuilderState.totalSteps) {
         documentBuilderState.currentStep++;
@@ -11790,6 +11795,41 @@ function validateRecordOfDiscussionStep2() {
               '• A fellow employee (if appropriate and no conflict of interest)\n\n' +
               'Please inform the employee of this right before continuing.');
         return false;
+    }
+    
+    return true;
+}
+
+// ✅ VALIDATION FOR PERFORMANCE IMPROVEMENT PLAN
+function validatePIPSupportPerson() {
+    // Only validate on Step 8 (Final Confirmation)
+    if (documentBuilderState.currentStep === 8) {
+        const supportPersonOffered = documentBuilderState.data.supportPersonOffered;
+        
+        if (supportPersonOffered === 'No') {
+            showAlert(
+                '⚠️ PROCEDURAL FAIRNESS REQUIRED\n\n' +
+                'You must offer the employee 24 hours notice and a support person when presenting the PIP.\n\n' +
+                'This is a requirement of procedural fairness. The employee should be informed:\n' +
+                '• At least 24 hours before the PIP meeting\n' +
+                '• That they can bring a support person\n\n' +
+                'A support person can be:\n' +
+                '• A family member or friend\n' +
+                '• A union representative\n' +
+                '• A fellow employee (if appropriate)\n\n' +
+                'Please change your answer to "Yes" to confirm you will offer these rights.'
+            );
+            
+            trackEvent('procedural_fairness_violation', {
+                user: currentUser,
+                violation: 'pip_support_person_not_offered',
+                documentType: 'performanceImprovementPlan'
+            });
+            
+            documentBuilderState.data.supportPersonOffered = '';
+            showDocumentStep(documentBuilderState.currentStep);
+            return false;
+        }
     }
     
     return true;
@@ -12506,7 +12546,6 @@ Suspension: ${data.suspensionRequired}
 
 MEETING SCHEDULED:
 Date: ${data.meetingDate}
-Time: ${data.meetingTime}
 Location: ${data.meetingLocation}
 
 **CRITICAL FORMATTING REQUIREMENTS:**
@@ -12598,8 +12637,6 @@ ${data.suspensionRequired.includes('No suspension') ?
 You are required to attend an investigation meeting to respond to this allegation:
 
 Date: ${data.meetingDate}
-
-Time: ${data.meetingTime}
 
 Location: ${data.meetingLocation}
 
