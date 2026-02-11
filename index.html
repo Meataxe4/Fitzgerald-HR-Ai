@@ -4836,7 +4836,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             class="flex-1 px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-semibold rounded-lg transition-all text-sm">
                         Cancel
                     </button>
-                    <button onclick="submitReviewRequest()" 
+                    <button id="submitReviewBtn" onclick="handleSubmitReview()" 
                             class="flex-1 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-lg transition-all flex items-center justify-center gap-2 text-sm">
                         <span>🛡️</span> Submit for Review
                     </button>
@@ -16291,23 +16291,56 @@ function checkForReviewReference() {
 }
 
 /**
+ * Wrapper function to catch and display any errors from submitReviewRequest
+ */
+async function handleSubmitReview() {
+    console.log('🔘 handleSubmitReview button clicked!');
+    try {
+        await submitReviewRequest();
+    } catch (error) {
+        console.error('❌ Error in submitReviewRequest:', error);
+        alert('Error submitting review: ' + error.message);
+        showNotification('Error submitting review. Please try again.', 'error');
+    }
+}
+
+/**
  * Submit the review request
  */
 async function submitReviewRequest() {
+    console.log('🚀 submitReviewRequest called');
+    console.log('📋 pendingReviewRequest:', pendingReviewRequest);
+    
     const { containerId, docType, docName, actionsId, documentContent, isFromPreviewModal, alreadyPaid } = pendingReviewRequest;
     
+    console.log('📄 docType:', docType, 'docName:', docName);
+    
     // Validate required fields
-    const employeeName = document.getElementById('reviewEmployeeName').value.trim();
-    const employeeRole = document.getElementById('reviewEmployeeRole').value.trim();
-    const issueDescription = document.getElementById('reviewIssueDescription').value.trim();
+    const employeeNameEl = document.getElementById('reviewEmployeeName');
+    const employeeRoleEl = document.getElementById('reviewEmployeeRole');
+    const issueDescriptionEl = document.getElementById('reviewIssueDescription');
+    
+    console.log('🔍 Form elements found:', {
+        employeeNameEl: !!employeeNameEl,
+        employeeRoleEl: !!employeeRoleEl,
+        issueDescriptionEl: !!issueDescriptionEl
+    });
+    
+    const employeeName = employeeNameEl ? employeeNameEl.value.trim() : '';
+    const employeeRole = employeeRoleEl ? employeeRoleEl.value.trim() : '';
+    const issueDescription = issueDescriptionEl ? issueDescriptionEl.value.trim() : '';
+    
+    console.log('📝 Form values:', { employeeName, employeeRole, issueDescription });
     
     if (!employeeName || !employeeRole || !issueDescription) {
         showNotification('Please fill in all required fields (Employee Name, Role, and Issue Description)', 'error');
+        console.log('❌ Validation failed - missing required fields');
         return;
     }
     
     // Generate reference number
     const refNumber = 'REV-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-6);
+    console.log('📋 Generated refNumber:', refNumber);
     
     // Gather all form data
     // Get the contact email (may be alternative email if specified)
@@ -16320,19 +16353,26 @@ async function submitReviewRequest() {
         employeeName,
         employeeRole,
         issueDescription,
-        previousWarnings: document.getElementById('reviewPreviousWarnings').value.trim(),
-        supportingDocs: document.getElementById('reviewSupportingDocs').value.trim(),
-        employeeResponse: document.getElementById('reviewEmployeeResponse').value.trim(),
+        previousWarnings: document.getElementById('reviewPreviousWarnings')?.value?.trim() || '',
+        supportingDocs: document.getElementById('reviewSupportingDocs')?.value?.trim() || '',
+        employeeResponse: document.getElementById('reviewEmployeeResponse')?.value?.trim() || '',
         userEmail: contactEmail,
-        signInEmail: currentUser?.email || 'Unknown', // Keep original for reference
-        userName: venueProfile.contactName || currentUser?.displayName || 'Unknown',
-        venueName: venueProfile.venueName || 'Unknown Venue',
-        phoneNumber: venueProfile.phoneNumber || '',
+        signInEmail: currentUser?.email || 'Unknown',
+        userName: venueProfile?.contactName || currentUser?.displayName || 'Unknown',
+        venueName: venueProfile?.venueName || 'Unknown Venue',
+        phoneNumber: venueProfile?.phoneNumber || '',
         refNumber: refNumber
     };
     
+    console.log('📦 reviewData:', reviewData);
+    
     // Show loading state
-    const submitBtn = document.querySelector('#reviewRequestModal button[onclick="submitReviewRequest()"]');
+    const submitBtn = document.getElementById('submitReviewBtn');
+    if (!submitBtn) {
+        console.error('❌ Submit button not found!');
+        showNotification('Error: Submit button not found. Please try again.', 'error');
+        return;
+    }
     const originalBtnText = submitBtn.innerHTML;
     submitBtn.innerHTML = '<span class="animate-spin">⏳</span> Sending...';
     submitBtn.disabled = true;
@@ -16376,6 +16416,7 @@ async function submitReviewRequest() {
             view_url: viewUrl
         };
         
+        console.log('📧 Sending email via EmailJS...');
         const response = await emailjs.send('service_7dz8e3q', 'template_l5asrxq', templateParams);
         
         if (response.status === 200) {
@@ -16500,7 +16541,7 @@ function showReviewSubmissionError(refNumber, reviewData) {
     return new Promise((resolve) => {
         const modal = document.createElement('div');
         modal.id = 'reviewErrorModal';
-        modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[80]';
+        modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[999999999]';
         modal.innerHTML = `
             <div class="bg-slate-800 rounded-2xl max-w-md w-full p-6 border border-red-500/50">
                 <div class="text-center mb-4">
