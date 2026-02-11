@@ -3337,6 +3337,14 @@ input, textarea, select {
     <!-- Calendly Styles & Script -->
     <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
     <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+    
+    <!-- EmailJS for review request notifications -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+    <script type="text/javascript">
+        (function() {
+            emailjs.init("cStomWilGU8SiOzyy");
+        })();
+    </script>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
 
@@ -15730,6 +15738,189 @@ function closeReviewRequestModal() {
 }
 
 /**
+ * Save review request to Firebase for consultant access
+ */
+async function saveReviewToFirebase(refNumber, reviewData) {
+    try {
+        await db.collection('reviewRequests').doc(refNumber).set({
+            ...reviewData,
+            refNumber: refNumber,
+            status: 'pending',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+            userId: currentUser?.uid || 'anonymous'
+        });
+        console.log('✅ Review saved to Firebase:', refNumber);
+        return true;
+    } catch (error) {
+        console.error('Error saving review to Firebase:', error);
+        return false;
+    }
+}
+
+/**
+ * Load and display a review request by reference number (for consultant view)
+ */
+async function loadReviewByReference(refNumber) {
+    try {
+        const doc = await db.collection('reviewRequests').doc(refNumber).get();
+        if (doc.exists) {
+            const data = doc.data();
+            showReviewViewerModal(data);
+            return true;
+        } else {
+            showNotification('Review not found: ' + refNumber, 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('Error loading review:', error);
+        showNotification('Error loading review. Please check the reference number.', 'error');
+        return false;
+    }
+}
+
+/**
+ * Show the review viewer modal (for consultant)
+ */
+function showReviewViewerModal(data) {
+    // Create modal if it doesn't exist
+    let modal = document.getElementById('reviewViewerModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'reviewViewerModal';
+        modal.className = 'fixed inset-0 bg-black/90 backdrop-blur-sm flex items-start justify-center p-4 z-50 overflow-y-auto';
+        document.body.appendChild(modal);
+    }
+    
+    const createdDate = data.createdAt?.toDate ? data.createdAt.toDate().toLocaleString('en-AU') : 'Unknown';
+    
+    modal.innerHTML = `
+        <div class="bg-slate-800 rounded-2xl max-w-4xl w-full border border-amber-500/50 my-4">
+            <div class="bg-gradient-to-r from-amber-600 to-orange-600 rounded-t-2xl p-6 relative">
+                <button onclick="document.getElementById('reviewViewerModal').classList.add('hidden')" 
+                        class="absolute top-4 right-4 text-white/70 hover:text-white text-2xl">×</button>
+                <div class="flex items-center gap-3">
+                    <span class="text-4xl">📋</span>
+                    <div>
+                        <h2 class="text-2xl font-bold text-white">${data.docName || 'Document Review'}</h2>
+                        <p class="text-amber-200">Reference: ${data.refNumber}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
+                <!-- Status Badge -->
+                <div class="flex items-center justify-between">
+                    <span class="bg-amber-500/20 text-amber-400 px-3 py-1 rounded-full text-sm font-semibold">
+                        ⏳ ${data.status === 'pending' ? 'Pending Review' : data.status}
+                    </span>
+                    <span class="text-slate-400 text-sm">Submitted: ${createdDate}</span>
+                </div>
+                
+                <!-- Venue & Contact -->
+                <div class="bg-slate-700/50 rounded-lg p-4">
+                    <h3 class="text-amber-400 font-semibold mb-2">📍 Venue Details</h3>
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <div><span class="text-slate-400">Venue:</span> <span class="text-white">${data.venueName || 'N/A'}</span></div>
+                        <div><span class="text-slate-400">Contact:</span> <span class="text-white">${data.userName || 'N/A'}</span></div>
+                        <div><span class="text-slate-400">Email:</span> <span class="text-white">${data.userEmail || 'N/A'}</span></div>
+                        <div><span class="text-slate-400">Phone:</span> <span class="text-white">${data.phoneNumber || 'N/A'}</span></div>
+                    </div>
+                </div>
+                
+                <!-- Employee Details -->
+                <div class="bg-slate-700/50 rounded-lg p-4">
+                    <h3 class="text-amber-400 font-semibold mb-2">👤 Employee Details</h3>
+                    <div class="grid grid-cols-2 gap-2 text-sm">
+                        <div><span class="text-slate-400">Name:</span> <span class="text-white">${data.employeeName || 'N/A'}</span></div>
+                        <div><span class="text-slate-400">Role:</span> <span class="text-white">${data.employeeRole || 'N/A'}</span></div>
+                    </div>
+                </div>
+                
+                <!-- Issue Description -->
+                <div class="bg-slate-700/50 rounded-lg p-4">
+                    <h3 class="text-amber-400 font-semibold mb-2">📝 Issue Description</h3>
+                    <p class="text-slate-300 text-sm whitespace-pre-wrap">${data.issueDescription || 'N/A'}</p>
+                </div>
+                
+                <!-- Previous Warnings -->
+                ${data.previousWarnings ? `
+                <div class="bg-slate-700/50 rounded-lg p-4">
+                    <h3 class="text-amber-400 font-semibold mb-2">⚠️ Previous Warnings</h3>
+                    <p class="text-slate-300 text-sm whitespace-pre-wrap">${data.previousWarnings}</p>
+                </div>
+                ` : ''}
+                
+                <!-- Employee Response -->
+                ${data.employeeResponse ? `
+                <div class="bg-slate-700/50 rounded-lg p-4">
+                    <h3 class="text-amber-400 font-semibold mb-2">💬 Employee Response</h3>
+                    <p class="text-slate-300 text-sm whitespace-pre-wrap">${data.employeeResponse}</p>
+                </div>
+                ` : ''}
+                
+                <!-- Generated Document -->
+                <div class="bg-slate-900 rounded-lg p-4 border border-slate-600">
+                    <h3 class="text-amber-400 font-semibold mb-3">📄 Generated Document</h3>
+                    <div class="bg-white text-slate-900 rounded-lg p-6 max-h-96 overflow-y-auto prose prose-sm">
+                        ${data.documentContent || '<p class="text-slate-500">Document content not available</p>'}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6 border-t border-slate-700 flex gap-3">
+                <button onclick="copyReviewDocumentContent()" 
+                        class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-all">
+                    📋 Copy Document
+                </button>
+                <button onclick="document.getElementById('reviewViewerModal').classList.add('hidden')" 
+                        class="flex-1 bg-slate-600 hover:bg-slate-500 text-white font-semibold py-3 rounded-lg transition-all">
+                    Close
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Store document content for copy function
+    modal.dataset.documentContent = data.documentContent || '';
+    modal.classList.remove('hidden');
+}
+
+/**
+ * Copy the document content from review viewer
+ */
+function copyReviewDocumentContent() {
+    const modal = document.getElementById('reviewViewerModal');
+    const content = modal?.dataset?.documentContent || '';
+    
+    // Strip HTML tags for plain text copy
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = content;
+    const plainText = tempDiv.textContent || tempDiv.innerText || '';
+    
+    navigator.clipboard.writeText(plainText).then(() => {
+        showNotification('📋 Document copied to clipboard!', 'success');
+    }).catch(() => {
+        showNotification('Failed to copy. Please select and copy manually.', 'error');
+    });
+}
+
+/**
+ * Check URL for review reference on page load
+ */
+function checkForReviewReference() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const refNumber = urlParams.get('ref');
+    
+    if (refNumber && refNumber.startsWith('REV-')) {
+        console.log('📋 Loading review:', refNumber);
+        // Wait for Firebase auth to be ready
+        setTimeout(() => {
+            loadReviewByReference(refNumber);
+        }, 2000);
+    }
+}
+
+/**
  * Submit the review request
  */
 async function submitReviewRequest() {
@@ -15779,19 +15970,45 @@ async function submitReviewRequest() {
     let submissionSuccessful = false;
     let usedFallback = false;
     
+    // Generate the view URL for consultant access
+    const viewUrl = `${window.location.origin}${window.location.pathname}?ref=${refNumber}`;
+    
     try {
-        // Try to send via Netlify function first
-        const response = await fetch('/.netlify/functions/send-review-request', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(reviewData)
-        });
+        // First, save to Firebase for permanent storage
+        const firebaseSaved = await saveReviewToFirebase(refNumber, reviewData);
+        if (!firebaseSaved) {
+            console.warn('⚠️ Could not save to Firebase, but will continue with email');
+        }
         
-        if (response.ok) {
-            console.log('✅ Review request sent via Netlify function');
+        // Send via EmailJS
+        const templateParams = {
+            doc_name: docName || 'Document',
+            employee_name: employeeName,
+            ref_number: refNumber,
+            submitted_date: new Date().toLocaleString('en-AU', { 
+                dateStyle: 'full', 
+                timeStyle: 'short',
+                timeZone: 'Australia/Sydney'
+            }),
+            venue_name: reviewData.venueName,
+            user_name: reviewData.userName,
+            user_email: reviewData.userEmail,
+            phone_number: reviewData.phoneNumber || 'Not provided',
+            employee_role: employeeRole,
+            issue_description: issueDescription,
+            previous_warnings: reviewData.previousWarnings || 'None specified',
+            employee_response: reviewData.employeeResponse || 'Not recorded',
+            document_content: documentContent ? documentContent.substring(0, 3000) + '\n\n[View full document via link below]' : 'See link below',
+            view_url: viewUrl
+        };
+        
+        const response = await emailjs.send('service_7dz8e3q', 'template_l5asrxq', templateParams);
+        
+        if (response.status === 200) {
+            console.log('✅ Review request sent via EmailJS');
             submissionSuccessful = true;
         } else {
-            throw new Error('Server returned ' + response.status);
+            throw new Error('EmailJS returned status ' + response.status);
         }
     } catch (error) {
         console.error('Error sending review request:', error);
@@ -35379,6 +35596,9 @@ if (auth) {
             }
             
             setupRealtimeSync(user.uid);
+            
+            // Check if URL contains a review reference (for consultant access)
+            checkForReviewReference();
         } else {
             currentUser = null;
             stopRealtimeSync();
