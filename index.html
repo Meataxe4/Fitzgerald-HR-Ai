@@ -15416,9 +15416,10 @@ function applyUniversalBlur(containerId, docType, docName, actionsId = null) {
     const creditCost = cost ? cost.credits : 0;
     const currentBalance = getTotalCredits();
     
-    // ===== TEMPLATES (Low Risk) - Free for paid users =====
+    // ===== TEMPLATES (Low Risk) - Free for paid users, 1 free for free tier =====
     if (category === 'template') {
         if (isPaidUser) {
+            // Paid users get ALL templates free - no blur, show included badge
             console.log('✅ Template document - no blur for paid user');
             const includedBadge = document.createElement('div');
             includedBadge.id = containerId + '_includedBadge';
@@ -15428,12 +15429,20 @@ function applyUniversalBlur(containerId, docType, docName, actionsId = null) {
                 </div>
             `;
             container.parentNode.insertBefore(includedBadge, container.nextSibling);
+            // Show action buttons for paid users
+            if (actionsId) {
+                const actionsContainer = document.getElementById(actionsId);
+                if (actionsContainer) {
+                    actionsContainer.style.display = '';
+                }
+            }
             return;
         }
         
         // Free tier - check if they have their 1 free template
         const lowRiskDocsUsed = userCredits.lowRiskDocsUsed || 0;
         if (lowRiskDocsUsed < 1) {
+            // Free user hasn't used their free template - allow access with a badge
             console.log('🎁 Free template available for free tier user');
             const freeTemplateBadge = document.createElement('div');
             freeTemplateBadge.id = containerId + '_includedBadge';
@@ -15443,8 +15452,76 @@ function applyUniversalBlur(containerId, docType, docName, actionsId = null) {
                 </div>
             `;
             container.parentNode.insertBefore(freeTemplateBadge, container.nextSibling);
+            // Show action buttons for free template
+            if (actionsId) {
+                const actionsContainer = document.getElementById(actionsId);
+                if (actionsContainer) {
+                    actionsContainer.style.display = '';
+                }
+            }
             return;
         }
+        
+        // Free user has ALREADY used their 1 free template - show upgrade prompt (NOT credit requirement)
+        console.log('⚠️ Free user already used free template - showing upgrade prompt');
+        container.dataset.originalContent = container.innerHTML;
+        container.style.maxHeight = '250px';
+        container.style.overflow = 'hidden';
+        container.style.position = 'relative';
+        
+        const blurOverlay = document.createElement('div');
+        blurOverlay.id = containerId + '_blurOverlay';
+        blurOverlay.style.cssText = `
+            position: absolute;
+            top: 150px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, 
+                rgba(30, 41, 59, 0) 0%,
+                rgba(30, 41, 59, 0.7) 30px,
+                rgba(30, 41, 59, 0.95) 60px,
+                rgba(30, 41, 59, 1) 100px
+            );
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            pointer-events: none;
+            z-index: 5;
+        `;
+        container.appendChild(blurOverlay);
+        
+        // Show upgrade prompt for free tier (NOT credit requirement since templates are 0 credits)
+        const upgradePrompt = document.createElement('div');
+        upgradePrompt.id = containerId + '_unlockPrompt';
+        upgradePrompt.innerHTML = `
+            <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
+                <div class="text-3xl mb-2">📄</div>
+                <h3 class="text-lg font-bold text-white mb-2">Free Template Used</h3>
+                <p class="text-slate-300 text-sm mb-4">You've used your 1 free template. Upgrade to get <strong>unlimited templates</strong>!</p>
+                <div class="bg-slate-600/50 rounded-lg p-3 mb-4 text-left">
+                    <p class="text-slate-400 text-xs mb-2">✨ Starter Plan Includes:</p>
+                    <ul class="text-slate-300 text-xs space-y-1">
+                        <li>✅ Unlimited template downloads</li>
+                        <li>✅ 8 expert-reviewed documents/year</li>
+                        <li>✅ Unlimited AI chat</li>
+                    </ul>
+                </div>
+                <button onclick="showSubscriptionOptions()" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
+                    View Plans
+                </button>
+            </div>
+        `;
+        container.parentNode.insertBefore(upgradePrompt, container.nextSibling);
+        
+        // Hide action buttons
+        if (actionsId) {
+            const actionsContainer = document.getElementById(actionsId);
+            if (actionsContainer) {
+                actionsContainer.style.display = 'none';
+            }
+        }
+        return;
     }
     
     // ===== PEOPLE MANAGEMENT (Optional Review) - Requires unlock, then choice =====
