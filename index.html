@@ -14777,16 +14777,6 @@ function applyDocumentBlur(docType, docName) {
                     <p class="text-slate-400 text-xs mt-2">You have ${currentBalance} credits</p>
                 </div>
             `;
-                    <div class="text-3xl mb-2">🔒</div>
-                    <h3 class="text-lg font-bold text-white mb-2">Unlock Document</h3>
-                    <p class="text-slate-300 text-sm mb-4">This document requires ${creditCost} credit to unlock.</p>
-                    <button onclick="unlockPeopleManagementDoc('${docType}', '${docName}')" 
-                            class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
-                        🔓 Unlock (${creditCost} credit)
-                    </button>
-                    <p class="text-slate-400 text-xs mt-2">You have ${currentBalance} credits</p>
-                </div>
-            `;
         } else {
             // Can't afford - show get credits
             unlockPrompt.innerHTML = `
