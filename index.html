@@ -14760,6 +14760,17 @@ function applyDocumentBlur(docType, docName) {
         `;
         previewContainer.appendChild(blurOverlay);
         
+        // CRITICAL: Reset footer to locked state
+        const modalFooter = document.querySelector('#documentPreviewModal .p-6.border-t');
+        if (modalFooter) {
+            modalFooter.innerHTML = `
+                <div class="flex items-center justify-center gap-2 text-slate-400">
+                    <span>🔒</span>
+                    <span class="text-sm">${creditCost} Credit${creditCost > 1 ? 's' : ''} Required to Unlock</span>
+                </div>
+            `;
+        }
+        
         // Show unlock prompt
         const unlockPrompt = document.createElement('div');
         unlockPrompt.id = 'documentUnlockPrompt';
@@ -14769,11 +14780,11 @@ function applyDocumentBlur(docType, docName) {
             unlockPrompt.innerHTML = `
                 <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
                     <div class="text-3xl mb-2">🔒</div>
-                    <h3 class="text-lg font-bold text-white mb-2">Unlock Document</h3>
-                    <p class="text-slate-300 text-sm mb-4">This document requires ${creditCost} credit to unlock.</p>
+                    <h3 class="text-lg font-bold text-white mb-2">${creditCost} Credit${creditCost > 1 ? 's' : ''} Required</h3>
+                    <p class="text-slate-300 text-sm mb-4">You need ${creditCost} credit${creditCost > 1 ? 's' : ''} to unlock this document. You have ${currentBalance}.</p>
                     <button onclick="unlockPeopleManagementDoc('${docType}', '${docName}')" 
                             class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
-                        🔓 Unlock (${creditCost} credit)
+                        🔓 Unlock (${creditCost} Credit${creditCost > 1 ? 's' : ''})
                     </button>
                     <p class="text-slate-400 text-xs mt-2">You have ${currentBalance} credits</p>
                 </div>
@@ -14786,13 +14797,9 @@ function applyDocumentBlur(docType, docName) {
                     <h3 class="text-lg font-bold text-white mb-2">${creditCost} Credit${creditCost > 1 ? 's' : ''} Required</h3>
                     <p class="text-slate-300 text-sm mb-4">You need ${creditCost} credit${creditCost > 1 ? 's' : ''} to unlock this document. You have ${currentBalance}.</p>
                     <div class="space-y-2">
-                        <button onclick="showSubscriptionOptions()" 
-                                class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
-                            View Plans
-                        </button>
                         <button onclick="savePendingDocumentAndGetCredits()" 
-                                class="w-full bg-slate-600 hover:bg-slate-500 text-white font-semibold py-2 px-6 rounded-lg transition-all text-sm">
-                            💳 Buy Credits Instead
+                                class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
+                            💳 Get Credits
                         </button>
                     </div>
                 </div>
@@ -14853,12 +14860,23 @@ function applyDocumentBlur(docType, docName) {
         `;
         previewContainer.appendChild(blurOverlay);
         
+        // CRITICAL: Reset footer to locked state
+        const modalFooter = document.querySelector('#documentPreviewModal .p-6.border-t');
+        if (modalFooter) {
+            modalFooter.innerHTML = `
+                <div class="flex items-center justify-center gap-2 text-slate-400">
+                    <span>🔒</span>
+                    <span class="text-sm">${creditCost} Credits Required to Unlock</span>
+                </div>
+            `;
+        }
+        
         let buttonHtml = '';
         if (currentBalance >= creditCost) {
             buttonHtml = `
                 <button onclick="unlockDocPreviewFormal('${docType}', '${docName}')" 
                         class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
-                    🔓 Unlock Document (${creditCost} credits)
+                    🔓 Unlock Document (${creditCost} Credits)
                 </button>
                 <p class="text-slate-400 text-xs mt-2">Your balance: ${currentBalance} credits</p>
             `;
@@ -14866,29 +14884,19 @@ function applyDocumentBlur(docType, docName) {
             buttonHtml = `
                 <button onclick="savePendingDocumentAndGetCredits()" 
                         class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
-                    💳 Get Review Credits
+                    💳 Get Credits
                 </button>
-                <p class="text-slate-400 text-xs mt-2">Need ${creditCost} credits • You have ${currentBalance}</p>
+                <p class="text-slate-400 text-xs mt-2">You need ${creditCost} credits. You have ${currentBalance}.</p>
             `;
         }
         
         const unlockPrompt = document.createElement('div');
         unlockPrompt.id = 'documentUnlockPrompt';
         unlockPrompt.innerHTML = `
-            <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl mx-auto max-w-md mt-4">
-                <div class="text-center mb-4">
-                    <span class="text-3xl">⚠️</span>
-                    <h3 class="text-lg font-bold text-white mt-2">High-Risk Document</h3>
-                </div>
-                <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4">
-                    <p class="text-amber-200 text-sm">
-                        This formal document carries <strong>significant legal risk</strong>. 
-                        Unlock to view, download, or request expert review.
-                    </p>
-                </div>
-                <p class="text-slate-300 text-sm mb-4 text-center">
-                    Includes option for <strong>free expert review</strong> within 24 hours
-                </p>
+            <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
+                <div class="text-3xl mb-2">🔒</div>
+                <h3 class="text-lg font-bold text-white mb-2">${creditCost} Credits Required</h3>
+                <p class="text-slate-300 text-sm mb-4">You need ${creditCost} credits to unlock this document. You have ${currentBalance}.</p>
                 ${buttonHtml}
             </div>
         `;
@@ -14917,6 +14925,18 @@ function applyDocumentBlur(docType, docName) {
     if (existingBlur) existingBlur.remove();
     const existingPrompt = document.getElementById('documentUnlockPrompt');
     if (existingPrompt) existingPrompt.remove();
+    
+    // CRITICAL: Reset footer to locked state
+    const modalFooter = document.querySelector('#documentPreviewModal .p-6.border-t');
+    if (modalFooter) {
+        const actualCostForFooter = cost ? cost.credits : creditCost;
+        modalFooter.innerHTML = `
+            <div class="flex items-center justify-center gap-2 text-slate-400">
+                <span>🔒</span>
+                <span class="text-sm">${actualCostForFooter > 0 ? actualCostForFooter + ' Credit' + (actualCostForFooter > 1 ? 's' : '') + ' Required to Unlock' : 'Subscription Required'}</span>
+            </div>
+        `;
+    }
     
     previewContainer.style.position = 'relative';
     previewContainer.style.overflow = 'hidden';
@@ -14966,16 +14986,10 @@ function applyDocumentBlur(docType, docName) {
                 </button>
                 <p class="text-slate-400 text-xs">You have ${currentBalance} credits</p>
                 ` : `
-                <button onclick="showSubscriptionOptions()" 
-                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
-                    View Plans
-                </button>
-                ${actualCost > 0 ? `
                 <button onclick="savePendingDocumentAndGetCredits()" 
-                        class="w-full bg-slate-600 hover:bg-slate-500 text-white font-semibold py-2 px-6 rounded-lg transition-all text-sm">
-                    💳 Buy Credits Instead
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
+                    💳 Get Credits
                 </button>
-                ` : ''}
                 `}
             </div>
         </div>
