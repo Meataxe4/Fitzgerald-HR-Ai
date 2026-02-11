@@ -21067,6 +21067,9 @@ Keep it concise - just list the questions with brief context.`;
         document.getElementById('iqPreviewContent').innerHTML = '<pre class="whitespace-pre-wrap text-slate-200">' + content + '</pre>';
         document.getElementById('interviewQuestionsPreviewModal').classList.remove('hidden');
         
+        // Apply blur overlay (consistent with other templates)
+        applyUniversalBlur('iqPreviewContent', 'interviewQuestions', 'Interview Questions', 'iqActionsContainer');
+        
         trackEvent('interview_questions_generated', { jobTitle: iqData.jobTitle, count: iqData.questionCount });
     } catch (error) {
         // Show user-friendly error message
@@ -27556,22 +27559,24 @@ function resetAIImport() {
             <!-- AI-generated content will appear here -->
         </div>
 
-        <div class="flex gap-3">
-            <button onclick="downloadInterviewQuestions('docx')" class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
-                📄 Download DOCX
-            </button>
-            <button onclick="downloadInterviewQuestions('pdf')" class="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
-                📕 Download PDF
-            </button>
-        </div>
-        
-        <div class="flex gap-3 mt-3">
-            <button onclick="resetInterviewQuestions()" class="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
-                ➕ Create New Interview Questions
-            </button>
-            <button onclick="closeInterviewQuestionsPreview(); openInterviewQuestionsGenerator();" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
-                ← Back to Edit
-            </button>
+        <div id="iqActionsContainer" class="space-y-3">
+            <div class="flex gap-3">
+                <button onclick="downloadInterviewQuestions('docx')" class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                    📄 Download DOCX
+                </button>
+                <button onclick="downloadInterviewQuestions('pdf')" class="flex-1 px-6 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+                    📕 Download PDF
+                </button>
+            </div>
+            
+            <div class="flex gap-3">
+                <button onclick="resetInterviewQuestions()" class="flex-1 px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-colors">
+                    ➕ Create New Interview Questions
+                </button>
+                <button onclick="closeInterviewQuestionsPreview(); openInterviewQuestionsGenerator();" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors">
+                    ← Back to Edit
+                </button>
+            </div>
         </div>
     </div>
 </div>
