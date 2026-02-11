@@ -15226,12 +15226,13 @@ function showPeopleManagementOptions(docType, docName, creditCost, currentBalanc
                     <span class="text-blue-200 text-xs">(Optional)</span>
                 </button>
                 <div class="flex items-center gap-2">
-                    <label class="flex items-center gap-1 cursor-pointer">
-                        <input type="checkbox" id="docPreviewDisclaimer" class="w-4 h-4">
-                        <span class="text-slate-400 text-xs">I accept responsibility</span>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="docPreviewDisclaimer" class="w-4 h-4 accent-green-500" onchange="toggleDownloadButton()">
+                        <span class="text-slate-300 text-xs">I accept responsibility</span>
                     </label>
-                    <button onclick="downloadDocPreviewWithDisclaimer('${docType}')" 
-                            class="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-all text-sm">
+                    <button id="downloadAfterUnlockBtn" onclick="downloadDocPreviewWithDisclaimer('${docType}')" 
+                            disabled
+                            class="px-4 py-2 bg-slate-500 text-slate-300 font-medium rounded-lg transition-all text-sm cursor-not-allowed opacity-60">
                         📥 Download
                     </button>
                 </div>
@@ -15264,7 +15265,7 @@ function showDocPreviewFormalOptions(docType, docName) {
     if (modalFooter) {
         modalFooter.className = 'p-4 border-t border-slate-700 bg-slate-800';
         modalFooter.innerHTML = `
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 flex-wrap">
                 <div class="flex-1 flex items-center gap-2 text-green-400">
                     <span>✅</span>
                     <span class="font-semibold text-sm">Document Unlocked</span>
@@ -15275,17 +15276,40 @@ function showDocPreviewFormalOptions(docType, docName) {
                     <span class="text-blue-200 text-xs">(Free)</span>
                 </button>
                 <div class="flex items-center gap-2">
-                    <label class="flex items-center gap-1 cursor-pointer">
-                        <input type="checkbox" id="docPreviewDisclaimer" class="w-4 h-4">
-                        <span class="text-slate-400 text-xs">I accept responsibility</span>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" id="docPreviewDisclaimer" class="w-4 h-4 accent-green-500" onchange="toggleDownloadButton()">
+                        <span class="text-slate-300 text-xs">I accept responsibility</span>
                     </label>
-                    <button onclick="downloadDocPreviewWithDisclaimer('${docType}')" 
-                            class="px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white font-medium rounded-lg transition-all text-sm">
+                    <button id="downloadAfterUnlockBtn" onclick="downloadDocPreviewWithDisclaimer('${docType}')" 
+                            disabled
+                            class="px-4 py-2 bg-slate-500 text-slate-300 font-medium rounded-lg transition-all text-sm cursor-not-allowed opacity-60">
                         ⚠️ Download Anyway
                     </button>
                 </div>
             </div>
         `;
+    }
+}
+
+/**
+ * Toggle download button enabled state based on checkbox
+ */
+function toggleDownloadButton() {
+    const checkbox = document.getElementById('docPreviewDisclaimer');
+    const downloadBtn = document.getElementById('downloadAfterUnlockBtn');
+    
+    if (checkbox && downloadBtn) {
+        if (checkbox.checked) {
+            // Enable the button
+            downloadBtn.disabled = false;
+            downloadBtn.classList.remove('bg-slate-500', 'text-slate-300', 'cursor-not-allowed', 'opacity-60');
+            downloadBtn.classList.add('bg-green-600', 'hover:bg-green-700', 'text-white', 'cursor-pointer');
+        } else {
+            // Disable the button
+            downloadBtn.disabled = true;
+            downloadBtn.classList.remove('bg-green-600', 'hover:bg-green-700', 'text-white', 'cursor-pointer');
+            downloadBtn.classList.add('bg-slate-500', 'text-slate-300', 'cursor-not-allowed', 'opacity-60');
+        }
     }
 }
 
