@@ -14715,8 +14715,8 @@ function applyDocumentBlur(docType, docName) {
             unlockPrompt.innerHTML = `
                 <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
                     <div class="text-3xl mb-2">🔒</div>
-                    <h3 class="text-lg font-bold text-white mb-2">Upgrade Required</h3>
-                    <p class="text-slate-300 text-sm mb-4">Upgrade for more features and additional review credits.</p>
+                    <h3 class="text-lg font-bold text-white mb-2">${creditCost} Credit${creditCost > 1 ? 's' : ''} Required</h3>
+                    <p class="text-slate-300 text-sm mb-4">You need ${creditCost} credit${creditCost > 1 ? 's' : ''} to unlock this document. You have ${currentBalance}.</p>
                     <div class="space-y-2">
                         <button onclick="showSubscriptionOptions()" 
                                 class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
@@ -14859,20 +14859,29 @@ function applyDocumentBlur(docType, docName) {
     
     const unlockPrompt = document.createElement('div');
     unlockPrompt.id = 'documentUnlockPrompt';
+    
+    // For templates (0 credits), show upgrade message. For credit-based docs, show credit count.
+    const heading = creditCost > 0 ? `${creditCost} Credit${creditCost > 1 ? 's' : ''} Required` : 'Upgrade Required';
+    const message = creditCost > 0 
+        ? `You need ${creditCost} credit${creditCost > 1 ? 's' : ''} to unlock this document. You have ${currentBalance}.`
+        : 'Subscribe to a plan to access all HR templates.';
+    
     unlockPrompt.innerHTML = `
         <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
             <div class="text-3xl mb-2">🔒</div>
-            <h3 class="text-lg font-bold text-white mb-2">Upgrade Required</h3>
-            <p class="text-slate-300 text-sm mb-4">Upgrade for more features and additional review credits.</p>
+            <h3 class="text-lg font-bold text-white mb-2">${heading}</h3>
+            <p class="text-slate-300 text-sm mb-4">${message}</p>
             <div class="space-y-2">
                 <button onclick="showSubscriptionOptions()" 
                         class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
                     View Plans
                 </button>
+                ${creditCost > 0 ? `
                 <button onclick="savePendingDocumentAndGetCredits()" 
                         class="w-full bg-slate-600 hover:bg-slate-500 text-white font-semibold py-2 px-6 rounded-lg transition-all text-sm">
                     💳 Buy Credits Instead
                 </button>
+                ` : ''}
             </div>
         </div>
     `;
@@ -15292,8 +15301,8 @@ function applyUniversalBlur(containerId, docType, docName, actionsId = null) {
             unlockPrompt.innerHTML = `
                 <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
                     <div class="text-3xl mb-2">🔒</div>
-                    <h3 class="text-lg font-bold text-white mb-2">Upgrade Required</h3>
-                    <p class="text-slate-300 text-sm mb-4">Upgrade for more features and additional review credits.</p>
+                    <h3 class="text-lg font-bold text-white mb-2">${creditCost} Credit${creditCost > 1 ? 's' : ''} Required</h3>
+                    <p class="text-slate-300 text-sm mb-4">You need ${creditCost} credit${creditCost > 1 ? 's' : ''} to unlock this document. You have ${currentBalance}.</p>
                     <div class="space-y-2">
                         <button onclick="showSubscriptionOptions()" 
                                 class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
@@ -15453,14 +15462,14 @@ function applyUniversalBlur(containerId, docType, docName, actionsId = null) {
     unlockPrompt.innerHTML = `
         <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
             <div class="text-3xl mb-2">🔒</div>
-            <h3 class="text-lg font-bold text-white mb-2">Upgrade Required</h3>
-            <p class="text-slate-300 text-sm mb-4">Upgrade for more features and additional review credits.</p>
+            <h3 class="text-lg font-bold text-white mb-2">${creditCost} Credit${creditCost > 1 ? 's' : ''} Required</h3>
+            <p class="text-slate-300 text-sm mb-4">You need ${creditCost} credit${creditCost > 1 ? 's' : ''} to unlock this document. You have ${currentBalance}.</p>
             <div class="space-y-2">
                 <button onclick="showSubscriptionOptions()" 
                         class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
                     View Plans
                 </button>
-                <button onclick="openCreditsModal()" 
+                <button onclick="saveInChatDocumentAndGetCredits('${containerId}', '${docType}', '${docName}')" 
                         class="w-full bg-slate-600 hover:bg-slate-500 text-white font-semibold py-2 px-6 rounded-lg transition-all text-sm">
                     💳 Buy Credits Instead
                 </button>
