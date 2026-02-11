@@ -13965,10 +13965,23 @@ function unlockDocument() {
     
     if (!docType) return;
     
+    // CRITICAL: Prevent double-charging - check if already unlocked
+    if (unlockedDocuments.has(docType)) {
+        console.log('⚠️ Document already unlocked, preventing double charge:', docType);
+        closeDocumentUnlockModal();
+        removeDocumentBlur();
+        showNotification('Document is already unlocked!', 'info');
+        return;
+    }
+    
     // Deduct credits
     const success = deductCreditsForDocument(docType);
     
     if (success) {
+        // Mark as unlocked IMMEDIATELY after deducting
+        unlockedDocuments.add(docType);
+        console.log('✅ Document unlocked and marked:', docType);
+        
         closeDocumentUnlockModal();
         
         // Remove blur from document preview (if using documentPreviewModal)
@@ -14713,6 +14726,12 @@ function applyDocumentBlur(docType, docName) {
             return;
         }
         
+        // CRITICAL: Remove any existing blur/prompts to prevent duplicates
+        const existingBlur = document.getElementById('documentBlurOverlay');
+        if (existingBlur) existingBlur.remove();
+        const existingPrompt = document.getElementById('documentUnlockPrompt');
+        if (existingPrompt) existingPrompt.remove();
+        
         // Not unlocked yet - BLUR the document and require payment
         console.log('🔒 Not unlocked - applying blur');
         previewContainer.style.position = 'relative';
@@ -14748,6 +14767,16 @@ function applyDocumentBlur(docType, docName) {
             // Can afford - show unlock button
             unlockPrompt.innerHTML = `
                 <div class="bg-slate-700 border-2 border-amber-500 rounded-xl p-6 shadow-2xl text-center mx-auto max-w-md mt-4">
+                    <div class="text-3xl mb-2">🔒</div>
+                    <h3 class="text-lg font-bold text-white mb-2">Unlock Document</h3>
+                    <p class="text-slate-300 text-sm mb-4">This document requires ${creditCost} credit to unlock.</p>
+                    <button onclick="unlockPeopleManagementDoc('${docType}', '${docName}')" 
+                            class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
+                        🔓 Unlock (${creditCost} credit)
+                    </button>
+                    <p class="text-slate-400 text-xs mt-2">You have ${currentBalance} credits</p>
+                </div>
+            `;
                     <div class="text-3xl mb-2">🔒</div>
                     <h3 class="text-lg font-bold text-white mb-2">Unlock Document</h3>
                     <p class="text-slate-300 text-sm mb-4">This document requires ${creditCost} credit to unlock.</p>
@@ -14800,6 +14829,12 @@ function applyDocumentBlur(docType, docName) {
             showDocPreviewFormalOptions(docType, docName);
             return;
         }
+        
+        // CRITICAL: Remove any existing blur/prompts to prevent duplicates
+        const existingBlur = document.getElementById('documentBlurOverlay');
+        if (existingBlur) existingBlur.remove();
+        const existingPrompt = document.getElementById('documentUnlockPrompt');
+        if (existingPrompt) existingPrompt.remove();
         
         // Not paid yet - BLUR the document
         previewContainer.style.position = 'relative';
@@ -14885,6 +14920,12 @@ function applyDocumentBlur(docType, docName) {
     
     // Debug logging to catch issues
     console.log('🔒 DEFAULT BLUR CASE:', { docType, category, creditCost, isTemplate: cost?.category === 'template' });
+    
+    // CRITICAL: Remove any existing blur/prompts to prevent duplicates
+    const existingBlur = document.getElementById('documentBlurOverlay');
+    if (existingBlur) existingBlur.remove();
+    const existingPrompt = document.getElementById('documentUnlockPrompt');
+    if (existingPrompt) existingPrompt.remove();
     
     previewContainer.style.position = 'relative';
     previewContainer.style.overflow = 'hidden';
@@ -14996,6 +15037,14 @@ function removeDocumentBlur() {
  * Routes to appropriate unlock function based on document category
  */
 function unlockDocumentFromPreview(docType, docName) {
+    // CRITICAL: Prevent double-charging - check if already unlocked
+    if (unlockedDocuments.has(docType)) {
+        console.log('⚠️ Document already unlocked, preventing double charge:', docType);
+        removeDocumentBlur();
+        showNotification('Document is already unlocked!', 'info');
+        return;
+    }
+    
     const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
     if (!cost) {
         console.error('Unknown document type:', docType);
@@ -15048,6 +15097,13 @@ function requestDocExpertReview(docType, docName) {
  * Unlock Formal Process document in preview modal (pay credits, then choose)
  */
 function unlockDocPreviewFormal(docType, docName) {
+    // CRITICAL: Prevent double-charging - check if already unlocked
+    if (unlockedDocuments.has(docType)) {
+        console.log('⚠️ Document already unlocked, preventing double charge:', docType);
+        showDocPreviewFormalOptions(docType, docName);
+        return;
+    }
+    
     const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
     const creditCost = cost ? cost.credits : 2;
     
@@ -15063,8 +15119,9 @@ function unlockDocPreviewFormal(docType, docName) {
         return;
     }
     
-    // Mark as unlocked
+    // Mark as unlocked IMMEDIATELY after deducting
     unlockedDocuments.add(docType);
+    console.log('✅ Document unlocked and marked:', docType);
     
     // Remove the blur overlay
     const blurOverlay = document.getElementById('documentBlurOverlay');
@@ -15092,6 +15149,13 @@ function unlockDocPreviewFormal(docType, docName) {
  * Unlock a People Management document (1 credit) and show options
  */
 function unlockPeopleManagementDoc(docType, docName) {
+    // CRITICAL: Prevent double-charging - check if already unlocked
+    if (unlockedDocuments.has(docType)) {
+        console.log('⚠️ Document already unlocked, preventing double charge:', docType);
+        showPeopleManagementOptions(docType, docName, 0, getTotalCredits());
+        return;
+    }
+    
     const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
     const creditCost = cost ? cost.credits : 1;
     
@@ -15109,8 +15173,9 @@ function unlockPeopleManagementDoc(docType, docName) {
         return;
     }
     
-    // Mark as unlocked
+    // Mark as unlocked IMMEDIATELY after deducting
     unlockedDocuments.add(docType);
+    console.log('✅ Document unlocked and marked:', docType);
     
     // Remove blur and show options
     showPeopleManagementOptions(docType, docName, creditCost, getTotalCredits());
