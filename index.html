@@ -18169,6 +18169,12 @@ function attemptAutoLogin() {
                     setTimeout(() => {
                         showRandomQuickPrompts();
                     }, 500);
+                    // Check if should show tour for first-time users
+                    setTimeout(() => {
+                        if (typeof FitzTour !== 'undefined' && !FitzTour.hasSeenTour && !FitzTour.hasDeclinedTour) {
+                            FitzTour.showTourPrompt();
+                        }
+                    }, 2500);
                 }, 300);
             }
         }
@@ -27195,6 +27201,14 @@ function resetAIImport() {
                 <div>
                     <div class="font-semibold">Give Feedback</div>
                     <div class="text-xs text-slate-400">Help us improve</div>
+                </div>
+            </button>
+            
+            <button onclick="FitzTour.restartTour(); closeProfileMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
+                <span class="text-xl">🎯</span>
+                <div>
+                    <div class="font-semibold">Take a Tour</div>
+                    <div class="text-xs text-slate-400">Learn how Fitz can help you</div>
                 </div>
             </button>
             
@@ -36840,6 +36854,742 @@ async function loadAllDataFromFirebase() {
         
     } catch (error) {
     }
+}
+
+// ========================================
+// GUIDED TOUR SYSTEM - "Take a Tour of Fitz"
+// ========================================
+
+const FitzTour = {
+    currentStep: 0,
+    isActive: false,
+    hasSeenTour: localStorage.getItem('fitzTourCompleted') === 'true',
+    hasDeclinedTour: localStorage.getItem('fitzTourDeclined') === 'true',
+    
+    steps: [
+        {
+            id: 'welcome',
+            type: 'modal',
+            title: "G'day! Welcome to Fitz 👋",
+            content: "I'm your AI-powered HR assistant, built specifically for Australian hospitality venues. Let me show you how I can help you manage your team with confidence.",
+            icon: '🦘'
+        },
+        {
+            id: 'sidebar',
+            target: '.sidebar-toggle-btn-header',
+            targetAction: null,
+            title: "Your Command Centre",
+            content: "Access your recent chats, bookmarks, and search through past conversations. Everything is saved automatically.",
+            position: 'right',
+            icon: '📚'
+        },
+        {
+            id: 'tools',
+            target: '#toolsButton',
+            targetAction: null,
+            title: "8 Specialised HR Tools",
+            content: "From generating warning letters to calculating award rates — these tools handle the complex HR tasks so you don't have to.",
+            position: 'bottom',
+            icon: '🛠️'
+        },
+        {
+            id: 'urgent',
+            target: 'button[onclick="activateCrisisMode()"]',
+            targetAction: null,
+            title: "Crisis Mode",
+            content: "Facing an urgent situation? Theft, walkout, or serious misconduct? Hit this button for immediate step-by-step guidance.",
+            position: 'bottom',
+            icon: '🚨'
+        },
+        {
+            id: 'consultant',
+            target: 'button[onclick="openConsultationBookingModal()"]',
+            targetAction: null,
+            title: "Talk to a Real HR Expert",
+            content: "Some situations need human expertise. Book a consultation with a senior HR professional for complex matters.",
+            position: 'bottom',
+            icon: '📞'
+        },
+        {
+            id: 'profile',
+            target: '.sidebar-profile-btn',
+            targetAction: 'toggleSidebar',
+            title: "Venue Settings",
+            content: "Set up your venue profile so I can give you tailored advice based on your specific situation, staff size, and industry.",
+            position: 'right',
+            icon: '⚙️'
+        },
+        {
+            id: 'subscriptions',
+            type: 'modal',
+            title: "Unlock the Full Experience",
+            content: "Free users get 1 template and limited chats. Upgrade to access unlimited templates, expert document reviews, and priority support.",
+            icon: '⭐',
+            showPlans: true
+        }
+    ],
+    
+    // Initialize tour system
+    init: function() {
+        this.createStyles();
+        this.createElements();
+        // Tour prompt is triggered from login flow after onboarding check
+    },
+    
+    // Create tour-specific styles
+    createStyles: function() {
+        const style = document.createElement('style');
+        style.id = 'fitzTourStyles';
+        style.textContent = `
+            /* Tour Overlay */
+            .fitz-tour-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.85);
+                z-index: 99998;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+                pointer-events: none;
+            }
+            .fitz-tour-overlay.active {
+                opacity: 1;
+                pointer-events: auto;
+            }
+            
+            /* Spotlight effect */
+            .fitz-tour-spotlight {
+                position: fixed;
+                z-index: 99999;
+                border-radius: 12px;
+                box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.85);
+                pointer-events: none;
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .fitz-tour-spotlight::before {
+                content: '';
+                position: absolute;
+                inset: -4px;
+                border: 2px solid #f59e0b;
+                border-radius: 16px;
+                animation: fitzPulse 2s infinite;
+            }
+            @keyframes fitzPulse {
+                0%, 100% { opacity: 1; transform: scale(1); }
+                50% { opacity: 0.5; transform: scale(1.02); }
+            }
+            
+            /* Tour Modal */
+            .fitz-tour-modal {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%) scale(0.9);
+                z-index: 100000;
+                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+                border: 2px solid #f59e0b;
+                border-radius: 24px;
+                padding: 40px;
+                max-width: 480px;
+                width: 90%;
+                opacity: 0;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(245, 158, 11, 0.15);
+            }
+            .fitz-tour-modal.active {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            .fitz-tour-modal-icon {
+                font-size: 56px;
+                text-align: center;
+                margin-bottom: 20px;
+                display: block;
+            }
+            .fitz-tour-modal-title {
+                font-size: 28px;
+                font-weight: 800;
+                color: white;
+                text-align: center;
+                margin-bottom: 16px;
+            }
+            .fitz-tour-modal-content {
+                color: #94a3b8;
+                text-align: center;
+                font-size: 16px;
+                line-height: 1.7;
+                margin-bottom: 32px;
+            }
+            
+            /* Tooltip */
+            .fitz-tour-tooltip {
+                position: fixed;
+                z-index: 100000;
+                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+                border: 2px solid #f59e0b;
+                border-radius: 20px;
+                padding: 28px;
+                max-width: 360px;
+                width: 90%;
+                opacity: 0;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(245, 158, 11, 0.1);
+            }
+            .fitz-tour-tooltip.active {
+                opacity: 1;
+            }
+            .fitz-tour-tooltip-arrow {
+                position: absolute;
+                width: 16px;
+                height: 16px;
+                background: #1e293b;
+                border: 2px solid #f59e0b;
+                transform: rotate(45deg);
+            }
+            .fitz-tour-tooltip-arrow.top { top: -10px; left: 50%; margin-left: -8px; border-right: none; border-bottom: none; }
+            .fitz-tour-tooltip-arrow.bottom { bottom: -10px; left: 50%; margin-left: -8px; border-left: none; border-top: none; }
+            .fitz-tour-tooltip-arrow.left { left: -10px; top: 50%; margin-top: -8px; border-right: none; border-top: none; }
+            .fitz-tour-tooltip-arrow.right { right: -10px; top: 50%; margin-top: -8px; border-left: none; border-bottom: none; }
+            
+            .fitz-tour-tooltip-header {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 12px;
+            }
+            .fitz-tour-tooltip-icon {
+                font-size: 32px;
+            }
+            .fitz-tour-tooltip-title {
+                font-size: 20px;
+                font-weight: 700;
+                color: white;
+            }
+            .fitz-tour-tooltip-content {
+                color: #94a3b8;
+                font-size: 15px;
+                line-height: 1.6;
+                margin-bottom: 24px;
+            }
+            
+            /* Progress & Buttons */
+            .fitz-tour-footer {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+            }
+            .fitz-tour-progress {
+                display: flex;
+                gap: 6px;
+            }
+            .fitz-tour-progress-dot {
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background: #475569;
+                transition: all 0.3s ease;
+            }
+            .fitz-tour-progress-dot.active {
+                background: #f59e0b;
+                transform: scale(1.2);
+            }
+            .fitz-tour-progress-dot.completed {
+                background: #22c55e;
+            }
+            
+            .fitz-tour-buttons {
+                display: flex;
+                gap: 12px;
+            }
+            .fitz-tour-btn {
+                padding: 12px 24px;
+                border-radius: 12px;
+                font-weight: 600;
+                font-size: 15px;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                border: none;
+            }
+            .fitz-tour-btn-skip {
+                background: transparent;
+                color: #64748b;
+                padding: 12px 16px;
+            }
+            .fitz-tour-btn-skip:hover {
+                color: #94a3b8;
+            }
+            .fitz-tour-btn-next {
+                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                color: #0f172a;
+            }
+            .fitz-tour-btn-next:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+            }
+            .fitz-tour-btn-start {
+                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+                color: #0f172a;
+                padding: 16px 32px;
+                font-size: 17px;
+            }
+            .fitz-tour-btn-later {
+                background: #334155;
+                color: #94a3b8;
+            }
+            .fitz-tour-btn-later:hover {
+                background: #475569;
+            }
+            
+            /* Initial Prompt */
+            .fitz-tour-prompt {
+                position: fixed;
+                bottom: 100px;
+                right: 24px;
+                z-index: 99999;
+                background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+                border: 2px solid #f59e0b;
+                border-radius: 20px;
+                padding: 24px;
+                max-width: 340px;
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+                transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(245, 158, 11, 0.15);
+            }
+            .fitz-tour-prompt.active {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            .fitz-tour-prompt-close {
+                position: absolute;
+                top: 12px;
+                right: 12px;
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background: #334155;
+                border: none;
+                color: #94a3b8;
+                font-size: 18px;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.2s;
+            }
+            .fitz-tour-prompt-close:hover {
+                background: #475569;
+                color: white;
+            }
+            .fitz-tour-prompt-icon {
+                font-size: 40px;
+                margin-bottom: 12px;
+            }
+            .fitz-tour-prompt-title {
+                font-size: 18px;
+                font-weight: 700;
+                color: white;
+                margin-bottom: 8px;
+            }
+            .fitz-tour-prompt-text {
+                color: #94a3b8;
+                font-size: 14px;
+                line-height: 1.5;
+                margin-bottom: 20px;
+            }
+            .fitz-tour-prompt-buttons {
+                display: flex;
+                gap: 10px;
+            }
+            .fitz-tour-prompt-buttons .fitz-tour-btn {
+                flex: 1;
+                text-align: center;
+                padding: 12px 16px;
+            }
+            
+            /* Plans preview in final step */
+            .fitz-tour-plans {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+                margin-bottom: 24px;
+            }
+            .fitz-tour-plan {
+                background: #0f172a;
+                border: 1px solid #334155;
+                border-radius: 12px;
+                padding: 16px;
+                text-align: center;
+                transition: all 0.2s;
+            }
+            .fitz-tour-plan:hover {
+                border-color: #f59e0b;
+                transform: translateY(-2px);
+            }
+            .fitz-tour-plan-name {
+                font-weight: 600;
+                color: #f59e0b;
+                font-size: 14px;
+                margin-bottom: 4px;
+            }
+            .fitz-tour-plan-price {
+                font-size: 20px;
+                font-weight: 800;
+                color: white;
+            }
+            .fitz-tour-plan-period {
+                font-size: 11px;
+                color: #64748b;
+            }
+            
+            /* Mobile adjustments */
+            @media (max-width: 640px) {
+                .fitz-tour-modal, .fitz-tour-tooltip {
+                    max-width: 95%;
+                    padding: 24px;
+                }
+                .fitz-tour-prompt {
+                    right: 12px;
+                    left: 12px;
+                    max-width: none;
+                    bottom: 80px;
+                }
+                .fitz-tour-plans {
+                    grid-template-columns: 1fr;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    },
+    
+    // Create DOM elements
+    createElements: function() {
+        // Overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'fitz-tour-overlay';
+        overlay.id = 'fitzTourOverlay';
+        document.body.appendChild(overlay);
+        
+        // Spotlight
+        const spotlight = document.createElement('div');
+        spotlight.className = 'fitz-tour-spotlight';
+        spotlight.id = 'fitzTourSpotlight';
+        spotlight.style.display = 'none';
+        document.body.appendChild(spotlight);
+        
+        // Modal
+        const modal = document.createElement('div');
+        modal.className = 'fitz-tour-modal';
+        modal.id = 'fitzTourModal';
+        document.body.appendChild(modal);
+        
+        // Tooltip
+        const tooltip = document.createElement('div');
+        tooltip.className = 'fitz-tour-tooltip';
+        tooltip.id = 'fitzTourTooltip';
+        document.body.appendChild(tooltip);
+        
+        // Initial Prompt
+        const prompt = document.createElement('div');
+        prompt.className = 'fitz-tour-prompt';
+        prompt.id = 'fitzTourPrompt';
+        prompt.innerHTML = `
+            <button class="fitz-tour-prompt-close" onclick="FitzTour.dismissPrompt()">×</button>
+            <div class="fitz-tour-prompt-icon">✨</div>
+            <div class="fitz-tour-prompt-title">New to Fitz?</div>
+            <div class="fitz-tour-prompt-text">Take a quick 60-second tour to discover how Fitz can help you manage HR with confidence.</div>
+            <div class="fitz-tour-prompt-buttons">
+                <button class="fitz-tour-btn fitz-tour-btn-later" onclick="FitzTour.dismissPrompt()">Maybe Later</button>
+                <button class="fitz-tour-btn fitz-tour-btn-start" onclick="FitzTour.startTour()">Show Me! →</button>
+            </div>
+        `;
+        document.body.appendChild(prompt);
+    },
+    
+    // Show initial tour prompt
+    showTourPrompt: function() {
+        const prompt = document.getElementById('fitzTourPrompt');
+        setTimeout(() => {
+            prompt.classList.add('active');
+        }, 100);
+    },
+    
+    // Dismiss prompt
+    dismissPrompt: function() {
+        const prompt = document.getElementById('fitzTourPrompt');
+        prompt.classList.remove('active');
+        localStorage.setItem('fitzTourDeclined', 'true');
+        this.hasDeclinedTour = true;
+    },
+    
+    // Start the tour
+    startTour: function() {
+        const prompt = document.getElementById('fitzTourPrompt');
+        prompt.classList.remove('active');
+        
+        this.isActive = true;
+        this.currentStep = 0;
+        
+        // Show overlay
+        document.getElementById('fitzTourOverlay').classList.add('active');
+        
+        this.showStep(0);
+    },
+    
+    // Show a specific step
+    showStep: function(stepIndex) {
+        const step = this.steps[stepIndex];
+        if (!step) {
+            this.endTour();
+            return;
+        }
+        
+        this.currentStep = stepIndex;
+        
+        // Hide all elements first
+        document.getElementById('fitzTourModal').classList.remove('active');
+        document.getElementById('fitzTourTooltip').classList.remove('active');
+        document.getElementById('fitzTourSpotlight').style.display = 'none';
+        
+        // Execute any required action before showing step
+        if (step.targetAction) {
+            if (step.targetAction === 'toggleSidebar' && !sidebarOpen) {
+                toggleSidebar();
+                setTimeout(() => this.renderStep(step, stepIndex), 400);
+                return;
+            }
+        }
+        
+        this.renderStep(step, stepIndex);
+    },
+    
+    // Render step content
+    renderStep: function(step, stepIndex) {
+        if (step.type === 'modal') {
+            this.showModal(step, stepIndex);
+        } else {
+            this.showTooltip(step, stepIndex);
+        }
+    },
+    
+    // Show modal step
+    showModal: function(step, stepIndex) {
+        const modal = document.getElementById('fitzTourModal');
+        
+        let plansHTML = '';
+        if (step.showPlans) {
+            plansHTML = `
+                <div class="fitz-tour-plans">
+                    <div class="fitz-tour-plan">
+                        <div class="fitz-tour-plan-name">Starter</div>
+                        <div class="fitz-tour-plan-price">$249</div>
+                        <div class="fitz-tour-plan-period">/year</div>
+                    </div>
+                    <div class="fitz-tour-plan">
+                        <div class="fitz-tour-plan-name">Pro</div>
+                        <div class="fitz-tour-plan-price">$449</div>
+                        <div class="fitz-tour-plan-period">/year</div>
+                    </div>
+                    <div class="fitz-tour-plan">
+                        <div class="fitz-tour-plan-name">Business</div>
+                        <div class="fitz-tour-plan-price">$899</div>
+                        <div class="fitz-tour-plan-period">/year</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        modal.innerHTML = `
+            <span class="fitz-tour-modal-icon">${step.icon}</span>
+            <h2 class="fitz-tour-modal-title">${step.title}</h2>
+            <p class="fitz-tour-modal-content">${step.content}</p>
+            ${plansHTML}
+            <div class="fitz-tour-footer">
+                <div class="fitz-tour-progress">
+                    ${this.steps.map((_, i) => `
+                        <div class="fitz-tour-progress-dot ${i < stepIndex ? 'completed' : ''} ${i === stepIndex ? 'active' : ''}"></div>
+                    `).join('')}
+                </div>
+                <div class="fitz-tour-buttons">
+                    <button class="fitz-tour-btn fitz-tour-btn-skip" onclick="FitzTour.endTour()">Skip Tour</button>
+                    <button class="fitz-tour-btn fitz-tour-btn-next" onclick="FitzTour.nextStep()">
+                        ${stepIndex === this.steps.length - 1 ? "Let's Go! 🚀" : 'Next →'}
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        setTimeout(() => modal.classList.add('active'), 50);
+    },
+    
+    // Show tooltip step with spotlight
+    showTooltip: function(step, stepIndex) {
+        const target = document.querySelector(step.target);
+        if (!target) {
+            console.warn('Tour target not found:', step.target);
+            this.nextStep();
+            return;
+        }
+        
+        const spotlight = document.getElementById('fitzTourSpotlight');
+        const tooltip = document.getElementById('fitzTourTooltip');
+        
+        // Position spotlight
+        const rect = target.getBoundingClientRect();
+        const padding = 8;
+        
+        spotlight.style.display = 'block';
+        spotlight.style.top = (rect.top - padding) + 'px';
+        spotlight.style.left = (rect.left - padding) + 'px';
+        spotlight.style.width = (rect.width + padding * 2) + 'px';
+        spotlight.style.height = (rect.height + padding * 2) + 'px';
+        
+        // Build tooltip content
+        tooltip.innerHTML = `
+            <div class="fitz-tour-tooltip-arrow ${this.getArrowPosition(step.position)}"></div>
+            <div class="fitz-tour-tooltip-header">
+                <span class="fitz-tour-tooltip-icon">${step.icon}</span>
+                <h3 class="fitz-tour-tooltip-title">${step.title}</h3>
+            </div>
+            <p class="fitz-tour-tooltip-content">${step.content}</p>
+            <div class="fitz-tour-footer">
+                <div class="fitz-tour-progress">
+                    ${this.steps.map((_, i) => `
+                        <div class="fitz-tour-progress-dot ${i < stepIndex ? 'completed' : ''} ${i === stepIndex ? 'active' : ''}"></div>
+                    `).join('')}
+                </div>
+                <div class="fitz-tour-buttons">
+                    <button class="fitz-tour-btn fitz-tour-btn-skip" onclick="FitzTour.endTour()">Skip</button>
+                    <button class="fitz-tour-btn fitz-tour-btn-next" onclick="FitzTour.nextStep()">Next →</button>
+                </div>
+            </div>
+        `;
+        
+        // Position tooltip
+        this.positionTooltip(tooltip, rect, step.position);
+        
+        setTimeout(() => tooltip.classList.add('active'), 50);
+    },
+    
+    // Get arrow position class
+    getArrowPosition: function(position) {
+        const map = { top: 'bottom', bottom: 'top', left: 'right', right: 'left' };
+        return map[position] || 'top';
+    },
+    
+    // Position tooltip relative to target
+    positionTooltip: function(tooltip, targetRect, position) {
+        const gap = 20;
+        const tooltipRect = tooltip.getBoundingClientRect();
+        let top, left;
+        
+        switch (position) {
+            case 'bottom':
+                top = targetRect.bottom + gap;
+                left = targetRect.left + (targetRect.width / 2) - (tooltip.offsetWidth / 2);
+                break;
+            case 'top':
+                top = targetRect.top - tooltip.offsetHeight - gap;
+                left = targetRect.left + (targetRect.width / 2) - (tooltip.offsetWidth / 2);
+                break;
+            case 'left':
+                top = targetRect.top + (targetRect.height / 2) - (tooltip.offsetHeight / 2);
+                left = targetRect.left - tooltip.offsetWidth - gap;
+                break;
+            case 'right':
+            default:
+                top = targetRect.top + (targetRect.height / 2) - (tooltip.offsetHeight / 2);
+                left = targetRect.right + gap;
+                break;
+        }
+        
+        // Keep within viewport
+        const maxLeft = window.innerWidth - tooltip.offsetWidth - 20;
+        const maxTop = window.innerHeight - tooltip.offsetHeight - 20;
+        left = Math.max(20, Math.min(left, maxLeft));
+        top = Math.max(20, Math.min(top, maxTop));
+        
+        tooltip.style.top = top + 'px';
+        tooltip.style.left = left + 'px';
+    },
+    
+    // Go to next step
+    nextStep: function() {
+        // Close sidebar if open and moving past profile step
+        if (this.currentStep === 5 && sidebarOpen) {
+            toggleSidebar();
+        }
+        
+        if (this.currentStep < this.steps.length - 1) {
+            this.showStep(this.currentStep + 1);
+        } else {
+            this.endTour();
+        }
+    },
+    
+    // End the tour
+    endTour: function() {
+        this.isActive = false;
+        
+        // Hide all elements
+        document.getElementById('fitzTourOverlay').classList.remove('active');
+        document.getElementById('fitzTourModal').classList.remove('active');
+        document.getElementById('fitzTourTooltip').classList.remove('active');
+        document.getElementById('fitzTourSpotlight').style.display = 'none';
+        
+        // Close sidebar if open
+        if (sidebarOpen) {
+            toggleSidebar();
+        }
+        
+        // Mark as completed
+        localStorage.setItem('fitzTourCompleted', 'true');
+        this.hasSeenTour = true;
+        
+        // Show completion message
+        if (this.currentStep === this.steps.length - 1) {
+            setTimeout(() => {
+                addMessage('assistant', "🎉 **You're all set!**\n\nYou now know your way around Fitz. If you ever want to take the tour again, just type \"take a tour\" or find it in your profile settings.\n\nWhat can I help you with today?");
+            }, 500);
+        }
+    },
+    
+    // Restart tour (can be called from settings)
+    restartTour: function() {
+        localStorage.removeItem('fitzTourCompleted');
+        localStorage.removeItem('fitzTourDeclined');
+        this.hasSeenTour = false;
+        this.hasDeclinedTour = false;
+        this.startTour();
+    }
+};
+
+// Initialize tour when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Small delay to ensure main app is loaded
+    setTimeout(() => {
+        FitzTour.init();
+    }, 1000);
+});
+
+// Check if user is logged in before showing tour prompt
+function checkAndShowTourPrompt() {
+    const accessScreen = document.getElementById('accessScreen');
+    const isLoggedIn = accessScreen && accessScreen.classList.contains('hidden');
+    
+    if (isLoggedIn && !FitzTour.hasSeenTour && !FitzTour.hasDeclinedTour) {
+        FitzTour.showTourPrompt();
+    }
+}
+
+// Also allow triggering via chat command
+function checkForTourCommand(message) {
+    const lowerMessage = message.toLowerCase().trim();
+    if (lowerMessage === 'take a tour' || lowerMessage === 'tour' || lowerMessage === 'show me around') {
+        FitzTour.restartTour();
+        return true;
+    }
+    return false;
 }
 </script>
 </body>
