@@ -14632,6 +14632,23 @@ function applyDocumentBlur(docType, docName) {
     const previewContent = document.getElementById('documentPreviewContent');
     if (!previewContent) return;
     
+    // CRITICAL: Check if already unlocked - skip ALL blur logic
+    if (unlockedDocuments.has(docType)) {
+        console.log('✅ Document already unlocked, skipping blur:', docType);
+        // Show appropriate options based on document type
+        const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+        const category = cost ? cost.category : 'template';
+        const creditCost = cost ? cost.credits : 0;
+        const currentBalance = getTotalCredits();
+        
+        if (category === 'people_management') {
+            showPeopleManagementOptions(docType, docName, creditCost, currentBalance);
+        } else if (category === 'formal_process') {
+            showDocPreviewFormalOptions(docType, docName);
+        }
+        return; // Don't apply blur for unlocked documents
+    }
+    
     // Store docType in the preview modal for the unlock button
     const previewModal = document.getElementById('documentPreviewModal');
     if (previewModal) {
@@ -14863,6 +14880,12 @@ function applyDocumentBlur(docType, docName) {
     }
     
     // ===== DEFAULT: Standard blur for upgrade prompt =====
+    // This should only be reached for templates that free users have exceeded
+    // Double-check: If we somehow got here with a credit-based doc, use its credit cost
+    
+    // Debug logging to catch issues
+    console.log('🔒 DEFAULT BLUR CASE:', { docType, category, creditCost, isTemplate: cost?.category === 'template' });
+    
     previewContainer.style.position = 'relative';
     previewContainer.style.overflow = 'hidden';
     previewContainer.style.maxHeight = '250px';
@@ -14891,10 +14914,11 @@ function applyDocumentBlur(docType, docName) {
     const unlockPrompt = document.createElement('div');
     unlockPrompt.id = 'documentUnlockPrompt';
     
-    // For templates (0 credits), show upgrade message. For credit-based docs, show credit count.
-    const heading = creditCost > 0 ? `${creditCost} Credit${creditCost > 1 ? 's' : ''} Required` : 'Upgrade Required';
-    const message = creditCost > 0 
-        ? `You need ${creditCost} credit${creditCost > 1 ? 's' : ''} to unlock this document. You have ${currentBalance}.`
+    // ALWAYS show credit cost if document has one, never show "Upgrade Required" for credit-based docs
+    const actualCost = cost ? cost.credits : creditCost;
+    const heading = actualCost > 0 ? `${actualCost} Credit${actualCost > 1 ? 's' : ''} Required` : 'Upgrade Required';
+    const message = actualCost > 0 
+        ? `You need ${actualCost} credit${actualCost > 1 ? 's' : ''} to unlock this document. You have ${currentBalance}.`
         : 'Subscribe to a plan to access all HR templates.';
     
     unlockPrompt.innerHTML = `
@@ -14903,16 +14927,24 @@ function applyDocumentBlur(docType, docName) {
             <h3 class="text-lg font-bold text-white mb-2">${heading}</h3>
             <p class="text-slate-300 text-sm mb-4">${message}</p>
             <div class="space-y-2">
+                ${actualCost > 0 && currentBalance >= actualCost ? `
+                <button onclick="unlockDocumentFromPreview('${docType}', '${docName}')" 
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
+                    🔓 Unlock (${actualCost} Credit${actualCost > 1 ? 's' : ''})
+                </button>
+                <p class="text-slate-400 text-xs">You have ${currentBalance} credits</p>
+                ` : `
                 <button onclick="showSubscriptionOptions()" 
                         class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 px-6 rounded-lg transition-all text-base">
                     View Plans
                 </button>
-                ${creditCost > 0 ? `
+                ${actualCost > 0 ? `
                 <button onclick="savePendingDocumentAndGetCredits()" 
                         class="w-full bg-slate-600 hover:bg-slate-500 text-white font-semibold py-2 px-6 rounded-lg transition-all text-sm">
                     💳 Buy Credits Instead
                 </button>
                 ` : ''}
+                `}
             </div>
         </div>
     `;
@@ -14957,6 +14989,31 @@ function removeDocumentBlur() {
         btn.title = '';
         btn.style.display = '';
     });
+}
+
+/**
+ * Unlock document from preview (used when user has enough credits)
+ * Routes to appropriate unlock function based on document category
+ */
+function unlockDocumentFromPreview(docType, docName) {
+    const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
+    if (!cost) {
+        console.error('Unknown document type:', docType);
+        return;
+    }
+    
+    const category = cost.category;
+    
+    if (category === 'people_management') {
+        unlockPeopleManagementDoc(docType, docName);
+    } else if (category === 'formal_process') {
+        unlockDocPreviewFormal(docType, docName);
+    } else {
+        // Template or unknown - just mark as unlocked and remove blur
+        unlockedDocuments.add(docType);
+        removeDocumentBlur();
+        showNotification('✅ Document unlocked!', 'success');
+    }
 }
 
 /**
@@ -16845,6 +16902,12 @@ function downloadFormalWithDisclaimer(containerId, docType, docName, actionsId) 
  * Check if document should be blurred (user hasn't paid or needs review)
  */
 function shouldBlurDocument(docType) {
+    // Check if already unlocked in this session - NO BLUR needed
+    if (unlockedDocuments.has(docType)) {
+        console.log('✅ Document already unlocked, no blur:', docType);
+        return false;
+    }
+    
     const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
     const cost = CONFIG.CREDITS.DOCUMENT_COSTS[docType];
     const isTemplate = cost && cost.category === 'template';
