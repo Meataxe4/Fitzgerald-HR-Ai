@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fitzgerald HR Assistant - Beta Test</title>
+    <title>Fitz HR</title>
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">
@@ -3689,7 +3689,7 @@ async function checkFirestoreData() {
         var code = document.getElementById('accessCode').value.trim().toUpperCase();
         var rememberMe = document.getElementById('rememberMe') ? document.getElementById('rememberMe').checked : false;
         var errorEl = document.getElementById('accessError');
-        var validCodes = ['BETA-VENUE-001', 'BETA-VENUE-002', 'BETA-VENUE-003', 'BETA-VENUE-004', 'BETA-VENUE-005', 'FITZGERALD-TEST', 'DEMO-2025'];
+        var validCodes = ['BETA-VENUE-001', 'BETA-VENUE-002', 'BETA-VENUE-003', 'BETA-VENUE-004', 'BETA-VENUE-005', 'FITZ-TEST', 'DEMO-2025'];
         
         if (!code) {
             if (errorEl) {
@@ -6359,7 +6359,7 @@ Be as specific as possible!"></textarea>
 
     <div class="mt-6 bg-amber-500/10 border border-amber-500 rounded-lg p-4">
         <p class="text-amber-300 text-sm">
-            <strong>⚠️ Important:</strong> All generated documents must be reviewed by a Fitzgerald HR consultant before use.
+            <strong>⚠️ Important:</strong> All generated documents must be reviewed by a Fitz HR consultant before use.
         </p>
     </div>
 </div>
@@ -7307,12 +7307,12 @@ function setBilling(billing) {
                 <p class="text-red-300">
                     This tool provides <strong>general information only</strong>. It is <strong>NOT legal advice</strong> 
                     and does not create a client-consultant relationship. All guidance and documents must be 
-                    reviewed by a qualified Fitzgerald HR consultant before use.
+                    reviewed by a qualified Fitz HR consultant before use.
                 </p>
             </div>
 
             <h3 class="text-white font-bold text-lg">1. Acceptance of Terms</h3>
-            <p>By accessing the Fitzgerald HR Knowledge Hub, you agree to these Terms of Use. If you do not agree, do not use this tool.</p>
+            <p>By accessing the Fitz HR Knowledge Hub, you agree to these Terms of Use. If you do not agree, do not use this tool.</p>
 
             <h3 class="text-white font-bold text-lg">2. Nature of Service</h3>
             <p>This tool is an <strong>information resource</strong>, not a professional advisory service. It provides:</p>
@@ -7325,7 +7325,7 @@ function setBilling(billing) {
             <p class="font-semibold text-amber-400">This tool does NOT provide legal advice or professional HR consulting services.</p>
 
             <h3 class="text-white font-bold text-lg">3. Professional Review Requirement</h3>
-            <p class="font-semibold">You MUST have all guidance and documents reviewed by a Fitzgerald HR consultant before:</p>
+            <p class="font-semibold">You MUST have all guidance and documents reviewed by a Fitz HR consultant before:</p>
             <ul class="list-disc ml-6 space-y-1">
                 <li>Issuing any document to an employee</li>
                 <li>Taking any employment action based on information provided</li>
@@ -7334,7 +7334,7 @@ function setBilling(billing) {
             </ul>
 
             <h3 class="text-white font-bold text-lg">4. Limitation of Liability</h3>
-            <p>Fitzgerald HR is NOT liable for:</p>
+            <p>Fitz HR is NOT liable for:</p>
             <ul class="list-disc ml-6 space-y-1">
                 <li>Decisions made based on information from this tool</li>
                 <li>Use of documents without professional review</li>
@@ -7413,7 +7413,7 @@ function setBilling(billing) {
             <h3 class="text-white font-bold text-lg">4. Data Sharing</h3>
             <p>We do NOT sell your data. We may share data with:</p>
             <ul class="list-disc ml-6 space-y-1">
-                <li>Fitzgerald HR consultants (when you request professional review or advice)</li>
+                <li>Fitz HR consultants (when you request professional review or advice)</li>
                 <li>Service providers (Anthropic, Supabase) - under strict confidentiality agreements</li>
                 <li>Legal authorities (if required by Australian law)</li>
             </ul>
@@ -7534,7 +7534,7 @@ function setBilling(billing) {
                     <span>Mandatory Professional Review</span>
                 </h3>
                 <p class="mb-2">
-                    <strong class="text-white">All documents and guidance MUST be reviewed</strong> by a Fitzgerald HR consultant before:
+                    <strong class="text-white">All documents and guidance MUST be reviewed</strong> by a Fitz HR consultant before:
                 </p>
                 <ul class="list-disc ml-6 space-y-1 text-xs">
                     <li>Issuing any document to an employee</li>
@@ -7549,7 +7549,7 @@ function setBilling(billing) {
                     <span>Legal Disclaimer</span>
                 </h3>
                 <p>
-                    Fitzgerald HR is <strong class="text-white">not liable</strong> for decisions made based on this tool's information, 
+                    Fitz HR is <strong class="text-white">not liable</strong> for decisions made based on this tool's information, 
                     documents used without professional review, or any legal costs/damages arising from use of this tool.
                 </p>
             </div>
@@ -7647,12 +7647,12 @@ const CONFIG = {
     VALID_CODES: [
         'BETA-VENUE-001', 'BETA-VENUE-002', 'BETA-VENUE-003',
         'BETA-VENUE-004', 'BETA-VENUE-005',
-        'FITZGERALD-TEST', 'DEMO-2025'
+        'FITZ-TEST', 'DEMO-2025'
     ],
     
     // API endpoints
     API: {
-        RATES_URL: 'https://raw.githubusercontent.com/Meataxe4/Fitzgerald-HR-Ai/main/hospitality-award-rates.json',
+        RATES_URL: 'https://raw.githubusercontent.com/Meataxe4/Fitz-HR-Ai/main/hospitality-award-rates.json',
         CHAT_ENDPOINT: '/.netlify/functions/chat',
         CRISIS_ENDPOINT: '/.netlify/functions/telegram-crisis'
     },
@@ -9551,7 +9551,7 @@ const hrTemplates = {
             employmentContract: (data) => `
                 <div class="header">
                     <h1>EMPLOYMENT CONTRACT</h1>
-                    <p>Fitzgerald HR - Professional HR Solutions</p>
+                    <p>Fitz HR - Professional HR Solutions</p>
                 </div>
                 
                 <h2>Employment Details</h2>
@@ -9595,9 +9595,9 @@ const hrTemplates = {
                 <div class="warning">
                     <strong>⚠️ IMPORTANT LEGAL NOTICE</strong>
                     <p>This employment contract template has been generated by Fitz AI and is provided for guidance purposes only.</p>
-                    <p><strong>You MUST have this contract reviewed and customised by a Fitzgerald HR Senior Consultant or employment lawyer before use.</strong></p>
+                    <p><strong>You MUST have this contract reviewed and customised by a Fitz HR Senior Consultant or employment lawyer before use.</strong></p>
                     <p>This ensures compliance with all applicable laws, awards, and your specific circumstances.</p>
-                    <p><strong>Contact:</strong> info@fitzgeraldhr.com.au | Fitzgerald HR</p>
+                    <p><strong>Contact:</strong> info@fitzgeraldhr.com.au | Fitz HR</p>
                 </div>
                 
                 <div style="margin-top: 50px;">
@@ -9609,7 +9609,7 @@ const hrTemplates = {
             warningLetter: (data) => `
                 <div class="header">
                     <h1>WRITTEN WARNING</h1>
-                    <p>Fitzgerald HR - Professional HR Solutions</p>
+                    <p>Fitz HR - Professional HR Solutions</p>
                 </div>
                 
                 <p><strong>Date:</strong> ${data.date || new Date().toLocaleDateString('en-AU')}</p>
@@ -9653,9 +9653,9 @@ const hrTemplates = {
                 <div class="warning">
                     <strong>⚠️ CRITICAL LEGAL RISK</strong>
                     <p>Performance management and disciplinary processes involve significant legal risks if not handled correctly.</p>
-                    <p><strong>This template MUST be reviewed by a Fitzgerald HR Senior Consultant before being issued to any employee.</strong></p>
+                    <p><strong>This template MUST be reviewed by a Fitz HR Senior Consultant before being issued to any employee.</strong></p>
                     <p>Incorrect process may result in unfair dismissal claims, general protections claims, or adverse action claims.</p>
-                    <p><strong>Contact immediately:</strong> info@fitzgeraldhr.com.au | Fitzgerald HR</p>
+                    <p><strong>Contact immediately:</strong> info@fitzgeraldhr.com.au | Fitz HR</p>
                 </div>
                 
                 <div style="margin-top: 40px;">
@@ -9671,7 +9671,7 @@ const hrTemplates = {
             performanceReview: (data) => `
                 <div class="header">
                     <h1>PERFORMANCE REVIEW</h1>
-                    <p>Fitzgerald HR - Professional HR Solutions</p>
+                    <p>Fitz HR - Professional HR Solutions</p>
                 </div>
                 
                 <h2>Employee Information</h2>
@@ -9742,8 +9742,8 @@ const hrTemplates = {
                 <div class="warning">
                     <strong>⚠️ IMPORTANT NOTE</strong>
                     <p>This performance review template has been generated by Fitz AI for guidance purposes.</p>
-                    <p>For best results and to ensure procedural fairness, consider having your performance review process and documentation reviewed by a Fitzgerald HR Senior Consultant.</p>
-                    <p><strong>Contact:</strong> info@fitzgeraldhr.com.au | Fitzgerald HR</p>
+                    <p>For best results and to ensure procedural fairness, consider having your performance review process and documentation reviewed by a Fitz HR Senior Consultant.</p>
+                    <p><strong>Contact:</strong> info@fitzgeraldhr.com.au | Fitz HR</p>
                 </div>
             `
         };
@@ -9938,7 +9938,7 @@ function convertHTMLToPdfMake(html, metadata) {
             ],
             margin: [0, 0, 0, 10]
         },
-        { text: 'FITZGERALD HR - AI-Powered Hospitality HR Solutions', bold: true, fontSize: 10, margin: [0, 0, 0, 4] },
+        { text: 'FITZ HR - AI-Powered Hospitality HR Solutions', bold: true, fontSize: 10, margin: [0, 0, 0, 4] },
         { text: 'Email: info@fitzgeraldhr.com.au', fontSize: 9, margin: [0, 0, 0, 3] },
         { text: `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}`, fontSize: 9, margin: [0, 0, 0, 3] },
         { text: `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}`, fontSize: 9, margin: [0, 0, 0, 3] },
@@ -12463,7 +12463,7 @@ Time: ___________________
 
 This meeting is ONLY for gathering information. You MUST take time (24-48 hours) to properly consider the employee's response before making any decision. Failing to do this could result in a finding of unfair dismissal if the matter proceeds to termination.
 
-*If you're unsure how to proceed at any point, pause the meeting and contact Fitzgerald HR: info@fitzgeraldhr.com.au*
+*If you're unsure how to proceed at any point, pause the meeting and contact Fitz HR: info@fitzgeraldhr.com.au*
 `;
     
     } else if (type === 'letterOfAllegation') {
@@ -12658,7 +12658,7 @@ Date: [Date]
 
 IMPORTANT LEGAL NOTICE:
 
-This letter must be reviewed by a Fitzgerald HR Senior Consultant before being issued to the employee.
+This letter must be reviewed by a Fitz HR Senior Consultant before being issued to the employee.
 
 Contact: info@fitzgeraldhr.com.au
 
@@ -12788,7 +12788,7 @@ ________________________________________________________________________________
 __________________________________________________________________________________
 __________________________________________________________________________________
 
-${data.conductConcerns ? `*Add a note about conduct/compliance matters if applicable: "${data.conductConcerns}"*` : '*Add: "Conduct or compliance breaches? Contact Fitzgerald HR: info@fitzgeraldhr.com.au"*'}
+${data.conductConcerns ? `*Add a note about conduct/compliance matters if applicable: "${data.conductConcerns}"*` : '*Add: "Conduct or compliance breaches? Contact Fitz HR: info@fitzgeraldhr.com.au"*'}
 
 ## ACTION PLAN
 
@@ -12856,10 +12856,10 @@ Employee's Signature: _________________________ Date: __ / __ / ____
 
 ✓ Both parties should retain a copy of this completed document
 ✓ This document forms part of the employee's probation record
-✓ Any serious concerns should be escalated to Fitzgerald HR: info@fitzgeraldhr.com.au
+✓ Any serious concerns should be escalated to Fitz HR: info@fitzgeraldhr.com.au
 ✓ The tone throughout should be supportive and developmental — firm where needed but always fair
 
-**⚠️ All generated documents must be reviewed by a Fitzgerald HR consultant before use.**
+**⚠️ All generated documents must be reviewed by a Fitz HR consultant before use.**
 
 Contact: info@fitzgeraldhr.com.au
 
@@ -13213,7 +13213,7 @@ Manager Signature: _______________ Date: ______
 
 **IMPORTANT REMINDER:**
 
-This PIP must be reviewed by a Fitzgerald HR Senior Consultant before presenting to the employee to ensure it is legally compliant and procedurally fair.
+This PIP must be reviewed by a Fitz HR Senior Consultant before presenting to the employee to ensure it is legally compliant and procedurally fair.
 
 Contact: info@fitzgeraldhr.com.au
 
@@ -16321,7 +16321,7 @@ async function downloadReviewDocument(refNumber, docName) {
         
         await generateWordDocument(htmlContent, `${filename}.docx`, {
             documentId: refNumber,
-            userName: 'Fitzgerald HR',
+            userName: 'Fitz HR',
             documentType: docName
         });
         
@@ -17510,7 +17510,7 @@ async function downloadGeneratedDocument(format = 'pdf') {
         "⚠️ CRITICAL LEGAL REMINDER\n\n" +
         "This document is a DRAFT TEMPLATE for review purposes only.\n\n" +
         "Before issuing this document to any employee, you MUST:\n\n" +
-        "✓ Have it reviewed by a Fitzgerald HR consultant\n" +
+        "✓ Have it reviewed by a Fitz HR consultant\n" +
         "✓ Ensure all factual details are accurate\n" +
         "✓ Verify it meets your specific circumstances\n" +
         "✓ Confirm it complies with current Fair Work requirements\n\n" +
@@ -18638,7 +18638,7 @@ function downloadDocument(documentType, format) {
     
     const confirmed = confirm(
         "⚠️ IMPORTANT: This is a TEMPLATE only.\n\n" +
-        "You MUST have it reviewed by a Fitzgerald HR consultant.\n\n" +
+        "You MUST have it reviewed by a Fitz HR consultant.\n\n" +
         "Contact: info@fitzgeraldhr.com.au\n\n" +
         "Click OK to download."
     );
@@ -24224,7 +24224,7 @@ function showJuniorRedirect() {
                     <div class="bg-slate-700/50 rounded-lg p-4">
                         <p class="text-sm text-slate-300">
                             <strong>Need help calculating junior rates?</strong><br/>
-                            Contact Fitzgerald HR for assistance: 
+                            Contact Fitz HR for assistance: 
                             <a href="mailto:info@fitzgeraldhr.com.au" class="text-amber-400 hover:underline">info@fitzgeraldhr.com.au</a>
                         </p>
                     </div>
@@ -24418,7 +24418,7 @@ function calculateAwardClassification(data) {
             level: 'Rate not found',
             rate: 0,
             penalties: [`Error: No rate for ${classificationPath} (${employmentType})`],
-            nextSteps: ['Contact Fitzgerald HR support']
+            nextSteps: ['Contact Fitz HR support']
         };
     }
     
@@ -24431,7 +24431,7 @@ function calculateAwardClassification(data) {
             level: title || 'Unknown',
             rate: 0,
             penalties: ['Error: Invalid rate value'],
-            nextSteps: ['Contact Fitzgerald HR support']
+            nextSteps: ['Contact Fitz HR support']
         };
     }
     
@@ -25068,7 +25068,7 @@ async function performLogout(loggedOutUser, type) {
                 <div class="flex justify-start">
                     <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
                         <p class="text-slate-100 leading-relaxed">
-                            👋 G'day! I'm Fitz, your AI-powered HR knowledge companion from Fitzgerald HR, 
+                            👋 G'day! I'm Fitz, your AI-powered HR knowledge companion from Fitz HR, 
                             specialising in hospitality HR for Australian venues.
                         </p>
 
@@ -25410,7 +25410,7 @@ function openTerminationConsultantEmail() {
     const subject = encodeURIComponent(`URGENT: Termination Guidance Required - ${venueName}`);
     
     const body = encodeURIComponent(
-`Dear Fitzgerald HR Senior Consultant,
+`Dear Fitz HR Senior Consultant,
 
 I require urgent expert guidance on an employment termination process to ensure full compliance with Fair Work requirements and minimize legal risk.
 
@@ -26328,7 +26328,7 @@ function openDeputyTokenEntry() {
                     <li>Click the "New OAuth Client" button</li>
                     <li>Fill in the form:
                         <div class="ml-6 mt-1 space-y-0.5 text-slate-400">
-                            • Name: <span class="text-white">Fitzgerald HR</span><br>
+                            • Name: <span class="text-white">Fitz HR</span><br>
                             • Description: <span class="text-white">HR compliance chatbot</span><br>
                             • Redirect URI: <span class="text-white">http://localhost</span>
                         </div>
@@ -29321,7 +29321,7 @@ function resetAIImport() {
                     <span>Important Notice</span>
                 </h3>
                 <p class="mb-2">
-                    By using the Fitzgerald HR Employment Contract Builder, you agree to these Terms of Use. 
+                    By using the Fitz HR Employment Contract Builder, you agree to these Terms of Use. 
                     These terms set out important information about how the tool must be used and the legal 
                     consequences of incorrect use.
                 </p>
@@ -29394,7 +29394,7 @@ function resetAIImport() {
                     <span>Limitation of Liability</span>
                 </h3>
                 <p>
-                    Fitzgerald HR makes no representation or warranty regarding the performance, accuracy, reliability, 
+                    Fitz HR makes no representation or warranty regarding the performance, accuracy, reliability, 
                     fitness for purpose, or availability of this tool. We exclude all liability for any direct or indirect 
                     loss or damage whatsoever arising from your use of, or reliance on, this tool or any generated contracts.
                 </p>
@@ -29408,7 +29408,7 @@ function resetAIImport() {
                 </h3>
                 <p class="text-slate-300">
                     <strong class="text-red-400">All generated contracts should be reviewed by a qualified HR professional or 
-                    employment lawyer before being issued to employees.</strong> If you are a Fitzgerald HR client, 
+                    employment lawyer before being issued to employees.</strong> If you are a Fitz HR client, 
                     please submit contracts for review. Incorrect contracts may expose you to legal risks including 
                     underpayment claims and unfair dismissal proceedings.
                 </p>
@@ -30805,7 +30805,7 @@ function buildTrainingPlanHTML() {
     
     html += `
             <div class="footer">
-                <p>Generated by Fitzgerald HR on ${today}</p>
+                <p>Generated by Fitz HR on ${today}</p>
                 <p>This training plan provides a structured approach to employee development</p>
             </div>
         </body>
@@ -30859,7 +30859,7 @@ function buildTrainingPlanPDFDefinition() {
     });
     
     content.push({
-        text: `Generated by Fitzgerald HR on ${today}`,
+        text: `Generated by Fitz HR on ${today}`,
         style: 'footer',
         margin: [0, 30, 0, 0]
     });
@@ -31647,7 +31647,7 @@ async function downloadProbationDocumentUnlocked(format = 'pdf') {
                 const metadata = {
                     title: `Probation Check-In - ${employeeName}`,
                     documentType: 'Probation Check-In',
-                    generatedBy: 'Fitzgerald HR Assistant'
+                    generatedBy: 'Fitz HR Assistant'
                 };
                 const docDefinition = convertHTMLToPdfMake(formattedHTML, metadata);
                 pdfMake.createPdf(docDefinition).download(`${filename}.pdf`);
@@ -31838,7 +31838,7 @@ function buildChecklistPDFDefinition() {
     
     // Footer
     content.push({
-        text: `Generated by Fitzgerald HR on ${today}`,
+        text: `Generated by Fitz HR on ${today}`,
         style: 'footer',
         margin: [0, 30, 0, 0]
     });
@@ -32038,7 +32038,7 @@ function buildChecklistHTML() {
     
     html += `
             <div class="footer">
-                <p>Generated by Fitzgerald HR on ${today}</p>
+                <p>Generated by Fitz HR on ${today}</p>
                 <p>This checklist helps ensure compliant and thorough employee onboarding</p>
             </div>
         </body>
@@ -32644,7 +32644,7 @@ function getStep0Template() {
                 <ul>
                     <li>Templates are based on Fair Work Australia requirements</li>
                     <li>You should review with a legal professional before use</li>
-                    <li>Fitzgerald HR recommends consulting with our Senior HR Consultant</li>
+                    <li>Fitz HR recommends consulting with our Senior HR Consultant</li>
                     <li>Your specific situation may require additional clauses or modifications</li>
                 </ul>
             </div>
@@ -35137,7 +35137,7 @@ function getStep8Template() {
                 <ul>
                     <li>Have this contract reviewed by a legal professional before use</li>
                     <li>Ensure it complies with your specific Modern Award</li>
-                    <li>Consider consulting with Fitzgerald HR's Senior Consultant</li>
+                    <li>Consider consulting with Fitz HR's Senior Consultant</li>
                     <li>Provide the Fair Work Information Statement to new employees</li>
                 </ul>
             </div>
@@ -35329,7 +35329,7 @@ function buildContractHTML() {
             <h1>EMPLOYMENT CONTRACT</h1>
             
             <div class="warning">
-                <strong>IMPORTANT LEGAL NOTICE:</strong> This contract has been generated using the Fitzgerald HR Employment Contract Builder.
+                <strong>IMPORTANT LEGAL NOTICE:</strong> This contract has been generated using the Fitz HR Employment Contract Builder.
                 This is a template document and should be reviewed by a legal professional before use. It is based on Fair Work Australia
                 requirements but may need customization for your specific circumstances.
             </div>
@@ -35492,7 +35492,7 @@ function buildContractHTML() {
             </div>
             
             <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; text-align: center; color: #6c757d; font-size: 12px;">
-                <p>Generated by Fitzgerald HR Employment Contract Builder on ${today}</p>
+                <p>Generated by Fitz HR Employment Contract Builder on ${today}</p>
                 <p>This is a template document - seek legal advice before use</p>
             </div>
         </body>
@@ -36807,4 +36807,3 @@ async function loadAllDataFromFirebase() {
 </script>
 </body>
 </html>
-
