@@ -17339,17 +17339,22 @@ async function downloadGeneratedDocument(format = 'pdf') {
 
     try {
         const type = documentBuilderState.currentType;
-        const employeeName = documentBuilderState.data.employeeName || 'Employee';
+        // For employment contract, get employee name from contractBuilderState
+        const employeeName = type === 'employmentContract' 
+            ? (contractBuilderState?.data?.employeeName || 'Employee')
+            : (documentBuilderState.data.employeeName || 'Employee');
         
         const typeNames = {
             formalWarning: 'Formal_Warning',
             recordOfDiscussion: 'Record_of_Discussion',
             letterOfAllegation: 'Letter_of_Allegation',
-            performanceImprovementPlan: 'Performance_Improvement_Plan'
+            performanceImprovementPlan: 'Performance_Improvement_Plan',
+            employmentContract: 'Employment_Contract'
         };
         
         const fileExtension = format === 'pdf' ? 'pdf' : 'docx';
-        const filename = `${typeNames[type]}_${employeeName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.${fileExtension}`;
+        const typeName = typeNames[type] || type.replace(/([A-Z])/g, '_$1').replace(/^_/, '');
+        const filename = `${typeName}_${employeeName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0,10)}.${fileExtension}`;
         
         const metadata = {
             documentId: generateDocumentId(),
@@ -34985,16 +34990,45 @@ function initializeStep8Listeners() {
 // DOCUMENT GENERATION
 // ========================================
 async function generateEmploymentContract() {
-    // Check if user has unlocked Employment Contract
-    if (!unlockedDocuments.has('employmentContract')) {
-        // Show unlock modal
-        requireCreditForDownload('employmentContract', 'Employment Contract', () => {
-            generateEmploymentContractUnlocked();
-        });
-        return;
-    }
+    // Show loading overlay
+    showContractLoading('Generating your employment contract preview...');
     
-    generateEmploymentContractUnlocked();
+    try {
+        // Build the contract content
+        const contractHTML = buildContractHTML();
+        
+        // Hide loading
+        hideContractLoading();
+        
+        // Store the generated document for later download
+        documentBuilderState.generatedDocument = contractHTML;
+        documentBuilderState.currentType = 'employmentContract';
+        
+        // Show in preview modal (like other documents)
+        const previewContent = document.getElementById('documentPreviewContent');
+        if (previewContent) {
+            // Convert contract HTML to display format
+            previewContent.innerHTML = contractHTML;
+        }
+        
+        // Store docType in the preview modal
+        const previewModal = document.getElementById('documentPreviewModal');
+        if (previewModal) {
+            previewModal.dataset.docType = 'employmentContract';
+            previewModal.dataset.docName = 'Employment Contract';
+        }
+        
+        // Show the preview modal
+        document.getElementById('documentPreviewModal').classList.remove('hidden');
+        
+        // Apply blur with formal_process unlock flow (2 credits required)
+        applyDocumentBlur('employmentContract', 'Employment Contract');
+        
+    } catch (error) {
+        hideContractLoading();
+        showAlert('Failed to generate contract preview. Please try again.');
+        console.error('Contract generation error:', error);
+    }
 }
 
 async function generateEmploymentContractUnlocked() {
