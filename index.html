@@ -15793,6 +15793,9 @@ function showReviewViewerModal(data) {
     
     const createdDate = data.createdAt?.toDate ? data.createdAt.toDate().toLocaleString('en-AU') : 'Unknown';
     
+    // Format the document content for proper display
+    const formattedContent = formatReviewDocumentContent(data.documentContent);
+    
     modal.innerHTML = `
         <div class="bg-slate-800 rounded-2xl max-w-4xl w-full border border-amber-500/50 my-4">
             <div class="bg-gradient-to-r from-amber-600 to-orange-600 rounded-t-2xl p-6 relative">
@@ -15807,70 +15810,72 @@ function showReviewViewerModal(data) {
                 </div>
             </div>
             
-            <div class="p-6 space-y-6 max-h-[70vh] overflow-y-auto">
-                <!-- Status Badge -->
-                <div class="flex items-center justify-between">
-                    <span class="bg-amber-500/20 text-amber-400 px-3 py-1 rounded-full text-sm font-semibold">
+            <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+                <!-- Quick Info Bar -->
+                <div class="flex flex-wrap items-center gap-4 text-sm">
+                    <span class="bg-amber-500/20 text-amber-400 px-3 py-1 rounded-full font-semibold">
                         ⏳ ${data.status === 'pending' ? 'Pending Review' : data.status}
                     </span>
-                    <span class="text-slate-400 text-sm">Submitted: ${createdDate}</span>
+                    <span class="text-slate-400">📅 ${createdDate}</span>
+                    <span class="text-slate-400">👤 ${data.employeeName || 'N/A'} (${data.employeeRole || 'N/A'})</span>
                 </div>
                 
-                <!-- Venue & Contact -->
-                <div class="bg-slate-700/50 rounded-lg p-4">
-                    <h3 class="text-amber-400 font-semibold mb-2">📍 Venue Details</h3>
-                    <div class="grid grid-cols-2 gap-2 text-sm">
-                        <div><span class="text-slate-400">Venue:</span> <span class="text-white">${data.venueName || 'N/A'}</span></div>
-                        <div><span class="text-slate-400">Contact:</span> <span class="text-white">${data.userName || 'N/A'}</span></div>
-                        <div><span class="text-slate-400">Email:</span> <span class="text-white">${data.userEmail || 'N/A'}</span></div>
-                        <div><span class="text-slate-400">Phone:</span> <span class="text-white">${data.phoneNumber || 'N/A'}</span></div>
-                    </div>
-                </div>
-                
-                <!-- Employee Details -->
-                <div class="bg-slate-700/50 rounded-lg p-4">
-                    <h3 class="text-amber-400 font-semibold mb-2">👤 Employee Details</h3>
-                    <div class="grid grid-cols-2 gap-2 text-sm">
-                        <div><span class="text-slate-400">Name:</span> <span class="text-white">${data.employeeName || 'N/A'}</span></div>
-                        <div><span class="text-slate-400">Role:</span> <span class="text-white">${data.employeeRole || 'N/A'}</span></div>
+                <!-- Venue & Contact - Compact -->
+                <div class="bg-slate-700/50 rounded-lg p-3 text-sm">
+                    <div class="flex flex-wrap gap-4">
+                        <span><span class="text-slate-400">Venue:</span> <span class="text-white">${data.venueName || 'N/A'}</span></span>
+                        <span><span class="text-slate-400">Contact:</span> <span class="text-white">${data.userName || 'N/A'}</span></span>
+                        <span><span class="text-slate-400">Email:</span> <a href="mailto:${data.userEmail}" class="text-blue-400 hover:underline">${data.userEmail || 'N/A'}</a></span>
+                        <span><span class="text-slate-400">Phone:</span> <a href="tel:${data.phoneNumber}" class="text-blue-400 hover:underline">${data.phoneNumber || 'N/A'}</a></span>
                     </div>
                 </div>
                 
                 <!-- Issue Description -->
-                <div class="bg-slate-700/50 rounded-lg p-4">
-                    <h3 class="text-amber-400 font-semibold mb-2">📝 Issue Description</h3>
-                    <p class="text-slate-300 text-sm whitespace-pre-wrap">${data.issueDescription || 'N/A'}</p>
+                ${data.issueDescription ? `
+                <div class="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
+                    <h3 class="text-red-400 font-semibold mb-2">📝 Issue Description</h3>
+                    <p class="text-slate-300 text-sm whitespace-pre-wrap">${data.issueDescription}</p>
                 </div>
+                ` : ''}
                 
                 <!-- Previous Warnings -->
                 ${data.previousWarnings ? `
-                <div class="bg-slate-700/50 rounded-lg p-4">
-                    <h3 class="text-amber-400 font-semibold mb-2">⚠️ Previous Warnings</h3>
+                <div class="bg-orange-900/20 border border-orange-500/30 rounded-lg p-4">
+                    <h3 class="text-orange-400 font-semibold mb-2">⚠️ Previous Warnings</h3>
                     <p class="text-slate-300 text-sm whitespace-pre-wrap">${data.previousWarnings}</p>
                 </div>
                 ` : ''}
                 
                 <!-- Employee Response -->
                 ${data.employeeResponse ? `
-                <div class="bg-slate-700/50 rounded-lg p-4">
-                    <h3 class="text-amber-400 font-semibold mb-2">💬 Employee Response</h3>
+                <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
+                    <h3 class="text-blue-400 font-semibold mb-2">💬 Employee Response</h3>
                     <p class="text-slate-300 text-sm whitespace-pre-wrap">${data.employeeResponse}</p>
                 </div>
                 ` : ''}
                 
                 <!-- Generated Document -->
-                <div class="bg-slate-900 rounded-lg p-4 border border-slate-600">
-                    <h3 class="text-amber-400 font-semibold mb-3">📄 Generated Document</h3>
-                    <div class="bg-white text-slate-900 rounded-lg p-6 max-h-96 overflow-y-auto prose prose-sm">
-                        ${data.documentContent || '<p class="text-slate-500">Document content not available</p>'}
+                <div class="bg-white rounded-lg border-2 border-slate-300 overflow-hidden">
+                    <div class="bg-slate-100 px-4 py-2 border-b border-slate-300 flex items-center justify-between">
+                        <h3 class="text-slate-700 font-semibold">📄 Generated Document</h3>
+                        <button onclick="printReviewDocument()" class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+                            🖨️ Print
+                        </button>
+                    </div>
+                    <div id="reviewDocumentContent" class="p-6 max-h-[500px] overflow-y-auto text-slate-900 text-sm leading-relaxed">
+                        ${formattedContent || '<p class="text-slate-500 italic">Document content not available</p>'}
                     </div>
                 </div>
             </div>
             
-            <div class="p-6 border-t border-slate-700 flex gap-3">
+            <div class="p-4 border-t border-slate-700 flex gap-3">
                 <button onclick="copyReviewDocumentContent()" 
                         class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-all">
                     📋 Copy Document
+                </button>
+                <button onclick="downloadReviewDocument('${data.refNumber}', '${data.docName || 'Document'}')" 
+                        class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-all">
+                    📥 Download Word
                 </button>
                 <button onclick="document.getElementById('reviewViewerModal').classList.add('hidden')" 
                         class="flex-1 bg-slate-600 hover:bg-slate-500 text-white font-semibold py-3 rounded-lg transition-all">
@@ -15883,6 +15888,124 @@ function showReviewViewerModal(data) {
     // Store document content for copy function
     modal.dataset.documentContent = data.documentContent || '';
     modal.classList.remove('hidden');
+}
+
+/**
+ * Format document content for display (convert markdown-style to HTML)
+ */
+function formatReviewDocumentContent(content) {
+    if (!content) return '';
+    
+    let formatted = content;
+    
+    // Escape HTML first to prevent XSS
+    formatted = formatted
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    
+    // Convert markdown-style formatting to HTML
+    
+    // Headers: # Header -> <h1>, ## Header -> <h2>, etc.
+    formatted = formatted.replace(/^### (.+)$/gm, '<h3 class="text-lg font-bold text-slate-800 mt-6 mb-2 border-b border-slate-200 pb-1">$1</h3>');
+    formatted = formatted.replace(/^## (.+)$/gm, '<h2 class="text-xl font-bold text-slate-900 mt-6 mb-3 border-b-2 border-amber-500 pb-2">$1</h2>');
+    formatted = formatted.replace(/^# (.+)$/gm, '<h1 class="text-2xl font-bold text-slate-900 mt-4 mb-4 border-b-2 border-slate-800 pb-2">$1</h1>');
+    
+    // Bold: **text** or __text__
+    formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong class="font-bold">$1</strong>');
+    formatted = formatted.replace(/__(.+?)__/g, '<strong class="font-bold">$1</strong>');
+    
+    // Italic: *text* or _text_
+    formatted = formatted.replace(/\*([^*]+)\*/g, '<em class="italic">$1</em>');
+    formatted = formatted.replace(/_([^_]+)_/g, '<em class="italic">$1</em>');
+    
+    // Bullet points: - item or • item
+    formatted = formatted.replace(/^[-•] (.+)$/gm, '<li class="ml-4 mb-1">$1</li>');
+    
+    // Wrap consecutive <li> items in <ul>
+    formatted = formatted.replace(/(<li class="ml-4 mb-1">.+<\/li>\n?)+/g, function(match) {
+        return '<ul class="list-disc list-inside my-3 space-y-1">' + match + '</ul>';
+    });
+    
+    // Numbered lists: 1. item
+    formatted = formatted.replace(/^\d+\. (.+)$/gm, '<li class="ml-4 mb-1">$1</li>');
+    
+    // Horizontal rules
+    formatted = formatted.replace(/^[-_]{3,}$/gm, '<hr class="my-4 border-slate-300">');
+    
+    // Line breaks - convert double newlines to paragraphs
+    formatted = formatted.replace(/\n\n+/g, '</p><p class="mb-3">');
+    
+    // Single newlines to <br> (within paragraphs)
+    formatted = formatted.replace(/\n/g, '<br>');
+    
+    // Wrap in paragraph if not already wrapped
+    if (!formatted.startsWith('<')) {
+        formatted = '<p class="mb-3">' + formatted + '</p>';
+    }
+    
+    // Clean up empty paragraphs
+    formatted = formatted.replace(/<p class="mb-3"><\/p>/g, '');
+    formatted = formatted.replace(/<p class="mb-3">(<h[123])/g, '$1');
+    formatted = formatted.replace(/(<\/h[123]>)<\/p>/g, '$1');
+    
+    return formatted;
+}
+
+/**
+ * Print the review document
+ */
+function printReviewDocument() {
+    const content = document.getElementById('reviewDocumentContent');
+    if (!content) return;
+    
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Document Review</title>
+            <style>
+                body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 20px; line-height: 1.6; }
+                h1 { font-size: 24px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+                h2 { font-size: 20px; border-bottom: 1px solid #f59e0b; padding-bottom: 8px; margin-top: 24px; }
+                h3 { font-size: 16px; margin-top: 20px; }
+                ul { margin: 12px 0; padding-left: 24px; }
+                li { margin-bottom: 4px; }
+                p { margin-bottom: 12px; }
+                hr { margin: 16px 0; border: none; border-top: 1px solid #ccc; }
+            </style>
+        </head>
+        <body>${content.innerHTML}</body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+}
+
+/**
+ * Download the review document as Word
+ */
+async function downloadReviewDocument(refNumber, docName) {
+    const content = document.getElementById('reviewDocumentContent');
+    if (!content) return;
+    
+    showNotification('📥 Preparing download...', 'info');
+    
+    try {
+        const htmlContent = content.innerHTML;
+        const filename = `${docName.replace(/\s+/g, '_')}_${refNumber}`;
+        
+        await generateWordDocument(htmlContent, `${filename}.docx`, {
+            documentId: refNumber,
+            userName: 'Fitzgerald HR',
+            documentType: docName
+        });
+        
+        showNotification('✅ Document downloaded!', 'success');
+    } catch (error) {
+        console.error('Error downloading document:', error);
+        showNotification('Error downloading. Try Copy instead.', 'error');
+    }
 }
 
 /**
