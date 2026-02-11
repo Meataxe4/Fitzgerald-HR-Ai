@@ -4713,7 +4713,7 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
     <!-- Expert Review Request Modal -->
-    <div id="reviewRequestModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[70]">
+    <div id="reviewRequestModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[99999999]">
         <div class="bg-slate-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-slate-700 fade-in">
             <!-- Header -->
             <div class="bg-gradient-to-r from-amber-500 to-amber-600 p-5 rounded-t-2xl">
@@ -35003,6 +35003,15 @@ async function generateEmploymentContract() {
         // Store the generated document for later download
         documentBuilderState.generatedDocument = contractHTML;
         documentBuilderState.currentType = 'employmentContract';
+        
+        // CRITICAL: Store contract data for review request pre-population
+        lastGeneratedDocumentData = { 
+            ...contractBuilderState.data,
+            employeeName: contractBuilderState.data?.employeeName || '',
+            position: contractBuilderState.data?.position || contractBuilderState.data?.jobTitle || '',
+            role: contractBuilderState.data?.position || contractBuilderState.data?.jobTitle || ''
+        };
+        console.log('📋 Preserved Employment Contract data:', lastGeneratedDocumentData);
         
         // CRITICAL: Hide the Employment Contract Builder (it has z-index: 999999)
         const contractBuilder = document.getElementById('employmentContractBuilder');
