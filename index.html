@@ -14303,12 +14303,12 @@ function handlePaymentReturn() {
         // Show processing modal immediately
         showPaymentProcessingModal();
         
-        // ✅ Set flag to prevent Firebase from overwriting our local credits
+        // ✅ Set flag to prevent Firebase from overwriting our local credits AFTER we process
         skipFirebaseCreditsLoad = true;
         
         // If user is already authenticated, process immediately
         if (currentUser?.uid) {
-            processPaymentSuccess();
+            processPaymentSuccess(); // Now async, will load existing credits first
         } else {
             // Wait for auth to complete, then process
             updatePaymentStatus('Verifying your account...');
@@ -14319,7 +14319,7 @@ function handlePaymentReturn() {
                 authCheckCount++;
                 if (currentUser?.uid) {
                     clearInterval(authCheckInterval);
-                    processPaymentSuccess();
+                    processPaymentSuccess(); // Now async, will load existing credits first
                 } else if (authCheckCount > 20) {
                     // Timeout - try to process anyway
                     clearInterval(authCheckInterval);
@@ -14345,7 +14345,7 @@ function handlePaymentReturn() {
 /**
  * Process payment success after auth is ready
  */
-function processPaymentSuccess() {
+async function processPaymentSuccess() {
     const pendingPurchase = localStorage.getItem('pendingPurchase');
     
     if (pendingPurchase) {
@@ -14355,9 +14355,35 @@ function processPaymentSuccess() {
             // Update status
             updatePaymentStatus('Adding credits to your account...');
             
+            // CRITICAL: Load existing credits from Firebase BEFORE adding new ones
+            // This ensures we don't lose existing credits
+            if (currentUser?.uid && db) {
+                try {
+                    console.log('🔄 Loading existing credits from Firebase before adding purchase...');
+                    const userRef = db.collection('users').doc(currentUser.uid);
+                    const doc = await userRef.get();
+                    
+                    if (doc.exists && doc.data().credits) {
+                        const firebaseCredits = doc.data().credits;
+                        // Load existing values (especially purchasedCredits!)
+                        userCredits.subscriptionTier = firebaseCredits.subscriptionTier || firebaseCredits.tier || userCredits.subscriptionTier || 'free';
+                        userCredits.reviewCreditsUsed = firebaseCredits.reviewCreditsUsed || 0;
+                        userCredits.purchasedCredits = firebaseCredits.purchasedCredits || 0; // CRITICAL: Get existing balance
+                        userCredits.lowRiskDocsUsed = firebaseCredits.lowRiskDocsUsed || 0;
+                        userCredits.bonusPrompts = firebaseCredits.bonusPrompts || 0;
+                        userCredits.monthlyPromptsUsed = firebaseCredits.monthlyPromptsUsed || 0;
+                        userCredits.subscriptionStartDate = firebaseCredits.subscriptionStartDate || null;
+                        console.log('✅ Loaded existing credits:', userCredits.purchasedCredits, 'purchased credits');
+                    }
+                } catch (e) {
+                    console.error('Error loading existing credits:', e);
+                    // Continue anyway - will use localStorage or defaults
+                }
+            }
+            
             // Allocate credits based on purchase type
             console.log('🛒 Processing purchase:', purchase);
-            console.log('📊 Current credits before:', JSON.stringify(userCredits));
+            console.log('📊 Current credits before adding purchase:', JSON.stringify(userCredits));
             console.log('👤 Current user:', currentUser?.uid || 'anonymous');
             
             if (purchase.type === 'subscription') {
