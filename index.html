@@ -37461,13 +37461,51 @@ const FitzTour = {
     
     // End tour and open subscription modal
     endTourAndShowPlans: function() {
-        this.endTour();
-        // Longer delay to ensure tour overlay is completely hidden
+        this.destroyTourElements();
         setTimeout(() => {
             if (typeof showSubscriptionOptions === 'function') {
                 showSubscriptionOptions();
             }
-        }, 500);
+        }, 100);
+    },
+    
+    // Completely remove tour elements from DOM
+    destroyTourElements: function() {
+        this.isActive = false;
+        this.toolsMenuLocked = false;
+        
+        // Completely remove all tour elements from DOM
+        const overlay = document.getElementById('fitzTourOverlay');
+        const modal = document.getElementById('fitzTourModal');
+        const tooltip = document.getElementById('fitzTourTooltip');
+        const spotlight = document.getElementById('fitzTourSpotlight');
+        
+        if (overlay) overlay.remove();
+        if (modal) modal.remove();
+        if (tooltip) tooltip.remove();
+        if (spotlight) spotlight.remove();
+        
+        // Close tools menu if open
+        if (window.innerWidth <= 768) {
+            const mobileModal = document.getElementById('mobileToolsModal');
+            if (mobileModal) mobileModal.classList.add('hidden');
+        } else {
+            if (DOM && DOM.toolsMenu) {
+                DOM.toolsMenu.classList.add('hidden');
+            } else {
+                const toolsMenu = document.getElementById('toolsMenu');
+                if (toolsMenu) toolsMenu.classList.add('hidden');
+            }
+        }
+        
+        // Close sidebar if open
+        if (sidebarOpen) {
+            toggleSidebar();
+        }
+        
+        // Mark as completed
+        localStorage.setItem('fitzTourCompleted', 'true');
+        this.hasSeenTour = true;
     },
     
     // Show subscription step - opens the actual subscription modal
@@ -37670,39 +37708,7 @@ const FitzTour = {
     
     // End the tour
     endTour: function() {
-        this.isActive = false;
-        this.toolsMenuLocked = false;
-        
-        // Hide all tour elements completely
-        const overlay = document.getElementById('fitzTourOverlay');
-        overlay.classList.remove('active');
-        overlay.classList.add('hidden'); // display: none to prevent click interception
-        
-        document.getElementById('fitzTourModal').classList.remove('active');
-        document.getElementById('fitzTourTooltip').classList.remove('active');
-        document.getElementById('fitzTourSpotlight').style.display = 'none';
-        
-        // Close tools menu if open (both mobile and desktop)
-        if (window.innerWidth <= 768) {
-            const mobileModal = document.getElementById('mobileToolsModal');
-            if (mobileModal) mobileModal.classList.add('hidden');
-        } else {
-            if (DOM && DOM.toolsMenu) {
-                DOM.toolsMenu.classList.add('hidden');
-            } else {
-                const toolsMenu = document.getElementById('toolsMenu');
-                if (toolsMenu) toolsMenu.classList.add('hidden');
-            }
-        }
-        
-        // Close sidebar if open
-        if (sidebarOpen) {
-            toggleSidebar();
-        }
-        
-        // Mark as completed
-        localStorage.setItem('fitzTourCompleted', 'true');
-        this.hasSeenTour = true;
+        this.destroyTourElements();
     },
     
     // Restart tour (can be called from settings)
@@ -37712,8 +37718,10 @@ const FitzTour = {
         this.hasSeenTour = false;
         this.hasDeclinedTour = false;
         
-        // Remove hidden class so overlay can be shown again
-        document.getElementById('fitzTourOverlay').classList.remove('hidden');
+        // Recreate tour elements if they were removed
+        if (!document.getElementById('fitzTourOverlay')) {
+            this.createElements();
+        }
         
         this.startTour();
     }
