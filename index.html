@@ -19735,6 +19735,11 @@ function toggleUploadMenu() {
 // toggleToolsMenu - defined below with mobile/desktop handling
 
 function closeToolsMenu() {
+    // Don't close if tour is active and has it locked
+    if (typeof FitzTour !== 'undefined' && FitzTour.toolsMenuLocked) {
+        return;
+    }
+    
     var menu = document.getElementById('toolsMenu');
     if (menu) {
         menu.classList.add('hidden');
@@ -25400,6 +25405,11 @@ function startTestimonialRotation() {
 // ========================================
 
 document.addEventListener('click', function(event) {
+    // Don't close tools menu if tour is active and has it locked
+    if (typeof FitzTour !== 'undefined' && FitzTour.toolsMenuLocked) {
+        return;
+    }
+    
     const toolsMenu = document.getElementById('toolsMenu');
     const toolsButton = event.target.closest('button');
     
@@ -36863,6 +36873,7 @@ async function loadAllDataFromFirebase() {
 const FitzTour = {
     currentStep: 0,
     isActive: false,
+    toolsMenuLocked: false,
     hasSeenTour: localStorage.getItem('fitzTourCompleted') === 'true',
     hasDeclinedTour: localStorage.getItem('fitzTourDeclined') === 'true',
     
@@ -36884,22 +36895,12 @@ const FitzTour = {
             icon: '💬'
         },
         {
-            id: 'toolsButton',
-            target: '#toolsButton',
-            targetAction: null,
-            title: "Your HR Toolkit",
-            content: "Click here to access 8 specialised tools. Let me show you what's inside...",
-            position: 'bottom',
-            icon: '🛠️',
-            autoAdvance: true,
-            autoAdvanceDelay: 2000
-        },
-        {
-            id: 'toolsMenu',
+            id: 'tools',
             target: '#toolsMenuInner',
             targetAction: 'openToolsMenu',
-            title: "Pick a Tool When You Need It",
-            content: "Warning letters, PIPs, contracts, termination guides — each one walks you through the process step-by-step with legally compliant templates.",
+            highlightAlso: '#toolsButton',
+            title: "Your HR Toolkit",
+            content: "Click the 🛠️ Tools button anytime to access these. Warning letters, PIPs, contracts, termination guides — each one walks you through step-by-step.",
             position: 'left',
             icon: '🛠️'
         },
@@ -37124,6 +37125,15 @@ const FitzTour = {
             }
             .fitz-tour-btn-skip:hover {
                 color: #94a3b8;
+            }
+            .fitz-tour-btn-back {
+                background: #334155;
+                color: #94a3b8;
+                padding: 12px 16px;
+            }
+            .fitz-tour-btn-back:hover {
+                background: #475569;
+                color: #ffffff;
             }
             .fitz-tour-btn-next {
                 background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
@@ -37366,15 +37376,14 @@ const FitzTour = {
                 return;
             }
             if (step.targetAction === 'openToolsMenu') {
-                // Open the tools menu using the same method as the app
+                // Set flag to prevent menu from closing during tour
+                this.toolsMenuLocked = true;
+                
+                // Open the tools menu immediately
                 if (window.innerWidth <= 768) {
-                    // Mobile - open mobile tools modal
                     const mobileModal = document.getElementById('mobileToolsModal');
-                    if (mobileModal) {
-                        mobileModal.classList.remove('hidden');
-                    }
+                    if (mobileModal) mobileModal.classList.remove('hidden');
                 } else {
-                    // Desktop - open dropdown
                     if (DOM && DOM.toolsMenu) {
                         DOM.toolsMenu.classList.remove('hidden');
                     } else {
@@ -37382,11 +37391,14 @@ const FitzTour = {
                         if (toolsMenu) toolsMenu.classList.remove('hidden');
                     }
                 }
-                setTimeout(() => this.renderStep(step, stepIndex), 400);
+                // Short delay just for DOM to update
+                setTimeout(() => this.renderStep(step, stepIndex), 100);
                 return;
             }
             if (step.targetAction === 'closeToolsMenu') {
-                // Close the tools menu
+                // Release the lock and close the menu
+                this.toolsMenuLocked = false;
+                
                 if (window.innerWidth <= 768) {
                     const mobileModal = document.getElementById('mobileToolsModal');
                     if (mobileModal) mobileModal.classList.add('hidden');
@@ -37398,21 +37410,12 @@ const FitzTour = {
                         if (toolsMenu) toolsMenu.classList.add('hidden');
                     }
                 }
-                setTimeout(() => this.renderStep(step, stepIndex), 200);
+                setTimeout(() => this.renderStep(step, stepIndex), 100);
                 return;
             }
         }
         
         this.renderStep(step, stepIndex);
-        
-        // Handle auto-advance for certain steps
-        if (step.autoAdvance && step.autoAdvanceDelay) {
-            setTimeout(() => {
-                if (this.isActive && this.currentStep === stepIndex) {
-                    this.nextStep();
-                }
-            }, step.autoAdvanceDelay);
-        }
     },
     
     // Render step content
@@ -37523,6 +37526,11 @@ const FitzTour = {
             `;
         }
         
+        // Build back button HTML (only show if not first step)
+        const backBtnHTML = stepIndex > 0 
+            ? `<button class="fitz-tour-btn fitz-tour-btn-back" onclick="FitzTour.prevStep()">← Back</button>`
+            : '';
+        
         modal.innerHTML = `
             <span class="fitz-tour-modal-icon">${step.icon}</span>
             <h2 class="fitz-tour-modal-title">${step.title}</h2>
@@ -37535,6 +37543,7 @@ const FitzTour = {
                     `).join('')}
                 </div>
                 <div class="fitz-tour-buttons">
+                    ${backBtnHTML}
                     <button class="fitz-tour-btn fitz-tour-btn-skip" onclick="FitzTour.endTour()">Skip Tour</button>
                     <button class="fitz-tour-btn fitz-tour-btn-next" onclick="FitzTour.nextStep()">
                         ${stepIndex === this.steps.length - 1 ? "Let's Go! 🚀" : 'Next →'}
@@ -37568,6 +37577,11 @@ const FitzTour = {
         spotlight.style.width = (rect.width + padding * 2) + 'px';
         spotlight.style.height = (rect.height + padding * 2) + 'px';
         
+        // Build back button HTML (only show if not first step)
+        const backBtnHTML = stepIndex > 0 
+            ? `<button class="fitz-tour-btn fitz-tour-btn-back" onclick="FitzTour.prevStep()">← Back</button>`
+            : '';
+        
         // Build tooltip content
         tooltip.innerHTML = `
             <div class="fitz-tour-tooltip-arrow ${this.getArrowPosition(step.position)}"></div>
@@ -37583,6 +37597,7 @@ const FitzTour = {
                     `).join('')}
                 </div>
                 <div class="fitz-tour-buttons">
+                    ${backBtnHTML}
                     <button class="fitz-tour-btn fitz-tour-btn-skip" onclick="FitzTour.endTour()">Skip</button>
                     <button class="fitz-tour-btn fitz-tour-btn-next" onclick="FitzTour.nextStep()">Next →</button>
                 </div>
@@ -37637,6 +37652,13 @@ const FitzTour = {
         tooltip.style.left = left + 'px';
     },
     
+    // Go to previous step
+    prevStep: function() {
+        if (this.currentStep > 0) {
+            this.showStep(this.currentStep - 1);
+        }
+    },
+    
     // Go to next step
     nextStep: function() {
         if (this.currentStep < this.steps.length - 1) {
@@ -37649,6 +37671,7 @@ const FitzTour = {
     // End the tour
     endTour: function() {
         this.isActive = false;
+        this.toolsMenuLocked = false;
         
         // Hide all tour elements completely
         const overlay = document.getElementById('fitzTourOverlay');
