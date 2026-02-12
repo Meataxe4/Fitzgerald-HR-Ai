@@ -36884,11 +36884,22 @@ const FitzTour = {
             icon: '💬'
         },
         {
-            id: 'tools',
+            id: 'toolsButton',
+            target: '#toolsButton',
+            targetAction: null,
+            title: "Your HR Toolkit",
+            content: "Click here to access 8 specialised tools. Let me show you what's inside...",
+            position: 'bottom',
+            icon: '🛠️',
+            autoAdvance: true,
+            autoAdvanceDelay: 2000
+        },
+        {
+            id: 'toolsMenu',
             target: '#toolsMenuInner',
             targetAction: 'openToolsMenu',
-            title: "Your HR Toolkit",
-            content: "Warning letters, PIPs, contracts, termination guides — pick a tool when you need it. Each one walks you through the process step-by-step.",
+            title: "Pick a Tool When You Need It",
+            content: "Warning letters, PIPs, contracts, termination guides — each one walks you through the process step-by-step with legally compliant templates.",
             position: 'left',
             icon: '🛠️'
         },
@@ -36938,11 +36949,13 @@ const FitzTour = {
                 background: rgba(0, 0, 0, 0.6);
                 z-index: 99998;
                 opacity: 0;
-                transition: opacity 0.3s ease;
+                visibility: hidden;
+                transition: opacity 0.3s ease, visibility 0.3s ease;
                 pointer-events: none;
             }
             .fitz-tour-overlay.active {
                 opacity: 1;
+                visibility: visible;
                 pointer-events: auto;
             }
             
@@ -37349,19 +37362,37 @@ const FitzTour = {
                 return;
             }
             if (step.targetAction === 'openToolsMenu') {
-                // Open the tools menu
-                const toolsMenu = document.getElementById('toolsMenu');
-                if (toolsMenu && toolsMenu.classList.contains('hidden')) {
-                    toolsMenu.classList.remove('hidden');
+                // Open the tools menu using the same method as the app
+                if (window.innerWidth <= 768) {
+                    // Mobile - open mobile tools modal
+                    const mobileModal = document.getElementById('mobileToolsModal');
+                    if (mobileModal) {
+                        mobileModal.classList.remove('hidden');
+                    }
+                } else {
+                    // Desktop - open dropdown
+                    if (DOM && DOM.toolsMenu) {
+                        DOM.toolsMenu.classList.remove('hidden');
+                    } else {
+                        const toolsMenu = document.getElementById('toolsMenu');
+                        if (toolsMenu) toolsMenu.classList.remove('hidden');
+                    }
                 }
-                setTimeout(() => this.renderStep(step, stepIndex), 300);
+                setTimeout(() => this.renderStep(step, stepIndex), 400);
                 return;
             }
             if (step.targetAction === 'closeToolsMenu') {
                 // Close the tools menu
-                const toolsMenu = document.getElementById('toolsMenu');
-                if (toolsMenu && !toolsMenu.classList.contains('hidden')) {
-                    toolsMenu.classList.add('hidden');
+                if (window.innerWidth <= 768) {
+                    const mobileModal = document.getElementById('mobileToolsModal');
+                    if (mobileModal) mobileModal.classList.add('hidden');
+                } else {
+                    if (DOM && DOM.toolsMenu) {
+                        DOM.toolsMenu.classList.add('hidden');
+                    } else {
+                        const toolsMenu = document.getElementById('toolsMenu');
+                        if (toolsMenu) toolsMenu.classList.add('hidden');
+                    }
                 }
                 setTimeout(() => this.renderStep(step, stepIndex), 200);
                 return;
@@ -37369,6 +37400,15 @@ const FitzTour = {
         }
         
         this.renderStep(step, stepIndex);
+        
+        // Handle auto-advance for certain steps
+        if (step.autoAdvance && step.autoAdvanceDelay) {
+            setTimeout(() => {
+                if (this.isActive && this.currentStep === stepIndex) {
+                    this.nextStep();
+                }
+            }, step.autoAdvanceDelay);
+        }
     },
     
     // Render step content
@@ -37415,11 +37455,12 @@ const FitzTour = {
     // End tour and open subscription modal
     endTourAndShowPlans: function() {
         this.endTour();
+        // Longer delay to ensure tour overlay is completely hidden
         setTimeout(() => {
             if (typeof showSubscriptionOptions === 'function') {
                 showSubscriptionOptions();
             }
-        }, 300);
+        }, 500);
     },
     
     // Show subscription step - opens the actual subscription modal
@@ -37591,14 +37632,6 @@ const FitzTour = {
     
     // Go to next step
     nextStep: function() {
-        // Close tools menu if moving past tools step (step 2)
-        if (this.currentStep === 2) {
-            const toolsMenu = document.getElementById('toolsMenu');
-            if (toolsMenu && !toolsMenu.classList.contains('hidden')) {
-                toolsMenu.classList.add('hidden');
-            }
-        }
-        
         if (this.currentStep < this.steps.length - 1) {
             this.showStep(this.currentStep + 1);
         } else {
@@ -37616,10 +37649,17 @@ const FitzTour = {
         document.getElementById('fitzTourTooltip').classList.remove('active');
         document.getElementById('fitzTourSpotlight').style.display = 'none';
         
-        // Close tools menu if open
-        const toolsMenu = document.getElementById('toolsMenu');
-        if (toolsMenu && !toolsMenu.classList.contains('hidden')) {
-            toolsMenu.classList.add('hidden');
+        // Close tools menu if open (both mobile and desktop)
+        if (window.innerWidth <= 768) {
+            const mobileModal = document.getElementById('mobileToolsModal');
+            if (mobileModal) mobileModal.classList.add('hidden');
+        } else {
+            if (DOM && DOM.toolsMenu) {
+                DOM.toolsMenu.classList.add('hidden');
+            } else {
+                const toolsMenu = document.getElementById('toolsMenu');
+                if (toolsMenu) toolsMenu.classList.add('hidden');
+            }
         }
         
         // Close sidebar if open
