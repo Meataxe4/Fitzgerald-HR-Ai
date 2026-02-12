@@ -465,77 +465,7 @@ header button[onclick*="logout"],
     }
     
     /* Tools menu - HIDE on mobile (use modal instead) */
-    /* Admin dashboard - FULL SCREEN mobile with proper scrolling */
-    #adminDashboardModal {
-        padding: 0 !important;
-        align-items: flex-start !important;
-        overflow-y: auto !important;
-    }
-    
-    #adminDashboardModal > div {
-        max-width: 100% !important;
-        width: 100% !important;
-        padding: 16px !important;
-        margin: 0 !important;
-        min-height: 100vh !important;
-        border-radius: 0 !important;
-        border: none !important;
-    }
-    
-    /* Admin header - compact */
-    #adminDashboardModal h2 {
-        font-size: 1.5rem !important;
-    }
-    
-    #adminDashboardModal .mb-6 {
-        margin-bottom: 16px !important;
-    }
-    
-    /* Admin stats - stack on mobile */
-    #adminDashboardModal .grid-cols-4 {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 8px !important;
-    }
-    
-    /* Admin stats cards - smaller text */
-    #adminDashboardModal .grid-cols-4 > div {
-        padding: 12px !important;
-    }
-    
-    #adminDashboardModal .grid-cols-4 .text-3xl {
-        font-size: 1.5rem !important;
-    }
-    
-    #adminDashboardModal .grid-cols-4 .text-xs {
-        font-size: 0.65rem !important;
-    }
-    
-    /* Admin tabs - wrap on mobile */
-    #adminDashboardModal .flex.gap-2 {
-        flex-wrap: wrap !important;
-        gap: 4px !important;
-    }
-    
-    #adminDashboardModal .admin-tab {
-        padding: 8px 12px !important;
-        font-size: 13px !important;
-        white-space: nowrap !important;
-    }
-    
-    /* Admin tab content - better height */
-    #adminTabContent {
-        max-height: 50vh !important;
-    }
-    
-    /* Admin buttons - stack on mobile */
-    #adminDashboardModal .mt-6.flex {
-        flex-direction: column !important;
-        gap: 8px !important;
-    }
-    
-    #adminDashboardModal .mt-6.flex button {
-        width: 100% !important;
-    }
+    /* Admin dashboard - handled via responsive Tailwind classes in HTML */
     
     /* Modals - full screen on mobile */
     .modal > div {
@@ -5536,114 +5466,147 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- ADMIN ANALYTICS DASHBOARD -->
 <!-- ========================================== -->
 
-<div id="adminDashboardModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50 overflow-y-auto">
-    <div class="bg-slate-800 rounded-2xl p-8 max-w-6xl w-full border-2 border-purple-500 fade-in my-8">
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <h2 class="text-3xl font-bold text-purple-400 flex items-center gap-2">
-                    <span>📊</span> Admin Analytics Dashboard
-                </h2>
-                <p class="text-slate-400 text-sm">Real-time user activity and conversation insights</p>
+<div id="adminDashboardModal" class="hidden fixed inset-0 bg-black/95 backdrop-blur-sm z-50 overflow-y-auto">
+    <div class="min-h-screen p-4 sm:p-6">
+        <div class="bg-slate-800 rounded-2xl p-4 sm:p-6 max-w-6xl w-full mx-auto border-2 border-purple-500 fade-in">
+            <!-- Header -->
+            <div class="flex items-start justify-between mb-4 gap-4">
+                <div class="min-w-0 flex-1">
+                    <h2 class="text-xl sm:text-2xl font-bold text-purple-400 flex items-center gap-2">
+                        <span>📊</span> <span class="truncate">Admin Dashboard</span>
+                    </h2>
+                    <p class="text-slate-400 text-xs sm:text-sm">Real-time analytics & insights</p>
+                </div>
+                <button onclick="closeAdminDashboard()" class="text-slate-400 hover:text-white text-2xl p-2 -m-2 flex-shrink-0">×</button>
             </div>
-            <button onclick="closeAdminDashboard()" class="text-slate-400 hover:text-white text-2xl">×</button>
-        </div>
 
-        <!-- Stats Overview -->
-        <div class="grid grid-cols-4 gap-4 mb-6">
-            <div class="bg-slate-900 border border-purple-500/30 rounded-lg p-4">
-                <p class="text-slate-400 text-xs mb-1">Total Users</p>
-                <p class="text-3xl font-bold text-purple-400" id="statTotalUsers">0</p>
+            <!-- Stats Overview - 2x2 grid on mobile, 4 cols on desktop -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 mb-4">
+                <div class="bg-slate-900 border border-purple-500/30 rounded-lg p-3">
+                    <p class="text-slate-400 text-xs mb-1">Total Users</p>
+                    <p class="text-2xl sm:text-3xl font-bold text-purple-400" id="statTotalUsers">0</p>
+                </div>
+                <div class="bg-slate-900 border border-purple-500/30 rounded-lg p-3">
+                    <p class="text-slate-400 text-xs mb-1">Total Messages</p>
+                    <p class="text-2xl sm:text-3xl font-bold text-purple-400" id="statTotalMessages">0</p>
+                </div>
+                <div class="bg-slate-900 border border-purple-500/30 rounded-lg p-3">
+                    <p class="text-slate-400 text-xs mb-1">Active Today</p>
+                    <p class="text-2xl sm:text-3xl font-bold text-green-400" id="statActiveToday">0</p>
+                </div>
+                <div class="bg-slate-900 border border-purple-500/30 rounded-lg p-3">
+                    <p class="text-slate-400 text-xs mb-1">Avg/User</p>
+                    <p class="text-2xl sm:text-3xl font-bold text-purple-400" id="statAvgSession">0</p>
+                </div>
             </div>
-            <div class="bg-slate-900 border border-purple-500/30 rounded-lg p-4">
-                <p class="text-slate-400 text-xs mb-1">Total Messages</p>
-                <p class="text-3xl font-bold text-purple-400" id="statTotalMessages">0</p>
+
+            <!-- Tabs - scrollable on mobile -->
+            <div class="flex gap-1 sm:gap-2 mb-4 border-b border-slate-700 overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+                <button onclick="switchAdminTab('conversations')" 
+                        class="admin-tab px-3 py-2 text-purple-400 border-b-2 border-purple-400 font-semibold text-sm whitespace-nowrap" 
+                        data-tab="conversations">
+                    💬 Chats
+                </button>
+                <button onclick="switchAdminTab('themes')" 
+                        class="admin-tab px-3 py-2 text-slate-400 hover:text-purple-400 transition-colors text-sm whitespace-nowrap" 
+                        data-tab="themes">
+                    🎯 Themes
+                </button>
+                <button onclick="switchAdminTab('users')" 
+                        class="admin-tab px-3 py-2 text-slate-400 hover:text-purple-400 transition-colors text-sm whitespace-nowrap" 
+                        data-tab="users">
+                    👥 Users
+                </button>
+                <button onclick="switchAdminTab('highrisk')" 
+                        class="admin-tab px-3 py-2 text-slate-400 hover:text-purple-400 transition-colors text-sm whitespace-nowrap" 
+                        data-tab="highrisk">
+                    🚨 Risk
+                </button>
+                <button onclick="switchAdminTab('documents')" 
+                        class="admin-tab px-3 py-2 text-slate-400 hover:text-purple-400 transition-colors text-sm whitespace-nowrap" 
+                        data-tab="documents">
+                    📝 Docs
+                </button>
+                <button onclick="switchAdminTab('subscriptions')" 
+                        class="admin-tab px-3 py-2 text-slate-400 hover:text-purple-400 transition-colors text-sm whitespace-nowrap" 
+                        data-tab="subscriptions">
+                    💳 Subs
+                </button>
+                <button onclick="switchAdminTab('reviews')" 
+                        class="admin-tab px-3 py-2 text-slate-400 hover:text-purple-400 transition-colors text-sm whitespace-nowrap" 
+                        data-tab="reviews">
+                    ✅ Reviews
+                </button>
+                <button onclick="switchAdminTab('charts')" 
+                        class="admin-tab px-3 py-2 text-slate-400 hover:text-purple-400 transition-colors text-sm whitespace-nowrap" 
+                        data-tab="charts">
+                    📈 Charts
+                </button>
             </div>
-            <div class="bg-slate-900 border border-purple-500/30 rounded-lg p-4">
-                <p class="text-slate-400 text-xs mb-1">Active Today</p>
-                <p class="text-3xl font-bold text-purple-400" id="statActiveToday">0</p>
+
+            <!-- Tab Content -->
+            <div id="adminTabContent" class="min-h-[300px] max-h-[50vh] sm:max-h-[400px] overflow-y-auto rounded-lg">
+                <!-- Conversations Tab -->
+                <div id="adminConversationsTab" class="admin-tab-content">
+                    <div class="bg-slate-900 rounded-lg p-3 mb-3">
+                        <input type="text" id="conversationSearch" placeholder="🔍 Search conversations..." 
+                               onkeyup="filterConversations()"
+                               class="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm">
+                    </div>
+                    <div id="conversationsList" class="space-y-2"></div>
+                </div>
+
+                <!-- Themes Tab -->
+                <div id="adminThemesTab" class="admin-tab-content hidden">
+                    <div id="themesList" class="space-y-2"></div>
+                </div>
+
+                <!-- Users Tab -->
+                <div id="adminUsersTab" class="admin-tab-content hidden">
+                    <div id="usersList" class="space-y-2"></div>
+                </div>
+
+                <!-- High-Risk Tab -->
+                <div id="adminHighRiskTab" class="admin-tab-content hidden">
+                    <div id="highRiskList" class="space-y-2"></div>
+                </div>
+
+                <!-- Documents Tab -->
+                <div id="adminDocumentsTab" class="admin-tab-content hidden">
+                    <div id="documentsList" class="space-y-2"></div>
+                </div>
+
+                <!-- Subscriptions Tab (NEW) -->
+                <div id="adminSubscriptionsTab" class="admin-tab-content hidden">
+                    <div id="subscriptionsList" class="space-y-2"></div>
+                </div>
+
+                <!-- Expert Reviews Tab (NEW) -->
+                <div id="adminReviewsTab" class="admin-tab-content hidden">
+                    <div id="reviewsList" class="space-y-2"></div>
+                </div>
+
+                <!-- Charts Tab (NEW) -->
+                <div id="adminChartsTab" class="admin-tab-content hidden">
+                    <div id="chartsList" class="space-y-4"></div>
+                </div>
             </div>
-            <div class="bg-slate-900 border border-purple-500/30 rounded-lg p-4">
-                <p class="text-slate-400 text-xs mb-1">Avg Session</p>
-                <p class="text-3xl font-bold text-purple-400" id="statAvgSession">0m</p>
+
+            <!-- Action Buttons -->
+            <div class="mt-4 flex flex-col sm:flex-row gap-2">
+                <button onclick="exportAnalytics()" 
+                        class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 rounded-lg transition-all text-sm">
+                    📥 Export Excel
+                </button>
+                <button onclick="refreshAnalytics()" 
+                        class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all text-sm">
+                    🔄 Refresh
+                </button>
+                <button onclick="closeAdminDashboard()" 
+                        class="px-4 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all text-sm">
+                    Close
+                </button>
             </div>
-        </div>
-
-        <!-- Tabs -->
-        <div class="flex gap-2 mb-6 border-b border-slate-700">
-            <button onclick="switchAdminTab('conversations')" 
-                    class="admin-tab px-4 py-2 text-purple-400 border-b-2 border-purple-400 font-semibold" 
-                    data-tab="conversations">
-                💬 Conversations
-            </button>
-            <button onclick="switchAdminTab('themes')" 
-                    class="admin-tab px-4 py-2 text-slate-400 hover:text-purple-400 transition-colors" 
-                    data-tab="themes">
-                🎯 Popular Themes
-            </button>
-            <button onclick="switchAdminTab('users')" 
-                    class="admin-tab px-4 py-2 text-slate-400 hover:text-purple-400 transition-colors" 
-                    data-tab="users">
-                👥 User Profiles
-            </button>
-            <button onclick="switchAdminTab('highrisk')" 
-                    class="admin-tab px-4 py-2 text-slate-400 hover:text-purple-400 transition-colors" 
-                    data-tab="highrisk">
-                🚨 High-Risk Topics
-            </button>
-	    <button onclick="switchAdminTab('documents')" 
-        	class="admin-tab px-4 py-2 text-slate-400 hover:text-purple-400 transition-colors" 
-        	data-tab="documents">
-    	     📝 Generated Documents
-	    </button>
-        </div>
-
-<!-- Tab Content -->
-<div id="adminTabContent" class="min-h-[400px] max-h-[500px] overflow-y-auto">
-    <!-- Conversations Tab -->
-    <div id="adminConversationsTab" class="admin-tab-content">
-        <div class="bg-slate-900 rounded-lg p-4 mb-4">
-            <input type="text" id="conversationSearch" placeholder="🔍 Search conversations..." 
-                   onkeyup="filterConversations()"
-                   class="w-full bg-slate-800 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm">
-        </div>
-        <div id="conversationsList" class="space-y-3"></div>
-    </div>
-
-    <!-- Themes Tab -->
-    <div id="adminThemesTab" class="admin-tab-content hidden">
-        <div id="themesList" class="space-y-3"></div>
-    </div>
-
-    <!-- Users Tab -->
-    <div id="adminUsersTab" class="admin-tab-content hidden">
-        <div id="usersList" class="space-y-3"></div>
-    </div>
-
-    <!-- High-Risk Tab -->
-    <div id="adminHighRiskTab" class="admin-tab-content hidden">
-        <div id="highRiskList" class="space-y-3"></div>
-    </div>
-
-    <!-- Documents Tab -->
-    <div id="adminDocumentsTab" class="admin-tab-content hidden">
-        <div id="documentsList" class="space-y-3"></div>
-    </div>
-</div>
-
-        <!-- Export Button -->
-        <div class="mt-6 flex gap-3">
-            <button onclick="exportAnalytics()" 
-                    class="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition-all">
-                📥 Export Analytics (Excel)
-            </button>
-            <button onclick="refreshAnalytics()" 
-                    class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
-                🔄 Refresh
-            </button>
-            <button onclick="closeAdminDashboard()" 
-                    class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
-                Close
-            </button>
         </div>
     </div>
 </div>
@@ -23269,8 +23232,9 @@ async function loadAnalytics() {
         
         // Load all conversations across all users
         let totalConversations = 0;
-        let todayConversations = 0;
+        const activeUsersToday = new Set();
         const today = new Date().toDateString();
+        let totalMessages = 0;
         
         for (const userDoc of usersSnapshot.docs) {
             const conversationsSnapshot = await db.collection('users').doc(userDoc.id).collection('conversations').get();
@@ -23278,21 +23242,29 @@ async function loadAnalytics() {
             
             conversationsSnapshot.forEach(conv => {
                 const data = conv.data();
-                if (data.timestamp && new Date(data.timestamp.toDate ? data.timestamp.toDate() : data.timestamp).toDateString() === today) {
-                    todayConversations++;
+                // Count total messages
+                if (data.messages && Array.isArray(data.messages)) {
+                    totalMessages += data.messages.length;
+                }
+                // Check if conversation was active today
+                const timestamp = data.timestamp?.toDate ? data.timestamp.toDate() : new Date(data.timestamp || 0);
+                const lastUpdated = data.lastUpdated?.toDate ? data.lastUpdated.toDate() : timestamp;
+                if (timestamp.toDateString() === today || lastUpdated.toDateString() === today) {
+                    activeUsersToday.add(userDoc.id);
                 }
             });
         }
         
         // Update stats
         document.getElementById('statTotalUsers').textContent = userCount || 0;
-        document.getElementById('statTotalMessages').textContent = totalConversations || 0;
-        document.getElementById('statActiveToday').textContent = todayConversations || 0;
-        document.getElementById('statAvgSession').textContent = '5m';
+        document.getElementById('statTotalMessages').textContent = totalMessages || totalConversations || 0;
+        document.getElementById('statActiveToday').textContent = activeUsersToday.size || 0;
+        document.getElementById('statAvgSession').textContent = userCount > 0 ? Math.round(totalConversations / userCount) + ' chats' : '0';
         
         // Load conversations tab by default
         switchAdminTab('conversations');
     } catch (error) {
+        console.error('Analytics load error:', error);
         showAlert('Error loading analytics. Check console.');
     }
 }
@@ -23320,7 +23292,10 @@ function switchAdminTab(tabName) {
         'themes': 'adminThemesTab',
         'users': 'adminUsersTab',
         'highrisk': 'adminHighRiskTab',
-        'documents': 'adminDocumentsTab'
+        'documents': 'adminDocumentsTab',
+        'subscriptions': 'adminSubscriptionsTab',
+        'reviews': 'adminReviewsTab',
+        'charts': 'adminChartsTab'
     };
     
     document.getElementById(contentMap[tabName]).classList.remove('hidden');
@@ -23331,6 +23306,9 @@ function switchAdminTab(tabName) {
     if (tabName === 'users') loadUsers();
     if (tabName === 'highrisk') loadHighRisk();
     if (tabName === 'documents') loadDocuments();
+    if (tabName === 'subscriptions') loadSubscriptions();
+    if (tabName === 'reviews') loadExpertReviews();
+    if (tabName === 'charts') loadCharts();
 }
 
 async function loadConversationsAdmin() {
@@ -23612,14 +23590,29 @@ async function loadHighRisk() {
     try {
         // Scan conversations for high-risk keywords
         const highRiskItems = [];
-        const highRiskKeywords = ['termination', 'unfair dismissal', 'lawsuit', 'legal action', 'sexual harassment', 
-                                   'discrimination', 'bullying', 'assault', 'theft', 'fraud', 'workers comp'];
+        const highRiskKeywords = [
+            { keyword: 'termination', severity: 'high' },
+            { keyword: 'unfair dismissal', severity: 'critical' },
+            { keyword: 'lawsuit', severity: 'critical' },
+            { keyword: 'legal action', severity: 'critical' },
+            { keyword: 'sexual harassment', severity: 'critical' },
+            { keyword: 'discrimination', severity: 'critical' },
+            { keyword: 'bullying', severity: 'high' },
+            { keyword: 'assault', severity: 'critical' },
+            { keyword: 'theft', severity: 'high' },
+            { keyword: 'fraud', severity: 'high' },
+            { keyword: 'workers comp', severity: 'medium' },
+            { keyword: 'fair work', severity: 'medium' },
+            { keyword: 'underpayment', severity: 'high' },
+            { keyword: 'misconduct', severity: 'high' }
+        ];
         
         const usersSnapshot = await db.collection('users').get();
         
         for (const userDoc of usersSnapshot.docs) {
             const userData = userDoc.data();
             const userName = userData.displayName || userData.email || userDoc.id.substring(0, 8);
+            const userEmail = userData.email || 'N/A';
             
             const conversationsSnapshot = await db.collection('users').doc(userDoc.id)
                 .collection('conversations')
@@ -23628,17 +23621,22 @@ async function loadHighRisk() {
             conversationsSnapshot.forEach(convDoc => {
                 const conv = convDoc.data();
                 const title = (conv.title || '').toLowerCase();
+                const messages = conv.messages || [];
+                const fullText = title + ' ' + messages.map(m => m.content || '').join(' ').toLowerCase();
                 
                 // Check for high-risk keywords
-                for (const keyword of highRiskKeywords) {
-                    if (title.includes(keyword)) {
+                for (const {keyword, severity} of highRiskKeywords) {
+                    if (fullText.includes(keyword)) {
                         highRiskItems.push({
+                            id: convDoc.id,
                             userName: userName,
-                            title: conv.title,
+                            userEmail: userEmail,
+                            userId: userDoc.id,
+                            title: conv.title || 'Untitled Conversation',
                             keyword: keyword,
                             timestamp: conv.timestamp,
-                            severity: keyword.includes('harassment') || keyword.includes('assault') ? 'critical' : 
-                                     keyword.includes('dismissal') || keyword.includes('lawsuit') ? 'high' : 'medium'
+                            severity: severity,
+                            messageCount: messages.length
                         });
                         break; // Only add once per conversation
                     }
@@ -23646,42 +23644,90 @@ async function loadHighRisk() {
             });
         }
         
-        // Sort by timestamp
+        // Sort by severity then timestamp
+        const severityOrder = { critical: 0, high: 1, medium: 2 };
         highRiskItems.sort((a, b) => {
+            if (severityOrder[a.severity] !== severityOrder[b.severity]) {
+                return severityOrder[a.severity] - severityOrder[b.severity];
+            }
             const dateA = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp || 0);
             const dateB = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp || 0);
             return dateB - dateA;
         });
         
         if (highRiskItems.length === 0) {
-            list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No high-risk topics detected</div>';
+            list.innerHTML = '<div class="bg-green-500/10 border border-green-500 rounded-lg p-6 text-center text-green-400">✅ No high-risk topics detected</div>';
             return;
         }
         
-        let html = '';
+        // Summary stats
+        const critical = highRiskItems.filter(r => r.severity === 'critical').length;
+        const high = highRiskItems.filter(r => r.severity === 'high').length;
+        const medium = highRiskItems.filter(r => r.severity === 'medium').length;
+        
+        let html = `
+            <div class="grid grid-cols-3 gap-3 mb-4">
+                <div class="bg-red-500/10 border border-red-500 rounded-lg p-3 text-center">
+                    <p class="text-2xl font-bold text-red-400">${critical}</p>
+                    <p class="text-xs text-red-300">Critical</p>
+                </div>
+                <div class="bg-yellow-500/10 border border-yellow-500 rounded-lg p-3 text-center">
+                    <p class="text-2xl font-bold text-yellow-400">${high}</p>
+                    <p class="text-xs text-yellow-300">High</p>
+                </div>
+                <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-3 text-center">
+                    <p class="text-2xl font-bold text-blue-400">${medium}</p>
+                    <p class="text-xs text-blue-300">Medium</p>
+                </div>
+            </div>
+            <div class="space-y-3">
+        `;
+        
         highRiskItems.slice(0, 50).forEach(risk => {
             const date = risk.timestamp?.toDate ? risk.timestamp.toDate().toLocaleString('en-AU') : 'Unknown';
-            const colorMap = { critical: 'red', high: 'yellow', medium: 'blue' };
-            const color = colorMap[risk.severity] || 'gray';
+            
+            let borderClass, bgClass, textClass, badgeClass;
+            if (risk.severity === 'critical') {
+                borderClass = 'border-red-500';
+                bgClass = 'bg-red-500/10';
+                textClass = 'text-red-400';
+                badgeClass = 'bg-red-500 text-white';
+            } else if (risk.severity === 'high') {
+                borderClass = 'border-yellow-500';
+                bgClass = 'bg-yellow-500/10';
+                textClass = 'text-yellow-400';
+                badgeClass = 'bg-yellow-500 text-slate-900';
+            } else {
+                borderClass = 'border-blue-500';
+                bgClass = 'bg-blue-500/10';
+                textClass = 'text-blue-400';
+                badgeClass = 'bg-blue-500 text-white';
+            }
             
             html += `
-                <div class="bg-slate-900 border-2 border-${color}-500 rounded-lg p-4">
-                    <div class="flex items-start justify-between mb-2">
-                        <div>
-                            <span class="text-${color}-400 font-semibold">${risk.title}</span>
-                            <span class="text-slate-500 text-xs ml-2">${date}</span>
+                <div class="bg-slate-900 border-2 ${borderClass} rounded-lg p-4">
+                    <div class="flex items-start justify-between mb-2 flex-wrap gap-2">
+                        <div class="flex-1 min-w-0">
+                            <p class="${textClass} font-semibold truncate">${risk.title}</p>
+                            <p class="text-slate-500 text-xs">${date}</p>
                         </div>
-                        <span class="text-xs bg-${color}-500 text-white px-2 py-1 rounded uppercase">${risk.severity}</span>
+                        <span class="text-xs ${badgeClass} px-2 py-1 rounded uppercase font-bold">${risk.severity}</span>
                     </div>
-                    <p class="text-slate-400 text-xs mb-2"><strong>User:</strong> ${risk.userName}</p>
-                    <p class="text-slate-300 text-sm">Detected keyword: <strong>${risk.keyword}</strong></p>
+                    <div class="text-sm space-y-1">
+                        <p class="text-slate-400"><strong>User:</strong> ${risk.userName}</p>
+                        <p class="text-slate-500 text-xs">${risk.userEmail}</p>
+                        <p class="text-slate-300 mt-2">Detected: <span class="${textClass} font-semibold">${risk.keyword}</span></p>
+                        <p class="text-slate-500 text-xs">${risk.messageCount} messages in conversation</p>
+                    </div>
                 </div>
             `;
         });
         
+        html += '</div>';
         list.innerHTML = html;
     } catch (error) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data</div>';
+        console.error('High risk load error:', error);
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
     }
 }
 
@@ -23715,7 +23761,8 @@ async function loadDocuments() {
                 userDocs.forEach(doc => {
                     documents.push({
                         ...doc,
-                        user_code: userData.displayName || userData.email || userDoc.id.substring(0, 8)
+                        user_code: userData.displayName || userData.email || userDoc.id.substring(0, 8),
+                        user_email: userData.email || 'N/A'
                     });
                 });
             }
@@ -23747,120 +23794,745 @@ async function loadDocuments() {
         const totalRecords = documents.filter(d => d.document_type === 'recordOfDiscussion').length;
         const totalPIPs = documents.filter(d => d.document_type === 'performanceImprovementPlan').length;
         
-        let html = '<div class="space-y-6">';
+        let html = '<div class="space-y-4">';
         
-        // Stats summary
+        // Stats summary - responsive grid
         html += `
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-3">
                     <p class="text-slate-400 text-xs mb-1">Total Generated</p>
-                    <p class="text-3xl font-bold text-purple-400">${totalGenerated}</p>
+                    <p class="text-2xl font-bold text-purple-400">${totalGenerated}</p>
                 </div>
-                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-3">
                     <p class="text-slate-400 text-xs mb-1">Downloaded</p>
-                    <p class="text-3xl font-bold text-green-400">${totalDownloaded}</p>
+                    <p class="text-2xl font-bold text-green-400">${totalDownloaded}</p>
                 </div>
-                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-3">
                     <p class="text-slate-400 text-xs mb-1">📄 PDF</p>
-                    <p class="text-3xl font-bold text-red-400">${totalPDF}</p>
+                    <p class="text-2xl font-bold text-red-400">${totalPDF}</p>
                 </div>
-                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-3">
                     <p class="text-slate-400 text-xs mb-1">📝 Word</p>
-                    <p class="text-3xl font-bold text-blue-400">${totalWord}</p>
+                    <p class="text-2xl font-bold text-blue-400">${totalWord}</p>
                 </div>
             </div>
             
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
-                    <p class="text-slate-400 text-xs mb-1">Warnings</p>
-                    <p class="text-3xl font-bold text-yellow-400">${totalWarnings}</p>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                <div class="bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-3">
+                    <p class="text-yellow-400 text-xs mb-1">⚠️ Warnings</p>
+                    <p class="text-2xl font-bold text-yellow-400">${totalWarnings}</p>
                 </div>
-                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
-                    <p class="text-slate-400 text-xs mb-1">Investigations</p>
-                    <p class="text-3xl font-bold text-red-400">${totalInvestigations}</p>
+                <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-3">
+                    <p class="text-red-400 text-xs mb-1">🔍 Investigations</p>
+                    <p class="text-2xl font-bold text-red-400">${totalInvestigations}</p>
                 </div>
-                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
-                    <p class="text-slate-400 text-xs mb-1">Records</p>
-                    <p class="text-3xl font-bold text-green-400">${totalRecords}</p>
+                <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-3">
+                    <p class="text-green-400 text-xs mb-1">📋 Records</p>
+                    <p class="text-2xl font-bold text-green-400">${totalRecords}</p>
                 </div>
-                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
-                    <p class="text-slate-400 text-xs mb-1">PIPs</p>
-                    <p class="text-3xl font-bold text-blue-400">${totalPIPs}</p>
+                <div class="bg-blue-500/10 border border-blue-500/30 rounded-lg p-3">
+                    <p class="text-blue-400 text-xs mb-1">📊 PIPs</p>
+                    <p class="text-2xl font-bold text-blue-400">${totalPIPs}</p>
                 </div>
             </div>
         `;
         
-        // Document type mapping
-        const typeEmoji = {
-            formalWarning: '⚠️',
-            recordOfDiscussion: '📋',
-            performanceImprovementPlan: '📊',
-            letterOfAllegation: '🔍'
-        };
-
-        const typeName = {
-            formalWarning: 'Formal Warning',
-            recordOfDiscussion: 'Record of Discussion',
-            performanceImprovementPlan: 'Performance Improvement Plan',
-            letterOfAllegation: 'Letter of Allegation'
-        };
-
-        const typeColor = {
-            formalWarning: 'yellow',
-            recordOfDiscussion: 'green',
-            performanceImprovementPlan: 'blue',
-            letterOfAllegation: 'red'
-        };
-        
-        const formatBadge = {
-            'pdf': '<span class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded">📄 PDF</span>',
-            'docx': '<span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">📝 Word</span>',
-            null: '<span class="text-xs bg-slate-700 text-slate-400 px-2 py-1 rounded">Not downloaded</span>'
+        // Document type config
+        const typeConfig = {
+            formalWarning: { emoji: '⚠️', name: 'Formal Warning', borderClass: 'border-yellow-500', textClass: 'text-yellow-400' },
+            recordOfDiscussion: { emoji: '📋', name: 'Record of Discussion', borderClass: 'border-green-500', textClass: 'text-green-400' },
+            performanceImprovementPlan: { emoji: '📊', name: 'Performance Improvement Plan', borderClass: 'border-blue-500', textClass: 'text-blue-400' },
+            letterOfAllegation: { emoji: '🔍', name: 'Letter of Allegation', borderClass: 'border-red-500', textClass: 'text-red-400' }
         };
         
         // Document list
+        html += '<div class="space-y-3">';
         documents.forEach(doc => {
             const date = doc.generated_at?.toDate 
                 ? doc.generated_at.toDate().toLocaleString('en-AU') 
                 : new Date(doc.generated_at).toLocaleString('en-AU');
-            const emoji = typeEmoji[doc.document_type] || '📄';
-            const name = typeName[doc.document_type] || doc.document_type || 'Unknown Document';
-            const color = typeColor[doc.document_type] || 'blue';
+            
+            const config = typeConfig[doc.document_type] || { emoji: '📄', name: doc.document_type || 'Unknown Document', borderClass: 'border-slate-600', textClass: 'text-slate-400' };
+            const docId = doc.document_id || doc.id || 'N/A';
+            
+            // Format badge
+            let formatBadge = '<span class="text-xs bg-slate-700 text-slate-400 px-2 py-1 rounded">Not downloaded</span>';
+            if (doc.downloaded && doc.format === 'pdf') {
+                formatBadge = '<span class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded">📄 PDF</span>';
+            } else if (doc.downloaded && doc.format === 'docx') {
+                formatBadge = '<span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">📝 Word</span>';
+            } else if (doc.downloaded) {
+                formatBadge = '<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">✓ Downloaded</span>';
+            }
+            
+            // Document link - if we have stored URL
+            let actionButtons = '';
+            if (doc.download_url) {
+                actionButtons = `
+                    <button onclick="viewAdminDocument('${docId}')" class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded hover:bg-purple-500/30 transition-colors">👁️ View</button>
+                    <button onclick="deleteAdminDocument('${docId}')" class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded hover:bg-red-500/30 transition-colors">🗑️</button>
+                `;
+            } else if (doc.content || doc.document_url) {
+                actionButtons = `<button onclick="viewAdminDocument('${docId}')" class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded hover:bg-purple-500/30 transition-colors">👁️ View</button>`;
+            }
             
             html += `
-                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 hover:border-${color}-500 transition-all">
-                    <div class="flex items-start justify-between mb-2">
-                        <div class="flex items-center gap-3">
-                            <span class="text-2xl">${emoji}</span>
-                            <div>
-                                <p class="text-${color}-400 font-semibold">${name}</p>
+                <div class="bg-slate-900 border ${config.borderClass} rounded-lg p-4 hover:bg-slate-800/50 transition-all">
+                    <div class="flex items-start justify-between mb-2 flex-wrap gap-2">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                            <span class="text-2xl flex-shrink-0">${config.emoji}</span>
+                            <div class="min-w-0">
+                                <p class="${config.textClass} font-semibold truncate">${config.name}</p>
                                 <p class="text-slate-500 text-xs">${date}</p>
                             </div>
                         </div>
-                        <div class="flex flex-col items-end gap-2">
-                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${doc.user_code || 'Unknown User'}</span>
-                            ${doc.downloaded ? 
-                                `<div class="flex gap-1">
-                                    <span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">✓ Downloaded</span>
-                                    ${formatBadge[doc.format] || ''}
-                                 </div>` : 
-                                '<span class="text-xs bg-slate-700 text-slate-400 px-2 py-1 rounded">Not downloaded</span>'}
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${doc.user_code || 'Unknown'}</span>
+                            ${formatBadge}
+                            ${actionButtons}
                         </div>
                     </div>
-                    <div class="text-sm">
+                    <div class="text-sm space-y-1 mt-3 pt-3 border-t border-slate-700/50">
                         <p class="text-slate-300"><strong>Employee:</strong> ${doc.employee_name || 'N/A'}</p>
-                        ${doc.venue_name ? `<p class="text-slate-400 text-xs mt-1">Venue: ${doc.venue_name}</p>` : ''}
-                        <p class="text-slate-500 text-xs mt-2">Document ID: ${doc.document_id || doc.id || 'N/A'}</p>
+                        ${doc.venue_name ? `<p class="text-slate-400 text-xs">Venue: ${doc.venue_name}</p>` : ''}
+                        ${doc.user_email ? `<p class="text-slate-500 text-xs">User: ${doc.user_email}</p>` : ''}
+                        ${doc.file_size ? `<p class="text-slate-600 text-xs">Size: ${(doc.file_size / 1024).toFixed(1)} KB</p>` : ''}
+                        <p class="text-slate-600 text-xs mt-2">ID: ${docId}</p>
+                    </div>
+                </div>
+            `;
+        });
+        html += '</div>';
+        
+        html += '</div>';
+        
+        list.innerHTML = html;
+    } catch (error) {
+        console.error('Documents load error:', error);
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
+    }
+}
+
+// Load Subscriptions tab
+async function loadSubscriptions() {
+    const list = document.getElementById('subscriptionsList');
+    
+    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading subscription data...</div>';
+    
+    if (!db) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
+        return;
+    }
+    
+    try {
+        const usersSnapshot = await db.collection('users').get();
+        
+        const subscriptions = {
+            free: [],
+            starter: [],
+            pro: [],
+            business: []
+        };
+        
+        let totalRevenue = 0;
+        
+        usersSnapshot.forEach(doc => {
+            const userData = doc.data();
+            const tier = (userData.subscriptionTier || 'free').toLowerCase();
+            const userInfo = {
+                id: doc.id,
+                email: userData.email || 'N/A',
+                name: userData.displayName || userData.email || doc.id.substring(0, 8),
+                tier: tier,
+                billing: userData.billingCycle || 'N/A',
+                creditsUsed: userData.reviewCreditsUsed || 0,
+                creditsTotal: userData.reviewCredits || 0,
+                joinDate: userData.createdAt?.toDate ? userData.createdAt.toDate() : null,
+                stripeCustomerId: userData.stripeCustomerId || null
+            };
+            
+            if (subscriptions[tier]) {
+                subscriptions[tier].push(userInfo);
+            } else {
+                subscriptions.free.push(userInfo);
+            }
+            
+            // Estimate revenue (annual prices)
+            if (tier === 'starter') totalRevenue += userData.billingCycle === 'monthly' ? 29 : 249;
+            if (tier === 'pro') totalRevenue += userData.billingCycle === 'monthly' ? 49 : 449;
+            if (tier === 'business') totalRevenue += userData.billingCycle === 'monthly' ? 99 : 899;
+        });
+        
+        const totalPaid = subscriptions.starter.length + subscriptions.pro.length + subscriptions.business.length;
+        
+        let html = `
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                <div class="bg-slate-700/50 border border-slate-600 rounded-lg p-3 text-center">
+                    <p class="text-2xl font-bold text-slate-400">${subscriptions.free.length}</p>
+                    <p class="text-xs text-slate-500">Free</p>
+                </div>
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 text-center">
+                    <p class="text-2xl font-bold text-amber-400">${subscriptions.starter.length}</p>
+                    <p class="text-xs text-amber-300">Starter</p>
+                </div>
+                <div class="bg-purple-500/10 border border-purple-500/30 rounded-lg p-3 text-center">
+                    <p class="text-2xl font-bold text-purple-400">${subscriptions.pro.length}</p>
+                    <p class="text-xs text-purple-300">Pro</p>
+                </div>
+                <div class="bg-green-500/10 border border-green-500/30 rounded-lg p-3 text-center">
+                    <p class="text-2xl font-bold text-green-400">${subscriptions.business.length}</p>
+                    <p class="text-xs text-green-300">Business</p>
+                </div>
+            </div>
+            
+            <div class="bg-green-500/10 border border-green-500 rounded-lg p-4 mb-4 text-center">
+                <p class="text-sm text-green-300">Estimated Revenue</p>
+                <p class="text-3xl font-bold text-green-400">$${totalRevenue.toLocaleString()}</p>
+                <p class="text-xs text-green-400/60">${totalPaid} paying customers</p>
+            </div>
+        `;
+        
+        // List paid users first
+        const paidUsers = [...subscriptions.business, ...subscriptions.pro, ...subscriptions.starter];
+        
+        if (paidUsers.length > 0) {
+            html += '<div class="space-y-2">';
+            html += '<p class="text-slate-400 text-sm font-semibold mb-2">💳 Paying Customers</p>';
+            
+            paidUsers.forEach(user => {
+                let tierBadge, tierBorder;
+                if (user.tier === 'business') {
+                    tierBadge = 'bg-green-500 text-white';
+                    tierBorder = 'border-green-500';
+                } else if (user.tier === 'pro') {
+                    tierBadge = 'bg-purple-500 text-white';
+                    tierBorder = 'border-purple-500';
+                } else {
+                    tierBadge = 'bg-amber-500 text-slate-900';
+                    tierBorder = 'border-amber-500';
+                }
+                
+                html += `
+                    <div class="bg-slate-900 border ${tierBorder} rounded-lg p-3">
+                        <div class="flex items-center justify-between flex-wrap gap-2">
+                            <div class="min-w-0 flex-1">
+                                <p class="text-white font-semibold truncate">${user.name}</p>
+                                <p class="text-slate-500 text-xs truncate">${user.email}</p>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs ${tierBadge} px-2 py-1 rounded font-bold uppercase">${user.tier}</span>
+                                <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">${user.billing}</span>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-xs text-slate-400">
+                            Credits: ${user.creditsUsed}/${user.creditsTotal} used
+                            ${user.stripeCustomerId ? ' • <span class="text-green-400">Stripe ✓</span>' : ''}
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+        }
+        
+        // Free users summary
+        if (subscriptions.free.length > 0) {
+            html += `
+                <div class="mt-4 p-3 bg-slate-900 rounded-lg border border-slate-700">
+                    <p class="text-slate-400 text-sm">${subscriptions.free.length} free tier users</p>
+                </div>
+            `;
+        }
+        
+        list.innerHTML = html;
+    } catch (error) {
+        console.error('Subscriptions load error:', error);
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
+    }
+}
+
+// Load Expert Reviews tab
+async function loadExpertReviews() {
+    const list = document.getElementById('reviewsList');
+    
+    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading expert review requests...</div>';
+    
+    if (!db) {
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
+        return;
+    }
+    
+    try {
+        // Load from reviewRequests collection (where expert reviews are actually stored)
+        const reviewsSnapshot = await db.collection('reviewRequests')
+            .orderBy('createdAt', 'desc')
+            .limit(100)
+            .get();
+        
+        let reviews = [];
+        
+        reviewsSnapshot.forEach(doc => {
+            reviews.push({ id: doc.id, ...doc.data() });
+        });
+        
+        // Count by status
+        const pending = reviews.filter(r => r.status === 'pending' || !r.status).length;
+        const inProgress = reviews.filter(r => r.status === 'in_progress').length;
+        const completed = reviews.filter(r => r.status === 'completed').length;
+        
+        let html = `
+            <div class="grid grid-cols-3 gap-3 mb-4">
+                <div class="bg-yellow-500/10 border border-yellow-500 rounded-lg p-3 text-center">
+                    <p class="text-2xl font-bold text-yellow-400">${pending}</p>
+                    <p class="text-xs text-yellow-300">Pending</p>
+                </div>
+                <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-3 text-center">
+                    <p class="text-2xl font-bold text-blue-400">${inProgress}</p>
+                    <p class="text-xs text-blue-300">In Progress</p>
+                </div>
+                <div class="bg-green-500/10 border border-green-500 rounded-lg p-3 text-center">
+                    <p class="text-2xl font-bold text-green-400">${completed}</p>
+                    <p class="text-xs text-green-300">Completed</p>
+                </div>
+            </div>
+        `;
+        
+        if (reviews.length === 0) {
+            html += '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No expert review requests yet</div>';
+            list.innerHTML = html;
+            return;
+        }
+        
+        // Sort by status (pending first) then by date
+        const statusOrder = { pending: 0, in_progress: 1, completed: 2 };
+        reviews.sort((a, b) => {
+            const statusA = statusOrder[a.status] ?? 0;
+            const statusB = statusOrder[b.status] ?? 0;
+            if (statusA !== statusB) return statusA - statusB;
+            const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+            const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+            return dateB - dateA;
+        });
+        
+        html += '<div class="space-y-2">';
+        
+        reviews.slice(0, 50).forEach(review => {
+            const date = review.createdAt?.toDate 
+                ? review.createdAt.toDate().toLocaleString('en-AU') 
+                : 'Unknown';
+            
+            const status = review.status || 'pending';
+            let statusBadge, borderClass;
+            
+            if (status === 'pending') {
+                statusBadge = 'bg-yellow-500 text-slate-900';
+                borderClass = 'border-yellow-500';
+            } else if (status === 'in_progress') {
+                statusBadge = 'bg-blue-500 text-white';
+                borderClass = 'border-blue-500';
+            } else {
+                statusBadge = 'bg-green-500 text-white';
+                borderClass = 'border-green-500';
+            }
+            
+            const docName = review.docName || review.docType || 'Document';
+            const refNumber = review.refNumber || review.id;
+            
+            html += `
+                <div class="bg-slate-900 border ${borderClass} rounded-lg p-3">
+                    <div class="flex items-start justify-between flex-wrap gap-2 mb-2">
+                        <div class="min-w-0 flex-1">
+                            <p class="text-white font-semibold truncate">${docName}</p>
+                            <p class="text-slate-500 text-xs">${date}</p>
+                            <p class="text-purple-400 text-xs font-mono">${refNumber}</p>
+                        </div>
+                        <span class="text-xs ${statusBadge} px-2 py-1 rounded font-bold uppercase">${status.replace('_', ' ')}</span>
+                    </div>
+                    <div class="text-sm space-y-1">
+                        <p class="text-slate-400"><strong>Employee:</strong> ${review.employeeName || 'N/A'} (${review.employeeRole || 'N/A'})</p>
+                        <p class="text-slate-400"><strong>Venue:</strong> ${review.venueName || 'N/A'}</p>
+                        <p class="text-slate-500 text-xs">${review.userEmail || ''}</p>
+                    </div>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        <button onclick="openReviewFromAdmin('${refNumber}')" 
+                                class="text-xs bg-purple-500 hover:bg-purple-600 text-white px-3 py-1.5 rounded transition-colors">
+                            👁️ View Document
+                        </button>
+                        ${status === 'pending' ? `
+                            <button onclick="updateReviewStatus('${refNumber}', 'in_progress')" 
+                                    class="text-xs bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded transition-colors">
+                                Start Review
+                            </button>
+                        ` : ''}
+                        ${status === 'in_progress' ? `
+                            <button onclick="updateReviewStatus('${refNumber}', 'completed')" 
+                                    class="text-xs bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded transition-colors">
+                                Mark Complete
+                            </button>
+                        ` : ''}
+                        <button onclick="emailReviewUser('${review.userEmail}')" 
+                                class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded transition-colors">
+                            ✉️ Email
+                        </button>
                     </div>
                 </div>
             `;
         });
         
         html += '</div>';
-        
         list.innerHTML = html;
     } catch (error) {
+        console.error('Reviews load error:', error);
         list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
+    }
+}
+
+// Open review document from admin dashboard
+function openReviewFromAdmin(refNumber) {
+    loadReviewByReference(refNumber);
+}
+
+// Update review status
+async function updateReviewStatus(refNumber, newStatus) {
+    if (!db || !refNumber) return;
+    
+    try {
+        await db.collection('reviewRequests').doc(refNumber).update({
+            status: newStatus,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        showAlert(`✅ Review status updated to: ${newStatus.replace('_', ' ')}`);
+        loadExpertReviews(); // Refresh the list
+    } catch (error) {
+        console.error('Error updating review:', error);
+        showAlert('❌ Failed to update review status');
+    }
+}
+
+// Email review user
+function emailReviewUser(email) {
+    if (!email || email === 'N/A') {
+        showAlert('❌ No email address available');
+        return;
+    }
+    window.open(`mailto:${email}?subject=Your FITZ HR Expert Review Request`, '_blank');
+}
+
+// Store chart instances for cleanup
+let adminCharts = {};
+
+// Load Charts tab
+async function loadCharts() {
+    const container = document.getElementById('chartsList');
+    
+    container.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading chart data...</div>';
+    
+    if (!db) {
+        container.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
+        return;
+    }
+    
+    try {
+        // Destroy existing charts
+        Object.values(adminCharts).forEach(chart => chart?.destroy());
+        adminCharts = {};
+        
+        // Collect data from Firebase
+        const usersSnapshot = await db.collection('users').get();
+        
+        // Data structures
+        const activityByDate = {};
+        const subscriptionCounts = { free: 0, starter: 0, pro: 0, business: 0 };
+        const documentTypes = { formalWarning: 0, recordOfDiscussion: 0, performanceImprovementPlan: 0, letterOfAllegation: 0, other: 0 };
+        const userSignupsByDate = {};
+        const messagesByDate = {};
+        
+        // Process users
+        for (const userDoc of usersSnapshot.docs) {
+            const userData = userDoc.data();
+            
+            // Subscription counts
+            const tier = (userData.subscriptionTier || 'free').toLowerCase();
+            if (subscriptionCounts.hasOwnProperty(tier)) {
+                subscriptionCounts[tier]++;
+            } else {
+                subscriptionCounts.free++;
+            }
+            
+            // User signup date
+            if (userData.createdAt) {
+                const signupDate = userData.createdAt.toDate ? userData.createdAt.toDate() : new Date(userData.createdAt);
+                const dateKey = signupDate.toISOString().split('T')[0];
+                userSignupsByDate[dateKey] = (userSignupsByDate[dateKey] || 0) + 1;
+            }
+            
+            // Process conversations for activity data
+            const conversationsSnapshot = await db.collection('users').doc(userDoc.id).collection('conversations').get();
+            
+            conversationsSnapshot.forEach(convDoc => {
+                const conv = convDoc.data();
+                if (conv.timestamp) {
+                    const convDate = conv.timestamp.toDate ? conv.timestamp.toDate() : new Date(conv.timestamp);
+                    const dateKey = convDate.toISOString().split('T')[0];
+                    activityByDate[dateKey] = (activityByDate[dateKey] || 0) + 1;
+                    
+                    // Count messages
+                    const msgCount = conv.messages?.length || 1;
+                    messagesByDate[dateKey] = (messagesByDate[dateKey] || 0) + msgCount;
+                }
+            });
+            
+            // Process generated documents
+            const userDocs = userData.generatedDocuments || [];
+            userDocs.forEach(doc => {
+                const docType = doc.document_type || 'other';
+                if (documentTypes.hasOwnProperty(docType)) {
+                    documentTypes[docType]++;
+                } else {
+                    documentTypes.other++;
+                }
+            });
+        }
+        
+        // Also get from generated_documents collection
+        try {
+            const docsSnapshot = await db.collection('generated_documents').get();
+            docsSnapshot.forEach(doc => {
+                const data = doc.data();
+                const docType = data.document_type || 'other';
+                if (documentTypes.hasOwnProperty(docType)) {
+                    documentTypes[docType]++;
+                } else {
+                    documentTypes.other++;
+                }
+            });
+        } catch (e) { /* Collection may not exist */ }
+        
+        // Generate last 30 days labels
+        const last30Days = [];
+        for (let i = 29; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            last30Days.push(d.toISOString().split('T')[0]);
+        }
+        
+        // Prepare chart data
+        const activityData = last30Days.map(date => activityByDate[date] || 0);
+        const messagesData = last30Days.map(date => messagesByDate[date] || 0);
+        const signupsData = last30Days.map(date => userSignupsByDate[date] || 0);
+        const dateLabels = last30Days.map(date => {
+            const d = new Date(date);
+            return d.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
+        });
+        
+        // Build HTML with canvas elements
+        container.innerHTML = `
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                <!-- Activity Chart -->
+                <div class="bg-slate-900 rounded-lg p-4 border border-slate-700">
+                    <h3 class="text-white font-semibold mb-3 flex items-center gap-2">
+                        <span>📊</span> Conversations (30 Days)
+                    </h3>
+                    <div class="h-48">
+                        <canvas id="activityChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Messages Chart -->
+                <div class="bg-slate-900 rounded-lg p-4 border border-slate-700">
+                    <h3 class="text-white font-semibold mb-3 flex items-center gap-2">
+                        <span>💬</span> Messages (30 Days)
+                    </h3>
+                    <div class="h-48">
+                        <canvas id="messagesChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Subscription Breakdown -->
+                <div class="bg-slate-900 rounded-lg p-4 border border-slate-700">
+                    <h3 class="text-white font-semibold mb-3 flex items-center gap-2">
+                        <span>💳</span> Subscription Breakdown
+                    </h3>
+                    <div class="h-48 flex items-center justify-center">
+                        <canvas id="subscriptionChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Document Types -->
+                <div class="bg-slate-900 rounded-lg p-4 border border-slate-700">
+                    <h3 class="text-white font-semibold mb-3 flex items-center gap-2">
+                        <span>📝</span> Documents Generated
+                    </h3>
+                    <div class="h-48">
+                        <canvas id="documentsChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- User Signups -->
+                <div class="bg-slate-900 rounded-lg p-4 border border-slate-700 lg:col-span-2">
+                    <h3 class="text-white font-semibold mb-3 flex items-center gap-2">
+                        <span>👥</span> New User Signups (30 Days)
+                    </h3>
+                    <div class="h-48">
+                        <canvas id="signupsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Chart.js default options for dark theme
+        const darkThemeOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#94a3b8' }
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#64748b', maxRotation: 45 },
+                    grid: { color: '#1e293b' }
+                },
+                y: {
+                    ticks: { color: '#64748b' },
+                    grid: { color: '#1e293b' },
+                    beginAtZero: true
+                }
+            }
+        };
+        
+        // Activity Chart (Line)
+        adminCharts.activity = new Chart(document.getElementById('activityChart'), {
+            type: 'line',
+            data: {
+                labels: dateLabels,
+                datasets: [{
+                    label: 'Conversations',
+                    data: activityData,
+                    borderColor: '#a855f7',
+                    backgroundColor: 'rgba(168, 85, 247, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: darkThemeOptions
+        });
+        
+        // Messages Chart (Line)
+        adminCharts.messages = new Chart(document.getElementById('messagesChart'), {
+            type: 'line',
+            data: {
+                labels: dateLabels,
+                datasets: [{
+                    label: 'Messages',
+                    data: messagesData,
+                    borderColor: '#22c55e',
+                    backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: darkThemeOptions
+        });
+        
+        // Subscription Chart (Doughnut)
+        adminCharts.subscription = new Chart(document.getElementById('subscriptionChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Free', 'Starter', 'Pro', 'Business'],
+                datasets: [{
+                    data: [subscriptionCounts.free, subscriptionCounts.starter, subscriptionCounts.pro, subscriptionCounts.business],
+                    backgroundColor: ['#64748b', '#f59e0b', '#a855f7', '#22c55e'],
+                    borderColor: '#0f172a',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { color: '#94a3b8', padding: 15 }
+                    }
+                }
+            }
+        });
+        
+        // Documents Chart (Bar)
+        adminCharts.documents = new Chart(document.getElementById('documentsChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Warnings', 'Records', 'PIPs', 'Allegations', 'Other'],
+                datasets: [{
+                    label: 'Documents',
+                    data: [documentTypes.formalWarning, documentTypes.recordOfDiscussion, documentTypes.performanceImprovementPlan, documentTypes.letterOfAllegation, documentTypes.other],
+                    backgroundColor: ['#eab308', '#22c55e', '#3b82f6', '#ef4444', '#64748b']
+                }]
+            },
+            options: {
+                ...darkThemeOptions,
+                plugins: { legend: { display: false } }
+            }
+        });
+        
+        // Signups Chart (Bar)
+        adminCharts.signups = new Chart(document.getElementById('signupsChart'), {
+            type: 'bar',
+            data: {
+                labels: dateLabels,
+                datasets: [{
+                    label: 'New Users',
+                    data: signupsData,
+                    backgroundColor: '#06b6d4'
+                }]
+            },
+            options: darkThemeOptions
+        });
+        
+    } catch (error) {
+        console.error('Charts load error:', error);
+        container.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading charts: ' + error.message + '</div>';
+    }
+}
+
+// ========================================
+// DOCUMENT STORAGE - Requires Firebase Blaze Plan
+// ========================================
+// Note: Document cloud storage is not available on the free Spark plan.
+// Expert Reviews store document content in Firestore (reviewRequests collection).
+// To enable cloud document backup, upgrade to Firebase Blaze plan.
+
+/**
+ * View a document from admin dashboard
+ * For regular documents, this just shows an info message.
+ * For expert reviews, use openReviewFromAdmin() instead.
+ */
+async function viewAdminDocument(docId) {
+    showAlert('📄 Document Viewing\n\nRegular documents are downloaded directly to users.\n\nTo view Expert Review documents, go to the Reviews tab and click "View Document".');
+}
+
+/**
+ * Delete document metadata (admin only)
+ * Note: This only deletes the metadata, not the actual file (which was downloaded by user)
+ */
+async function deleteAdminDocument(docId) {
+    if (!db) {
+        showAlert('❌ Firebase not connected');
+        return;
+    }
+    
+    if (!confirm('⚠️ Delete this document record?\n\nThis only removes the metadata from your database. The user\'s downloaded file is not affected.')) {
+        return;
+    }
+    
+    try {
+        await db.collection('generated_documents').doc(docId).delete();
+        showAlert('✅ Document record deleted');
+        loadDocuments();
+    } catch (error) {
+        console.error('Error deleting document:', error);
+        showAlert('❌ Error deleting record: ' + error.message);
     }
 }
 
@@ -35889,6 +36561,7 @@ function hideContractLoading() {
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
 <script>
 const firebaseConfig = {
@@ -35902,12 +36575,13 @@ const firebaseConfig = {
 };
 
 // Use existing currentUser from line 4714
-let auth, db, currentSubscription = null;
+let auth, db, storage, currentSubscription = null;
 
 try {
   firebase.initializeApp(firebaseConfig);
   auth = firebase.auth();
   db = firebase.firestore();
+  storage = firebase.storage();
   
   // Check for magic link sign-in completion on page load
   if (auth.isSignInWithEmailLink(window.location.href)) {
