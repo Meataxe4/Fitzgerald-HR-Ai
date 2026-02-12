@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Primary Meta Tags -->
+    <title>FITZ | HR Compliance Simplified for Australian Hospitality</title>
+    <meta name="title" content="FITZ | HR Compliance Simplified for Australian Hospitality">
+    <meta name="description" content="AI-powered HR assistance backed by qualified professionals. Instant answers for everyday questions, expert support when you need it. Built for Australian hospitality.">
+    <meta name="keywords" content="HR software, hospitality HR, Australian HR, award rates, Fair Work compliance, restaurant HR, cafe HR, bar HR, HR documents">
+    <meta name="author" content="Fitzgerald HR Pty Ltd">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://fitzhr.com/">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://fitzhr.com/">
+    <meta property="og:title" content="Fitz HR | AI-Powered HR Software for Australian Hospitality">
+    <meta property="og:description" content="Instant HR advice for Australian hospitality venues. Award rates, Fair Work compliance, warning letters, and expert support.">
+    <meta property="og:image" content="https://fitzhr.com/assets/og-image.png">
+    <meta property="og:locale" content="en_AU">
+    <meta property="og:site_name" content="Fitz HR">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://fitzhr.com/">
+    <meta name="twitter:title" content="Fitz HR | AI-Powered HR Software for Australian Hospitality">
+    <meta name="twitter:description" content="Instant HR advice for Australian hospitality venues. Award rates, Fair Work compliance, warning letters, and expert support.">
+    <meta name="twitter:image" content="https://fitzhr.com/assets/og-image.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <meta name="theme-color" content="#f59e0b">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'outfit': ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        amber: {
+                            500: '#f59e0b',
+                            600: '#d97706',
+                        },
+                        slate: {
+                            800: '#1e293b',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Fitz HR",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Web",
+        "offers": {
+            "@type": "AggregateOffer",
+            "lowPrice": "249",
+            "highPrice": "899",
+            "priceCurrency": "AUD",
+            "offerCount": "3"
+        },
+        "description": "AI-powered HR software for Australian hospitality venues. Instant advice on award rates, Fair Work compliance, and HR documentation.",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Fitzgerald HR Pty Ltd",
+            "url": "https://fitzhr.com"
+        }
+    }
+    </script>
+
+    <style>
+        * {
+            font-family: 'Outfit', sans-serif;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .gradient-text {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-gradient {
+            background: radial-gradient(ellipse at top, #1e293b 0%, #0f172a 70%);
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-white antialiased">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
+        <div class="max-w-6xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Logo -->
+                <a href="/" class="flex items-center text-3xl font-extrabold tracking-tight" style="letter-spacing: -1px;">
+                    <span class="text-amber-500">F</span><span class="text-white">ITZ</span>
+                </a>
+                
+                <!-- Desktop Nav -->
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#features" class="text-slate-300 hover:text-white transition-colors">Features</a>
+                    <a href="#how-it-works" class="text-slate-300 hover:text-white transition-colors">How It Works</a>
+                    <a href="/pricing" class="text-slate-300 hover:text-white transition-colors">Pricing</a>
+                </div>
+
+                <!-- CTA -->
+                <div class="flex items-center gap-4">
+                    <a href="/app" class="hidden sm:inline-block text-slate-300 hover:text-white transition-colors">Log In</a>
+                    <a href="/app" class="btn-primary px-5 py-2.5 rounded-lg font-semibold text-slate-900">
+                        Get Started Free
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-gradient pt-32 pb-20 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="max-w-3xl mx-auto text-center">
+                <!-- Headline -->
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
+                    HR Compliance.<br>
+                    <span class="gradient-text">Simplified.</span>
+                </h1>
+
+                <!-- Subheadline -->
+                <p class="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">
+                    AI-powered HR assistance backed by qualified professionals. 
+                    Instant answers for everyday questions, expert support when you need it.
+                </p>
+
+                <!-- CTAs -->
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
+                    <a href="/app" class="btn-primary px-8 py-4 rounded-xl font-bold text-lg text-slate-900 w-full sm:w-auto text-center">
+                        Start Free — No Credit Card
+                    </a>
+                    <a href="/pricing" class="px-8 py-4 rounded-xl font-semibold text-lg border border-slate-600 hover:border-slate-500 transition-colors w-full sm:w-auto text-center">
+                        View Pricing
+                    </a>
+                </div>
+
+                <!-- Stats Bar -->
+                <div class="flex flex-wrap items-center justify-center gap-8 sm:gap-16 pt-8 border-t border-slate-700/50">
+                    <div class="text-center">
+                        <div class="text-3xl sm:text-4xl font-bold text-amber-500">$12k</div>
+                        <div class="text-sm text-slate-400">Avg. Savings</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl sm:text-4xl font-bold text-amber-500">&lt;90s</div>
+                        <div class="text-sm text-slate-400">Response Time</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl sm:text-4xl font-bold text-amber-500">24/7</div>
+                        <div class="text-sm text-slate-400">Available</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Pain Points Section -->
+    <section class="py-20 px-6 bg-slate-800/50">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-4">HR Shouldn't Keep You Up at Night</h2>
+                <p class="text-slate-400 text-lg max-w-2xl mx-auto">Running a venue is hard enough without worrying about compliance, documentation, and difficult conversations.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Pain Point 1 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
+                    <div class="text-5xl mb-4">😰</div>
+                    <h3 class="text-xl font-bold mb-3">Award Rates Are Confusing</h3>
+                    <p class="text-slate-400">Penalty rates, allowances, casual loading — one mistake can cost thousands in back-pay claims.</p>
+                </div>
+
+                <!-- Pain Point 2 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
+                    <div class="text-5xl mb-4">📋</div>
+                    <h3 class="text-xl font-bold mb-3">Documentation Takes Hours</h3>
+                    <p class="text-slate-400">Warning letters, contracts, policies — you didn't open a venue to become a paperwork expert.</p>
+                </div>
+
+                <!-- Pain Point 3 -->
+                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
+                    <div class="text-5xl mb-4">⚖️</div>
+                    <h3 class="text-xl font-bold mb-3">Compliance Risks Are Real</h3>
+                    <p class="text-slate-400">Unfair dismissal claims, Fair Work audits, underpayment scandals — the stakes have never been higher.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-20 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Everything You Need to Manage HR</h2>
+                <p class="text-slate-400 text-lg max-w-2xl mx-auto">Fitz combines AI smarts with real HR expertise — so you get instant answers you can trust.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Feature 1: AI Chat -->
+                <div class="card-hover bg-slate-800 border border-slate-700 rounded-2xl p-8">
+                    <div class="w-14 h-14 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6">
+                        <span class="text-3xl">💬</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">AI HR Chat</h3>
+                    <p class="text-slate-400 mb-4">Ask anything about Australian hospitality HR. Award rates, leave entitlements, performance management — get instant, practical advice.</p>
+                    <ul class="space-y-2 text-slate-300">
+                        <li class="flex items-center gap-2">
+                            <span class="text-amber-500">✓</span> Trained on Australian workplace law
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-amber-500">✓</span> Hospitality Award specific
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-amber-500">✓</span> Available 24/7
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Feature 2: Document Tools -->
+                <div class="card-hover bg-slate-800 border border-slate-700 rounded-2xl p-8">
+                    <div class="w-14 h-14 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6">
+                        <span class="text-3xl">🛠️</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">HR Document Tools</h3>
+                    <p class="text-slate-400 mb-4">Generate legally-compliant HR documents in minutes. Warning letters, contracts, PIPs — all customised for your situation.</p>
+                    <ul class="space-y-2 text-slate-300">
+                        <li class="flex items-center gap-2">
+                            <span class="text-amber-500">✓</span> Warning letters & PIPs
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-amber-500">✓</span> Employment contracts
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-amber-500">✓</span> Termination guides
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Feature 3: Expert Review -->
+                <div class="card-hover bg-slate-800 border border-slate-700 rounded-2xl p-8">
+                    <div class="w-14 h-14 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6">
+                        <span class="text-3xl">👨‍💼</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Expert Document Review</h3>
+                    <p class="text-slate-400 mb-4">Every document can be reviewed by a qualified HR consultant before you use it. Real humans checking real documents.</p>
+                    <ul class="space-y-2 text-slate-300">
+                        <li class="flex items-center gap-2">
+                            <span class="text-amber-500">✓</span> Qualified HR professionals
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-amber-500">✓</span> 24-hour turnaround
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-amber-500">✓</span> Included in subscription
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Feature 4: Crisis Mode -->
+                <div class="card-hover bg-slate-800 border border-slate-700 rounded-2xl p-8">
+                    <div class="w-14 h-14 bg-red-500/10 rounded-xl flex items-center justify-center mb-6">
+                        <span class="text-3xl">🚨</span>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-3">Crisis Mode</h3>
+                    <p class="text-slate-400 mb-4">Staff walkout? Theft? Serious misconduct? Get immediate step-by-step guidance to handle urgent situations properly.</p>
+                    <ul class="space-y-2 text-slate-300">
+                        <li class="flex items-center gap-2">
+                            <span class="text-amber-500">✓</span> Step-by-step checklists
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-amber-500">✓</span> Legal compliance focus
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-amber-500">✓</span> Escalation paths
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="py-20 px-6 bg-slate-800/50">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Get Started in 60 Seconds</h2>
+                <p class="text-slate-400 text-lg max-w-2xl mx-auto">No complex setup. No training required. Just ask.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Step 1 -->
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center text-2xl font-bold text-slate-900 mx-auto mb-6">1</div>
+                    <h3 class="text-xl font-bold mb-3">Ask Your Question</h3>
+                    <p class="text-slate-400">Type your HR question — anything from "What's the Sunday penalty rate for casuals?" to "How do I manage underperformance?"</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center text-2xl font-bold text-slate-900 mx-auto mb-6">2</div>
+                    <h3 class="text-xl font-bold mb-3">Get Instant Guidance</h3>
+                    <p class="text-slate-400">Fitz gives you clear, practical advice based on Australian workplace law and hospitality industry best practices.</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="text-center">
+                    <div class="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center text-2xl font-bold text-slate-900 mx-auto mb-6">3</div>
+                    <h3 class="text-xl font-bold mb-3">Take Action Confidently</h3>
+                    <p class="text-slate-400">Generate documents, follow step-by-step guides, or escalate to an expert — whatever you need to move forward.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Preview -->
+    <section class="py-20 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
+                <p class="text-slate-400 text-lg max-w-2xl mx-auto">Choose the plan that fits your venue. All plans include unlimited AI chat and access to every template.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+                <!-- Starter -->
+                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8">
+                    <h3 class="text-xl font-bold mb-2">Starter</h3>
+                    <p class="text-slate-400 text-sm mb-4">For small venues with occasional HR needs</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold">$249</span>
+                        <span class="text-slate-400">/year</span>
+                    </div>
+                    <ul class="space-y-3 mb-8 text-slate-300">
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-500">✓</span> All HR templates
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-500">✓</span> 8 expert-reviewed docs/year
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-500">✓</span> Unlimited AI chat
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-500">✓</span> Email support
+                        </li>
+                    </ul>
+                    <a href="/pricing" class="block text-center py-3 border border-slate-600 rounded-lg hover:border-amber-500 transition-colors">
+                        Learn More
+                    </a>
+                </div>
+
+                <!-- Pro (Featured) -->
+                <div class="bg-slate-800 border-2 border-amber-500 rounded-2xl p-8 relative">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-900 text-sm font-bold px-4 py-1 rounded-full">
+                        MOST POPULAR
+                    </div>
+                    <h3 class="text-xl font-bold mb-2">Pro</h3>
+                    <p class="text-slate-400 text-sm mb-4">For busy venues with regular HR needs</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold">$449</span>
+                        <span class="text-slate-400">/year</span>
+                    </div>
+                    <ul class="space-y-3 mb-8 text-slate-300">
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-500">✓</span> All HR templates
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-500">✓</span> 20 expert-reviewed docs/year
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-500">✓</span> Unlimited AI chat
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-500">✓</span> Priority email support
+                        </li>
+                    </ul>
+                    <a href="/app" class="btn-primary block text-center py-3 rounded-lg font-semibold text-slate-900">
+                        Get Started
+                    </a>
+                </div>
+
+                <!-- Business -->
+                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8">
+                    <h3 class="text-xl font-bold mb-2">Business</h3>
+                    <p class="text-slate-400 text-sm mb-4">For multi-venue or high-turnover operations</p>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold">$899</span>
+                        <span class="text-slate-400">/year</span>
+                    </div>
+                    <ul class="space-y-3 mb-8 text-slate-300">
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-500">✓</span> All HR templates
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-500">✓</span> 50 expert-reviewed docs/year
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-500">✓</span> Priority turnaround
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <span class="text-green-500">✓</span> Phone support
+                        </li>
+                    </ul>
+                    <a href="/pricing" class="block text-center py-3 border border-slate-600 rounded-lg hover:border-amber-500 transition-colors">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+
+            <p class="text-center text-slate-400 mt-8">
+                All plans include a 14-day money-back guarantee. Cancel anytime.
+            </p>
+        </div>
+    </section>
+
+    <!-- Trust Section -->
+    <section class="py-20 px-6 bg-slate-800/50">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-6">Built Specifically for Australian Hospitality</h2>
+            <p class="text-xl text-slate-300 mb-10">
+                Fitz understands the unique challenges of running a restaurant, cafe, bar, or hotel in Australia. 
+                From the Hospitality Industry (General) Award to state-specific regulations — we've got you covered.
+            </p>
+            
+            <div class="flex flex-wrap items-center justify-center gap-8 text-slate-400">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🏆</span>
+                    <span>Fair Work Compliant</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">👨‍💼</span>
+                    <span>Expert HR Reviewed</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🔒</span>
+                    <span>Data Secure</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">🇦🇺</span>
+                    <span>Australian Owned</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="py-24 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <h2 class="text-3xl sm:text-4xl font-bold mb-6">Ready to Simplify Your HR?</h2>
+            <p class="text-xl text-slate-300 mb-10">
+                Join hospitality venues across Australia who trust Fitz for their HR needs.
+                Get started free — no credit card required.
+            </p>
+            <a href="/app" class="btn-primary inline-block px-10 py-5 rounded-xl font-bold text-xl text-slate-900">
+                Start Free Today →
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-800 border-t border-slate-700 py-12 px-6">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <!-- Brand -->
+                <div>
+                    <a href="/" class="flex items-center text-3xl font-extrabold tracking-tight mb-4" style="letter-spacing: -1px;">
+                        <span class="text-amber-500">F</span><span class="text-white">ITZ</span>
+                    </a>
+                    <p class="text-slate-400 text-sm">AI-powered HR software for Australian hospitality venues.</p>
+                </div>
+
+                <!-- Product -->
+                <div>
+                    <h4 class="font-semibold mb-4">Product</h4>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="/#features" class="hover:text-white transition-colors">Features</a></li>
+                        <li><a href="/pricing" class="hover:text-white transition-colors">Pricing</a></li>
+                        <li><a href="/app" class="hover:text-white transition-colors">Log In</a></li>
+                    </ul>
+                </div>
+
+                <!-- Legal -->
+                <div>
+                    <h4 class="font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                        <li><a href="/terms" class="hover:text-white transition-colors">Terms of Service</a></li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h4 class="font-semibold mb-4">Contact</h4>
+                    <ul class="space-y-2 text-slate-400">
+                        <li><a href="mailto:support@fitzhr.com" class="hover:text-white transition-colors">support@fitzhr.com</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-slate-700 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
+                <p class="text-slate-400 text-sm">
+                    © 2025 Fitzgerald HR Pty Ltd (ABN 87 693 882 709). All rights reserved.
+                </p>
+                <p class="text-slate-500 text-sm">
+                    Made with ❤️ in Australia
+                </p>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>

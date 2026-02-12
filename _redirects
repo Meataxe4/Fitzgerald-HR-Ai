@@ -1,0 +1,13 @@
+# Netlify Redirects
+# Clean URLs (remove .html extension)
+
+/pricing    /pricing.html   200
+/app        /app.html       200
+/privacy    /privacy.html   200
+/terms      /terms.html     200
+
+# Redirect www to non-www
+https://www.fitzhr.com/*    https://fitzhr.com/:splat   301
+
+# Handle 404s
+/*          /index.html     404
