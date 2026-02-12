@@ -36950,13 +36950,17 @@ const FitzTour = {
                 z-index: 99998;
                 opacity: 0;
                 visibility: hidden;
-                transition: opacity 0.3s ease, visibility 0.3s ease;
                 pointer-events: none;
+                transition: opacity 0.3s ease, visibility 0.3s ease;
             }
             .fitz-tour-overlay.active {
                 opacity: 1;
                 visibility: visible;
                 pointer-events: auto;
+            }
+            /* When tour is completely done, hide overlay entirely */
+            .fitz-tour-overlay.hidden {
+                display: none !important;
             }
             
             /* Spotlight effect - Lighter shadow */
@@ -37465,8 +37469,11 @@ const FitzTour = {
     
     // Show subscription step - opens the actual subscription modal
     showSubscriptionStep: function(step, stepIndex) {
-        // Hide tour elements
-        document.getElementById('fitzTourOverlay').classList.remove('active');
+        // Hide tour elements completely
+        const overlay = document.getElementById('fitzTourOverlay');
+        overlay.classList.remove('active');
+        overlay.classList.add('hidden'); // display: none to prevent click interception
+        
         document.getElementById('fitzTourModal').classList.remove('active');
         document.getElementById('fitzTourTooltip').classList.remove('active');
         document.getElementById('fitzTourSpotlight').style.display = 'none';
@@ -37643,8 +37650,11 @@ const FitzTour = {
     endTour: function() {
         this.isActive = false;
         
-        // Hide all tour elements
-        document.getElementById('fitzTourOverlay').classList.remove('active');
+        // Hide all tour elements completely
+        const overlay = document.getElementById('fitzTourOverlay');
+        overlay.classList.remove('active');
+        overlay.classList.add('hidden'); // display: none to prevent click interception
+        
         document.getElementById('fitzTourModal').classList.remove('active');
         document.getElementById('fitzTourTooltip').classList.remove('active');
         document.getElementById('fitzTourSpotlight').style.display = 'none';
@@ -37678,6 +37688,10 @@ const FitzTour = {
         localStorage.removeItem('fitzTourDeclined');
         this.hasSeenTour = false;
         this.hasDeclinedTour = false;
+        
+        // Remove hidden class so overlay can be shown again
+        document.getElementById('fitzTourOverlay').classList.remove('hidden');
+        
         this.startTour();
     }
 };
