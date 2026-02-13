@@ -1774,6 +1774,189 @@ header button[onclick*="logout"],
             display: none !important;
         }
     }
+    
+    /* === CRITICAL MOBILE FIXES - Feb 2025 === */
+    
+    /* FIX 1: Profile Menu - Full screen, scrollable, ABOVE sidebar */
+    #profileMenu {
+        padding: 0 !important;
+        align-items: flex-start !important;
+        z-index: 9999 !important; /* Above everything including sidebar */
+    }
+    
+    #profileMenu > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        min-height: 100dvh !important;
+        max-height: none !important;
+        height: auto !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 16px !important;
+        padding-bottom: 120px !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain !important;
+    }
+    
+    /* FIX 2: Chat messages container - MUST scroll */
+    #assistantScreen {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        max-height: 100vh !important;
+        max-height: 100dvh !important;
+        overflow: hidden !important;
+        position: relative !important;
+    }
+    
+    #messagesContainer {
+        flex: 1 1 0% !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain !important;
+        min-height: 0 !important;
+        position: relative !important;
+        touch-action: pan-y !important;
+    }
+    
+    /* Ensure messages inner container doesn't block scroll */
+    #messagesContainer > div {
+        min-height: auto !important;
+    }
+    
+    /* FIX 3: Consultation modal - full height scrollable */
+    #consultationBookingModal {
+        padding: 0 !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior: contain !important;
+        align-items: flex-start !important;
+    }
+    
+    #consultationBookingModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        min-height: auto !important;
+        max-height: none !important;
+        height: auto !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        margin-bottom: 80px !important;
+    }
+    
+    /* Ensure ALL consultation content sections are visible */
+    #consultationBookingModal .p-6,
+    #consultationBookingModal [class*="p-"] {
+        overflow: visible !important;
+    }
+    
+    #bookingStep1,
+    #bookingStep2,
+    #bookingStep3 {
+        overflow: visible !important;
+        padding-bottom: 20px !important;
+    }
+    
+    /* FIX 4: Input area must be tappable - remove any overlays */
+    #messageInput {
+        position: relative !important;
+        z-index: 5 !important;
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        touch-action: manipulation !important;
+        pointer-events: auto !important;
+    }
+    
+    /* Ensure input wrapper is interactive */
+    .bg-slate-800\/80.backdrop-blur-sm.border-t {
+        position: relative !important;
+        z-index: 30 !important;
+        pointer-events: auto !important;
+    }
+    
+    /* Input flex container */
+    .bg-slate-800\/80.backdrop-blur-sm.border-t .flex.gap-2 {
+        pointer-events: auto !important;
+    }
+    
+    /* All input buttons must be tappable */
+    #uploadButton,
+    #voiceButton,
+    #sendButton {
+        pointer-events: auto !important;
+        touch-action: manipulation !important;
+        z-index: 5 !important;
+    }
+    
+    /* FIX 5: Footer disclaimer should not block input */
+    .bg-slate-800\/50.border-t {
+        pointer-events: none !important;
+    }
+    
+    .bg-slate-800\/50.border-t a,
+    .bg-slate-800\/50.border-t button {
+        pointer-events: auto !important;
+    }
+    
+    /* FIX 6: Header must not expand and block content */
+    #mainHeader {
+        flex-shrink: 0 !important;
+        position: relative !important;
+        z-index: 40 !important;
+    }
+    
+    #dailyTipBanner {
+        flex-shrink: 0 !important;
+    }
+    
+    /* FIX 7: Scroll to bottom button positioning */
+    #scrollToBottomBtn {
+        bottom: 160px !important;
+        right: 16px !important;
+        z-index: 25 !important;
+    }
+    
+    /* FIX 8: Landscape mode - ensure content is visible */
+    @media (orientation: landscape) {
+        #assistantScreen {
+            height: 100vh !important;
+            height: 100dvh !important;
+        }
+        
+        #messagesContainer {
+            flex: 1 1 0% !important;
+            min-height: 0 !important;
+        }
+        
+        /* More compact header in landscape */
+        #mainHeader {
+            padding: 4px 10px !important;
+        }
+        
+        #dailyTipBanner {
+            display: none !important;
+        }
+        
+        .bg-slate-800\/80.backdrop-blur-sm.border-t {
+            padding: 8px 12px !important;
+        }
+    }
+}
+
+/* Ensure desktop styles aren't affected */
+@media (min-width: 769px) {
+    #profileMenu {
+        z-index: 50 !important;
+    }
+    
+    #profileMenu > div {
+        min-height: auto !important;
+        max-height: 90vh !important;
+        padding-bottom: 24px !important;
+    }
 }
 
 /* Desktop styles for tools menu (restore flex centering) */
@@ -18682,7 +18865,10 @@ function attemptAutoLogin() {
                     }, 500);
                     // Check if should show tour for first-time users
                     setTimeout(() => {
-                        if (typeof FitzTour !== 'undefined' && !FitzTour.hasSeenTour && !FitzTour.hasDeclinedTour) {
+                        // Check localStorage directly for freshest values
+                        const tourCompleted = localStorage.getItem('fitzTourCompleted') === 'true';
+                        const tourDeclined = localStorage.getItem('fitzTourDeclined') === 'true';
+                        if (typeof FitzTour !== 'undefined' && !tourCompleted && !tourDeclined) {
                             FitzTour.showTourPrompt();
                         }
                     }, 2500);
@@ -20274,6 +20460,15 @@ function closeMoreMenu() {
 
 // Profile Menu Functions
 function openProfileMenu() {
+    // Close sidebar first on mobile so profile menu is visible
+    var sidebar = document.getElementById('chatSidebar');
+    var overlay = document.getElementById('sidebarOverlay');
+    if (sidebar && !sidebar.classList.contains('closed')) {
+        sidebar.classList.add('closed');
+        if (overlay) overlay.classList.remove('visible');
+        document.body.style.overflow = '';
+    }
+    
     var menu = document.getElementById('profileMenu');
     if (menu) {
         menu.classList.remove('hidden');
@@ -28358,7 +28553,7 @@ function resetAIImport() {
 
 
 <!-- Profile Modal -->
-<div id="profileMenu" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50" onclick="if(event.target === this) closeProfileMenu();">
+<div id="profileMenu" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-[250]" onclick="if(event.target === this) closeProfileMenu();">
     <div class="bg-slate-800 rounded-2xl p-6 max-w-md w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-xl font-bold text-amber-500">👤 Your Profile</h2>
@@ -38547,7 +38742,20 @@ const FitzTour = {
     
     // Show initial tour prompt
     showTourPrompt: function() {
+        // Re-check localStorage right before showing (in case it was set elsewhere)
+        const completed = localStorage.getItem('fitzTourCompleted') === 'true';
+        const declined = localStorage.getItem('fitzTourDeclined') === 'true';
+        
+        if (completed || declined) {
+            this.hasSeenTour = completed;
+            this.hasDeclinedTour = declined;
+            console.log('Tour already completed or declined, not showing');
+            return;
+        }
+        
         const prompt = document.getElementById('fitzTourPrompt');
+        if (!prompt) return;
+        
         setTimeout(() => {
             prompt.classList.add('active');
         }, 100);
@@ -38962,7 +39170,11 @@ function checkAndShowTourPrompt() {
     const accessScreen = document.getElementById('accessScreen');
     const isLoggedIn = accessScreen && accessScreen.classList.contains('hidden');
     
-    if (isLoggedIn && !FitzTour.hasSeenTour && !FitzTour.hasDeclinedTour) {
+    // Re-check localStorage values fresh
+    const completed = localStorage.getItem('fitzTourCompleted') === 'true';
+    const declined = localStorage.getItem('fitzTourDeclined') === 'true';
+    
+    if (isLoggedIn && !completed && !declined) {
         FitzTour.showTourPrompt();
     }
 }
