@@ -1478,6 +1478,302 @@ header button[onclick*="logout"],
     #creditsModal details .flex.justify-between span:last-child {
         font-size: 0.75rem !important;
     }
+    
+    /* ==========================================
+       MOBILE DEEP DIVE FIXES - Feb 2025
+       Systematic fixes for mobile UX issues
+       ========================================== */
+    
+    /* === SUBSCRIPTION MODAL MOBILE === */
+    #subscriptionModal {
+        padding: 8px !important;
+        align-items: flex-start !important;
+    }
+    
+    #subscriptionModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        max-height: calc(100vh - 16px) !important;
+        border-radius: 16px !important;
+        padding: 16px !important;
+        margin: 0 !important;
+    }
+    
+    /* Subscription modal header - stack on mobile */
+    #subscriptionModal .flex.items-center.justify-between.mb-4 {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+    
+    #subscriptionModal h2 {
+        font-size: 1.25rem !important;
+    }
+    
+    #subscriptionModal #subscriptionModalManageBtn {
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+        white-space: nowrap !important;
+    }
+    
+    /* Billing toggle - more compact */
+    #subscriptionModal .flex.justify-center.mb-4 > div {
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+    }
+    
+    /* Plan cards - single column on very small screens */
+    #subscriptionModal .grid {
+        gap: 8px !important;
+    }
+    
+    #subscriptionModal .grid > div {
+        padding: 12px !important;
+    }
+    
+    #subscriptionModal .grid > div h3 {
+        font-size: 1rem !important;
+    }
+    
+    #subscriptionModal .grid > div .text-2xl {
+        font-size: 1.5rem !important;
+    }
+    
+    #subscriptionModal .grid > div ul {
+        font-size: 11px !important;
+    }
+    
+    #subscriptionModal .grid > div button {
+        padding: 10px !important;
+        font-size: 13px !important;
+        min-height: 44px !important;
+    }
+    
+    /* Plan badges - smaller on mobile */
+    #subscriptionModal .absolute.-top-2\.5 {
+        font-size: 9px !important;
+        padding: 2px 6px !important;
+    }
+    
+    /* === CONSULTATION BOOKING MODAL MOBILE === */
+    #consultationBookingModal {
+        padding: 0 !important;
+    }
+    
+    #consultationBookingModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        min-height: 100vh !important;
+    }
+    
+    #consultationBookingModal .rounded-t-2xl {
+        border-radius: 0 !important;
+        padding: 16px !important;
+    }
+    
+    #consultationBookingModal .text-5xl {
+        font-size: 2.5rem !important;
+    }
+    
+    #consultationBookingModal h2 {
+        font-size: 1.25rem !important;
+    }
+    
+    /* Consultation type buttons - stack better */
+    #consultationBookingModal .consultation-type-btn {
+        padding: 12px !important;
+    }
+    
+    #consultationBookingModal .consultation-type-btn .flex.items-center.justify-between {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+    
+    #consultationBookingModal .consultation-type-btn .text-2xl {
+        font-size: 1.5rem !important;
+    }
+    
+    #consultationBookingModal .consultation-type-btn p.text-white {
+        font-size: 14px !important;
+    }
+    
+    #consultationBookingModal .consultation-type-btn span.bg-purple-600\/30 {
+        font-size: 11px !important;
+        padding: 4px 8px !important;
+        margin-top: 4px !important;
+        width: 100% !important;
+        text-align: center !important;
+    }
+    
+    /* === HEADER MOBILE FIXES === */
+    /* Ensure header buttons don't overflow */
+    #headerRight {
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        scrollbar-width: none !important;
+        -ms-overflow-style: none !important;
+        max-width: 100% !important;
+    }
+    
+    #headerRight::-webkit-scrollbar {
+        display: none !important;
+    }
+    
+    /* Crisis and Consultant buttons - very compact on mobile */
+    #headerRight > button {
+        flex-shrink: 0 !important;
+        padding: 6px 8px !important;
+    }
+    
+    #headerRight > button .text-lg,
+    #headerRight > button .text-xl {
+        font-size: 16px !important;
+    }
+    
+    /* === iOS SAFE AREA SUPPORT === */
+    /* Input area padding for iPhone notch/home indicator */
+    .bg-slate-800\/80.border-t {
+        padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+    }
+    
+    /* Footer disclaimer safe area */
+    .bg-slate-800\/50.border-t {
+        padding-bottom: max(12px, env(safe-area-inset-bottom)) !important;
+    }
+    
+    /* === SCROLL TO BOTTOM BUTTON FIX === */
+    #scrollToBottomBtn {
+        bottom: 180px !important;
+        right: 16px !important;
+    }
+    
+    /* === TOUCH TARGET IMPROVEMENTS === */
+    /* Ensure all interactive elements meet 44x44px minimum */
+    #headerRight button,
+    .sidebar-chat-item,
+    .sidebar-new-chat-btn,
+    #uploadButton,
+    #voiceButton,
+    #sendButton {
+        min-width: 44px !important;
+        min-height: 44px !important;
+    }
+    
+    /* === TEXT OVERFLOW FIXES === */
+    /* Prevent text overflow in cramped areas */
+    #headerTitle h1 {
+        white-space: nowrap !important;
+    }
+    
+    #sidebarVenueName {
+        max-width: 120px !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+    
+    /* === EXPERT REVIEW MODAL MOBILE === */
+    #expertReviewModal {
+        padding: 0 !important;
+    }
+    
+    #expertReviewModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 16px !important;
+    }
+    
+    /* === FEEDBACK MODAL MOBILE === */
+    #feedbackModal {
+        padding: 8px !important;
+    }
+    
+    #feedbackModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 16px !important;
+    }
+    
+    /* === TERMS/PRIVACY MODAL MOBILE === */
+    #termsModal,
+    #privacyModal {
+        padding: 0 !important;
+    }
+    
+    #termsModal > div,
+    #privacyModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+    }
+    
+    /* === SEARCH MODAL MOBILE === */
+    #searchModal {
+        padding: 16px !important;
+    }
+    
+    #searchModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+    
+    /* === PROMPT LIMIT MODAL MOBILE === */
+    #promptLimitModal {
+        padding: 12px !important;
+    }
+    
+    #promptLimitModal > div {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 16px !important;
+    }
+    
+    /* === LANDSCAPE MODE IMPROVEMENTS === */
+    @media (orientation: landscape) and (max-height: 500px) {
+        /* Reduce header height in landscape */
+        #mainHeader {
+            padding: 4px 10px !important;
+        }
+        
+        /* Reduce daily tip height */
+        #dailyTipBanner {
+            padding: 2px 10px !important;
+        }
+        
+        /* More compact input area */
+        .bg-slate-800\/80.border-t {
+            padding: 8px 12px !important;
+        }
+        
+        /* Scroll button closer to bottom */
+        #scrollToBottomBtn {
+            bottom: 100px !important;
+        }
+    }
+    
+    /* === VERY SMALL SCREENS (< 360px) === */
+    @media (max-width: 359px) {
+        /* Single column plan cards */
+        #subscriptionModal .grid {
+            grid-template-columns: 1fr !important;
+        }
+        
+        /* Even smaller fonts */
+        #headerTitle h1 {
+            font-size: 16px !important;
+        }
+        
+        /* Hide consultant button text */
+        #headerRight button span.hidden.sm\\:inline {
+            display: none !important;
+        }
+    }
 }
 
 /* Desktop styles for tools menu (restore flex centering) */
