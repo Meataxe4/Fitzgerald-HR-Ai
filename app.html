@@ -7940,6 +7940,9 @@ async function loadCreditsFromFirebase() {
             
             // Firebase is source of truth - load exactly what's stored
             // Support both old and new field names during migration
+            // Also check for stripeCustomerId at top level (some older accounts)
+            const topLevelData = doc.data();
+            
             userCredits = {
                 ...userCredits,
                 subscriptionTier: firebaseCredits.subscriptionTier || firebaseCredits.tier || 'free',
@@ -7951,8 +7954,8 @@ async function loadCreditsFromFirebase() {
                 monthlyPromptsReset: firebaseCredits.monthlyPromptsReset || new Date().toISOString(),
                 subscriptionStartDate: firebaseCredits.subscriptionStartDate || null,
                 lastUpdated: firebaseCredits.lastUpdated || null,
-                // Stripe subscription management fields
-                stripeCustomerId: firebaseCredits.stripeCustomerId || null,
+                // Stripe subscription management fields - check both credits and top level
+                stripeCustomerId: firebaseCredits.stripeCustomerId || topLevelData.stripeCustomerId || null,
                 stripeSubscriptionId: firebaseCredits.stripeSubscriptionId || null,
                 subscriptionStatus: firebaseCredits.subscriptionStatus || null,
                 subscriptionPeriodEnd: firebaseCredits.subscriptionPeriodEnd || null,
@@ -7960,6 +7963,8 @@ async function loadCreditsFromFirebase() {
                 billingInterval: firebaseCredits.billingInterval || null,
                 lastRenewalDate: firebaseCredits.lastRenewalDate || null
             };
+            
+            console.log('📦 Stripe Customer ID:', userCredits.stripeCustomerId);
             
             // Check if it's a new month - reset prompts for free tier
             const now = new Date();
@@ -13572,15 +13577,22 @@ function updateManageSubscriptionUI() {
  */
 async function openBillingPortal(flow) {
     if (!userCredits.stripeCustomerId) {
-        showNotification('❌ No subscription found. Please subscribe first.', 'error');
+        showNotification('📧 Please contact support@fitzhr.com to manage your subscription.', 'info', 5000);
         return;
     }
     
     const btn = document.getElementById('billingPortalBtn');
+    const manageBtn = document.getElementById('subscriptionModalManageBtn');
     const originalText = btn?.innerHTML;
+    const originalManageText = manageBtn?.innerHTML;
+    
     if (btn) {
         btn.innerHTML = '<span class="animate-spin">⏳</span> Opening...';
         btn.disabled = true;
+    }
+    if (manageBtn) {
+        manageBtn.innerHTML = '⏳ Opening...';
+        manageBtn.disabled = true;
     }
     
     try {
@@ -13607,11 +13619,15 @@ async function openBillingPortal(flow) {
         
     } catch (error) {
         console.error('Billing portal error:', error);
-        showNotification('❌ Could not open billing portal. Please try again or contact support.', 'error');
+        showNotification('❌ Could not open billing portal. Please contact support@fitzhr.com', 'error');
         
         if (btn) {
             btn.innerHTML = originalText;
             btn.disabled = false;
+        }
+        if (manageBtn) {
+            manageBtn.innerHTML = originalManageText || '⚙️ Manage Subscription';
+            manageBtn.disabled = false;
         }
     }
 }
@@ -14200,11 +14216,15 @@ function updateSubscriptionModalButtons() {
     
     // Check if user has Stripe customer ID (needed for portal)
     const hasStripeId = userCredits.stripeCustomerId;
+    const isPaidUser = currentTier !== 'free';
     
-    // Show/hide manage subscription button (only for paying customers)
+    console.log('📋 Subscription modal - Tier:', currentTier, 'StripeID:', hasStripeId);
+    
+    // Show/hide manage subscription button (for paying customers)
     const manageBtn = document.getElementById('subscriptionModalManageBtn');
     if (manageBtn) {
-        if (hasStripeId && currentTier !== 'free') {
+        // Show for any paid user (they can contact support if no Stripe ID)
+        if (isPaidUser) {
             manageBtn.classList.remove('hidden');
         } else {
             manageBtn.classList.add('hidden');
