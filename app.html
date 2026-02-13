@@ -6753,7 +6753,7 @@ Be as specific as possible!"></textarea>
         <!-- Plan Cards - 4 column grid -->
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
             <!-- Free -->
-            <div class="bg-slate-900 rounded-xl p-4 border border-green-500/50 relative">
+            <div id="planCard_free" class="bg-slate-900 rounded-xl p-4 border border-green-500/50 relative">
                 <div class="absolute -top-2.5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                     FREE FOREVER
                 </div>
@@ -6774,14 +6774,14 @@ Be as specific as possible!"></textarea>
                     <li class="flex items-center gap-2 text-slate-500"><span>–</span> Expert reviews</li>
                 </ul>
                 
-                <button onclick="closeSubscriptionModal()" 
+                <button id="planBtn_free" onclick="closeSubscriptionModal()" 
                         class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 rounded-lg transition-all text-sm">
                     Continue Free
                 </button>
             </div>
 
             <!-- Starter -->
-            <div class="bg-slate-900 rounded-xl p-4 border border-slate-700 hover:border-amber-500 transition-all">
+            <div id="planCard_starter" class="bg-slate-900 rounded-xl p-4 border border-slate-700 hover:border-amber-500 transition-all">
                 <h3 class="text-lg font-bold text-white mb-1">Starter</h3>
                 <p class="text-slate-400 text-xs mb-3">Small venues, occasional needs</p>
                 
@@ -6798,14 +6798,14 @@ Be as specific as possible!"></textarea>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR Tools</li>
                 </ul>
                 
-                <button onclick="purchaseSubscription('starter', currentBilling)" 
+                <button id="planBtn_starter" onclick="purchaseSubscription('starter', currentBilling)" 
                         class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded-lg transition-all text-sm">
                     Choose Starter
                 </button>
             </div>
 
             <!-- Pro (Recommended) -->
-            <div class="bg-gradient-to-b from-amber-500/20 to-slate-900 rounded-xl p-4 border-2 border-amber-500 relative">
+            <div id="planCard_pro" class="bg-gradient-to-b from-amber-500/20 to-slate-900 rounded-xl p-4 border-2 border-amber-500 relative">
                 <div class="absolute -top-2.5 left-1/2 transform -translate-x-1/2 bg-amber-500 text-slate-900 text-xs font-bold px-2 py-0.5 rounded-full">
                     MOST POPULAR
                 </div>
@@ -6826,14 +6826,14 @@ Be as specific as possible!"></textarea>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR Tools</li>
                 </ul>
                 
-                <button onclick="purchaseSubscription('pro', currentBilling)" 
+                <button id="planBtn_pro" onclick="purchaseSubscription('pro', currentBilling)" 
                         class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 rounded-lg transition-all text-sm">
                     Choose Pro
                 </button>
             </div>
 
             <!-- Business -->
-            <div class="bg-slate-900 rounded-xl p-4 border border-slate-700 hover:border-amber-500 transition-all">
+            <div id="planCard_business" class="bg-slate-900 rounded-xl p-4 border border-slate-700 hover:border-amber-500 transition-all">
                 <h3 class="text-lg font-bold text-white mb-1">Business</h3>
                 <p class="text-slate-400 text-xs mb-3">Multi-venue, high-turnover</p>
                 
@@ -6850,7 +6850,7 @@ Be as specific as possible!"></textarea>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR Tools</li>
                 </ul>
                 
-                <button onclick="purchaseSubscription('business', currentBilling)" 
+                <button id="planBtn_business" onclick="purchaseSubscription('business', currentBilling)" 
                         class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded-lg transition-all text-sm">
                     Choose Business
                 </button>
@@ -14178,7 +14178,60 @@ function showSubscriptionOptions() {
  * Open the subscription selection modal
  */
 function openSubscriptionModal() {
+    // Update buttons based on current tier
+    updateSubscriptionModalButtons();
     document.getElementById('subscriptionModal').classList.remove('hidden');
+}
+
+/**
+ * Update subscription modal buttons based on current tier
+ */
+function updateSubscriptionModalButtons() {
+    const currentTier = (userCredits.subscriptionTier || userCredits.tier || 'free').toLowerCase();
+    const tierOrder = ['free', 'starter', 'pro', 'business'];
+    const currentTierIndex = tierOrder.indexOf(currentTier);
+    
+    // Check if user has Stripe customer ID (needed for portal)
+    const hasStripeId = userCredits.stripeCustomerId;
+    
+    tierOrder.forEach((tier, index) => {
+        const btn = document.getElementById(`planBtn_${tier}`);
+        const card = document.getElementById(`planCard_${tier}`);
+        if (!btn || !card) return;
+        
+        // Reset card styling
+        card.classList.remove('ring-2', 'ring-green-500');
+        
+        if (tier === currentTier) {
+            // Current plan
+            btn.textContent = '✓ Current Plan';
+            btn.className = 'w-full bg-green-600 text-white font-bold py-2 rounded-lg text-sm cursor-default';
+            btn.onclick = null;
+            btn.disabled = true;
+            // Add highlight to current plan card
+            card.classList.add('ring-2', 'ring-green-500');
+        } else if (index > currentTierIndex) {
+            // Upgrade option
+            const tierName = tier.charAt(0).toUpperCase() + tier.slice(1);
+            btn.textContent = `Upgrade to ${tierName}`;
+            btn.className = 'w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 rounded-lg transition-all text-sm';
+            btn.onclick = () => purchaseSubscription(tier, currentBilling);
+            btn.disabled = false;
+        } else if (index < currentTierIndex) {
+            // Downgrade option (via portal)
+            if (tier === 'free') {
+                btn.textContent = 'Manage Plan';
+                btn.className = 'w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded-lg transition-all text-sm';
+                btn.onclick = hasStripeId ? () => openBillingPortal() : null;
+                btn.disabled = !hasStripeId;
+            } else {
+                btn.textContent = 'Downgrade';
+                btn.className = 'w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded-lg transition-all text-sm';
+                btn.onclick = hasStripeId ? () => openBillingPortal() : null;
+                btn.disabled = !hasStripeId;
+            }
+        }
+    });
 }
 
 /**
