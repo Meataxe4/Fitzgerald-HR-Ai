@@ -14397,8 +14397,8 @@ async function initiateStripeCheckout(priceKey) {
                 productKey: priceKey,
                 userId: userKey,
                 userEmail: userEmail,
-                successUrl: window.location.origin + '/?payment=success',
-                cancelUrl: window.location.origin + '/?payment=cancelled'
+                successUrl: window.location.origin + '/app?payment=success',
+                cancelUrl: window.location.origin + '/app?payment=cancelled'
             })
         });
         
