@@ -4102,7 +4102,7 @@ async function checkFirestoreData() {
                             </svg>
                         </summary>
                         <div class="px-5 pb-5 text-slate-400 text-sm">
-                            Yes! The free plan includes 1 document credit per month and 20 chat prompts. Perfect for trying out Fitz before upgrading.
+                            Yes! The free plan includes 20 AI chats/month, 1 free template download, and unlimited access to all HR Tools (Award Wizard, Compliance Calendar, etc). Perfect for trying out Fitz before upgrading.
                         </div>
                     </details>
                     
@@ -6707,124 +6707,149 @@ Be as specific as possible!"></textarea>
 <!-- ========================================== -->
 <!-- SUBSCRIPTION SELECTION MODAL -->
 <!-- ========================================== -->
-<div id="subscriptionModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-[60]">
-    <div class="bg-slate-800 rounded-2xl p-8 max-w-4xl w-full border-2 border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
-        <div class="flex items-center justify-between mb-6">
+<div id="subscriptionModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-[60]">
+    <div class="bg-slate-800 rounded-2xl p-6 max-w-5xl w-full border-2 border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-4">
             <div>
-                <h2 class="text-2xl font-bold text-amber-400">⭐ Choose Your Plan</h2>
-                <p class="text-slate-400 text-sm">Full template access + expert-reviewed documents</p>
+                <h2 class="text-xl sm:text-2xl font-bold text-amber-400">⭐ Choose Your Plan</h2>
+                <p class="text-slate-400 text-sm">Start free, upgrade when you need more</p>
             </div>
             <button onclick="closeSubscriptionModal()" class="text-slate-400 hover:text-white text-2xl">×</button>
         </div>
 
         <!-- Billing Toggle - Canva Style (Annual Default) -->
-        <div class="flex justify-center mb-6">
+        <div class="flex justify-center mb-4">
             <div class="bg-slate-900 rounded-lg p-1 flex items-center">
                 <button id="billingMonthly" onclick="setBilling('monthly')" 
-                        class="px-4 py-2 rounded-md text-sm font-medium transition-all text-slate-400 hover:text-white">
+                        class="px-3 py-1.5 rounded-md text-sm font-medium transition-all text-slate-400 hover:text-white">
                     Monthly
                 </button>
                 <button id="billingAnnual" onclick="setBilling('annual')" 
-                        class="px-4 py-2 rounded-md text-sm font-medium transition-all bg-amber-500 text-slate-900">
+                        class="px-3 py-1.5 rounded-md text-sm font-medium transition-all bg-amber-500 text-slate-900">
                     Yearly
                 </button>
                 <span class="ml-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">Save 20%</span>
             </div>
         </div>
 
-        <!-- Plan Cards -->
-        <div class="grid md:grid-cols-3 gap-4 mb-6">
-            <!-- Starter -->
-            <div class="bg-slate-900 rounded-xl p-6 border border-slate-700 hover:border-amber-500 transition-all">
-                <h3 class="text-xl font-bold text-white mb-2">Starter</h3>
-                <p class="text-slate-400 text-sm mb-4">For small venues with occasional HR needs</p>
-                
-                <div class="mb-4">
-                    <span id="starterPrice" class="text-3xl font-bold text-white">$249</span>
-                    <span id="starterBilling" class="text-slate-400">/year</span>
+        <!-- Plan Cards - 4 column grid -->
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+            <!-- Free -->
+            <div class="bg-slate-900 rounded-xl p-4 border border-green-500/50 relative">
+                <div class="absolute -top-2.5 left-1/2 transform -translate-x-1/2 bg-green-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                    FREE FOREVER
                 </div>
-                <p id="starterMonthlyEquiv" class="text-green-400 text-sm mb-4">Just $21/month</p>
                 
-                <ul class="text-slate-300 text-sm space-y-2 mb-6">
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>All</strong> HR templates</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>8</strong> expert-reviewed docs/year</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Unlimited AI chat</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 24hr review turnaround</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Email support</li>
+                <h3 class="text-lg font-bold text-green-400 mb-1 mt-1">Free</h3>
+                <p class="text-slate-400 text-xs mb-3">Try with no commitment</p>
+                
+                <div class="mb-2">
+                    <span class="text-2xl font-bold text-white">$0</span>
+                    <span class="text-slate-400 text-sm">/forever</span>
+                </div>
+                <p class="text-green-400 text-xs mb-3">No credit card needed</p>
+                
+                <ul class="text-slate-300 text-xs space-y-1.5 mb-4">
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>20</strong> AI chats/month</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 1 free template</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR Tools</li>
+                    <li class="flex items-center gap-2 text-slate-500"><span>–</span> Expert reviews</li>
+                </ul>
+                
+                <button onclick="closeSubscriptionModal()" 
+                        class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-2 rounded-lg transition-all text-sm">
+                    Continue Free
+                </button>
+            </div>
+
+            <!-- Starter -->
+            <div class="bg-slate-900 rounded-xl p-4 border border-slate-700 hover:border-amber-500 transition-all">
+                <h3 class="text-lg font-bold text-white mb-1">Starter</h3>
+                <p class="text-slate-400 text-xs mb-3">Small venues, occasional needs</p>
+                
+                <div class="mb-2">
+                    <span id="starterPrice" class="text-2xl font-bold text-white">$249</span>
+                    <span id="starterBilling" class="text-slate-400 text-sm">/year</span>
+                </div>
+                <p id="starterMonthlyEquiv" class="text-green-400 text-xs mb-3">Just $21/month</p>
+                
+                <ul class="text-slate-300 text-xs space-y-1.5 mb-4">
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> AI chat</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>All</strong> templates</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>8</strong> expert reviews/yr</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR Tools</li>
                 </ul>
                 
                 <button onclick="purchaseSubscription('starter', currentBilling)" 
-                        class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-lg transition-all">
+                        class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded-lg transition-all text-sm">
                     Choose Starter
                 </button>
             </div>
 
             <!-- Pro (Recommended) -->
-            <div class="bg-gradient-to-b from-amber-500/20 to-slate-900 rounded-xl p-6 border-2 border-amber-500 relative">
-                <div class="absolute -top-3 left-1/2 transform -translate-x-1/2 bg-amber-500 text-slate-900 text-xs font-bold px-3 py-1 rounded-full">
+            <div class="bg-gradient-to-b from-amber-500/20 to-slate-900 rounded-xl p-4 border-2 border-amber-500 relative">
+                <div class="absolute -top-2.5 left-1/2 transform -translate-x-1/2 bg-amber-500 text-slate-900 text-xs font-bold px-2 py-0.5 rounded-full">
                     MOST POPULAR
                 </div>
                 
-                <h3 class="text-xl font-bold text-amber-400 mb-2">Pro</h3>
-                <p class="text-slate-400 text-sm mb-4">For busy venues with regular HR needs</p>
+                <h3 class="text-lg font-bold text-amber-400 mb-1 mt-1">Pro</h3>
+                <p class="text-slate-400 text-xs mb-3">Busy venues, regular needs</p>
                 
-                <div class="mb-4">
-                    <span id="proPrice" class="text-3xl font-bold text-white">$449</span>
-                    <span id="proBilling" class="text-slate-400">/year</span>
+                <div class="mb-2">
+                    <span id="proPrice" class="text-2xl font-bold text-white">$449</span>
+                    <span id="proBilling" class="text-slate-400 text-sm">/year</span>
                 </div>
-                <p id="proMonthlyEquiv" class="text-green-400 text-sm mb-4">Just $37/month</p>
+                <p id="proMonthlyEquiv" class="text-green-400 text-xs mb-3">Just $37/month</p>
                 
-                <ul class="text-slate-300 text-sm space-y-2 mb-6">
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>All</strong> HR templates</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>20</strong> expert-reviewed docs/year</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Unlimited AI chat</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 24hr review turnaround</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Priority email support</li>
+                <ul class="text-slate-300 text-xs space-y-1.5 mb-4">
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> AI chat</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>All</strong> templates</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>20</strong> expert reviews/yr</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR Tools</li>
                 </ul>
                 
                 <button onclick="purchaseSubscription('pro', currentBilling)" 
-                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 rounded-lg transition-all text-sm">
                     Choose Pro
                 </button>
             </div>
 
             <!-- Business -->
-            <div class="bg-slate-900 rounded-xl p-6 border border-slate-700 hover:border-amber-500 transition-all">
-                <h3 class="text-xl font-bold text-white mb-2">Business</h3>
-                <p class="text-slate-400 text-sm mb-4">For multi-venue or high-turnover operations</p>
+            <div class="bg-slate-900 rounded-xl p-4 border border-slate-700 hover:border-amber-500 transition-all">
+                <h3 class="text-lg font-bold text-white mb-1">Business</h3>
+                <p class="text-slate-400 text-xs mb-3">Multi-venue, high-turnover</p>
                 
-                <div class="mb-4">
-                    <span id="businessPrice" class="text-3xl font-bold text-white">$899</span>
-                    <span id="businessBilling" class="text-slate-400">/year</span>
+                <div class="mb-2">
+                    <span id="businessPrice" class="text-2xl font-bold text-white">$899</span>
+                    <span id="businessBilling" class="text-slate-400 text-sm">/year</span>
                 </div>
-                <p id="businessMonthlyEquiv" class="text-green-400 text-sm mb-4">Just $75/month</p>
+                <p id="businessMonthlyEquiv" class="text-green-400 text-xs mb-3">Just $75/month</p>
                 
-                <ul class="text-slate-300 text-sm space-y-2 mb-6">
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>All</strong> HR templates</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>50</strong> expert-reviewed docs/year</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Unlimited AI chat</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Priority</strong> review turnaround</li>
-                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Phone support</li>
+                <ul class="text-slate-300 text-xs space-y-1.5 mb-4">
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> AI chat</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>All</strong> templates</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>50</strong> expert reviews/yr</li>
+                    <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR Tools</li>
                 </ul>
                 
                 <button onclick="purchaseSubscription('business', currentBilling)" 
-                        class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-3 rounded-lg transition-all">
+                        class="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded-lg transition-all text-sm">
                     Choose Business
                 </button>
             </div>
         </div>
 
         <!-- What's Included -->
-        <div class="bg-slate-900/50 rounded-lg p-4 mb-4">
-            <p class="text-slate-300 text-sm text-center">
-                <span class="text-amber-400 font-semibold">Every reviewed document</span> is checked by a qualified HR consultant before you download — included in your subscription.
+        <div class="bg-slate-900/50 rounded-lg p-3 mb-3">
+            <p class="text-slate-300 text-xs text-center">
+                <span class="text-amber-400 font-semibold">Every reviewed document</span> is checked by a qualified HR consultant — included in paid plans.
             </p>
         </div>
 
         <!-- FAQ -->
-        <div class="text-center text-slate-400 text-sm">
-            <p>All plans include a 14-day money-back guarantee. Cancel anytime.</p>
-            <p class="mt-2">Questions? Contact <a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline">support@fitzhr.com</a></p>
+        <div class="text-center text-slate-400 text-xs">
+            <p>14-day money-back guarantee on paid plans. Cancel anytime.</p>
+            <p class="mt-1">Questions? <a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline">support@fitzhr.com</a></p>
         </div>
     </div>
 </div>
