@@ -6864,6 +6864,14 @@ Be as specific as possible!"></textarea>
             </p>
         </div>
 
+        <!-- Manage Subscription Link (for paying customers) -->
+        <div id="subscriptionModalManageLink" class="hidden text-center mb-3">
+            <button onclick="openBillingPortal(); closeSubscriptionModal();" 
+                    class="text-amber-400 hover:text-amber-300 text-sm underline">
+                ⚙️ Manage subscription, billing & payment methods
+            </button>
+        </div>
+
         <!-- FAQ -->
         <div class="text-center text-slate-400 text-xs">
             <p>14-day money-back guarantee on paid plans. Cancel anytime.</p>
@@ -14194,6 +14202,16 @@ function updateSubscriptionModalButtons() {
     // Check if user has Stripe customer ID (needed for portal)
     const hasStripeId = userCredits.stripeCustomerId;
     
+    // Show/hide manage subscription link
+    const manageLink = document.getElementById('subscriptionModalManageLink');
+    if (manageLink) {
+        if (hasStripeId && currentTier !== 'free') {
+            manageLink.classList.remove('hidden');
+        } else {
+            manageLink.classList.add('hidden');
+        }
+    }
+    
     tierOrder.forEach((tier, index) => {
         const btn = document.getElementById(`planBtn_${tier}`);
         const card = document.getElementById(`planCard_${tier}`);
@@ -14214,22 +14232,26 @@ function updateSubscriptionModalButtons() {
             // Upgrade option
             const tierName = tier.charAt(0).toUpperCase() + tier.slice(1);
             btn.textContent = `Upgrade to ${tierName}`;
-            btn.className = 'w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 rounded-lg transition-all text-sm';
+            btn.className = 'w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-2 rounded-lg transition-all text-sm cursor-pointer';
             btn.onclick = () => purchaseSubscription(tier, currentBilling);
             btn.disabled = false;
         } else if (index < currentTierIndex) {
             // Downgrade option (via portal)
             if (tier === 'free') {
-                btn.textContent = 'Manage Plan';
-                btn.className = 'w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded-lg transition-all text-sm';
-                btn.onclick = hasStripeId ? () => openBillingPortal() : null;
-                btn.disabled = !hasStripeId;
+                btn.textContent = 'Cancel Subscription';
+                btn.className = 'w-full bg-red-600/80 hover:bg-red-600 text-white font-bold py-2 rounded-lg transition-all text-sm cursor-pointer';
             } else {
                 btn.textContent = 'Downgrade';
-                btn.className = 'w-full bg-slate-700 hover:bg-slate-600 text-white font-bold py-2 rounded-lg transition-all text-sm';
-                btn.onclick = hasStripeId ? () => openBillingPortal() : null;
-                btn.disabled = !hasStripeId;
+                btn.className = 'w-full bg-slate-600 hover:bg-slate-500 text-white font-bold py-2 rounded-lg transition-all text-sm cursor-pointer';
             }
+            btn.onclick = () => {
+                if (hasStripeId) {
+                    openBillingPortal();
+                } else {
+                    showNotification('Please contact support@fitzhr.com to manage your subscription.', 'info');
+                }
+            };
+            btn.disabled = false;
         }
     });
 }
