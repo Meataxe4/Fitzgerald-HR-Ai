@@ -6677,6 +6677,24 @@ Be as specific as possible!"></textarea>
             </button>
         </div>
 
+        <!-- Manage Subscription (only shown for paying customers) -->
+        <div id="manageSubscriptionSection" class="hidden bg-slate-900 rounded-lg p-4 mb-6 border border-slate-700">
+            <h3 class="text-white font-bold mb-2">⚙️ Manage Your Subscription</h3>
+            <p class="text-slate-400 text-sm mb-3">Update payment method, change plan, or cancel.</p>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <button onclick="openBillingPortal()" 
+                        id="billingPortalBtn"
+                        class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg transition-all flex items-center justify-center gap-2">
+                    <span>💳</span> Billing & Payments
+                </button>
+                <button onclick="openBillingPortal('subscription')" 
+                        class="flex-1 bg-slate-700 hover:bg-slate-600 text-white font-semibold py-2 px-4 rounded-lg transition-all flex items-center justify-center gap-2">
+                    <span>📋</span> Change Plan
+                </button>
+            </div>
+            <p id="subscriptionStatusText" class="text-slate-500 text-xs mt-3 text-center"></p>
+        </div>
+
         <!-- Document Categories Reference -->
         <details class="bg-slate-900 rounded-lg p-4">
             <summary class="text-white font-bold cursor-pointer">📋 What Uses Review Credits?</summary>
@@ -7819,7 +7837,15 @@ let userCredits = {
     monthlyPromptsReset: null,
     lowRiskDocsUsed: 0,        // For free tier only (they get 1 total)
     subscriptionStartDate: null,
-    lastUpdated: null
+    lastUpdated: null,
+    // Stripe subscription management fields
+    stripeCustomerId: null,
+    stripeSubscriptionId: null,
+    subscriptionStatus: null,        // 'active', 'past_due', 'canceled', etc.
+    subscriptionPeriodEnd: null,     // When current period ends (for billing date display)
+    cancelAtPeriodEnd: false,        // True if user has requested cancellation
+    billingInterval: null,           // 'month' or 'year'
+    lastRenewalDate: null
 };
 
 // Flag to prevent Firebase from overwriting local credits after payment return
@@ -7859,7 +7885,14 @@ function initializeUserCredits() {
             monthlyPromptsReset: new Date().toISOString(),
             lowRiskDocsUsed: 0,
             subscriptionStartDate: null,
-            lastUpdated: null
+            lastUpdated: null,
+            stripeCustomerId: null,
+            stripeSubscriptionId: null,
+            subscriptionStatus: null,
+            subscriptionPeriodEnd: null,
+            cancelAtPeriodEnd: false,
+            billingInterval: null,
+            lastRenewalDate: null
         };
         console.log('📦 No localStorage cache - using defaults');
     }
@@ -7910,7 +7943,15 @@ async function loadCreditsFromFirebase() {
                 monthlyPromptsUsed: firebaseCredits.monthlyPromptsUsed || 0,
                 monthlyPromptsReset: firebaseCredits.monthlyPromptsReset || new Date().toISOString(),
                 subscriptionStartDate: firebaseCredits.subscriptionStartDate || null,
-                lastUpdated: firebaseCredits.lastUpdated || null
+                lastUpdated: firebaseCredits.lastUpdated || null,
+                // Stripe subscription management fields
+                stripeCustomerId: firebaseCredits.stripeCustomerId || null,
+                stripeSubscriptionId: firebaseCredits.stripeSubscriptionId || null,
+                subscriptionStatus: firebaseCredits.subscriptionStatus || null,
+                subscriptionPeriodEnd: firebaseCredits.subscriptionPeriodEnd || null,
+                cancelAtPeriodEnd: firebaseCredits.cancelAtPeriodEnd || false,
+                billingInterval: firebaseCredits.billingInterval || null,
+                lastRenewalDate: firebaseCredits.lastRenewalDate || null
             };
             
             // Check if it's a new month - reset prompts for free tier
@@ -8006,7 +8047,15 @@ async function syncCreditsToFirebase() {
                 monthlyPromptsUsed: userCredits.monthlyPromptsUsed || 0,
                 monthlyPromptsReset: userCredits.monthlyPromptsReset,
                 subscriptionStartDate: userCredits.subscriptionStartDate,
-                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
+                // Stripe subscription management fields
+                stripeCustomerId: userCredits.stripeCustomerId || null,
+                stripeSubscriptionId: userCredits.stripeSubscriptionId || null,
+                subscriptionStatus: userCredits.subscriptionStatus || null,
+                subscriptionPeriodEnd: userCredits.subscriptionPeriodEnd || null,
+                cancelAtPeriodEnd: userCredits.cancelAtPeriodEnd || false,
+                billingInterval: userCredits.billingInterval || null,
+                lastRenewalDate: userCredits.lastRenewalDate || null
             }
         }, { merge: true });
         console.log('✅ Credits synced to Firebase');
@@ -13458,6 +13507,9 @@ function openCreditsModal() {
     if (freeDocsDropdown) freeDocsDropdown.classList.add('hidden');
     if (freeDocsChevron) freeDocsChevron.classList.remove('rotate-180');
     
+    // Show/hide manage subscription section
+    updateManageSubscriptionUI();
+    
     document.getElementById('creditsModal').classList.remove('hidden');
 }
 
@@ -13466,6 +13518,95 @@ function openCreditsModal() {
  */
 function closeCreditsModal() {
     document.getElementById('creditsModal').classList.add('hidden');
+}
+
+/**
+ * Update the manage subscription UI based on current subscription status
+ */
+function updateManageSubscriptionUI() {
+    const manageSection = document.getElementById('manageSubscriptionSection');
+    const statusText = document.getElementById('subscriptionStatusText');
+    
+    if (!manageSection) return;
+    
+    // Show manage section for paying customers with Stripe customer ID
+    const isPaying = userCredits.tier && userCredits.tier !== 'free';
+    const hasStripeId = userCredits.stripeCustomerId;
+    
+    if (isPaying && hasStripeId) {
+        manageSection.classList.remove('hidden');
+        
+        // Update status text
+        if (statusText) {
+            if (userCredits.cancelAtPeriodEnd) {
+                const endDate = userCredits.subscriptionPeriodEnd 
+                    ? new Date(userCredits.subscriptionPeriodEnd).toLocaleDateString('en-AU')
+                    : 'end of billing period';
+                statusText.textContent = `⚠️ Your subscription will cancel on ${endDate}`;
+                statusText.classList.add('text-amber-400');
+                statusText.classList.remove('text-slate-500');
+            } else if (userCredits.subscriptionPeriodEnd) {
+                const renewDate = new Date(userCredits.subscriptionPeriodEnd).toLocaleDateString('en-AU');
+                statusText.textContent = `Next billing date: ${renewDate}`;
+                statusText.classList.remove('text-amber-400');
+                statusText.classList.add('text-slate-500');
+            } else {
+                statusText.textContent = '';
+            }
+        }
+    } else {
+        manageSection.classList.add('hidden');
+    }
+}
+
+/**
+ * Open Stripe Customer Portal for subscription management
+ * @param {string} flow - Optional flow type: 'subscription' for plan changes, undefined for general billing
+ */
+async function openBillingPortal(flow) {
+    if (!userCredits.stripeCustomerId) {
+        showNotification('❌ No subscription found. Please subscribe first.', 'error');
+        return;
+    }
+    
+    const btn = document.getElementById('billingPortalBtn');
+    const originalText = btn?.innerHTML;
+    if (btn) {
+        btn.innerHTML = '<span class="animate-spin">⏳</span> Opening...';
+        btn.disabled = true;
+    }
+    
+    try {
+        const response = await fetch('/.netlify/functions/create-portal-session', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                customerId: userCredits.stripeCustomerId,
+                returnUrl: window.location.href
+            })
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Failed to open billing portal');
+        }
+        
+        const { url } = await response.json();
+        
+        // Open the portal
+        window.location.href = url;
+        
+    } catch (error) {
+        console.error('Billing portal error:', error);
+        showNotification('❌ Could not open billing portal. Please try again or contact support.', 'error');
+        
+        if (btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
 }
 
 /**
