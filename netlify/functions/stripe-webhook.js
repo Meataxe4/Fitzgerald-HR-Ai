@@ -2,6 +2,7 @@
 // STRIPE WEBHOOK - Netlify Function
 // Handles payment confirmations and updates Firebase
 // Uses METADATA from checkout (no hardcoded price IDs needed)
+// + EMAIL NOTIFICATIONS for cancellations (14-day refund check)
 // ========================================
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -37,12 +38,33 @@ try {
     console.error('❌ Firebase initialization failed:', initError.message);
 }
 
+// ========================================
+// EMAIL NOTIFICATION CONFIG
+// ========================================
+const EMAILJS_CONFIG = {
+    serviceId: process.env.EMAILJS_SERVICE_ID || 'service_fitzhr',
+    templateId: process.env.EMAILJS_CANCELLATION_TEMPLATE_ID || 'template_cancellation',
+    publicKey: process.env.EMAILJS_PUBLIC_KEY || 'cStomWilGU8SiOzyy',
+    adminEmail: process.env.ADMIN_EMAIL || 'blakefitzgerald4@gmail.com'
+};
+
+// 14-day money-back guarantee window
+const REFUND_WINDOW_DAYS = 14;
+const REFUND_WINDOW_MS = REFUND_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+
 // Credit amounts by tier (used as fallback)
 const TIER_CREDITS = {
     starter: 8,
     pro: 20,
     business: 50,
     free: 0
+};
+
+// Tier pricing for email notifications
+const TIER_PRICING = {
+    starter: 249,
+    pro: 449,
+    business: 899
 };
 
 exports.handler = async (event, context) => {
@@ -274,9 +296,61 @@ async function handleSubscriptionCancelled(subscription) {
     
     const metadata = subscription.metadata || {};
     const userId = metadata.userId;
+    const tier = metadata.tier;
+    const customerId = subscription.customer;
     
     console.log('📋 Subscription metadata:', JSON.stringify(metadata));
     
+    // ========================================
+    // SEND EMAIL NOTIFICATION WITH REFUND CHECK
+    // ========================================
+    try {
+        // Get customer details from Stripe
+        let customerEmail = 'Unknown';
+        let customerName = 'Unknown';
+        try {
+            const customer = await stripe.customers.retrieve(customerId);
+            customerEmail = customer.email || 'Unknown';
+            customerName = customer.name || customer.email || 'Unknown';
+        } catch (e) {
+            console.log('Could not fetch customer details:', e.message);
+        }
+        
+        // Calculate if within 14-day refund window
+        const subscriptionCreatedAt = subscription.created * 1000; // Convert to milliseconds
+        const now = Date.now();
+        const daysSinceSubscription = Math.floor((now - subscriptionCreatedAt) / (24 * 60 * 60 * 1000));
+        const isRefundEligible = (now - subscriptionCreatedAt) <= REFUND_WINDOW_MS;
+        
+        // Get tier name and price
+        const tierName = tier ? tier.charAt(0).toUpperCase() + tier.slice(1) : 'Unknown';
+        const tierPrice = TIER_PRICING[tier] || 0;
+        
+        // Send email notification
+        await sendCancellationEmail({
+            customerEmail,
+            customerName,
+            userId: userId || 'N/A',
+            customerId,
+            subscriptionId: subscription.id,
+            tierName,
+            tierPrice,
+            subscriptionCreatedAt: new Date(subscriptionCreatedAt).toISOString(),
+            cancelledAt: new Date().toISOString(),
+            daysSinceSubscription,
+            isRefundEligible,
+            refundWindowDays: REFUND_WINDOW_DAYS
+        });
+        
+        console.log(`📧 Cancellation email sent - Refund eligible: ${isRefundEligible} (${daysSinceSubscription} days)`);
+    } catch (emailError) {
+        console.error('Error sending cancellation email:', emailError.message);
+        // Don't fail the webhook if email fails
+    }
+    
+    // ========================================
+    // DOWNGRADE USER TO FREE TIER
+    // ========================================
     if (!userId || userId === 'anonymous') {
         console.log('⚠️ No valid userId in subscription metadata');
         return;
@@ -306,6 +380,30 @@ async function handleSubscriptionUpdated(subscription) {
     // Track cancellation scheduled (user clicked cancel in Customer Portal)
     if (subscription.cancel_at_period_end) {
         console.log(`⚠️ ${userId} scheduled cancellation at period end`);
+        
+        // Send heads-up email that cancellation is scheduled
+        try {
+            const customerId = subscription.customer;
+            let customerEmail = 'Unknown';
+            try {
+                const customer = await stripe.customers.retrieve(customerId);
+                customerEmail = customer.email || 'Unknown';
+            } catch (e) {}
+            
+            const cancelAt = subscription.cancel_at 
+                ? new Date(subscription.cancel_at * 1000).toLocaleDateString('en-AU', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                })
+                : 'End of billing period';
+            
+            console.log(`📅 Cancellation scheduled for ${customerEmail} on ${cancelAt}`);
+        } catch (e) {
+            console.log('Could not log scheduled cancellation details');
+        }
+        
         await userRef.set({
             credits: {
                 cancelAtPeriodEnd: true,
@@ -346,6 +444,129 @@ async function handleSubscriptionUpdated(subscription) {
                 lastUpdated: admin.firestore.FieldValue.serverTimestamp()
             }
         }, { merge: true });
+    }
+}
+
+// ========================================
+// EMAIL NOTIFICATION FUNCTION
+// ========================================
+
+async function sendCancellationEmail(data) {
+    const {
+        customerEmail,
+        customerName,
+        userId,
+        customerId,
+        subscriptionId,
+        tierName,
+        tierPrice,
+        subscriptionCreatedAt,
+        cancelledAt,
+        daysSinceSubscription,
+        isRefundEligible,
+        refundWindowDays
+    } = data;
+    
+    // Build email content
+    const refundStatus = isRefundEligible 
+        ? `🟢 REFUND ELIGIBLE (within ${refundWindowDays} days)`
+        : `🔴 NOT ELIGIBLE FOR REFUND (${daysSinceSubscription} days since subscription)`;
+    
+    const emailSubject = isRefundEligible 
+        ? `🟢 REFUND ELIGIBLE - ${customerName} cancelled ${tierName}`
+        : `🔴 Subscription Cancelled - ${customerName} (${tierName})`;
+    
+    const emailBody = `
+🔔 SUBSCRIPTION CANCELLATION ALERT
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+REFUND STATUS: ${refundStatus}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Customer Details:
+• Name: ${customerName}
+• Email: ${customerEmail}
+• User ID: ${userId}
+• Stripe Customer: ${customerId}
+
+Subscription Details:
+• Plan: ${tierName}
+• Price: $${tierPrice} AUD/year
+• Subscription ID: ${subscriptionId}
+• Started: ${new Date(subscriptionCreatedAt).toLocaleDateString('en-AU', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+    })}
+• Cancelled: ${new Date(cancelledAt).toLocaleDateString('en-AU', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    })}
+• Days Active: ${daysSinceSubscription}
+
+${isRefundEligible ? `
+⚡ ACTION REQUIRED:
+Customer is within the 14-day money-back guarantee period.
+If they request a refund, process via Stripe Dashboard:
+https://dashboard.stripe.com/customers/${customerId}
+
+Steps:
+1. Click link above
+2. Find the subscription payment
+3. Click "Refund" and select "Full refund"
+` : `
+ℹ️ NO ACTION REQUIRED:
+Customer is outside the 14-day refund window.
+Refunds are not required under your policy.
+`}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Automated notification from Fitz HR
+    `.trim();
+    
+    // Send via EmailJS REST API
+    try {
+        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                service_id: EMAILJS_CONFIG.serviceId,
+                template_id: EMAILJS_CONFIG.templateId,
+                user_id: EMAILJS_CONFIG.publicKey,
+                template_params: {
+                    to_email: EMAILJS_CONFIG.adminEmail,
+                    from_name: 'Fitz HR System',
+                    subject: emailSubject,
+                    message: emailBody,
+                    customer_email: customerEmail,
+                    customer_name: customerName,
+                    tier_name: tierName,
+                    tier_price: tierPrice,
+                    days_active: daysSinceSubscription,
+                    refund_eligible: isRefundEligible ? 'Yes - Within 14 days' : 'No - Outside 14 days',
+                    stripe_customer_url: `https://dashboard.stripe.com/customers/${customerId}`
+                }
+            })
+        });
+        
+        if (response.ok) {
+            console.log('✅ Cancellation email sent successfully to', EMAILJS_CONFIG.adminEmail);
+        } else {
+            const errorText = await response.text();
+            console.error('❌ EmailJS error:', errorText);
+            // Log details as backup (visible in Netlify function logs)
+            console.log('📧 CANCELLATION DETAILS (backup):\n', emailBody);
+        }
+    } catch (error) {
+        console.error('❌ Failed to send email:', error.message);
+        // Log details as backup (visible in Netlify function logs)
+        console.log('📧 CANCELLATION DETAILS (backup):\n', emailBody);
     }
 }
 
