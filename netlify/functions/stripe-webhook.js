@@ -1,6 +1,7 @@
 // ========================================
 // STRIPE WEBHOOK - Netlify Function
 // Handles payment confirmations and updates Firebase
+// Uses METADATA from checkout (no hardcoded price IDs needed)
 // ========================================
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -36,20 +37,12 @@ try {
     console.error('❌ Firebase initialization failed:', initError.message);
 }
 
-// Price to config mapping - UPDATE WITH YOUR STRIPE PRICE IDs
-const PRODUCT_CONFIG = {
-    // Subscriptions - matches your pricing (8/20/50 review credits)
-    'price_1Sxbs12Ig0gUvbfw60DcAdsb': { type: 'subscription', tier: 'starter', credits: 8, name: 'Starter Monthly' },
-    'price_1Sxc6M2Ig0gUvbfwKGnLYPsD': { type: 'subscription', tier: 'starter', credits: 8, name: 'Starter Annual' },
-    'price_1Sxc8H2Ig0gUvbfwZpnVjgV1': { type: 'subscription', tier: 'pro', credits: 20, name: 'Pro Monthly' },
-    'price_1SxcAu2Ig0gUvbfwCgAD1pcK': { type: 'subscription', tier: 'pro', credits: 20, name: 'Pro Annual' },
-    'price_1SxcCt2Ig0gUvbfwA7KAzrM7': { type: 'subscription', tier: 'business', credits: 50, name: 'Business Monthly' },
-    'price_1SxcF92Ig0gUvbfwoplfYN9m': { type: 'subscription', tier: 'business', credits: 50, name: 'Business Annual' },
-    // Credit packs - $29 each or 5 for $119
-    'price_1SxcGL2Ig0gUvbfw0OEB9gPK': { type: 'credits', credits: 1, name: '1 Credit' },
-    'price_1SxcHP2Ig0gUvbfwrQjmaEFm': { type: 'credits', credits: 5, name: '5 Credit Pack' },
-    'price_1SxcJ32Ig0gUvbfwJeetPLHa': { type: 'credits', credits: 10, name: '10 Credit Pack' },
-    'price_1SxcKS2Ig0gUvbfwQBqvE9k4': { type: 'topup', prompts: 30, name: 'Chat Top-Up' }
+// Credit amounts by tier (used as fallback)
+const TIER_CREDITS = {
+    starter: 8,
+    pro: 20,
+    business: 50,
+    free: 0
 };
 
 exports.handler = async (event, context) => {
@@ -156,54 +149,67 @@ exports.handler = async (event, context) => {
 
 async function handleCheckoutComplete(session) {
     console.log('✅ Checkout completed:', session.id);
+    console.log('📦 Session metadata:', JSON.stringify(session.metadata));
+    console.log('👤 Customer ID:', session.customer);
     
+    // Get info from session metadata (set by stripe-checkout.js)
     const metadata = session.metadata || {};
     const userId = metadata.userId;
+    const productType = metadata.productType;
+    const tier = metadata.tier;
+    const reviewCredits = parseInt(metadata.reviewCredits) || 0;
+    const productKey = metadata.productKey;
+    
+    console.log('📋 Parsed - userId:', userId, 'type:', productType, 'tier:', tier, 'credits:', reviewCredits);
     
     if (!userId || userId === 'anonymous') {
         console.log('⚠️ No valid userId in session metadata');
         return;
     }
 
-    const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
-    
-    for (const item of lineItems.data) {
-        const config = PRODUCT_CONFIG[item.price.id];
-        if (!config) {
-            console.log('Unknown product:', item.price.id);
-            continue;
-        }
+    // Handle based on product type from metadata
+    if (productType === 'subscription') {
+        console.log(`⭐ Subscription started: ${tier} for ${userId}`);
         
-        if (config.type === 'credits') {
-            console.log(`📦 Credit pack: ${config.credits} credits for ${userId}`);
-            await addPurchasedCredits(userId, config.credits, session.id, config.name);
-        }
-        
-        if (config.type === 'topup') {
-            console.log(`💬 Chat top-up: ${config.prompts} prompts for ${userId}`);
-            await addBonusPrompts(userId, config.prompts, session.id);
-        }
-        
-        if (config.type === 'subscription') {
-            console.log(`⭐ Subscription started: ${config.tier} for ${userId}`);
-            // Get subscription details for period end date
-            let subscriptionPeriodEnd = null;
-            if (session.subscription) {
-                try {
-                    const subscription = await stripe.subscriptions.retrieve(session.subscription);
-                    subscriptionPeriodEnd = subscription.current_period_end;
-                } catch (e) {
-                    console.log('Could not retrieve subscription details:', e.message);
-                }
+        // Get subscription details for period end date
+        let subscriptionPeriodEnd = null;
+        let subscriptionId = null;
+        if (session.subscription) {
+            try {
+                const subscription = await stripe.subscriptions.retrieve(session.subscription);
+                subscriptionPeriodEnd = subscription.current_period_end;
+                subscriptionId = subscription.id;
+                
+                // Also update subscription metadata with userId for future events
+                await stripe.subscriptions.update(subscription.id, {
+                    metadata: { userId: userId, tier: tier }
+                });
+                console.log('✅ Updated subscription metadata');
+            } catch (e) {
+                console.log('Could not retrieve/update subscription details:', e.message);
             }
-            await activateSubscription(userId, config.tier, config.credits, session.customer, session.id, subscriptionPeriodEnd);
         }
+        
+        const credits = reviewCredits || TIER_CREDITS[tier] || 0;
+        await activateSubscription(userId, tier, credits, session.customer, session.id, subscriptionPeriodEnd, subscriptionId);
+    }
+    
+    if (productType === 'reviewCredits') {
+        console.log(`📦 Credit pack: ${reviewCredits} credits for ${userId}`);
+        await addPurchasedCredits(userId, reviewCredits, session.id, productKey, session.customer);
+    }
+    
+    if (productType === 'consultation') {
+        console.log(`📞 Consultation booked for ${userId}`);
+        // Just log it - no credits to add
+        await logTransaction(userId, 'consultation', session.id, session.customer);
     }
 }
 
 async function handleInvoicePaid(invoice) {
-    console.log('💰 Invoice paid:', invoice.id);
+    console.log('💰 Invoice paid:', invoice.id, 'Reason:', invoice.billing_reason);
     
+    // Skip initial invoice - already handled by checkout.session.completed
     if (invoice.billing_reason === 'subscription_create') {
         console.log('Skipping initial invoice - handled by checkout');
         return;
@@ -213,18 +219,20 @@ async function handleInvoicePaid(invoice) {
         const subscription = await stripe.subscriptions.retrieve(invoice.subscription);
         const metadata = subscription.metadata || {};
         const userId = metadata.userId;
+        const tier = metadata.tier;
+        
+        console.log('📋 Subscription metadata:', JSON.stringify(metadata));
         
         if (!userId || userId === 'anonymous') {
             console.log('⚠️ No valid userId in subscription metadata');
             return;
         }
         
-        const priceId = subscription.items.data[0]?.price?.id;
-        const config = PRODUCT_CONFIG[priceId];
+        const credits = TIER_CREDITS[tier] || 0;
         
-        if (config && config.credits) {
-            console.log(`🔄 Monthly renewal: ${config.credits} credits for ${userId}`);
-            await addSubscriptionCredits(userId, config.credits, invoice.id, subscription.current_period_end);
+        if (credits > 0) {
+            console.log(`🔄 Renewal: ${credits} credits for ${userId}`);
+            await addSubscriptionCredits(userId, credits, invoice.id, subscription.current_period_end);
         }
     }
 }
@@ -267,6 +275,8 @@ async function handleSubscriptionCancelled(subscription) {
     const metadata = subscription.metadata || {};
     const userId = metadata.userId;
     
+    console.log('📋 Subscription metadata:', JSON.stringify(metadata));
+    
     if (!userId || userId === 'anonymous') {
         console.log('⚠️ No valid userId in subscription metadata');
         return;
@@ -278,9 +288,13 @@ async function handleSubscriptionCancelled(subscription) {
 
 async function handleSubscriptionUpdated(subscription) {
     console.log('📝 Subscription updated:', subscription.id, 'Status:', subscription.status);
+    console.log('📋 cancel_at_period_end:', subscription.cancel_at_period_end);
     
     const metadata = subscription.metadata || {};
     const userId = metadata.userId;
+    const tier = metadata.tier;
+    
+    console.log('📋 Subscription metadata:', JSON.stringify(metadata));
     
     if (!userId || userId === 'anonymous') {
         console.log('⚠️ No valid userId in subscription metadata');
@@ -323,62 +337,6 @@ async function handleSubscriptionUpdated(subscription) {
         }
     }
     
-    // Track plan changes (upgrade/downgrade)
-    const priceId = subscription.items.data[0]?.price?.id;
-    const config = PRODUCT_CONFIG[priceId];
-    
-    if (config && config.type === 'subscription') {
-        const doc = await userRef.get();
-        const currentData = doc.exists ? doc.data() : {};
-        const currentCredits = currentData.credits || {};
-        const currentTier = currentCredits.subscriptionTier || currentCredits.tier || 'free';
-        
-        // Check if tier changed
-        if (currentTier !== config.tier) {
-            console.log(`🔄 Plan change: ${currentTier} → ${config.tier} for ${userId}`);
-            
-            // Determine credit handling
-            const tierOrder = { free: 0, starter: 1, pro: 2, business: 3 };
-            const isUpgrade = tierOrder[config.tier] > tierOrder[currentTier];
-            const isDowngrade = tierOrder[config.tier] < tierOrder[currentTier];
-            
-            let newCredits = config.credits;
-            
-            if (isDowngrade) {
-                // Keep remaining credits but cap at new tier max
-                const currentRemaining = Math.max(0, (currentCredits.reviewCredits || 0) - (currentCredits.reviewCreditsUsed || 0));
-                newCredits = Math.min(currentRemaining, config.credits);
-                console.log(`⬇️ Downgrade: keeping ${newCredits} credits (capped at ${config.credits})`);
-            } else if (isUpgrade) {
-                // Give full new tier credits
-                console.log(`⬆️ Upgrade: giving ${config.credits} credits`);
-            }
-            
-            await userRef.set({
-                credits: {
-                    subscriptionTier: config.tier,
-                    tier: config.tier,
-                    reviewCredits: newCredits,
-                    reviewCreditsUsed: isUpgrade ? 0 : (currentCredits.reviewCreditsUsed || 0),
-                    cancelAtPeriodEnd: false,
-                    subscriptionStatus: 'active',
-                    subscriptionPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
-                    lastUpdated: admin.firestore.FieldValue.serverTimestamp()
-                },
-                transactions: admin.firestore.FieldValue.arrayUnion({
-                    type: isUpgrade ? 'plan_upgrade' : 'plan_downgrade',
-                    fromTier: currentTier,
-                    toTier: config.tier,
-                    credits: newCredits,
-                    timestamp: new Date().toISOString()
-                })
-            }, { merge: true });
-            
-            console.log(`✅ Updated ${userId} to ${config.tier} with ${newCredits} credits`);
-            return;
-        }
-    }
-    
     // Track payment issues
     if (subscription.status === 'past_due' || subscription.status === 'unpaid') {
         console.log(`⚠️ Payment issue for ${userId}, status: ${subscription.status}`);
@@ -395,7 +353,7 @@ async function handleSubscriptionUpdated(subscription) {
 // FIREBASE OPERATIONS
 // ========================================
 
-async function addPurchasedCredits(userId, credits, transactionId, productName) {
+async function addPurchasedCredits(userId, credits, transactionId, productName, stripeCustomerId = null) {
     if (!db) return false;
     const userRef = db.collection('users').doc(userId);
     
@@ -405,7 +363,7 @@ async function addPurchasedCredits(userId, credits, transactionId, productName) 
             const currentData = doc.exists ? doc.data() : {};
             const currentCredits = currentData.credits || {};
             
-            transaction.set(userRef, {
+            const updateData = {
                 credits: {
                     ...currentCredits,
                     purchasedCredits: (currentCredits.purchasedCredits || 0) + credits,
@@ -419,7 +377,15 @@ async function addPurchasedCredits(userId, credits, transactionId, productName) 
                     transactionId: transactionId,
                     timestamp: new Date().toISOString()
                 })
-            }, { merge: true });
+            };
+            
+            // Save stripeCustomerId if provided
+            if (stripeCustomerId) {
+                updateData.credits.stripeCustomerId = stripeCustomerId;
+                updateData.stripeCustomerId = stripeCustomerId;
+            }
+            
+            transaction.set(userRef, updateData, { merge: true });
         });
         
         console.log(`✅ Added ${credits} purchased credits to ${userId}`);
@@ -430,40 +396,42 @@ async function addPurchasedCredits(userId, credits, transactionId, productName) 
     }
 }
 
-async function addBonusPrompts(userId, prompts, transactionId) {
+async function logTransaction(userId, type, transactionId, stripeCustomerId = null) {
     if (!db) return false;
     const userRef = db.collection('users').doc(userId);
     
     try {
-        await db.runTransaction(async (transaction) => {
-            const doc = await transaction.get(userRef);
-            const currentData = doc.exists ? doc.data() : {};
-            const currentCredits = currentData.credits || {};
-            
-            transaction.set(userRef, {
-                credits: {
-                    ...currentCredits,
-                    bonusPrompts: (currentCredits.bonusPrompts || 0) + prompts,
-                    lastTransaction: transactionId,
-                    lastUpdated: admin.firestore.FieldValue.serverTimestamp()
-                }
-            }, { merge: true });
-        });
+        const updateData = {
+            transactions: admin.firestore.FieldValue.arrayUnion({
+                type: type,
+                transactionId: transactionId,
+                timestamp: new Date().toISOString()
+            })
+        };
         
-        console.log(`✅ Added ${prompts} bonus prompts to ${userId}`);
+        if (stripeCustomerId) {
+            updateData.stripeCustomerId = stripeCustomerId;
+        }
+        
+        await userRef.set(updateData, { merge: true });
+        console.log(`✅ Logged ${type} transaction for ${userId}`);
         return true;
     } catch (error) {
-        console.error('Error adding bonus prompts:', error.message);
+        console.error('Error logging transaction:', error.message);
         return false;
     }
 }
 
-async function activateSubscription(userId, tier, credits, stripeCustomerId, transactionId, periodEnd = null) {
+async function activateSubscription(userId, tier, credits, stripeCustomerId, transactionId, periodEnd = null, subscriptionId = null) {
     if (!db) return false;
     const userRef = db.collection('users').doc(userId);
     
+    console.log(`🔥 Activating subscription for ${userId}: tier=${tier}, credits=${credits}, customerId=${stripeCustomerId}`);
+    
     try {
         await userRef.set({
+            // Save stripeCustomerId at TOP LEVEL for easy querying
+            stripeCustomerId: stripeCustomerId,
             credits: {
                 subscriptionTier: tier,
                 tier: tier,
@@ -473,8 +441,10 @@ async function activateSubscription(userId, tier, credits, stripeCustomerId, tra
                 bonusPrompts: admin.firestore.FieldValue.increment(0),
                 monthlyPromptsUsed: 0,
                 lowRiskDocsUsed: 0,
+                // Stripe IDs - CRITICAL: These enable "Manage Subscription"
                 stripeCustomerId: stripeCustomerId,
-                // NEW: Subscription management fields
+                stripeSubscriptionId: subscriptionId,
+                // Subscription status
                 subscriptionStatus: 'active',
                 cancelAtPeriodEnd: false,
                 subscriptionPeriodEnd: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
@@ -483,8 +453,6 @@ async function activateSubscription(userId, tier, credits, stripeCustomerId, tra
                 lastTransaction: transactionId,
                 lastUpdated: admin.firestore.FieldValue.serverTimestamp()
             },
-            // Also save stripeCustomerId at top level for easier querying
-            stripeCustomerId: stripeCustomerId,
             transactions: admin.firestore.FieldValue.arrayUnion({
                 type: 'subscription_started',
                 tier: tier,
@@ -494,7 +462,7 @@ async function activateSubscription(userId, tier, credits, stripeCustomerId, tra
             })
         }, { merge: true });
         
-        console.log(`✅ Activated ${tier} subscription for ${userId} with ${credits} credits`);
+        console.log(`✅ Activated ${tier} subscription for ${userId} with ${credits} credits, customerId: ${stripeCustomerId}`);
         return true;
     } catch (error) {
         console.error('Error activating subscription:', error.message);
@@ -516,7 +484,6 @@ async function addSubscriptionCredits(userId, credits, transactionId, periodEnd 
                 ...currentCredits,
                 reviewCredits: credits,
                 reviewCreditsUsed: 0,
-                // NEW: Update subscription management fields on renewal
                 subscriptionStatus: 'active',
                 cancelAtPeriodEnd: false,
                 subscriptionPeriodEnd: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
@@ -556,8 +523,8 @@ async function downgradeToFree(userId, transactionId) {
                 tier: 'free',
                 reviewCredits: 0,
                 reviewCreditsUsed: 0,
-                stripeCustomerId: currentCredits.stripeCustomerId, // Keep for future purchases
-                // NEW: Update subscription management fields
+                // Keep stripeCustomerId for future purchases
+                stripeSubscriptionId: null,
                 subscriptionStatus: 'canceled',
                 cancelAtPeriodEnd: false,
                 subscriptionPeriodEnd: null,
