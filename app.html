@@ -1776,188 +1776,306 @@ header button[onclick*="logout"],
     }
     
     /* === CRITICAL MOBILE FIXES - Feb 2025 === */
+    /* COMPLETE REWRITE FOR TOUCH/SCROLL/INPUT ISSUES */
     
-    /* FIX 1: Profile Menu - Full screen, scrollable, ABOVE sidebar */
-    #profileMenu {
-        padding: 0 !important;
-        align-items: flex-start !important;
-        z-index: 9999 !important; /* Above everything including sidebar */
-    }
-    
-    #profileMenu > div {
-        max-width: 100% !important;
+    /* ============================================
+       FIX 1: BODY AND HTML - Prevent scroll lock
+       ============================================ */
+    html, body {
+        height: 100% !important;
+        overflow: hidden !important;
+        position: fixed !important;
         width: 100% !important;
-        min-height: 100vh !important;
-        min-height: 100dvh !important;
-        max-height: none !important;
-        height: auto !important;
-        border-radius: 0 !important;
-        margin: 0 !important;
-        padding: 16px !important;
-        padding-bottom: 120px !important;
-        overflow-y: auto !important;
         -webkit-overflow-scrolling: touch !important;
-        overscroll-behavior: contain !important;
     }
     
-    /* FIX 2: Chat messages container - MUST scroll */
+    /* ============================================
+       FIX 2: ASSISTANT SCREEN - Proper flex layout
+       ============================================ */
     #assistantScreen {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
         display: flex !important;
         flex-direction: column !important;
-        height: 100vh !important;
+        height: 100% !important;
         height: 100dvh !important;
-        max-height: 100vh !important;
-        max-height: 100dvh !important;
         overflow: hidden !important;
-        position: relative !important;
     }
     
-    #messagesContainer {
-        flex: 1 1 0% !important;
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-        overscroll-behavior: contain !important;
-        min-height: 0 !important;
-        position: relative !important;
-        touch-action: pan-y !important;
+    #assistantScreen.hidden {
+        display: none !important;
     }
     
-    /* Ensure messages inner container doesn't block scroll */
-    #messagesContainer > div {
-        min-height: auto !important;
-    }
-    
-    /* FIX 3: Consultation modal - full height scrollable */
-    #consultationBookingModal {
-        padding: 0 !important;
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch !important;
-        overscroll-behavior: contain !important;
-        align-items: flex-start !important;
-    }
-    
-    #consultationBookingModal > div {
-        max-width: 100% !important;
-        width: 100% !important;
-        min-height: auto !important;
-        max-height: none !important;
-        height: auto !important;
-        border-radius: 0 !important;
-        margin: 0 !important;
-        margin-bottom: 80px !important;
-    }
-    
-    /* Ensure ALL consultation content sections are visible */
-    #consultationBookingModal .p-6,
-    #consultationBookingModal [class*="p-"] {
-        overflow: visible !important;
-    }
-    
-    #bookingStep1,
-    #bookingStep2,
-    #bookingStep3 {
-        overflow: visible !important;
-        padding-bottom: 20px !important;
-    }
-    
-    /* FIX 4: Input area must be tappable - remove any overlays */
-    #messageInput {
-        position: relative !important;
-        z-index: 5 !important;
-        -webkit-appearance: none !important;
-        appearance: none !important;
-        touch-action: manipulation !important;
-        pointer-events: auto !important;
-    }
-    
-    /* Ensure input wrapper is interactive */
-    .bg-slate-800\/80.backdrop-blur-sm.border-t {
-        position: relative !important;
-        z-index: 30 !important;
-        pointer-events: auto !important;
-    }
-    
-    /* Input flex container */
-    .bg-slate-800\/80.backdrop-blur-sm.border-t .flex.gap-2 {
-        pointer-events: auto !important;
-    }
-    
-    /* All input buttons must be tappable */
-    #uploadButton,
-    #voiceButton,
-    #sendButton {
-        pointer-events: auto !important;
-        touch-action: manipulation !important;
-        z-index: 5 !important;
-    }
-    
-    /* FIX 5: Footer disclaimer should not block input */
-    .bg-slate-800\/50.border-t {
-        pointer-events: none !important;
-    }
-    
-    .bg-slate-800\/50.border-t a,
-    .bg-slate-800\/50.border-t button {
-        pointer-events: auto !important;
-    }
-    
-    /* FIX 6: Header must not expand and block content */
+    /* ============================================
+       FIX 3: HEADER - Fixed height, no flex grow
+       ============================================ */
     #mainHeader {
-        flex-shrink: 0 !important;
+        flex: 0 0 auto !important;
         position: relative !important;
         z-index: 40 !important;
     }
     
     #dailyTipBanner {
-        flex-shrink: 0 !important;
+        flex: 0 0 auto !important;
     }
     
-    /* FIX 7: Scroll to bottom button positioning */
+    /* ============================================
+       FIX 4: MESSAGES CONTAINER - SCROLLABLE
+       ============================================ */
+    #messagesContainer {
+        flex: 1 1 auto !important;
+        overflow-y: scroll !important;
+        -webkit-overflow-scrolling: touch !important;
+        overscroll-behavior-y: contain !important;
+        min-height: 0 !important;
+        position: relative !important;
+        touch-action: pan-y !important;
+        -ms-touch-action: pan-y !important;
+    }
+    
+    #messagesContainer > div {
+        min-height: auto !important;
+        padding-bottom: 20px !important;
+    }
+    
+    /* ============================================
+       FIX 5: INPUT AREA - MUST BE CLICKABLE
+       ============================================ */
+    /* Input container wrapper */
+    .bg-slate-800\/80.backdrop-blur-sm.border-t.border-slate-700\/50 {
+        flex: 0 0 auto !important;
+        position: relative !important;
+        z-index: 100 !important;
+        pointer-events: auto !important;
+        touch-action: manipulation !important;
+    }
+    
+    /* Inner container */
+    .bg-slate-800\/80.backdrop-blur-sm.border-t.border-slate-700\/50 .max-w-3xl {
+        pointer-events: auto !important;
+    }
+    
+    /* Flex container with input and buttons */
+    .bg-slate-800\/80.backdrop-blur-sm.border-t.border-slate-700\/50 .flex.gap-2 {
+        pointer-events: auto !important;
+    }
+    
+    /* THE INPUT TEXTAREA ITSELF */
+    #messageInput {
+        position: relative !important;
+        z-index: 101 !important;
+        pointer-events: auto !important;
+        touch-action: manipulation !important;
+        -webkit-user-select: text !important;
+        user-select: text !important;
+        -webkit-appearance: none !important;
+        appearance: none !important;
+        cursor: text !important;
+    }
+    
+    /* Upload, voice, send buttons */
+    #uploadButton,
+    #voiceButton,
+    #sendButton {
+        position: relative !important;
+        z-index: 101 !important;
+        pointer-events: auto !important;
+        touch-action: manipulation !important;
+        cursor: pointer !important;
+    }
+    
+    /* Upload menu popup */
+    #uploadMenu {
+        z-index: 1000 !important;
+        pointer-events: auto !important;
+    }
+    
+    /* ============================================
+       FIX 6: FOOTER DISCLAIMER - DON'T BLOCK INPUT
+       ============================================ */
+    .bg-slate-800\/50.border-t.border-slate-700\/50 {
+        flex: 0 0 auto !important;
+        position: relative !important;
+        z-index: 1 !important;
+        pointer-events: none !important;
+    }
+    
+    .bg-slate-800\/50.border-t.border-slate-700\/50 a {
+        pointer-events: auto !important;
+    }
+    
+    /* ============================================
+       FIX 7: PROFILE MENU - Full screen scrollable
+       ============================================ */
+    #profileMenu {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        padding: 0 !important;
+        z-index: 99999 !important;
+        display: flex !important;
+        align-items: flex-start !important;
+        justify-content: center !important;
+        overflow-y: scroll !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    #profileMenu.hidden {
+        display: none !important;
+    }
+    
+    #profileMenu > div {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: 100vh !important;
+        min-height: 100dvh !important;
+        max-height: none !important;
+        height: auto !important;
+        border-radius: 0 !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 20px !important;
+        padding-bottom: 150px !important;
+    }
+    
+    /* ============================================
+       FIX 8: CONSULTATION MODAL - Scrollable
+       ============================================ */
+    #consultationBookingModal {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        padding: 0 !important;
+        overflow-y: scroll !important;
+        -webkit-overflow-scrolling: touch !important;
+        display: flex !important;
+        align-items: flex-start !important;
+    }
+    
+    #consultationBookingModal.hidden {
+        display: none !important;
+    }
+    
+    #consultationBookingModal > div {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: auto !important;
+        max-height: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        margin-bottom: 100px !important;
+    }
+    
+    #consultationBookingModal .p-6 {
+        padding-bottom: 100px !important;
+    }
+    
+    /* ============================================
+       FIX 9: TOOLS MENU - Show all tools, scrollable
+       ============================================ */
+    #toolsMenu {
+        overflow-y: scroll !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    #toolsMenu .grid {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+    }
+    
+    #toolsMenu .grid button {
+        display: flex !important;
+    }
+    
+    /* ============================================
+       FIX 10: SCROLL BUTTON POSITIONING
+       ============================================ */
     #scrollToBottomBtn {
-        bottom: 160px !important;
+        bottom: 180px !important;
         right: 16px !important;
-        z-index: 25 !important;
+        left: auto !important;
+        transform: none !important;
+        z-index: 50 !important;
     }
     
-    /* FIX 8: Landscape mode - ensure content is visible */
+    #scrollToBottomBtn.visible {
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+    
+    /* ============================================
+       FIX 11: TOUR PROMPT - Don't block content
+       ============================================ */
+    .fitz-tour-prompt {
+        z-index: 99997 !important;
+    }
+    
+    /* ============================================
+       FIX 12: LANDSCAPE MODE
+       ============================================ */
     @media (orientation: landscape) {
-        #assistantScreen {
-            height: 100vh !important;
-            height: 100dvh !important;
-        }
-        
-        #messagesContainer {
-            flex: 1 1 0% !important;
-            min-height: 0 !important;
-        }
-        
-        /* More compact header in landscape */
-        #mainHeader {
-            padding: 4px 10px !important;
-        }
-        
         #dailyTipBanner {
             display: none !important;
         }
         
-        .bg-slate-800\/80.backdrop-blur-sm.border-t {
-            padding: 8px 12px !important;
+        #mainHeader {
+            padding: 4px 12px !important;
+        }
+        
+        .bg-slate-800\/80.backdrop-blur-sm.border-t.border-slate-700\/50 {
+            padding: 6px 12px !important;
+        }
+        
+        #scrollToBottomBtn {
+            bottom: 100px !important;
         }
     }
 }
 
-/* Ensure desktop styles aren't affected */
+/* ============================================
+   DESKTOP OVERRIDES - Restore normal behavior
+   ============================================ */
 @media (min-width: 769px) {
+    html, body {
+        position: static !important;
+        overflow: auto !important;
+    }
+    
+    #assistantScreen {
+        position: relative !important;
+    }
+    
     #profileMenu {
         z-index: 50 !important;
+        padding: 24px !important;
+        align-items: center !important;
+        overflow-y: auto !important;
     }
     
     #profileMenu > div {
         min-height: auto !important;
         max-height: 90vh !important;
+        width: auto !important;
+        max-width: 28rem !important;
+        border-radius: 1rem !important;
+        border: 1px solid #f59e0b !important;
+        padding: 24px !important;
         padding-bottom: 24px !important;
     }
-}
+    
+    #scrollToBottomBtn {
+        bottom: 220px !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+    }
 
 /* Desktop styles for tools menu (restore flex centering) */
 @media (min-width: 769px) {
@@ -38742,6 +38860,12 @@ const FitzTour = {
     
     // Show initial tour prompt
     showTourPrompt: function() {
+        // GUARD: If already showing or shown this session, don't show again
+        if (this._promptShownThisSession) {
+            console.log('Tour prompt already shown this session, skipping');
+            return;
+        }
+        
         // Re-check localStorage right before showing (in case it was set elsewhere)
         const completed = localStorage.getItem('fitzTourCompleted') === 'true';
         const declined = localStorage.getItem('fitzTourDeclined') === 'true';
@@ -38756,10 +38880,16 @@ const FitzTour = {
         const prompt = document.getElementById('fitzTourPrompt');
         if (!prompt) return;
         
+        // Mark as shown this session
+        this._promptShownThisSession = true;
+        
         setTimeout(() => {
             prompt.classList.add('active');
         }, 100);
     },
+    
+    // Flag to track if prompt was shown this session
+    _promptShownThisSession: false,
     
     // Dismiss prompt
     dismissPrompt: function() {
