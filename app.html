@@ -20037,9 +20037,20 @@ function openProfileMenu() {
             if (tier === 'free') {
                 statusEl.textContent = 'Upgrade for more features';
                 upgradeBtn.textContent = 'Upgrade';
+                upgradeBtn.onclick = function() {
+                    closeProfileMenu();
+                    showSubscriptionOptions();
+                };
             } else {
                 statusEl.textContent = 'Annual subscription';
                 upgradeBtn.textContent = 'Manage';
+                upgradeBtn.onclick = function() {
+                    // Show loading state
+                    upgradeBtn.textContent = '⏳ Please wait...';
+                    upgradeBtn.disabled = true;
+                    closeProfileMenu();
+                    openBillingPortal();
+                };
             }
         }
         
