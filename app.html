@@ -37997,12 +37997,14 @@ const FitzTour = {
                 max-width: 480px;
                 width: 90%;
                 opacity: 0;
+                pointer-events: none;
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 40px rgba(245, 158, 11, 0.15);
             }
             .fitz-tour-modal.active {
                 opacity: 1;
                 transform: translate(-50%, -50%) scale(1);
+                pointer-events: auto;
             }
             .fitz-tour-modal-icon {
                 font-size: 56px;
@@ -38036,11 +38038,13 @@ const FitzTour = {
                 max-width: 360px;
                 width: 90%;
                 opacity: 0;
+                pointer-events: none;
                 transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(245, 158, 11, 0.1);
             }
             .fitz-tour-tooltip.active {
                 opacity: 1;
+                pointer-events: auto;
             }
             .fitz-tour-tooltip-arrow {
                 position: absolute;
