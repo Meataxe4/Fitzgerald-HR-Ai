@@ -42,8 +42,8 @@ try {
 // EMAIL NOTIFICATION CONFIG
 // ========================================
 const EMAILJS_CONFIG = {
-    serviceId: process.env.EMAILJS_SERVICE_ID || 'service_fitzhr',
-    templateId: process.env.EMAILJS_CANCELLATION_TEMPLATE_ID || 'template_cancellation',
+    serviceId: process.env.EMAILJS_SERVICE_ID || 'service_7dz8e3q',
+    templateId: process.env.EMAILJS_CANCELLATION_TEMPLATE_ID || 'template_ua7eq02',
     publicKey: process.env.EMAILJS_PUBLIC_KEY || 'cStomWilGU8SiOzyy',
     adminEmail: process.env.ADMIN_EMAIL || 'blakefitzgerald4@gmail.com'
 };
