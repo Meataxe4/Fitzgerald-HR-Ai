@@ -434,7 +434,7 @@
                             <span class="text-green-500">✓</span> All HR templates
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> <span id="starterDocs">96</span> expert-reviewed docs/<span id="starterDocsPeriod">year</span>
+                            <span class="text-green-500">✓</span> <span id="starterDocs">96</span> <span id="starterDocsPeriod">credits/year</span>
                         </li>
                         <li class="flex items-center gap-2">
                             <span class="text-green-500">✓</span> Unlimited HR Tools
@@ -465,7 +465,7 @@
                             <span class="text-green-500">✓</span> All HR templates
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> <span id="proDocs">240</span> expert-reviewed docs/<span id="proDocsPeriod">year</span>
+                            <span class="text-green-500">✓</span> <span id="proDocs">240</span> <span id="proDocsPeriod">credits/year</span>
                         </li>
                         <li class="flex items-center gap-2">
                             <span class="text-green-500">✓</span> Unlimited HR Tools
@@ -493,7 +493,7 @@
                             <span class="text-green-500">✓</span> All HR templates
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> <span id="businessDocs">600</span> expert-reviewed docs/<span id="businessDocsPeriod">year</span>
+                            <span class="text-green-500">✓</span> <span id="businessDocs">600</span> <span id="businessDocsPeriod">credits/year</span>
                         </li>
                         <li class="flex items-center gap-2">
                             <span class="text-green-500">✓</span> Unlimited HR Tools
@@ -502,6 +502,28 @@
                     <a href="/pricing" class="block text-center py-3 border border-slate-600 rounded-lg hover:border-amber-500 transition-colors">
                         Learn More
                     </a>
+                </div>
+            </div>
+
+            <!-- What are credits? -->
+            <div class="max-w-4xl mx-auto mt-12 bg-slate-800 border border-slate-700 rounded-2xl p-6">
+                <p class="text-amber-500 font-bold text-lg text-center mb-4">💡 What can you do with credits?</p>
+                <div class="grid md:grid-cols-3 gap-6 text-center">
+                    <div>
+                        <span class="text-3xl">📄</span>
+                        <h4 class="text-white font-semibold mt-2">Generate Documents</h4>
+                        <p class="text-slate-400 text-sm">Employment contracts, position descriptions, onboarding docs, policies</p>
+                    </div>
+                    <div>
+                        <span class="text-3xl">⚠️</span>
+                        <h4 class="text-white font-semibold mt-2">Expert-Reviewed Docs</h4>
+                        <p class="text-slate-400 text-sm">Warnings, PIPs, terminations — reviewed by qualified HR consultants</p>
+                    </div>
+                    <div>
+                        <span class="text-3xl">👤</span>
+                        <h4 class="text-white font-semibold mt-2">HR Consultations</h4>
+                        <p class="text-slate-400 text-sm">Book time with HR professionals for any workplace matter</p>
+                    </div>
                 </div>
             </div>
 
@@ -610,14 +632,14 @@
     <script>
         const pricing = {
             yearly: {
-                starter: { price: '$249', period: '/year', monthly: 'Just $21/month', docs: '96', docsPeriod: 'year' },
-                pro: { price: '$449', period: '/year', monthly: 'Just $37/month', docs: '240', docsPeriod: 'year' },
-                business: { price: '$899', period: '/year', monthly: 'Just $75/month', docs: '600', docsPeriod: 'year' }
+                starter: { price: '$249', period: '/year', monthly: 'Just $21/month', docs: '96', docsPeriod: 'credits/year' },
+                pro: { price: '$449', period: '/year', monthly: 'Just $37/month', docs: '240', docsPeriod: 'credits/year' },
+                business: { price: '$899', period: '/year', monthly: 'Just $75/month', docs: '600', docsPeriod: 'credits/year' }
             },
             monthly: {
-                starter: { price: '$29', period: '/month', monthly: '', docs: '8', docsPeriod: 'month' },
-                pro: { price: '$49', period: '/month', monthly: '', docs: '20', docsPeriod: 'month' },
-                business: { price: '$99', period: '/month', monthly: '', docs: '50', docsPeriod: 'month' }
+                starter: { price: '$29', period: '/month', monthly: '', docs: '8', docsPeriod: 'credits/month' },
+                pro: { price: '$49', period: '/month', monthly: '', docs: '20', docsPeriod: 'credits/month' },
+                business: { price: '$99', period: '/month', monthly: '', docs: '50', docsPeriod: 'credits/month' }
             }
         };
 
