@@ -28171,9 +28171,11 @@ function resetAIImport() {
             <div class="w-full bg-slate-600 rounded-full h-2 mb-2">
                 <div id="profileCreditsBar" class="bg-amber-500 h-2 rounded-full transition-all" style="width: 0%"></div>
             </div>
-            <button onclick="closeProfileMenu(); showSubscriptionOptions();" class="text-amber-400 hover:text-amber-300 text-sm font-medium cursor-pointer hover:underline">
+            <a href="#" onclick="event.preventDefault(); closeProfileMenu(); showSubscriptionOptions();" 
+               style="cursor: pointer; text-decoration: underline;"
+               class="text-amber-400 hover:text-amber-300 text-sm font-medium inline-block">
                 Buy more credits →
-            </button>
+            </a>
         </div>
         
         <!-- Menu Options -->
