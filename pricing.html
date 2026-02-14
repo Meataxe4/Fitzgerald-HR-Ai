@@ -278,7 +278,7 @@
                             <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
-                            <span><strong>8</strong> expert-reviewed docs/year</span>
+                            <span><strong id="starterDocs">96</strong> expert-reviewed docs/<span id="starterDocsPeriod">year</span></span>
                         </li>
                         <li class="flex items-start gap-3">
                             <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -329,7 +329,7 @@
                             <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
-                            <span><strong>20</strong> expert-reviewed docs/year</span>
+                            <span><strong id="proDocs">240</strong> expert-reviewed docs/<span id="proDocsPeriod">year</span></span>
                         </li>
                         <li class="flex items-start gap-3">
                             <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -376,7 +376,7 @@
                             <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
                             </svg>
-                            <span><strong>50</strong> expert-reviewed docs/year</span>
+                            <span><strong id="businessDocs">600</strong> expert-reviewed docs/<span id="businessDocsPeriod">year</span></span>
                         </li>
                         <li class="flex items-start gap-3">
                             <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -516,14 +516,14 @@
     <script>
         const pricing = {
             yearly: {
-                starter: { price: '$249', period: '/year', monthly: 'Just $21/month' },
-                pro: { price: '$449', period: '/year', monthly: 'Just $37/month' },
-                business: { price: '$899', period: '/year', monthly: 'Just $75/month' }
+                starter: { price: '$249', period: '/year', monthly: 'Just $21/month', docs: '96', docsPeriod: 'year' },
+                pro: { price: '$449', period: '/year', monthly: 'Just $37/month', docs: '240', docsPeriod: 'year' },
+                business: { price: '$899', period: '/year', monthly: 'Just $75/month', docs: '600', docsPeriod: 'year' }
             },
             monthly: {
-                starter: { price: '$29', period: '/month', monthly: '' },
-                pro: { price: '$49', period: '/month', monthly: '' },
-                business: { price: '$99', period: '/month', monthly: '' }
+                starter: { price: '$29', period: '/month', monthly: '', docs: '8', docsPeriod: 'month' },
+                pro: { price: '$49', period: '/month', monthly: '', docs: '20', docsPeriod: 'month' },
+                business: { price: '$99', period: '/month', monthly: '', docs: '50', docsPeriod: 'month' }
             }
         };
 
@@ -534,18 +534,26 @@
             document.getElementById('monthlyBtn').classList.toggle('active', type === 'monthly');
             document.getElementById('yearlyBtn').classList.toggle('active', type === 'yearly');
             
-            // Update prices
+            // Update Starter prices and docs
             document.getElementById('starterPrice').textContent = p.starter.price;
             document.getElementById('starterPeriod').textContent = p.starter.period;
             document.getElementById('starterMonthly').textContent = p.starter.monthly;
+            document.getElementById('starterDocs').textContent = p.starter.docs;
+            document.getElementById('starterDocsPeriod').textContent = p.starter.docsPeriod;
             
+            // Update Pro prices and docs
             document.getElementById('proPrice').textContent = p.pro.price;
             document.getElementById('proPeriod').textContent = p.pro.period;
             document.getElementById('proMonthly').textContent = p.pro.monthly;
+            document.getElementById('proDocs').textContent = p.pro.docs;
+            document.getElementById('proDocsPeriod').textContent = p.pro.docsPeriod;
             
+            // Update Business prices and docs
             document.getElementById('businessPrice').textContent = p.business.price;
             document.getElementById('businessPeriod').textContent = p.business.period;
             document.getElementById('businessMonthly').textContent = p.business.monthly;
+            document.getElementById('businessDocs').textContent = p.business.docs;
+            document.getElementById('businessDocsPeriod').textContent = p.business.docsPeriod;
         }
     </script>
 
