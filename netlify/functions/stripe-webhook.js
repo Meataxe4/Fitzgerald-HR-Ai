@@ -52,12 +52,20 @@ const EMAILJS_CONFIG = {
 const REFUND_WINDOW_DAYS = 14;
 const REFUND_WINDOW_MS = REFUND_WINDOW_DAYS * 24 * 60 * 60 * 1000;
 
-// Credit amounts by tier (used as fallback)
+// Credit amounts by tier
 const TIER_CREDITS = {
+    // Monthly credit amounts
     starter: 8,
     pro: 20,
     business: 50,
     free: 0
+};
+
+// Annual credit amounts (monthly × 12)
+const TIER_CREDITS_ANNUAL = {
+    starter: 96,
+    pro: 240,
+    business: 600
 };
 
 // Tier pricing for email notifications
@@ -202,11 +210,14 @@ async function handleCheckoutComplete(session) {
                 subscriptionPeriodEnd = subscription.current_period_end;
                 subscriptionId = subscription.id;
                 
+                // Determine billing cycle from productKey
+                const billingCycle = (metadata.productKey && metadata.productKey.includes('annual')) ? 'annual' : 'monthly';
+                
                 // Also update subscription metadata with userId for future events
                 await stripe.subscriptions.update(subscription.id, {
-                    metadata: { userId: userId, tier: tier }
+                    metadata: { userId: userId, tier: tier, billingCycle: billingCycle }
                 });
-                console.log('✅ Updated subscription metadata');
+                console.log('✅ Updated subscription metadata with billingCycle:', billingCycle);
             } catch (e) {
                 console.log('Could not retrieve/update subscription details:', e.message);
             }
@@ -250,10 +261,14 @@ async function handleInvoicePaid(invoice) {
             return;
         }
         
-        const credits = TIER_CREDITS[tier] || 0;
+        // Determine credits based on billing cycle
+        const billingCycle = metadata.billingCycle || 'monthly';
+        const credits = billingCycle === 'annual' 
+            ? (TIER_CREDITS_ANNUAL[tier] || 0)
+            : (TIER_CREDITS[tier] || 0);
         
         if (credits > 0) {
-            console.log(`🔄 Renewal: ${credits} credits for ${userId}`);
+            console.log(`🔄 Renewal (${billingCycle}): ${credits} credits for ${userId}`);
             await addSubscriptionCredits(userId, credits, invoice.id, subscription.current_period_end);
         }
     }
