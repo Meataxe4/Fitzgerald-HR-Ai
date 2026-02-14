@@ -125,6 +125,13 @@
             0%, 100% { transform: translateY(0px); }
             50% { transform: translateY(-10px); }
         }
+        .toggle-btn {
+            transition: all 0.3s ease;
+        }
+        .toggle-btn.active {
+            background: #f59e0b;
+            color: #0f172a;
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-white antialiased">
@@ -362,9 +369,24 @@
     <!-- Pricing Preview -->
     <section class="py-20 px-6">
         <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-16">
+            <div class="text-center mb-8">
                 <h2 class="text-3xl sm:text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
                 <p class="text-slate-400 text-lg max-w-2xl mx-auto">Start free, upgrade when you need more. All plans include unlimited AI chat.</p>
+            </div>
+
+            <!-- Billing Toggle -->
+            <div class="flex justify-center mb-12">
+                <div class="inline-flex items-center bg-slate-800 rounded-xl p-1">
+                    <button id="monthlyBtn" onclick="toggleBilling('monthly')" class="toggle-btn px-6 py-3 rounded-lg font-medium text-slate-300">
+                        Monthly
+                    </button>
+                    <button id="yearlyBtn" onclick="toggleBilling('yearly')" class="toggle-btn active px-6 py-3 rounded-lg font-medium">
+                        Yearly
+                    </button>
+                    <span class="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full ml-2">
+                        Save 20%
+                    </span>
+                </div>
             </div>
 
             <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
@@ -399,10 +421,11 @@
                 <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
                     <h3 class="text-xl font-bold mb-2">Starter</h3>
                     <p class="text-slate-400 text-sm mb-4">For small venues with occasional HR needs</p>
-                    <div class="mb-6">
-                        <span class="text-4xl font-bold">$249</span>
-                        <span class="text-slate-400">/year</span>
+                    <div class="mb-2">
+                        <span id="starterPrice" class="text-4xl font-bold">$249</span>
+                        <span id="starterPeriod" class="text-slate-400">/year</span>
                     </div>
+                    <p id="starterMonthly" class="text-green-500 text-sm mb-4">Just $21/month</p>
                     <ul class="space-y-3 mb-8 text-slate-300 text-sm">
                         <li class="flex items-center gap-2">
                             <span class="text-green-500">✓</span> Unlimited AI chat
@@ -411,7 +434,7 @@
                             <span class="text-green-500">✓</span> All HR templates
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> 8 expert-reviewed docs/year
+                            <span class="text-green-500">✓</span> <span id="starterDocs">96</span> expert-reviewed docs/<span id="starterDocsPeriod">year</span>
                         </li>
                         <li class="flex items-center gap-2">
                             <span class="text-green-500">✓</span> Unlimited HR Tools
@@ -429,10 +452,11 @@
                     </div>
                     <h3 class="text-xl font-bold mb-2">Pro</h3>
                     <p class="text-slate-400 text-sm mb-4">For busy venues with regular HR needs</p>
-                    <div class="mb-6">
-                        <span class="text-4xl font-bold">$449</span>
-                        <span class="text-slate-400">/year</span>
+                    <div class="mb-2">
+                        <span id="proPrice" class="text-4xl font-bold">$449</span>
+                        <span id="proPeriod" class="text-slate-400">/year</span>
                     </div>
+                    <p id="proMonthly" class="text-green-500 text-sm mb-4">Just $37/month</p>
                     <ul class="space-y-3 mb-8 text-slate-300 text-sm">
                         <li class="flex items-center gap-2">
                             <span class="text-green-500">✓</span> Unlimited AI chat
@@ -441,7 +465,7 @@
                             <span class="text-green-500">✓</span> All HR templates
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> 20 expert-reviewed docs/year
+                            <span class="text-green-500">✓</span> <span id="proDocs">240</span> expert-reviewed docs/<span id="proDocsPeriod">year</span>
                         </li>
                         <li class="flex items-center gap-2">
                             <span class="text-green-500">✓</span> Unlimited HR Tools
@@ -456,10 +480,11 @@
                 <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
                     <h3 class="text-xl font-bold mb-2">Business</h3>
                     <p class="text-slate-400 text-sm mb-4">For multi-venue or high-turnover</p>
-                    <div class="mb-6">
-                        <span class="text-4xl font-bold">$899</span>
-                        <span class="text-slate-400">/year</span>
+                    <div class="mb-2">
+                        <span id="businessPrice" class="text-4xl font-bold">$899</span>
+                        <span id="businessPeriod" class="text-slate-400">/year</span>
                     </div>
+                    <p id="businessMonthly" class="text-green-500 text-sm mb-4">Just $75/month</p>
                     <ul class="space-y-3 mb-8 text-slate-300 text-sm">
                         <li class="flex items-center gap-2">
                             <span class="text-green-500">✓</span> Unlimited AI chat
@@ -468,7 +493,7 @@
                             <span class="text-green-500">✓</span> All HR templates
                         </li>
                         <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> 50 expert-reviewed docs/year
+                            <span class="text-green-500">✓</span> <span id="businessDocs">600</span> expert-reviewed docs/<span id="businessDocsPeriod">year</span>
                         </li>
                         <li class="flex items-center gap-2">
                             <span class="text-green-500">✓</span> Unlimited HR Tools
@@ -580,6 +605,51 @@
             </div>
         </div>
     </footer>
+
+    <!-- Billing Toggle Script -->
+    <script>
+        const pricing = {
+            yearly: {
+                starter: { price: '$249', period: '/year', monthly: 'Just $21/month', docs: '96', docsPeriod: 'year' },
+                pro: { price: '$449', period: '/year', monthly: 'Just $37/month', docs: '240', docsPeriod: 'year' },
+                business: { price: '$899', period: '/year', monthly: 'Just $75/month', docs: '600', docsPeriod: 'year' }
+            },
+            monthly: {
+                starter: { price: '$29', period: '/month', monthly: '', docs: '8', docsPeriod: 'month' },
+                pro: { price: '$49', period: '/month', monthly: '', docs: '20', docsPeriod: 'month' },
+                business: { price: '$99', period: '/month', monthly: '', docs: '50', docsPeriod: 'month' }
+            }
+        };
+
+        function toggleBilling(type) {
+            const p = pricing[type];
+            
+            // Update buttons
+            document.getElementById('monthlyBtn').classList.toggle('active', type === 'monthly');
+            document.getElementById('yearlyBtn').classList.toggle('active', type === 'yearly');
+            
+            // Update Starter
+            document.getElementById('starterPrice').textContent = p.starter.price;
+            document.getElementById('starterPeriod').textContent = p.starter.period;
+            document.getElementById('starterMonthly').textContent = p.starter.monthly;
+            document.getElementById('starterDocs').textContent = p.starter.docs;
+            document.getElementById('starterDocsPeriod').textContent = p.starter.docsPeriod;
+            
+            // Update Pro
+            document.getElementById('proPrice').textContent = p.pro.price;
+            document.getElementById('proPeriod').textContent = p.pro.period;
+            document.getElementById('proMonthly').textContent = p.pro.monthly;
+            document.getElementById('proDocs').textContent = p.pro.docs;
+            document.getElementById('proDocsPeriod').textContent = p.pro.docsPeriod;
+            
+            // Update Business
+            document.getElementById('businessPrice').textContent = p.business.price;
+            document.getElementById('businessPeriod').textContent = p.business.period;
+            document.getElementById('businessMonthly').textContent = p.business.monthly;
+            document.getElementById('businessDocs').textContent = p.business.docs;
+            document.getElementById('businessDocsPeriod').textContent = p.business.docsPeriod;
+        }
+    </script>
 
 </body>
 </html>
