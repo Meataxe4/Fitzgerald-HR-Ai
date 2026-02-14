@@ -13510,8 +13510,9 @@ function openCreditsModal() {
     const freeDocStatus = document.getElementById('freeDocumentStatus');
     const freeDocUsedStatus = document.getElementById('freeDocumentUsedStatus');
     
-    // Update tier display
-    document.getElementById('modalCurrentTier').textContent = CONFIG.CREDITS.TIERS[userCredits.tier]?.name || 'Free';
+    // Update tier display - use subscriptionTier if available, fallback to tier, then 'free'
+    const currentTier = userCredits.subscriptionTier || userCredits.tier || 'free';
+    document.getElementById('modalCurrentTier').textContent = CONFIG.CREDITS.TIERS[currentTier]?.name || 'Free';
     
     // Update credits balance - show actual number
     modalCreditsBalance.textContent = totalCredits;
@@ -13618,11 +13619,11 @@ async function openBillingPortal(flow) {
     const originalManageText = manageBtn?.innerHTML;
     
     if (btn) {
-        btn.innerHTML = '<span class="animate-spin">⏳</span> Opening...';
+        btn.innerHTML = '<span class="animate-spin">⏳</span> Please wait, redirecting...';
         btn.disabled = true;
     }
     if (manageBtn) {
-        manageBtn.innerHTML = '⏳ Opening...';
+        manageBtn.innerHTML = '⏳ Please wait, redirecting...';
         manageBtn.disabled = true;
     }
     
@@ -28138,7 +28139,7 @@ function resetAIImport() {
             <div class="w-full bg-slate-600 rounded-full h-2 mb-2">
                 <div id="profileCreditsBar" class="bg-amber-500 h-2 rounded-full transition-all" style="width: 0%"></div>
             </div>
-            <button onclick="closeProfileMenu(); openCreditsModal();" class="text-amber-400 hover:text-amber-300 text-sm font-medium">
+            <button onclick="closeProfileMenu(); showSubscriptionOptions();" class="text-amber-400 hover:text-amber-300 text-sm font-medium">
                 Buy more credits →
             </button>
         </div>
@@ -28317,7 +28318,7 @@ function resetAIImport() {
                     <span class="text-3xl">🔗</span>
                     <div>
                         <div class="font-semibold text-white mb-1">Integrations</div>
-                        <div class="text-sm text-slate-400">Connect Deputy, Xero & more</div>
+                        <div class="text-sm text-slate-400">Import 3rd party data for Fitz to analyse</div>
                     </div>
                 </div>
             </button>
