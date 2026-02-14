@@ -45,6 +45,7 @@ const EMAILJS_CONFIG = {
     serviceId: process.env.EMAILJS_SERVICE_ID || 'service_7dz8e3q',
     templateId: process.env.EMAILJS_CANCELLATION_TEMPLATE_ID || 'template_ua7eq02',
     publicKey: process.env.EMAILJS_PUBLIC_KEY || 'cStomWilGU8SiOzyy',
+    privateKey: process.env.EMAILJS_PRIVATE_KEY || '', // Required for server-side requests
     adminEmail: process.env.ADMIN_EMAIL || 'blakefitzgerald4@gmail.com'
 };
 
@@ -554,6 +555,7 @@ Automated notification from Fitz HR
                 service_id: EMAILJS_CONFIG.serviceId,
                 template_id: EMAILJS_CONFIG.templateId,
                 user_id: EMAILJS_CONFIG.publicKey,
+                accessToken: EMAILJS_CONFIG.privateKey, // Required for server-side requests
                 template_params: {
                     to_email: EMAILJS_CONFIG.adminEmail,
                     from_name: 'Fitz HR System',
