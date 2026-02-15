@@ -382,7 +382,8 @@ async function handleSubscriptionUpdated(subscription) {
     
     const metadata = subscription.metadata || {};
     const userId = metadata.userId;
-    const tier = metadata.tier;
+    let tier = metadata.tier;
+    let billingCycle = metadata.billingCycle || 'monthly';
     
     console.log('📋 Subscription metadata:', JSON.stringify(metadata));
     
@@ -393,7 +394,132 @@ async function handleSubscriptionUpdated(subscription) {
     
     const userRef = db.collection('users').doc(userId);
     
-    // Track cancellation scheduled (user clicked cancel in Customer Portal)
+    // ========================================
+    // DETECT CURRENT TIER FROM STRIPE PRICE
+    // (Handles plan switches where metadata doesn't auto-update)
+    // ========================================
+    let detectedTier = tier;
+    let detectedBillingCycle = billingCycle;
+    
+    if (subscription.items && subscription.items.data && subscription.items.data.length > 0) {
+        try {
+            const priceId = subscription.items.data[0].price.id;
+            const price = await stripe.prices.retrieve(priceId, { expand: ['product'] });
+            
+            // Check price metadata for tier
+            if (price.metadata && price.metadata.tier) {
+                detectedTier = price.metadata.tier;
+                console.log(`📦 Detected tier from price metadata: ${detectedTier}`);
+            }
+            // Check product metadata for tier
+            else if (price.product && price.product.metadata && price.product.metadata.tier) {
+                detectedTier = price.product.metadata.tier;
+                console.log(`📦 Detected tier from product metadata: ${detectedTier}`);
+            }
+            // Fallback: Infer from price amount (in cents)
+            else {
+                const amount = price.unit_amount;
+                const interval = price.recurring?.interval;
+                
+                if (interval === 'year') {
+                    detectedBillingCycle = 'annual';
+                    if (amount === 24900) detectedTier = 'starter';
+                    else if (amount === 44900) detectedTier = 'pro';
+                    else if (amount === 89900) detectedTier = 'business';
+                } else if (interval === 'month') {
+                    detectedBillingCycle = 'monthly';
+                    if (amount === 2900) detectedTier = 'starter';
+                    else if (amount === 4900) detectedTier = 'pro';
+                    else if (amount === 9900) detectedTier = 'business';
+                }
+                
+                if (detectedTier !== tier) {
+                    console.log(`📦 Inferred tier from price amount ($${amount/100}/${interval}): ${detectedTier}`);
+                }
+            }
+            
+            // Update subscription metadata if tier changed
+            if (detectedTier && detectedTier !== tier) {
+                await stripe.subscriptions.update(subscription.id, {
+                    metadata: { 
+                        ...metadata, 
+                        tier: detectedTier, 
+                        billingCycle: detectedBillingCycle 
+                    }
+                });
+                console.log(`✅ Updated subscription metadata: tier=${detectedTier}, billingCycle=${detectedBillingCycle}`);
+                tier = detectedTier;
+                billingCycle = detectedBillingCycle;
+            }
+        } catch (e) {
+            console.log('Could not detect tier from price:', e.message);
+        }
+    }
+    
+    // ========================================
+    // CHECK FOR PLAN SWITCH (UPGRADE/DOWNGRADE)
+    // ========================================
+    if (subscription.status === 'active' && !subscription.cancel_at_period_end) {
+        try {
+            const doc = await userRef.get();
+            const currentData = doc.exists ? doc.data() : {};
+            const currentCredits = currentData.credits || {};
+            const currentTier = currentCredits.subscriptionTier || currentCredits.tier || 'free';
+            
+            // Detect tier change
+            if (tier && currentTier !== tier && currentTier !== 'free') {
+                console.log(`🔄 Plan switch detected: ${currentTier} → ${tier}`);
+                
+                // Calculate new credits based on billing cycle
+                const newCredits = billingCycle === 'annual' 
+                    ? (TIER_CREDITS_ANNUAL[tier] || 0)
+                    : (TIER_CREDITS[tier] || 0);
+                
+                const oldCredits = billingCycle === 'annual'
+                    ? (TIER_CREDITS_ANNUAL[currentTier] || 0)
+                    : (TIER_CREDITS[currentTier] || 0);
+                
+                const isUpgrade = newCredits > oldCredits;
+                
+                console.log(`${isUpgrade ? '⬆️ UPGRADE' : '⬇️ DOWNGRADE'}: ${currentTier} (${oldCredits} credits) → ${tier} (${newCredits} credits)`);
+                
+                // For upgrades: Give full new tier credits
+                // For downgrades: Give new tier credits (they keep unused from old tier via purchasedCredits if needed)
+                await userRef.set({
+                    credits: {
+                        ...currentCredits,
+                        subscriptionTier: tier,
+                        tier: tier,
+                        reviewCredits: newCredits,
+                        reviewCreditsUsed: 0, // Reset usage for new tier
+                        subscriptionStatus: 'active',
+                        cancelAtPeriodEnd: false,
+                        subscriptionPeriodEnd: subscription.current_period_end 
+                            ? new Date(subscription.current_period_end * 1000).toISOString() 
+                            : null,
+                        lastPlanChange: admin.firestore.FieldValue.serverTimestamp(),
+                        lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+                    },
+                    transactions: admin.firestore.FieldValue.arrayUnion({
+                        type: isUpgrade ? 'plan_upgrade' : 'plan_downgrade',
+                        fromTier: currentTier,
+                        toTier: tier,
+                        credits: newCredits,
+                        timestamp: new Date().toISOString()
+                    })
+                }, { merge: true });
+                
+                console.log(`✅ Plan switch complete: ${userId} now on ${tier} with ${newCredits} credits`);
+                return;
+            }
+        } catch (e) {
+            console.error('Error checking for plan switch:', e.message);
+        }
+    }
+    
+    // ========================================
+    // TRACK CANCELLATION SCHEDULED
+    // ========================================
     if (subscription.cancel_at_period_end) {
         console.log(`⚠️ ${userId} scheduled cancellation at period end`);
         
@@ -433,7 +559,9 @@ async function handleSubscriptionUpdated(subscription) {
         return;
     }
     
-    // Track if cancellation was reversed (user reactivated)
+    // ========================================
+    // TRACK REACTIVATION (cancellation reversed)
+    // ========================================
     if (!subscription.cancel_at_period_end && subscription.status === 'active') {
         const doc = await userRef.get();
         const currentData = doc.exists ? doc.data() : {};
@@ -455,7 +583,9 @@ async function handleSubscriptionUpdated(subscription) {
         }
     }
     
-    // Track payment issues
+    // ========================================
+    // TRACK PAYMENT ISSUES
+    // ========================================
     if (subscription.status === 'past_due' || subscription.status === 'unpaid') {
         console.log(`⚠️ Payment issue for ${userId}, status: ${subscription.status}`);
         await userRef.set({
