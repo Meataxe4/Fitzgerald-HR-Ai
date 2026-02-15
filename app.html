@@ -1517,6 +1517,556 @@ input, textarea, select {
     font-size: 16px;
 }
 
+/* ==========================================
+   COMPREHENSIVE MOBILE OPTIMIZATION v2.0
+   Screen width <= 768px
+   DO NOT MODIFY - This section handles all mobile UX
+   ========================================== */
+
+@media (max-width: 768px) {
+    /* ===================
+       Z-INDEX HIERARCHY (Mobile)
+       ===================
+       1. Base content: 0
+       2. Header: 100
+       3. Sidebar overlay: 150
+       4. Sidebar: 200
+       5. Modals: 500
+       6. Profile menu: 600
+       7. Toast notifications: 700
+       8. Critical modals (payment, etc): 800
+    */
+    
+    /* ===================
+       HIDE ON MOBILE
+       =================== */
+    
+    /* Hide Daily Tip Banner */
+    #dailyTipBanner {
+        display: none !important;
+    }
+    
+    /* Hide Footer Disclaimer */
+    #footerDisclaimer {
+        display: none !important;
+    }
+    
+    /* Hide Credits Display in Header (moved to sidebar) */
+    #creditsDisplay {
+        display: none !important;
+    }
+    
+    /* Hide Admin Button on mobile */
+    #adminButton {
+        display: none !important;
+    }
+    
+    /* Hide dividers in header */
+    #headerRight > .hidden.md\\:block {
+        display: none !important;
+    }
+    
+    /* ===================
+       MAIN LAYOUT
+       =================== */
+    
+    /* Assistant screen - full height, proper flex */
+    #assistantScreen {
+        height: 100vh !important;
+        height: 100dvh !important;
+        height: -webkit-fill-available !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+    }
+    
+    /* Header - compact and fixed at top */
+    #mainHeader {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 100 !important;
+        flex-shrink: 0 !important;
+        padding: 8px 12px !important;
+        min-height: 56px !important;
+    }
+    
+    /* Header content - single row */
+    #headerContent {
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 8px !important;
+    }
+    
+    /* Header left - logo and menu */
+    #headerLeft {
+        flex: 0 0 auto !important;
+        gap: 8px !important;
+    }
+    
+    /* Header title - compact */
+    #headerTitle h1 {
+        font-size: 18px !important;
+    }
+    
+    #headerTitle p {
+        display: none !important;
+    }
+    
+    /* Header right - action buttons */
+    #headerRight {
+        flex: 1 1 auto !important;
+        justify-content: flex-end !important;
+        gap: 6px !important;
+        flex-wrap: nowrap !important;
+    }
+    
+    /* ===================
+       MOBILE ACTION BUTTONS (Must remain visible)
+       =================== */
+    
+    /* Crisis/Urgent Button - prominent */
+    #headerRight button[onclick*="crisisMode"] {
+        padding: 8px 10px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        font-size: 14px !important;
+    }
+    
+    /* Consultation Button - prominent */
+    #headerRight button[onclick*="Consultation"] {
+        padding: 8px 10px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+        font-size: 14px !important;
+    }
+    
+    /* Tools Button - prominent */
+    #toolsButton {
+        padding: 8px 10px !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+    }
+    
+    /* Hide text labels on buttons, show only icons */
+    #headerRight button .hidden.sm\\:inline,
+    #headerRight .hidden.sm\\:inline {
+        display: none !important;
+    }
+    
+    /* ===================
+       MESSAGES CONTAINER
+       =================== */
+    
+    #messagesContainer {
+        flex: 1 1 auto !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding: 12px !important;
+        min-height: 0 !important;
+        scroll-behavior: smooth !important;
+    }
+    
+    /* Message bubbles */
+    #messagesContainer > div > div {
+        padding: 12px !important;
+        margin-bottom: 12px !important;
+        font-size: 15px !important;
+        line-height: 1.5 !important;
+        word-wrap: break-word !important;
+        overflow-wrap: break-word !important;
+    }
+    
+    /* ===================
+       INPUT AREA
+       =================== */
+    
+    /* Input container - sticky at bottom */
+    #assistantScreen > .bg-slate-800\/80:has(#messageInput) {
+        flex-shrink: 0 !important;
+        padding: 8px 12px !important;
+        padding-bottom: calc(8px + env(safe-area-inset-bottom)) !important;
+        position: sticky !important;
+        bottom: 0 !important;
+        z-index: 50 !important;
+    }
+    
+    /* Input wrapper */
+    #assistantScreen .max-w-3xl:has(#messageInput) {
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+    
+    /* Input flex container */
+    .flex.gap-2.items-end:has(#messageInput) {
+        gap: 6px !important;
+    }
+    
+    /* Text input */
+    #messageInput {
+        min-height: 44px !important;
+        max-height: 120px !important;
+        padding: 10px 12px !important;
+        font-size: 16px !important;
+        border-radius: 20px !important;
+        line-height: 1.4 !important;
+    }
+    
+    /* Upload button */
+    #uploadButton {
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 10px !important;
+    }
+    
+    /* Voice button */
+    #voiceButton {
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 10px !important;
+    }
+    
+    /* Send button */
+    #sendButton {
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 10px !important;
+        border-radius: 50% !important;
+    }
+    
+    /* Upload menu popup */
+    #uploadMenu {
+        bottom: calc(100% + 8px) !important;
+        left: 0 !important;
+        min-width: 180px !important;
+    }
+    
+    /* ===================
+       SIDEBAR
+       =================== */
+    
+    /* Sidebar overlay */
+    #sidebarOverlay {
+        z-index: 150 !important;
+    }
+    
+    #sidebarOverlay.active {
+        display: block !important;
+        position: fixed !important;
+        inset: 0 !important;
+        background: rgba(0, 0, 0, 0.7) !important;
+    }
+    
+    /* Sidebar panel */
+    #chatSidebar {
+        width: 85vw !important;
+        max-width: 320px !important;
+        z-index: 200 !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+    }
+    
+    #chatSidebar.closed {
+        transform: translateX(-100%) !important;
+    }
+    
+    /* Sidebar content scrollable */
+    .sidebar-content {
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding-bottom: 100px !important;
+    }
+    
+    /* Sidebar buttons - proper touch targets */
+    .sidebar-chat-item,
+    .sidebar-new-chat-btn,
+    .sidebar-profile-btn {
+        min-height: 48px !important;
+        padding: 12px !important;
+    }
+    
+    /* ===================
+       ALL MODALS - FULL SCREEN
+       =================== */
+    
+    /* Base modal styles */
+    [id$="Modal"]:not(.hidden),
+    [id$="menu"]:not(.hidden):not(#uploadMenu) {
+        padding: 0 !important;
+        align-items: flex-start !important;
+        z-index: 500 !important;
+    }
+    
+    /* Modal content containers */
+    [id$="Modal"]:not(.hidden) > div:first-child,
+    #profileMenu > div {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: 100vh !important;
+        min-height: 100dvh !important;
+        max-height: 100vh !important;
+        max-height: 100dvh !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+        border: none !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    
+    /* Profile menu - higher z-index */
+    #profileMenu {
+        z-index: 600 !important;
+        padding: 0 !important;
+    }
+    
+    #profileMenu > div {
+        padding: 16px !important;
+        padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+    }
+    
+    /* Modal close buttons - large touch targets */
+    [id$="Modal"] button[onclick*="close"],
+    [id$="Modal"] button:has(svg):first-child {
+        min-width: 44px !important;
+        min-height: 44px !important;
+        padding: 8px !important;
+    }
+    
+    /* Tools Menu Modal */
+    #toolsMenu:not(.hidden) {
+        z-index: 500 !important;
+    }
+    
+    #toolsMenu > div {
+        padding: 16px !important;
+        padding-bottom: calc(100px + env(safe-area-inset-bottom)) !important;
+    }
+    
+    /* Mobile Tools Modal (dedicated mobile version) */
+    #mobileToolsModal {
+        z-index: 500 !important;
+    }
+    
+    #mobileToolsModal > div {
+        height: 100vh !important;
+        height: 100dvh !important;
+    }
+    
+    #mobileToolsModal button {
+        min-height: 56px !important;
+    }
+    
+    /* ===================
+       SPECIFIC MODALS
+       =================== */
+    
+    /* Consultation Booking Modal */
+    #consultationBookingModal {
+        z-index: 500 !important;
+    }
+    
+    #consultationBookingModal > div {
+        max-width: 100% !important;
+    }
+    
+    /* Calendly container */
+    #calendlyContainer {
+        min-height: 500px !important;
+        height: calc(100vh - 300px) !important;
+    }
+    
+    /* Crisis Modal - keep prominent */
+    #crisisModal {
+        z-index: 800 !important;
+        padding: 12px !important;
+    }
+    
+    #crisisModal > div {
+        padding: 16px !important;
+        min-height: auto !important;
+        max-height: calc(100vh - 24px) !important;
+        overflow-y: auto !important;
+    }
+    
+    /* Payment Processing Modal */
+    #paymentProcessingModal {
+        z-index: 800 !important;
+    }
+    
+    /* Credits Modal */
+    #creditsModal,
+    #subscriptionModal,
+    #documentUnlockModal,
+    #promptLimitModal {
+        z-index: 600 !important;
+    }
+    
+    /* Document Builder Modal */
+    #documentBuilderModal > div {
+        padding: 12px !important;
+    }
+    
+    #documentBuilderModal select,
+    #documentBuilderModal input,
+    #documentBuilderModal textarea {
+        min-height: 48px !important;
+        font-size: 16px !important;
+        padding: 12px !important;
+    }
+    
+    /* Document Preview Modal */
+    #documentPreviewModal {
+        z-index: 700 !important;
+    }
+    
+    #documentPreviewModal > div {
+        padding: 12px !important;
+    }
+    
+    /* Review Request Modal */
+    #reviewRequestModal {
+        z-index: 750 !important;
+    }
+    
+    /* ===================
+       SCROLL TO BOTTOM BUTTON
+       =================== */
+    
+    #scrollToBottomBtn {
+        bottom: 100px !important;
+        right: 16px !important;
+        width: 44px !important;
+        height: 44px !important;
+        z-index: 40 !important;
+    }
+    
+    /* ===================
+       TOAST NOTIFICATIONS
+       =================== */
+    
+    .toast-container,
+    #toastContainer {
+        z-index: 700 !important;
+        bottom: 80px !important;
+        left: 12px !important;
+        right: 12px !important;
+    }
+    
+    /* ===================
+       FORM ELEMENTS
+       =================== */
+    
+    /* All form inputs - proper sizing */
+    input[type="text"],
+    input[type="email"],
+    input[type="password"],
+    input[type="number"],
+    input[type="tel"],
+    textarea,
+    select {
+        min-height: 48px !important;
+        font-size: 16px !important;
+        padding: 12px !important;
+        -webkit-appearance: none !important;
+    }
+    
+    /* Buttons - minimum touch target */
+    button {
+        min-height: 44px !important;
+    }
+    
+    /* ===================
+       GRIDS - Stack on Mobile
+       =================== */
+    
+    .grid.grid-cols-2,
+    .grid.grid-cols-3,
+    .grid.grid-cols-4,
+    .grid.md\\:grid-cols-2,
+    .grid.md\\:grid-cols-3,
+    .grid.md\\:grid-cols-4 {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+    
+    /* ===================
+       PREVENT BODY SCROLL WHEN MODAL OPEN
+       =================== */
+    
+    body.modal-open {
+        overflow: hidden !important;
+        position: fixed !important;
+        width: 100% !important;
+    }
+    
+    /* ===================
+       iOS SAFE AREAS
+       =================== */
+    
+    /* Apply safe area insets */
+    #mainHeader {
+        padding-top: calc(8px + env(safe-area-inset-top)) !important;
+    }
+    
+    /* ===================
+       DISABLE PULL-TO-REFRESH
+       =================== */
+    
+    body {
+        overscroll-behavior-y: contain;
+    }
+}
+
+/* ===================
+   VERY SMALL SCREENS (< 380px)
+   =================== */
+
+@media (max-width: 380px) {
+    #headerTitle h1 {
+        font-size: 16px !important;
+    }
+    
+    #headerRight {
+        gap: 4px !important;
+    }
+    
+    #headerRight button {
+        padding: 6px !important;
+    }
+    
+    #messageInput {
+        font-size: 16px !important;
+        padding: 8px 10px !important;
+    }
+}
+
+/* ===================
+   LANDSCAPE MODE
+   =================== */
+
+@media (max-width: 768px) and (orientation: landscape) {
+    #mainHeader {
+        padding: 4px 12px !important;
+        min-height: 44px !important;
+    }
+    
+    #messagesContainer {
+        padding: 8px !important;
+    }
+    
+    /* Modals - allow scroll but don't force full height */
+    [id$="Modal"]:not(.hidden) > div:first-child {
+        min-height: auto !important;
+        max-height: 100vh !important;
+    }
+}
+
         /* Crisis Mode Pulse Animation */
 
 
@@ -4574,7 +5124,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- Footer Disclaimer (Fixed at very bottom) -->
-<div class="bg-slate-800/50 border-t border-slate-700/50 px-6 py-3">
+<div id="footerDisclaimer" class="bg-slate-800/50 border-t border-slate-700/50 px-6 py-3">
     <div class="max-w-5xl mx-auto text-center">
         <p class="text-slate-400 text-xs mb-1">
             <span class="text-amber-400 font-semibold">ℹ️ Information Only:</span> 
@@ -27237,6 +27787,68 @@ window.addEventListener('DOMContentLoaded', function() {
             messagesContainer.style.opacity = '1';
         }, 100);
     }
+    
+    // ========================================
+    // MOBILE OPTIMIZATION INITIALIZATION
+    // ========================================
+    
+    if (window.innerWidth <= 768) {
+        console.log('📱 Mobile mode initialized');
+        
+        // Fix iOS viewport height issue
+        function setMobileViewportHeight() {
+            const vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        setMobileViewportHeight();
+        window.addEventListener('resize', setMobileViewportHeight);
+        
+        // iOS keyboard handling - adjust layout when keyboard opens
+        const messageInput = document.getElementById('messageInput');
+        if (messageInput) {
+            messageInput.addEventListener('focus', function() {
+                // Scroll to bottom when input is focused
+                setTimeout(() => {
+                    const container = document.getElementById('messagesContainer');
+                    if (container) {
+                        container.scrollTop = container.scrollHeight;
+                    }
+                    // Ensure input is visible
+                    this.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                }, 300);
+            });
+        }
+        
+        // Prevent body scroll when modals are open
+        const observeModals = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.attributeName === 'class') {
+                    const target = mutation.target;
+                    if (target.id && target.id.includes('Modal') || target.id === 'profileMenu' || target.id === 'toolsMenu') {
+                        if (!target.classList.contains('hidden')) {
+                            document.body.classList.add('modal-open');
+                        } else {
+                            // Check if any other modals are still open
+                            const openModals = document.querySelectorAll('[id$="Modal"]:not(.hidden), #profileMenu:not(.hidden), #toolsMenu:not(.hidden)');
+                            if (openModals.length === 0) {
+                                document.body.classList.remove('modal-open');
+                            }
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Observe all modal elements
+        document.querySelectorAll('[id$="Modal"], #profileMenu, #toolsMenu').forEach(function(modal) {
+            observeModals.observe(modal, { attributes: true });
+        });
+        
+        // Touch handling improvements
+        document.addEventListener('touchstart', function() {}, { passive: true });
+        
+        console.log('📱 Mobile initialization complete');
+    }
 });
 
 
@@ -28278,7 +28890,7 @@ function resetAIImport() {
                 </div>
             </button>
             
-            <button onclick="FitzTour.restartTour(); closeProfileMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
+            <button onclick="if(window.innerWidth <= 768) { showNotification('Tour is available on desktop devices', 'info'); closeProfileMenu(); return; } FitzTour.restartTour(); closeProfileMenu();" class="w-full text-left px-4 py-3 hover:bg-slate-700 rounded-lg text-slate-200 flex items-center gap-3 transition-colors">
                 <span class="text-xl">🎯</span>
                 <div>
                     <div class="font-semibold">Take a Tour</div>
@@ -38800,6 +39412,14 @@ const FitzTour = {
 document.addEventListener('DOMContentLoaded', function() {
     // Small delay to ensure main app is loaded
     setTimeout(() => {
+        // DISABLE FITZTOUR ON MOBILE (screens <= 768px)
+        if (window.innerWidth <= 768) {
+            console.log('📱 Mobile detected - FitzTour disabled');
+            // Mark tour as seen so it doesn't prompt
+            localStorage.setItem('fitzTourCompleted', 'true');
+            FitzTour.hasSeenTour = true;
+            return; // Don't initialize tour on mobile
+        }
         FitzTour.init();
     }, 1000);
 });
