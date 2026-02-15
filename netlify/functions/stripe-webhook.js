@@ -424,7 +424,9 @@ async function handleSubscriptionUpdated(subscription) {
             credits: {
                 cancelAtPeriodEnd: true,
                 subscriptionStatus: 'canceling',
-                subscriptionPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+                subscriptionPeriodEnd: subscription.current_period_end 
+                    ? new Date(subscription.current_period_end * 1000).toISOString() 
+                    : null,
                 lastUpdated: admin.firestore.FieldValue.serverTimestamp()
             }
         }, { merge: true });
@@ -443,7 +445,9 @@ async function handleSubscriptionUpdated(subscription) {
                 credits: {
                     cancelAtPeriodEnd: false,
                     subscriptionStatus: 'active',
-                    subscriptionPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString(),
+                    subscriptionPeriodEnd: subscription.current_period_end 
+                        ? new Date(subscription.current_period_end * 1000).toISOString() 
+                        : null,
                     lastUpdated: admin.firestore.FieldValue.serverTimestamp()
                 }
             }, { merge: true });
