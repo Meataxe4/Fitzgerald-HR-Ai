@@ -2069,6 +2069,31 @@ input, textarea, select {
 
         /* Crisis Mode Pulse Animation */
 
+/* ===================
+   DESKTOP CRISIS MODAL FIX
+   Ensure proper display on screens > 768px
+   =================== */
+@media (min-width: 769px) {
+    #crisisModal {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 24px !important;
+    }
+    
+    #crisisModal.hidden {
+        display: none !important;
+    }
+    
+    #crisisModal > div {
+        max-width: 672px !important; /* max-w-2xl */
+        width: 100% !important;
+        margin: 0 auto !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+    }
+}
+
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
