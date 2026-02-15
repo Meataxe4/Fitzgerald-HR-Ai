@@ -1489,13 +1489,14 @@ header button[onclick*="logout"],
         padding: 24px;
     }
     
-    /* Desktop message input - taller like Claude */
+    /* Desktop message input - compact single line that expands */
     #messageInput {
-        min-height: 100px;
-        max-height: 250px;
-        padding: 16px;
+        min-height: 48px;
+        max-height: 200px;
+        padding: 12px 16px;
         font-size: 15px;
-        line-height: 1.6;
+        line-height: 1.5;
+        border-radius: 24px;
     }
 }
 
@@ -5076,7 +5077,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- Chat Input Area (ChatGPT Style) -->
-<div class="bg-slate-800/80 backdrop-blur-sm border-t border-slate-700/50 px-6 py-4">
+<div class="bg-slate-800/80 backdrop-blur-sm border-t border-slate-700/50 px-4 md:px-6 py-3">
     <div class="max-w-3xl mx-auto">
         <div class="flex gap-2 items-end">
             <!-- Upload Button (+) -->
@@ -5112,7 +5113,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <textarea id="messageInput" 
                 placeholder="Ask about HR, contracts, compliance..." 
                 rows="1"
-                class="flex-1 bg-slate-900 text-slate-100 border border-slate-700 rounded-xl px-4 py-3 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none min-h-[44px] max-h-[200px]"
+                class="flex-1 bg-slate-900 text-slate-100 border border-slate-700 rounded-2xl px-4 py-3 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none min-h-[44px] max-h-[200px]"
                 onkeypress="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
                 oninput="autoResizeTextarea(this)"></textarea>
             
@@ -22570,12 +22571,16 @@ async function readFileContent(file) {
 
 // Auto-resize textarea
 function autoResizeTextarea(textarea) {
+    // Reset height to auto to get accurate scrollHeight
     textarea.style.height = 'auto';
+    
     // Collapse back to single row when empty
     if (!textarea.value.trim()) {
-        textarea.style.height = '44px';
+        textarea.style.height = '48px';
     } else {
-        textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+        // Expand based on content, max 200px
+        const newHeight = Math.min(textarea.scrollHeight, 200);
+        textarea.style.height = newHeight + 'px';
     }
 }
 
