@@ -3268,6 +3268,20 @@ input, textarea, select {
     <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
     <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
     
+    <style>
+    /* Calendly widget sizing fix */
+    #calendlyContainer {
+        min-height: 700px !important;
+        height: 700px;
+    }
+    #calendlyContainer .calendly-inline-widget,
+    #calendlyContainer iframe {
+        min-height: 680px !important;
+        height: 680px !important;
+        width: 100% !important;
+    }
+    </style>
+    
     <!-- EmailJS for review request notifications -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <script type="text/javascript">
@@ -7106,7 +7120,7 @@ function setBilling(billing) {
 <!-- CONSULTATION BOOKING MODAL (Main booking flow) -->
 <!-- ========================================== -->
 <div id="consultationBookingModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-start justify-center p-4 z-50 overflow-y-auto">
-    <div class="bg-slate-800 rounded-2xl max-w-3xl w-full border border-purple-500/50 fade-in my-4">
+    <div class="bg-slate-800 rounded-2xl max-w-4xl w-full border border-purple-500/50 fade-in my-4">
         
         <!-- Header -->
         <div class="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-t-2xl p-6 text-center relative">
@@ -7308,9 +7322,9 @@ function setBilling(billing) {
                 </h3>
                 
                 <!-- Calendly Container -->
-                <div id="calendlyContainer" class="bg-white rounded-xl overflow-hidden" style="min-height: 700px;">
+                <div id="calendlyContainer" class="bg-white rounded-xl overflow-hidden" style="min-height: 700px; min-width: 320px;">
                     <!-- Calendly inline widget will be loaded here -->
-                    <div id="calendlyPlaceholder" class="flex items-center justify-center bg-slate-100" style="height: 650px;">
+                    <div id="calendlyPlaceholder" class="flex items-center justify-center bg-slate-100" style="height: 680px;">
                         <div class="text-center">
                             <div class="animate-spin text-4xl mb-4">⏳</div>
                             <p class="text-slate-600">Loading calendar...</p>
@@ -14009,10 +14023,13 @@ function loadCalendlyWidget() {
     
     // Check if Calendly script is loaded
     if (typeof Calendly !== 'undefined') {
-        container.innerHTML = '';
+        // Create a proper container for the Calendly widget
+        container.innerHTML = '<div class="calendly-inline-widget" data-auto-load="false" style="min-width:320px;height:680px;"></div>';
+        const widgetContainer = container.querySelector('.calendly-inline-widget');
+        
         Calendly.initInlineWidget({
             url: fullUrl,
-            parentElement: container,
+            parentElement: widgetContainer,
             prefill: prefillData,
             utm: {
                 utmSource: 'fitz-hr-app',
@@ -14020,6 +14037,8 @@ function loadCalendlyWidget() {
                 utmCampaign: selectedConsultation
             }
         });
+        
+        console.log('📅 Calendly widget initialized with URL:', fullUrl);
     } else {
         // Show manual booking fallback
         container.innerHTML = `
@@ -14064,21 +14083,29 @@ function handleCalendlyEventScheduled(eventData) {
         // Deduct credits
         const config = CONSULTATION_TYPES[booking.consultationType];
         if (config) {
-            // Deduct from purchased credits first, then subscription
-            if (userCredits.purchasedCredits >= config.credits) {
-                userCredits.purchasedCredits -= config.credits;
+            const creditsToDeduct = config.credits;
+            
+            // Deduct from purchased credits first, then subscription reviewCredits
+            if (userCredits.purchasedCredits >= creditsToDeduct) {
+                userCredits.purchasedCredits -= creditsToDeduct;
+                console.log(`💳 Deducted ${creditsToDeduct} from purchased credits`);
             } else {
-                const remaining = config.credits - userCredits.purchasedCredits;
+                // Use purchased credits first, then subscription credits
+                const fromPurchased = userCredits.purchasedCredits;
+                const remaining = creditsToDeduct - fromPurchased;
                 userCredits.purchasedCredits = 0;
-                userCredits.subscriptionCredits -= remaining;
+                userCredits.reviewCreditsUsed = (userCredits.reviewCreditsUsed || 0) + remaining;
+                console.log(`💳 Deducted ${fromPurchased} from purchased + ${remaining} from subscription credits`);
             }
             
             saveUserCredits();
+            syncCreditsToFirebase();
+            updateCreditsDisplay();
             
             showNotification(`🎉 Consultation booked! ${config.credits} credits used.`, 'success');
             
             // Add confirmation message to chat
-            addMessage('assistant', `## 📅 Consultation Booked!\n\nYour **${config.name}** has been scheduled.\n\n**Meeting type:** ${booking.meetingType === 'zoom' ? '📹 Zoom Video Call' : '📞 Phone Call'}\n**Credits used:** ${config.credits}\n\nYou'll receive a calendar invite shortly with all the details.\n\n${config.includes}`);
+            addMessage('assistant', `## 📅 Consultation Booked!\n\nYour **${config.name}** has been scheduled.\n\n**Meeting type:** ${booking.meetingType === 'zoom' ? '📹 Zoom Video Call' : '📞 Phone Call'}\n**Credits used:** ${config.credits}\n**Remaining credits:** ${getTotalCredits()}\n\nYou'll receive a calendar invite shortly with all the details.\n\n${config.includes}`);
         }
         
         // Clear pending booking
