@@ -205,16 +205,30 @@ async function handleCheckoutComplete(session) {
         // Get subscription details for period end date
         let subscriptionPeriodEnd = null;
         let subscriptionId = null;
+        let billingCycle = 'monthly'; // Default to monthly
+        
+        // Determine billing cycle from productKey FIRST
+        if (metadata.productKey && metadata.productKey.includes('annual')) {
+            billingCycle = 'annual';
+        }
+        
         if (session.subscription) {
             try {
                 const subscription = await stripe.subscriptions.retrieve(session.subscription);
                 subscriptionPeriodEnd = subscription.current_period_end;
                 subscriptionId = subscription.id;
                 
-                // Determine billing cycle from productKey
-                const billingCycle = (metadata.productKey && metadata.productKey.includes('annual')) ? 'annual' : 'monthly';
+                // Double-check billing cycle from actual subscription interval
+                if (subscription.items && subscription.items.data && subscription.items.data.length > 0) {
+                    const interval = subscription.items.data[0].price.recurring?.interval;
+                    if (interval === 'year') {
+                        billingCycle = 'annual';
+                    } else if (interval === 'month') {
+                        billingCycle = 'monthly';
+                    }
+                }
                 
-                // Also update subscription metadata with userId for future events
+                // Update subscription metadata with userId for future events
                 await stripe.subscriptions.update(subscription.id, {
                     metadata: { userId: userId, tier: tier, billingCycle: billingCycle }
                 });
@@ -224,8 +238,17 @@ async function handleCheckoutComplete(session) {
             }
         }
         
-        const credits = reviewCredits || TIER_CREDITS[tier] || 0;
-        await activateSubscription(userId, tier, credits, session.customer, session.id, subscriptionPeriodEnd, subscriptionId);
+        // CRITICAL: Use correct credits based on billing cycle
+        let credits;
+        if (billingCycle === 'annual') {
+            credits = TIER_CREDITS_ANNUAL[tier] || 0;
+            console.log(`📅 Annual plan - using annual credits: ${credits}`);
+        } else {
+            credits = TIER_CREDITS[tier] || 0;
+            console.log(`📅 Monthly plan - using monthly credits: ${credits}`);
+        }
+        
+        await activateSubscription(userId, tier, credits, session.customer, session.id, subscriptionPeriodEnd, subscriptionId, billingCycle);
     }
     
     if (productType === 'reviewCredits') {
@@ -802,11 +825,11 @@ async function logTransaction(userId, type, transactionId, stripeCustomerId = nu
     }
 }
 
-async function activateSubscription(userId, tier, credits, stripeCustomerId, transactionId, periodEnd = null, subscriptionId = null) {
+async function activateSubscription(userId, tier, credits, stripeCustomerId, transactionId, periodEnd = null, subscriptionId = null, billingCycle = 'monthly') {
     if (!db) return false;
     const userRef = db.collection('users').doc(userId);
     
-    console.log(`🔥 Activating subscription for ${userId}: tier=${tier}, credits=${credits}, customerId=${stripeCustomerId}`);
+    console.log(`🔥 Activating subscription for ${userId}: tier=${tier}, credits=${credits}, billingCycle=${billingCycle}, customerId=${stripeCustomerId}`);
     
     try {
         await userRef.set({
@@ -815,6 +838,7 @@ async function activateSubscription(userId, tier, credits, stripeCustomerId, tra
             credits: {
                 subscriptionTier: tier,
                 tier: tier,
+                billingCycle: billingCycle,
                 reviewCredits: credits,
                 reviewCreditsUsed: 0,
                 purchasedCredits: admin.firestore.FieldValue.increment(0),
@@ -836,13 +860,14 @@ async function activateSubscription(userId, tier, credits, stripeCustomerId, tra
             transactions: admin.firestore.FieldValue.arrayUnion({
                 type: 'subscription_started',
                 tier: tier,
+                billingCycle: billingCycle,
                 credits: credits,
                 transactionId: transactionId,
                 timestamp: new Date().toISOString()
             })
         }, { merge: true });
         
-        console.log(`✅ Activated ${tier} subscription for ${userId} with ${credits} credits, customerId: ${stripeCustomerId}`);
+        console.log(`✅ Activated ${tier} (${billingCycle}) subscription for ${userId} with ${credits} credits, customerId: ${stripeCustomerId}`);
         return true;
     } catch (error) {
         console.error('Error activating subscription:', error.message);
