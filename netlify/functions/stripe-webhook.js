@@ -429,6 +429,15 @@ async function handleSubscriptionUpdated(subscription) {
             const priceId = subscription.items.data[0].price.id;
             const price = await stripe.prices.retrieve(priceId, { expand: ['product'] });
             
+            // ALWAYS detect billing cycle from price interval
+            const interval = price.recurring?.interval;
+            if (interval === 'year') {
+                detectedBillingCycle = 'annual';
+            } else if (interval === 'month') {
+                detectedBillingCycle = 'monthly';
+            }
+            console.log(`📅 Detected billing cycle from price: ${detectedBillingCycle} (interval: ${interval})`);
+            
             // Check price metadata for tier
             if (price.metadata && price.metadata.tier) {
                 detectedTier = price.metadata.tier;
@@ -439,18 +448,15 @@ async function handleSubscriptionUpdated(subscription) {
                 detectedTier = price.product.metadata.tier;
                 console.log(`📦 Detected tier from product metadata: ${detectedTier}`);
             }
-            // Fallback: Infer from price amount (in cents)
+            // Fallback: Infer tier from price amount (in cents)
             else {
                 const amount = price.unit_amount;
-                const interval = price.recurring?.interval;
                 
                 if (interval === 'year') {
-                    detectedBillingCycle = 'annual';
                     if (amount === 24900) detectedTier = 'starter';
                     else if (amount === 44900) detectedTier = 'pro';
                     else if (amount === 89900) detectedTier = 'business';
                 } else if (interval === 'month') {
-                    detectedBillingCycle = 'monthly';
                     if (amount === 2900) detectedTier = 'starter';
                     else if (amount === 4900) detectedTier = 'pro';
                     else if (amount === 9900) detectedTier = 'business';
@@ -461,17 +467,17 @@ async function handleSubscriptionUpdated(subscription) {
                 }
             }
             
-            // Update subscription metadata if tier changed
-            if (detectedTier && detectedTier !== tier) {
+            // Update subscription metadata if tier OR billing cycle changed
+            if ((detectedTier && detectedTier !== tier) || (detectedBillingCycle && detectedBillingCycle !== billingCycle)) {
                 await stripe.subscriptions.update(subscription.id, {
                     metadata: { 
                         ...metadata, 
-                        tier: detectedTier, 
+                        tier: detectedTier || tier, 
                         billingCycle: detectedBillingCycle 
                     }
                 });
-                console.log(`✅ Updated subscription metadata: tier=${detectedTier}, billingCycle=${detectedBillingCycle}`);
-                tier = detectedTier;
+                console.log(`✅ Updated subscription metadata: tier=${detectedTier || tier}, billingCycle=${detectedBillingCycle}`);
+                tier = detectedTier || tier;
                 billingCycle = detectedBillingCycle;
             }
         } catch (e) {
@@ -480,7 +486,7 @@ async function handleSubscriptionUpdated(subscription) {
     }
     
     // ========================================
-    // CHECK FOR PLAN SWITCH (UPGRADE/DOWNGRADE)
+    // CHECK FOR PLAN SWITCH (UPGRADE/DOWNGRADE OR BILLING CYCLE CHANGE)
     // ========================================
     if (subscription.status === 'active' && !subscription.cancel_at_period_end) {
         try {
@@ -488,33 +494,48 @@ async function handleSubscriptionUpdated(subscription) {
             const currentData = doc.exists ? doc.data() : {};
             const currentCredits = currentData.credits || {};
             const currentTier = currentCredits.subscriptionTier || currentCredits.tier || 'free';
+            const currentBillingCycle = currentCredits.billingCycle || 'monthly';
+            const currentReviewCredits = currentCredits.reviewCredits || 0;
             
-            // Detect tier change
-            if (tier && currentTier !== tier && currentTier !== 'free') {
-                console.log(`🔄 Plan switch detected: ${currentTier} → ${tier}`);
+            // Debug logging
+            console.log(`📊 Plan comparison for ${userId}:`);
+            console.log(`   Firebase: tier=${currentTier}, billing=${currentBillingCycle}, credits=${currentReviewCredits}`);
+            console.log(`   Stripe:   tier=${tier}, billing=${billingCycle}`);
+            
+            // Detect tier change OR billing cycle change
+            const tierChanged = tier && currentTier !== tier && currentTier !== 'free';
+            const billingCycleChanged = billingCycle && currentBillingCycle !== billingCycle && currentTier !== 'free';
+            
+            console.log(`   tierChanged=${tierChanged}, billingCycleChanged=${billingCycleChanged}`);
+            
+            if (tierChanged || billingCycleChanged) {
+                console.log(`🔄 Plan switch detected:`);
+                console.log(`   Tier: ${currentTier} → ${tier}`);
+                console.log(`   Billing: ${currentBillingCycle} → ${billingCycle}`);
                 
-                // Calculate new credits based on billing cycle
+                // Calculate new credits based on NEW billing cycle
                 const newCredits = billingCycle === 'annual' 
                     ? (TIER_CREDITS_ANNUAL[tier] || 0)
                     : (TIER_CREDITS[tier] || 0);
                 
-                const oldCredits = billingCycle === 'annual'
+                // Calculate old credits for comparison
+                const oldCredits = currentBillingCycle === 'annual'
                     ? (TIER_CREDITS_ANNUAL[currentTier] || 0)
                     : (TIER_CREDITS[currentTier] || 0);
                 
                 const isUpgrade = newCredits > oldCredits;
                 
-                console.log(`${isUpgrade ? '⬆️ UPGRADE' : '⬇️ DOWNGRADE'}: ${currentTier} (${oldCredits} credits) → ${tier} (${newCredits} credits)`);
+                console.log(`${isUpgrade ? '⬆️ UPGRADE' : '⬇️ DOWNGRADE'}: ${currentTier}/${currentBillingCycle} (${oldCredits} credits) → ${tier}/${billingCycle} (${newCredits} credits)`);
                 
-                // For upgrades: Give full new tier credits
-                // For downgrades: Give new tier credits (they keep unused from old tier via purchasedCredits if needed)
+                // Update Firebase with new plan details
                 await userRef.set({
                     credits: {
                         ...currentCredits,
                         subscriptionTier: tier,
                         tier: tier,
+                        billingCycle: billingCycle,
                         reviewCredits: newCredits,
-                        reviewCreditsUsed: 0, // Reset usage for new tier
+                        reviewCreditsUsed: 0, // Reset usage for new plan
                         subscriptionStatus: 'active',
                         cancelAtPeriodEnd: false,
                         subscriptionPeriodEnd: subscription.current_period_end 
@@ -526,13 +547,16 @@ async function handleSubscriptionUpdated(subscription) {
                     transactions: admin.firestore.FieldValue.arrayUnion({
                         type: isUpgrade ? 'plan_upgrade' : 'plan_downgrade',
                         fromTier: currentTier,
+                        fromBillingCycle: currentBillingCycle,
                         toTier: tier,
-                        credits: newCredits,
+                        toBillingCycle: billingCycle,
+                        oldCredits: oldCredits,
+                        newCredits: newCredits,
                         timestamp: new Date().toISOString()
                     })
                 }, { merge: true });
                 
-                console.log(`✅ Plan switch complete: ${userId} now on ${tier} with ${newCredits} credits`);
+                console.log(`✅ Plan switch complete: ${userId} now on ${tier}/${billingCycle} with ${newCredits} credits`);
                 return;
             }
         } catch (e) {
