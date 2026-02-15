@@ -7869,11 +7869,13 @@ let isListening = false;
 // ========================================
 let userCredits = {
     subscriptionTier: 'free',
-    reviewCreditsUsed: 0,      // How many review credits used this year
-    purchasedCredits: 0,       // Extra purchased review credits (never expire)
-    monthlyPromptsUsed: 0,     // For free tier only
+    reviewCredits: 0,           // Total review credits for this billing period (from webhook)
+    reviewCreditsUsed: 0,       // How many review credits used this year
+    purchasedCredits: 0,        // Extra purchased review credits (never expire)
+    billingCycle: null,         // 'monthly' or 'annual' (from webhook)
+    monthlyPromptsUsed: 0,      // For free tier only
     monthlyPromptsReset: null,
-    lowRiskDocsUsed: 0,        // For free tier only (they get 1 total)
+    lowRiskDocsUsed: 0,         // For free tier only (they get 1 total)
     subscriptionStartDate: null,
     lastUpdated: null,
     // Stripe subscription management fields
@@ -7977,10 +7979,12 @@ async function loadCreditsFromFirebase() {
             userCredits = {
                 ...userCredits,
                 subscriptionTier: firebaseCredits.subscriptionTier || firebaseCredits.tier || 'free',
+                reviewCredits: firebaseCredits.reviewCredits || 0,  // Actual credits from webhook
                 reviewCreditsUsed: firebaseCredits.reviewCreditsUsed || 0,
                 purchasedCredits: firebaseCredits.purchasedCredits || 0,
                 lowRiskDocsUsed: firebaseCredits.lowRiskDocsUsed || 0,
                 bonusPrompts: firebaseCredits.bonusPrompts || 0,
+                billingCycle: firebaseCredits.billingCycle || null,  // 'monthly' or 'annual'
                 monthlyPromptsUsed: firebaseCredits.monthlyPromptsUsed || 0,
                 monthlyPromptsReset: firebaseCredits.monthlyPromptsReset || new Date().toISOString(),
                 subscriptionStartDate: firebaseCredits.subscriptionStartDate || null,
@@ -8083,10 +8087,12 @@ async function syncCreditsToFirebase() {
         await userRef.set({
             credits: {
                 subscriptionTier: userCredits.subscriptionTier || userCredits.tier || 'free',
+                reviewCredits: userCredits.reviewCredits || 0,  // Actual credits for this billing period
                 reviewCreditsUsed: userCredits.reviewCreditsUsed || 0,
                 purchasedCredits: userCredits.purchasedCredits || 0,
                 lowRiskDocsUsed: userCredits.lowRiskDocsUsed || 0,
                 bonusPrompts: userCredits.bonusPrompts || 0,
+                billingCycle: userCredits.billingCycle || null,  // 'monthly' or 'annual'
                 monthlyPromptsUsed: userCredits.monthlyPromptsUsed || 0,
                 monthlyPromptsReset: userCredits.monthlyPromptsReset,
                 subscriptionStartDate: userCredits.subscriptionStartDate,
@@ -8110,7 +8116,22 @@ async function syncCreditsToFirebase() {
 function getTotalCredits() {
     const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
     const tierConfig = CONFIG.CREDITS.TIERS[tier] || CONFIG.CREDITS.TIERS.free;
-    const totalReviewCredits = tierConfig.reviewCredits || 0;
+    
+    // PRIORITY: Use reviewCredits from Firebase (set by webhook) if available
+    // This correctly handles annual vs monthly billing
+    let totalReviewCredits;
+    
+    if (userCredits.reviewCredits && userCredits.reviewCredits > 0) {
+        // Use the actual credits stored by the webhook
+        totalReviewCredits = userCredits.reviewCredits;
+    } else if (userCredits.billingCycle === 'annual') {
+        // Calculate annual credits: monthly × 12
+        totalReviewCredits = (tierConfig.reviewCredits || 0) * 12;
+    } else {
+        // Default to monthly credits from config
+        totalReviewCredits = tierConfig.reviewCredits || 0;
+    }
+    
     const usedCredits = userCredits.reviewCreditsUsed || 0;
     const purchasedCredits = userCredits.purchasedCredits || 0;
     
@@ -14582,12 +14603,12 @@ async function initiateStripeCheckout(priceKey) {
 function getPurchaseInfo(priceKey) {
     const purchaseMap = {
         // Subscriptions - New tiers (Feb 2025)
-        starter_monthly: { type: 'subscription', tier: 'starter', tierName: 'Starter', reviewCredits: 8 },
-        starter_annual: { type: 'subscription', tier: 'starter', tierName: 'Starter', reviewCredits: 96 },
-        pro_monthly: { type: 'subscription', tier: 'pro', tierName: 'Pro', reviewCredits: 20 },
-        pro_annual: { type: 'subscription', tier: 'pro', tierName: 'Pro', reviewCredits: 240 },
-        business_monthly: { type: 'subscription', tier: 'business', tierName: 'Business', reviewCredits: 50 },
-        business_annual: { type: 'subscription', tier: 'business', tierName: 'Business', reviewCredits: 600 },
+        starter_monthly: { type: 'subscription', tier: 'starter', tierName: 'Starter', reviewCredits: 8, billingCycle: 'monthly' },
+        starter_annual: { type: 'subscription', tier: 'starter', tierName: 'Starter', reviewCredits: 96, billingCycle: 'annual' },
+        pro_monthly: { type: 'subscription', tier: 'pro', tierName: 'Pro', reviewCredits: 20, billingCycle: 'monthly' },
+        pro_annual: { type: 'subscription', tier: 'pro', tierName: 'Pro', reviewCredits: 240, billingCycle: 'annual' },
+        business_monthly: { type: 'subscription', tier: 'business', tierName: 'Business', reviewCredits: 50, billingCycle: 'monthly' },
+        business_annual: { type: 'subscription', tier: 'business', tierName: 'Business', reviewCredits: 600, billingCycle: 'annual' },
         
         // Review credit packs
         credits_1: { type: 'reviewCredits', credits: 1 },
@@ -14705,9 +14726,12 @@ async function processPaymentSuccess() {
             if (purchase.type === 'subscription') {
                 // New pricing model - subscription gives review credits
                 userCredits.subscriptionTier = purchase.tier;
+                userCredits.reviewCredits = purchase.reviewCredits || 0; // Set actual credits from purchase
                 userCredits.reviewCreditsUsed = 0; // Reset for new subscription
+                userCredits.billingCycle = purchase.billingCycle || (pendingPurchaseKey?.includes('annual') ? 'annual' : 'monthly');
                 userCredits.subscriptionStartDate = new Date().toISOString();
                 userCredits.lastUpdated = new Date().toISOString();
+                console.log(`📅 Subscription activated: ${purchase.tier} (${userCredits.billingCycle}) with ${userCredits.reviewCredits} credits`);
                 saveUserCredits();
             } else if (purchase.type === 'reviewCredits') {
                 // Purchased review credits (never expire)
