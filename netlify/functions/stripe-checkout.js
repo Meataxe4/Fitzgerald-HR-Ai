@@ -21,15 +21,20 @@ const PRICE_IDS = {
     consultation: 'price_1Sys7E2Ig0gUvbfwD6RrsWAR'  // HR Consultation - $150
 };
 
-// Review credits for each product (per year for subscriptions)
+// ============================================
+// REVIEW CREDITS - FIXED AMOUNTS
+// Monthly = per month, Annual = full year upfront
+// ============================================
 const REVIEW_CREDIT_AMOUNTS = {
-    // Subscriptions give review credits per year
+    // Monthly subscriptions - credits per month
     starter_monthly: 8,
-    starter_annual: 8,
     pro_monthly: 20,
-    pro_annual: 20,
     business_monthly: 50,
-    business_annual: 50,
+    
+    // Annual subscriptions - ALL credits upfront (monthly × 12)
+    starter_annual: 96,    // 8 × 12 = 96
+    pro_annual: 240,       // 20 × 12 = 240
+    business_annual: 600,  // 50 × 12 = 600
     
     // One-time credit packs
     credits_1: 1,
@@ -62,6 +67,16 @@ const PRODUCT_TYPE = {
     consultation: 'consultation'
 };
 
+// Billing cycle mapping
+const BILLING_CYCLE = {
+    starter_monthly: 'monthly',
+    starter_annual: 'annual',
+    pro_monthly: 'monthly',
+    pro_annual: 'annual',
+    business_monthly: 'monthly',
+    business_annual: 'annual'
+};
+
 exports.handler = async (event, context) => {
     const headers = {
         'Access-Control-Allow-Origin': '*',
@@ -86,6 +101,10 @@ exports.handler = async (event, context) => {
 
         const priceId = PRICE_IDS[productKey];
         const isSubscription = productKey.includes('monthly') || productKey.includes('annual');
+        const billingCycle = BILLING_CYCLE[productKey] || 'monthly';
+        const reviewCredits = REVIEW_CREDIT_AMOUNTS[productKey] || 0;
+
+        console.log(`📦 Creating checkout for ${productKey}: ${reviewCredits} credits (${billingCycle})`);
 
         const sessionConfig = {
             payment_method_types: ['card'],
@@ -97,8 +116,9 @@ exports.handler = async (event, context) => {
                 userId: userId || 'anonymous',
                 productKey: productKey,
                 productType: PRODUCT_TYPE[productKey] || 'unknown',
-                reviewCredits: REVIEW_CREDIT_AMOUNTS[productKey] || 0,
-                tier: TIER_MAPPING[productKey] || 'free'
+                reviewCredits: reviewCredits,
+                tier: TIER_MAPPING[productKey] || 'free',
+                billingCycle: billingCycle
             },
             allow_promotion_codes: true,
             billing_address_collection: 'auto'
@@ -113,17 +133,25 @@ exports.handler = async (event, context) => {
                 metadata: {
                     userId: userId || 'anonymous',
                     tier: TIER_MAPPING[productKey],
-                    reviewCredits: REVIEW_CREDIT_AMOUNTS[productKey]
+                    reviewCredits: reviewCredits,
+                    billingCycle: billingCycle
                 }
             };
         }
 
         const session = await stripe.checkout.sessions.create(sessionConfig);
 
+        console.log(`✅ Checkout session created: ${session.id}`);
+
         return {
             statusCode: 200,
             headers,
-            body: JSON.stringify({ sessionId: session.id, url: session.url })
+            body: JSON.stringify({ 
+                sessionId: session.id, 
+                url: session.url,
+                reviewCredits: reviewCredits,
+                billingCycle: billingCycle
+            })
         };
 
     } catch (error) {
@@ -146,14 +174,14 @@ exports.handler = async (event, context) => {
 //    and update the PRICE_IDS above
 //
 // 2. New Pricing Model (Feb 2025):
-//    - Starter: $249/yr or $29/mo - 8 review credits/year
-//    - Pro: $449/yr or $49/mo - 20 review credits/year  
-//    - Business: $899/yr or $99/mo - 50 review credits/year
+//    - Starter: $249/yr (96 credits) or $29/mo (8 credits)
+//    - Pro: $449/yr (240 credits) or $49/mo (20 credits)
+//    - Business: $899/yr (600 credits) or $99/mo (50 credits)
 //    - Single Credit: $29
 //    - 5 Credit Pack: $119
 //    - Consultation: $150
 //
-// 3. Review credits are for expert-reviewed documents only
-//    Low-risk templates are UNLIMITED for all paid tiers
+// 3. Annual plans get ALL credits upfront (monthly × 12)
+//    Monthly plans get credits each month on renewal
 //
 // ============================================
