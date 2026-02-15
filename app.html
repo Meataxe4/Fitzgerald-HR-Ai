@@ -18490,11 +18490,17 @@ async function downloadGeneratedDocument(format = 'pdf') {
     });    
 
     try {
-        const type = documentBuilderState.currentType;
+        // Use docType which has proper fallback (already computed above)
+        const type = docType || documentBuilderState.currentType;
+        
+        if (!type) {
+            throw new Error('Document type not found. Please try regenerating the document.');
+        }
+        
         // For employment contract, get employee name from contractBuilderState
         const employeeName = type === 'employmentContract' 
             ? (contractBuilderState?.data?.employeeName || 'Employee')
-            : (documentBuilderState.data.employeeName || 'Employee');
+            : (documentBuilderState.data?.employeeName || 'Employee');
         
         const typeNames = {
             formalWarning: 'Formal_Warning',
