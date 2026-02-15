@@ -14820,9 +14820,10 @@ async function processPaymentSuccess() {
                     
                     if (!documentRestored && !consultationRestored) {
                         if (purchase.type === 'subscription') {
-                            const tierConfig = CONFIG.CREDITS.TIERS[purchase.tier];
-                            const reviewCredits = tierConfig ? tierConfig.reviewCredits : 0;
-                            addMessage('assistant', `## 🎉 Welcome to Fitz ${purchase.tierName}!\n\nYour subscription is now active!\n\n**Your benefits:**\n- ✅ **All HR templates** (Position Descriptions, Job Ads, Onboarding, etc.)\n- ✅ **${reviewCredits} credits/year** for documents, expert reviews & consultations\n- ✅ **Unlimited AI chat**\n- ✅ **24hr review turnaround**\n\nQuestions? Contact **support@fitzhr.com**`);
+                            // Use reviewCredits from purchase info (already has correct annual/monthly value)
+                            const reviewCredits = purchase.reviewCredits || 0;
+                            const billingText = purchase.billingCycle === 'annual' ? 'year' : 'month';
+                            addMessage('assistant', `## 🎉 Welcome to Fitz ${purchase.tierName}!\n\nYour subscription is now active!\n\n**Your benefits:**\n- ✅ **All HR templates** (Position Descriptions, Job Ads, Onboarding, etc.)\n- ✅ **${reviewCredits} credits/${billingText}** for documents, expert reviews & consultations\n- ✅ **Unlimited AI chat**\n- ✅ **24hr review turnaround**\n\nQuestions? Contact **support@fitzhr.com**`);
                         } else if (purchase.type === 'reviewCredits' || purchase.type === 'credits') {
                             addMessage('assistant', `## 🎉 Credits Added!\n\n**${purchase.credits} credit${purchase.credits > 1 ? 's' : ''}** added to your account.\n\nUse credits for document generation, expert reviews & HR consultations. They never expire!\n\nYour new balance: **${getTotalCredits()} credits**`);
                         } else if (purchase.type === 'consultation') {
@@ -14902,8 +14903,8 @@ function showPaymentSuccess(purchase) {
     
     // Set message based on purchase type
     if (purchase.type === 'subscription') {
-        const tierConfig = CONFIG.CREDITS.TIERS[purchase.tier];
-        const reviewCredits = tierConfig ? tierConfig.reviewCredits : 0;
+        // Use reviewCredits from purchase info (already has correct annual/monthly value)
+        const reviewCredits = purchase.reviewCredits || 0;
         messageEl.textContent = `Welcome to ${purchase.tierName}! ${reviewCredits} review credits + all templates.`;
     } else if (purchase.type === 'reviewCredits' || purchase.type === 'credits') {
         messageEl.textContent = `${purchase.credits} review credit${purchase.credits > 1 ? 's' : ''} added to your account!`;
@@ -20121,15 +20122,31 @@ function openProfileMenu() {
                 statusEl.textContent = 'Upgrade for more features';
                 upgradeBtn.textContent = 'Upgrade';
             } else {
-                statusEl.textContent = 'Annual subscription';
+                // Show correct billing cycle
+                var billingCycle = userCredits.billingCycle || 'monthly';
+                statusEl.textContent = billingCycle === 'annual' ? 'Annual subscription' : 'Monthly subscription';
                 upgradeBtn.textContent = 'Manage';
             }
         }
         
         // Update review credits
         var reviewCreditsUsed = userCredits.reviewCreditsUsed || 0;
-        var totalReviewCredits = tierConfig && tierConfig.reviewCredits ? tierConfig.reviewCredits : 0;
         var purchasedCredits = userCredits.purchasedCredits || 0;
+        
+        // PRIORITY: Use reviewCredits from Firebase (set by webhook) if available
+        // This correctly handles annual vs monthly billing
+        var totalReviewCredits;
+        if (userCredits.reviewCredits && userCredits.reviewCredits > 0) {
+            // Use actual credits from Firebase
+            totalReviewCredits = userCredits.reviewCredits;
+        } else if (userCredits.billingCycle === 'annual') {
+            // Calculate annual credits: monthly × 12
+            totalReviewCredits = tierConfig && tierConfig.reviewCredits ? tierConfig.reviewCredits * 12 : 0;
+        } else {
+            // Default to monthly credits from config
+            totalReviewCredits = tierConfig && tierConfig.reviewCredits ? tierConfig.reviewCredits : 0;
+        }
+        
         var remainingCredits = Math.max(0, totalReviewCredits - reviewCreditsUsed) + purchasedCredits;
         
         var creditsEl = document.getElementById('profileReviewCredits');
