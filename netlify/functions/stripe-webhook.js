@@ -487,6 +487,14 @@ async function sendCancellationEmail(data) {
         refundWindowDays
     } = data;
     
+    // Debug: Check if private key is loaded
+    console.log('📧 EmailJS Config Check:');
+    console.log('  - Service ID:', EMAILJS_CONFIG.serviceId);
+    console.log('  - Template ID:', EMAILJS_CONFIG.templateId);
+    console.log('  - Public Key:', EMAILJS_CONFIG.publicKey ? 'SET' : 'MISSING');
+    console.log('  - Private Key:', EMAILJS_CONFIG.privateKey ? 'SET (' + EMAILJS_CONFIG.privateKey.length + ' chars)' : 'MISSING');
+    console.log('  - Admin Email:', EMAILJS_CONFIG.adminEmail);
+    
     // Build email content
     const refundStatus = isRefundEligible 
         ? `🟢 REFUND ELIGIBLE (within ${refundWindowDays} days)`
