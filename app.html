@@ -4689,7 +4689,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <h3 class="text-white font-semibold mb-2 text-sm">👷 Employee Details</h3>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-slate-400 text-xs mb-1">Employee Name *</label>
+                            <label class="block text-slate-400 text-xs mb-1">Employee Name</label>
                             <input type="text" id="reviewEmployeeName" 
                                    class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm focus:border-amber-500 focus:outline-none"
                                    placeholder="e.g. John Smith">
@@ -10889,7 +10889,7 @@ formalWarning: [
         id: 4,
         title: "Employee Details",
         fields: [
-            { name: "employeeName", label: "Employee's full name", type: "text", required: true, placeholder: "e.g., Blake Smith" },
+            { name: "employeeName", label: "Employee's full name", type: "text", required: false, placeholder: "e.g., Blake Smith" },
             { name: "position", label: "Position/Role", type: "text", required: true, placeholder: "e.g., Chef" },
             { name: "employmentType", label: "Employment Type", type: "select", 
               options: ["Full-Time", "Part-Time", "Casual"], required: true }
@@ -10947,7 +10947,7 @@ formalWarning: [
         id: 1,
         title: "Employee Details",
         fields: [
-            { name: "employeeName", label: "Employee's full name", type: "text", required: true, placeholder: "e.g., Sarah Johnson" },
+            { name: "employeeName", label: "Employee's full name", type: "text", required: false, placeholder: "e.g., Sarah Johnson" },
             { name: "position", label: "Position/Role", type: "text", required: true, placeholder: "e.g., Waiter" }
         ]
     },
@@ -11046,7 +11046,7 @@ formalWarning: [
         id: 3,
         title: "Employee & Probation Details",
         fields: [
-            { name: "employeeName", label: "Employee's full name", type: "text", required: true, placeholder: "e.g., Sarah Johnson" },
+            { name: "employeeName", label: "Employee's full name", type: "text", required: false, placeholder: "e.g., Sarah Johnson" },
             { name: "position", label: "Position/Role", type: "text", required: true, placeholder: "e.g., Bartender" },
             { name: "peopleLeader", label: "People Leader / Manager conducting the review", type: "text", required: true, placeholder: "Your name" },
             { name: "meetingDate", label: "Meeting date", type: "date", required: true },
@@ -11168,7 +11168,7 @@ formalWarning: [
             id: 1,
             title: "Employee Details",
             fields: [
-                { name: "employeeName", label: "Employee's full name", type: "text", required: true, placeholder: "e.g., Sarah Johnson" },
+                { name: "employeeName", label: "Employee's full name", type: "text", required: false, placeholder: "e.g., Sarah Johnson" },
                 { name: "position", label: "Position/Role", type: "text", required: true, placeholder: "e.g., Waiter" },
                 { name: "employmentType", label: "Employment Type", type: "select", 
                   options: ["Full-Time", "Part-Time", "Casual"], required: true },
@@ -11295,7 +11295,7 @@ formalWarning: [
             id: 1,
             title: "Employee Details",
             fields: [
-                { name: "employeeName", label: "Employee's full name", type: "text", required: true },
+                { name: "employeeName", label: "Employee's full name", type: "text", required: false },
                 { name: "position", label: "Position/Role", type: "text", required: true },
                 { name: "employmentType", label: "Employment Type", type: "select", 
                   options: ["Full-Time", "Part-Time", "Casual"], required: true }
@@ -16777,8 +16777,9 @@ async function submitReviewRequest() {
     
     console.log('📝 Form values:', { employeeName, employeeRole, issueDescription });
     
-    if (!employeeName || !employeeRole || !issueDescription) {
-        showNotification('Please fill in all required fields (Employee Name, Role, and Issue Description)', 'error');
+    // Only require employeeRole and issueDescription - employeeName is optional
+    if (!employeeRole || !issueDescription) {
+        showNotification('Please fill in required fields (Role and Issue Description)', 'error');
         console.log('❌ Validation failed - missing required fields');
         return;
     }
@@ -29765,7 +29766,7 @@ function resetAIImport() {
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-slate-300 text-sm font-semibold mb-2">Employee Name *</label>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">Employee Name</label>
                     <input type="text" id="trainingEmployeeName" 
                            class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
                            placeholder="Full name">
@@ -30118,7 +30119,7 @@ function resetAIImport() {
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-slate-300 text-sm font-semibold mb-2">Employee Name *</label>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">Employee Name</label>
                     <input type="text" id="onboardingEmployeeName" 
                            class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
                            placeholder="Full name">
@@ -32065,7 +32066,7 @@ const probationWizardSteps = [
         id: 2,
         title: "Employee & Probation Details",
         fields: [
-            { name: "employeeName", label: "Employee's full name", type: "text", required: true, placeholder: "e.g., Sarah Johnson" },
+            { name: "employeeName", label: "Employee's full name", type: "text", required: false, placeholder: "e.g., Sarah Johnson" },
             { name: "position", label: "Position/Role", type: "text", required: true, placeholder: "e.g., Bartender" },
             { name: "employmentType", label: "Employment Type", type: "select",
               options: ["Full-Time", "Part-Time", "Casual"], required: true },
