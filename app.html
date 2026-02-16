@@ -11,6 +11,7 @@
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15403,7 +15404,7 @@ async function processPaymentSuccess() {
                         } else if (purchase.type === 'reviewCredits' || purchase.type === 'credits') {
                             addMessage('assistant', `## 🎉 Credits Added!\n\n**${purchase.credits} credit${purchase.credits > 1 ? 's' : ''}** added to your account.\n\nUse credits for document generation, expert reviews & HR consultations. They never expire!\n\nYour new balance: **${getTotalCredits()} credits**`);
                         } else if (purchase.type === 'consultation') {
-                            addMessage('assistant', `## 🎉 Consultation Booked!\n\nYour HR consultation has been confirmed.\n\nBlake will be in touch within 24 hours to schedule a time.\n\nQuestions? Contact **support@fitzhr.com**`);
+                            addMessage('assistant', `## 🎉 Consultation Booked!\n\nYour HR consultation has been confirmed.\n\nA Fitz HR consultant will be in touch within 24 hours to schedule a time.\n\nQuestions? Contact **support@fitzhr.com**`);
                         } else if (purchase.type === 'topup') {
                             addMessage('assistant', `## 🎉 Chat Top-Up Added!\n\n**${purchase.prompts} extra prompts** have been added to your account for this month.\n\nKeep chatting!`);
                         }
@@ -17717,7 +17718,7 @@ function closeAttachmentPromptModal() {
  */
 function openAttachmentEmail(refNumber, employeeName) {
     const subject = encodeURIComponent(`${refNumber} - ${employeeName} - Supporting Documents`);
-    const body = encodeURIComponent(`Hi Blake,
+    const body = encodeURIComponent(`Hi Fitz HR Team,
 
 Please find attached the supporting documents for review request ${refNumber} (${employeeName}).
 
