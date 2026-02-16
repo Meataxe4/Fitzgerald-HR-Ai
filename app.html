@@ -37737,26 +37737,14 @@ async function loadLastConversationIdFromFirebase() {
     }
 }
 
-// Beta Tester Whitelist - Easy to add more emails here!
-const BETA_TESTERS = [
-    'blakefitzgerald4@gmail.com',
-    'phalan.chilli@gmail.com',
-    'fitzgeraldilona@gmail.com',
-    'ellyse.saunderson@hotmail.com'
-    // Add more emails here as needed - just copy the line format above
-];
-
 async function createOrUpdateUserProfile(user) {
     if (!db) return;
     try {
         const userRef = db.collection('users').doc(user.uid);
         const doc = await userRef.get();
         
-        // Check if user is a beta tester
-        const isBetaTester = BETA_TESTERS.includes(user.email.toLowerCase());
-        const subscriptionTier = isBetaTester ? 'professional' : 'free';
-        
         if (!doc.exists) {
+            // New user - start on free tier (subscriptions handled via Stripe)
             await userRef.set({
                 uid: user.uid, 
                 email: user.email, 
@@ -37764,9 +37752,8 @@ async function createOrUpdateUserProfile(user) {
                 photoURL: user.photoURL,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
-                subscriptionTier: subscriptionTier,
-                subscriptionStatus: 'active',
-                betaTester: isBetaTester
+                subscriptionTier: 'free',
+                subscriptionStatus: 'active'
             });
         } else {
             await userRef.update({ 
