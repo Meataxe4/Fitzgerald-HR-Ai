@@ -15324,7 +15324,7 @@ async function processPaymentSuccess() {
             
             // Allocate credits based on purchase type
             console.log('🛒 Processing purchase:', purchase);
-            console.log('📊 Current credits before adding purchase:', JSON.stringify(userCredits));
+            console.log('📊 Current credits from Firebase:', JSON.stringify(userCredits));
             console.log('👤 Current user:', currentUser?.uid || 'anonymous');
             
             if (purchase.type === 'subscription') {
@@ -15337,12 +15337,10 @@ async function processPaymentSuccess() {
                 userCredits.lastUpdated = new Date().toISOString();
                 console.log(`📅 Subscription activated: ${purchase.tier} (${userCredits.billingCycle}) with ${userCredits.reviewCredits} credits`);
                 saveUserCredits();
-            } else if (purchase.type === 'reviewCredits') {
-                // Purchased review credits (never expire)
-                userCredits.purchasedCredits = (userCredits.purchasedCredits || 0) + purchase.credits;
-                console.log('💰 New purchasedCredits:', userCredits.purchasedCredits);
-                saveUserCredits();
-                
+            } else if (purchase.type === 'reviewCredits' || purchase.type === 'credits') {
+                // Credit packs - webhook already added credits to Firebase
+                // We just loaded them above, so just update the display
+                console.log('💰 Credit pack purchased - credits already added by webhook:', userCredits.purchasedCredits);
                 // Force immediate display update
                 updateCreditsDisplay();
             } else if (purchase.type === 'consultation') {
@@ -15350,12 +15348,8 @@ async function processPaymentSuccess() {
                 console.log('📞 Consultation booked');
             }
             
-            // Legacy support for old credit types
-            if (purchase.type === 'credits') {
-                userCredits.purchasedCredits = (userCredits.purchasedCredits || 0) + purchase.credits;
-                saveUserCredits();
-                updateCreditsDisplay();
-            } else if (purchase.type === 'topup') {
+            // Legacy support for topup (bonus prompts)
+            if (purchase.type === 'topup') {
                 userCredits.bonusPrompts = (userCredits.bonusPrompts || 0) + purchase.prompts;
                 saveUserCredits();
             }
