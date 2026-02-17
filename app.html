@@ -5491,6 +5491,52 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 
+    <!-- Crisis Mode Pricing Confirmation Modal -->
+    <div id="crisisPricingModal" class="hidden fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center p-6 z-[60]">
+        <div class="bg-slate-800 rounded-2xl p-8 max-w-lg w-full border-2 border-red-500 fade-in">
+            <div class="text-center mb-6">
+                <div class="text-5xl mb-3">🚨</div>
+                <h2 class="text-2xl font-bold text-red-400 mb-2">Urgent Consultant Callback</h2>
+                <p class="text-slate-400 text-sm">A Senior HR Consultant will call you within 15 minutes</p>
+            </div>
+
+            <div class="bg-slate-900 rounded-xl p-5 mb-6">
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-slate-300 font-medium">Crisis Response Fee</span>
+                    <div class="text-right">
+                        <span id="crisisOriginalPrice" class="hidden text-slate-500 line-through text-sm mr-2">$320</span>
+                        <span id="crisisPrice" class="text-2xl font-bold text-white">$320</span>
+                    </div>
+                </div>
+                <div id="crisisDiscountBadge" class="hidden">
+                    <span class="inline-block bg-green-500/20 text-green-400 text-xs font-semibold px-3 py-1 rounded-full"></span>
+                </div>
+                <p class="text-slate-500 text-xs mt-3">Charged via invoice after your consultation</p>
+            </div>
+
+            <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
+                <p class="text-red-300 text-sm font-medium mb-2">This includes:</p>
+                <ul class="text-red-200/80 text-sm space-y-1">
+                    <li>• Callback within 15 minutes from a Senior HR Consultant</li>
+                    <li>• Expert guidance on your urgent situation</li>
+                    <li>• Immediate action plan and next steps</li>
+                    <li>• Follow-up summary email</li>
+                </ul>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="confirmCrisisSubmission()" 
+                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-lg transition-all text-lg">
+                    🚨 Confirm &amp; Get Help Now
+                </button>
+                <button onclick="closeCrisisPricingModal()" 
+                        class="px-6 py-4 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Award Calculator Modal -->
     <div id="awardCalculatorModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
         <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
@@ -19620,6 +19666,14 @@ function generateExcelSpreadsheet(data, filename, sheetName = 'Data') {
 // CRISIS MODE
 // ========================================
 
+// Crisis Mode pricing by tier
+const CRISIS_PRICING = {
+    free:         { price: 320, discount: 0,  label: null },
+    starter:      { price: 288, discount: 10, label: '10% Starter Discount' },
+    professional: { price: 240, discount: 25, label: '25% Professional Discount' },
+    enterprise:   { price: 160, discount: 50, label: '50% Enterprise Discount' }
+};
+
 function activateCrisisMode() {
     document.getElementById('crisisModal').classList.remove('hidden');
     trackEvent('crisis_mode_activated', { user: currentUser });
@@ -19628,12 +19682,15 @@ function activateCrisisMode() {
 function closeCrisisModal() {
     document.getElementById('crisisModal').classList.add('hidden');
 }
+
+function closeCrisisPricingModal() {
+    document.getElementById('crisisPricingModal').classList.add('hidden');
+}
+
 /**
- * Submits crisis form to backend for urgent consultant callback
- * Shows loading state and handles errors gracefully
- * @returns {Promise<void>}
+ * Validates crisis form then shows pricing confirmation modal
  */
-async function submitCrisis() {
+function submitCrisis() {
     const crisisType = document.getElementById('crisisType').value;
     const description = document.getElementById('crisisDescription').value;
     const phone = document.getElementById('crisisPhone').value;
@@ -19643,31 +19700,118 @@ async function submitCrisis() {
         return;
     }
 
-    const submitBtn = document.querySelector('#crisisModal button[onclick="submitCrisis()"]');
-    const originalText = submitBtn.innerHTML;
-    submitBtn.disabled = true;
-    submitBtn.innerHTML = '<span class="animate-pulse">⏳ Sending...</span>';
+    // Get user tier and pricing
+    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
+    const pricing = CRISIS_PRICING[tier] || CRISIS_PRICING.free;
+
+    // Update pricing modal
+    const priceEl = document.getElementById('crisisPrice');
+    const originalPriceEl = document.getElementById('crisisOriginalPrice');
+    const discountBadge = document.getElementById('crisisDiscountBadge');
+
+    priceEl.textContent = `$${pricing.price}`;
+
+    if (pricing.discount > 0) {
+        originalPriceEl.textContent = '$320';
+        originalPriceEl.classList.remove('hidden');
+        discountBadge.classList.remove('hidden');
+        discountBadge.querySelector('span').textContent = `✨ ${pricing.label}`;
+    } else {
+        originalPriceEl.classList.add('hidden');
+        discountBadge.classList.add('hidden');
+    }
+
+    // Hide crisis form, show pricing confirmation
+    document.getElementById('crisisModal').classList.add('hidden');
+    document.getElementById('crisisPricingModal').classList.remove('hidden');
+
+    trackEvent('crisis_pricing_shown', { user: currentUser, tier: tier, price: pricing.price });
+}
+
+/**
+ * Confirmed by user - sends crisis alert to backend
+ */
+async function confirmCrisisSubmission() {
+    const crisisType = document.getElementById('crisisType').value;
+    const description = document.getElementById('crisisDescription').value;
+    const phone = document.getElementById('crisisPhone').value;
+    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
+    const pricing = CRISIS_PRICING[tier] || CRISIS_PRICING.free;
+
+    const confirmBtn = document.querySelector('#crisisPricingModal button[onclick="confirmCrisisSubmission()"]');
+    const originalText = confirmBtn.innerHTML;
+    confirmBtn.disabled = true;
+    confirmBtn.innerHTML = '<span class="animate-pulse">⏳ Sending urgent alert...</span>';
 
     try {
         const response = await fetch(CONFIG.API.CRISIS_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ crisisType, description, phone, user: currentUser })
+            body: JSON.stringify({ 
+                crisisType, 
+                description, 
+                phone, 
+                user: currentUser,
+                tier: tier,
+                chargeAmount: pricing.price,
+                discount: pricing.discount
+            })
         });
 
         const result = await response.json();
 
         if (response.ok) {
-            showAlert(`🚨 URGENT ALERT SENT\n\nCrisis ID: ${result.crisisId}\n\nA consultant will call ${phone} within 15 minutes.`);
-            closeCrisisModal();
+            closeCrisisPricingModal();
+            showAlert(`🚨 URGENT ALERT SENT\n\nCrisis ID: ${result.crisisId}\n\nA Senior Consultant will call ${phone} within 15 minutes.\n\nA $${pricing.price} invoice will be sent after your consultation.`);
+            
+            // Send confirmation email to support@fitzhr.com
+            const crisisLabels = {
+                'injury': 'Workplace Injury',
+                'harassment': 'Sexual Harassment / Bullying',
+                'theft': 'Theft / Serious Misconduct',
+                'walkout': 'Employee Walkout / Strike',
+                'discrimination': 'Discrimination Complaint',
+                'violence': 'Workplace Violence / Threat',
+                'death': 'Death / Medical Emergency',
+                'other': 'Other Urgent Matter'
+            };
+            
+            try {
+                await emailjs.send('service_dfmeslf', 'template_crisis_confirm', {
+                    crisis_id: result.crisisId,
+                    crisis_type: crisisLabels[crisisType] || crisisType,
+                    description: description,
+                    user_name: currentUser?.displayName || 'N/A',
+                    user_email: currentUser?.email || 'N/A',
+                    phone_number: phone,
+                    charge_amount: `$${pricing.price}`,
+                    discount_applied: pricing.discount > 0 ? `${pricing.discount}% (${pricing.label})` : 'None',
+                    user_tier: tier.charAt(0).toUpperCase() + tier.slice(1),
+                    submitted_date: new Date().toLocaleString('en-AU', {
+                        dateStyle: 'full',
+                        timeStyle: 'short',
+                        timeZone: 'Australia/Sydney'
+                    })
+                });
+                console.log('✅ Crisis confirmation email sent to support');
+            } catch (emailError) {
+                console.warn('⚠️ Crisis confirmation email failed:', emailError);
+            }
+            
+            // Reset crisis form
+            document.getElementById('crisisType').value = '';
+            document.getElementById('crisisDescription').value = '';
+            document.getElementById('crisisPhone').value = '';
+            
+            trackEvent('crisis_submitted', { user: currentUser, tier: tier, price: pricing.price, crisisType: crisisType });
         } else {
             throw new Error(result.error || 'Failed');
         }
     } catch (error) {
-        showAlert(`⚠️ ALERT FAILED\n\nPLEASE EMAIL: support@fitzhr.com\n\nYour submission is logged locally.`);
+        showAlert(`⚠️ ALERT FAILED\n\nPLEASE EMAIL: support@fitzhr.com\nOR CALL: Your emergency contact\n\nYour submission is logged locally.`);
     } finally {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = originalText;
+        confirmBtn.disabled = false;
+        confirmBtn.innerHTML = originalText;
     }
 }
 
