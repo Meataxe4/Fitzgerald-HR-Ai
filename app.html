@@ -19717,8 +19717,31 @@ function submitCrisis() {
     }
 
     // Store form data so it persists between modal transitions
-    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
+    // DEBUG: Log exact tier values to diagnose pricing mismatch
+    const rawSubscriptionTier = userCredits.subscriptionTier;
+    const rawTier = userCredits.tier;
+    console.log('🚨 DEBUG - userCredits.subscriptionTier:', JSON.stringify(rawSubscriptionTier));
+    console.log('🚨 DEBUG - userCredits.tier:', JSON.stringify(rawTier));
+    console.log('🚨 DEBUG - Full userCredits:', JSON.stringify(userCredits));
+    
+    // Normalize tier to lowercase to handle 'Pro', 'PRO', 'professional' etc
+    const rawTierValue = (userCredits.subscriptionTier || userCredits.tier || 'free').toLowerCase().trim();
+    
+    // Map any variations to our pricing keys
+    const tierMap = {
+        'free': 'free',
+        'starter': 'starter',
+        'pro': 'pro',
+        'professional': 'pro',
+        'business': 'business',
+        'enterprise': 'business'
+    };
+    const tier = tierMap[rawTierValue] || 'free';
     const pricing = CRISIS_PRICING[tier] || CRISIS_PRICING.free;
+    
+    console.log('🚨 DEBUG - Raw tier value:', JSON.stringify(rawTierValue));
+    console.log('🚨 DEBUG - Mapped tier:', tier);
+    console.log('🚨 DEBUG - Pricing:', JSON.stringify(pricing));
     
     crisisFormData = {
         crisisType,
