@@ -19674,6 +19674,20 @@ const CRISIS_PRICING = {
     enterprise:   { price: 160, discount: 50, label: '50% Enterprise Discount' }
 };
 
+// Store crisis form data between modals
+let crisisFormData = {};
+
+const CRISIS_TYPE_LABELS = {
+    'injury': 'Workplace Injury',
+    'harassment': 'Sexual Harassment / Bullying',
+    'theft': 'Theft / Serious Misconduct',
+    'walkout': 'Employee Walkout / Strike',
+    'discrimination': 'Discrimination Complaint',
+    'violence': 'Workplace Violence / Threat',
+    'death': 'Death / Medical Emergency',
+    'other': 'Other Urgent Matter'
+};
+
 function activateCrisisMode() {
     document.getElementById('crisisModal').classList.remove('hidden');
     trackEvent('crisis_mode_activated', { user: currentUser });
@@ -19688,9 +19702,11 @@ function closeCrisisPricingModal() {
 }
 
 /**
- * Validates crisis form then shows pricing confirmation modal
+ * Validates crisis form, stores data, then shows pricing confirmation modal
  */
 function submitCrisis() {
+    console.log('🚨 submitCrisis() called');
+    
     const crisisType = document.getElementById('crisisType').value;
     const description = document.getElementById('crisisDescription').value;
     const phone = document.getElementById('crisisPhone').value;
@@ -19700,11 +19716,21 @@ function submitCrisis() {
         return;
     }
 
-    // Get user tier and pricing
+    // Store form data so it persists between modal transitions
     const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
     const pricing = CRISIS_PRICING[tier] || CRISIS_PRICING.free;
+    
+    crisisFormData = {
+        crisisType,
+        description,
+        phone,
+        tier,
+        pricing
+    };
+    
+    console.log('🚨 Crisis data stored:', crisisFormData);
 
-    // Update pricing modal
+    // Update pricing modal display
     const priceEl = document.getElementById('crisisPrice');
     const originalPriceEl = document.getElementById('crisisOriginalPrice');
     const discountBadge = document.getElementById('crisisDiscountBadge');
@@ -19724,26 +19750,37 @@ function submitCrisis() {
     // Hide crisis form, show pricing confirmation
     document.getElementById('crisisModal').classList.add('hidden');
     document.getElementById('crisisPricingModal').classList.remove('hidden');
-
+    
+    console.log('🚨 Pricing modal shown');
     trackEvent('crisis_pricing_shown', { user: currentUser, tier: tier, price: pricing.price });
 }
 
 /**
- * Confirmed by user - sends crisis alert to backend
+ * Confirmed by user - sends crisis alert to backend + confirmation email
  */
 async function confirmCrisisSubmission() {
-    const crisisType = document.getElementById('crisisType').value;
-    const description = document.getElementById('crisisDescription').value;
-    const phone = document.getElementById('crisisPhone').value;
-    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
-    const pricing = CRISIS_PRICING[tier] || CRISIS_PRICING.free;
+    console.log('🚨 confirmCrisisSubmission() called');
+    
+    const { crisisType, description, phone, tier, pricing } = crisisFormData;
+    
+    if (!crisisType || !phone) {
+        showAlert('Crisis data missing. Please try again.');
+        closeCrisisPricingModal();
+        activateCrisisMode();
+        return;
+    }
 
     const confirmBtn = document.querySelector('#crisisPricingModal button[onclick="confirmCrisisSubmission()"]');
     const originalText = confirmBtn.innerHTML;
     confirmBtn.disabled = true;
     confirmBtn.innerHTML = '<span class="animate-pulse">⏳ Sending urgent alert...</span>';
 
+    let telegramSuccess = false;
+    let crisisId = 'CR-' + Date.now();
+
+    // Step 1: Try sending Telegram alert
     try {
+        console.log('🚨 Sending Telegram alert...');
         const response = await fetch(CONFIG.API.CRISIS_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -19761,58 +19798,59 @@ async function confirmCrisisSubmission() {
         const result = await response.json();
 
         if (response.ok) {
-            closeCrisisPricingModal();
-            showAlert(`🚨 URGENT ALERT SENT\n\nCrisis ID: ${result.crisisId}\n\nA Senior Consultant will call ${phone} within 15 minutes.\n\nA $${pricing.price} invoice will be sent after your consultation.`);
-            
-            // Send confirmation email to support@fitzhr.com
-            const crisisLabels = {
-                'injury': 'Workplace Injury',
-                'harassment': 'Sexual Harassment / Bullying',
-                'theft': 'Theft / Serious Misconduct',
-                'walkout': 'Employee Walkout / Strike',
-                'discrimination': 'Discrimination Complaint',
-                'violence': 'Workplace Violence / Threat',
-                'death': 'Death / Medical Emergency',
-                'other': 'Other Urgent Matter'
-            };
-            
-            try {
-                await emailjs.send('service_dfmeslf', 'template_crisis_confirm', {
-                    crisis_id: result.crisisId,
-                    crisis_type: crisisLabels[crisisType] || crisisType,
-                    description: description,
-                    user_name: currentUser?.displayName || 'N/A',
-                    user_email: currentUser?.email || 'N/A',
-                    phone_number: phone,
-                    charge_amount: `$${pricing.price}`,
-                    discount_applied: pricing.discount > 0 ? `${pricing.discount}% (${pricing.label})` : 'None',
-                    user_tier: tier.charAt(0).toUpperCase() + tier.slice(1),
-                    submitted_date: new Date().toLocaleString('en-AU', {
-                        dateStyle: 'full',
-                        timeStyle: 'short',
-                        timeZone: 'Australia/Sydney'
-                    })
-                });
-                console.log('✅ Crisis confirmation email sent to support');
-            } catch (emailError) {
-                console.warn('⚠️ Crisis confirmation email failed:', emailError);
-            }
-            
-            // Reset crisis form
-            document.getElementById('crisisType').value = '';
-            document.getElementById('crisisDescription').value = '';
-            document.getElementById('crisisPhone').value = '';
-            
-            trackEvent('crisis_submitted', { user: currentUser, tier: tier, price: pricing.price, crisisType: crisisType });
+            crisisId = result.crisisId || crisisId;
+            telegramSuccess = true;
+            console.log('✅ Telegram alert sent, Crisis ID:', crisisId);
         } else {
-            throw new Error(result.error || 'Failed');
+            console.warn('⚠️ Telegram endpoint returned error:', result);
         }
-    } catch (error) {
-        showAlert(`⚠️ ALERT FAILED\n\nPLEASE EMAIL: support@fitzhr.com\nOR CALL: Your emergency contact\n\nYour submission is logged locally.`);
-    } finally {
-        confirmBtn.disabled = false;
-        confirmBtn.innerHTML = originalText;
+    } catch (telegramError) {
+        console.warn('⚠️ Telegram alert failed:', telegramError);
     }
+
+    // Step 2: Send confirmation email (always attempt, regardless of Telegram)
+    try {
+        console.log('📧 Sending crisis confirmation email...');
+        await emailjs.send('service_dfmeslf', 'template_crisis_confirm', {
+            crisis_id: crisisId,
+            crisis_type: CRISIS_TYPE_LABELS[crisisType] || crisisType,
+            description: description,
+            user_name: currentUser?.displayName || 'N/A',
+            user_email: currentUser?.email || 'N/A',
+            phone_number: phone,
+            charge_amount: `$${pricing.price}`,
+            discount_applied: pricing.discount > 0 ? `${pricing.discount}% (${pricing.label})` : 'None',
+            user_tier: tier.charAt(0).toUpperCase() + tier.slice(1),
+            submitted_date: new Date().toLocaleString('en-AU', {
+                dateStyle: 'full',
+                timeStyle: 'short',
+                timeZone: 'Australia/Sydney'
+            })
+        });
+        console.log('✅ Crisis confirmation email sent to support');
+    } catch (emailError) {
+        console.warn('⚠️ Crisis confirmation email failed:', emailError);
+    }
+
+    // Step 3: Show result to user
+    closeCrisisPricingModal();
+    
+    if (telegramSuccess) {
+        showAlert(`🚨 URGENT ALERT SENT\n\nCrisis ID: ${crisisId}\n\nA Senior Consultant will call ${phone} within 15 minutes.\n\nA $${pricing.price} invoice will be sent after your consultation.`);
+    } else {
+        showAlert(`🚨 CRISIS LOGGED\n\nCrisis ID: ${crisisId}\n\nOur team has been notified and will call ${phone} as soon as possible.\n\nIf urgent, also email: support@fitzhr.com\n\nA $${pricing.price} invoice will be sent after your consultation.`);
+    }
+    
+    // Reset crisis form
+    document.getElementById('crisisType').value = '';
+    document.getElementById('crisisDescription').value = '';
+    document.getElementById('crisisPhone').value = '';
+    crisisFormData = {};
+    
+    confirmBtn.disabled = false;
+    confirmBtn.innerHTML = originalText;
+    
+    trackEvent('crisis_submitted', { user: currentUser, tier: tier, price: pricing.price, crisisType: crisisType, telegramSuccess: telegramSuccess });
 }
 
 // ========================================
