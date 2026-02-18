@@ -17652,7 +17652,7 @@ function showAttachmentPromptModal(refNumber, employeeName, isFormalProcess, use
     if (!modal) {
         modal = document.createElement('div');
         modal.id = 'attachmentPromptModal';
-        modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm flex items-start justify-center p-4 pt-8 z-[9999999999] overflow-y-auto';
+        modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-[9999999999]';
         document.body.appendChild(modal);
     }
     
@@ -17669,7 +17669,7 @@ function showAttachmentPromptModal(refNumber, employeeName, isFormalProcess, use
     ` : '';
     
     modal.innerHTML = `
-        <div class="bg-slate-800 rounded-2xl max-w-lg w-full border border-green-500 fade-in shadow-2xl mb-8">
+        <div class="bg-slate-800 rounded-2xl max-w-lg w-full border border-green-500 fade-in shadow-2xl max-h-[90vh] overflow-y-auto">
             <!-- Header -->
             <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-6 rounded-t-2xl">
                 <div class="flex items-center gap-3">
