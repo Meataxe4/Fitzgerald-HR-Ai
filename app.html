@@ -10752,7 +10752,7 @@ function convertHTMLToPdfMake(html, metadata) {
         { text: 'FITZ HR - AI-Powered Hospitality HR Solutions', bold: true, fontSize: 10, margin: [0, 0, 0, 4] },
         { text: 'Email: support@fitzhr.com', fontSize: 9, margin: [0, 0, 0, 3] },
         { text: `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}`, fontSize: 9, margin: [0, 0, 0, 3] },
-        { text: `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}`, fontSize: 9, margin: [0, 0, 0, 3] },
+        { text: `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser?.displayName || currentUser?.email || 'Unknown'}`, fontSize: 9, margin: [0, 0, 0, 3] },
         { text: 'For personalised advice and document review, contact our Senior Consultants.', fontSize: 9, italics: true, color: '#666666' }
     );
 
@@ -18737,7 +18737,7 @@ async function generateWordDocument(htmlContent, filename, metadata = {}) {
                 html: htmlContent,
                 metadata: {
                     documentId: metadata.documentId || generateDocumentId(),
-                    userName: metadata.userName || currentUser,
+                    userName: metadata.userName || currentUser?.displayName || currentUser?.email || 'Unknown',
                     filename: filename,
                     generatedAt: new Date().toISOString()
                 }
