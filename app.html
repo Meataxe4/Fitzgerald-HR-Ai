@@ -13480,9 +13480,9 @@ If you have any questions about this process or need to discuss the meeting arra
 
 ${venueProfile.userName || '[Manager Name]'}
 
-Email: [email]
+Email: support@fitzhr.com
 
-Phone: [phone]
+Phone: [Insert Phone Number]
 
 We encourage you to seek advice from a union representative or legal advisor if you wish.
 
@@ -19542,6 +19542,13 @@ CRITICAL RULES:
 - Do NOT explain what the document is or how to use it
 - Do NOT ask for more information - use what is provided
 
+CRITICAL CONTACT DETAILS RULES:
+- The company name is "Fitz HR" - NEVER use "Fitzgerald HR"
+- The contact email is "support@fitzhr.com" - NEVER use any @fitzgeraldhr email
+- NEVER include personal mobile or phone numbers in generated documents
+- For phone fields, use "[Insert Phone Number]" as placeholder
+- For email fields in document contact sections, use "support@fitzhr.com"
+
 If you output anything other than the actual document, you are violating the strict mode.
 
 BEGIN DOCUMENT OUTPUT:
@@ -19567,8 +19574,22 @@ BEGIN DOCUMENT OUTPUT:
         const data = await response.json();
         let documentContent = data.message;
         
-        // Fix AI hallucinating "Fitzgerald HR"
+        // Fix AI hallucinating "Fitzgerald HR" and old contact details
         documentContent = documentContent.replace(/Fitzgerald\s*HR/gi, 'Fitz HR');
+        documentContent = documentContent.replace(/FitzgeraldHR/gi, 'Fitz HR');
+        documentContent = documentContent.replace(/info@fitzgeraldhr\.com\.au/gi, 'support@fitzhr.com');
+        documentContent = documentContent.replace(/info@fitzgeraldhr\.com/gi, 'support@fitzhr.com');
+        documentContent = documentContent.replace(/fitzgeraldhr\.com\.au/gi, 'fitzhr.com');
+        documentContent = documentContent.replace(/fitzgeraldhr\.com/gi, 'fitzhr.com');
+        
+        // Strip any Australian mobile/phone numbers (04XX XXX XXX or 0X XXXX XXXX patterns)
+        documentContent = documentContent.replace(/\b0[45]\d{2}[\s.-]?\d{3}[\s.-]?\d{3}\b/g, '[Phone Number Removed]');
+        documentContent = documentContent.replace(/\b0[2378]\s?\d{4}\s?\d{4}\b/g, '[Phone Number Removed]');
+        documentContent = documentContent.replace(/\+61\s?\d[\s.-]?\d{4}[\s.-]?\d{4}/g, '[Phone Number Removed]');
+        
+        // Remove any lines that look like exposed personal phone numbers
+        documentContent = documentContent.replace(/Phone:\s*\[?Phone Number Removed\]?/gi, 'Phone: [Insert Phone Number]');
+        documentContent = documentContent.replace(/Mobile:\s*\[?Phone Number Removed\]?/gi, 'Mobile: [Insert Phone Number]');
         
         // Post-process: If response still starts with conversational text, try to extract the document
         if (documentContent.toLowerCase().startsWith('i understand') || 
