@@ -21,48 +21,6 @@ exports.handler = async (event) => {
         
         const paragraphs = parseHTMLToDocx(html);
         
-        paragraphs.push(
-            new Paragraph({ text: '' }),
-            new Paragraph({
-                children: [
-                    new TextRun({
-                        text: 'FITZ HR - AI-Powered Hospitality HR Solutions',
-                        bold: true,
-                        size: 20
-                    })
-                ],
-                alignment: AlignmentType.CENTER
-            }),
-            new Paragraph({
-                text: 'Email: support@fitzhr.com',
-                alignment: AlignmentType.CENTER
-            }),
-            new Paragraph({
-                text: 'Generated: ' + new Date().toLocaleDateString('en-AU') + ' at ' + new Date().toLocaleTimeString('en-AU'),
-                alignment: AlignmentType.CENTER
-            }),
-            new Paragraph({
-                text: 'Document ID: ' + (metadata.documentId || 'N/A') + ' | User: ' + (metadata.userName || 'Unknown'),
-                alignment: AlignmentType.CENTER
-            }),
-            new Paragraph({ text: '' }),
-            new Paragraph({
-                children: [
-                    new TextRun({
-                        text: 'WARNING: DRAFT TEMPLATE - Requires professional review before use',
-                        bold: true,
-                        color: 'FF0000',
-                        size: 20
-                    })
-                ],
-                alignment: AlignmentType.CENTER
-            }),
-            new Paragraph({
-                text: 'For personalised advice, contact our Senior Consultants.',
-                alignment: AlignmentType.CENTER
-            })
-        );
-        
         const doc = new Document({
             sections: [{
                 properties: {
