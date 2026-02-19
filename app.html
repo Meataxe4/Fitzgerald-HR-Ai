@@ -6563,9 +6563,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="font-semibold">Weekdays (Mon-Fri) - Daytime</div>
                         <div class="text-xs opacity-70">Regular business hours</div>
                     </button>
+                    <button onclick="wizardAnswer('hours', 'weekday-evening')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+                        <div class="font-semibold">Weekdays (Mon-Fri) - Evening</div>
+                        <div class="text-xs opacity-70">7pm to midnight</div>
+                    </button>
                     <button onclick="wizardAnswer('hours', 'weekday-night')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Weekdays (Mon-Fri) - Evenings/Nights</div>
-                        <div class="text-xs opacity-70">After 7pm or late shifts</div>
+                        <div class="font-semibold">Weekdays (Mon-Fri) - Night</div>
+                        <div class="text-xs opacity-70">Midnight to 7am</div>
                     </button>
                     <button onclick="wizardAnswer('hours', 'saturday')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
                         <div class="font-semibold">Saturdays</div>
@@ -9995,7 +9999,8 @@ function getFallbackRates() {
             saturday: 1.5,
             sunday: 1.75,
             public_holiday: 2.5,
-            evening_after_7pm: 1.1
+            evening_after_7pm_loading: 2.81,
+            night_midnight_to_7am_loading: 4.22
         },
         casual_loading: 0.25
     };
@@ -26764,9 +26769,12 @@ function calculateAwardClassification(data) {
     } else if (data.hours === 'public-holiday') {
         const publicHolRate = baseRate * penaltyRates.public_holiday;
         penalties.push(`Public Holiday: ${(penaltyRates.public_holiday * 100)}% = $${publicHolRate.toFixed(2)}/hr`);
+    } else if (data.hours === 'weekday-evening') {
+        const eveningRate = baseRate + penaltyRates.evening_after_7pm_loading;
+        penalties.push(`Evening (7pm-midnight): +$${penaltyRates.evening_after_7pm_loading.toFixed(2)}/hr = $${eveningRate.toFixed(2)}/hr`);
     } else if (data.hours === 'weekday-night') {
-        const eveningRate = baseRate * penaltyRates.evening_after_7pm;
-        penalties.push(`Evening (after 7pm): ${(penaltyRates.evening_after_7pm * 100)}% = $${eveningRate.toFixed(2)}/hr`);
+        const nightRate = baseRate + penaltyRates.night_midnight_to_7am_loading;
+        penalties.push(`Night (midnight-7am): +$${penaltyRates.night_midnight_to_7am_loading.toFixed(2)}/hr = $${nightRate.toFixed(2)}/hr`);
     }
     
     if (isCasual) {
@@ -26920,9 +26928,13 @@ function resetWizard() {
                         <div class="font-semibold">Weekdays (Mon-Fri) - Daytime</div>
                         <div class="text-xs opacity-70">Regular business hours</div>
                     </button>
+                    <button onclick="wizardAnswer('hours', 'weekday-evening')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+                        <div class="font-semibold">Weekdays (Mon-Fri) - Evening</div>
+                        <div class="text-xs opacity-70">7pm to midnight</div>
+                    </button>
                     <button onclick="wizardAnswer('hours', 'weekday-night')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Weekdays (Mon-Fri) - Evenings/Nights</div>
-                        <div class="text-xs opacity-70">After 7pm or late shifts</div>
+                        <div class="font-semibold">Weekdays (Mon-Fri) - Night</div>
+                        <div class="text-xs opacity-70">Midnight to 7am</div>
                     </button>
                     <button onclick="wizardAnswer('hours', 'saturday')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
                         <div class="font-semibold">Saturdays</div>
