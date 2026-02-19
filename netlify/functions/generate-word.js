@@ -26,7 +26,7 @@ exports.handler = async (event) => {
             new Paragraph({
                 children: [
                     new TextRun({
-                        text: 'FITZGERALD HR - AI-Powered Hospitality HR Solutions',
+                        text: 'FITZ HR - AI-Powered Hospitality HR Solutions',
                         bold: true,
                         size: 20
                     })
@@ -34,7 +34,7 @@ exports.handler = async (event) => {
                 alignment: AlignmentType.CENTER
             }),
             new Paragraph({
-                text: 'Email: info@fitzgeraldhr.com.au | Phone: +61 400 211 014',
+                text: 'Email: support@fitzhr.com',
                 alignment: AlignmentType.CENTER
             }),
             new Paragraph({
@@ -173,5 +173,3 @@ function parseHTMLToDocx(html) {
     
     return paragraphs;
 }
-
-
