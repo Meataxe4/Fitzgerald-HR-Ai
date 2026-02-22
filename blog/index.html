@@ -3,717 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Primary Meta Tags -->
-    <title>Fitz HR — Hospitality HR Software for Pubs, Restaurants & Hotels | Australia</title>
-    <meta name="title" content="Fitz HR — Hospitality HR Software for Pubs, Restaurants & Hotels | Australia">
-    <meta name="description" content="AI-powered HR software built for Australian hospitality. Award rate calculator, employment contracts, warning letters, and Fair Work compliance for cafés, pubs, restaurants, and hotels. Free to start.">
-    <meta name="keywords" content="hospitality HR software, HR for pubs restaurants, Fair Work compliance hospitality, award rates calculator, employment contract hospitality, AI HR assistant Australia, HR software for restaurants, hospitality award rates">
-    <meta name="author" content="Fitz HR">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://fitzhr.com/">
-    
-    <!-- Open Graph / Facebook -->
+    <title>Hospitality HR Blog | Fitz HR — HR Guides for Pubs, Restaurants & Hotels in Australia</title>
+    <meta name="description" content="Practical HR guides for Australian hospitality venues. Award rates, employment contracts, Fair Work compliance, performance management, and more for pubs, restaurants, cafes, and hotels.">
+    <meta name="keywords" content="hospitality HR blog, HR guides restaurants Australia, Fair Work hospitality, pub HR advice, hotel HR compliance">
+    <link rel="canonical" href="https://fitzhr.com/blog">
+    <meta property="og:title" content="Hospitality HR Blog | Fitz HR">
+    <meta property="og:description" content="Practical HR guides for pubs, restaurants, and hotels in Australia.">
+    <meta property="og:url" content="https://fitzhr.com/blog">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://fitzhr.com/">
-    <meta property="og:title" content="Fitz HR — AI HR Software for Australian Hospitality">
-    <meta property="og:description" content="Award rates, contracts, warnings, compliance — sorted in 90 seconds. Built for cafés, pubs, restaurants, and hotels.">
-    <meta property="og:image" content="https://fitzhr.com/assets/og-image.png">
-    <meta property="og:locale" content="en_AU">
     <meta property="og:site_name" content="Fitz HR">
-
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:url" content="https://fitzhr.com/">
-    <meta name="twitter:title" content="Fitz HR — AI HR Software for Australian Hospitality">
-    <meta name="twitter:description" content="Award rates, contracts, warnings, compliance — sorted in 90 seconds. Built for cafés, pubs, restaurants, and hotels.">
-    <meta name="twitter:image" content="https://fitzhr.com/assets/og-image.png">
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
-    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-    <meta name="theme-color" content="#f59e0b">
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'outfit': ['Outfit', 'sans-serif'],
-                    },
-                    colors: {
-                        amber: {
-                            500: '#f59e0b',
-                            600: '#d97706',
-                        },
-                        slate: {
-                            800: '#1e293b',
-                            900: '#0f172a',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
-    <!-- Structured Data -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "SoftwareApplication",
-        "name": "Fitz HR",
-        "url": "https://fitzhr.com",
-        "applicationCategory": "BusinessApplication",
-        "applicationSubCategory": "Human Resources Software",
-        "operatingSystem": "Web",
-        "offers": {
-            "@type": "AggregateOffer",
-            "lowPrice": "0",
-            "highPrice": "899",
-            "priceCurrency": "AUD",
-            "offerCount": "4"
-        },
-        "description": "AI-powered HR software for Australian hospitality businesses. Provides instant HR guidance, award rate calculations, employment contract generation, warning letters, and Fair Work compliance tools specifically for pubs, restaurants, cafes, and hotels.",
-        "publisher": {
-            "@type": "Organization",
-            "name": "Fitz HR",
-            "url": "https://fitzhr.com",
-            "email": "support@fitzhr.com",
-            "address": {
-                "@type": "PostalAddress",
-                "addressCountry": "AU"
-            }
-        },
-        "featureList": [
-            "AI HR Chat trained on Australian workplace law",
-            "Hospitality Award rate calculator with penalty rates",
-            "Employment contract builder for the Hospitality Award",
-            "Warning letter and PIP generator",
-            "Crisis mode for urgent HR situations",
-            "Expert document review by qualified HR consultants"
-        ],
-        "keywords": "hospitality HR software, AI HR assistant, Australian hospitality, Fair Work compliance, award rates calculator, employment contracts, pubs restaurants hotels"
-    }
-    </script>
-
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-            {
-                "@type": "Question",
-                "name": "What HR software is best for hospitality businesses in Australia?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Fitz HR is an AI-powered HR assistant built specifically for pubs, restaurants, cafes, and hotels in Australia. It provides instant answers to HR questions based on Australian workplace law and the Hospitality Industry (General) Award, generates compliant employment contracts and warning letters, and includes an Award Rate Calculator. Start free at fitzhr.com."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "How do I calculate penalty rates for hospitality staff?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Penalty rates under the Hospitality Industry (General) Award are: Saturday 150%, Sunday 175%, Public Holiday 250%. Evening work (7pm-midnight Mon-Fri) has a flat $2.81/hr loading, and night work (midnight-7am) has a $4.22/hr loading. Fitz HR's free Award Wizard calculates the correct rate for any classification, day, and shift type."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Can I generate employment contracts for restaurant staff online?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes. Fitz HR's Employment Contract Builder generates contracts tailored to the Hospitality Industry (General) Award in minutes. You answer a few questions about the role, and it produces a contract with the correct Award classification, pay rates, leave entitlements, and hospitality-specific clauses."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Is there an AI HR assistant for Australian hospitality?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes. Fitz HR (fitzhr.com) is an AI-powered HR assistant built specifically for Australian hospitality businesses including pubs, restaurants, cafes, bars, and hotels. It provides instant guidance on award rates, Fair Work compliance, employment contracts, performance management, and more."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Is Fitz HR free?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Fitz HR has a free tier that includes 20 AI chats per month, 1 free template download, and unlimited access to HR tools like the Award Rate Calculator. Paid plans start from $249/year ($21/month) for unlimited chat and full document access."
-                }
-            }
-        ]
-    }
-    </script>
-
     <style>
-        * {
-            font-family: 'Outfit', sans-serif;
-        }
-        html {
-            scroll-behavior: smooth;
-        }
-        .gradient-text {
-            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .hero-gradient {
-            background: radial-gradient(ellipse at top, #1e293b 0%, #0f172a 70%);
-        }
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
-        }
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        .toggle-btn {
-            transition: all 0.3s ease;
-        }
-        .toggle-btn.active {
-            background: #f59e0b;
-            color: #0f172a;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; background: #fff; }
+        .nav { background: #0f172a; padding: 16px 0; }
+        .nav-inner { max-width: 900px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; }
+        .nav a { color: #f59e0b; text-decoration: none; font-weight: 700; font-size: 1.1rem; }
+        .nav .home { color: #94a3b8; font-size: 0.9rem; }
+        .nav .home:hover { color: #fff; }
+        .hero { background: #0f172a; padding: 60px 24px 48px; text-align: center; }
+        .hero h1 { color: #f59e0b; font-size: 2.2rem; margin-bottom: 12px; }
+        .hero p { color: #94a3b8; font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+        .posts { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+        .post-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 28px; margin-bottom: 20px; transition: border-color 0.2s, box-shadow 0.2s; }
+        .post-card:hover { border-color: #f59e0b; box-shadow: 0 4px 12px rgba(245,158,11,0.1); }
+        .post-card h2 { font-size: 1.3rem; margin-bottom: 8px; }
+        .post-card h2 a { color: #0f172a; text-decoration: none; }
+        .post-card h2 a:hover { color: #d97706; }
+        .post-card .excerpt { color: #475569; margin-bottom: 12px; }
+        .post-card .meta { color: #94a3b8; font-size: 0.85rem; }
+        .tag { display: inline-block; background: #f1f5f9; color: #475569; padding: 2px 10px; border-radius: 12px; font-size: 0.8rem; margin-right: 6px; }
+        .cta { background: #0f172a; color: #fff; padding: 40px; border-radius: 12px; text-align: center; margin: 40px 0; }
+        .cta h2 { color: #f59e0b; margin-bottom: 8px; font-size: 1.5rem; }
+        .cta p { color: #94a3b8; margin-bottom: 16px; }
+        .cta a { display: inline-block; background: #f59e0b; color: #0f172a; padding: 12px 32px; border-radius: 8px; text-decoration: none; font-weight: 700; }
+        footer { background: #0f172a; color: #94a3b8; padding: 32px 0; text-align: center; font-size: 0.85rem; }
+        footer a { color: #f59e0b; text-decoration: none; }
     </style>
 </head>
-<body class="bg-slate-900 text-white antialiased">
-
-    <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-        <div class="max-w-6xl mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <a href="/" class="flex items-center text-3xl font-extrabold tracking-tight" style="letter-spacing: -1px;">
-                    <span class="text-amber-500">F</span><span class="text-white">ITZ</span><span class="text-white">&nbsp;</span><span class="text-amber-500">HR</span>
-                </a>
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="#features" class="text-slate-300 hover:text-white transition-colors">Features</a>
-                    <a href="#how-it-works" class="text-slate-300 hover:text-white transition-colors">How It Works</a>
-                    <a href="/pricing" class="text-slate-300 hover:text-white transition-colors">Pricing</a>
-                    <a href="/blog" class="text-slate-300 hover:text-white transition-colors">Blog</a>
-                </div>
-                <div class="flex items-center gap-4">
-                    <a href="/app" class="hidden sm:inline-block text-slate-300 hover:text-white transition-colors">Log In</a>
-                    <a href="/app" class="btn-primary px-5 py-2.5 rounded-lg font-semibold text-slate-900">
-                        Get Started Free
-                    </a>
-                </div>
-            </div>
+<body>
+    <nav class="nav">
+        <div class="nav-inner">
+            <a href="/">FITZ HR</a>
+            <a href="/" class="home">&larr; Home</a>
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <header class="hero-gradient pt-32 pb-20 px-6">
-        <div class="max-w-6xl mx-auto">
-            <div class="max-w-3xl mx-auto text-center">
-                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
-                    AI HR Software for<br>
-                    <span class="gradient-text">Pubs, Restaurants & Hotels</span><br>
-                    <span class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-300">in Australia</span>
-                </h1>
-                <p class="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">
-                    Award rates, employment contracts, compliance — sorted in 90 seconds. Built specifically for hospitality.
-                </p>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-                    <a href="/app" class="btn-primary px-8 py-4 rounded-xl font-bold text-lg text-slate-900 w-full sm:w-auto text-center">
-                        Start Free
-                    </a>
-                    <a href="/pricing" class="px-8 py-4 rounded-xl font-semibold text-lg border border-slate-600 hover:border-slate-500 transition-colors w-full sm:w-auto text-center">
-                        View Pricing
-                    </a>
-                </div>
-                <div class="flex flex-wrap items-center justify-center gap-8 sm:gap-16 pt-8 border-t border-slate-700/50">
-                    <div class="text-center">
-                        <div class="text-4xl sm:text-5xl font-bold text-amber-500">$12k</div>
-                        <div class="text-base sm:text-lg text-slate-400">Avg. Savings</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-4xl sm:text-5xl font-bold text-amber-500">&lt;90s</div>
-                        <div class="text-base sm:text-lg text-slate-400">Response Time</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-4xl sm:text-5xl font-bold text-amber-500">24/7</div>
-                        <div class="text-base sm:text-lg text-slate-400">Available</div>
-                    </div>
-                </div>
-            </div>
+    <div class="hero">
+        <h1>Hospitality HR Blog</h1>
+        <p>Practical guides for managing HR in pubs, restaurants, cafes, and hotels across Australia. Written for venue managers, not HR departments.</p>
+    </div>
+
+    <div class="posts">
+        <div class="post-card">
+            <h2><a href="/blog/hospitality-award-rates-2026">Hospitality Award Rates 2026: Complete Guide to Penalty Rates for Pubs &amp; Restaurants</a></h2>
+            <p class="excerpt">Everything you need to know about the Hospitality Industry (General) Award pay rates, including base rates by classification, weekend penalties, evening and night loadings, overtime, and casual loading.</p>
+            <p class="meta">22 Feb 2026 &middot; 6 min read &middot; <span class="tag">Award Rates</span> <span class="tag">Penalty Rates</span></p>
         </div>
-    </header>
 
-    <!-- Pain Points Section -->
-    <section class="py-20 px-6 bg-slate-800/50">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl sm:text-4xl font-bold mb-4">HR Shouldn't Keep You Up at Night</h2>
-                <p class="text-slate-400 text-lg max-w-2xl mx-auto">Running a venue is hard enough without worrying about compliance, documentation, and difficult conversations.</p>
-            </div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
-                    <div class="text-5xl mb-4">🧮</div>
-                    <h3 class="text-xl font-bold mb-3">Award Rates Are Confusing</h3>
-                    <p class="text-slate-400">Penalty rates, allowances, casual loading — one mistake can cost thousands in back-pay claims.</p>
-                </div>
-                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
-                    <div class="text-5xl mb-4">📋</div>
-                    <h3 class="text-xl font-bold mb-3">Documentation Takes Hours</h3>
-                    <p class="text-slate-400">Warning letters, contracts, policies — you didn't open a venue to become a paperwork expert.</p>
-                </div>
-                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
-                    <div class="text-5xl mb-4">⚖️</div>
-                    <h3 class="text-xl font-bold mb-3">Compliance Risks Are Real</h3>
-                    <p class="text-slate-400">Unfair dismissal claims, Fair Work audits, underpayment scandals — the stakes have never been higher.</p>
-                </div>
-            </div>
+        <div class="post-card">
+            <h2><a href="/blog/employment-contract-restaurant-staff-australia">How to Write an Employment Contract for Restaurant Staff in Australia</a></h2>
+            <p class="excerpt">Step-by-step guide to writing legally compliant employment contracts for hospitality staff, including what must be included, hospitality-specific clauses, and common mistakes to avoid.</p>
+            <p class="meta">22 Feb 2026 &middot; 7 min read &middot; <span class="tag">Contracts</span> <span class="tag">Compliance</span></p>
         </div>
-    </section>
 
-    <!-- Features Section -->
-    <section id="features" class="py-20 px-6">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Everything You Need to Manage HR</h2>
-                <p class="text-slate-400 text-lg max-w-2xl mx-auto">Fitz combines AI smarts with real HR expertise — so you get instant answers you can trust.</p>
-            </div>
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="card-hover bg-slate-800 border border-slate-700 rounded-2xl p-8">
-                    <div class="w-14 h-14 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6">
-                        <span class="text-3xl">💬</span>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-3">AI HR Chat</h3>
-                    <p class="text-slate-400 mb-4">Ask anything about Australian hospitality HR. Award rates, leave entitlements, performance management — get instant, practical advice.</p>
-                    <ul class="space-y-2 text-slate-300">
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Trained on Australian workplace law</li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Hospitality Award specific</li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Available 24/7</li>
-                    </ul>
-                </div>
-                <div class="card-hover bg-slate-800 border border-slate-700 rounded-2xl p-8">
-                    <div class="w-14 h-14 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6">
-                        <span class="text-3xl">🛠️</span>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-3">HR Document Tools</h3>
-                    <p class="text-slate-400 mb-4">Generate legally-compliant HR documents in minutes. Warning letters, contracts, PIPs — all customised for your situation.</p>
-                    <ul class="space-y-2 text-slate-300">
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Warning letters & PIPs</li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Employment contracts</li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Termination guides</li>
-                    </ul>
-                </div>
-                <div class="card-hover bg-slate-800 border border-slate-700 rounded-2xl p-8">
-                    <div class="w-14 h-14 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6">
-                        <span class="text-3xl">👨‍💼</span>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-3">Expert Document Review</h3>
-                    <p class="text-slate-400 mb-4">Every document can be reviewed by a qualified HR consultant before you use it. Real humans checking real documents.</p>
-                    <ul class="space-y-2 text-slate-300">
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Qualified HR professionals</li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> 24-hour turnaround</li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Included in subscription</li>
-                    </ul>
-                </div>
-                <div class="card-hover bg-slate-800 border border-slate-700 rounded-2xl p-8">
-                    <div class="w-14 h-14 bg-red-500/10 rounded-xl flex items-center justify-center mb-6">
-                        <span class="text-3xl">🚨</span>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-3">Crisis Mode</h3>
-                    <p class="text-slate-400 mb-4">Staff walkout? Theft? Serious misconduct? Get immediate step-by-step guidance to handle urgent situations properly.</p>
-                    <ul class="space-y-2 text-slate-300">
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Step-by-step checklists</li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Legal compliance focus</li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Escalation paths</li>
-                    </ul>
-                </div>
-            </div>
+        <div class="post-card">
+            <h2><a href="/blog/fair-work-compliance-checklist-hospitality">Fair Work Compliance Checklist for Hospitality Businesses</a></h2>
+            <p class="excerpt">The complete compliance checklist covering pay, record keeping, documentation, leave entitlements, termination, and workplace safety for pubs, restaurants, and hotels.</p>
+            <p class="meta">22 Feb 2026 &middot; 8 min read &middot; <span class="tag">Fair Work</span> <span class="tag">Compliance</span></p>
         </div>
-    </section>
 
-    <!-- How It Works -->
-    <section id="how-it-works" class="py-20 px-6 bg-slate-800/50">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Get Started in 60 Seconds</h2>
-                <p class="text-slate-400 text-lg max-w-2xl mx-auto">No complex setup. No training required. Just ask.</p>
-            </div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center text-2xl font-bold text-slate-900 mx-auto mb-6">1</div>
-                    <h3 class="text-xl font-bold mb-3">Ask Your Question</h3>
-                    <p class="text-slate-400">Type your HR question — anything from "What's the Sunday penalty rate for casuals?" to "How do I manage underperformance?"</p>
-                </div>
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center text-2xl font-bold text-slate-900 mx-auto mb-6">2</div>
-                    <h3 class="text-xl font-bold mb-3">Get Instant Guidance</h3>
-                    <p class="text-slate-400">Fitz gives you clear, practical advice based on Australian workplace law and hospitality industry best practices.</p>
-                </div>
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center text-2xl font-bold text-slate-900 mx-auto mb-6">3</div>
-                    <h3 class="text-xl font-bold mb-3">Take Action Confidently</h3>
-                    <p class="text-slate-400">Generate documents, follow step-by-step guides, or escalate to an expert — whatever you need to move forward.</p>
-                </div>
-            </div>
+        <div class="post-card">
+            <h2><a href="/blog/managing-underperformance-hospitality">How to Handle Underperformance in Hospitality: A Manager&rsquo;s Guide</a></h2>
+            <p class="excerpt">The 5-step process for managing underperforming staff legally. Covers informal conversations, written warnings, PIPs, and termination &mdash; with hospitality-specific examples.</p>
+            <p class="meta">22 Feb 2026 &middot; 7 min read &middot; <span class="tag">Performance</span> <span class="tag">Warnings</span></p>
         </div>
-    </section>
 
-    <!-- Pricing Preview -->
-    <section class="py-20 px-6">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
-                <p class="text-slate-400 text-lg max-w-2xl mx-auto">Start free, upgrade when you need more. All plans include unlimited AI chat.</p>
-            </div>
-
-            <!-- Billing Toggle -->
-            <div class="flex justify-center mb-12">
-                <div class="inline-flex items-center bg-slate-800 rounded-xl p-1">
-                    <button id="monthlyBtn" onclick="toggleBilling('monthly')" class="toggle-btn px-6 py-3 rounded-lg font-medium text-slate-300">
-                        Monthly
-                    </button>
-                    <button id="yearlyBtn" onclick="toggleBilling('yearly')" class="toggle-btn active px-6 py-3 rounded-lg font-medium">
-                        Yearly
-                    </button>
-                    <span class="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full ml-2">
-                        Save 20%+
-                    </span>
-                </div>
-            </div>
-
-            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-                <!-- Free -->
-                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
-                    <h3 class="text-xl font-bold mb-2">Free</h3>
-                    <p class="text-slate-400 text-sm mb-4">Try Fitz with no commitment</p>
-                    <div class="mb-6">
-                        <span class="text-4xl font-bold">$0</span>
-                        <span class="text-slate-400">/forever</span>
-                    </div>
-                    <ul class="space-y-3 mb-8 text-slate-300 text-sm">
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> 20 AI chats/month
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> 1 free template download
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Unlimited HR Tools
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-slate-500">–</span> <span class="text-slate-500">Expert-reviewed docs</span>
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-red-400">🚨</span> Crisis Support <span class="text-slate-500">$320</span>
-                        </li>
-                    </ul>
-                    <a href="/app" class="block text-center py-3 border border-slate-600 rounded-lg hover:border-green-500 hover:text-green-400 transition-colors">
-                        Start Free
-                    </a>
-                </div>
-
-                <!-- Starter -->
-                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
-                    <h3 class="text-xl font-bold mb-2">Starter</h3>
-                    <p class="text-slate-400 text-sm mb-4">For small venues with occasional HR needs</p>
-                    <div class="mb-2">
-                        <span id="starterPrice" class="text-4xl font-bold">$249</span>
-                        <span id="starterPeriod" class="text-slate-400">/year</span>
-                    </div>
-                    <p id="starterMonthly" class="text-green-500 text-sm mb-4">Just $21/month</p>
-                    <ul class="space-y-3 mb-8 text-slate-300 text-sm">
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Unlimited AI chat
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> All HR templates
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> <span id="starterDocs">96</span> <span id="starterDocsPeriod">credits/year</span>
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Unlimited HR Tools
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-red-400">🚨</span> Crisis Support <span class="text-green-500 font-semibold">10% off</span>
-                        </li>
-                    </ul>
-                    <a href="/pricing" class="block text-center py-3 border border-slate-600 rounded-lg hover:border-amber-500 transition-colors">
-                        Learn More
-                    </a>
-                </div>
-
-                <!-- Pro (Featured) -->
-                <div class="bg-slate-800 border-2 border-amber-500 rounded-2xl p-6 relative">
-                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-900 text-sm font-bold px-4 py-1 rounded-full">
-                        MOST POPULAR
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Pro</h3>
-                    <p class="text-slate-400 text-sm mb-4">For busy venues with regular HR needs</p>
-                    <div class="mb-2">
-                        <span id="proPrice" class="text-4xl font-bold">$449</span>
-                        <span id="proPeriod" class="text-slate-400">/year</span>
-                    </div>
-                    <p id="proMonthly" class="text-green-500 text-sm mb-4">Just $37/month</p>
-                    <ul class="space-y-3 mb-8 text-slate-300 text-sm">
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Unlimited AI chat
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> All HR templates
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> <span id="proDocs">240</span> <span id="proDocsPeriod">credits/year</span>
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Unlimited HR Tools
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-red-400">🚨</span> Crisis Support <span class="text-green-500 font-semibold">25% off</span>
-                        </li>
-                    </ul>
-                    <a href="/app" class="btn-primary block text-center py-3 rounded-lg font-semibold text-slate-900">
-                        Get Started
-                    </a>
-                </div>
-
-                <!-- Business -->
-                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
-                    <h3 class="text-xl font-bold mb-2">Business</h3>
-                    <p class="text-slate-400 text-sm mb-4">For multi-venue or high-turnover</p>
-                    <div class="mb-2">
-                        <span id="businessPrice" class="text-4xl font-bold">$899</span>
-                        <span id="businessPeriod" class="text-slate-400">/year</span>
-                    </div>
-                    <p id="businessMonthly" class="text-green-500 text-sm mb-4">Just $75/month</p>
-                    <ul class="space-y-3 mb-8 text-slate-300 text-sm">
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Unlimited AI chat
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> All HR templates
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> <span id="businessDocs">600</span> <span id="businessDocsPeriod">credits/year</span>
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Unlimited HR Tools
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-red-400">🚨</span> Crisis Support <span class="text-green-500 font-semibold">50% off</span>
-                        </li>
-                    </ul>
-                    <a href="/pricing" class="block text-center py-3 border border-slate-600 rounded-lg hover:border-amber-500 transition-colors">
-                        Learn More
-                    </a>
-                </div>
-            </div>
-
-            <!-- What are credits? -->
-            <div class="max-w-4xl mx-auto mt-12 bg-slate-800 border border-slate-700 rounded-2xl p-6">
-                <p class="text-amber-500 font-bold text-lg text-center mb-4">💡 What can you do with credits?</p>
-                <div class="grid md:grid-cols-3 gap-6 text-center">
-                    <div>
-                        <span class="text-3xl">📄</span>
-                        <h4 class="text-white font-semibold mt-2">Generate Documents</h4>
-                        <p class="text-slate-400 text-sm">Employment contracts, position descriptions, onboarding docs, policies</p>
-                    </div>
-                    <div>
-                        <span class="text-3xl">⚠️</span>
-                        <h4 class="text-white font-semibold mt-2">Expert-Reviewed Docs</h4>
-                        <p class="text-slate-400 text-sm">Warnings, PIPs, terminations — reviewed by qualified HR consultants</p>
-                    </div>
-                    <div>
-                        <span class="text-3xl">👤</span>
-                        <h4 class="text-white font-semibold mt-2">HR Consultations</h4>
-                        <p class="text-slate-400 text-sm">Book time with HR professionals for any workplace matter</p>
-                    </div>
-                </div>
-            </div>
-
-            <p class="text-center text-slate-400 mt-8">
-                All paid plans include a 14-day money-back guarantee. Cancel anytime.
-            </p>
+        <div class="post-card">
+            <h2><a href="/blog/best-hr-software-hospitality-australia">Best HR Software for Hospitality in Australia (2026)</a></h2>
+            <p class="excerpt">Comparing the HR tools that actually work for Australian hospitality venues. Features, pricing, and which ones understand the Hospitality Award.</p>
+            <p class="meta">22 Feb 2026 &middot; 8 min read &middot; <span class="tag">Software</span> <span class="tag">Comparison</span></p>
         </div>
-    </section>
 
-    <!-- Trust Section -->
-    <section class="py-20 px-6 bg-slate-800/50">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-3xl sm:text-4xl font-bold mb-6">Built Specifically for Australian Hospitality</h2>
-            <p class="text-xl text-slate-300 mb-10">
-                Fitz understands the unique challenges of running a restaurant, cafe, bar, or hotel in Australia. 
-                From the Hospitality Industry (General) Award to state-specific regulations — we've got you covered.
-            </p>
-            <div class="flex flex-wrap items-center justify-center gap-8 text-slate-400">
-                <div class="flex items-center gap-2"><span class="text-2xl">🏆</span><span>Fair Work Compliant</span></div>
-                <div class="flex items-center gap-2"><span class="text-2xl">👨‍💼</span><span>Expert HR Reviewed</span></div>
-                <div class="flex items-center gap-2"><span class="text-2xl">🔒</span><span>Data Secure</span></div>
-                <div class="flex items-center gap-2"><span class="text-2xl">🇦🇺</span><span>Australian Owned</span></div>
-            </div>
+        <div class="cta">
+            <h2>Got an HR Question Right Now?</h2>
+            <p>Fitz HR gives you instant answers to any hospitality HR question &mdash; award rates, compliance, performance management, and more.</p>
+            <a href="/app">Ask Fitz Free &rarr;</a>
         </div>
-    </section>
+    </div>
 
-    <!-- FAQ Section (AI Discoverability) -->
-    <section class="py-20 px-6">
-        <div class="max-w-3xl mx-auto">
-            <h2 class="text-3xl sm:text-4xl font-bold mb-10 text-center">Frequently Asked Questions</h2>
-            
-            <div class="space-y-4">
-                <details class="bg-slate-800/50 rounded-xl border border-slate-700 group">
-                    <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-lg">
-                        What HR software is best for hospitality businesses in Australia?
-                        <span class="text-amber-500 text-2xl group-open:rotate-45 transition-transform">+</span>
-                    </summary>
-                    <div class="px-6 pb-6 text-slate-300">
-                        <p>Fitz HR is an AI-powered HR assistant built specifically for pubs, restaurants, cafes, and hotels in Australia. It provides instant answers to HR questions based on Australian workplace law and the Hospitality Industry (General) Award, generates compliant employment contracts and warning letters, and includes an Award Rate Calculator.</p>
-                    </div>
-                </details>
-
-                <details class="bg-slate-800/50 rounded-xl border border-slate-700 group">
-                    <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-lg">
-                        How do I calculate penalty rates for hospitality staff?
-                        <span class="text-amber-500 text-2xl group-open:rotate-45 transition-transform">+</span>
-                    </summary>
-                    <div class="px-6 pb-6 text-slate-300">
-                        <p>Penalty rates under the Hospitality Industry (General) Award are: Saturday 150%, Sunday 175%, Public Holiday 250%. Evening work (7pm–midnight Mon–Fri) adds a flat $2.81/hr, and night work (midnight–7am) adds $4.22/hr. Fitz HR's free Award Wizard calculates the correct rate for any classification, day, and shift type.</p>
-                    </div>
-                </details>
-
-                <details class="bg-slate-800/50 rounded-xl border border-slate-700 group">
-                    <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-lg">
-                        Can I generate employment contracts for restaurant staff online?
-                        <span class="text-amber-500 text-2xl group-open:rotate-45 transition-transform">+</span>
-                    </summary>
-                    <div class="px-6 pb-6 text-slate-300">
-                        <p>Yes — Fitz HR's Employment Contract Builder generates contracts tailored to the Hospitality Industry (General) Award in minutes. Answer a few questions about the role, and it produces a contract with the correct Award classification, pay rates, leave entitlements, and hospitality-specific clauses.</p>
-                    </div>
-                </details>
-
-                <details class="bg-slate-800/50 rounded-xl border border-slate-700 group">
-                    <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-lg">
-                        Is there an AI HR assistant for Australian hospitality?
-                        <span class="text-amber-500 text-2xl group-open:rotate-45 transition-transform">+</span>
-                    </summary>
-                    <div class="px-6 pb-6 text-slate-300">
-                        <p>Yes. Fitz HR is an AI-powered HR assistant built specifically for Australian hospitality businesses including pubs, restaurants, cafes, bars, and hotels. It covers award rates, Fair Work compliance, employment contracts, performance management, and crisis situations — all tailored to the Hospitality Award.</p>
-                    </div>
-                </details>
-
-                <details class="bg-slate-800/50 rounded-xl border border-slate-700 group">
-                    <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-lg">
-                        Is Fitz HR free?
-                        <span class="text-amber-500 text-2xl group-open:rotate-45 transition-transform">+</span>
-                    </summary>
-                    <div class="px-6 pb-6 text-slate-300">
-                        <p>Yes — the free tier includes 20 AI chats per month, 1 free template download, and unlimited access to HR tools like the Award Rate Calculator. Paid plans start from $249/year ($21/month) for unlimited chat and full document access.</p>
-                    </div>
-                </details>
-            </div>
-        </div>
-    </section>
-
-    <!-- Final CTA -->
-    <section class="py-24 px-6">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-3xl sm:text-4xl font-bold mb-6">Ready to Simplify Your HR?</h2>
-            <p class="text-xl text-slate-300 mb-10">
-                Join hospitality venues across Australia who trust Fitz for their HR needs.
-                Get started free — no credit card required.
-            </p>
-            <a href="/app" class="btn-primary inline-block px-10 py-5 rounded-xl font-bold text-xl text-slate-900">
-                Start Free Today →
-            </a>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-slate-800 border-t border-slate-700 py-12 px-6">
-        <div class="max-w-6xl mx-auto">
-            <div class="grid md:grid-cols-4 gap-8 mb-8">
-                <div>
-                    <a href="/" class="flex items-center text-3xl font-extrabold tracking-tight mb-4" style="letter-spacing: -1px;">
-                        <span class="text-amber-500">F</span><span class="text-white">ITZ</span><span class="text-white">&nbsp;</span><span class="text-amber-500">HR</span>
-                    </a>
-                    <p class="text-slate-400 text-sm">AI-powered HR software for Australian hospitality venues.</p>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Product</h4>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><a href="/#features" class="hover:text-white transition-colors">Features</a></li>
-                        <li><a href="/pricing" class="hover:text-white transition-colors">Pricing</a></li>
-                        <li><a href="/blog" class="hover:text-white transition-colors">Blog</a></li>
-                        <li><a href="/app" class="hover:text-white transition-colors">Log In</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Legal</h4>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="/terms" class="hover:text-white transition-colors">Terms of Service</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-4">Contact</h4>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><a href="/cdn-cgi/l/email-protection#02717772726d707642646b76786a702c616d6f" class="hover:text-white transition-colors"><span class="__cf_email__" data-cfemail="abd8dedbdbc4d9dfebcdc2dfd1c3d985c8c4c6">[email&#160;protected]</span></a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="border-t border-slate-700 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                <p class="text-slate-400 text-sm">© 2026 Fitz HR Pty Ltd (ABN 87 693 882 709). All rights reserved.</p>
-                <p class="text-slate-500 text-sm">Made with ❤️ in Australia</p>
-            </div>
-        </div>
+    <footer>
+        <p>&copy; 2026 Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog">Blog</a> &middot; <a href="/app">Try Free</a></p>
     </footer>
-
-    <!-- Billing Toggle Script -->
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-        const pricing = {
-            yearly: {
-                starter: { price: '$249', period: '/year', monthly: 'Just $21/month', docs: '96', docsPeriod: 'credits/year' },
-                pro: { price: '$449', period: '/year', monthly: 'Just $37/month', docs: '240', docsPeriod: 'credits/year' },
-                business: { price: '$899', period: '/year', monthly: 'Just $75/month', docs: '600', docsPeriod: 'credits/year' }
-            },
-            monthly: {
-                starter: { price: '$29', period: '/month', monthly: '', docs: '8', docsPeriod: 'credits/month' },
-                pro: { price: '$49', period: '/month', monthly: '', docs: '20', docsPeriod: 'credits/month' },
-                business: { price: '$99', period: '/month', monthly: '', docs: '50', docsPeriod: 'credits/month' }
-            }
-        };
-
-        function toggleBilling(type) {
-            const p = pricing[type];
-            document.getElementById('monthlyBtn').classList.toggle('active', type === 'monthly');
-            document.getElementById('yearlyBtn').classList.toggle('active', type === 'yearly');
-            document.getElementById('starterPrice').textContent = p.starter.price;
-            document.getElementById('starterPeriod').textContent = p.starter.period;
-            document.getElementById('starterMonthly').textContent = p.starter.monthly;
-            document.getElementById('starterDocs').textContent = p.starter.docs;
-            document.getElementById('starterDocsPeriod').textContent = p.starter.docsPeriod;
-            document.getElementById('proPrice').textContent = p.pro.price;
-            document.getElementById('proPeriod').textContent = p.pro.period;
-            document.getElementById('proMonthly').textContent = p.pro.monthly;
-            document.getElementById('proDocs').textContent = p.pro.docs;
-            document.getElementById('proDocsPeriod').textContent = p.pro.docsPeriod;
-            document.getElementById('businessPrice').textContent = p.business.price;
-            document.getElementById('businessPeriod').textContent = p.business.period;
-            document.getElementById('businessMonthly').textContent 
+</body>
+</html>
