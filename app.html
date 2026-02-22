@@ -6103,6 +6103,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="font-semibold">Fast Food Industry Award</div>
                         <div class="text-xs opacity-70">QSR, takeaway, delivery</div>
                     </button>
+                    <button onclick="saveOnboardingAnswer('primaryAward', 'Restaurant Industry Award')" 
+                            class="w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
+                        <div class="font-semibold">Restaurant Industry Award</div>
+                        <div class="text-xs opacity-70">MA000119 — restaurants, catering, cafés</div>
+                    </button>
                     <button onclick="saveOnboardingAnswer('primaryAward', 'Not sure')" 
                             class="w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
                         <div class="font-semibold">🤷 Not sure</div>
@@ -10733,28 +10738,6 @@ function convertHTMLToPdfMake(html, metadata) {
             }
         }
     }
-
-    // Add footer
-    content.push(
-        { text: '', margin: [0, 30, 0, 0] },
-        {
-            canvas: [
-                {
-                    type: 'line',
-                    x1: 0, y1: 0,
-                    x2: 515, y2: 0,
-                    lineWidth: 1,
-                    lineColor: '#cccccc'
-                }
-            ],
-            margin: [0, 0, 0, 10]
-        },
-        { text: 'FITZ HR - AI-Powered Hospitality HR Solutions', bold: true, fontSize: 10, margin: [0, 0, 0, 4] },
-        { text: 'Email: support@fitzhr.com', fontSize: 9, margin: [0, 0, 0, 3] },
-        { text: `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}`, fontSize: 9, margin: [0, 0, 0, 3] },
-        { text: `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser?.displayName || currentUser?.email || 'Unknown'}`, fontSize: 9, margin: [0, 0, 0, 3] },
-        { text: 'For personalised advice and document review, contact our Senior Consultants.', fontSize: 9, italics: true, color: '#666666' }
-    );
 
     // Define document with styles
     return {
