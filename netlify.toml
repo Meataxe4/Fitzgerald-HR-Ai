@@ -1,8 +1,7 @@
-# Netlify Configuration for Fitzgerald HR
-# Deputy Integration Setup
+# Netlify Configuration for Fitz HR
 
 [build]
-  command = "echo 'No build step required - single HTML file'"
+  command = "echo 'No build step required - static site'"
   publish = "."
   functions = "netlify/functions"
 
@@ -28,6 +27,7 @@
 # ============================================
 # Static pages - MUST come before the catch-all
 # ============================================
+
 [[redirects]]
   from = "/pricing"
   to = "/pricing.html"
@@ -46,6 +46,45 @@
 [[redirects]]
   from = "/app"
   to = "/app.html"
+  status = 200
+
+# ============================================
+# Blog pages - MUST come before the catch-all
+# ============================================
+
+[[redirects]]
+  from = "/blog"
+  to = "/blog/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/blog/"
+  to = "/blog/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/blog/hospitality-award-rates-2026"
+  to = "/blog/hospitality-award-rates-2026.html"
+  status = 200
+
+[[redirects]]
+  from = "/blog/employment-contract-restaurant-staff-australia"
+  to = "/blog/employment-contract-restaurant-staff-australia.html"
+  status = 200
+
+[[redirects]]
+  from = "/blog/fair-work-compliance-checklist-hospitality"
+  to = "/blog/fair-work-compliance-checklist-hospitality.html"
+  status = 200
+
+[[redirects]]
+  from = "/blog/managing-underperformance-hospitality"
+  to = "/blog/managing-underperformance-hospitality.html"
+  status = 200
+
+[[redirects]]
+  from = "/blog/best-hr-software-hospitality-australia"
+  to = "/blog/best-hr-software-hospitality-australia.html"
   status = 200
 
 # ============================================
