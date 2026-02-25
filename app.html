@@ -39,71 +39,6 @@
  <style>
 
 /* ========================================
-   FITZ MASCOT SYSTEM
-   ======================================== */
-:root {
-    --fitz-img: url("assets/fitz-neon-transparent.png");
-}
-
-.fitz-bot {
-    display: inline-block;
-    background: var(--fitz-img) center/contain no-repeat;
-}
-.fitz-bot.fitz-xl { width: 80px; height: 80px; }
-.fitz-bot.fitz-lg { width: 48px; height: 48px; }
-.fitz-bot.fitz-md { width: 36px; height: 36px; }
-.fitz-bot.fitz-sm { width: 20px; height: 20px; }
-.fitz-bot.fitz-xs { width: 16px; height: 16px; }
-
-/* Breathing Glow — for loading/generating states */
-.fitz-breathe {
-    animation: fitz-breathe-float 3s ease-in-out infinite, fitz-breathe-glow 3s ease-in-out infinite;
-}
-@keyframes fitz-breathe-float {
-    0%, 100% { transform: translateY(0) scale(1); }
-    50% { transform: translateY(-6px) scale(1.02); }
-}
-@keyframes fitz-breathe-glow {
-    0%, 100% { filter: drop-shadow(0 0 8px rgba(245,158,11,0.3)) drop-shadow(0 0 24px rgba(245,158,11,0.1)); }
-    50% { filter: drop-shadow(0 0 24px rgba(245,158,11,0.6)) drop-shadow(0 0 56px rgba(245,158,11,0.2)); }
-}
-
-/* Idle Float — for AI insight panels */
-.fitz-float {
-    animation: fitz-idle-float 3s ease-in-out infinite;
-}
-@keyframes fitz-idle-float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-}
-
-/* Thinking dots — for AI processing */
-.fitz-thinking-wrap {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-.fitz-thinking-dots {
-    display: inline-flex;
-    gap: 4px;
-    align-items: center;
-}
-.fitz-thinking-dots span {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #f59e0b;
-    animation: fitz-dot-bounce 1.4s ease-in-out infinite;
-}
-.fitz-thinking-dots span:nth-child(2) { animation-delay: 0.15s; }
-.fitz-thinking-dots span:nth-child(3) { animation-delay: 0.3s; }
-@keyframes fitz-dot-bounce {
-    0%, 80%, 100% { transform: translateY(0); opacity: 0.3; }
-    40% { transform: translateY(-6px); opacity: 1; }
-}
-
-
-/* ========================================
    DARK MODE SYSTEM
    ======================================== */
 
@@ -4813,7 +4748,7 @@ async function checkFirestoreData() {
                 <div class="flex items-center gap-6 text-sm">
                     <a href="#" onclick="showTermsOfService(); return false;" class="text-slate-400 hover:text-white transition-colors">Terms</a>
                     <a href="#" onclick="showPrivacyPolicy(); return false;" class="text-slate-400 hover:text-white transition-colors">Privacy</a>
-                    <a href="mailto:hello@fitzhr.com" class="text-slate-400 hover:text-white transition-colors">Contact</a>
+                    <a href="/cdn-cgi/l/email-protection#6f070a0303002f09061b15071d410c0002" class="text-slate-400 hover:text-white transition-colors">Contact</a>
                 </div>
             </div>
         </footer>
@@ -5224,7 +5159,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </p>
         <p class="text-slate-500 text-xs">
             Professional Advice: 
-            <a href="mailto:support@fitzhr.com" class="text-slate-400 hover:text-amber-400 underline">support@fitzhr.com</a> | 
+            <a href="/cdn-cgi/l/email-protection#196a6c6969766b6d597f706d63716b377a7674" class="text-slate-400 hover:text-amber-400 underline"><span class="__cf_email__" data-cfemail="61121411110e1315210708151b09134f020e0c">[email&#160;protected]</span></a> | 
             <a href="#terms" onclick="showTermsOfService(); return false;" class="text-slate-400 hover:text-amber-400 underline">Terms</a>
         </p>
     </div>
@@ -5553,52 +5488,6 @@ document.addEventListener('DOMContentLoaded', function() {
             <p class="text-center text-slate-400 text-sm mt-4">
                 A Senior Consultant will contact you within 15 minutes
             </p>
-        </div>
-    </div>
-
-    <!-- Crisis Mode Pricing Confirmation Modal -->
-    <div id="crisisPricingModal" class="hidden fixed inset-0 bg-black/95 backdrop-blur-sm flex items-center justify-center p-6 z-[60]">
-        <div class="bg-slate-800 rounded-2xl p-8 max-w-lg w-full border-2 border-red-500 fade-in">
-            <div class="text-center mb-6">
-                <div class="text-5xl mb-3">🚨</div>
-                <h2 class="text-2xl font-bold text-red-400 mb-2">Urgent Consultant Callback</h2>
-                <p class="text-slate-400 text-sm">A Senior HR Consultant will call you within 15 minutes</p>
-            </div>
-
-            <div class="bg-slate-900 rounded-xl p-5 mb-6">
-                <div class="flex items-center justify-between mb-3">
-                    <span class="text-slate-300 font-medium">Crisis Response Fee</span>
-                    <div class="text-right">
-                        <span id="crisisOriginalPrice" class="hidden text-slate-500 line-through text-sm mr-2">$320</span>
-                        <span id="crisisPrice" class="text-2xl font-bold text-white">$320</span>
-                    </div>
-                </div>
-                <div id="crisisDiscountBadge" class="hidden">
-                    <span class="inline-block bg-green-500/20 text-green-400 text-xs font-semibold px-3 py-1 rounded-full"></span>
-                </div>
-                <p class="text-slate-500 text-xs mt-3">Charged via invoice after your consultation</p>
-            </div>
-
-            <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
-                <p class="text-red-300 text-sm font-medium mb-2">This includes:</p>
-                <ul class="text-red-200/80 text-sm space-y-1">
-                    <li>• Callback within 15 minutes from a Senior HR Consultant</li>
-                    <li>• Expert guidance on your urgent situation</li>
-                    <li>• Immediate action plan and next steps</li>
-                    <li>• Follow-up summary email</li>
-                </ul>
-            </div>
-
-            <div class="flex gap-3">
-                <button onclick="confirmCrisisSubmission()" 
-                        class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-4 px-6 rounded-lg transition-all text-lg">
-                    🚨 Confirm &amp; Get Help Now
-                </button>
-                <button onclick="closeCrisisPricingModal()" 
-                        class="px-6 py-4 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
-                    Cancel
-                </button>
-            </div>
         </div>
     </div>
 
@@ -6103,11 +5992,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="font-semibold">Fast Food Industry Award</div>
                         <div class="text-xs opacity-70">QSR, takeaway, delivery</div>
                     </button>
-                    <button onclick="saveOnboardingAnswer('primaryAward', 'Restaurant Industry Award')" 
-                            class="w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Restaurant Industry Award</div>
-                        <div class="text-xs opacity-70">MA000119 — restaurants, catering, cafés</div>
-                    </button>
                     <button onclick="saveOnboardingAnswer('primaryAward', 'Not sure')" 
                             class="w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
                         <div class="font-semibold">🤷 Not sure</div>
@@ -6568,13 +6452,9 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="font-semibold">Weekdays (Mon-Fri) - Daytime</div>
                         <div class="text-xs opacity-70">Regular business hours</div>
                     </button>
-                    <button onclick="wizardAnswer('hours', 'weekday-evening')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Weekdays (Mon-Fri) - Evening</div>
-                        <div class="text-xs opacity-70">7pm to midnight</div>
-                    </button>
                     <button onclick="wizardAnswer('hours', 'weekday-night')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Weekdays (Mon-Fri) - Night</div>
-                        <div class="text-xs opacity-70">Midnight to 7am</div>
+                        <div class="font-semibold">Weekdays (Mon-Fri) - Evenings/Nights</div>
+                        <div class="text-xs opacity-70">After 7pm or late shifts</div>
                     </button>
                     <button onclick="wizardAnswer('hours', 'saturday')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
                         <div class="font-semibold">Saturdays</div>
@@ -6662,14 +6542,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
 
                 <div class="flex gap-3 mt-6">
-                    <button onclick="openEmploymentContract()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
-                        📝 Create Employment Contract
+                    <button onclick="downloadWizardResults()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+                        📄 Download Summary
                     </button>
                     <button onclick="resetWizard()" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
                         Start Over
-                    </button>
-                    <button onclick="closeToolModal('awardWizardModal')" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
-                        ✕ Close
                     </button>
                 </div>
             </div>
@@ -7075,7 +6952,7 @@ Be as specific as possible!"></textarea>
 
         <!-- AI Generation Loading -->
         <div id="documentGenerating" class="hidden text-center py-12">
-            <div class="fitz-bot fitz-xl fitz-breathe mb-4 mx-auto"></div>
+            <div class="text-6xl mb-4 animate-bounce">🤖</div>
             <h3 class="text-amber-400 font-bold text-xl mb-2">Fitz is generating your document...</h3>
             <p class="text-slate-400 text-sm">This may take 10-20 seconds</p>
             <div class="mt-6 flex justify-center gap-2">
@@ -7135,7 +7012,7 @@ Be as specific as possible!"></textarea>
                     <span>CRITICAL: This document MUST be reviewed by a consultant before use</span>
                 </p>
                 <p class="text-red-200 text-xs">
-                    Contact: <a href="mailto:support@fitzhr.com" class="underline hover:text-red-100">support@fitzhr.com</a>
+                    Contact: <a href="/cdn-cgi/l/email-protection#2e5d5b5e5e415c5a6e48475a54465c004d4143" class="underline hover:text-red-100"><span class="__cf_email__" data-cfemail="493a3c3939263b3d092f203d33213b672a2624">[email&#160;protected]</span></a>
                 </p>
             </div>
         </div>
@@ -7252,7 +7129,7 @@ Be as specific as possible!"></textarea>
 
         <div class="mt-6 text-center">
             <p class="text-slate-400 text-sm">
-                ✉️ Need help? <a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline font-semibold">support@fitzhr.com</a>
+                ✉️ Need help? <a href="/cdn-cgi/l/email-protection#a5d6d0d5d5cad7d1e5c3ccd1dfcdd78bc6cac8" class="text-amber-400 hover:underline font-semibold"><span class="__cf_email__" data-cfemail="9cefe9ececf3eee8dcfaf5e8e6f4eeb2fff3f1">[email&#160;protected]</span></a>
             </p>
         </div>
     </div>
@@ -7493,7 +7370,6 @@ Be as specific as possible!"></textarea>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 1 free template</li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR Tools</li>
                     <li class="flex items-center gap-2 text-slate-500"><span>–</span> Expert reviews</li>
-                    <li class="flex items-center gap-2"><span class="text-red-400">🚨</span> Crisis Support <span class="text-slate-500">$320</span></li>
                 </ul>
                 
                 <button id="planBtn_free" onclick="closeSubscriptionModal()" 
@@ -7518,7 +7394,6 @@ Be as specific as possible!"></textarea>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>All</strong> templates</li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong id="starterReviews">96</strong> <span id="starterReviewsPeriod">credits/year</span></li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR Tools</li>
-                    <li class="flex items-center gap-2"><span class="text-red-400">🚨</span> Crisis Support <span class="text-green-400 font-semibold">10% off</span></li>
                 </ul>
                 
                 <button id="planBtn_starter" onclick="purchaseSubscription('starter', currentBilling)" 
@@ -7547,7 +7422,6 @@ Be as specific as possible!"></textarea>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>All</strong> templates</li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong id="proReviews">240</strong> <span id="proReviewsPeriod">credits/year</span></li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR Tools</li>
-                    <li class="flex items-center gap-2"><span class="text-red-400">🚨</span> Crisis Support <span class="text-green-400 font-semibold">25% off</span></li>
                 </ul>
                 
                 <button id="planBtn_pro" onclick="purchaseSubscription('pro', currentBilling)" 
@@ -7572,7 +7446,6 @@ Be as specific as possible!"></textarea>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>All</strong> templates</li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong id="businessReviews">600</strong> <span id="businessReviewsPeriod">credits/year</span></li>
                     <li class="flex items-center gap-2"><span class="text-green-400">✓</span> <strong>Unlimited</strong> HR Tools</li>
-                    <li class="flex items-center gap-2"><span class="text-red-400">🚨</span> Crisis Support <span class="text-green-400 font-semibold">50% off</span></li>
                 </ul>
                 
                 <button id="planBtn_business" onclick="purchaseSubscription('business', currentBilling)" 
@@ -7607,7 +7480,7 @@ Be as specific as possible!"></textarea>
         <!-- FAQ -->
         <div class="text-center text-slate-400 text-xs">
             <p>14-day money-back guarantee on paid plans. Cancel anytime.</p>
-            <p class="mt-1">Questions? <a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline">support@fitzhr.com</a></p>
+            <p class="mt-1">Questions? <a href="/cdn-cgi/l/email-protection#34474144445b464074525d404e5c461a575b59" class="text-amber-400 hover:underline"><span class="__cf_email__" data-cfemail="a7d4d2d7d7c8d5d3e7c1ced3ddcfd589c4c8ca">[email&#160;protected]</span></a></p>
         </div>
     </div>
 </div>
@@ -7815,7 +7688,7 @@ function setBilling(billing) {
         </div>
 
         <p class="text-center text-slate-500 text-xs mt-4">
-            Questions? <a href="mailto:support@fitzhr.com" class="text-amber-400">support@fitzhr.com</a>
+            Questions? <a href="/cdn-cgi/l/email-protection#5d2e282d2d322f291d3b342927352f733e3230" class="text-amber-400"><span class="__cf_email__" data-cfemail="b8cbcdc8c8d7caccf8ded1ccc2d0ca96dbd7d5">[email&#160;protected]</span></a>
         </p>
     </div>
 </div>
@@ -8042,10 +7915,10 @@ function setBilling(billing) {
         <!-- Footer -->
         <div class="bg-slate-900 rounded-b-2xl p-4 flex items-center justify-between">
             <p class="text-slate-500 text-xs">
-                Questions? <a href="mailto:support@fitzhr.com" class="text-purple-400 hover:text-purple-300">support@fitzhr.com</a>
+                Questions? <a href="/cdn-cgi/l/email-protection#8efdfbfefee1fcfacee8e7faf4e6fca0ede1e3" class="text-purple-400 hover:text-purple-300"><span class="__cf_email__" data-cfemail="374442474758454377515e434d5f451954585a">[email&#160;protected]</span></a>
             </p>
             <p class="text-slate-500 text-xs">
-                <a href="mailto:support@fitzhr.com" class="text-purple-400 hover:text-purple-300">support@fitzhr.com</a>
+                <a href="/cdn-cgi/l/email-protection#72010702021d000632141b06081a005c111d1f" class="text-purple-400 hover:text-purple-300"><span class="__cf_email__" data-cfemail="99eaece9e9f6ebedd9fff0ede3f1ebb7faf6f4">[email&#160;protected]</span></a>
             </p>
         </div>
     </div>
@@ -8120,7 +7993,7 @@ function setBilling(billing) {
             <h3 class="text-white font-bold text-lg">7. Professional Consultation</h3>
             <p>For professional HR advice and document review:</p>
             <p class="font-semibold text-amber-400">
-                Email: <a href="mailto:support@fitzhr.com" class="underline">support@fitzhr.com</a>
+                Email: <a href="/cdn-cgi/l/email-protection#1b686e6b6b74696f5b7d726f61736935787476" class="underline"><span class="__cf_email__" data-cfemail="98ebede8e8f7eaecd8fef1ece2f0eab6fbf7f5">[email&#160;protected]</span></a>
             </p>
 
             <p class="text-xs text-slate-400 mt-6">Last Updated: January 2026</p>
@@ -8193,7 +8066,7 @@ function setBilling(billing) {
             <h3 class="text-white font-bold text-lg">7. Contact Us</h3>
             <p>For privacy concerns or data requests:</p>
             <p class="font-semibold text-amber-400">
-                Email: <a href="mailto:privacy@fitzhr.com" class="underline">privacy@fitzhr.com</a>
+                Email: <a href="/cdn-cgi/l/email-protection#3b535e5757547b5d524f41534915585456" class="underline"><span class="__cf_email__" data-cfemail="f49c9198989bb4929d808e9c86da979b99">[email&#160;protected]</span></a>
             </p>
 
             <p class="text-xs text-slate-400 mt-6">Last Updated: January 2026</p>
@@ -8319,7 +8192,7 @@ function setBilling(billing) {
                     <span>Get Professional Advice</span>
                 </h3>
                 <p class="text-amber-300">
-                    Email: <a href="mailto:support@fitzhr.com" class="underline hover:text-amber-200 font-semibold">support@fitzhr.com</a>
+                    Email: <a href="/cdn-cgi/l/email-protection#bccfc9ccccd3cec8fcdad5c8c6d4ce92dfd3d1" class="underline hover:text-amber-200 font-semibold"><span class="__cf_email__" data-cfemail="ef9c9a9f9f809d9baf89869b95879dc18c8082">[email&#160;protected]</span></a>
                 </p>
             </div>
 
@@ -10007,8 +9880,7 @@ function getFallbackRates() {
             saturday: 1.5,
             sunday: 1.75,
             public_holiday: 2.5,
-            evening_after_7pm_loading: 2.81,
-            night_midnight_to_7am_loading: 4.22
+            evening_after_7pm: 1.1
         },
         casual_loading: 0.25
     };
@@ -10738,6 +10610,28 @@ function convertHTMLToPdfMake(html, metadata) {
             }
         }
     }
+
+    // Add footer
+    content.push(
+        { text: '', margin: [0, 30, 0, 0] },
+        {
+            canvas: [
+                {
+                    type: 'line',
+                    x1: 0, y1: 0,
+                    x2: 515, y2: 0,
+                    lineWidth: 1,
+                    lineColor: '#cccccc'
+                }
+            ],
+            margin: [0, 0, 0, 10]
+        },
+        { text: 'FITZ HR - AI-Powered Hospitality HR Solutions', bold: true, fontSize: 10, margin: [0, 0, 0, 4] },
+        { text: 'Email: support@fitzhr.com', fontSize: 9, margin: [0, 0, 0, 3] },
+        { text: `Generated: ${new Date().toLocaleDateString('en-AU')} at ${new Date().toLocaleTimeString('en-AU')}`, fontSize: 9, margin: [0, 0, 0, 3] },
+        { text: `Document ID: ${metadata.documentId || 'N/A'} | User: ${metadata.userName || currentUser}`, fontSize: 9, margin: [0, 0, 0, 3] },
+        { text: 'For personalised advice and document review, contact our Senior Consultants.', fontSize: 9, italics: true, color: '#666666' }
+    );
 
     // Define document with styles
     return {
@@ -13463,9 +13357,9 @@ If you have any questions about this process or need to discuss the meeting arra
 
 ${venueProfile.userName || '[Manager Name]'}
 
-Email: support@fitzhr.com
+Email: [email]
 
-Phone: [Insert Phone Number]
+Phone: [phone]
 
 We encourage you to seek advice from a union representative or legal advisor if you wish.
 
@@ -14199,7 +14093,7 @@ const CONSULTATION_TYPES = {
 // CALENDLY CONFIGURATION
 // ============================================
 const CALENDLY_CONFIG = {
-    baseUrl: 'https://calendly.com/fitzhr',
+    baseUrl: 'https://calendly.com/blakefitzgerald4',
     events: {
         zoom: 'hr-consultation-zoom',
         phone: '30min'
@@ -17540,7 +17434,7 @@ async function submitReviewRequest() {
         };
         
         console.log('📧 Sending email via EmailJS...');
-        const response = await emailjs.send('service_dfmeslf', 'template_l5asrxq', templateParams);
+        const response = await emailjs.send('service_7dz8e3q', 'template_l5asrxq', templateParams);
         
         if (response.status === 200) {
             console.log('✅ Review request sent via EmailJS');
@@ -17725,7 +17619,7 @@ function showAttachmentPromptModal(refNumber, employeeName, isFormalProcess, use
     ` : '';
     
     modal.innerHTML = `
-        <div class="bg-slate-800 rounded-2xl max-w-lg w-full border border-green-500 fade-in shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="bg-slate-800 rounded-2xl max-w-lg w-full border border-green-500 fade-in shadow-2xl">
             <!-- Header -->
             <div class="bg-gradient-to-r from-green-500 to-emerald-600 p-6 rounded-t-2xl">
                 <div class="flex items-center gap-3">
@@ -18720,7 +18614,7 @@ async function generateWordDocument(htmlContent, filename, metadata = {}) {
                 html: htmlContent,
                 metadata: {
                     documentId: metadata.documentId || generateDocumentId(),
-                    userName: metadata.userName || currentUser?.displayName || currentUser?.email || 'Unknown',
+                    userName: metadata.userName || currentUser,
                     filename: filename,
                     generatedAt: new Date().toISOString()
                 }
@@ -19370,9 +19264,6 @@ function addMessage(role, content) {
     
     let formattedContent = content;
     if (role === 'assistant') {
-        // Global fix: AI sometimes hallucinates "Fitzgerald HR" instead of "Fitz HR"
-        formattedContent = formattedContent.replace(/Fitzgerald\s*HR/gi, 'Fitz HR').replace(/FitzgeraldHR/gi, 'Fitz HR');
-        
         // Check if content already contains high-risk HTML warning
         const hasHighRiskHTML = content.includes('IMPORTANT: This matter involves legal risk');
         
@@ -19425,9 +19316,7 @@ function addMessage(role, content) {
             formattedContent = formattedContent
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\n\n/g, '</p><p class="mt-3">')
-                .replace(/info@fitzgeraldhr\.com\.au/g, '<a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline">support@fitzhr.com</a>')
-                .replace(/Fitzgerald\s*HR/gi, 'Fitz HR')
-                .replace(/FitzgeraldHR/gi, 'Fitz HR');
+                .replace(/info@fitzgeraldhr\.com\.au/g, '<a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline">support@fitzhr.com</a>');
             formattedContent = '<p>' + formattedContent + '</p>';
         } else {
             // If it has the warning, format the text AFTER the warning
@@ -19439,9 +19328,7 @@ function addMessage(role, content) {
                 textPart = textPart
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/\n\n/g, '</p><p class="mt-3">')
-                    .replace(/info@fitzgeraldhr\.com\.au/g, '<a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline">support@fitzhr.com</a>')
-                    .replace(/Fitzgerald\s*HR/gi, 'Fitz HR')
-                    .replace(/FitzgeraldHR/gi, 'Fitz HR');
+                    .replace(/info@fitzgeraldhr\.com\.au/g, '<a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline">support@fitzhr.com</a>');
                 textPart = '<p>' + textPart + '</p>';
                 
                 formattedContent = warningPart + textPart;
@@ -19525,13 +19412,6 @@ CRITICAL RULES:
 - Do NOT explain what the document is or how to use it
 - Do NOT ask for more information - use what is provided
 
-CRITICAL CONTACT DETAILS RULES:
-- The company name is "Fitz HR" - NEVER use "Fitzgerald HR"
-- The contact email is "support@fitzhr.com" - NEVER use any @fitzgeraldhr email
-- NEVER include personal mobile or phone numbers in generated documents
-- For phone fields, use "[Insert Phone Number]" as placeholder
-- For email fields in document contact sections, use "support@fitzhr.com"
-
 If you output anything other than the actual document, you are violating the strict mode.
 
 BEGIN DOCUMENT OUTPUT:
@@ -19556,23 +19436,6 @@ BEGIN DOCUMENT OUTPUT:
 
         const data = await response.json();
         let documentContent = data.message;
-        
-        // Fix AI hallucinating "Fitzgerald HR" and old contact details
-        documentContent = documentContent.replace(/Fitzgerald\s*HR/gi, 'Fitz HR');
-        documentContent = documentContent.replace(/FitzgeraldHR/gi, 'Fitz HR');
-        documentContent = documentContent.replace(/info@fitzgeraldhr\.com\.au/gi, 'support@fitzhr.com');
-        documentContent = documentContent.replace(/info@fitzgeraldhr\.com/gi, 'support@fitzhr.com');
-        documentContent = documentContent.replace(/fitzgeraldhr\.com\.au/gi, 'fitzhr.com');
-        documentContent = documentContent.replace(/fitzgeraldhr\.com/gi, 'fitzhr.com');
-        
-        // Strip any Australian mobile/phone numbers (04XX XXX XXX or 0X XXXX XXXX patterns)
-        documentContent = documentContent.replace(/\b0[45]\d{2}[\s.-]?\d{3}[\s.-]?\d{3}\b/g, '[Phone Number Removed]');
-        documentContent = documentContent.replace(/\b0[2378]\s?\d{4}\s?\d{4}\b/g, '[Phone Number Removed]');
-        documentContent = documentContent.replace(/\+61\s?\d[\s.-]?\d{4}[\s.-]?\d{4}/g, '[Phone Number Removed]');
-        
-        // Remove any lines that look like exposed personal phone numbers
-        documentContent = documentContent.replace(/Phone:\s*\[?Phone Number Removed\]?/gi, 'Phone: [Insert Phone Number]');
-        documentContent = documentContent.replace(/Mobile:\s*\[?Phone Number Removed\]?/gi, 'Mobile: [Insert Phone Number]');
         
         // Post-process: If response still starts with conversational text, try to extract the document
         if (documentContent.toLowerCase().startsWith('i understand') || 
@@ -19757,28 +19620,6 @@ function generateExcelSpreadsheet(data, filename, sheetName = 'Data') {
 // CRISIS MODE
 // ========================================
 
-// Crisis Mode pricing by tier
-const CRISIS_PRICING = {
-    free:         { price: 320, discount: 0,  label: null },
-    starter:      { price: 288, discount: 10, label: '10% Starter Discount' },
-    pro:          { price: 240, discount: 25, label: '25% Pro Discount' },
-    business:     { price: 160, discount: 50, label: '50% Business Discount' }
-};
-
-// Store crisis form data between modals
-let crisisFormData = {};
-
-const CRISIS_TYPE_LABELS = {
-    'injury': 'Workplace Injury',
-    'harassment': 'Sexual Harassment / Bullying',
-    'theft': 'Theft / Serious Misconduct',
-    'walkout': 'Employee Walkout / Strike',
-    'discrimination': 'Discrimination Complaint',
-    'violence': 'Workplace Violence / Threat',
-    'death': 'Death / Medical Emergency',
-    'other': 'Other Urgent Matter'
-};
-
 function activateCrisisMode() {
     document.getElementById('crisisModal').classList.remove('hidden');
     trackEvent('crisis_mode_activated', { user: currentUser });
@@ -19787,17 +19628,12 @@ function activateCrisisMode() {
 function closeCrisisModal() {
     document.getElementById('crisisModal').classList.add('hidden');
 }
-
-function closeCrisisPricingModal() {
-    document.getElementById('crisisPricingModal').classList.add('hidden');
-}
-
 /**
- * Validates crisis form, stores data, then shows pricing confirmation modal
+ * Submits crisis form to backend for urgent consultant callback
+ * Shows loading state and handles errors gracefully
+ * @returns {Promise<void>}
  */
-function submitCrisis() {
-    console.log('🚨 submitCrisis() called');
-    
+async function submitCrisis() {
     const crisisType = document.getElementById('crisisType').value;
     const description = document.getElementById('crisisDescription').value;
     const phone = document.getElementById('crisisPhone').value;
@@ -19807,164 +19643,32 @@ function submitCrisis() {
         return;
     }
 
-    // Store form data so it persists between modal transitions
-    // DEBUG: Log exact tier values to diagnose pricing mismatch
-    const rawSubscriptionTier = userCredits.subscriptionTier;
-    const rawTier = userCredits.tier;
-    console.log('🚨 DEBUG - userCredits.subscriptionTier:', JSON.stringify(rawSubscriptionTier));
-    console.log('🚨 DEBUG - userCredits.tier:', JSON.stringify(rawTier));
-    console.log('🚨 DEBUG - Full userCredits:', JSON.stringify(userCredits));
-    
-    // Normalize tier to lowercase to handle 'Pro', 'PRO', 'professional' etc
-    const rawTierValue = (userCredits.subscriptionTier || userCredits.tier || 'free').toLowerCase().trim();
-    
-    // Map any variations to our pricing keys
-    const tierMap = {
-        'free': 'free',
-        'starter': 'starter',
-        'pro': 'pro',
-        'professional': 'pro',
-        'business': 'business',
-        'enterprise': 'business'
-    };
-    const tier = tierMap[rawTierValue] || 'free';
-    const pricing = CRISIS_PRICING[tier] || CRISIS_PRICING.free;
-    
-    console.log('🚨 DEBUG - Raw tier value:', JSON.stringify(rawTierValue));
-    console.log('🚨 DEBUG - Mapped tier:', tier);
-    console.log('🚨 DEBUG - Pricing:', JSON.stringify(pricing));
-    
-    crisisFormData = {
-        crisisType,
-        description,
-        phone,
-        tier,
-        pricing
-    };
-    
-    console.log('🚨 Crisis data stored:', crisisFormData);
+    const submitBtn = document.querySelector('#crisisModal button[onclick="submitCrisis()"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="animate-pulse">⏳ Sending...</span>';
 
-    // Update pricing modal display
-    const priceEl = document.getElementById('crisisPrice');
-    const originalPriceEl = document.getElementById('crisisOriginalPrice');
-    const discountBadge = document.getElementById('crisisDiscountBadge');
-
-    priceEl.textContent = `$${pricing.price}`;
-
-    if (pricing.discount > 0) {
-        originalPriceEl.textContent = '$320';
-        originalPriceEl.classList.remove('hidden');
-        discountBadge.classList.remove('hidden');
-        discountBadge.querySelector('span').textContent = `✨ ${pricing.label}`;
-    } else {
-        originalPriceEl.classList.add('hidden');
-        discountBadge.classList.add('hidden');
-    }
-
-    // Hide crisis form, show pricing confirmation
-    document.getElementById('crisisModal').classList.add('hidden');
-    document.getElementById('crisisPricingModal').classList.remove('hidden');
-    
-    console.log('🚨 Pricing modal shown');
-    trackEvent('crisis_pricing_shown', { user: currentUser, tier: tier, price: pricing.price });
-}
-
-/**
- * Confirmed by user - sends crisis alert to backend + confirmation email
- */
-async function confirmCrisisSubmission() {
-    console.log('🚨 confirmCrisisSubmission() called');
-    
-    const { crisisType, description, phone, tier, pricing } = crisisFormData;
-    
-    if (!crisisType || !phone) {
-        showAlert('Crisis data missing. Please try again.');
-        closeCrisisPricingModal();
-        activateCrisisMode();
-        return;
-    }
-
-    const confirmBtn = document.querySelector('#crisisPricingModal button[onclick="confirmCrisisSubmission()"]');
-    const originalText = confirmBtn.innerHTML;
-    confirmBtn.disabled = true;
-    confirmBtn.innerHTML = '<span class="animate-pulse">⏳ Sending urgent alert...</span>';
-
-    let telegramSuccess = false;
-    let crisisId = 'CR-' + Date.now();
-
-    // Step 1: Try sending Telegram alert
     try {
-        console.log('🚨 Sending Telegram alert...');
         const response = await fetch(CONFIG.API.CRISIS_ENDPOINT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                crisisType, 
-                description, 
-                phone, 
-                user: currentUser,
-                tier: tier,
-                chargeAmount: pricing.price,
-                discount: pricing.discount
-            })
+            body: JSON.stringify({ crisisType, description, phone, user: currentUser })
         });
 
         const result = await response.json();
 
         if (response.ok) {
-            crisisId = result.crisisId || crisisId;
-            telegramSuccess = true;
-            console.log('✅ Telegram alert sent, Crisis ID:', crisisId);
+            showAlert(`🚨 URGENT ALERT SENT\n\nCrisis ID: ${result.crisisId}\n\nA consultant will call ${phone} within 15 minutes.`);
+            closeCrisisModal();
         } else {
-            console.warn('⚠️ Telegram endpoint returned error:', result);
+            throw new Error(result.error || 'Failed');
         }
-    } catch (telegramError) {
-        console.warn('⚠️ Telegram alert failed:', telegramError);
+    } catch (error) {
+        showAlert(`⚠️ ALERT FAILED\n\nPLEASE EMAIL: support@fitzhr.com\n\nYour submission is logged locally.`);
+    } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
     }
-
-    // Step 2: Send confirmation email (always attempt, regardless of Telegram)
-    try {
-        console.log('📧 Sending crisis confirmation email...');
-        await emailjs.send('service_dfmeslf', 'template_crisis_confirm', {
-            crisis_id: crisisId,
-            crisis_type: CRISIS_TYPE_LABELS[crisisType] || crisisType,
-            description: description,
-            user_name: currentUser?.displayName || 'N/A',
-            user_email: currentUser?.email || 'N/A',
-            phone_number: phone,
-            charge_amount: `$${pricing.price}`,
-            discount_applied: pricing.discount > 0 ? `${pricing.discount}% (${pricing.label})` : 'None',
-            user_tier: tier.charAt(0).toUpperCase() + tier.slice(1),
-            submitted_date: new Date().toLocaleString('en-AU', {
-                dateStyle: 'full',
-                timeStyle: 'short',
-                timeZone: 'Australia/Sydney'
-            })
-        });
-        console.log('✅ Crisis confirmation email sent to support');
-    } catch (emailError) {
-        console.warn('⚠️ Crisis confirmation email failed:', emailError);
-    }
-
-    // Step 3: Show result to user
-    closeCrisisPricingModal();
-    
-    if (telegramSuccess) {
-        showAlert(`🚨 URGENT ALERT SENT\n\nCrisis ID: ${crisisId}\n\nA Senior Consultant will call ${phone} within 15 minutes.\n\nA $${pricing.price} invoice will be sent after your consultation.`);
-    } else {
-        showAlert(`🚨 CRISIS LOGGED\n\nCrisis ID: ${crisisId}\n\nOur team has been notified and will call ${phone} as soon as possible.\n\nIf urgent, also email: support@fitzhr.com\n\nA $${pricing.price} invoice will be sent after your consultation.`);
-    }
-    
-    // Reset crisis form
-    document.getElementById('crisisType').value = '';
-    document.getElementById('crisisDescription').value = '';
-    document.getElementById('crisisPhone').value = '';
-    crisisFormData = {};
-    
-    confirmBtn.disabled = false;
-    confirmBtn.innerHTML = originalText;
-    
-    trackEvent('crisis_submitted', { user: currentUser, tier: tier, price: pricing.price, crisisType: crisisType, telegramSuccess: telegramSuccess });
 }
 
 // ========================================
@@ -21687,24 +21391,30 @@ async function downloadJobDescription(format) {
 async function downloadJobDescriptionUnlocked(format) {
     const content = jdData.generatedContent || document.getElementById('jdPreviewContent').innerText;
     const filename = `Job_Description_${jdData.jobTitle.replace(/\s+/g, '_')}`;
-    const today = new Date().toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
     
     if (format === 'docx') {
         try {
-            // Build a full styled HTML document for client-side DOCX generation
-            const fullHTML = buildJobDescriptionHTML(content, today);
-            const blob = htmlDocx.asBlob(fullHTML);
-            saveAs(blob, `${filename}.docx`);
+            // Convert markdown-style content to HTML
+            const htmlContent = convertMarkdownToHTML(content);
             
-            showToast('✅ Job description downloaded as DOCX', 'success');
+            // Generate Word document using existing function
+            await generateWordDocument(htmlContent, `${filename}.docx`, {
+                documentId: generateDocumentId(),
+                userName: currentUser,
+                documentType: 'Job Description'
+            });
+            
             trackEvent('job_description_downloaded', { format: 'docx', jobTitle: jdData.jobTitle });
         } catch (error) {
-            showToast('Error generating Word document. Please try PDF instead.', 'error');
+            showToast('Error generating Word document', 'error');
         }
     } else if (format === 'pdf') {
         try {
-            // Pass raw content directly — generatePDFDocument handles its own conversion
-            await generatePDFDocument(content, `${filename}.pdf`, {
+            // Convert markdown-style content to HTML
+            const htmlContent = convertMarkdownToHTML(content);
+            
+            // Generate PDF using existing function
+            await generatePDFDocument(htmlContent, `${filename}.pdf`, {
                 documentId: generateDocumentId(),
                 userName: currentUser,
                 documentType: 'Job Description'
@@ -21715,63 +21425,6 @@ async function downloadJobDescriptionUnlocked(format) {
             showToast('Error generating PDF document', 'error');
         }
     }
-}
-
-// Build full styled HTML document for Job Description DOCX export
-function buildJobDescriptionHTML(content, today) {
-    // Convert markdown formatting to HTML
-    let formattedContent = content
-        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/^[•\-\*] (.+)$/gm, '<li>$1</li>')
-        .replace(/(<li>.*?<\/li>\s*)+/gs, '<ul>$&</ul>');
-    
-    // Convert remaining plain text lines to paragraphs
-    formattedContent = formattedContent.split('\n\n').map(block => {
-        block = block.trim();
-        if (!block) return '';
-        if (block.startsWith('<h') || block.startsWith('<ul') || block.startsWith('<li')) return block;
-        return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
-    }).join('\n');
-
-    return `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 20px; color: #000; }
-        h1 { color: #2c3e50; border-bottom: 3px solid #f39c12; padding-bottom: 10px; margin-bottom: 20px; font-size: 22px; }
-        h2 { color: #34495e; margin-top: 25px; border-bottom: 2px solid #bdc3c7; padding-bottom: 5px; font-size: 16px; }
-        h3 { color: #555; margin-top: 18px; font-size: 14px; }
-        p { margin: 8px 0; font-size: 11px; }
-        ul { margin: 8px 0 8px 20px; padding: 0; }
-        li { margin: 4px 0; font-size: 11px; }
-        strong { font-weight: bold; }
-        .info-box { background: #ecf0f1; padding: 15px; border-radius: 8px; margin-bottom: 25px; }
-        .info-box p { margin: 4px 0; }
-        .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #bdc3c7; text-align: center; color: #7f8c8d; font-size: 10px; }
-    </style>
-</head>
-<body>
-    <h1>Job Description: ${jdData.jobTitle}</h1>
-    
-    <div class="info-box">
-        <p><strong>Position:</strong> ${jdData.jobTitle}</p>
-        <p><strong>Experience Level:</strong> ${jdData.experienceLevel || 'N/A'}</p>
-        ${jdData.award ? `<p><strong>Award:</strong> ${jdData.award}</p>` : ''}
-        ${jdData.classification ? `<p><strong>Classification:</strong> ${jdData.classification}</p>` : ''}
-    </div>
-
-    ${formattedContent}
-
-    <div class="footer">
-        <p>Generated by Fitz HR on ${today}</p>
-        <p>This job description is designed to comply with Australian employment standards</p>
-    </div>
-</body>
-</html>`;
 }
 
 function resetJobDescription() {
@@ -22160,92 +21813,37 @@ async function downloadPositionDescription(format = 'pdf') {
         saveUserCredits();
     }
     
-    const content = pdData.generatedContent;
-    const filename = `Position_Description_${pdData.positionTitle.replace(/\s+/g, '_')}`;
-    const today = new Date().toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
+    showToast(`Preparing ${format.toUpperCase()} download...`, 'info');
     
-    if (format === 'docx') {
-        try {
-            const fullHTML = buildPositionDescriptionHTML(content, today);
-            const blob = htmlDocx.asBlob(fullHTML);
-            saveAs(blob, `${filename}.docx`);
-            
-            showToast('✅ Position description downloaded as DOCX', 'success');
-            trackEvent('position_description_downloaded', { format: 'docx', positionTitle: pdData.positionTitle });
-        } catch (error) {
-            showToast('Error generating Word document. Please try PDF instead.', 'error');
-        }
-    } else if (format === 'pdf') {
-        try {
-            // Pass raw content directly — generatePDFDocument handles its own conversion
-            await generatePDFDocument(content, `${filename}.pdf`, {
-                documentId: generateDocumentId(),
-                userName: currentUser,
-                documentType: 'Position Description'
-            });
-            
-            trackEvent('position_description_downloaded', { format: 'pdf', positionTitle: pdData.positionTitle });
-        } catch (error) {
-            showToast('Error generating PDF document', 'error');
-        }
+    try {
+        const response = await fetch('/.netlify/functions/generate-document', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                content: pdData.generatedContent,
+                format: format,
+                filename: `Position_Description_${pdData.positionTitle.replace(/\s+/g, '_')}`,
+                documentType: 'position_description'
+            })
+        });
+        
+        if (!response.ok) throw new Error('Download failed');
+        
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `Position_Description_${pdData.positionTitle.replace(/\s+/g, '_')}.${format}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        
+        showToast(`Position description downloaded as ${format.toUpperCase()}!`, 'success');
+        trackEvent('position_description_downloaded', { format: format, positionTitle: pdData.positionTitle });
+    } catch (error) {
+        showToast('Error downloading document. Please try again.', 'error');
     }
-}
-
-// Build full styled HTML document for Position Description DOCX export
-function buildPositionDescriptionHTML(content, today) {
-    // Convert markdown formatting to HTML
-    let formattedContent = content
-        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/^[•\-\*] (.+)$/gm, '<li>$1</li>')
-        .replace(/(<li>.*?<\/li>\s*)+/gs, '<ul>$&</ul>');
-    
-    // Convert remaining plain text lines to paragraphs
-    formattedContent = formattedContent.split('\n\n').map(block => {
-        block = block.trim();
-        if (!block) return '';
-        if (block.startsWith('<h') || block.startsWith('<ul') || block.startsWith('<li')) return block;
-        return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
-    }).join('\n');
-
-    return `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 20px; color: #000; }
-        h1 { color: #2c3e50; border-bottom: 3px solid #f39c12; padding-bottom: 10px; margin-bottom: 20px; font-size: 22px; }
-        h2 { color: #34495e; margin-top: 25px; border-bottom: 2px solid #bdc3c7; padding-bottom: 5px; font-size: 16px; }
-        h3 { color: #555; margin-top: 18px; font-size: 14px; }
-        p { margin: 8px 0; font-size: 11px; }
-        ul { margin: 8px 0 8px 20px; padding: 0; }
-        li { margin: 4px 0; font-size: 11px; }
-        strong { font-weight: bold; }
-        .info-box { background: #ecf0f1; padding: 15px; border-radius: 8px; margin-bottom: 25px; }
-        .info-box p { margin: 4px 0; }
-        .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #bdc3c7; text-align: center; color: #7f8c8d; font-size: 10px; }
-    </style>
-</head>
-<body>
-    <h1>Position Description: ${pdData.positionTitle}</h1>
-    
-    <div class="info-box">
-        <p><strong>Position Title:</strong> ${pdData.positionTitle}</p>
-        ${pdData.department ? `<p><strong>Department:</strong> ${pdData.department}</p>` : ''}
-        ${pdData.reportsTo ? `<p><strong>Reports To:</strong> ${pdData.reportsTo}</p>` : ''}
-        <p><strong>Employment Type:</strong> ${pdData.employmentType || 'N/A'}</p>
-    </div>
-
-    ${formattedContent}
-
-    <div class="footer">
-        <p>Generated by Fitz HR on ${today}</p>
-        <p>This position description is designed to comply with Australian employment standards</p>
-    </div>
-</body>
-</html>`;
 }
 
 function resetPositionDescription() {
@@ -22499,24 +22097,30 @@ async function downloadInterviewQuestions(format) {
     
     const content = iqData.generatedContent || document.getElementById('iqPreviewContent').innerText;
     const filename = `Interview_Questions_${iqData.jobTitle.replace(/\s+/g, '_')}`;
-    const today = new Date().toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
     
     if (format === 'docx') {
         try {
-            // Build a full styled HTML document for client-side DOCX generation
-            const fullHTML = buildInterviewQuestionsHTML(content, today);
-            const blob = htmlDocx.asBlob(fullHTML);
-            saveAs(blob, `${filename}.docx`);
+            // Convert markdown-style content to HTML
+            const htmlContent = convertMarkdownToHTML(content);
             
-            showToast('✅ Interview questions downloaded as DOCX', 'success');
+            // Generate Word document using existing function
+            await generateWordDocument(htmlContent, `${filename}.docx`, {
+                documentId: generateDocumentId(),
+                userName: currentUser,
+                documentType: 'Interview Questions'
+            });
+            
             trackEvent('interview_questions_downloaded', { format: 'docx', jobTitle: iqData.jobTitle });
         } catch (error) {
-            showToast('Error generating Word document. Please try PDF instead.', 'error');
+            showToast('Error generating Word document', 'error');
         }
     } else if (format === 'pdf') {
         try {
-            // Pass raw content directly — generatePDFDocument handles its own conversion
-            await generatePDFDocument(content, `${filename}.pdf`, {
+            // Convert markdown-style content to HTML
+            const htmlContent = convertMarkdownToHTML(content);
+            
+            // Generate PDF using existing function
+            await generatePDFDocument(htmlContent, `${filename}.pdf`, {
                 documentId: generateDocumentId(),
                 userName: currentUser,
                 documentType: 'Interview Questions'
@@ -22527,63 +22131,6 @@ async function downloadInterviewQuestions(format) {
             showToast('Error generating PDF document', 'error');
         }
     }
-}
-
-// Build full styled HTML document for Interview Questions DOCX export
-function buildInterviewQuestionsHTML(content, today) {
-    // Convert markdown formatting to HTML
-    let formattedContent = content
-        .replace(/^### (.+)$/gm, '<h3>$1</h3>')
-        .replace(/^## (.+)$/gm, '<h2>$1</h2>')
-        .replace(/^# (.+)$/gm, '<h1>$1</h1>')
-        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-        .replace(/^[•\-\*] (.+)$/gm, '<li>$1</li>')
-        .replace(/(<li>.*?<\/li>\s*)+/gs, '<ul>$&</ul>');
-    
-    // Convert remaining plain text lines to paragraphs
-    formattedContent = formattedContent.split('\n\n').map(block => {
-        block = block.trim();
-        if (!block) return '';
-        if (block.startsWith('<h') || block.startsWith('<ul') || block.startsWith('<li')) return block;
-        return '<p>' + block.replace(/\n/g, '<br>') + '</p>';
-    }).join('\n');
-
-    return `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 20px; color: #000; }
-        h1 { color: #2c3e50; border-bottom: 3px solid #f39c12; padding-bottom: 10px; margin-bottom: 20px; font-size: 22px; }
-        h2 { color: #34495e; margin-top: 25px; border-bottom: 2px solid #bdc3c7; padding-bottom: 5px; font-size: 16px; }
-        h3 { color: #555; margin-top: 18px; font-size: 14px; }
-        p { margin: 8px 0; font-size: 11px; }
-        ul { margin: 8px 0 8px 20px; padding: 0; }
-        li { margin: 4px 0; font-size: 11px; }
-        strong { font-weight: bold; }
-        .info-box { background: #ecf0f1; padding: 15px; border-radius: 8px; margin-bottom: 25px; }
-        .info-box p { margin: 4px 0; }
-        .footer { margin-top: 40px; padding-top: 20px; border-top: 2px solid #bdc3c7; text-align: center; color: #7f8c8d; font-size: 10px; }
-    </style>
-</head>
-<body>
-    <h1>Interview Questions: ${iqData.jobTitle}</h1>
-    
-    <div class="info-box">
-        <p><strong>Position:</strong> ${iqData.jobTitle}</p>
-        <p><strong>Experience Level:</strong> ${iqData.experienceLevel}</p>
-        <p><strong>Question Categories:</strong> ${iqData.categories.join(', ')}</p>
-        <p><strong>Number of Questions:</strong> ${iqData.questionCount}</p>
-    </div>
-
-    ${formattedContent}
-
-    <div class="footer">
-        <p>Generated by Fitz HR on ${today}</p>
-        <p>These questions are designed to be legally compliant under Australian employment law</p>
-    </div>
-</body>
-</html>`;
 }
 
 function resetInterviewQuestions() {
@@ -22779,35 +22326,28 @@ async function downloadReferenceCheck(format) {
 
 // Unlocked download (called after credit payment)
 async function downloadReferenceCheckUnlocked(format) {
+    // Get the content from preview
+    const content = document.getElementById('rcPreviewContent').innerHTML;
     const candidateName = document.getElementById('rcCandidateName').value.trim();
-    const position = document.getElementById('rcPosition').value.trim();
-    const refereeName = document.getElementById('rcRefereeName').value.trim();
-    const relationship = document.getElementById('rcRelationship').value.trim();
-    const company = document.getElementById('rcCompany').value.trim();
-    const phone = document.getElementById('rcPhone').value.trim();
-    const startDate = document.getElementById('rcStartDate').value.trim();
-    const endDate = document.getElementById('rcEndDate').value.trim();
     const filename = `Reference_Check_${candidateName.replace(/\s+/g, '_')}`;
-    const today = new Date().toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
-    
-    const rcFields = { candidateName, position, refereeName, relationship, company, phone, startDate, endDate };
     
     if (format === 'docx') {
         try {
-            const fullHTML = buildReferenceCheckHTML(rcFields, today);
-            const blob = htmlDocx.asBlob(fullHTML);
-            saveAs(blob, `${filename}.docx`);
+            // Generate Word document using existing function
+            await generateWordDocument(content, `${filename}.docx`, {
+                documentId: generateDocumentId(),
+                userName: currentUser,
+                documentType: 'Reference Check'
+            });
             
-            showToast('✅ Reference check downloaded as DOCX', 'success');
             trackEvent('reference_check_downloaded', { format: 'docx', candidateName: candidateName });
         } catch (error) {
-            showToast('Error generating Word document. Please try PDF instead.', 'error');
+            showToast('Error generating Word document', 'error');
         }
     } else if (format === 'pdf') {
         try {
-            // Build clean text content for PDF generation
-            const pdfContent = buildReferenceCheckText(rcFields);
-            await generatePDFDocument(pdfContent, `${filename}.pdf`, {
+            // Generate PDF using existing function
+            await generatePDFDocument(content, `${filename}.pdf`, {
                 documentId: generateDocumentId(),
                 userName: currentUser,
                 documentType: 'Reference Check'
@@ -22818,179 +22358,6 @@ async function downloadReferenceCheckUnlocked(format) {
             showToast('Error generating PDF document', 'error');
         }
     }
-}
-
-// Build full styled HTML document for Reference Check DOCX export
-function buildReferenceCheckHTML(fields, today) {
-    return `<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body { font-family: Arial, sans-serif; line-height: 1.6; max-width: 800px; margin: 40px auto; padding: 20px; color: #000; }
-        h1 { color: #2c3e50; border-bottom: 3px solid #f39c12; padding-bottom: 10px; margin-bottom: 5px; font-size: 22px; text-align: center; }
-        .subtitle { text-align: center; color: #777; margin-bottom: 25px; font-size: 12px; }
-        h2 { color: #34495e; margin-top: 25px; border-bottom: 2px solid #bdc3c7; padding-bottom: 5px; font-size: 16px; }
-        p { margin: 6px 0; font-size: 11px; }
-        .info-box { background: #ecf0f1; padding: 15px; border-radius: 8px; margin-bottom: 25px; }
-        .info-box p { margin: 4px 0; }
-        .question-block { margin: 15px 0; padding: 12px; border-left: 4px solid #3498db; background: #f8f9fa; }
-        .question-block p.question { font-weight: bold; margin-bottom: 8px; font-size: 11px; }
-        .question-block p.answer { color: #777; font-size: 11px; }
-        .checkbox-line { color: #555; font-size: 11px; margin-top: 8px; }
-        .red-flag { margin: 20px 0; padding: 12px; border-left: 4px solid #e74c3c; background: #fdf2f2; }
-        .red-flag p.title { font-weight: bold; color: #c0392b; margin-bottom: 6px; }
-        .red-flag ul { margin: 5px 0 5px 20px; padding: 0; }
-        .red-flag li { font-size: 11px; margin: 3px 0; color: #555; }
-        .sign-off { margin-top: 30px; padding-top: 15px; border-top: 2px solid #bdc3c7; }
-        .sign-off p { color: #555; font-size: 11px; margin: 8px 0; }
-        .legal-note { margin-top: 20px; padding: 12px; background: #eaf4fe; border-left: 4px solid #3498db; font-size: 10px; color: #555; }
-        .footer { margin-top: 30px; padding-top: 15px; border-top: 2px solid #bdc3c7; text-align: center; color: #7f8c8d; font-size: 10px; }
-    </style>
-</head>
-<body>
-    <h1>EMPLOYMENT REFERENCE CHECK</h1>
-    <p class="subtitle">Confidential</p>
-    
-    <div class="info-box">
-        <p><strong>Candidate:</strong> ${fields.candidateName}</p>
-        <p><strong>Position Applied For:</strong> ${fields.position}</p>
-        <p><strong>Referee:</strong> ${fields.refereeName}</p>
-        <p><strong>Relationship to Candidate:</strong> ${fields.relationship}</p>
-        <p><strong>Company:</strong> ${fields.company}</p>
-        <p><strong>Phone:</strong> ${fields.phone || 'N/A'}</p>
-        <p><strong>Employment Period:</strong> ${fields.startDate || 'N/A'} - ${fields.endDate || 'N/A'}</p>
-    </div>
-
-    <h2>Reference Check Questions</h2>
-
-    <div class="question-block">
-        <p class="question">1. Can you confirm the candidate's employment dates and position?</p>
-        <p class="answer">Answer: _______________________________________________</p>
-    </div>
-
-    <div class="question-block">
-        <p class="question">2. How would you rate their overall performance?</p>
-        <p class="checkbox-line">☐ Excellent&nbsp;&nbsp;&nbsp;☐ Good&nbsp;&nbsp;&nbsp;☐ Satisfactory&nbsp;&nbsp;&nbsp;☐ Needs Improvement</p>
-    </div>
-
-    <div class="question-block">
-        <p class="question">3. What were their key strengths?</p>
-        <p class="answer">Answer: _______________________________________________</p>
-    </div>
-
-    <div class="question-block">
-        <p class="question">4. Were there any areas for improvement?</p>
-        <p class="answer">Answer: _______________________________________________</p>
-    </div>
-
-    <div class="question-block">
-        <p class="question">5. How did they handle pressure and busy periods?</p>
-        <p class="answer">Answer: _______________________________________________</p>
-    </div>
-
-    <div class="question-block">
-        <p class="question">6. Were they reliable and punctual?</p>
-        <p class="checkbox-line">☐ Always&nbsp;&nbsp;&nbsp;☐ Usually&nbsp;&nbsp;&nbsp;☐ Sometimes&nbsp;&nbsp;&nbsp;☐ Rarely</p>
-    </div>
-
-    <div class="question-block">
-        <p class="question">7. How did they work with team members and customers?</p>
-        <p class="answer">Answer: _______________________________________________</p>
-    </div>
-
-    <div class="question-block">
-        <p class="question">8. Why did they leave?</p>
-        <p class="answer">Answer: _______________________________________________</p>
-    </div>
-
-    <div class="question-block">
-        <p class="question">9. Would you re-employ them?</p>
-        <p class="checkbox-line">☐ Yes&nbsp;&nbsp;&nbsp;☐ No&nbsp;&nbsp;&nbsp;☐ Maybe</p>
-    </div>
-
-    <div class="red-flag">
-        <p class="title">⚠ RED FLAGS TO NOTE:</p>
-        <ul>
-            <li>Hesitation or vague answers</li>
-            <li>Contradictions with candidate's claims</li>
-            <li>Refusal to answer specific questions</li>
-            <li>Negative tone or body language</li>
-        </ul>
-    </div>
-
-    <div class="sign-off">
-        <p>Completed by: ___________________________________</p>
-        <p>Date: ___________________________________</p>
-        <p>Signature: ___________________________________</p>
-    </div>
-
-    <div class="legal-note">
-        <strong>Legal Compliance Note:</strong> This reference check complies with Australian privacy laws. 
-        Information collected is confidential and used solely for employment assessment purposes.
-    </div>
-
-    <div class="footer">
-        <p>Generated by Fitz HR on ${today}</p>
-    </div>
-</body>
-</html>`;
-}
-
-// Build clean text content for Reference Check PDF export
-function buildReferenceCheckText(fields) {
-    return `# EMPLOYMENT REFERENCE CHECK
-Confidential
-
-## Candidate Details
-Candidate: ${fields.candidateName}
-Position Applied For: ${fields.position}
-Referee: ${fields.refereeName}
-Relationship to Candidate: ${fields.relationship}
-Company: ${fields.company}
-Phone: ${fields.phone || 'N/A'}
-Employment Period: ${fields.startDate || 'N/A'} - ${fields.endDate || 'N/A'}
-
-## Reference Check Questions
-
-### 1. Can you confirm the candidate's employment dates and position?
-Answer: _______________________________________________
-
-### 2. How would you rate their overall performance?
-☐ Excellent  ☐ Good  ☐ Satisfactory  ☐ Needs Improvement
-
-### 3. What were their key strengths?
-Answer: _______________________________________________
-
-### 4. Were there any areas for improvement?
-Answer: _______________________________________________
-
-### 5. How did they handle pressure and busy periods?
-Answer: _______________________________________________
-
-### 6. Were they reliable and punctual?
-☐ Always  ☐ Usually  ☐ Sometimes  ☐ Rarely
-
-### 7. How did they work with team members and customers?
-Answer: _______________________________________________
-
-### 8. Why did they leave?
-Answer: _______________________________________________
-
-### 9. Would you re-employ them?
-☐ Yes  ☐ No  ☐ Maybe
-
-## Red Flags to Note
-- Hesitation or vague answers
-- Contradictions with candidate's claims
-- Refusal to answer specific questions
-- Negative tone or body language
-
-Completed by: ___________________________________
-Date: ___________________________________
-Signature: ___________________________________
-
-Legal Compliance Note: This reference check complies with Australian privacy laws. Information collected is confidential and used solely for employment assessment purposes.`;
 }
 
 
@@ -23363,7 +22730,7 @@ function performSearch() {
         return `
             <div class="search-result" onclick="jumpToMessage(${index})">
                 <div class="flex items-start justify-between mb-2">
-                    <span class="text-xs text-slate-500">${conv.role === 'user' ? '👤 You' : '<span class="fitz-thinking-wrap"><span class="fitz-bot fitz-xs" style="vertical-align: middle;"></span> Fitz</span>'}</span>
+                    <span class="text-xs text-slate-500">${conv.role === 'user' ? '👤 You' : '🤖 Fitz'}</span>
                     <span class="text-xs text-slate-500">${conv.timestamp || 'Recent'}</span>
                 </div>
                 <div class="text-sm text-slate-300">${highlighted}</div>
@@ -24822,6 +24189,14 @@ async function updateUserProfile(user, message) {
     }
 }
 
+// Global admin data cache - loaded once, used by all tabs
+let adminCache = {
+    loaded: false,
+    users: [],           // { id, displayName, email, venueProfile, legalTermsAccepted, legalTermsAcceptedAt, subscriptionTier, billingCycle, reviewCreditsUsed, reviewCredits, createdAt, stripeCustomerId, generatedDocuments, conversationCount }
+    conversations: [],   // { userId, userName, userEmail, userMessage, assistantResponse, timestamp, title, messages }
+    totalMessages: 0
+};
+
 function showAdminDashboard() {
     document.getElementById('adminDashboardModal').classList.remove('hidden');
     loadAnalytics();
@@ -24831,45 +24206,95 @@ function closeAdminDashboard() {
     document.getElementById('adminDashboardModal').classList.add('hidden');
 }
 
-async function loadAnalytics() {
+async function loadAnalytics(forceRefresh = false) {
     if (!db) {
         showAlert('⚠️ Firebase not connected. Check console for errors.');
         return;
     }
     
     try {
-        // Load user count from Firebase
-        const usersSnapshot = await db.collection('users').get();
-        const userCount = usersSnapshot.size;
-        
-        // Load all conversations across all users
-        let totalConversations = 0;
-        const activeUsersToday = new Set();
-        const today = new Date().toDateString();
-        let totalMessages = 0;
-        
-        for (const userDoc of usersSnapshot.docs) {
-            const conversationsSnapshot = await db.collection('users').doc(userDoc.id).collection('conversations').get();
-            totalConversations += conversationsSnapshot.size;
+        // Only fetch from Firebase if cache is empty or force refresh
+        if (!adminCache.loaded || forceRefresh) {
+            // Reset cache
+            adminCache.users = [];
+            adminCache.conversations = [];
+            adminCache.totalMessages = 0;
             
-            conversationsSnapshot.forEach(conv => {
-                const data = conv.data();
-                // Count total messages
-                if (data.messages && Array.isArray(data.messages)) {
-                    totalMessages += data.messages.length;
-                }
-                // Check if conversation was active today
-                const timestamp = data.timestamp?.toDate ? data.timestamp.toDate() : new Date(data.timestamp || 0);
-                const lastUpdated = data.lastUpdated?.toDate ? data.lastUpdated.toDate() : timestamp;
-                if (timestamp.toDateString() === today || lastUpdated.toDateString() === today) {
-                    activeUsersToday.add(userDoc.id);
-                }
-            });
+            const usersSnapshot = await db.collection('users').get();
+            
+            for (const userDoc of usersSnapshot.docs) {
+                const userData = userDoc.data();
+                const userName = userData.displayName || userData.email || userDoc.id.substring(0, 8);
+                const userEmail = userData.email || 'N/A';
+                
+                // Cache user data
+                adminCache.users.push({
+                    id: userDoc.id,
+                    displayName: userName,
+                    email: userEmail,
+                    venueProfile: userData.venueProfile || null,
+                    legalTermsAccepted: userData.legalTermsAccepted || false,
+                    legalTermsAcceptedAt: userData.legalTermsAcceptedAt || null,
+                    subscriptionTier: (userData.subscriptionTier || 'free').toLowerCase(),
+                    billingCycle: userData.billingCycle || 'N/A',
+                    reviewCreditsUsed: userData.reviewCreditsUsed || 0,
+                    reviewCredits: userData.reviewCredits || 0,
+                    createdAt: userData.createdAt || null,
+                    stripeCustomerId: userData.stripeCustomerId || null,
+                    generatedDocuments: userData.generatedDocuments || [],
+                    conversationCount: 0
+                });
+                
+                // Cache conversations for this user
+                const conversationsSnapshot = await db.collection('users').doc(userDoc.id)
+                    .collection('conversations')
+                    .limit(50)
+                    .get();
+                
+                const userIndex = adminCache.users.length - 1;
+                adminCache.users[userIndex].conversationCount = conversationsSnapshot.size;
+                
+                conversationsSnapshot.forEach(convDoc => {
+                    const conv = convDoc.data();
+                    const messages = conv.messages || [];
+                    const lastUserMsg = messages.filter(m => m.role === 'user').pop();
+                    const lastAssistantMsg = messages.filter(m => m.role === 'assistant').pop();
+                    
+                    adminCache.totalMessages += messages.length;
+                    
+                    adminCache.conversations.push({
+                        id: convDoc.id,
+                        userId: userDoc.id,
+                        userName: userName,
+                        userEmail: userEmail,
+                        userMessage: lastUserMsg?.content ? lastUserMsg.content.substring(0, 200) : 'No user message',
+                        assistantResponse: lastAssistantMsg?.content ? lastAssistantMsg.content.substring(0, 200) : 'No response',
+                        timestamp: conv.timestamp || conv.updated || conv.created,
+                        title: conv.title || 'Untitled',
+                        messageCount: messages.length,
+                        fullText: (conv.title || '') + ' ' + messages.map(m => m.content || '').join(' ')
+                    });
+                });
+            }
+            
+            adminCache.loaded = true;
         }
         
-        // Update stats
+        // Update stats from cache
+        const userCount = adminCache.users.length;
+        const totalConversations = adminCache.conversations.length;
+        const today = new Date().toDateString();
+        const activeUsersToday = new Set();
+        
+        adminCache.conversations.forEach(conv => {
+            const timestamp = conv.timestamp?.toDate ? conv.timestamp.toDate() : new Date(conv.timestamp || 0);
+            if (timestamp.toDateString() === today) {
+                activeUsersToday.add(conv.userId);
+            }
+        });
+        
         document.getElementById('statTotalUsers').textContent = userCount || 0;
-        document.getElementById('statTotalMessages').textContent = totalMessages || totalConversations || 0;
+        document.getElementById('statTotalMessages').textContent = adminCache.totalMessages || totalConversations || 0;
         document.getElementById('statActiveToday').textContent = activeUsersToday.size || 0;
         document.getElementById('statAvgSession').textContent = userCount > 0 ? Math.round(totalConversations / userCount) + ' chats' : '0';
         
@@ -24926,157 +24351,88 @@ function switchAdminTab(tabName) {
 async function loadConversationsAdmin() {
     const list = document.getElementById('conversationsList');
     
-    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading conversations from Firebase...</div>';
-    
-    if (!db) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected. Check console for details.</div>';
+    if (!adminCache.loaded) {
+        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading... Please wait for data to load.</div>';
         return;
     }
     
-    try {
-        // Collect conversations from all users
-        const allConversations = [];
-        
-        const usersSnapshot = await db.collection('users').get();
-        
-        if (usersSnapshot.size === 0) {
-            list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No users found in database</div>';
-            return;
-        }
-        
-        for (const userDoc of usersSnapshot.docs) {
-            const userData = userDoc.data();
-            const userName = userData.displayName || userData.email || userDoc.id.substring(0, 8);
-            
-            // Get conversations without orderBy (may not have index)
-            const conversationsSnapshot = await db.collection('users').doc(userDoc.id)
-                .collection('conversations')
-                .limit(50)
-                .get();
-            
-            conversationsSnapshot.forEach(convDoc => {
-                const conv = convDoc.data();
-                // Get messages from conversation
-                if (conv.messages && conv.messages.length > 0) {
-                    const lastUserMsg = conv.messages.filter(m => m.role === 'user').pop();
-                    const lastAssistantMsg = conv.messages.filter(m => m.role === 'assistant').pop();
-                    
-                    allConversations.push({
-                        oduserId: userDoc.id,
-                        userName: userName,
-                        userMessage: lastUserMsg && lastUserMsg.content ? lastUserMsg.content.substring(0, 200) : 'No user message',
-                        assistantResponse: lastAssistantMsg && lastAssistantMsg.content ? lastAssistantMsg.content.substring(0, 200) : 'No response',
-                        timestamp: conv.timestamp || conv.updated || conv.created,
-                        title: conv.title || 'Untitled'
-                    });
-                } else {
-                    // Conversation exists but might have no messages yet or different structure
-                    allConversations.push({
-                        userId: userDoc.id,
-                        userName: userName,
-                        userMessage: 'No messages yet',
-                        assistantResponse: 'N/A',
-                        timestamp: conv.timestamp || conv.updated || conv.created,
-                        title: conv.title || 'Untitled'
-                    });
-                }
-            });
-        }
-        
-        // Sort by timestamp (newest first)
-        allConversations.sort((a, b) => {
-            const dateA = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp || 0);
-            const dateB = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp || 0);
-            return dateB - dateA;
-        });
-        
-        if (allConversations.length === 0) {
-            list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No conversations found across all users</div>';
-            return;
-        }
-        
-        let html = '';
-        allConversations.slice(0, 50).forEach(conv => {
-            let dateStr = 'Unknown';
-            try {
-                if (conv.timestamp) {
-                    const date = conv.timestamp.toDate ? conv.timestamp.toDate() : new Date(conv.timestamp);
-                    dateStr = date.toLocaleString('en-AU');
-                }
-            } catch (e) {
-                dateStr = 'Unknown';
-            }
-            
-            html += `
-                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 hover:border-purple-500 transition-all">
-                    <div class="flex items-start justify-between mb-2">
-                        <div>
-                            <span class="text-purple-400 font-semibold">${conv.userName}</span>
-                            <span class="text-slate-500 text-xs ml-2">${dateStr}</span>
-                        </div>
-                        <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${conv.title}</span>
-                    </div>
-                    <div class="text-sm">
-                        <p class="text-slate-300 mb-2"><strong>User:</strong> ${conv.userMessage}...</p>
-                        <p class="text-slate-400 text-xs"><strong>Response:</strong> ${conv.assistantResponse}...</p>
-                    </div>
-                </div>
-            `;
-        });
-        
-        list.innerHTML = html;
-    } catch (error) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error: ' + error.message + '</div>';
+    // Sort by timestamp (newest first)
+    const sorted = [...adminCache.conversations].sort((a, b) => {
+        const dateA = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp || 0);
+        const dateB = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp || 0);
+        return dateB - dateA;
+    });
+    
+    if (sorted.length === 0) {
+        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No conversations found across all users</div>';
+        return;
     }
+    
+    let html = '';
+    sorted.slice(0, 50).forEach(conv => {
+        let dateStr = 'Unknown';
+        try {
+            if (conv.timestamp) {
+                const date = conv.timestamp.toDate ? conv.timestamp.toDate() : new Date(conv.timestamp);
+                dateStr = date.toLocaleString('en-AU');
+            }
+        } catch (e) {
+            dateStr = 'Unknown';
+        }
+        
+        html += `
+            <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 hover:border-purple-500 transition-all conversation-item">
+                <div class="flex items-start justify-between mb-2">
+                    <div>
+                        <span class="text-purple-400 font-semibold">${conv.userName}</span>
+                        <span class="text-slate-500 text-xs ml-2">${dateStr}</span>
+                    </div>
+                    <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${conv.title}</span>
+                </div>
+                <div class="text-sm">
+                    <p class="text-slate-300 mb-2"><strong>User:</strong> ${conv.userMessage}...</p>
+                    <p class="text-slate-400 text-xs"><strong>Response:</strong> ${conv.assistantResponse}...</p>
+                </div>
+            </div>
+        `;
+    });
+    
+    list.innerHTML = html;
 }
 
 async function loadThemes() {
     const list = document.getElementById('themesList');
     
-    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Analyzing conversation themes...</div>';
-    
-    if (!db) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
+    if (!adminCache.loaded) {
+        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading... Please wait for data to load.</div>';
         return;
     }
     
     try {
-        // Collect themes from conversation titles/content
         const themeCount = {};
-        const usersSnapshot = await db.collection('users').get();
         
-        for (const userDoc of usersSnapshot.docs) {
-            const conversationsSnapshot = await db.collection('users').doc(userDoc.id)
-                .collection('conversations')
-                .get();
+        adminCache.conversations.forEach(conv => {
+            const titleLower = (conv.title || 'Other').toLowerCase();
+            let theme = 'Other';
             
-            conversationsSnapshot.forEach(convDoc => {
-                const conv = convDoc.data();
-                const title = conv.title || 'Other';
-                
-                // Categorize by keywords
-                let theme = 'Other';
-                const titleLower = title.toLowerCase();
-                
-                if (titleLower.includes('award') || titleLower.includes('pay') || titleLower.includes('wage')) {
-                    theme = 'Pay & Awards';
-                } else if (titleLower.includes('roster') || titleLower.includes('shift') || titleLower.includes('hours')) {
-                    theme = 'Rostering & Hours';
-                } else if (titleLower.includes('leave') || titleLower.includes('sick') || titleLower.includes('annual')) {
-                    theme = 'Leave';
-                } else if (titleLower.includes('termination') || titleLower.includes('dismiss') || titleLower.includes('fire')) {
-                    theme = 'Termination';
-                } else if (titleLower.includes('contract') || titleLower.includes('employment')) {
-                    theme = 'Contracts';
-                } else if (titleLower.includes('warning') || titleLower.includes('disciplin') || titleLower.includes('performance')) {
-                    theme = 'Discipline & Warnings';
-                } else if (titleLower.includes('super') || titleLower.includes('tax') || titleLower.includes('tfn')) {
-                    theme = 'Super & Tax';
-                }
-                
-                themeCount[theme] = (themeCount[theme] || 0) + 1;
-            });
-        }
+            if (titleLower.includes('award') || titleLower.includes('pay') || titleLower.includes('wage')) {
+                theme = 'Pay & Awards';
+            } else if (titleLower.includes('roster') || titleLower.includes('shift') || titleLower.includes('hours')) {
+                theme = 'Rostering & Hours';
+            } else if (titleLower.includes('leave') || titleLower.includes('sick') || titleLower.includes('annual')) {
+                theme = 'Leave';
+            } else if (titleLower.includes('termination') || titleLower.includes('dismiss') || titleLower.includes('fire')) {
+                theme = 'Termination';
+            } else if (titleLower.includes('contract') || titleLower.includes('employment')) {
+                theme = 'Contracts';
+            } else if (titleLower.includes('warning') || titleLower.includes('disciplin') || titleLower.includes('performance')) {
+                theme = 'Discipline & Warnings';
+            } else if (titleLower.includes('super') || titleLower.includes('tax') || titleLower.includes('tfn')) {
+                theme = 'Super & Tax';
+            }
+            
+            themeCount[theme] = (themeCount[theme] || 0) + 1;
+        });
         
         const themes = Object.entries(themeCount)
             .map(([theme, count]) => ({ theme, count }))
@@ -25115,43 +24471,19 @@ async function loadThemes() {
 async function loadUsers() {
     const list = document.getElementById('usersList');
     
-    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading users from Firebase...</div>';
-    
-    if (!db) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
+    if (!adminCache.loaded) {
+        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading... Please wait for data to load.</div>';
         return;
     }
     
     try {
-        const usersSnapshot = await db.collection('users').get();
-        
-        if (usersSnapshot.empty) {
+        if (adminCache.users.length === 0) {
             list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No users yet</div>';
             return;
         }
         
-        const users = [];
-        
-        for (const userDoc of usersSnapshot.docs) {
-            const userData = userDoc.data();
-            
-            // Count conversations for this user
-            const conversationsSnapshot = await db.collection('users').doc(userDoc.id).collection('conversations').get();
-            const messageCount = conversationsSnapshot.size;
-            
-            users.push({
-                id: userDoc.id,
-                displayName: userData.displayName || 'Unknown',
-                email: userData.email || 'N/A',
-                venueProfile: userData.venueProfile || null,
-                legalTermsAccepted: userData.legalTermsAccepted || false,
-                legalTermsAcceptedAt: userData.legalTermsAcceptedAt || null,
-                messageCount: messageCount
-            });
-        }
-        
-        // Sort by message count
-        users.sort((a, b) => b.messageCount - a.messageCount);
+        // Sort by conversation count
+        const users = [...adminCache.users].sort((a, b) => b.conversationCount - a.conversationCount);
         
         let html = '';
         users.forEach(profile => {
@@ -25172,7 +24504,7 @@ async function loadUsers() {
                             <p class="text-xs text-slate-400 mt-1">${venueInfo}</p>
                         </div>
                         <div class="flex flex-col items-end gap-1">
-                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${profile.messageCount} chats</span>
+                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${profile.conversationCount} chats</span>
                             ${legalStatus}
                         </div>
                     </div>
@@ -25192,16 +24524,12 @@ async function loadUsers() {
 async function loadHighRisk() {
     const list = document.getElementById('highRiskList');
     
-    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Scanning for high-risk topics...</div>';
-    
-    if (!db) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
+    if (!adminCache.loaded) {
+        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading... Please wait for data to load.</div>';
         return;
     }
     
     try {
-        // Scan conversations for high-risk keywords
-        const highRiskItems = [];
         const highRiskKeywords = [
             { keyword: 'termination', severity: 'high' },
             { keyword: 'unfair dismissal', severity: 'critical' },
@@ -25219,42 +24547,28 @@ async function loadHighRisk() {
             { keyword: 'misconduct', severity: 'high' }
         ];
         
-        const usersSnapshot = await db.collection('users').get();
+        const highRiskItems = [];
         
-        for (const userDoc of usersSnapshot.docs) {
-            const userData = userDoc.data();
-            const userName = userData.displayName || userData.email || userDoc.id.substring(0, 8);
-            const userEmail = userData.email || 'N/A';
+        adminCache.conversations.forEach(conv => {
+            const fullText = (conv.fullText || conv.title || '').toLowerCase();
             
-            const conversationsSnapshot = await db.collection('users').doc(userDoc.id)
-                .collection('conversations')
-                .get();
-            
-            conversationsSnapshot.forEach(convDoc => {
-                const conv = convDoc.data();
-                const title = (conv.title || '').toLowerCase();
-                const messages = conv.messages || [];
-                const fullText = title + ' ' + messages.map(m => m.content || '').join(' ').toLowerCase();
-                
-                // Check for high-risk keywords
-                for (const {keyword, severity} of highRiskKeywords) {
-                    if (fullText.includes(keyword)) {
-                        highRiskItems.push({
-                            id: convDoc.id,
-                            userName: userName,
-                            userEmail: userEmail,
-                            userId: userDoc.id,
-                            title: conv.title || 'Untitled Conversation',
-                            keyword: keyword,
-                            timestamp: conv.timestamp,
-                            severity: severity,
-                            messageCount: messages.length
-                        });
-                        break; // Only add once per conversation
-                    }
+            for (const {keyword, severity} of highRiskKeywords) {
+                if (fullText.includes(keyword)) {
+                    highRiskItems.push({
+                        id: conv.id,
+                        userName: conv.userName,
+                        userEmail: conv.userEmail,
+                        userId: conv.userId,
+                        title: conv.title,
+                        keyword: keyword,
+                        timestamp: conv.timestamp,
+                        severity: severity,
+                        messageCount: conv.messageCount || 0
+                    });
+                    break;
                 }
-            });
-        }
+            }
+        });
         
         // Sort by severity then timestamp
         const severityOrder = { critical: 0, high: 1, medium: 2 };
@@ -25272,7 +24586,6 @@ async function loadHighRisk() {
             return;
         }
         
-        // Summary stats
         const critical = highRiskItems.filter(r => r.severity === 'critical').length;
         const high = highRiskItems.filter(r => r.severity === 'high').length;
         const medium = highRiskItems.filter(r => r.severity === 'medium').length;
@@ -25529,16 +24842,12 @@ async function loadDocuments() {
 async function loadSubscriptions() {
     const list = document.getElementById('subscriptionsList');
     
-    list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading subscription data...</div>';
-    
-    if (!db) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
+    if (!adminCache.loaded) {
+        list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading... Please wait for data to load.</div>';
         return;
     }
     
     try {
-        const usersSnapshot = await db.collection('users').get();
-        
         const subscriptions = {
             free: [],
             starter: [],
@@ -25548,19 +24857,18 @@ async function loadSubscriptions() {
         
         let totalRevenue = 0;
         
-        usersSnapshot.forEach(doc => {
-            const userData = doc.data();
-            const tier = (userData.subscriptionTier || 'free').toLowerCase();
+        adminCache.users.forEach(userData => {
+            const tier = userData.subscriptionTier;
             const userInfo = {
-                id: doc.id,
-                email: userData.email || 'N/A',
-                name: userData.displayName || userData.email || doc.id.substring(0, 8),
+                id: userData.id,
+                email: userData.email,
+                name: userData.displayName,
                 tier: tier,
-                billing: userData.billingCycle || 'N/A',
-                creditsUsed: userData.reviewCreditsUsed || 0,
-                creditsTotal: userData.reviewCredits || 0,
+                billing: userData.billingCycle,
+                creditsUsed: userData.reviewCreditsUsed,
+                creditsTotal: userData.reviewCredits,
                 joinDate: userData.createdAt?.toDate ? userData.createdAt.toDate() : null,
-                stripeCustomerId: userData.stripeCustomerId || null
+                stripeCustomerId: userData.stripeCustomerId
             };
             
             if (subscriptions[tier]) {
@@ -25569,7 +24877,6 @@ async function loadSubscriptions() {
                 subscriptions.free.push(userInfo);
             }
             
-            // Estimate revenue (annual prices)
             if (tier === 'starter') totalRevenue += userData.billingCycle === 'monthly' ? 29 : 249;
             if (tier === 'pro') totalRevenue += userData.billingCycle === 'monthly' ? 49 : 449;
             if (tier === 'business') totalRevenue += userData.billingCycle === 'monthly' ? 99 : 899;
@@ -25838,8 +25145,8 @@ async function loadCharts() {
     
     container.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading chart data...</div>';
     
-    if (!db) {
-        container.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
+    if (!adminCache.loaded) {
+        container.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading... Please wait for data to load.</div>';
         return;
     }
     
@@ -25848,9 +25155,6 @@ async function loadCharts() {
         Object.values(adminCharts).forEach(chart => chart?.destroy());
         adminCharts = {};
         
-        // Collect data from Firebase
-        const usersSnapshot = await db.collection('users').get();
-        
         // Data structures
         const activityByDate = {};
         const subscriptionCounts = { free: 0, starter: 0, pro: 0, business: 0 };
@@ -25858,44 +25162,23 @@ async function loadCharts() {
         const userSignupsByDate = {};
         const messagesByDate = {};
         
-        // Process users
-        for (const userDoc of usersSnapshot.docs) {
-            const userData = userDoc.data();
-            
-            // Subscription counts
-            const tier = (userData.subscriptionTier || 'free').toLowerCase();
+        // Process from cache - users
+        adminCache.users.forEach(userData => {
+            const tier = userData.subscriptionTier;
             if (subscriptionCounts.hasOwnProperty(tier)) {
                 subscriptionCounts[tier]++;
             } else {
                 subscriptionCounts.free++;
             }
             
-            // User signup date
             if (userData.createdAt) {
                 const signupDate = userData.createdAt.toDate ? userData.createdAt.toDate() : new Date(userData.createdAt);
                 const dateKey = signupDate.toISOString().split('T')[0];
                 userSignupsByDate[dateKey] = (userSignupsByDate[dateKey] || 0) + 1;
             }
             
-            // Process conversations for activity data
-            const conversationsSnapshot = await db.collection('users').doc(userDoc.id).collection('conversations').get();
-            
-            conversationsSnapshot.forEach(convDoc => {
-                const conv = convDoc.data();
-                if (conv.timestamp) {
-                    const convDate = conv.timestamp.toDate ? conv.timestamp.toDate() : new Date(conv.timestamp);
-                    const dateKey = convDate.toISOString().split('T')[0];
-                    activityByDate[dateKey] = (activityByDate[dateKey] || 0) + 1;
-                    
-                    // Count messages
-                    const msgCount = conv.messages?.length || 1;
-                    messagesByDate[dateKey] = (messagesByDate[dateKey] || 0) + msgCount;
-                }
-            });
-            
-            // Process generated documents
-            const userDocs = userData.generatedDocuments || [];
-            userDocs.forEach(doc => {
+            // Process generated documents from user data
+            (userData.generatedDocuments || []).forEach(doc => {
                 const docType = doc.document_type || 'other';
                 if (documentTypes.hasOwnProperty(docType)) {
                     documentTypes[docType]++;
@@ -25903,9 +25186,20 @@ async function loadCharts() {
                     documentTypes.other++;
                 }
             });
-        }
+        });
         
-        // Also get from generated_documents collection
+        // Process from cache - conversations
+        adminCache.conversations.forEach(conv => {
+            if (conv.timestamp) {
+                const convDate = conv.timestamp.toDate ? conv.timestamp.toDate() : new Date(conv.timestamp);
+                const dateKey = convDate.toISOString().split('T')[0];
+                activityByDate[dateKey] = (activityByDate[dateKey] || 0) + 1;
+                const msgCount = conv.messageCount || 1;
+                messagesByDate[dateKey] = (messagesByDate[dateKey] || 0) + msgCount;
+            }
+        });
+        
+        // Also get from generated_documents collection (still needs separate query)
         try {
             const docsSnapshot = await db.collection('generated_documents').get();
             docsSnapshot.forEach(doc => {
@@ -26150,12 +25444,18 @@ async function deleteAdminDocument(docId) {
 
 function filterConversations() {
     const search = document.getElementById('conversationSearch').value.toLowerCase();
-    const conversations = JSON.parse(localStorage.getItem('analytics_conversations') || '[]');
     
-    const filtered = conversations.filter(conv => 
-        conv.userMessage.toLowerCase().includes(search) ||
-        conv.assistantResponse.toLowerCase().includes(search) ||
-        conv.theme.toLowerCase().includes(search)
+    if (!search) {
+        // If search is empty, reload all conversations
+        loadConversationsAdmin();
+        return;
+    }
+    
+    const filtered = adminCache.conversations.filter(conv => 
+        (conv.userMessage || '').toLowerCase().includes(search) ||
+        (conv.assistantResponse || '').toLowerCase().includes(search) ||
+        (conv.title || '').toLowerCase().includes(search) ||
+        (conv.userName || '').toLowerCase().includes(search)
     );
     
     const list = document.getElementById('conversationsList');
@@ -26165,24 +25465,37 @@ function filterConversations() {
         return;
     }
     
+    // Sort newest first
+    filtered.sort((a, b) => {
+        const dateA = a.timestamp?.toDate ? a.timestamp.toDate() : new Date(a.timestamp || 0);
+        const dateB = b.timestamp?.toDate ? b.timestamp.toDate() : new Date(b.timestamp || 0);
+        return dateB - dateA;
+    });
+    
     let html = '';
-    filtered.reverse().forEach(conv => {
-        const date = new Date(conv.timestamp).toLocaleString('en-AU');
-        const riskBadge = conv.isHighRisk ? '<span class="text-xs bg-red-500 text-white px-2 py-1 rounded">HIGH RISK</span>' : '';
+    filtered.slice(0, 50).forEach(conv => {
+        let dateStr = 'Unknown';
+        try {
+            if (conv.timestamp) {
+                const date = conv.timestamp.toDate ? conv.timestamp.toDate() : new Date(conv.timestamp);
+                dateStr = date.toLocaleString('en-AU');
+            }
+        } catch (e) {
+            dateStr = 'Unknown';
+        }
         
         html += `
-            <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 hover:border-purple-500 transition-all">
+            <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 hover:border-purple-500 transition-all conversation-item">
                 <div class="flex items-start justify-between mb-2">
                     <div>
-                        <span class="text-purple-400 font-semibold">${conv.user}</span>
-                        <span class="text-slate-500 text-xs ml-2">${date}</span>
-                        ${riskBadge}
+                        <span class="text-purple-400 font-semibold">${conv.userName}</span>
+                        <span class="text-slate-500 text-xs ml-2">${dateStr}</span>
                     </div>
-                    <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${conv.theme}</span>
+                    <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${conv.title}</span>
                 </div>
                 <div class="text-sm">
-                    <p class="text-slate-300 mb-2"><strong>User:</strong> ${conv.userMessage}</p>
-                    <p class="text-slate-400 text-xs"><strong>Response:</strong> ${conv.assistantResponse.substring(0, 150)}...</p>
+                    <p class="text-slate-300 mb-2"><strong>User:</strong> ${conv.userMessage}...</p>
+                    <p class="text-slate-400 text-xs"><strong>Response:</strong> ${conv.assistantResponse}...</p>
                 </div>
             </div>
         `;
@@ -26192,24 +25505,47 @@ function filterConversations() {
 }
 
 function refreshAnalytics() {
-    loadAnalytics();
+    loadAnalytics(true); // force refresh from Firebase
     showAlert('✅ Analytics refreshed!');
 }
 
 function exportAnalytics() {
-    const conversations = JSON.parse(localStorage.getItem('analytics_conversations') || '[]');
-    const themes = JSON.parse(localStorage.getItem('analytics_themes') || '{}');
-    const users = JSON.parse(localStorage.getItem('analytics_users') || '{}');
+    if (!adminCache.loaded || adminCache.conversations.length === 0) {
+        showAlert('⚠️ No data to export. Open the admin dashboard first.');
+        return;
+    }
     
-    // Prepare data for Excel
-    const data = conversations.map(conv => ({
-        'Timestamp': new Date(conv.timestamp).toLocaleString('en-AU'),
-        'User': conv.user,
-        'Theme': conv.theme,
-        'High Risk': conv.isHighRisk ? 'YES' : 'NO',
-        'User Message': conv.userMessage,
-        'Assistant Response': conv.assistantResponse.substring(0, 500)
-    }));
+    // Detect theme for each conversation
+    function detectExportTheme(title) {
+        const t = (title || '').toLowerCase();
+        if (t.includes('award') || t.includes('pay') || t.includes('wage')) return 'Pay & Awards';
+        if (t.includes('roster') || t.includes('shift') || t.includes('hours')) return 'Rostering & Hours';
+        if (t.includes('leave') || t.includes('sick') || t.includes('annual')) return 'Leave';
+        if (t.includes('termination') || t.includes('dismiss') || t.includes('fire')) return 'Termination';
+        if (t.includes('contract') || t.includes('employment')) return 'Contracts';
+        if (t.includes('warning') || t.includes('disciplin') || t.includes('performance')) return 'Discipline & Warnings';
+        return 'Other';
+    }
+    
+    const data = adminCache.conversations.map(conv => {
+        let dateStr = 'Unknown';
+        try {
+            if (conv.timestamp) {
+                const date = conv.timestamp.toDate ? conv.timestamp.toDate() : new Date(conv.timestamp);
+                dateStr = date.toLocaleString('en-AU');
+            }
+        } catch (e) {}
+        
+        return {
+            'Timestamp': dateStr,
+            'User': conv.userName,
+            'Email': conv.userEmail,
+            'Theme': detectExportTheme(conv.title),
+            'Title': conv.title,
+            'User Message': conv.userMessage,
+            'Assistant Response': conv.assistantResponse
+        };
+    });
     
     generateExcelSpreadsheet(data, `Analytics_Export_${Date.now()}.xlsx`, 'Conversations');
     
@@ -26470,14 +25806,11 @@ function showWizardResults() {
             </div>
 
             <div class="flex gap-3 mt-6">
-                <button onclick="openEmploymentContract()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
-                    📝 Create Employment Contract
+                <button onclick="downloadWizardResults()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
+                    📄 Download Summary
                 </button>
                 <button onclick="resetWizard()" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
                     Start Over
-                </button>
-                <button onclick="closeToolModal('awardWizardModal')" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
-                    ✕ Close
                 </button>
             </div>
         </div>
@@ -26779,12 +26112,9 @@ function calculateAwardClassification(data) {
     } else if (data.hours === 'public-holiday') {
         const publicHolRate = baseRate * penaltyRates.public_holiday;
         penalties.push(`Public Holiday: ${(penaltyRates.public_holiday * 100)}% = $${publicHolRate.toFixed(2)}/hr`);
-    } else if (data.hours === 'weekday-evening') {
-        const eveningRate = baseRate + penaltyRates.evening_after_7pm_loading;
-        penalties.push(`Evening (7pm-midnight): +$${penaltyRates.evening_after_7pm_loading.toFixed(2)}/hr = $${eveningRate.toFixed(2)}/hr`);
     } else if (data.hours === 'weekday-night') {
-        const nightRate = baseRate + penaltyRates.night_midnight_to_7am_loading;
-        penalties.push(`Night (midnight-7am): +$${penaltyRates.night_midnight_to_7am_loading.toFixed(2)}/hr = $${nightRate.toFixed(2)}/hr`);
+        const eveningRate = baseRate * penaltyRates.evening_after_7pm;
+        penalties.push(`Evening (after 7pm): ${(penaltyRates.evening_after_7pm * 100)}% = $${eveningRate.toFixed(2)}/hr`);
     }
     
     if (isCasual) {
@@ -26938,13 +26268,9 @@ function resetWizard() {
                         <div class="font-semibold">Weekdays (Mon-Fri) - Daytime</div>
                         <div class="text-xs opacity-70">Regular business hours</div>
                     </button>
-                    <button onclick="wizardAnswer('hours', 'weekday-evening')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Weekdays (Mon-Fri) - Evening</div>
-                        <div class="text-xs opacity-70">7pm to midnight</div>
-                    </button>
                     <button onclick="wizardAnswer('hours', 'weekday-night')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Weekdays (Mon-Fri) - Night</div>
-                        <div class="text-xs opacity-70">Midnight to 7am</div>
+                        <div class="font-semibold">Weekdays (Mon-Fri) - Evenings/Nights</div>
+                        <div class="text-xs opacity-70">After 7pm or late shifts</div>
                     </button>
                     <button onclick="wizardAnswer('hours', 'saturday')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
                         <div class="font-semibold">Saturdays</div>
@@ -27390,11 +26716,8 @@ async function performLogout(loggedOutUser, type) {
     // Reset current user
     currentUser = null;
     
-    // Clear conversation history
-    conversationHistory = [];
-    
-    // Clear current conversation ID
-    currentConversationId = null;
+    // Clear all local user data
+    clearLocalUserData();
     
     // Clear messages from screen
     const messagesContainer = document.getElementById('messagesContainer');
@@ -29855,7 +29178,7 @@ function resetAIImport() {
 
         <!-- Loading Screen -->
         <div id="iqGenerating" class="hidden text-center py-12">
-            <div class="fitz-bot fitz-xl fitz-breathe mb-4 mx-auto"></div>
+            <div class="text-6xl mb-4 animate-bounce">🤖</div>
             <h3 class="text-amber-400 font-bold text-xl mb-2">Fitz is generating your interview questions...</h3>
             <p class="text-slate-400 text-sm">This may take 10-20 seconds</p>
             <div class="mt-6 flex justify-center gap-2">
@@ -30007,7 +29330,7 @@ function resetAIImport() {
 
         <!-- Loading Screen -->
         <div id="jdGenerating" class="hidden text-center py-12">
-            <div class="fitz-bot fitz-xl fitz-breathe mb-4 mx-auto"></div>
+            <div class="text-6xl mb-4 animate-bounce">🤖</div>
             <h3 class="text-amber-400 font-bold text-xl mb-2">Fitz is generating your job advertisement...</h3>
             <p class="text-slate-400 text-sm">This may take 10-20 seconds</p>
             <div class="mt-6 flex justify-center gap-2">
@@ -30147,7 +29470,7 @@ function resetAIImport() {
 
         <!-- Loading Screen -->
         <div id="pdGenerating" class="hidden text-center py-12">
-            <div class="fitz-bot fitz-xl fitz-breathe mb-4 mx-auto"></div>
+            <div class="text-6xl mb-4 animate-bounce">🤖</div>
             <h3 class="text-amber-400 font-bold text-xl mb-2">Fitz is generating your position description...</h3>
             <p class="text-slate-400 text-sm">This may take 10-20 seconds</p>
             <div class="mt-6 flex justify-center gap-2">
@@ -30735,7 +30058,7 @@ function resetAIImport() {
         <h1 style="font-size: 3rem; font-weight: 700; background: linear-gradient(135deg, #00f0ff 0%, #7b2ff7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px;">AI-Powered Data Import</h1>
         <p style="font-size: 1.25rem; color: #8b9dc3;">Drop your data and watch AI work its magic ✨</p>
         <span class="ai-badge" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; background: rgba(0, 240, 255, 0.1); border: 1px solid rgba(0, 240, 255, 0.3); border-radius: 100px; color: #00f0ff; font-size: 0.875rem; font-weight: 600; margin-top: 20px;">
-            <span class="fitz-bot fitz-sm" style="vertical-align: middle;"></span>
+            <span>🤖</span>
             <span>Powered by Advanced AI</span>
         </span>
     </div>
@@ -31060,9 +30383,31 @@ function resetAIImport() {
                 
                 <div>
                     <label class="block text-slate-300 text-sm font-semibold mb-2">Position/Role *</label>
-                    <input type="text" id="trainingPosition" 
-                           class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
-                           placeholder="e.g., Head Chef, Barista, Floor Manager, Sommelier...">
+                    <select id="trainingPosition" 
+                            class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
+                            onchange="updateTrainingRoleInfo()">
+                        <option value="">Select position...</option>
+                        <optgroup label="Kitchen">
+                            <option value="head-chef">Head Chef</option>
+                            <option value="sous-chef">Sous Chef</option>
+                            <option value="chef-de-partie">Chef de Partie</option>
+                            <option value="commis-chef">Commis Chef</option>
+                            <option value="kitchen-hand">Kitchen Hand</option>
+                        </optgroup>
+                        <optgroup label="Front of House">
+                            <option value="restaurant-manager">Restaurant Manager</option>
+                            <option value="floor-supervisor">Floor Supervisor</option>
+                            <option value="waiter">Waiter/Waitress</option>
+                            <option value="bartender">Bartender</option>
+                            <option value="barista">Barista</option>
+                            <option value="host">Host/Hostess</option>
+                        </optgroup>
+                        <optgroup label="Other">
+                            <option value="cleaner">Cleaner</option>
+                            <option value="dishwasher">Dishwasher</option>
+                            <option value="delivery-driver">Delivery Driver</option>
+                        </optgroup>
+                    </select>
                 </div>
                 
                 <div>
@@ -31099,6 +30444,15 @@ function resetAIImport() {
                           placeholder="e.g., Customer service excellence, Wine knowledge, Dietary requirements..."></textarea>
             </div>
             
+            <div id="roleInfoBox" class="hidden mt-4 bg-blue-900/30 border border-blue-500 rounded-lg p-4">
+                <div class="flex items-start gap-2">
+                    <span class="text-2xl">💡</span>
+                    <div>
+                        <div class="text-blue-300 font-semibold mb-1">Role Information</div>
+                        <div id="roleInfoContent" class="text-blue-200 text-sm"></div>
+                    </div>
+                </div>
+            </div>
             
             <button onclick="generateTrainingPlan()" 
                     class="mt-4 w-full px-6 py-3 bg-amber-500 hover:bg-amber-600 text-black font-semibold rounded-lg transition-all flex items-center justify-center gap-2">
@@ -31109,7 +30463,7 @@ function resetAIImport() {
         <!-- AI Insights Box -->
         <div id="trainingAIInsights" class="hidden bg-gradient-to-r from-purple-900/50 to-blue-900/50 border border-purple-500 rounded-xl p-6 mb-6">
             <div class="flex items-start gap-3">
-                <span class="fitz-bot fitz-lg fitz-float"></span>
+                <span class="text-3xl">🤖</span>
                 <div class="flex-1">
                     <h4 class="text-lg font-bold text-white mb-2">AI Training Insights</h4>
                     <div id="trainingAIContent" class="text-slate-300 text-sm leading-relaxed"></div>
@@ -31145,7 +30499,7 @@ function resetAIImport() {
                       rows="2"></textarea>
             <button onclick="askTrainingCoach()" 
                     class="px-6 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-all flex items-center gap-2">
-                <span class="fitz-bot fitz-xs" style="vertical-align: middle;"></span> Ask AI Coach
+                <span>🤖</span> Ask AI Coach
             </button>
             <div id="trainingCoachResponse" class="hidden mt-4 p-4 bg-slate-800 rounded-lg border border-purple-500">
                 <div id="trainingCoachContent" class="text-slate-300 text-sm leading-relaxed"></div>
@@ -31414,7 +30768,7 @@ function resetAIImport() {
         <!-- AI Insights Box -->
         <div id="aiInsightsBox" class="hidden bg-gradient-to-r from-purple-900/50 to-blue-900/50 border border-purple-500 rounded-xl p-6 mb-6">
             <div class="flex items-start gap-3">
-                <span class="fitz-bot fitz-lg fitz-float"></span>
+                <span class="text-3xl">🤖</span>
                 <div>
                     <h4 class="text-lg font-bold text-white mb-2">AI Insights</h4>
                     <div id="aiInsightsContent" class="text-slate-300 text-sm leading-relaxed"></div>
@@ -32562,10 +31916,44 @@ function closeTrainingPlan() {
     }
 }
 
+// Update role information
+function updateTrainingRoleInfo() {
+    const position = document.getElementById('trainingPosition').value;
+    const infoBox = document.getElementById('roleInfoBox');
+    const infoContent = document.getElementById('roleInfoContent');
+    
+    if (!position) {
+        infoBox.classList.add('hidden');
+        return;
+    }
+    
+    const roleInfo = {
+        'head-chef': 'Requires advanced culinary skills, leadership abilities, menu planning, and kitchen management. Typical training: 4-8 weeks.',
+        'sous-chef': 'Needs strong cooking skills, team coordination, and ability to manage kitchen operations. Typical training: 4-8 weeks.',
+        'chef-de-partie': 'Must master specific kitchen station, timing, and quality control. Typical training: 2-4 weeks.',
+        'commis-chef': 'Entry-level chef position requiring basic culinary skills and kitchen procedures. Typical training: 2-4 weeks.',
+        'kitchen-hand': 'Focuses on cleaning, basic prep work, and supporting kitchen operations. Typical training: 1-2 weeks.',
+        'restaurant-manager': 'Requires leadership, operations management, customer service, and P&L understanding. Typical training: 4-12 weeks.',
+        'floor-supervisor': 'Needs team management, service coordination, and problem-solving skills. Typical training: 2-4 weeks.',
+        'waiter': 'Requires menu knowledge, service skills, POS system, and customer interaction. Typical training: 1-2 weeks.',
+        'bartender': 'Needs drink preparation skills, customer service, RSA certification, and bar management. Typical training: 2-4 weeks.',
+        'barista': 'Requires coffee-making skills, machine operation, customer service, and product knowledge. Typical training: 1-2 weeks.',
+        'host': 'Focuses on greeting guests, reservations, seating coordination, and customer service. Typical training: 1 week.',
+        'cleaner': 'Requires knowledge of cleaning standards, chemical safety, and efficiency. Typical training: 1 week.',
+        'dishwasher': 'Needs efficiency, hygiene practices, and equipment operation skills. Typical training: 1 week.',
+        'delivery-driver': 'Requires safe driving, customer service, order accuracy, and time management. Typical training: 1 week.'
+    };
+    
+    if (roleInfo[position]) {
+        infoContent.textContent = roleInfo[position];
+        infoBox.classList.remove('hidden');
+    }
+}
+
 // Generate Training Plan
 async function generateTrainingPlan() {
     const employeeName = document.getElementById('trainingEmployeeName').value.trim();
-    const position = document.getElementById('trainingPosition').value.trim();
+    const position = document.getElementById('trainingPosition').value;
     const experience = document.getElementById('trainingExperience').value;
     const duration = document.getElementById('trainingDuration').value;
     const focusAreas = document.getElementById('trainingFocusAreas').value.trim();
@@ -32618,13 +32006,13 @@ function showTrainingAIThinking() {
     const insightsBox = document.getElementById('trainingAIInsights');
     const content = document.getElementById('trainingAIContent');
     
-    content.innerHTML = '<div class="ai-thinking-training"><span class="fitz-thinking-wrap"><span class="fitz-bot fitz-sm fitz-float" style="vertical-align: middle;"></span> <span class="fitz-thinking-dots"><span></span><span></span><span></span></span> Analysing role requirements and generating personalised training plan</span></div>';
+    content.innerHTML = '<div class="ai-thinking-training">🤖 Analysing role requirements and generating personalised training plan</div>';
     insightsBox.classList.remove('hidden');
 }
 
 // Get AI Insights
 async function getTrainingAIInsights() {
-    const positionName = document.getElementById('trainingPosition').value.trim();
+    const positionName = document.getElementById('trainingPosition').selectedOptions[0].text;
     const prompt = `As an Australian hospitality training expert, provide 3 key insights for training a ${trainingPlanState.experience} ${positionName} over ${trainingPlanState.duration} weeks. ${trainingPlanState.focusAreas ? 'Focus areas: ' + trainingPlanState.focusAreas : ''}
 
 Provide:
@@ -32643,7 +32031,7 @@ Be specific to Australian hospitality and practical.`;
 }
 
 function getFallbackInsights() {
-    const positionName = document.getElementById('trainingPosition').value.trim();
+    const positionName = document.getElementById('trainingPosition').selectedOptions[0].text;
     return `For ${trainingPlanState.experience} ${positionName}:
 
 • Start with compliance and safety - WHS, food safety (if applicable), RSA (if applicable)
@@ -32956,10 +32344,10 @@ async function askTrainingCoach() {
     const responseContent = document.getElementById('trainingCoachContent');
     
     responseBox.classList.remove('hidden');
-    responseContent.innerHTML = '<div class="ai-thinking-training"><span class="fitz-thinking-wrap"><span class="fitz-bot fitz-sm fitz-float" style="vertical-align: middle;"></span> <span class="fitz-thinking-dots"><span></span><span></span><span></span></span> Thinking</span></div>';
+    responseContent.innerHTML = '<div class="ai-thinking-training">🤖 Thinking</div>';
     
     try {
-        const positionName = document.getElementById('trainingPosition').value.trim();
+        const positionName = document.getElementById('trainingPosition').selectedOptions[0].text;
         const context = `Training plan for ${trainingPlanState.experience} ${positionName} over ${trainingPlanState.duration} weeks`;
         const prompt = `As an Australian hospitality training expert, answer this question:\n\nContext: ${context}\n\nQuestion: ${question}\n\nProvide practical, specific advice.`;
         
@@ -33030,7 +32418,7 @@ function exportTrainingPlanDOCXUnlocked() {
     try {
         const html = buildTrainingPlanHTML();
         const converted = htmlDocx.asBlob(html);
-        const positionName = document.getElementById('trainingPosition').value.trim().replace(/\s+/g, '_');
+        const positionName = document.getElementById('trainingPosition').selectedOptions[0].text.replace(/\s+/g, '_');
         const filename = `Training_Plan_${positionName}_${Date.now()}.docx`;
         
         saveAs(converted, filename);
@@ -33051,7 +32439,7 @@ function exportTrainingPlanPDFUnlocked() {
     
     try {
         const docDefinition = buildTrainingPlanPDFDefinition();
-        const positionName = document.getElementById('trainingPosition').value.trim().replace(/\s+/g, '_');
+        const positionName = document.getElementById('trainingPosition').selectedOptions[0].text.replace(/\s+/g, '_');
         const filename = `Training_Plan_${positionName}_${Date.now()}.pdf`;
         
         pdfMake.createPdf(docDefinition).download(filename);
@@ -33085,7 +32473,7 @@ function printTrainingPlan() {
 // Build HTML for DOCX export
 function buildTrainingPlanHTML() {
     const today = new Date().toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
-    const positionName = document.getElementById('trainingPosition').value.trim();
+    const positionName = document.getElementById('trainingPosition').selectedOptions[0].text;
     const plan = trainingPlanState.plan;
     
     let html = `
@@ -33164,7 +32552,7 @@ function buildTrainingPlanHTML() {
 // Build PDF definition
 function buildTrainingPlanPDFDefinition() {
     const today = new Date().toLocaleDateString('en-AU', { year: 'numeric', month: 'long', day: 'numeric' });
-    const positionName = document.getElementById('trainingPosition').value.trim();
+    const positionName = document.getElementById('trainingPosition').selectedOptions[0].text;
     const plan = trainingPlanState.plan;
     
     const content = [
@@ -38248,6 +37636,44 @@ async function signInWithGoogleFromAccess() {
     }
 }
 
+/**
+ * Clears all user-specific data from localStorage and memory.
+ * Called on logout and before loading a new user's data.
+ */
+function clearLocalUserData() {
+    // Clear non-user-scoped localStorage keys
+    localStorage.removeItem('fitz_conversations');
+    localStorage.removeItem('fitz_bookmarks');
+    localStorage.removeItem('fitz_recent_tools');
+    localStorage.removeItem('analytics_conversations');
+    localStorage.removeItem('analytics_themes');
+    localStorage.removeItem('analytics_users');
+    
+    // Clear training plans
+    Object.keys(localStorage).filter(k => k.startsWith('training_plan_')).forEach(k => localStorage.removeItem(k));
+    
+    // Clear in-memory state
+    conversationHistory = [];
+    currentConversationId = null;
+    if (typeof bookmarks !== 'undefined') bookmarks = [];
+    
+    // Clear admin cache
+    if (typeof adminCache !== 'undefined') {
+        adminCache.loaded = false;
+        adminCache.users = [];
+        adminCache.conversations = [];
+        adminCache.totalMessages = 0;
+    }
+    
+    // Clear sidebar conversation list
+    const chatList = document.getElementById('chatList');
+    if (chatList) chatList.innerHTML = '';
+    
+    // Clear bookmarks list
+    const bookmarkList = document.getElementById('bookmarkList');
+    if (bookmarkList) bookmarkList.innerHTML = '';
+}
+
 async function signOut() {
     if (!auth) return;
     try {
@@ -38265,6 +37691,9 @@ async function signOut() {
         if (currentConversationId && currentUser && currentUser.uid) {
             await saveCurrentConversationIdToFirebase(currentConversationId);
         }
+        
+        // Clear all local user data before signing out
+        clearLocalUserData();
         
         await auth.signOut();
         if (typeof showNotification === 'function') showNotification('Signed out', 'success');
@@ -38444,6 +37873,9 @@ if (auth) {
                     '<div class="h-4 bg-slate-700 rounded w-5/6"></div>' +
                     '</div></div></div></div>';
             }
+            
+            // Clear previous user's local data before loading new user's data
+            clearLocalUserData();
             
             await loadAllDataFromFirebase(); // Use new Firebase-first system with retry
             
