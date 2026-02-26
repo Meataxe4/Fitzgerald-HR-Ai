@@ -19169,6 +19169,20 @@ async function sendMessage() {
     
     conversationHistory.push({ role: 'user', content: message });
     
+    // Auto-create a conversation if none exists
+    if (!currentConversationId) {
+        console.log('🆕 sendMessage: No active conversation - creating one automatically');
+        const newConv = {
+            id: 'conv-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9),
+            title: message.substring(0, 50) + (message.length > 50 ? '...' : ''),
+            messages: [],
+            created: new Date().toISOString(),
+            updated: new Date().toISOString()
+        };
+        conversations.push(newConv);
+        currentConversationId = newConv.id;
+    }
+    
     try {
         const response = await callClaudeAPI(message);
         
