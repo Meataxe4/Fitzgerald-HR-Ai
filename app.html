@@ -6295,8 +6295,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 <button onclick="openToolFromMobile('xeroIntegration')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
                     <span class="text-2xl">🔗</span>
                     <div>
-                        <div class="font-semibold">Xero Integration</div>
-                        <div class="text-sm text-slate-400">Connect with Xero</div>
+                        <div class="font-semibold">Integrations</div>
+                        <div class="text-sm text-slate-400">Import 3rd party data for Fitz to analyse</div>
                     </div>
                 </button>
             </div>
@@ -9469,8 +9469,8 @@ function detectToolNeeds(message) {
                 // Questions
                 'use xero', 'using xero', 'have xero', 'xero account'
             ],
-            title: '🔗 Xero Integration',
-            description: 'Import employee and payroll data from Xero',
+            title: '🔗 Integrations',
+            description: 'Import 3rd party data for Fitz to analyse',
             action: 'openIntegrationHub()',
             buttonText: 'Open Integration Hub',
             color: 'green'
@@ -19777,48 +19777,78 @@ function loadConversations() {
 function saveConversations() {
     try {
         localStorage.setItem('fitz_conversations', JSON.stringify(conversations));
+        console.log('💾 saveConversations: Saved', conversations.length, 'conversations to localStorage');
         // Sync to cloud
         syncConversationsToCloud();
     } catch (e) {
+        console.error('❌ saveConversations error:', e);
     }
+}
+
+/**
+ * Helper to get the Firebase UID regardless of how currentUser was set.
+ * Returns { uid, userRef } or null if no Firebase auth.
+ */
+function getFirebaseUser() {
+    // Try 1: currentUser is a Firebase auth user object
+    if (currentUser && currentUser.uid) {
+        return currentUser;
+    }
+    // Try 2: Firebase auth directly
+    if (typeof auth !== 'undefined' && auth && auth.currentUser) {
+        // Also fix currentUser variable for future calls
+        currentUser = auth.currentUser;
+        return auth.currentUser;
+    }
+    return null;
 }
 
 // Sync all conversations to cloud
 async function syncConversationsToCloud() {
-    if (!currentUser || !db) {
+    const fbUser = getFirebaseUser();
+    if (!fbUser || !db) {
+        console.warn('⚠️ syncConversationsToCloud: No Firebase user or db -', 'fbUser:', !!fbUser, 'db:', !!db);
         return;
     }
+    
+    console.log('☁️ syncConversationsToCloud: Syncing', conversations.length, 'conversations for user', fbUser.uid);
     
     try {
         // Save each conversation to Firestore
         for (const conversation of conversations) {
+            if (!conversation || !conversation.id) continue;
+            
             // Create clean data object without undefined fields
             const cleanData = {
                 id: conversation.id,
-                title: conversation.title,
+                title: conversation.title || 'Untitled',
                 messages: conversation.messages || [],
-                created: conversation.created,
-                updated: conversation.updated,
-                userId: currentUser.uid,
+                created: conversation.created || new Date().toISOString(),
+                updated: conversation.updated || new Date().toISOString(),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                userId: fbUser.uid,
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             
-            await db.collection('users').doc(currentUser.uid)
+            await db.collection('users').doc(fbUser.uid)
                     .collection('conversations').doc(conversation.id)
                     .set(cleanData, { merge: true });
         }
+        console.log('✅ syncConversationsToCloud: Successfully synced', conversations.length, 'conversations');
     } catch (error) {
+        console.error('❌ syncConversationsToCloud error:', error);
     }
 }
 
 // Load conversations from cloud
 async function loadConversationsFromCloud() {
-    if (!currentUser || !db) {
+    const fbUser = getFirebaseUser();
+    if (!fbUser || !db) {
         return;
     }
     
     try {
-        const snapshot = await db.collection('users').doc(currentUser.uid)
+        const snapshot = await db.collection('users').doc(fbUser.uid)
                                   .collection('conversations').get();
         
         if (snapshot.empty) {
@@ -19876,6 +19906,7 @@ function createNewConversation() {
     
     conversations.push(newConv);
     currentConversationId = newConv.id;
+    console.log('🆕 createNewConversation: Created', newConv.id, '- conversations array now:', conversations.length);
     
     // Clear UI
     const container = DOM.messagesContainer.querySelector('.space-y-6');
@@ -19943,6 +19974,7 @@ function createNewConversation() {
 // Save current conversation
 function saveCurrentConversation() {
     if (!currentConversationId) {
+        console.warn('⚠️ saveCurrentConversation: No currentConversationId - skipping save');
         return;
     }
     
@@ -19955,6 +19987,7 @@ function saveCurrentConversation() {
     
     var conv = getCurrentConversation();
     if (!conv) {
+        console.warn('⚠️ saveCurrentConversation: Conversation not found in array for ID:', currentConversationId, 'Array length:', conversations.length);
         return;
     }
     
@@ -19970,6 +20003,7 @@ function saveCurrentConversation() {
         }
     }
     
+    console.log('💾 saveCurrentConversation: Saving', conv.title, 'with', conversationHistory.length, 'messages');
     saveConversations();
     updateSidebarChats();
     
@@ -20032,9 +20066,11 @@ function loadConversation(convId) {
  * Similar to how Claude.ai works - shows previous chat instead of blank
  */
 function restoreLastConversation() {
+    console.log('🔄 restoreLastConversation: conversations array length:', conversations.length);
     // First, load conversations from localStorage if not already loaded
     if (conversations.length === 0) {
         loadConversations();
+        console.log('🔄 restoreLastConversation: After loadConversations:', conversations.length);
     }
     
     // Try to get the last active conversation ID using user-specific key
@@ -20240,12 +20276,13 @@ function loadBookmarks() {
 
 // Load bookmarks from Firebase and merge with local
 async function loadBookmarksFromFirebase() {
-    if (!currentUser || !currentUser.uid || !db) {
+    const fbUser = getFirebaseUser();
+    if (!fbUser || !db) {
         return;
     }
     
     try {
-        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+        const userDoc = await db.collection('users').doc(fbUser.uid).get();
         if (userDoc.exists) {
             const userData = userDoc.data();
             const firebaseBookmarks = userData.bookmarks || [];
@@ -20272,6 +20309,7 @@ async function loadBookmarksFromFirebase() {
             updateSidebarBookmarks();
         }
     } catch (error) {
+        console.error('loadBookmarksFromFirebase error:', error);
     }
 }
 
@@ -20280,10 +20318,12 @@ function saveBookmarks() {
     localStorage.setItem('fitz_bookmarks', JSON.stringify(bookmarks));
     
     // Sync to Firebase
-    if (currentUser && currentUser.uid && db) {
-        db.collection('users').doc(currentUser.uid).set({
+    const fbUser = getFirebaseUser();
+    if (fbUser && db) {
+        db.collection('users').doc(fbUser.uid).set({
             bookmarks: bookmarks
         }, { merge: true }).catch(err => {
+            console.error('saveBookmarks error:', err);
         });
     }
 }
@@ -23991,9 +24031,10 @@ function closeVenueSettings() {
 // ========================================
 
 async function trackConversation(userMessage, assistantResponse) {
+    const userKey = currentUser?.uid || currentUser?.email || currentUser || 'anonymous';
     const conversation = {
         timestamp: new Date().toISOString(),
-        user_code: currentUser,
+        user_code: userKey,
         user_message: userMessage,
         assistant_response: assistantResponse,
         theme: detectTheme(userMessage),
@@ -24032,7 +24073,7 @@ async function trackConversation(userMessage, assistantResponse) {
     }
     
     // 5. Update user profile
-    updateUserProfile(currentUser, userMessage);
+    updateUserProfile(userKey, userMessage);
 }
 
 function detectTheme(message) {
@@ -24102,7 +24143,7 @@ async function trackHighRiskTopic(message) {
     
     const highRiskEntry = {
         timestamp: new Date().toISOString(),
-        user_code: currentUser,
+        user_code: currentUser?.uid || currentUser?.email || currentUser || 'anonymous',
         category: risk.category,
         title: risk.title,
         severity: risk.severity,
@@ -37655,6 +37696,7 @@ function clearLocalUserData() {
     // Clear in-memory state
     conversationHistory = [];
     currentConversationId = null;
+    conversations = [];
     if (typeof bookmarks !== 'undefined') bookmarks = [];
     
     // Clear admin cache
@@ -37688,7 +37730,7 @@ async function signOut() {
         }
         
         // Save the current conversation ID to Firebase one last time
-        if (currentConversationId && currentUser && currentUser.uid) {
+        if (currentConversationId && getFirebaseUser()) {
             await saveCurrentConversationIdToFirebase(currentConversationId);
         }
         
@@ -37705,16 +37747,18 @@ async function signOut() {
  * @param {string} conversationId - The ID of the current active conversation
  */
 async function saveCurrentConversationIdToFirebase(conversationId) {
-    if (!currentUser || !currentUser.uid || !db) {
+    const fbUser = getFirebaseUser();
+    if (!fbUser || !db) {
         return;
     }
     
     try {
-        await db.collection('users').doc(currentUser.uid).set({
+        await db.collection('users').doc(fbUser.uid).set({
             lastConversationId: conversationId,
             lastConversationUpdated: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
     } catch (error) {
+        console.error('saveCurrentConversationIdToFirebase error:', error);
     }
 }
 
@@ -37723,23 +37767,25 @@ async function saveCurrentConversationIdToFirebase(conversationId) {
  * @returns {Promise<string|null>} The last conversation ID or null if not found
  */
 async function loadLastConversationIdFromFirebase() {
-    if (!currentUser || !currentUser.uid || !db) {
+    const fbUser = getFirebaseUser();
+    if (!fbUser || !db) {
         return null;
     }
     
     try {
-        const userDoc = await db.collection('users').doc(currentUser.uid).get();
+        const userDoc = await db.collection('users').doc(fbUser.uid).get();
         if (userDoc.exists) {
             const userData = userDoc.data();
             const lastConvId = userData.lastConversationId;
             if (lastConvId) {
                 // Also save to localStorage for faster access next time
-                localStorage.setItem('fitz_currentConversationId_' + currentUser.uid, lastConvId);
+                localStorage.setItem('fitz_currentConversationId_' + fbUser.uid, lastConvId);
                 return lastConvId;
             }
         }
         return null;
     } catch (error) {
+        console.error('loadLastConversationIdFromFirebase error:', error);
         return null;
     }
 }
@@ -38362,23 +38408,33 @@ function stopRealTimeCloudSync() {
 
 // Save conversation to Firebase immediately
 async function saveConversationToFirebase(conversation) {
-    if (!currentUser || !db) {
+    const fbUser = getFirebaseUser();
+    if (!fbUser || !db) {
         return false;
     }
     
     try {
-        await db.collection('users').doc(currentUser.uid)
+        // Ensure timestamp field exists for admin dashboard
+        if (!conversation.timestamp) {
+            conversation.timestamp = firebase.firestore.FieldValue.serverTimestamp();
+        }
+        conversation.userId = fbUser.uid;
+        conversation.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+        
+        await db.collection('users').doc(fbUser.uid)
                   .collection('conversations').doc(conversation.id)
                   .set(conversation, { merge: true });
         return true;
     } catch (error) {
+        console.error('saveConversationToFirebase error:', error);
         return false;
     }
 }
 
 // Load all conversations from Firebase
 async function loadConversationsFromFirebase() {
-    if (!currentUser || !db) {
+    const fbUser = getFirebaseUser();
+    if (!fbUser || !db) {
         loadConversations();
         return conversations || [];
     }
@@ -38387,7 +38443,7 @@ async function loadConversationsFromFirebase() {
         // First, load from localStorage to have something
         loadConversations();
         const localConversations = [...conversations];
-        const snapshot = await db.collection('users').doc(currentUser.uid)
+        const snapshot = await db.collection('users').doc(fbUser.uid)
                                    .collection('conversations')
                                    .get();
         
@@ -38395,6 +38451,8 @@ async function loadConversationsFromFirebase() {
         snapshot.forEach(doc => {
             firebaseConversations.push(doc.data());
         });
+        
+        console.log('📥 loadConversationsFromFirebase: Found', firebaseConversations.length, 'in Firebase,', localConversations.length, 'in localStorage');
         
         // Merge: Firebase takes priority, but keep local ones that aren't in Firebase
         const mergedMap = new Map();
@@ -38435,28 +38493,31 @@ async function loadConversationsFromFirebase() {
 
 // Save contract to Firebase
 async function saveContractToFirebase(contract) {
-    if (!currentUser || !db) {
+    const fbUser = getFirebaseUser();
+    if (!fbUser || !db) {
         return false;
     }
     
     try {
-        await db.collection('users').doc(currentUser.uid)
+        await db.collection('users').doc(fbUser.uid)
                   .collection('contracts').doc(contract.contractId)
                   .set(contract, { merge: true });
         return true;
     } catch (error) {
+        console.error('saveContractToFirebase error:', error);
         return false;
     }
 }
 
 // Load all contracts from Firebase
 async function loadContractsFromFirebase() {
-    if (!currentUser || !db) {
+    const fbUser = getFirebaseUser();
+    if (!fbUser || !db) {
         return [];
     }
     
     try {
-        const snapshot = await db.collection('users').doc(currentUser.uid)
+        const snapshot = await db.collection('users').doc(fbUser.uid)
                                    .collection('contracts').get();
         
         const contracts = [];
@@ -38472,28 +38533,31 @@ async function loadContractsFromFirebase() {
 
 // Save checklist to Firebase
 async function saveChecklistToFirebase(checklist) {
-    if (!currentUser || !db) {
+    const fbUser = getFirebaseUser();
+    if (!fbUser || !db) {
         return false;
     }
     
     try {
-        await db.collection('users').doc(currentUser.uid)
+        await db.collection('users').doc(fbUser.uid)
                   .collection('checklists').doc(checklist.checklistId)
                   .set(checklist, { merge: true });
         return true;
     } catch (error) {
+        console.error('saveChecklistToFirebase error:', error);
         return false;
     }
 }
 
 // Load all checklists from Firebase
 async function loadChecklistsFromFirebase() {
-    if (!currentUser || !db) {
+    const fbUser = getFirebaseUser();
+    if (!fbUser || !db) {
         return [];
     }
     
     try {
-        const snapshot = await db.collection('users').doc(currentUser.uid)
+        const snapshot = await db.collection('users').doc(fbUser.uid)
                                    .collection('checklists').get();
         
         const checklists = [];
@@ -38509,28 +38573,31 @@ async function loadChecklistsFromFirebase() {
 
 // Save training plan to Firebase
 async function saveTrainingPlanToFirebase(plan) {
-    if (!currentUser || !db) {
+    const fbUser = getFirebaseUser();
+    if (!fbUser || !db) {
         return false;
     }
     
     try {
-        await db.collection('users').doc(currentUser.uid)
+        await db.collection('users').doc(fbUser.uid)
                   .collection('trainingPlans').doc(plan.planId)
                   .set(plan, { merge: true });
         return true;
     } catch (error) {
+        console.error('saveTrainingPlanToFirebase error:', error);
         return false;
     }
 }
 
 // Load all training plans from Firebase
 async function loadTrainingPlansFromFirebase() {
-    if (!currentUser || !db) {
+    const fbUser = getFirebaseUser();
+    if (!fbUser || !db) {
         return [];
     }
     
     try {
-        const snapshot = await db.collection('users').doc(currentUser.uid)
+        const snapshot = await db.collection('users').doc(fbUser.uid)
                                    .collection('trainingPlans').get();
         
         const plans = [];
@@ -38546,7 +38613,8 @@ async function loadTrainingPlansFromFirebase() {
 
 // MASTER LOAD FUNCTION - Load everything on sign in
 async function loadAllDataFromFirebase() {
-    if (!currentUser || !db) {
+    const fbUser = getFirebaseUser();
+    if (!fbUser || !db) {
         return;
     }
     
