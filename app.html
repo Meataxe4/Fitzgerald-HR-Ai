@@ -19825,7 +19825,7 @@ async function syncConversationsToCloud() {
                 messages: conversation.messages || [],
                 created: conversation.created || new Date().toISOString(),
                 updated: conversation.updated || new Date().toISOString(),
-                timestamp: conversation.created || conversation.updated || new Date().toISOString(),
+                timestamp: conversation.updated || conversation.created || new Date().toISOString(),
                 userId: fbUser.uid,
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
@@ -24310,7 +24310,7 @@ async function loadAnalytics(forceRefresh = false) {
                         userEmail: userEmail,
                         userMessage: lastUserMsg?.content ? lastUserMsg.content.substring(0, 200) : 'No user message',
                         assistantResponse: lastAssistantMsg?.content ? lastAssistantMsg.content.substring(0, 200) : 'No response',
-                        timestamp: conv.created || conv.updated || conv.timestamp,
+                        timestamp: conv.updated || conv.created || conv.timestamp,
                         title: conv.title || 'Untitled',
                         messageCount: messages.length,
                         fullText: (conv.title || '') + ' ' + messages.map(m => m.content || '').join(' ')
