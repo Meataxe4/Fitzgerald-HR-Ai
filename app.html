@@ -24019,9 +24019,10 @@ function closeVenueSettings() {
 // ========================================
 
 async function trackConversation(userMessage, assistantResponse) {
+    const userKey = currentUser?.uid || currentUser?.email || currentUser || 'anonymous';
     const conversation = {
         timestamp: new Date().toISOString(),
-        user_code: currentUser,
+        user_code: userKey,
         user_message: userMessage,
         assistant_response: assistantResponse,
         theme: detectTheme(userMessage),
@@ -24060,7 +24061,7 @@ async function trackConversation(userMessage, assistantResponse) {
     }
     
     // 5. Update user profile
-    updateUserProfile(currentUser, userMessage);
+    updateUserProfile(userKey, userMessage);
 }
 
 function detectTheme(message) {
@@ -24130,7 +24131,7 @@ async function trackHighRiskTopic(message) {
     
     const highRiskEntry = {
         timestamp: new Date().toISOString(),
-        user_code: currentUser,
+        user_code: currentUser?.uid || currentUser?.email || currentUser || 'anonymous',
         category: risk.category,
         title: risk.title,
         severity: risk.severity,
