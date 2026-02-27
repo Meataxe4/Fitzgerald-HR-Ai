@@ -56,29 +56,26 @@
 .fitz-bot.fitz-xs { width: 16px; height: 16px; }
 
 /* ========================================
-   FIELD INFO TOOLTIP
+   FIELD INFO TOOLTIP (Click-to-toggle)
    ======================================== */
-.fitz-info-tooltip {
-    position: relative;
+.fitz-info-icon {
     display: inline-flex;
     align-items: center;
-    cursor: help;
+    justify-content: center;
+    cursor: pointer;
     margin-left: 6px;
-    font-size: 14px;
+    font-size: 13px;
     color: #94a3b8;
     vertical-align: middle;
     transition: color 0.2s;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
-.fitz-info-tooltip:hover {
+.fitz-info-icon:hover {
     color: #f59e0b;
 }
-.fitz-info-tooltip .fitz-tooltip-text {
-    visibility: hidden;
-    opacity: 0;
-    position: absolute;
-    bottom: calc(100% + 8px);
-    left: 50%;
-    transform: translateX(-50%);
+.fitz-info-box {
+    display: none;
     background: #1e293b;
     color: #e2e8f0;
     font-size: 12px;
@@ -87,55 +84,23 @@
     padding: 10px 14px;
     border-radius: 8px;
     border: 1px solid #475569;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-    width: 280px;
-    text-align: left;
-    z-index: 100;
-    transition: opacity 0.2s, visibility 0.2s;
-    pointer-events: none;
+    margin-top: 6px;
+    margin-bottom: 4px;
 }
-.fitz-info-tooltip .fitz-tooltip-text::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 6px solid transparent;
-    border-top-color: #475569;
+.fitz-info-box.active {
+    display: block;
 }
-.fitz-info-tooltip:hover .fitz-tooltip-text {
-    visibility: visible;
-    opacity: 1;
-}
-/* Light mode tooltip adjustments */
-.light-mode .fitz-info-tooltip {
+/* Light mode */
+.light-mode .fitz-info-icon {
     color: #64748b;
 }
-.light-mode .fitz-info-tooltip:hover {
+.light-mode .fitz-info-icon:hover {
     color: #d97706;
 }
-.light-mode .fitz-info-tooltip .fitz-tooltip-text {
-    background: #ffffff;
+.light-mode .fitz-info-box {
+    background: #f8fafc;
     color: #1e293b;
     border-color: #d1d5db;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
-}
-.light-mode .fitz-info-tooltip .fitz-tooltip-text::after {
-    border-top-color: #d1d5db;
-}
-/* Mobile: tap-friendly tooltip */
-@media (max-width: 768px) {
-    .fitz-info-tooltip .fitz-tooltip-text {
-        width: 240px;
-        left: auto;
-        right: -8px;
-        transform: none;
-    }
-    .fitz-info-tooltip .fitz-tooltip-text::after {
-        left: auto;
-        right: 16px;
-        transform: none;
-    }
 }
 
 /* Breathing Glow — for loading/generating states */
@@ -5414,7 +5379,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     <h3 class="text-white font-semibold mb-2 text-sm">👷 Employee Details</h3>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-slate-400 text-xs mb-1">Employee Name <span class="fitz-info-tooltip" aria-label="Data processing info">ⓘ<span class="fitz-tooltip-text">Fitz HR processes workplace data entered by users to generate HR documents. You must have authority to input employee information.</span></span></label>
+                            <label class="block text-slate-400 text-xs mb-1">Employee Name <span class="fitz-info-icon" onclick="fitzInfoToggle(this)">ⓘ</span></label>
+                            <div class="fitz-info-box">Fitz HR processes workplace data entered by users to generate HR documents. You must have authority to input employee information.</div>
                             <input type="text" id="reviewEmployeeName" 
                                    class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm focus:border-amber-500 focus:outline-none"
                                    placeholder="e.g. John Smith">
@@ -8664,6 +8630,14 @@ let wizardData = {};
 let currentWizardStep = 1;
 let recognition = null;
 let isListening = false;
+
+// ========================================
+// FIELD INFO TOOLTIP TOGGLE
+// ========================================
+function fitzInfoToggle(el) {
+    const box = el.closest('div').querySelector('.fitz-info-box');
+    if (box) box.classList.toggle('active');
+}
 
 // ========================================
 // FITZ CREDITS - GLOBAL STATE
@@ -12203,10 +12177,14 @@ function showDocumentStep(stepNumber) {
         }
         
         html += `<div>`;
-        const employeeTooltip = field.name === 'employeeName' ? '<span class="fitz-info-tooltip" aria-label="Data processing info">ⓘ<span class="fitz-tooltip-text">Fitz HR processes workplace data entered by users to generate HR documents. You must have authority to input employee information.</span></span>' : '';
+        const isEmployeeName = field.name === 'employeeName';
+        const infoIcon = isEmployeeName ? ' <span class="fitz-info-icon" onclick="fitzInfoToggle(this)">ⓘ</span>' : '';
         html += `<label class="block text-slate-300 text-sm mb-2">
-                    ${field.label}${field.required ? ' <span class="text-red-400">*</span>' : ''}${employeeTooltip}
+                    ${field.label}${field.required ? ' <span class="text-red-400">*</span>' : ''}${infoIcon}
                  </label>`;
+        if (isEmployeeName) {
+            html += '<div class="fitz-info-box">Fitz HR processes workplace data entered by users to generate HR documents. You must have authority to input employee information.</div>';
+        }
         
         if (field.type === 'text') {
             html += `<input type="text" id="field_${field.name}" 
@@ -31136,7 +31114,8 @@ function resetAIImport() {
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-slate-300 text-sm font-semibold mb-2">Employee Name <span class="fitz-info-tooltip" aria-label="Data processing info">ⓘ<span class="fitz-tooltip-text">Fitz HR processes workplace data entered by users to generate HR documents. You must have authority to input employee information.</span></span></label>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">Employee Name <span class="fitz-info-icon" onclick="fitzInfoToggle(this)">ⓘ</span></label>
+                    <div class="fitz-info-box">Fitz HR processes workplace data entered by users to generate HR documents. You must have authority to input employee information.</div>
                     <input type="text" id="trainingEmployeeName" 
                            class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
                            placeholder="Full name">
@@ -31458,7 +31437,8 @@ function resetAIImport() {
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-slate-300 text-sm font-semibold mb-2">Employee Name <span class="fitz-info-tooltip" aria-label="Data processing info">ⓘ<span class="fitz-tooltip-text">Fitz HR processes workplace data entered by users to generate HR documents. You must have authority to input employee information.</span></span></label>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">Employee Name <span class="fitz-info-icon" onclick="fitzInfoToggle(this)">ⓘ</span></label>
+                    <div class="fitz-info-box">Fitz HR processes workplace data entered by users to generate HR documents. You must have authority to input employee information.</div>
                     <input type="text" id="onboardingEmployeeName" 
                            class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
                            placeholder="Full name">
@@ -33581,10 +33561,14 @@ function showProbationStep(stepNumber) {
     
     step.fields.forEach(field => {
         html += '<div>';
-        const probTooltip = field.name === 'employeeName' ? '<span class="fitz-info-tooltip" aria-label="Data processing info">ⓘ<span class="fitz-tooltip-text">Fitz HR processes workplace data entered by users to generate HR documents. You must have authority to input employee information.</span></span>' : '';
+        const isProbEmployeeName = field.name === 'employeeName';
+        const probInfoIcon = isProbEmployeeName ? ' <span class="fitz-info-icon" onclick="fitzInfoToggle(this)">ⓘ</span>' : '';
         html += `<label class="block text-slate-300 text-sm mb-2">
-                    ${field.label}${field.required ? ' <span class="text-red-400">*</span>' : ''}${probTooltip}
+                    ${field.label}${field.required ? ' <span class="text-red-400">*</span>' : ''}${probInfoIcon}
                  </label>`;
+        if (isProbEmployeeName) {
+            html += '<div class="fitz-info-box">Fitz HR processes workplace data entered by users to generate HR documents. You must have authority to input employee information.</div>';
+        }
         
         const savedValue = probationCheckInState.data[field.name] || '';
         
