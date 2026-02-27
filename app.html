@@ -55,6 +55,89 @@
 .fitz-bot.fitz-sm { width: 20px; height: 20px; }
 .fitz-bot.fitz-xs { width: 16px; height: 16px; }
 
+/* ========================================
+   FIELD INFO TOOLTIP
+   ======================================== */
+.fitz-info-tooltip {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    cursor: help;
+    margin-left: 6px;
+    font-size: 14px;
+    color: #94a3b8;
+    vertical-align: middle;
+    transition: color 0.2s;
+}
+.fitz-info-tooltip:hover {
+    color: #f59e0b;
+}
+.fitz-info-tooltip .fitz-tooltip-text {
+    visibility: hidden;
+    opacity: 0;
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1e293b;
+    color: #e2e8f0;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.5;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #475569;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    width: 280px;
+    text-align: left;
+    z-index: 100;
+    transition: opacity 0.2s, visibility 0.2s;
+    pointer-events: none;
+}
+.fitz-info-tooltip .fitz-tooltip-text::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #475569;
+}
+.fitz-info-tooltip:hover .fitz-tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+/* Light mode tooltip adjustments */
+.light-mode .fitz-info-tooltip {
+    color: #64748b;
+}
+.light-mode .fitz-info-tooltip:hover {
+    color: #d97706;
+}
+.light-mode .fitz-info-tooltip .fitz-tooltip-text {
+    background: #ffffff;
+    color: #1e293b;
+    border-color: #d1d5db;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
+.light-mode .fitz-info-tooltip .fitz-tooltip-text::after {
+    border-top-color: #d1d5db;
+}
+/* Mobile: tap-friendly tooltip */
+@media (max-width: 768px) {
+    .fitz-info-tooltip .fitz-tooltip-text {
+        width: 240px;
+        left: auto;
+        right: -8px;
+        transform: none;
+    }
+    .fitz-info-tooltip .fitz-tooltip-text::after {
+        left: auto;
+        right: 16px;
+        transform: none;
+    }
+}
+
 /* Breathing Glow — for loading/generating states */
 .fitz-breathe {
     animation: fitz-breathe-float 3s ease-in-out infinite, fitz-breathe-glow 3s ease-in-out infinite;
@@ -4813,14 +4896,14 @@ async function checkFirestoreData() {
                 <div class="flex items-center gap-6 text-sm">
                     <a href="#" onclick="showTermsOfService(); return false;" class="text-slate-400 hover:text-white transition-colors">Terms</a>
                     <a href="#" onclick="showPrivacyPolicy(); return false;" class="text-slate-400 hover:text-white transition-colors">Privacy</a>
-                    <a href="mailto:hello@fitzhr.com" class="text-slate-400 hover:text-white transition-colors">Contact</a>
+                    <a href="/cdn-cgi/l/email-protection#eb838e878784ab8d829f918399c5888486" class="text-slate-400 hover:text-white transition-colors">Contact</a>
                 </div>
             </div>
         </footer>
     </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // Smart view switching based on returning user
 function initAccessScreen() {
     const isReturning = localStorage.getItem('fitzhr_returning') === 'true' || 
@@ -5224,7 +5307,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </p>
         <p class="text-slate-500 text-xs">
             Professional Advice: 
-            <a href="mailto:support@fitzhr.com" class="text-slate-400 hover:text-amber-400 underline">support@fitzhr.com</a> | 
+            <a href="/cdn-cgi/l/email-protection#93e0e6e3e3fce1e7d3f5fae7e9fbe1bdf0fcfe" class="text-slate-400 hover:text-amber-400 underline"><span class="__cf_email__" data-cfemail="6f1c1a1f1f001d1b2f09061b15071d410c0002">[email&#160;protected]</span></a> | 
             <a href="#terms" onclick="showTermsOfService(); return false;" class="text-slate-400 hover:text-amber-400 underline">Terms</a>
         </p>
     </div>
@@ -5331,7 +5414,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <h3 class="text-white font-semibold mb-2 text-sm">👷 Employee Details</h3>
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-slate-400 text-xs mb-1">Employee Name</label>
+                            <label class="block text-slate-400 text-xs mb-1">Employee Name <span class="fitz-info-tooltip" aria-label="Data processing info">ⓘ<span class="fitz-tooltip-text">Fitz HR processes workplace data entered by users to generate HR documents. You must have authority to input employee information.</span></span></label>
                             <input type="text" id="reviewEmployeeName" 
                                    class="w-full px-3 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white text-sm focus:border-amber-500 focus:outline-none"
                                    placeholder="e.g. John Smith">
@@ -7135,7 +7218,7 @@ Be as specific as possible!"></textarea>
                     <span>CRITICAL: This document MUST be reviewed by a consultant before use</span>
                 </p>
                 <p class="text-red-200 text-xs">
-                    Contact: <a href="mailto:support@fitzhr.com" class="underline hover:text-red-100">support@fitzhr.com</a>
+                    Contact: <a href="/cdn-cgi/l/email-protection#10636560607f6264507679646a78623e737f7d" class="underline hover:text-red-100"><span class="__cf_email__" data-cfemail="40333530302f3234002629343a28326e232f2d">[email&#160;protected]</span></a>
                 </p>
             </div>
         </div>
@@ -7252,7 +7335,7 @@ Be as specific as possible!"></textarea>
 
         <div class="mt-6 text-center">
             <p class="text-slate-400 text-sm">
-                ✉️ Need help? <a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline font-semibold">support@fitzhr.com</a>
+                ✉️ Need help? <a href="/cdn-cgi/l/email-protection#4c3f393c3c233e380c2a253836243e622f2321" class="text-amber-400 hover:underline font-semibold"><span class="__cf_email__" data-cfemail="81f2f4f1f1eef3f5c1e7e8f5fbe9f3afe2eeec">[email&#160;protected]</span></a>
             </p>
         </div>
     </div>
@@ -7607,12 +7690,12 @@ Be as specific as possible!"></textarea>
         <!-- FAQ -->
         <div class="text-center text-slate-400 text-xs">
             <p>14-day money-back guarantee on paid plans. Cancel anytime.</p>
-            <p class="mt-1">Questions? <a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline">support@fitzhr.com</a></p>
+            <p class="mt-1">Questions? <a href="/cdn-cgi/l/email-protection#097a7c7979667b7d496f607d73617b276a6664" class="text-amber-400 hover:underline"><span class="__cf_email__" data-cfemail="fb888e8b8b94898fbb9d928f819389d5989496">[email&#160;protected]</span></a></p>
         </div>
     </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // Billing toggle state - DEFAULT TO ANNUAL
 let currentBilling = 'annual';
 
@@ -7815,7 +7898,7 @@ function setBilling(billing) {
         </div>
 
         <p class="text-center text-slate-500 text-xs mt-4">
-            Questions? <a href="mailto:support@fitzhr.com" class="text-amber-400">support@fitzhr.com</a>
+            Questions? <a href="/cdn-cgi/l/email-protection#04777174746b767044626d707e6c762a676b69" class="text-amber-400"><span class="__cf_email__" data-cfemail="7b080e0b0b14090f3b1d120f01130955181416">[email&#160;protected]</span></a>
         </p>
     </div>
 </div>
@@ -8042,10 +8125,10 @@ function setBilling(billing) {
         <!-- Footer -->
         <div class="bg-slate-900 rounded-b-2xl p-4 flex items-center justify-between">
             <p class="text-slate-500 text-xs">
-                Questions? <a href="mailto:support@fitzhr.com" class="text-purple-400 hover:text-purple-300">support@fitzhr.com</a>
+                Questions? <a href="/cdn-cgi/l/email-protection#186b6d6868776a6c587e716c62706a367b7775" class="text-purple-400 hover:text-purple-300"><span class="__cf_email__" data-cfemail="72010702021d000632141b06081a005c111d1f">[email&#160;protected]</span></a>
             </p>
             <p class="text-slate-500 text-xs">
-                <a href="mailto:support@fitzhr.com" class="text-purple-400 hover:text-purple-300">support@fitzhr.com</a>
+                <a href="/cdn-cgi/l/email-protection#71020401011e0305311718050b19035f121e1c" class="text-purple-400 hover:text-purple-300"><span class="__cf_email__" data-cfemail="80f3f5f0f0eff2f4c0e6e9f4fae8f2aee3efed">[email&#160;protected]</span></a>
             </p>
         </div>
     </div>
@@ -8120,7 +8203,7 @@ function setBilling(billing) {
             <h3 class="text-white font-bold text-lg">7. Professional Consultation</h3>
             <p>For professional HR advice and document review:</p>
             <p class="font-semibold text-amber-400">
-                Email: <a href="mailto:support@fitzhr.com" class="underline">support@fitzhr.com</a>
+                Email: <a href="/cdn-cgi/l/email-protection#63101613130c111723050a17190b114d000c0e" class="underline"><span class="__cf_email__" data-cfemail="8bf8fefbfbe4f9ffcbede2fff1e3f9a5e8e4e6">[email&#160;protected]</span></a>
             </p>
 
             <p class="text-xs text-slate-400 mt-6">Last Updated: January 2026</p>
@@ -8193,7 +8276,7 @@ function setBilling(billing) {
             <h3 class="text-white font-bold text-lg">7. Contact Us</h3>
             <p>For privacy concerns or data requests:</p>
             <p class="font-semibold text-amber-400">
-                Email: <a href="mailto:privacy@fitzhr.com" class="underline">privacy@fitzhr.com</a>
+                Email: <a href="/cdn-cgi/l/email-protection#09797b607f686a70496f607d73617b276a6664" class="underline"><span class="__cf_email__" data-cfemail="0c7c7e657a6d6f754c6a657876647e226f6361">[email&#160;protected]</span></a>
             </p>
 
             <p class="text-xs text-slate-400 mt-6">Last Updated: January 2026</p>
@@ -8319,7 +8402,7 @@ function setBilling(billing) {
                     <span>Get Professional Advice</span>
                 </h3>
                 <p class="text-amber-300">
-                    Email: <a href="mailto:support@fitzhr.com" class="underline hover:text-amber-200 font-semibold">support@fitzhr.com</a>
+                    Email: <a href="/cdn-cgi/l/email-protection#ef9c9a9f9f809d9baf89869b95879dc18c8082" class="underline hover:text-amber-200 font-semibold"><span class="__cf_email__" data-cfemail="a8dbddd8d8c7dadce8cec1dcd2c0da86cbc7c5">[email&#160;protected]</span></a>
                 </p>
             </div>
 
@@ -8361,7 +8444,7 @@ function setBilling(billing) {
     </div>
 </div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ========================================
 // CONFIGURATION & GLOBALS
 // ========================================
@@ -12120,8 +12203,9 @@ function showDocumentStep(stepNumber) {
         }
         
         html += `<div>`;
+        const employeeTooltip = field.name === 'employeeName' ? '<span class="fitz-info-tooltip" aria-label="Data processing info">ⓘ<span class="fitz-tooltip-text">Fitz HR processes workplace data entered by users to generate HR documents. You must have authority to input employee information.</span></span>' : '';
         html += `<label class="block text-slate-300 text-sm mb-2">
-                    ${field.label}${field.required ? ' <span class="text-red-400">*</span>' : ''}
+                    ${field.label}${field.required ? ' <span class="text-red-400">*</span>' : ''}${employeeTooltip}
                  </label>`;
         
         if (field.type === 'text') {
@@ -31052,7 +31136,7 @@ function resetAIImport() {
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-slate-300 text-sm font-semibold mb-2">Employee Name</label>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">Employee Name <span class="fitz-info-tooltip" aria-label="Data processing info">ⓘ<span class="fitz-tooltip-text">Fitz HR processes workplace data entered by users to generate HR documents. You must have authority to input employee information.</span></span></label>
                     <input type="text" id="trainingEmployeeName" 
                            class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
                            placeholder="Full name">
@@ -31374,7 +31458,7 @@ function resetAIImport() {
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-slate-300 text-sm font-semibold mb-2">Employee Name</label>
+                    <label class="block text-slate-300 text-sm font-semibold mb-2">Employee Name <span class="fitz-info-tooltip" aria-label="Data processing info">ⓘ<span class="fitz-tooltip-text">Fitz HR processes workplace data entered by users to generate HR documents. You must have authority to input employee information.</span></span></label>
                     <input type="text" id="onboardingEmployeeName" 
                            class="w-full px-4 py-2 bg-slate-600 border border-slate-500 rounded-lg text-white focus:border-amber-500 focus:outline-none"
                            placeholder="Full name">
@@ -33497,8 +33581,9 @@ function showProbationStep(stepNumber) {
     
     step.fields.forEach(field => {
         html += '<div>';
+        const probTooltip = field.name === 'employeeName' ? '<span class="fitz-info-tooltip" aria-label="Data processing info">ⓘ<span class="fitz-tooltip-text">Fitz HR processes workplace data entered by users to generate HR documents. You must have authority to input employee information.</span></span>' : '';
         html += `<label class="block text-slate-300 text-sm mb-2">
-                    ${field.label}${field.required ? ' <span class="text-red-400">*</span>' : ''}
+                    ${field.label}${field.required ? ' <span class="text-red-400">*</span>' : ''}${probTooltip}
                  </label>`;
         
         const savedValue = probationCheckInState.data[field.name] || '';
@@ -40040,4 +40125,3 @@ function checkForTourCommand(message) {
 </script>
 </body>
 </html>
-
