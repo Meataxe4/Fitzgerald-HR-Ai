@@ -17293,15 +17293,32 @@ async function processPaymentSuccess() {
                     
                     if (doc.exists && doc.data().credits) {
                         const firebaseCredits = doc.data().credits;
-                        // Load existing values (especially purchasedCredits!)
+                        const topLevelData = doc.data();
+                        
+                        // Load ALL existing values from Firebase (source of truth)
+                        // Previously this was missing reviewCredits, billingCycle, etc.
+                        // which caused credit wipes when buying credit packs
                         userCredits.subscriptionTier = firebaseCredits.subscriptionTier || firebaseCredits.tier || userCredits.subscriptionTier || 'free';
+                        userCredits.reviewCredits = firebaseCredits.reviewCredits || userCredits.reviewCredits || 0;  // CRITICAL: preserve subscription credits
                         userCredits.reviewCreditsUsed = firebaseCredits.reviewCreditsUsed || 0;
-                        userCredits.purchasedCredits = firebaseCredits.purchasedCredits || 0; // CRITICAL: Get existing balance
+                        userCredits.purchasedCredits = firebaseCredits.purchasedCredits || 0;
                         userCredits.lowRiskDocsUsed = firebaseCredits.lowRiskDocsUsed || 0;
                         userCredits.bonusPrompts = firebaseCredits.bonusPrompts || 0;
                         userCredits.monthlyPromptsUsed = firebaseCredits.monthlyPromptsUsed || 0;
                         userCredits.subscriptionStartDate = firebaseCredits.subscriptionStartDate || null;
-                        console.log('✅ Loaded existing credits:', userCredits.purchasedCredits, 'purchased credits');
+                        userCredits.billingCycle = firebaseCredits.billingCycle || userCredits.billingCycle || null;  // CRITICAL: preserve billing cycle
+                        userCredits.lastCreditRefresh = firebaseCredits.lastCreditRefresh || userCredits.lastCreditRefresh || null;
+                        userCredits.stripeCustomerId = firebaseCredits.stripeCustomerId || topLevelData.stripeCustomerId || userCredits.stripeCustomerId || null;
+                        userCredits.stripeSubscriptionId = firebaseCredits.stripeSubscriptionId || userCredits.stripeSubscriptionId || null;
+                        userCredits.subscriptionStatus = firebaseCredits.subscriptionStatus || userCredits.subscriptionStatus || null;
+                        userCredits.subscriptionPeriodEnd = firebaseCredits.subscriptionPeriodEnd || userCredits.subscriptionPeriodEnd || null;
+                        userCredits.cancelAtPeriodEnd = firebaseCredits.cancelAtPeriodEnd || false;
+                        
+                        console.log('✅ Loaded ALL existing credits from Firebase:', 
+                            'reviewCredits:', userCredits.reviewCredits,
+                            'purchasedCredits:', userCredits.purchasedCredits,
+                            'tier:', userCredits.subscriptionTier,
+                            'billing:', userCredits.billingCycle);
                     }
                 } catch (e) {
                     console.error('Error loading existing credits:', e);
@@ -17334,11 +17351,24 @@ async function processPaymentSuccess() {
                 // Start renewal checker now that user is a paid subscriber
                 startRenewalChecker();
             } else if (purchase.type === 'reviewCredits' || purchase.type === 'credits') {
-                // Credit packs - webhook already added credits to Firebase
-                // We just loaded them above, so just update the display
-                console.log('💰 Credit pack purchased - credits already added by webhook:', userCredits.purchasedCredits);
-                // Force immediate display update
+                // Credit packs - webhook adds purchasedCredits to Firebase
+                // We loaded existing credits above, now save complete state to localStorage
+                console.log('💰 Credit pack purchased. Current state - reviewCredits:', userCredits.reviewCredits, 'purchasedCredits:', userCredits.purchasedCredits);
+                
+                // Save complete state to localStorage cache immediately
+                const userKey = currentUser?.uid || currentUser || 'anonymous';
+                localStorage.setItem('fitzCredits_' + userKey, JSON.stringify(userCredits));
+                
+                // Force immediate display update with what we have
                 updateCreditsDisplay();
+                
+                // Reload from Firebase after a delay to pick up webhook's credit addition
+                // (webhook may not have processed yet when we loaded above)
+                setTimeout(async () => {
+                    console.log('🔄 Reloading credits from Firebase to pick up webhook additions...');
+                    skipFirebaseCreditsLoad = false; // Allow Firebase load
+                    await loadCreditsFromFirebase();
+                }, 3000); // 3 second delay for webhook processing
             } else if (purchase.type === 'consultation') {
                 // Consultation booking - no credits to add, just confirm
                 console.log('📞 Consultation booked');
@@ -41941,3 +41971,4 @@ function checkForTourCommand(message) {
 </script>
 </body>
 </html>
+
