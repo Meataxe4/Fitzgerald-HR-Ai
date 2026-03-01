@@ -16125,8 +16125,9 @@ function openCreditsModal() {
     }
     
     // Show free tier info or hide for paid tiers
+    const modalTier = userCredits.subscriptionTier || userCredits.tier || 'free';
     if (freeDocStatus && freeDocUsedStatus) {
-        if (userCredits.tier === 'free') {
+        if (modalTier === 'free') {
             freeDocStatus.classList.remove('hidden');
             freeDocUsedStatus.classList.add('hidden');
         } else {
@@ -16137,7 +16138,7 @@ function openCreditsModal() {
     }
     
     // Update prompts remaining
-    if (userCredits.tier === 'free') {
+    if (modalTier === 'free') {
         const remaining = getRemainingPrompts();
         document.getElementById('modalPromptsRemaining').textContent = `${remaining}/${CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS} prompts remaining`;
     } else {
@@ -16173,7 +16174,8 @@ function updateManageSubscriptionUI() {
     if (!manageSection) return;
     
     // Show manage section for paying customers with Stripe customer ID
-    const isPaying = userCredits.tier && userCredits.tier !== 'free';
+    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
+    const isPaying = tier !== 'free';
     const hasStripeId = userCredits.stripeCustomerId;
     
     if (isPaying && hasStripeId) {
@@ -41971,4 +41973,3 @@ function checkForTourCommand(message) {
 </script>
 </body>
 </html>
-
