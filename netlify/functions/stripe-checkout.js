@@ -1,27 +1,27 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // ============================================
-// PRICE ID MAPPING - Updated February 2025
-// NEW PRICING MODEL: Starter/Pro/Business
+// PRICE ID MAPPING - Updated March 2025
+// LIVE MODE - Starter/Pro/Business
 // ============================================
 const PRICE_IDS = {
-    // Subscriptions - NEW TIERS (Test Mode)
-    starter_monthly: 'price_1Sys3V2Ig0gUvbfwwy70aKko',
-    starter_annual: 'price_1Sys2t2Ig0gUvbfwRMxXCSnP',
-    pro_monthly: 'price_1Sys4S2Ig0gUvbfwEfAFtmpk',
-    pro_annual: 'price_1Sys402Ig0gUvbfwc2M1RM7K',
-    business_monthly: 'price_1Sys5I2Ig0gUvbfwRjf1Rs2e',
-    business_annual: 'price_1Sys4y2Ig0gUvbfwv5PTTgrg',
+    // Subscriptions - LIVE MODE
+    starter_monthly: 'price_1T6TF02Ig0gUvbfwRi8SuyIM',
+    starter_annual: 'price_1T6THA2Ig0gUvbfwgqwTuKuJ',
+    pro_monthly: 'price_1T6TJ72Ig0gUvbfwUT1vMaAb',
+    pro_annual: 'price_1T6TKD2Ig0gUvbfws3sw93m1',
+    business_monthly: 'price_1T6TL52Ig0gUvbfwnBbFQK6l',
+    business_annual: 'price_1T6TM62Ig0gUvbfw8IMbOAoG',
     
     // Review Credit Packs (one-time)
-    credits_1: 'price_1Sys622Ig0gUvbfwgSo1au7E',    // 1 credit - $29
-    credits_5: 'price_1Sys6Z2Ig0gUvbfwp7WVRLGF',    // 5 credits - $119
+    credits_1: 'price_1T6TNB2Ig0gUvbfwopGhRIlF',    // 1 credit - $29
+    credits_5: 'price_1T6TOK2Ig0gUvbfwAdowCoQc',    // 5 credits - $119
     
     // Chat Top-Up (one-time)
-    chat_topup: 'price_1T6St22Ig0gUvbfwoWHRJ8vZ',  // Chat Top-Up - $19 for 30 prompts
+    chat_topup: 'price_1T6TPs2Ig0gUvbfwymN5AEq7',   // Chat Top-Up - $19 for 30 prompts
     
-    // Consultation (one-time)
-    consultation: 'price_1Sys7E2Ig0gUvbfwD6RrsWAR'  // HR Consultation - $150
+    // Consultation (one-time) - not currently offered
+    consultation: 'price_1T6TQw2Ig0gUvbfwv0jTcxZi'   // HR Consultation - $150
 };
 
 // ============================================
@@ -181,9 +181,8 @@ exports.handler = async (event, context) => {
 // IMPORTANT NOTES:
 // ============================================
 // 
-// 1. These are TEST MODE price IDs
-//    When going LIVE, create new products in Stripe Live Mode
-//    and update the PRICE_IDS above
+// 1. These are LIVE MODE price IDs (switched March 2025)
+//    Test mode IDs are no longer used
 //
 // 2. New Pricing Model (Feb 2025):
 //    - Starter: $249/yr (96 credits) or $29/mo (8 credits)
