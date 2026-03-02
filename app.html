@@ -17415,10 +17415,20 @@ async function processPaymentSuccess() {
                 console.log('📞 Consultation booked');
             }
             
-            // Legacy support for topup (bonus prompts)
+            // Chat top-up - webhook already added bonusPrompts to Firebase
+            // Just reload from Firebase to pick up the webhook's addition
             if (purchase.type === 'topup') {
-                userCredits.bonusPrompts = (userCredits.bonusPrompts || 0) + purchase.prompts;
-                saveUserCredits();
+                console.log('💬 Chat top-up purchased - bonus prompts added by webhook');
+                const userKey = currentUser?.uid || currentUser || 'anonymous';
+                localStorage.setItem('fitzCredits_' + userKey, JSON.stringify(userCredits));
+                updateCreditsDisplay();
+                
+                // Reload from Firebase after delay to pick up webhook's addition
+                setTimeout(async () => {
+                    console.log('🔄 Reloading credits from Firebase to pick up bonus prompts...');
+                    skipFirebaseCreditsLoad = false;
+                    await loadCreditsFromFirebase();
+                }, 3000);
             }
             
             console.log('📊 Credits after purchase:', JSON.stringify(userCredits));
