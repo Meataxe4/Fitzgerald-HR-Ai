@@ -7344,7 +7344,7 @@ Be as specific as possible!"></textarea>
         <div class="text-center mb-6">
             <div class="text-6xl mb-4">💬</div>
             <h2 class="text-2xl font-bold text-amber-400 mb-2">You've Used Your Free Prompts</h2>
-            <p class="text-slate-300">You've used all 20 free prompts for this month.</p>
+            <p class="text-slate-300">You've used all 20 free prompts for this period.</p>
         </div>
 
         <div class="bg-slate-900 rounded-lg p-6 mb-6">
@@ -7355,8 +7355,8 @@ Be as specific as possible!"></textarea>
                         class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-4 px-6 rounded-lg transition-all flex items-center justify-center gap-3">
                     <span class="text-2xl">⭐</span>
                     <div class="text-left">
-                        <p class="text-lg">Subscribe from $59/month</p>
-                        <p class="text-xs opacity-75">Unlimited chat + 5-25 document credits</p>
+                        <p class="text-lg">Subscribe from $29/month</p>
+                        <p class="text-xs opacity-75">Unlimited chat + 8-50 document credits</p>
                     </div>
                 </button>
                 
@@ -7366,14 +7366,14 @@ Be as specific as possible!"></textarea>
                     <span class="text-xl">💳</span>
                     <div class="text-left">
                         <p>Chat Top-Up — $19</p>
-                        <p class="text-xs opacity-75">30 additional prompts this month</p>
+                        <p class="text-xs opacity-75">30 additional prompts</p>
                     </div>
                 </button>
             </div>
         </div>
 
         <div class="text-center">
-            <p class="text-slate-400 text-sm mb-4">Your prompts reset on the 1st of each month.</p>
+            <p class="text-slate-400 text-sm mb-4" id="promptResetText">Your prompts reset every 30 days.</p>
             <button onclick="closePromptLimitModal()" class="text-slate-400 hover:text-white text-sm underline">
                 Maybe Later
             </button>
@@ -10479,15 +10479,41 @@ async function loadCreditsFromFirebase() {
             
             console.log('📦 Stripe Customer ID:', userCredits.stripeCustomerId);
             
-            // Check if it's a new month - reset prompts for free tier
+            // Check if prompts should reset - based on 30-day cycle from account creation
+            // Free tier prompts reset every 30 days from when the user signed up
             const now = new Date();
             const lastReset = userCredits.monthlyPromptsReset ? new Date(userCredits.monthlyPromptsReset) : null;
-            const isNewMonth = !lastReset || 
-                (now.getMonth() !== lastReset.getMonth() || now.getFullYear() !== lastReset.getFullYear());
             
-            if (isNewMonth) {
-                console.log('📅 New month detected - resetting prompts');
+            // Get account creation date from Firestore for anniversary-based reset
+            let accountCreatedAt = null;
+            if (doc.exists && doc.data().createdAt) {
+                const createdAtField = doc.data().createdAt;
+                accountCreatedAt = createdAtField.toDate ? createdAtField.toDate() : new Date(createdAtField);
+            }
+            
+            // Calculate if we're in a new 30-day cycle based on account creation
+            let shouldReset = false;
+            if (!lastReset) {
+                // Never reset before - do it now
+                shouldReset = true;
+            } else if (accountCreatedAt) {
+                // Anniversary-based: calculate how many 30-day cycles have passed since account creation
+                const msPerCycle = 30 * 24 * 60 * 60 * 1000;
+                const msSinceCreation = now.getTime() - accountCreatedAt.getTime();
+                const currentCycle = Math.floor(msSinceCreation / msPerCycle);
+                const msSinceLastReset = lastReset.getTime() - accountCreatedAt.getTime();
+                const lastResetCycle = Math.floor(msSinceLastReset / msPerCycle);
+                shouldReset = currentCycle > lastResetCycle;
+            } else {
+                // Fallback: 30 days since last reset
+                const daysSinceReset = (now.getTime() - lastReset.getTime()) / (24 * 60 * 60 * 1000);
+                shouldReset = daysSinceReset >= 30;
+            }
+            
+            if (shouldReset) {
+                console.log('📅 New 30-day cycle detected - resetting prompts');
                 userCredits.monthlyPromptsUsed = 0;
+                userCredits.bonusPrompts = 0; // Top-ups expire with each cycle
                 userCredits.monthlyPromptsReset = now.toISOString();
                 
                 // Save the refreshed data
@@ -10806,7 +10832,8 @@ function hasPromptsRemaining() {
     // Paid subscribers have unlimited prompts
     if (tier !== 'free') return true;
     
-    return userCredits.monthlyPromptsUsed < CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS;
+    const totalAllowed = CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS + (userCredits.bonusPrompts || 0);
+    return userCredits.monthlyPromptsUsed < totalAllowed;
 }
 
 // Use a prompt
@@ -10834,7 +10861,8 @@ function usePrompt() {
 function getRemainingPrompts() {
     const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
     if (tier !== 'free') return Infinity;
-    return CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS - userCredits.monthlyPromptsUsed;
+    const totalAllowed = CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS + (userCredits.bonusPrompts || 0);
+    return totalAllowed - userCredits.monthlyPromptsUsed;
 }
 
 // Update the credits display in the header
@@ -16866,6 +16894,14 @@ function unlockDocument() {
 /**
  * Show subscription options
  */
+/**
+ * Purchase chat top-up (30 extra prompts for $19)
+ */
+function purchaseChatTopUp() {
+    closePromptLimitModal();
+    initiateStripeCheckout('chat_topup');
+}
+
 function showSubscriptionOptions() {
     // Close any open modals
     closeCreditsModal();
@@ -17208,7 +17244,10 @@ function getPurchaseInfo(priceKey) {
         credits_5: { type: 'reviewCredits', credits: 5 },
         
         // Consultation
-        consultation: { type: 'consultation', price: 150 }
+        consultation: { type: 'consultation', price: 150 },
+        
+        // Chat top-up (30 extra prompts)
+        chat_topup: { type: 'topup', prompts: 30 }
     };
     
     return purchaseMap[priceKey] || { type: 'unknown' };
