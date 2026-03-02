@@ -18,7 +18,7 @@ const PRICE_IDS = {
     credits_5: 'price_1Sys6Z2Ig0gUvbfwp7WVRLGF',    // 5 credits - $119
     
     // Chat Top-Up (one-time)
-    chat_topup: 'price_XXXXX',  // TODO: Replace with live price ID - $19 for 30 prompts
+    chat_topup: 'price_1T6St22Ig0gUvbfwoWHRJ8vZ',  // Chat Top-Up - $19 for 30 prompts
     
     // Consultation (one-time)
     consultation: 'price_1Sys7E2Ig0gUvbfwD6RrsWAR'  // HR Consultation - $150
