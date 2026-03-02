@@ -17,6 +17,9 @@ const PRICE_IDS = {
     credits_1: 'price_1Sys622Ig0gUvbfwgSo1au7E',    // 1 credit - $29
     credits_5: 'price_1Sys6Z2Ig0gUvbfwp7WVRLGF',    // 5 credits - $119
     
+    // Chat Top-Up (one-time)
+    chat_topup: 'price_XXXXX',  // TODO: Replace with live price ID - $19 for 30 prompts
+    
     // Consultation (one-time)
     consultation: 'price_1Sys7E2Ig0gUvbfwD6RrsWAR'  // HR Consultation - $150
 };
@@ -39,6 +42,9 @@ const REVIEW_CREDIT_AMOUNTS = {
     // One-time credit packs
     credits_1: 1,
     credits_5: 5,
+    
+    // Chat top-up doesn't give review credits
+    chat_topup: 0,
     
     // Consultation doesn't give credits
     consultation: 0
@@ -64,6 +70,7 @@ const PRODUCT_TYPE = {
     business_annual: 'subscription',
     credits_1: 'reviewCredits',
     credits_5: 'reviewCredits',
+    chat_topup: 'topup',
     consultation: 'consultation'
 };
 
@@ -124,6 +131,11 @@ exports.handler = async (event, context) => {
             billing_address_collection: 'auto'
         };
 
+        // Add prompts metadata for top-up purchases
+        if (productKey === 'chat_topup') {
+            sessionConfig.metadata.prompts = '30';
+        }
+
         if (userEmail) {
             sessionConfig.customer_email = userEmail;
         }
@@ -179,6 +191,7 @@ exports.handler = async (event, context) => {
 //    - Business: $899/yr (600 credits) or $99/mo (50 credits)
 //    - Single Credit: $29
 //    - 5 Credit Pack: $119
+//    - Chat Top-Up: $19 (30 bonus prompts)
 //    - Consultation: $150
 //
 // 3. Annual plans get ALL credits upfront (monthly × 12)
