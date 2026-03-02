@@ -259,6 +259,12 @@ async function handleCheckoutComplete(session) {
         await addPurchasedCredits(userId, reviewCredits, session.id, productKey, session.customer);
     }
     
+    if (productType === 'topup') {
+        const prompts = parseInt(metadata.prompts) || 30;
+        console.log(`💬 Chat top-up: ${prompts} bonus prompts for ${userId}`);
+        await addBonusPrompts(userId, prompts, session.id, session.customer);
+    }
+    
     if (productType === 'consultation') {
         console.log(`📞 Consultation booked for ${userId}`);
         // Just log it - no credits to add
@@ -822,6 +828,39 @@ async function addPurchasedCredits(userId, credits, transactionId, productName, 
         return true;
     } catch (error) {
         console.error('Error adding purchased credits:', error.message);
+        return false;
+    }
+}
+
+async function addBonusPrompts(userId, prompts, transactionId, stripeCustomerId = null) {
+    if (!db) return false;
+    const userRef = db.collection('users').doc(userId);
+    
+    try {
+        const updateData = {
+            credits: {
+                bonusPrompts: admin.firestore.FieldValue.increment(prompts),
+                lastTransaction: transactionId,
+                lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+            },
+            transactions: admin.firestore.FieldValue.arrayUnion({
+                type: 'chat_topup',
+                prompts: prompts,
+                transactionId: transactionId,
+                timestamp: new Date().toISOString()
+            })
+        };
+        
+        if (stripeCustomerId) {
+            updateData.credits.stripeCustomerId = stripeCustomerId;
+            updateData.stripeCustomerId = stripeCustomerId;
+        }
+        
+        await userRef.set(updateData, { merge: true });
+        console.log(`✅ Added ${prompts} bonus prompts to ${userId}`);
+        return true;
+    } catch (error) {
+        console.error('Error adding bonus prompts:', error.message);
         return false;
     }
 }
