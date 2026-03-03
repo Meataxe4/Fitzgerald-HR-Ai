@@ -10173,7 +10173,7 @@ const CONFIG = {
         TIERS: {
             free: { 
                 name: 'Free', 
-                reviewCredits: 0, 
+                reviewCredits: 1,  // 1 free credit to try the platform
                 lowRiskDocs: 1,  // 1 total, not monthly
                 monthlyPrompts: 20,
                 price: { annual: 0, monthly: 0 }
@@ -29078,15 +29078,32 @@ function clearLocalUserData() {
     }
     keysToDelete.forEach(key => localStorage.removeItem(key));
     
+    // Reset in-memory state
     currentUser = null;
     conversationHistory = [];
     currentConversationId = null;
     conversations = [];
     bookmarks = [];
     skipFirebaseCreditsLoad = false;
+    if (typeof conversationHistory_searchable !== 'undefined') conversationHistory_searchable = [];
     userCredits = { subscriptionCredits: 0, purchasedCredits: 0, bonusPrompts: 0, usedPrompts: 0, usedCredits: 0, promptLimit: 20, creditLimit: 0, tier: 'free', subscriptionTier: 'free' };
     venueProfile = { name: '', type: '', size: '', state: '', challenges: [] };
-    console.log('✅ Local user data cleared');
+    
+    // Clear DOM elements so old user's UI doesn't bleed through
+    const sidebarChatsList = document.getElementById('sidebarChatsList');
+    if (sidebarChatsList) sidebarChatsList.innerHTML = '<p class="text-slate-500 text-sm py-4 text-center">No chats yet</p>';
+    
+    const messagesContainer = document.getElementById('messagesContainer');
+    if (messagesContainer) {
+        const container = messagesContainer.querySelector('.space-y-6');
+        if (container) container.innerHTML = '';
+    }
+    
+    // Clear recent tools display
+    const recentToolsEls = document.querySelectorAll('[data-recent-tools], .recent-tools-list');
+    recentToolsEls.forEach(el => { el.innerHTML = ''; });
+    
+    console.log('✅ Local user data cleared (localStorage + memory + DOM)');
 }
 
 function logout() {
@@ -40195,8 +40212,8 @@ if (auth) {
         if (user) {
             // Detect user switch — clear stale data if a different user is signing in
             const previousUid = localStorage.getItem('fitzhr_current_uid');
-            if (previousUid && previousUid !== user.uid) {
-                console.log('🔄 Different user detected — clearing previous user data');
+            if (!previousUid || previousUid !== user.uid) {
+                console.log('🔄 New or different user detected — clearing local data before Firebase load');
                 clearLocalUserData();
             }
             localStorage.setItem('fitzhr_current_uid', user.uid);
