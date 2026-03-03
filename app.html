@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -4070,7 +4072,7 @@ input, textarea, select {
 // LAUNCH GATE CONFIGURATION
 // ============================================
 // Set to false or remove this entire section when ready to launch publicly
-const LAUNCH_MODE = false;  // ← CHANGED TO false - SITE IS LIVE
+const LAUNCH_MODE = true;  // ← CHANGE TO false TO DISABLE GATE
 
 // Password is hashed - never store plain text in client code!
 // To generate a new hash: console.log(await hashPassword('your-password'))
@@ -4692,8 +4694,11 @@ async function checkFirestoreData() {
                         </div>
                         
                         <!-- Trust Badge: Human Support -->
-                        <div class="mt-4 text-center">
-                            <p class="text-xs text-slate-400">Backed by qualified HR professionals for complex situations</p>
+                        <div class="mt-4 flex items-center justify-center gap-2 text-slate-400">
+                            <div class="flex items-center justify-center w-8 h-8 bg-amber-500/20 rounded-full border border-amber-500/30">
+                                <span class="text-sm">👤</span>
+                            </div>
+                            <p class="text-xs">Backed by qualified HR professionals for complex situations</p>
                         </div>
                     </div>
                 </div>
@@ -4785,7 +4790,7 @@ async function checkFirestoreData() {
                 </div>
                 <div class="bg-slate-800/50 border border-slate-700/50 rounded-2xl p-6 text-center hover:border-amber-500/30 transition-all">
                     <div class="w-14 h-14 bg-amber-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-amber-500/20">
-                        <span class="text-2xl">🤝</span>
+                        <span class="text-2xl">👤</span>
                     </div>
                     <h3 class="text-lg font-semibold text-white mb-2">AI + Human Support</h3>
                     <p class="text-slate-400 text-sm">Fitz handles everyday questions instantly. Complex issues get escalated to qualified HR professionals for review.</p>
@@ -4886,14 +4891,14 @@ async function checkFirestoreData() {
                 <div class="flex items-center gap-6 text-sm">
                     <a href="#" onclick="showTermsOfService(); return false;" class="text-slate-400 hover:text-white transition-colors">Terms</a>
                     <a href="#" onclick="showPrivacyPolicy(); return false;" class="text-slate-400 hover:text-white transition-colors">Privacy</a>
-                    <a href="/cdn-cgi/l/email-protection#592a2c2929362b2d193f302d23312b773a3634" class="text-slate-400 hover:text-white transition-colors">Contact</a>
+                    <!--email_off--><a href="mailto:support@fitzhr.com" class="text-slate-400 hover:text-white transition-colors">Contact</a><!--/email_off-->
                 </div>
             </div>
         </footer>
     </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // Smart view switching based on returning user
 function initAccessScreen() {
     const isReturning = localStorage.getItem('fitzhr_returning') === 'true' || 
@@ -5297,7 +5302,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </p>
         <p class="text-slate-500 text-xs">
             Professional Advice: 
-            <a href="/cdn-cgi/l/email-protection#d2a1a7a2a2bda0a692b4bba6a8baa0fcb1bdbf" class="text-slate-400 hover:text-amber-400 underline"><span class="__cf_email__" data-cfemail="e3909693938c9197a3858a97998b91cd808c8e">[email&#160;protected]</span></a> | 
+            <!--email_off--><a href="mailto:support@fitzhr.com" class="text-slate-400 hover:text-amber-400 underline">support@fitzhr.com</a><!--/email_off--> | 
             <a href="#terms" onclick="showTermsOfService(); return false;" class="text-slate-400 hover:text-amber-400 underline">Terms</a>
         </p>
     </div>
@@ -5625,7 +5630,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
 
             <p class="text-center text-slate-400 text-sm mt-4">
-                A Senior Consultant will contact you within 15 minutes
+                A Senior Consultant will contact you within 15 minutes during business hours (9am–5pm) or 2 hours outside business hours
             </p>
         </div>
     </div>
@@ -5636,7 +5641,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="text-center mb-6">
                 <div class="text-5xl mb-3">🚨</div>
                 <h2 class="text-2xl font-bold text-red-400 mb-2">Urgent Consultant Callback</h2>
-                <p class="text-slate-400 text-sm">A Senior HR Consultant will call you within 15 minutes</p>
+                <p class="text-slate-400 text-sm">A Senior HR Consultant will call you within 15 mins (business hours) or 2 hrs (after hours)</p>
             </div>
 
             <div class="bg-slate-900 rounded-xl p-5 mb-6">
@@ -5656,7 +5661,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
                 <p class="text-red-300 text-sm font-medium mb-2">This includes:</p>
                 <ul class="text-red-200/80 text-sm space-y-1">
-                    <li>• Callback within 15 minutes from a Senior HR Consultant</li>
+                    <li>• Callback within 15 mins (business hours 9am–5pm) or 2 hrs (after hours)</li>
                     <li>• Expert guidance on your urgent situation</li>
                     <li>• Immediate action plan and next steps</li>
                     <li>• Follow-up summary email</li>
@@ -6482,11 +6487,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </button>
                 
-                <button onclick="openToolFromMobile('xeroIntegration')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
+                <button onclick="closeMobileTools(); openIntegrationHub();" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
                     <span class="text-2xl">🔗</span>
                     <div>
-                        <div class="font-semibold">Xero Integration</div>
-                        <div class="text-sm text-slate-400">Connect with Xero</div>
+                        <div class="font-semibold">Integrations</div>
+                        <div class="text-sm text-slate-400">Import 3rd party data for Fitz to analyse</div>
                     </div>
                 </button>
             </div>
@@ -7209,7 +7214,7 @@ Be as specific as possible!"></textarea>
                     <span>CRITICAL: This document MUST be reviewed by a consultant before use</span>
                 </p>
                 <p class="text-red-200 text-xs">
-                    Contact: <a href="/cdn-cgi/l/email-protection#cab9bfbabaa5b8be8aaca3beb0a2b8e4a9a5a7" class="underline hover:text-red-100"><span class="__cf_email__" data-cfemail="abd8dedbdbc4d9dfebcdc2dfd1c3d985c8c4c6">[email&#160;protected]</span></a>
+                    Contact: <!--email_off--><a href="mailto:support@fitzhr.com" class="underline hover:text-red-100">support@fitzhr.com</a><!--/email_off-->
                 </p>
             </div>
         </div>
@@ -7326,7 +7331,7 @@ Be as specific as possible!"></textarea>
 
         <div class="mt-6 text-center">
             <p class="text-slate-400 text-sm">
-                ✉️ Need help? <a href="/cdn-cgi/l/email-protection#89fafcf9f9e6fbfdc9efe0fdf3e1fba7eae6e4" class="text-amber-400 hover:underline font-semibold"><span class="__cf_email__" data-cfemail="75060005051a070135131c010f1d075b161a18">[email&#160;protected]</span></a>
+                ✉️ Need help? <!--email_off--><a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline font-semibold">support@fitzhr.com</a><!--/email_off-->
             </p>
         </div>
     </div>
@@ -7341,7 +7346,7 @@ Be as specific as possible!"></textarea>
         <div class="text-center mb-6">
             <div class="text-6xl mb-4">💬</div>
             <h2 class="text-2xl font-bold text-amber-400 mb-2">You've Used Your Free Prompts</h2>
-            <p class="text-slate-300">You've used all 20 free prompts for this month.</p>
+            <p class="text-slate-300">You've used all 20 free prompts for this period.</p>
         </div>
 
         <div class="bg-slate-900 rounded-lg p-6 mb-6">
@@ -7352,8 +7357,8 @@ Be as specific as possible!"></textarea>
                         class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-4 px-6 rounded-lg transition-all flex items-center justify-center gap-3">
                     <span class="text-2xl">⭐</span>
                     <div class="text-left">
-                        <p class="text-lg">Subscribe from $59/month</p>
-                        <p class="text-xs opacity-75">Unlimited chat + 5-25 document credits</p>
+                        <p class="text-lg">Subscribe from $29/month</p>
+                        <p class="text-xs opacity-75">Unlimited chat + 8-50 document credits</p>
                     </div>
                 </button>
                 
@@ -7363,14 +7368,14 @@ Be as specific as possible!"></textarea>
                     <span class="text-xl">💳</span>
                     <div class="text-left">
                         <p>Chat Top-Up — $19</p>
-                        <p class="text-xs opacity-75">30 additional prompts this month</p>
+                        <p class="text-xs opacity-75">30 additional prompts</p>
                     </div>
                 </button>
             </div>
         </div>
 
         <div class="text-center">
-            <p class="text-slate-400 text-sm mb-4">Your prompts reset on the 1st of each month.</p>
+            <p class="text-slate-400 text-sm mb-4" id="promptResetText">Your prompts reset every 30 days.</p>
             <button onclick="closePromptLimitModal()" class="text-slate-400 hover:text-white text-sm underline">
                 Maybe Later
             </button>
@@ -7681,12 +7686,12 @@ Be as specific as possible!"></textarea>
         <!-- FAQ -->
         <div class="text-center text-slate-400 text-xs">
             <p>14-day money-back guarantee on paid plans. Cancel anytime.</p>
-            <p class="mt-1">Questions? <a href="/cdn-cgi/l/email-protection#41323431312e3335012728353b29336f222e2c" class="text-amber-400 hover:underline"><span class="__cf_email__" data-cfemail="cbb8bebbbba4b9bf8bada2bfb1a3b9e5a8a4a6">[email&#160;protected]</span></a></p>
+            <p class="mt-1">Questions? <!--email_off--><a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline">support@fitzhr.com</a><!--/email_off--></p>
         </div>
     </div>
 </div>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 // Billing toggle state - DEFAULT TO ANNUAL
 let currentBilling = 'annual';
 
@@ -7889,7 +7894,7 @@ function setBilling(billing) {
         </div>
 
         <p class="text-center text-slate-500 text-xs mt-4">
-            Questions? <a href="/cdn-cgi/l/email-protection#0d7e787d7d627f794d6b647977657f236e6260" class="text-amber-400"><span class="__cf_email__" data-cfemail="0f7c7a7f7f607d7b4f69667b75677d216c6062">[email&#160;protected]</span></a>
+            Questions? <!--email_off--><a href="mailto:support@fitzhr.com" class="text-amber-400">support@fitzhr.com</a><!--/email_off-->
         </p>
     </div>
 </div>
@@ -8116,10 +8121,10 @@ function setBilling(billing) {
         <!-- Footer -->
         <div class="bg-slate-900 rounded-b-2xl p-4 flex items-center justify-between">
             <p class="text-slate-500 text-xs">
-                Questions? <a href="/cdn-cgi/l/email-protection#166563666679646256707f626c7e643875797b" class="text-purple-400 hover:text-purple-300"><span class="__cf_email__" data-cfemail="691a1c1919061b1d290f001d13011b470a0604">[email&#160;protected]</span></a>
+                Questions? <!--email_off--><a href="mailto:support@fitzhr.com" class="text-purple-400 hover:text-purple-300">support@fitzhr.com</a><!--/email_off-->
             </p>
             <p class="text-slate-500 text-xs">
-                <a href="/cdn-cgi/l/email-protection#760503060619040236101f020c1e045815191b" class="text-purple-400 hover:text-purple-300"><span class="__cf_email__" data-cfemail="e1929491918e9395a18788959b8993cf828e8c">[email&#160;protected]</span></a>
+                <!--email_off--><a href="mailto:support@fitzhr.com" class="text-purple-400 hover:text-purple-300">support@fitzhr.com</a><!--/email_off-->
             </p>
         </div>
     </div>
@@ -8207,7 +8212,7 @@ function setBilling(billing) {
 <h2 class="terms-h2">5.2 ACCOUNTS</h2>
 <ol type="a">
 <li><p>(<strong>Accounts</strong>) To use the Solution, you are required to sign-up, register and receive an account through the Website (an <strong>Account</strong>).</p></li>
-<li><p>(<strong>Provide Information</strong>) As part of the Account registration process and as part of your continued use of the Website, you may be required to provide personal information and details, such as your email address, first and last name, business name, preferred username, a secure password, billing, postal and physical addresses, mobile phone number, payment details, verified identifications, verified certifications and authentication, and other information as determined by us from time to time.</p></li>
+<li><p>(<strong>Provide Information</strong>) As part of the Account registration process and as part of your continued use of the Website, you may be required to provide personal information and details, such as your email address, first and last name, business name, preferred username, a secure password, billing, postal and physical addresses, mobile phone number, payment details, verified identifications, verified certifications and authentication, and other information as determined by us from time to time.</p></li>
 <li><p>You may register for an Account using your Apple or Google Account (<strong>Third Party Account</strong>). If you sign in to your Account using your Third Party Account, you authorise us to access certain information on your Third Party Account.</p></li>
 <li><p>(<strong>Warranty</strong>) You warrant that any information you give to us in the course of completing the Account registration process is accurate, honest, correct and up-to-date.</p></li>
 <li><p>(<strong>Acceptance</strong>) Once you complete the Account registration process, we may, in our absolute discretion, choose to accept you as a registered user within the Website and provide you with an Account.</p></li>
@@ -8410,7 +8415,7 @@ function setBilling(billing) {
 <li><p>If you do not pay the Crisis Fee:</p>
 <ol type="i">
 <li><p>on or before the date it is due, Fitz HR may immediately cease providing the Platform;</p></li>
-<li><p>within 60 after the date it is due, without limiting any of Fitz HR’s other rights under these terms, interest will begin to accrue at a rate of 5% per annum, on each amount outstanding, accruing daily and compounding monthly, from the due date for payment to the date on which payment is received by Fitz HR, which you must pay to Fitz HR; </p></li>
+<li><p>within 60 after the date it is due, without limiting any of Fitz HR’s other rights under these terms, interest will begin to accrue at a rate of 5% per annum, on each amount outstanding, accruing daily and compounding monthly, from the due date for payment to the date on which payment is received by Fitz HR, which you must pay to Fitz HR; </p></li>
 <li><p>within 90 days after the date it is due, Fitz HR may seek to recover the amount due by referring the matter to a collection agency; and</p></li>
 <li><p>you must reimburse Fitz HR for any costs it incurs, including any legal costs, in recovering the amount due or enforcing any of its rights under this agreement.</p></li>
 </ol></li>
@@ -8619,13 +8624,13 @@ function setBilling(billing) {
 </ol>
 <h1 class="terms-h1">16. DISPUTE RESOLUTION</h1>
 <ol type="a">
-<li><p>A party claiming that a dispute has arisen under or in connection with this agreement must not commence court proceedings arising from or relating to the dispute, other than a claim for urgent interlocutory relief, unless that party has complied with the requirements of this clause.</p></li>
-<li><p>A party that requires resolution of a dispute which arises under or in connection with this agreement must give the other party or parties to the dispute written notice containing reasonable details of the dispute and requiring its resolution under this clause.</p></li>
-<li><p>Once the dispute notice has been given, each party to the dispute must then use its best efforts to resolve the dispute in good faith. If the dispute is not resolved within a period of 14 days (or such other period as agreed by the parties in writing) after the date of the notice, any party to the dispute may take legal proceedings to resolve the dispute.</p></li>
+<li><p>A party claiming that a dispute has arisen under or in connection with this agreement must not commence court proceedings arising from or relating to the dispute, other than a claim for urgent interlocutory relief, unless that party has complied with the requirements of this clause.</p></li>
+<li><p>A party that requires resolution of a dispute which arises under or in connection with this agreement must give the other party or parties to the dispute written notice containing reasonable details of the dispute and requiring its resolution under this clause.</p></li>
+<li><p>Once the dispute notice has been given, each party to the dispute must then use its best efforts to resolve the dispute in good faith. If the dispute is not resolved within a period of 14 days (or such other period as agreed by the parties in writing) after the date of the notice, any party to the dispute may take legal proceedings to resolve the dispute.</p></li>
 </ol>
 <h1 class="terms-h1">17. FORCE MAJEURE</h1>
 <ol type="a">
-<li><p>We will not be liable for any delay or failure to perform its obligations under this agreement if such delay or failure arises out of a Force Majeure Event. </p></li>
+<li><p>We will not be liable for any delay or failure to perform its obligations under this agreement if such delay or failure arises out of a Force Majeure Event. </p></li>
 <li><p>If a Force Majeure Event occurs, we must use reasonable endeavours to notify you of:</p>
 <ol type="i">
 <li><p>reasonable details of the Force Majeure Event; and</p></li>
@@ -8748,7 +8753,7 @@ function setBilling(billing) {
 </tr>
 <tr>
 <td>Intellectual Property Rights</td>
-<td>means any and all present and future intellectual and industrial property rights throughout the world (whether registered or unregistered), including copyright, trade marks, designs, patents, moral rights, semiconductor and circuit layout rights, trade, business, company and domain names, and other proprietary rights, trade secrets, know-how, technical data, confidential information and the right to have information kept confidential, or any rights to registration of such rights (including renewal), whether created before or after the date of this agreement.</td>
+<td>means any and all present and future intellectual and industrial property rights throughout the world (whether registered or unregistered), including copyright, trade marks, designs, patents, moral rights, semiconductor and circuit layout rights, trade, business, company and domain names, and other proprietary rights, trade secrets, know-how, technical data, confidential information and the right to have information kept confidential, or any rights to registration of such rights (including renewal), whether created before or after the date of this agreement.</td>
 </tr>
 <tr>
 <td>Material</td>
@@ -9148,7 +9153,7 @@ function setBilling(billing) {
 <ol>
 <li><p>For further information about our privacy policy or practices, or to access or correct your personal information, or make a complaint, please contact us using the details set out below:</p>
 <p><strong>Name:</strong> Blake Fitzgerald</p>
-<p><strong>Email</strong>: <a href="/cdn-cgi/l/email-protection#127a777e7e7d52747b66687a603c717d7f" class="text-amber-400 underline hover:text-amber-300"><span class="__cf_email__" data-cfemail="452d2029292a05232c313f2d376b262a28">[email&#160;protected]</span></a></p>
+<p><strong>Email</strong>: <!--email_off--><a href="mailto:hello@fitzhr.com" class="text-amber-400 underline hover:text-amber-300">hello@fitzhr.com</a><!--/email_off--></p>
 <p>Our privacy policy was last updated on 27 February 2026</p></li>
 </ol>
 
@@ -9298,7 +9303,7 @@ function setBilling(billing) {
 <h2 class="terms-h2">5.2 ACCOUNTS</h2>
 <ol type="a">
 <li><p>(<strong>Accounts</strong>) To use the Solution, you are required to sign-up, register and receive an account through the Website (an <strong>Account</strong>).</p></li>
-<li><p>(<strong>Provide Information</strong>) As part of the Account registration process and as part of your continued use of the Website, you may be required to provide personal information and details, such as your email address, first and last name, business name, preferred username, a secure password, billing, postal and physical addresses, mobile phone number, payment details, verified identifications, verified certifications and authentication, and other information as determined by us from time to time.</p></li>
+<li><p>(<strong>Provide Information</strong>) As part of the Account registration process and as part of your continued use of the Website, you may be required to provide personal information and details, such as your email address, first and last name, business name, preferred username, a secure password, billing, postal and physical addresses, mobile phone number, payment details, verified identifications, verified certifications and authentication, and other information as determined by us from time to time.</p></li>
 <li><p>You may register for an Account using your Apple or Google Account (<strong>Third Party Account</strong>). If you sign in to your Account using your Third Party Account, you authorise us to access certain information on your Third Party Account.</p></li>
 <li><p>(<strong>Warranty</strong>) You warrant that any information you give to us in the course of completing the Account registration process is accurate, honest, correct and up-to-date.</p></li>
 <li><p>(<strong>Acceptance</strong>) Once you complete the Account registration process, we may, in our absolute discretion, choose to accept you as a registered user within the Website and provide you with an Account.</p></li>
@@ -9501,7 +9506,7 @@ function setBilling(billing) {
 <li><p>If you do not pay the Crisis Fee:</p>
 <ol type="i">
 <li><p>on or before the date it is due, Fitz HR may immediately cease providing the Platform;</p></li>
-<li><p>within 60 after the date it is due, without limiting any of Fitz HR’s other rights under these terms, interest will begin to accrue at a rate of 5% per annum, on each amount outstanding, accruing daily and compounding monthly, from the due date for payment to the date on which payment is received by Fitz HR, which you must pay to Fitz HR; </p></li>
+<li><p>within 60 after the date it is due, without limiting any of Fitz HR’s other rights under these terms, interest will begin to accrue at a rate of 5% per annum, on each amount outstanding, accruing daily and compounding monthly, from the due date for payment to the date on which payment is received by Fitz HR, which you must pay to Fitz HR; </p></li>
 <li><p>within 90 days after the date it is due, Fitz HR may seek to recover the amount due by referring the matter to a collection agency; and</p></li>
 <li><p>you must reimburse Fitz HR for any costs it incurs, including any legal costs, in recovering the amount due or enforcing any of its rights under this agreement.</p></li>
 </ol></li>
@@ -9710,13 +9715,13 @@ function setBilling(billing) {
 </ol>
 <h1 class="terms-h1">16. DISPUTE RESOLUTION</h1>
 <ol type="a">
-<li><p>A party claiming that a dispute has arisen under or in connection with this agreement must not commence court proceedings arising from or relating to the dispute, other than a claim for urgent interlocutory relief, unless that party has complied with the requirements of this clause.</p></li>
-<li><p>A party that requires resolution of a dispute which arises under or in connection with this agreement must give the other party or parties to the dispute written notice containing reasonable details of the dispute and requiring its resolution under this clause.</p></li>
-<li><p>Once the dispute notice has been given, each party to the dispute must then use its best efforts to resolve the dispute in good faith. If the dispute is not resolved within a period of 14 days (or such other period as agreed by the parties in writing) after the date of the notice, any party to the dispute may take legal proceedings to resolve the dispute.</p></li>
+<li><p>A party claiming that a dispute has arisen under or in connection with this agreement must not commence court proceedings arising from or relating to the dispute, other than a claim for urgent interlocutory relief, unless that party has complied with the requirements of this clause.</p></li>
+<li><p>A party that requires resolution of a dispute which arises under or in connection with this agreement must give the other party or parties to the dispute written notice containing reasonable details of the dispute and requiring its resolution under this clause.</p></li>
+<li><p>Once the dispute notice has been given, each party to the dispute must then use its best efforts to resolve the dispute in good faith. If the dispute is not resolved within a period of 14 days (or such other period as agreed by the parties in writing) after the date of the notice, any party to the dispute may take legal proceedings to resolve the dispute.</p></li>
 </ol>
 <h1 class="terms-h1">17. FORCE MAJEURE</h1>
 <ol type="a">
-<li><p>We will not be liable for any delay or failure to perform its obligations under this agreement if such delay or failure arises out of a Force Majeure Event. </p></li>
+<li><p>We will not be liable for any delay or failure to perform its obligations under this agreement if such delay or failure arises out of a Force Majeure Event. </p></li>
 <li><p>If a Force Majeure Event occurs, we must use reasonable endeavours to notify you of:</p>
 <ol type="i">
 <li><p>reasonable details of the Force Majeure Event; and</p></li>
@@ -9839,7 +9844,7 @@ function setBilling(billing) {
 </tr>
 <tr>
 <td>Intellectual Property Rights</td>
-<td>means any and all present and future intellectual and industrial property rights throughout the world (whether registered or unregistered), including copyright, trade marks, designs, patents, moral rights, semiconductor and circuit layout rights, trade, business, company and domain names, and other proprietary rights, trade secrets, know-how, technical data, confidential information and the right to have information kept confidential, or any rights to registration of such rights (including renewal), whether created before or after the date of this agreement.</td>
+<td>means any and all present and future intellectual and industrial property rights throughout the world (whether registered or unregistered), including copyright, trade marks, designs, patents, moral rights, semiconductor and circuit layout rights, trade, business, company and domain names, and other proprietary rights, trade secrets, know-how, technical data, confidential information and the right to have information kept confidential, or any rights to registration of such rights (including renewal), whether created before or after the date of this agreement.</td>
 </tr>
 <tr>
 <td>Material</td>
@@ -10093,7 +10098,7 @@ function setBilling(billing) {
     </div>
 </div>
 
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script>
 // ========================================
 // CONFIGURATION & GLOBALS
 // ========================================
@@ -10173,7 +10178,7 @@ const CONFIG = {
         TIERS: {
             free: { 
                 name: 'Free', 
-                reviewCredits: 1,  // 1 free credit to try the platform
+                reviewCredits: 0, 
                 lowRiskDocs: 1,  // 1 total, not monthly
                 monthlyPrompts: 20,
                 price: { annual: 0, monthly: 0 }
@@ -10336,6 +10341,7 @@ let userCredits = {
     lowRiskDocsUsed: 0,         // For free tier only (they get 1 total)
     subscriptionStartDate: null,
     lastUpdated: null,
+    lastCreditRefresh: null,    // Timestamp from webhook when credits were last refreshed (renewal detection)
     // Stripe subscription management fields
     stripeCustomerId: null,
     stripeSubscriptionId: null,
@@ -10434,6 +10440,21 @@ async function loadCreditsFromFirebase() {
             // Also check for stripeCustomerId at top level (some older accounts)
             const topLevelData = doc.data();
             
+            // Check if a renewal happened since our last load
+            // by comparing lastCreditRefresh timestamps
+            const previousRefresh = userCredits.lastCreditRefresh || null;
+            const newRefresh = firebaseCredits.lastCreditRefresh || null;
+            
+            // Convert Firestore timestamps to comparable values
+            const previousRefreshTime = previousRefresh ? 
+                (previousRefresh.toDate ? previousRefresh.toDate().getTime() : new Date(previousRefresh).getTime()) : 0;
+            const newRefreshTime = newRefresh ? 
+                (newRefresh.toDate ? newRefresh.toDate().getTime() : new Date(newRefresh).getTime()) : 0;
+            
+            if (previousRefreshTime > 0 && newRefreshTime > previousRefreshTime) {
+                console.log('🔄 RENEWAL DETECTED! Credits refreshed by webhook. Previous:', new Date(previousRefreshTime).toISOString(), 'New:', new Date(newRefreshTime).toISOString());
+            }
+            
             userCredits = {
                 ...userCredits,
                 subscriptionTier: firebaseCredits.subscriptionTier || firebaseCredits.tier || 'free',
@@ -10447,6 +10468,7 @@ async function loadCreditsFromFirebase() {
                 monthlyPromptsReset: firebaseCredits.monthlyPromptsReset || new Date().toISOString(),
                 subscriptionStartDate: firebaseCredits.subscriptionStartDate || null,
                 lastUpdated: firebaseCredits.lastUpdated || null,
+                lastCreditRefresh: firebaseCredits.lastCreditRefresh || null,  // Track webhook renewal timestamp
                 // Stripe subscription management fields - check both credits and top level
                 stripeCustomerId: firebaseCredits.stripeCustomerId || topLevelData.stripeCustomerId || null,
                 stripeSubscriptionId: firebaseCredits.stripeSubscriptionId || null,
@@ -10459,15 +10481,41 @@ async function loadCreditsFromFirebase() {
             
             console.log('📦 Stripe Customer ID:', userCredits.stripeCustomerId);
             
-            // Check if it's a new month - reset prompts for free tier
+            // Check if prompts should reset - based on 30-day cycle from account creation
+            // Free tier prompts reset every 30 days from when the user signed up
             const now = new Date();
             const lastReset = userCredits.monthlyPromptsReset ? new Date(userCredits.monthlyPromptsReset) : null;
-            const isNewMonth = !lastReset || 
-                (now.getMonth() !== lastReset.getMonth() || now.getFullYear() !== lastReset.getFullYear());
             
-            if (isNewMonth) {
-                console.log('📅 New month detected - resetting prompts');
+            // Get account creation date from Firestore for anniversary-based reset
+            let accountCreatedAt = null;
+            if (doc.exists && doc.data().createdAt) {
+                const createdAtField = doc.data().createdAt;
+                accountCreatedAt = createdAtField.toDate ? createdAtField.toDate() : new Date(createdAtField);
+            }
+            
+            // Calculate if we're in a new 30-day cycle based on account creation
+            let shouldReset = false;
+            if (!lastReset) {
+                // Never reset before - do it now
+                shouldReset = true;
+            } else if (accountCreatedAt) {
+                // Anniversary-based: calculate how many 30-day cycles have passed since account creation
+                const msPerCycle = 30 * 24 * 60 * 60 * 1000;
+                const msSinceCreation = now.getTime() - accountCreatedAt.getTime();
+                const currentCycle = Math.floor(msSinceCreation / msPerCycle);
+                const msSinceLastReset = lastReset.getTime() - accountCreatedAt.getTime();
+                const lastResetCycle = Math.floor(msSinceLastReset / msPerCycle);
+                shouldReset = currentCycle > lastResetCycle;
+            } else {
+                // Fallback: 30 days since last reset
+                const daysSinceReset = (now.getTime() - lastReset.getTime()) / (24 * 60 * 60 * 1000);
+                shouldReset = daysSinceReset >= 30;
+            }
+            
+            if (shouldReset) {
+                console.log('📅 New 30-day cycle detected - resetting prompts');
                 userCredits.monthlyPromptsUsed = 0;
+                userCredits.bonusPrompts = 0; // Top-ups expire with each cycle
                 userCredits.monthlyPromptsReset = now.toISOString();
                 
                 // Save the refreshed data
@@ -10536,6 +10584,12 @@ async function loadCreditsFromFirebase() {
 
 /**
  * Sync local credits to Firebase (called after local changes)
+ * 
+ * IMPORTANT: Only writes USAGE-tracking fields (credits used, prompts used, etc.)
+ * NEVER overwrites webhook-managed fields (reviewCredits, subscriptionTier, 
+ * subscriptionStatus, etc.) - those are set by stripe-webhook.js and are 
+ * the server-side source of truth. Writing them here would overwrite fresh
+ * renewal data if the user is active when Stripe fires a renewal webhook.
  */
 async function syncCreditsToFirebase() {
     if (!currentUser?.uid) return;
@@ -10544,18 +10598,49 @@ async function syncCreditsToFirebase() {
         const userRef = db.collection('users').doc(currentUser.uid);
         await userRef.set({
             credits: {
-                subscriptionTier: userCredits.subscriptionTier || userCredits.tier || 'free',
-                reviewCredits: userCredits.reviewCredits || 0,  // Actual credits for this billing period
+                // ✅ USAGE fields - safe to write from client
                 reviewCreditsUsed: userCredits.reviewCreditsUsed || 0,
                 purchasedCredits: userCredits.purchasedCredits || 0,
                 lowRiskDocsUsed: userCredits.lowRiskDocsUsed || 0,
                 bonusPrompts: userCredits.bonusPrompts || 0,
-                billingCycle: userCredits.billingCycle || null,  // 'monthly' or 'annual'
+                monthlyPromptsUsed: userCredits.monthlyPromptsUsed || 0,
+                monthlyPromptsReset: userCredits.monthlyPromptsReset,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                // ❌ DO NOT write these here - webhook manages them:
+                // reviewCredits, subscriptionTier, billingCycle, subscriptionStatus,
+                // stripeCustomerId, stripeSubscriptionId, subscriptionPeriodEnd,
+                // cancelAtPeriodEnd, lastCreditRefresh
+            }
+        }, { merge: true });
+        console.log('✅ Usage credits synced to Firebase');
+    } catch (e) {
+        console.error('Error syncing credits to Firebase:', e);
+    }
+}
+
+/**
+ * Full sync to Firebase - writes ALL fields including subscription data.
+ * Only called after initial subscription activation (handlePaymentReturn)
+ * or when we explicitly need to set subscription fields from the client.
+ */
+async function fullSyncCreditsToFirebase() {
+    if (!currentUser?.uid) return;
+    
+    try {
+        const userRef = db.collection('users').doc(currentUser.uid);
+        await userRef.set({
+            credits: {
+                subscriptionTier: userCredits.subscriptionTier || userCredits.tier || 'free',
+                reviewCredits: userCredits.reviewCredits || 0,
+                reviewCreditsUsed: userCredits.reviewCreditsUsed || 0,
+                purchasedCredits: userCredits.purchasedCredits || 0,
+                lowRiskDocsUsed: userCredits.lowRiskDocsUsed || 0,
+                bonusPrompts: userCredits.bonusPrompts || 0,
+                billingCycle: userCredits.billingCycle || null,
                 monthlyPromptsUsed: userCredits.monthlyPromptsUsed || 0,
                 monthlyPromptsReset: userCredits.monthlyPromptsReset,
                 subscriptionStartDate: userCredits.subscriptionStartDate,
                 lastUpdated: firebase.firestore.FieldValue.serverTimestamp(),
-                // Stripe subscription management fields
                 stripeCustomerId: userCredits.stripeCustomerId || null,
                 stripeSubscriptionId: userCredits.stripeSubscriptionId || null,
                 subscriptionStatus: userCredits.subscriptionStatus || null,
@@ -10565,9 +10650,88 @@ async function syncCreditsToFirebase() {
                 lastRenewalDate: userCredits.lastRenewalDate || null
             }
         }, { merge: true });
-        console.log('✅ Credits synced to Firebase');
+        console.log('✅ Full credits synced to Firebase');
     } catch (e) {
         console.error('Error syncing credits to Firebase:', e);
+    }
+}
+
+// ========================================
+// PERIODIC RENEWAL CHECKER
+// Detects when the webhook has refreshed credits (e.g. monthly renewal)
+// while the user has an active session, so they don't need to refresh.
+// Checks Firebase every 5 minutes for paid subscribers only.
+// ========================================
+let renewalCheckerInterval = null;
+
+function startRenewalChecker() {
+    // Clear any existing interval
+    if (renewalCheckerInterval) {
+        clearInterval(renewalCheckerInterval);
+        renewalCheckerInterval = null;
+    }
+    
+    const tier = userCredits.subscriptionTier || 'free';
+    if (tier === 'free') {
+        console.log('⏭️ Renewal checker not needed for free tier');
+        return;
+    }
+    
+    console.log('🔄 Starting periodic renewal checker (every 5 minutes)');
+    
+    // Check every 5 minutes
+    renewalCheckerInterval = setInterval(async () => {
+        if (!currentUser?.uid || !db) return;
+        
+        try {
+            const userRef = db.collection('users').doc(currentUser.uid);
+            const doc = await userRef.get();
+            
+            if (!doc.exists || !doc.data().credits) return;
+            
+            const firebaseCredits = doc.data().credits;
+            const fbRefresh = firebaseCredits.lastCreditRefresh;
+            const localRefresh = userCredits.lastCreditRefresh;
+            
+            // Convert to comparable timestamps
+            const fbTime = fbRefresh ? (fbRefresh.toDate ? fbRefresh.toDate().getTime() : new Date(fbRefresh).getTime()) : 0;
+            const localTime = localRefresh ? (localRefresh.toDate ? localRefresh.toDate().getTime() : new Date(localRefresh).getTime()) : 0;
+            
+            if (fbTime > localTime) {
+                console.log('🎉 RENEWAL DETECTED during active session! Refreshing credits from Firebase...');
+                
+                // Update all webhook-managed fields
+                userCredits.reviewCredits = firebaseCredits.reviewCredits || 0;
+                userCredits.reviewCreditsUsed = firebaseCredits.reviewCreditsUsed || 0;
+                userCredits.subscriptionTier = firebaseCredits.subscriptionTier || firebaseCredits.tier || 'free';
+                userCredits.billingCycle = firebaseCredits.billingCycle || null;
+                userCredits.subscriptionStatus = firebaseCredits.subscriptionStatus || null;
+                userCredits.subscriptionPeriodEnd = firebaseCredits.subscriptionPeriodEnd || null;
+                userCredits.cancelAtPeriodEnd = firebaseCredits.cancelAtPeriodEnd || false;
+                userCredits.lastCreditRefresh = firebaseCredits.lastCreditRefresh;
+                userCredits.monthlyPromptsUsed = firebaseCredits.monthlyPromptsUsed || 0;
+                userCredits.lowRiskDocsUsed = firebaseCredits.lowRiskDocsUsed || 0;
+                
+                // Update localStorage cache
+                const userKey = currentUser.uid;
+                localStorage.setItem('fitzCredits_' + userKey, JSON.stringify(userCredits));
+                
+                // Update UI
+                updateCreditsDisplay();
+                
+                console.log('✅ Credits refreshed after renewal:', userCredits.reviewCredits, 'credits available,', userCredits.reviewCreditsUsed, 'used');
+            }
+        } catch (e) {
+            console.error('Renewal check error:', e);
+        }
+    }, 5 * 60 * 1000); // 5 minutes
+}
+
+function stopRenewalChecker() {
+    if (renewalCheckerInterval) {
+        clearInterval(renewalCheckerInterval);
+        renewalCheckerInterval = null;
+        console.log('⏹️ Renewal checker stopped');
     }
 }
 // Get total available review credits
@@ -10670,7 +10834,8 @@ function hasPromptsRemaining() {
     // Paid subscribers have unlimited prompts
     if (tier !== 'free') return true;
     
-    return userCredits.monthlyPromptsUsed < CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS;
+    const totalAllowed = CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS + (userCredits.bonusPrompts || 0);
+    return userCredits.monthlyPromptsUsed < totalAllowed;
 }
 
 // Use a prompt
@@ -10698,7 +10863,8 @@ function usePrompt() {
 function getRemainingPrompts() {
     const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
     if (tier !== 'free') return Infinity;
-    return CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS - userCredits.monthlyPromptsUsed;
+    const totalAllowed = CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS + (userCredits.bonusPrompts || 0);
+    return totalAllowed - userCredits.monthlyPromptsUsed;
 }
 
 // Update the credits display in the header
@@ -12077,13 +12243,13 @@ function createHighRiskWarningBox(risk) {
         <span>IMPORTANT: This matter involves legal risk.</span>
     </p>
     <p class="text-red-300 text-sm mb-3">
-        ${risk.title} - Please contact a Senior Consultant at <a href="mailto:support@fitzhr.com" class="underline hover:text-red-200">support@fitzhr.com</a> before taking action.
+        ${risk.title} - Please contact a Senior Consultant at <!--email_off--><a href="mailto:support@fitzhr.com" class="underline hover:text-red-200">support@fitzhr.com</a><!--/email_off--> before taking action.
     </p>
     <div class="flex gap-2">
-        <a href="mailto:support@fitzhr.com?subject=URGENT: ${encodeURIComponent(risk.title)} - ${encodeURIComponent(currentUser)}&body=${encodeURIComponent('I need urgent advice regarding a ' + risk.title + ' matter.\n\nUser ID: ' + currentUser + '\nDate/Time: ' + currentTime + '\n\nBrief Description:\n[Please describe your situation here]')}" 
+        <!--email_off--><a href="mailto:support@fitzhr.com?subject=URGENT: ${encodeURIComponent(risk.title)} - ${encodeURIComponent(currentUser)}&body=${encodeURIComponent('I need urgent advice regarding a ' + risk.title + ' matter.\n\nUser ID: ' + currentUser + '\nDate/Time: ' + currentTime + '\n\nBrief Description:\n[Please describe your situation here]')}" 
            class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-3 rounded text-sm transition-all text-center">
             ✉️ Email Consultant
-        </a>
+        </a><!--/email_off-->
         <button onclick="openConsultationBookingModal()" 
            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 rounded text-sm transition-all text-center whitespace-nowrap">
             💬 Book Consultation
@@ -15989,8 +16155,9 @@ function openCreditsModal() {
     }
     
     // Show free tier info or hide for paid tiers
+    const modalTier = userCredits.subscriptionTier || userCredits.tier || 'free';
     if (freeDocStatus && freeDocUsedStatus) {
-        if (userCredits.tier === 'free') {
+        if (modalTier === 'free') {
             freeDocStatus.classList.remove('hidden');
             freeDocUsedStatus.classList.add('hidden');
         } else {
@@ -16001,7 +16168,7 @@ function openCreditsModal() {
     }
     
     // Update prompts remaining
-    if (userCredits.tier === 'free') {
+    if (modalTier === 'free') {
         const remaining = getRemainingPrompts();
         document.getElementById('modalPromptsRemaining').textContent = `${remaining}/${CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS} prompts remaining`;
     } else {
@@ -16037,7 +16204,8 @@ function updateManageSubscriptionUI() {
     if (!manageSection) return;
     
     // Show manage section for paying customers with Stripe customer ID
-    const isPaying = userCredits.tier && userCredits.tier !== 'free';
+    const tier = userCredits.subscriptionTier || userCredits.tier || 'free';
+    const isPaying = tier !== 'free';
     const hasStripeId = userCredits.stripeCustomerId;
     
     if (isPaying && hasStripeId) {
@@ -16728,6 +16896,14 @@ function unlockDocument() {
 /**
  * Show subscription options
  */
+/**
+ * Purchase chat top-up (30 extra prompts for $19)
+ */
+function purchaseChatTopUp() {
+    closePromptLimitModal();
+    initiateStripeCheckout('chat_topup');
+}
+
 function showSubscriptionOptions() {
     // Close any open modals
     closeCreditsModal();
@@ -17070,7 +17246,10 @@ function getPurchaseInfo(priceKey) {
         credits_5: { type: 'reviewCredits', credits: 5 },
         
         // Consultation
-        consultation: { type: 'consultation', price: 150 }
+        consultation: { type: 'consultation', price: 150 },
+        
+        // Chat top-up (30 extra prompts)
+        chat_topup: { type: 'topup', prompts: 30 }
     };
     
     return purchaseMap[priceKey] || { type: 'unknown' };
@@ -17157,15 +17336,32 @@ async function processPaymentSuccess() {
                     
                     if (doc.exists && doc.data().credits) {
                         const firebaseCredits = doc.data().credits;
-                        // Load existing values (especially purchasedCredits!)
+                        const topLevelData = doc.data();
+                        
+                        // Load ALL existing values from Firebase (source of truth)
+                        // Previously this was missing reviewCredits, billingCycle, etc.
+                        // which caused credit wipes when buying credit packs
                         userCredits.subscriptionTier = firebaseCredits.subscriptionTier || firebaseCredits.tier || userCredits.subscriptionTier || 'free';
+                        userCredits.reviewCredits = firebaseCredits.reviewCredits || userCredits.reviewCredits || 0;  // CRITICAL: preserve subscription credits
                         userCredits.reviewCreditsUsed = firebaseCredits.reviewCreditsUsed || 0;
-                        userCredits.purchasedCredits = firebaseCredits.purchasedCredits || 0; // CRITICAL: Get existing balance
+                        userCredits.purchasedCredits = firebaseCredits.purchasedCredits || 0;
                         userCredits.lowRiskDocsUsed = firebaseCredits.lowRiskDocsUsed || 0;
                         userCredits.bonusPrompts = firebaseCredits.bonusPrompts || 0;
                         userCredits.monthlyPromptsUsed = firebaseCredits.monthlyPromptsUsed || 0;
                         userCredits.subscriptionStartDate = firebaseCredits.subscriptionStartDate || null;
-                        console.log('✅ Loaded existing credits:', userCredits.purchasedCredits, 'purchased credits');
+                        userCredits.billingCycle = firebaseCredits.billingCycle || userCredits.billingCycle || null;  // CRITICAL: preserve billing cycle
+                        userCredits.lastCreditRefresh = firebaseCredits.lastCreditRefresh || userCredits.lastCreditRefresh || null;
+                        userCredits.stripeCustomerId = firebaseCredits.stripeCustomerId || topLevelData.stripeCustomerId || userCredits.stripeCustomerId || null;
+                        userCredits.stripeSubscriptionId = firebaseCredits.stripeSubscriptionId || userCredits.stripeSubscriptionId || null;
+                        userCredits.subscriptionStatus = firebaseCredits.subscriptionStatus || userCredits.subscriptionStatus || null;
+                        userCredits.subscriptionPeriodEnd = firebaseCredits.subscriptionPeriodEnd || userCredits.subscriptionPeriodEnd || null;
+                        userCredits.cancelAtPeriodEnd = firebaseCredits.cancelAtPeriodEnd || false;
+                        
+                        console.log('✅ Loaded ALL existing credits from Firebase:', 
+                            'reviewCredits:', userCredits.reviewCredits,
+                            'purchasedCredits:', userCredits.purchasedCredits,
+                            'tier:', userCredits.subscriptionTier,
+                            'billing:', userCredits.billingCycle);
                     }
                 } catch (e) {
                     console.error('Error loading existing credits:', e);
@@ -17186,23 +17382,55 @@ async function processPaymentSuccess() {
                 userCredits.billingCycle = purchase.billingCycle || (pendingPurchaseKey?.includes('annual') ? 'annual' : 'monthly');
                 userCredits.subscriptionStartDate = new Date().toISOString();
                 userCredits.lastUpdated = new Date().toISOString();
+                userCredits.lastCreditRefresh = new Date().toISOString(); // Set initial refresh timestamp
                 console.log(`📅 Subscription activated: ${purchase.tier} (${userCredits.billingCycle}) with ${userCredits.reviewCredits} credits`);
-                saveUserCredits();
-            } else if (purchase.type === 'reviewCredits' || purchase.type === 'credits') {
-                // Credit packs - webhook already added credits to Firebase
-                // We just loaded them above, so just update the display
-                console.log('💰 Credit pack purchased - credits already added by webhook:', userCredits.purchasedCredits);
-                // Force immediate display update
+                // Use fullSync here since we're setting subscription fields (not just usage)
+                const userKey = currentUser?.uid || currentUser || 'anonymous';
+                localStorage.setItem('fitzCredits_' + userKey, JSON.stringify(userCredits));
                 updateCreditsDisplay();
+                if (currentUser?.uid) {
+                    await fullSyncCreditsToFirebase();
+                }
+                // Start renewal checker now that user is a paid subscriber
+                startRenewalChecker();
+            } else if (purchase.type === 'reviewCredits' || purchase.type === 'credits') {
+                // Credit packs - webhook adds purchasedCredits to Firebase
+                // We loaded existing credits above, now save complete state to localStorage
+                console.log('💰 Credit pack purchased. Current state - reviewCredits:', userCredits.reviewCredits, 'purchasedCredits:', userCredits.purchasedCredits);
+                
+                // Save complete state to localStorage cache immediately
+                const userKey = currentUser?.uid || currentUser || 'anonymous';
+                localStorage.setItem('fitzCredits_' + userKey, JSON.stringify(userCredits));
+                
+                // Force immediate display update with what we have
+                updateCreditsDisplay();
+                
+                // Reload from Firebase after a delay to pick up webhook's credit addition
+                // (webhook may not have processed yet when we loaded above)
+                setTimeout(async () => {
+                    console.log('🔄 Reloading credits from Firebase to pick up webhook additions...');
+                    skipFirebaseCreditsLoad = false; // Allow Firebase load
+                    await loadCreditsFromFirebase();
+                }, 3000); // 3 second delay for webhook processing
             } else if (purchase.type === 'consultation') {
                 // Consultation booking - no credits to add, just confirm
                 console.log('📞 Consultation booked');
             }
             
-            // Legacy support for topup (bonus prompts)
+            // Chat top-up - webhook already added bonusPrompts to Firebase
+            // Just reload from Firebase to pick up the webhook's addition
             if (purchase.type === 'topup') {
-                userCredits.bonusPrompts = (userCredits.bonusPrompts || 0) + purchase.prompts;
-                saveUserCredits();
+                console.log('💬 Chat top-up purchased - bonus prompts added by webhook');
+                const userKey = currentUser?.uid || currentUser || 'anonymous';
+                localStorage.setItem('fitzCredits_' + userKey, JSON.stringify(userCredits));
+                updateCreditsDisplay();
+                
+                // Reload from Firebase after delay to pick up webhook's addition
+                setTimeout(async () => {
+                    console.log('🔄 Reloading credits from Firebase to pick up bonus prompts...');
+                    skipFirebaseCreditsLoad = false;
+                    await loadCreditsFromFirebase();
+                }, 3000);
             }
             
             console.log('📊 Credits after purchase:', JSON.stringify(userCredits));
@@ -18938,7 +19166,7 @@ function showReviewViewerModal(data) {
                     <div class="flex flex-wrap gap-4">
                         <span><span class="text-slate-400">Venue:</span> <span class="text-white">${data.venueName || 'N/A'}</span></span>
                         <span><span class="text-slate-400">Contact:</span> <span class="text-white">${data.userName || 'N/A'}</span></span>
-                        <span><span class="text-slate-400">Email:</span> <a href="mailto:${data.userEmail}" class="text-blue-400 hover:underline">${data.userEmail || 'N/A'}</a></span>
+                        <span><span class="text-slate-400">Email:</span> <!--email_off--><a href="mailto:${data.userEmail}" class="text-blue-400 hover:underline">${data.userEmail || 'N/A'}</a><!--/email_off--></span>
                         ${data.signInEmail && data.signInEmail !== data.userEmail ? `<span><span class="text-slate-500">(Sign-in:</span> <span class="text-slate-400">${data.signInEmail})</span></span>` : ''}
                         <span><span class="text-slate-400">Phone:</span> <a href="tel:${data.phoneNumber}" class="text-blue-400 hover:underline">${data.phoneNumber || 'N/A'}</a></span>
                     </div>
@@ -21140,13 +21368,13 @@ function addMessage(role, content) {
         <span>IMPORTANT: This matter involves legal risk.</span>
     </p>
     <p class="text-red-300 text-sm mb-3">
-        Please contact a Senior Consultant at <a href="mailto:support@fitzhr.com" class="underline hover:text-red-200">support@fitzhr.com</a> for expert guidance before taking action.
+        Please contact a Senior Consultant at <!--email_off--><a href="mailto:support@fitzhr.com" class="underline hover:text-red-200">support@fitzhr.com</a><!--/email_off--> for expert guidance before taking action.
     </p>
     <div class="flex gap-2">
-        <a href="mailto:support@fitzhr.com?subject=URGENT: High-Risk HR Matter - ${encodeURIComponent(currentUser)}" 
+        <!--email_off--><a href="mailto:support@fitzhr.com?subject=URGENT: High-Risk HR Matter - ${encodeURIComponent(currentUser)}" 
            class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-3 rounded text-sm transition-all text-center">
             ✉️ Email Consultant
-        </a>
+        </a><!--/email_off-->
         <button onclick="openConsultationBookingModal()" 
            class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 rounded text-sm transition-all text-center whitespace-nowrap">
             💬 Book Consultation
@@ -21170,7 +21398,7 @@ function addMessage(role, content) {
             formattedContent = formattedContent
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\n\n/g, '</p><p class="mt-3">')
-                .replace(/info@fitzgeraldhr\.com\.au/g, '<a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline">support@fitzhr.com</a>')
+                .replace(/info@fitzgeraldhr\.com\.au/g, '<!--email_off--><a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline">support@fitzhr.com</a><!--/email_off-->')
                 .replace(/Fitzgerald\s*HR/gi, 'Fitz HR')
                 .replace(/FitzgeraldHR/gi, 'Fitz HR');
             formattedContent = '<p>' + formattedContent + '</p>';
@@ -21184,7 +21412,7 @@ function addMessage(role, content) {
                 textPart = textPart
                     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                     .replace(/\n\n/g, '</p><p class="mt-3">')
-                    .replace(/info@fitzgeraldhr\.com\.au/g, '<a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline">support@fitzhr.com</a>')
+                    .replace(/info@fitzgeraldhr\.com\.au/g, '<!--email_off--><a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline">support@fitzhr.com</a><!--/email_off-->')
                     .replace(/Fitzgerald\s*HR/gi, 'Fitz HR')
                     .replace(/FitzgeraldHR/gi, 'Fitz HR');
                 textPart = '<p>' + textPart + '</p>';
@@ -21695,7 +21923,7 @@ async function confirmCrisisSubmission() {
     closeCrisisPricingModal();
     
     if (telegramSuccess) {
-        showAlert(`🚨 URGENT ALERT SENT\n\nCrisis ID: ${crisisId}\n\nA Senior Consultant will call ${phone} within 15 minutes.\n\nA $${pricing.price} invoice will be sent after your consultation.`);
+        showAlert(`🚨 URGENT ALERT SENT\n\nCrisis ID: ${crisisId}\n\nA Senior Consultant will call ${phone} within 15 minutes during business hours (9am–5pm) or within 2 hours outside business hours.\n\nA $${pricing.price} invoice will be sent after your consultation.`);
     } else {
         showAlert(`🚨 CRISIS LOGGED\n\nCrisis ID: ${crisisId}\n\nOur team has been notified and will call ${phone} as soon as possible.\n\nIf urgent, also email: support@fitzhr.com\n\nA $${pricing.price} invoice will be sent after your consultation.`);
     }
@@ -28301,7 +28529,7 @@ function showJuniorRedirect() {
                         <p class="text-sm text-slate-300">
                             <strong>Need help calculating junior rates?</strong><br/>
                             Contact Fitz HR for assistance: 
-                            <a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline">support@fitzhr.com</a>
+                            <!--email_off--><a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline">support@fitzhr.com</a><!--/email_off-->
                         </p>
                     </div>
                 </div>
@@ -29049,63 +29277,6 @@ function closeFeedback() {
 // LOGOUT FUNCTION
 // ========================================
 
-function clearLocalUserData() {
-    const keysToRemove = [
-        'fitzhr_access_code', 'fitzhr_last_login', 'fitzhr_google_auth',
-        'fitzhr_remember_me', 'fitzhr_returning', 'fitzEmailForSignIn',
-        'fitzTourCompleted', 'fitzTourDeclined', 'fitz_conversations',
-        'fitz_bookmarks', 'fitz_recent_tools', 'fitz_currentConversationId',
-        'currentConversationId', 'userCode', 'venueName',
-        'paymentSuccessPending', 'pendingPurchase', 'pendingDocument',
-        'pendingCalendlyBooking', 'pendingConsultationBooking',
-        'documentGenerationLogs', 'analytics_conversations',
-        'analytics_highrisk', 'analytics_themes', 'analytics_users'
-    ];
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-    
-    const prefixesToClear = [
-        'fitzCredits_', 'fitz_currentConversationId_', 'venueProfile_',
-        'documentLogs_', 'contract_draft_', 'contract_',
-        'legalTermsAccepted_', 'legalTermsAcceptedAt_',
-        'checklist_', 'complianceSettings_', 'onboarding_', 'training_plan_'
-    ];
-    const keysToDelete = [];
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (prefixesToClear.some(prefix => key.startsWith(prefix))) {
-            keysToDelete.push(key);
-        }
-    }
-    keysToDelete.forEach(key => localStorage.removeItem(key));
-    
-    // Reset in-memory state
-    currentUser = null;
-    conversationHistory = [];
-    currentConversationId = null;
-    conversations = [];
-    bookmarks = [];
-    skipFirebaseCreditsLoad = false;
-    if (typeof conversationHistory_searchable !== 'undefined') conversationHistory_searchable = [];
-    userCredits = { subscriptionCredits: 0, purchasedCredits: 0, bonusPrompts: 0, usedPrompts: 0, usedCredits: 0, promptLimit: 20, creditLimit: 0, tier: 'free', subscriptionTier: 'free' };
-    venueProfile = { name: '', type: '', size: '', state: '', challenges: [] };
-    
-    // Clear DOM elements so old user's UI doesn't bleed through
-    const sidebarChatsList = document.getElementById('sidebarChatsList');
-    if (sidebarChatsList) sidebarChatsList.innerHTML = '<p class="text-slate-500 text-sm py-4 text-center">No chats yet</p>';
-    
-    const messagesContainer = document.getElementById('messagesContainer');
-    if (messagesContainer) {
-        const container = messagesContainer.querySelector('.space-y-6');
-        if (container) container.innerHTML = '';
-    }
-    
-    // Clear recent tools display
-    const recentToolsEls = document.querySelectorAll('[data-recent-tools], .recent-tools-list');
-    recentToolsEls.forEach(el => { el.innerHTML = ''; });
-    
-    console.log('✅ Local user data cleared (localStorage + memory + DOM)');
-}
-
 function logout() {
     // Show the logout options modal
     document.getElementById('logoutModal').classList.remove('hidden');
@@ -29153,7 +29324,6 @@ async function confirmLogout(type) {
         // ✅ HARD LOGOUT - Clear everything, forget this device
         localStorage.removeItem('fitzhr_access_code');
         localStorage.removeItem('fitzhr_last_login');
-        localStorage.removeItem('fitzhr_current_uid');
     }
     
     // Perform the actual logout (now async)
@@ -29190,8 +29360,14 @@ async function performLogout(loggedOutUser, type) {
         }
     }
     
-    // Clear all local user data to prevent leaking between accounts
-    clearLocalUserData();
+    // Reset current user
+    currentUser = null;
+    
+    // Clear conversation history
+    conversationHistory = [];
+    
+    // Clear current conversation ID
+    currentConversationId = null;
     
     // Clear messages from screen
     const messagesContainer = document.getElementById('messagesContainer');
@@ -31051,6 +31227,27 @@ let uploadedAIFileData = null;
 let parsedAIData = null;
 
 function openAIImportModal(type) {
+    // Show disclaimer first
+    pendingImportType = type;
+    document.getElementById('importDisclaimerModal').classList.remove('hidden');
+}
+
+let pendingImportType = null;
+
+function acceptImportDisclaimer() {
+    document.getElementById('importDisclaimerModal').classList.add('hidden');
+    if (pendingImportType) {
+        _openAIImportModal(pendingImportType);
+        pendingImportType = null;
+    }
+}
+
+function closeImportDisclaimer() {
+    document.getElementById('importDisclaimerModal').classList.add('hidden');
+    pendingImportType = null;
+}
+
+function _openAIImportModal(type) {
     currentImportType = type;
     
     // Hide Integration Hub
@@ -32418,6 +32615,37 @@ function resetAIImport() {
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Import Data Disclaimer Modal -->
+<div id="importDisclaimerModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-[60]">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-md w-full border border-amber-500/50 fade-in">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-3xl">⚠️</span>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Data Import Notice</h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+                Fitz HR processes workplace data you provide to generate insights and compliance analysis. 
+                By proceeding, you confirm that you have the appropriate authority to input employee information 
+                and that the data is being shared in accordance with your organisation's privacy obligations.
+            </p>
+        </div>
+        <div class="bg-slate-900/50 border border-slate-700 rounded-lg p-4 mb-6">
+            <p class="text-slate-400 text-xs leading-relaxed">
+                Uploaded data is used solely for analysis within your session. 
+                See our <a href="/privacy" target="_blank" class="text-amber-400 underline hover:text-amber-300">Privacy Policy</a> for details on how we handle your data.
+            </p>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="closeImportDisclaimer()" class="flex-1 px-4 py-3 border border-slate-600 text-slate-300 rounded-lg hover:bg-slate-700 transition-colors font-medium">
+                Cancel
+            </button>
+            <button onclick="acceptImportDisclaimer()" class="flex-1 px-4 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-lg transition-colors font-bold">
+                I Understand, Continue
+            </button>
         </div>
     </div>
 </div>
@@ -40070,9 +40298,6 @@ async function signOut() {
             await saveCurrentConversationIdToFirebase(currentConversationId);
         }
         
-        // Clear all local user data to prevent leaking between accounts
-        clearLocalUserData();
-        
         await auth.signOut();
         if (typeof showNotification === 'function') showNotification('Signed out', 'success');
     } catch (error) { }
@@ -40210,14 +40435,6 @@ function stopRealtimeSync() {
 if (auth) {
     auth.onAuthStateChanged(async function(user) {
         if (user) {
-            // Detect user switch — clear stale data if a different user is signing in
-            const previousUid = localStorage.getItem('fitzhr_current_uid');
-            if (!previousUid || previousUid !== user.uid) {
-                console.log('🔄 New or different user detected — clearing local data before Firebase load');
-                clearLocalUserData();
-            }
-            localStorage.setItem('fitzhr_current_uid', user.uid);
-            
             currentUser = user;
             const accessScreen = document.getElementById('accessScreen');
             const assistantScreen = document.getElementById('assistantScreen');
@@ -40267,6 +40484,10 @@ if (auth) {
             
             // Force credits display update after data is loaded
             updateCreditsDisplay();
+            
+            // Start periodic renewal check for paid subscribers
+            // This catches renewals that happen while the user is logged in
+            startRenewalChecker();
             
             // Check Firebase for legal acceptance and load last conversation ID
             if (db) {
