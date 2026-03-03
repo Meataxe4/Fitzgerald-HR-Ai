@@ -4009,6 +4009,7 @@ input, textarea, select {
     </script>
 </head>
 <body class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-screen">
+<!--email_off-->
 
 <!-- ============================================
      LAUNCH GATE - Remove or set LAUNCH_MODE = false when ready to go live
@@ -4070,7 +4071,7 @@ input, textarea, select {
 // LAUNCH GATE CONFIGURATION
 // ============================================
 // Set to false or remove this entire section when ready to launch publicly
-const LAUNCH_MODE = true;  // ← CHANGE TO false TO DISABLE GATE
+const LAUNCH_MODE = false; // ← SITE IS LIVE
 
 // Password is hashed - never store plain text in client code!
 // To generate a new hash: console.log(await hashPassword('your-password'))
@@ -4889,14 +4890,14 @@ async function checkFirestoreData() {
                 <div class="flex items-center gap-6 text-sm">
                     <a href="#" onclick="showTermsOfService(); return false;" class="text-slate-400 hover:text-white transition-colors">Terms</a>
                     <a href="#" onclick="showPrivacyPolicy(); return false;" class="text-slate-400 hover:text-white transition-colors">Privacy</a>
-                    <a href="mailto:support@fitzhr.com" class="text-slate-400 hover:text-white transition-colors">Contact</a>
+                    <a href="/cdn-cgi/l/email-protection#ddaea8adadb2afa99dbbb4a9a7b5aff3beb2b0" class="text-slate-400 hover:text-white transition-colors">Contact</a>
                 </div>
             </div>
         </footer>
     </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // Smart view switching based on returning user
 function initAccessScreen() {
     const isReturning = localStorage.getItem('fitzhr_returning') === 'true' || 
@@ -5300,7 +5301,7 @@ document.addEventListener('DOMContentLoaded', function() {
         </p>
         <p class="text-slate-500 text-xs">
             Professional Advice: 
-            <a href="mailto:support@fitzhr.com" class="text-slate-400 hover:text-amber-400 underline">support@fitzhr.com</a> | 
+            <a href="/cdn-cgi/l/email-protection#6b181e1b1b04191f2b0d021f11031945080406" class="text-slate-400 hover:text-amber-400 underline"><span class="__cf_email__" data-cfemail="52212722223d202612343b26283a207c313d3f">[email&#160;protected]</span></a> | 
             <a href="#terms" onclick="showTermsOfService(); return false;" class="text-slate-400 hover:text-amber-400 underline">Terms</a>
         </p>
     </div>
@@ -5628,7 +5629,7 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
 
             <p class="text-center text-slate-400 text-sm mt-4">
-                A Senior Consultant will contact you within 15 minutes
+                A Senior Consultant will contact you within 15 minutes during business hours (9am–5pm) or 2 hours outside business hours
             </p>
         </div>
     </div>
@@ -5639,7 +5640,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="text-center mb-6">
                 <div class="text-5xl mb-3">🚨</div>
                 <h2 class="text-2xl font-bold text-red-400 mb-2">Urgent Consultant Callback</h2>
-                <p class="text-slate-400 text-sm">A Senior HR Consultant will call you within 15 minutes</p>
+                <p class="text-slate-400 text-sm">15 mins (business hours) or 2 hrs (after hours)</p>
             </div>
 
             <div class="bg-slate-900 rounded-xl p-5 mb-6">
@@ -5659,7 +5660,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 mb-6">
                 <p class="text-red-300 text-sm font-medium mb-2">This includes:</p>
                 <ul class="text-red-200/80 text-sm space-y-1">
-                    <li>• Callback within 15 minutes from a Senior HR Consultant</li>
+                    <li>• Callback within 15 minutes during business hours (9am–5pm) or 2 hours outside business hours</li>
                     <li>• Expert guidance on your urgent situation</li>
                     <li>• Immediate action plan and next steps</li>
                     <li>• Follow-up summary email</li>
@@ -6485,11 +6486,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                 </button>
                 
-                <button onclick="openToolFromMobile('xeroIntegration')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
+                <button onclick="closeMobileTools(); openIntegrationHub();" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
                     <span class="text-2xl">🔗</span>
                     <div>
-                        <div class="font-semibold">Xero Integration</div>
-                        <div class="text-sm text-slate-400">Connect with Xero</div>
+                        <div class="font-semibold">Integrations</div>
+                        <div class="text-sm text-slate-400">Import 3rd party data for Fitz to analyse</div>
                     </div>
                 </button>
             </div>
@@ -7212,7 +7213,7 @@ Be as specific as possible!"></textarea>
                     <span>CRITICAL: This document MUST be reviewed by a consultant before use</span>
                 </p>
                 <p class="text-red-200 text-xs">
-                    Contact: <a href="mailto:support@fitzhr.com" class="underline hover:text-red-100">support@fitzhr.com</a>
+                    Contact: <a href="/cdn-cgi/l/email-protection#582b2d2828372a2c183e312c22302a763b3735" class="underline hover:text-red-100"><span class="__cf_email__" data-cfemail="01727471716e7375416768757b69732f626e6c">[email&#160;protected]</span></a>
                 </p>
             </div>
         </div>
@@ -7329,7 +7330,7 @@ Be as specific as possible!"></textarea>
 
         <div class="mt-6 text-center">
             <p class="text-slate-400 text-sm">
-                ✉️ Need help? <a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline font-semibold">support@fitzhr.com</a>
+                ✉️ Need help? <a href="/cdn-cgi/l/email-protection#ea999f9a9a85989eaa8c839e908298c4898587" class="text-amber-400 hover:underline font-semibold"><span class="__cf_email__" data-cfemail="ef9c9a9f9f809d9baf89869b95879dc18c8082">[email&#160;protected]</span></a>
             </p>
         </div>
     </div>
@@ -7684,12 +7685,12 @@ Be as specific as possible!"></textarea>
         <!-- FAQ -->
         <div class="text-center text-slate-400 text-xs">
             <p>14-day money-back guarantee on paid plans. Cancel anytime.</p>
-            <p class="mt-1">Questions? <a href="mailto:support@fitzhr.com" class="text-amber-400 hover:underline">support@fitzhr.com</a></p>
+            <p class="mt-1">Questions? <a href="/cdn-cgi/l/email-protection#1f6c6a6f6f706d6b5f79766b65776d317c7072" class="text-amber-400 hover:underline"><span class="__cf_email__" data-cfemail="f0838580809f8284b09699848a9882de939f9d">[email&#160;protected]</span></a></p>
         </div>
     </div>
 </div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // Billing toggle state - DEFAULT TO ANNUAL
 let currentBilling = 'annual';
 
@@ -7892,7 +7893,7 @@ function setBilling(billing) {
         </div>
 
         <p class="text-center text-slate-500 text-xs mt-4">
-            Questions? <a href="mailto:support@fitzhr.com" class="text-amber-400">support@fitzhr.com</a>
+            Questions? <a href="/cdn-cgi/l/email-protection#04777174746b767044626d707e6c762a676b69" class="text-amber-400"><span class="__cf_email__" data-cfemail="e2919792928d9096a2848b96988a90cc818d8f">[email&#160;protected]</span></a>
         </p>
     </div>
 </div>
@@ -8119,10 +8120,10 @@ function setBilling(billing) {
         <!-- Footer -->
         <div class="bg-slate-900 rounded-b-2xl p-4 flex items-center justify-between">
             <p class="text-slate-500 text-xs">
-                Questions? <a href="mailto:support@fitzhr.com" class="text-purple-400 hover:text-purple-300">support@fitzhr.com</a>
+                Questions? <a href="/cdn-cgi/l/email-protection#85f6f0f5f5eaf7f1c5e3ecf1ffedf7abe6eae8" class="text-purple-400 hover:text-purple-300"><span class="__cf_email__" data-cfemail="dba8aeababb4a9af9bbdb2afa1b3a9f5b8b4b6">[email&#160;protected]</span></a>
             </p>
             <p class="text-slate-500 text-xs">
-                <a href="mailto:support@fitzhr.com" class="text-purple-400 hover:text-purple-300">support@fitzhr.com</a>
+                <a href="/cdn-cgi/l/email-protection#45363035352a373105232c313f2d376b262a28" class="text-purple-400 hover:text-purple-300"><span class="__cf_email__" data-cfemail="24575154544b565064424d505e4c560a474b49">[email&#160;protected]</span></a>
             </p>
         </div>
     </div>
@@ -9151,7 +9152,7 @@ function setBilling(billing) {
 <ol>
 <li><p>For further information about our privacy policy or practices, or to access or correct your personal information, or make a complaint, please contact us using the details set out below:</p>
 <p><strong>Name:</strong> Blake Fitzgerald</p>
-<p><strong>Email</strong>: <a href="mailto:hello@fitzhr.com" class="text-amber-400 underline hover:text-amber-300">hello@fitzhr.com</a></p>
+<p><strong>Email</strong>: <a href="/cdn-cgi/l/email-protection#2149444d4d4e614748555b49530f424e4c" class="text-amber-400 underline hover:text-amber-300"><span class="__cf_email__" data-cfemail="3058555c5c5f705659444a58421e535f5d">[email&#160;protected]</span></a></p>
 <p>Our privacy policy was last updated on 27 February 2026</p></li>
 </ol>
 
@@ -10096,7 +10097,7 @@ function setBilling(billing) {
     </div>
 </div>
 
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ========================================
 // CONFIGURATION & GLOBALS
 // ========================================
@@ -10176,7 +10177,7 @@ const CONFIG = {
         TIERS: {
             free: { 
                 name: 'Free', 
-                reviewCredits: 0, 
+                reviewCredits: 1,  // 1 free credit to try the platform
                 lowRiskDocs: 1,  // 1 total, not monthly
                 monthlyPrompts: 20,
                 price: { annual: 0, monthly: 0 }
@@ -21921,7 +21922,7 @@ async function confirmCrisisSubmission() {
     closeCrisisPricingModal();
     
     if (telegramSuccess) {
-        showAlert(`🚨 URGENT ALERT SENT\n\nCrisis ID: ${crisisId}\n\nA Senior Consultant will call ${phone} within 15 minutes.\n\nA $${pricing.price} invoice will be sent after your consultation.`);
+        showAlert(`🚨 URGENT ALERT SENT\n\nCrisis ID: ${crisisId}\n\nA Senior Consultant will call ${phone} within 15 mins (business hours 9am-5pm) or 2 hrs (after hours).\n\nA $${pricing.price} invoice will be sent after your consultation.`);
     } else {
         showAlert(`🚨 CRISIS LOGGED\n\nCrisis ID: ${crisisId}\n\nOur team has been notified and will call ${phone} as soon as possible.\n\nIf urgent, also email: support@fitzhr.com\n\nA $${pricing.price} invoice will be sent after your consultation.`);
     }
@@ -29275,6 +29276,34 @@ function closeFeedback() {
 // LOGOUT FUNCTION
 // ========================================
 
+function clearLocalUserData() {
+    var keysToRemove = ['fitzhr_access_code','fitzhr_last_login','fitzhr_google_auth','fitzhr_remember_me','fitzhr_returning','fitzEmailForSignIn','fitzTourCompleted','fitzTourDeclined','fitz_conversations','fitz_bookmarks','fitz_recent_tools','fitz_currentConversationId','currentConversationId','userCode','venueName','paymentSuccessPending','pendingPurchase','pendingDocument','pendingCalendlyBooking','pendingConsultationBooking','documentGenerationLogs','analytics_conversations','analytics_highrisk','analytics_themes','analytics_users'];
+    keysToRemove.forEach(function(key) { localStorage.removeItem(key); });
+    var prefixes = ['fitzCredits_','fitz_currentConversationId_','venueProfile_','documentLogs_','contract_draft_','contract_','legalTermsAccepted_','legalTermsAcceptedAt_','checklist_','complianceSettings_','onboarding_','training_plan_'];
+    var toDelete = [];
+    for (var i = 0; i < localStorage.length; i++) {
+        var key = localStorage.key(i);
+        for (var j = 0; j < prefixes.length; j++) {
+            if (key.indexOf(prefixes[j]) === 0) { toDelete.push(key); break; }
+        }
+    }
+    toDelete.forEach(function(key) { localStorage.removeItem(key); });
+    currentUser = null;
+    conversationHistory = [];
+    currentConversationId = null;
+    conversations = [];
+    bookmarks = [];
+    skipFirebaseCreditsLoad = false;
+    if (typeof conversationHistory_searchable !== 'undefined') conversationHistory_searchable = [];
+    userCredits = {subscriptionCredits:0,purchasedCredits:0,bonusPrompts:0,usedPrompts:0,usedCredits:0,promptLimit:20,creditLimit:0,tier:'free',subscriptionTier:'free'};
+    venueProfile = {name:'',type:'',size:'',state:'',challenges:[]};
+    var sl = document.getElementById('sidebarChatsList');
+    if (sl) sl.innerHTML = '<p class="text-slate-500 text-sm py-4 text-center">No chats yet</p>';
+    var mc = document.getElementById('messagesContainer');
+    if (mc) { var inner = mc.querySelector('.space-y-6'); if (inner) inner.innerHTML = ''; }
+    console.log('Local user data cleared');
+}
+
 function logout() {
     // Show the logout options modal
     document.getElementById('logoutModal').classList.remove('hidden');
@@ -29322,6 +29351,7 @@ async function confirmLogout(type) {
         // ✅ HARD LOGOUT - Clear everything, forget this device
         localStorage.removeItem('fitzhr_access_code');
         localStorage.removeItem('fitzhr_last_login');
+        localStorage.removeItem('fitzhr_current_uid');
     }
     
     // Perform the actual logout (now async)
@@ -29358,14 +29388,8 @@ async function performLogout(loggedOutUser, type) {
         }
     }
     
-    // Reset current user
-    currentUser = null;
-    
-    // Clear conversation history
-    conversationHistory = [];
-    
-    // Clear current conversation ID
-    currentConversationId = null;
+    // Clear all local user data to prevent leaking between accounts
+    clearLocalUserData();
     
     // Clear messages from screen
     const messagesContainer = document.getElementById('messagesContainer');
@@ -31225,6 +31249,23 @@ let uploadedAIFileData = null;
 let parsedAIData = null;
 
 function openAIImportModal(type) {
+    // Show disclaimer before opening import
+    document.getElementById('importDisclaimerModal').classList.remove('hidden');
+    window._pendingImportType = type;
+}
+
+function acceptImportDisclaimer() {
+    document.getElementById('importDisclaimerModal').classList.add('hidden');
+    var type = window._pendingImportType;
+    if (type) _openAIImportModal(type);
+}
+
+function closeImportDisclaimer() {
+    document.getElementById('importDisclaimerModal').classList.add('hidden');
+    window._pendingImportType = null;
+}
+
+function _openAIImportModal(type) {
     currentImportType = type;
     
     // Hide Integration Hub
@@ -32348,6 +32389,31 @@ function resetAIImport() {
 <!-- ========================================
      INTEGRATION HUB MODAL
      ======================================== -->
+
+<!-- Import Data Disclaimer Modal -->
+<div id="importDisclaimerModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-[60]">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-md w-full border border-amber-500/50 fade-in">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border border-amber-500/30">
+                <span class="text-3xl">⚠️</span>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Data Import Notice</h3>
+            <p class="text-slate-300 text-sm leading-relaxed">Fitz HR processes workplace data entered by users to provide insights. You must have authority to input employee information.</p>
+        </div>
+        <div class="bg-slate-700/50 rounded-xl p-4 mb-6 text-sm text-slate-400">
+            <p class="mb-2">🔒 <strong class="text-slate-300">Data handling:</strong> Your data is processed securely and is not shared with third parties.</p>
+            <p>By proceeding, you confirm you have appropriate authority to upload this information. See our <a href="#" onclick="showPrivacyPolicy(); return false;" class="text-amber-500 hover:text-amber-400 underline">Privacy Policy</a>.</p>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="closeImportDisclaimer()" class="flex-1 px-4 py-3 bg-slate-700 hover:bg-slate-600 text-white font-medium rounded-xl transition-all text-sm">
+                Cancel
+            </button>
+            <button onclick="acceptImportDisclaimer()" class="flex-1 px-4 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold rounded-xl transition-all text-sm">
+                I Confirm & Continue
+            </button>
+        </div>
+    </div>
+</div>
 
 <div id="integrationHubModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
     <div class="bg-slate-800 rounded-2xl p-8 max-w-4xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
@@ -39820,7 +39886,8 @@ function buildContractHTML() {
                 <p>This is a template document - seek legal advice before use</p>
             </div>
         </body>
-        </html>
+        <!--/email_off-->
+</html>
     `;
     
     return html;
@@ -40244,6 +40311,7 @@ async function signOut() {
             await saveCurrentConversationIdToFirebase(currentConversationId);
         }
         
+        clearLocalUserData();
         await auth.signOut();
         if (typeof showNotification === 'function') showNotification('Signed out', 'success');
     } catch (error) { }
@@ -40381,6 +40449,13 @@ function stopRealtimeSync() {
 if (auth) {
     auth.onAuthStateChanged(async function(user) {
         if (user) {
+            var prevUid = localStorage.getItem('fitzhr_current_uid');
+            if (!prevUid || prevUid !== user.uid) {
+                console.log('Different user detected - clearing local data');
+                clearLocalUserData();
+            }
+            localStorage.setItem('fitzhr_current_uid', user.uid);
+            
             currentUser = user;
             const accessScreen = document.getElementById('accessScreen');
             const assistantScreen = document.getElementById('assistantScreen');
