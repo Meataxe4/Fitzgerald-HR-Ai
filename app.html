@@ -31249,7 +31249,8 @@ let uploadedAIFileData = null;
 let parsedAIData = null;
 
 function openAIImportModal(type) {
-    // Show disclaimer before opening import
+    // Hide Integration Hub first so disclaimer is clearly visible (especially on mobile)
+    document.getElementById('integrationHubModal').classList.add('hidden');
     document.getElementById('importDisclaimerModal').classList.remove('hidden');
     window._pendingImportType = type;
 }
@@ -31263,6 +31264,8 @@ function acceptImportDisclaimer() {
 function closeImportDisclaimer() {
     document.getElementById('importDisclaimerModal').classList.add('hidden');
     window._pendingImportType = null;
+    // Return to Integration Hub
+    document.getElementById('integrationHubModal').classList.remove('hidden');
 }
 
 function _openAIImportModal(type) {
