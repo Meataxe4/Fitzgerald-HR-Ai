@@ -31225,6 +31225,27 @@ let uploadedAIFileData = null;
 let parsedAIData = null;
 
 function openAIImportModal(type) {
+    // Show disclaimer first
+    pendingImportType = type;
+    document.getElementById('importDisclaimerModal').classList.remove('hidden');
+}
+
+let pendingImportType = null;
+
+function acceptImportDisclaimer() {
+    document.getElementById('importDisclaimerModal').classList.add('hidden');
+    if (pendingImportType) {
+        _openAIImportModal(pendingImportType);
+        pendingImportType = null;
+    }
+}
+
+function closeImportDisclaimer() {
+    document.getElementById('importDisclaimerModal').classList.add('hidden');
+    pendingImportType = null;
+}
+
+function _openAIImportModal(type) {
     currentImportType = type;
     
     // Hide Integration Hub
@@ -32592,6 +32613,37 @@ function resetAIImport() {
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Import Data Disclaimer Modal -->
+<div id="importDisclaimerModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-[60]">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-md w-full border border-amber-500/50 fade-in">
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-amber-500/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span class="text-3xl">⚠️</span>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-2">Data Import Notice</h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+                Fitz HR processes workplace data you provide to generate insights and compliance analysis. 
+                By proceeding, you confirm that you have the appropriate authority to input employee information 
+                and that the data is being shared in accordance with your organisation's privacy obligations.
+            </p>
+        </div>
+        <div class="bg-slate-900/50 border border-slate-700 rounded-lg p-4 mb-6">
+            <p class="text-slate-400 text-xs leading-relaxed">
+                Uploaded data is used solely for analysis within your session. 
+                See our <a href="/privacy" target="_blank" class="text-amber-400 underline hover:text-amber-300">Privacy Policy</a> for details on how we handle your data.
+            </p>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="closeImportDisclaimer()" class="flex-1 px-4 py-3 border border-slate-600 text-slate-300 rounded-lg hover:bg-slate-700 transition-colors font-medium">
+                Cancel
+            </button>
+            <button onclick="acceptImportDisclaimer()" class="flex-1 px-4 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-lg transition-colors font-bold">
+                I Understand, Continue
+            </button>
         </div>
     </div>
 </div>
