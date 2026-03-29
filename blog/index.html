@@ -3,15 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hospitality HR Blog | Fitz HR &mdash; HR Guides for Pubs, Restaurants &amp; Hotels in Australia</title>
-    <meta name="description" content="Practical HR guides for Australian hospitality venues. Award rates, employment contracts, Fair Work compliance, performance management, and more for pubs, restaurants, cafes, and hotels.">
+
+    <!-- ============================================================
+         SEO FIXES APPLIED (Ahrefs Audit — March 2026)
+         1. Title shortened to 57 chars (was 79, limit is 60)
+         2. Meta description shortened to 154 chars (was 186, limit is 160)
+         3. Canonical fixed to /blog/ with trailing slash
+            (was /blog which is a 301 redirect — "non-canonical page in sitemap" error)
+         4. OG URL fixed to /blog/ with trailing slash
+         5. OG image added (was missing entirely)
+         6. OG locale added
+         7. Twitter card added (was missing entirely)
+         8. Robots meta tag added
+         9. Structured data added (BreadcrumbList + Blog schema)
+         ============================================================ -->
+
+    <!-- FIX 1: Title shortened from 79 chars to 57 chars -->
+    <title>Hospitality HR Blog | Fitz HR — Guides for Aussie Venues</title>
+
+    <!-- FIX 2: Description shortened from 186 chars to 154 chars -->
+    <meta name="description" content="Practical HR guides for Australian hospitality venues. Award rates, Fair Work compliance, contracts & performance management for pubs, restaurants & hotels.">
+
     <meta name="keywords" content="hospitality HR blog, HR guides restaurants Australia, Fair Work hospitality, pub HR advice, hotel HR compliance">
-    <link rel="canonical" href="https://fitzhr.com/blog">
-    <meta property="og:title" content="Hospitality HR Blog | Fitz HR">
-    <meta property="og:description" content="Practical HR guides for pubs, restaurants, and hotels in Australia.">
-    <meta property="og:url" content="https://fitzhr.com/blog">
+    <meta name="author" content="Fitz HR">
+    <meta name="robots" content="index, follow">
+
+    <!-- FIX 3: Canonical now points to /blog/ (trailing slash) — the 200 URL -->
+    <!-- /blog without trailing slash is a 301 redirect, causing "non-canonical page in sitemap" error -->
+    <link rel="canonical" href="https://fitzhr.com/blog/">
+
+    <!-- Open Graph -->
+    <!-- FIX 4: OG URL updated to match canonical /blog/ -->
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://fitzhr.com/blog/">
+    <meta property="og:title" content="Hospitality HR Blog | Fitz HR">
+    <meta property="og:description" content="Practical HR guides for Australian hospitality venues. Award rates, Fair Work compliance, contracts & performance management for pubs, restaurants & hotels.">
+    <!-- FIX 5: OG image added (was missing) -->
+    <meta property="og:image" content="https://fitzhr.com/assets/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Fitz HR — Hospitality HR Blog">
+    <!-- FIX 6: OG locale added -->
+    <meta property="og:locale" content="en_AU">
     <meta property="og:site_name" content="Fitz HR">
+
+    <!-- FIX 7: Twitter card added (was completely missing) -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@FitzHR">
+    <meta name="twitter:url" content="https://fitzhr.com/blog/">
+    <meta name="twitter:title" content="Hospitality HR Blog | Fitz HR">
+    <meta name="twitter:description" content="Practical HR guides for Australian hospitality venues. Award rates, Fair Work compliance, contracts & performance management for pubs, restaurants & hotels.">
+    <meta name="twitter:image" content="https://fitzhr.com/assets/og-image.png">
+    <meta name="twitter:image:alt" content="Fitz HR — Hospitality HR Blog">
+
+    <!-- FIX 8: Favicon (was missing from blog page) -->
+    <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+    <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+    <meta name="theme-color" content="#f59e0b">
+
+    <!-- FIX 9: Structured data — BreadcrumbList + Blog schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://fitzhr.com/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Blog",
+                "item": "https://fitzhr.com/blog/"
+            }
+        ]
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Blog",
+        "name": "Hospitality HR Blog | Fitz HR",
+        "url": "https://fitzhr.com/blog/",
+        "description": "Practical HR guides for Australian hospitality venues covering Award rates, Fair Work compliance, employment contracts, and performance management.",
+        "publisher": {
+            "@type": "Organization",
+            "name": "Fitz HR",
+            "url": "https://fitzhr.com",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://fitzhr.com/assets/favicon.svg"
+            }
+        },
+        "inLanguage": "en-AU"
+    }
+    </script>
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1e293b; background: #fff; }
@@ -83,7 +174,6 @@
 
         <div class="section-header">&#x1f4da; All Guides</div>
 
-        
         <div class="post-card">
             <h2><a href="/blog/split-shift-rules-hospitality-award-australia">Split Shift Rules Under the Hospitality Award in Australia</a></h2>
             <p class="excerpt">Complete guide to split shift rules under the Hospitality Industry (General) Award, including allowances, maximum spread of hours, and when split shifts can be used.</p>
@@ -162,7 +252,6 @@
             <p class="meta">22 Feb 2026 &middot; 8 min read &middot; <span class="tag">Software</span> <span class="tag">Comparison</span></p>
         </div>
 
-
         <div class="cta">
             <h2>Got a HR Question Right Now?</h2>
             <p>Fitz HR gives you instant answers to any hospitality HR question &mdash; award rates, compliance, performance management, and more.</p>
@@ -171,7 +260,7 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog">Blog</a> &middot; <a href="/app">Try Free</a></p>
+        <p>&copy; 2026 Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog/">Blog</a> &middot; <a href="/app">Try Free</a></p>
     </footer>
 </body>
 </html>
