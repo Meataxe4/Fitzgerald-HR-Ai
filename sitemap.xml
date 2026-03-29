@@ -1,44 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-    SITEMAP — fitzhr.com (corrected March 2026)
+    SITEMAP — fitzhr.com (final, March 2026)
     ====================================================
-    TRAILING SLASH RULES (based on Ahrefs crawl evidence):
-    - https://fitzhr.com/          → root always has trailing slash ✓
-    - https://fitzhr.com/blog/     → confirmed 301 /blog → /blog/ ✓
-    - All other URLs               → serve 200 WITHOUT trailing slash ✓
-
-    Adding trailing slashes to blog posts and compare pages caused
-    18 new "3XX redirect in sitemap" errors. Reverted to no trailing
-    slash for all pages except /blog/.
-
-    EXCLUDED:
-    - /privacy → noindex page, excluded from sitemap
-    - /terms   → noindex page, excluded from sitemap
-
-    ADDED:
-    - /demo → indexable page previously missing from sitemap
+    - /blog/ uses trailing slash (confirmed 301 /blog → /blog/)
+    - All other URLs serve 200 WITHOUT trailing slash
+    - /privacy and /terms excluded (noindex pages)
+    - /demo excluded (page does not exist)
     ====================================================
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
     <!-- ==================== CORE PAGES ==================== -->
-
-    <!-- Root always correctly uses trailing slash -->
     <url>
         <loc>https://fitzhr.com/</loc>
         <lastmod>2026-03-29</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
-
-    <!-- /pricing serves 200 without trailing slash -->
     <url>
         <loc>https://fitzhr.com/pricing</loc>
         <lastmod>2026-02-22</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
-
     <!-- /blog confirmed 301 → /blog/ so trailing slash is correct here -->
     <url>
         <loc>https://fitzhr.com/blog/</loc>
@@ -47,17 +31,7 @@
         <priority>0.9</priority>
     </url>
 
-    <!-- /demo was missing from sitemap — added (no trailing slash) -->
-    <url>
-        <loc>https://fitzhr.com/demo</loc>
-        <lastmod>2026-03-20</lastmod>
-        <changefreq>monthly</changefreq>
-        <priority>0.7</priority>
-    </url>
-
     <!-- ==================== COMPARISON PAGES ==================== -->
-    <!-- All serve 200 without trailing slash per Ahrefs crawl data -->
-
     <url>
         <loc>https://fitzhr.com/compare/fitz-hr-vs-hr-consultants</loc>
         <lastmod>2026-03-20</lastmod>
@@ -84,8 +58,6 @@
     </url>
 
     <!-- ==================== BLOG POSTS (ORIGINAL) ==================== -->
-    <!-- All serve 200 without trailing slash per Ahrefs crawl data -->
-
     <url>
         <loc>https://fitzhr.com/blog/hospitality-award-rates-2026</loc>
         <lastmod>2026-03-29</lastmod>
@@ -118,8 +90,6 @@
     </url>
 
     <!-- ==================== BLOG POSTS (NEW) ==================== -->
-    <!-- All serve 200 without trailing slash per Ahrefs crawl data -->
-
     <url>
         <loc>https://fitzhr.com/blog/how-to-write-formal-warning-letter-hospitality-australia</loc>
         <lastmod>2026-03-05</lastmod>
@@ -170,9 +140,10 @@
     </url>
 
     <!--
-        /privacy and /terms intentionally excluded.
-        These pages carry noindex meta tags — including noindex pages
-        in the sitemap sends contradictory signals to Google.
+        EXCLUDED:
+        - /privacy → noindex meta tag, excluded from sitemap
+        - /terms   → noindex meta tag, excluded from sitemap
+        - /demo    → page does not exist, removed from sitemap
     -->
 
 </urlset>
