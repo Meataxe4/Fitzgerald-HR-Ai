@@ -6,48 +6,39 @@
 
     <!-- ============================================================
          SEO FIXES APPLIED (Ahrefs Audit — March 2026)
-         1. Title shortened to 57 chars (was 79, limit is 60)
-         2. Meta description shortened to 154 chars (was 186, limit is 160)
+         1. Title shortened to 57 chars
+         2. Meta description shortened to 154 chars
          3. Canonical fixed to /blog/ with trailing slash
-            (was /blog which is a 301 redirect — "non-canonical page in sitemap" error)
          4. OG URL fixed to /blog/ with trailing slash
-         5. OG image added (was missing entirely)
+         5. OG image added
          6. OG locale added
-         7. Twitter card added (was missing entirely)
+         7. Twitter card added
          8. Robots meta tag added
          9. Structured data added (BreadcrumbList + Blog schema)
+         GSC FIX (April 2026)
+         10. Footer /blog link updated to /blog/ — resolves redirect error
          ============================================================ -->
 
-    <!-- FIX 1: Title shortened from 79 chars to 57 chars -->
     <title>Hospitality HR Blog | Fitz HR — Guides for Aussie Venues</title>
-
-    <!-- FIX 2: Description shortened from 186 chars to 154 chars -->
     <meta name="description" content="Practical HR guides for Australian hospitality venues. Award rates, Fair Work compliance, contracts & performance management for pubs, restaurants & hotels.">
-
     <meta name="keywords" content="hospitality HR blog, HR guides restaurants Australia, Fair Work hospitality, pub HR advice, hotel HR compliance">
     <meta name="author" content="Fitz HR">
     <meta name="robots" content="index, follow">
-
-    <!-- FIX 3: Canonical now points to /blog/ (trailing slash) — the 200 URL -->
-    <!-- /blog without trailing slash is a 301 redirect, causing "non-canonical page in sitemap" error -->
     <link rel="canonical" href="https://fitzhr.com/blog/">
 
     <!-- Open Graph -->
-    <!-- FIX 4: OG URL updated to match canonical /blog/ -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://fitzhr.com/blog/">
     <meta property="og:title" content="Hospitality HR Blog | Fitz HR">
     <meta property="og:description" content="Practical HR guides for Australian hospitality venues. Award rates, Fair Work compliance, contracts & performance management for pubs, restaurants & hotels.">
-    <!-- FIX 5: OG image added (was missing) -->
     <meta property="og:image" content="https://fitzhr.com/assets/og-image.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Fitz HR — Hospitality HR Blog">
-    <!-- FIX 6: OG locale added -->
     <meta property="og:locale" content="en_AU">
     <meta property="og:site_name" content="Fitz HR">
 
-    <!-- FIX 7: Twitter card added (was completely missing) -->
+    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@FitzHR">
     <meta name="twitter:url" content="https://fitzhr.com/blog/">
@@ -56,12 +47,12 @@
     <meta name="twitter:image" content="https://fitzhr.com/assets/og-image.png">
     <meta name="twitter:image:alt" content="Fitz HR — Hospitality HR Blog">
 
-    <!-- FIX 8: Favicon (was missing from blog page) -->
+    <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
     <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
     <meta name="theme-color" content="#f59e0b">
 
-    <!-- FIX 9: Structured data — BreadcrumbList + Blog schema -->
+    <!-- Structured Data -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -259,6 +250,7 @@
         </div>
     </div>
 
+    <!-- FIX: Footer /blog link updated to /blog/ to resolve GSC redirect error -->
     <footer>
         <p>&copy; 2026 Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog/">Blog</a> &middot; <a href="/app">Try Free</a></p>
     </footer>
