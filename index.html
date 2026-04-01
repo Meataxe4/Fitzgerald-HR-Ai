@@ -15,25 +15,25 @@
          7. Structured data: expanded offers array (fixes validation error)
          8. Structured data: added "aggregateRating" placeholder comment
          ============================================================ -->
+    <!-- ============================================================
+         GSC FIX APPLIED (April 2026)
+         FIX: All internal /blog links updated to /blog/ (trailing slash)
+              to resolve "Redirect error" in Google Search Console.
+              https://fitzhr.com/blog 301 redirects to https://fitzhr.com/blog/
+              Sitemap already references /blog/ — internal links now match.
+         Affected: nav href, footer href
+         ============================================================ -->
 
     <!-- Primary Meta Tags -->
-    <!-- FIX 1: Title shortened from 77 chars to 51 chars (Google truncates at ~60) -->
     <title>Fitz HR | AI HR Software for Australian Hospitality</title>
-
-    <!-- FIX 2: meta name="title" now exactly matches <title> tag above -->
-    <!-- Note: meta name="title" is non-standard — some crawlers use it -->
     <meta name="title" content="Fitz HR | AI HR Software for Australian Hospitality">
-
-    <!-- FIX 3: Description shortened from ~200 chars to 150 chars (limit is 155-160) -->
     <meta name="description" content="AI-powered HR for Australian hospitality. Fair Work compliance, award rates, contracts & warning letters for pubs, restaurants & cafés. Free to start.">
-
     <meta name="keywords" content="hospitality HR software, HR for pubs restaurants, Fair Work compliance hospitality, award rates calculator, employment contract hospitality, AI HR assistant Australia, HR software for restaurants, hospitality award rates">
     <meta name="author" content="Fitz HR">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://fitzhr.com/">
     
     <!-- Open Graph / Facebook -->
-    <!-- FIX 4: OG title now matches <title> exactly (was mismatched, causing "SERP title mismatch" error) -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://fitzhr.com/">
     <meta property="og:title" content="Fitz HR | AI HR Software for Australian Hospitality">
@@ -46,7 +46,6 @@
     <meta property="og:site_name" content="Fitz HR">
 
     <!-- Twitter / X -->
-    <!-- FIX 5: Twitter title now matches <title> exactly -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@FitzHR">
     <meta name="twitter:url" content="https://fitzhr.com/">
@@ -89,14 +88,7 @@
         }
     </script>
 
-    <!-- ============================================================
-         STRUCTURED DATA FIXES
-         FIX 6: Added required "image" field to SoftwareApplication
-                 (Google requires this for rich results eligibility)
-         FIX 7: Expanded "offers" to include individual Offer items
-                 inside AggregateOffer (fixes schema validation error)
-         FIX 8: Added "publisher" sameAs field for brand authority
-         ============================================================ -->
+    <!-- Structured Data -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -306,7 +298,8 @@
                     <a href="#features" class="text-slate-300 hover:text-white transition-colors">Features</a>
                     <a href="#how-it-works" class="text-slate-300 hover:text-white transition-colors">How It Works</a>
                     <a href="/pricing" class="text-slate-300 hover:text-white transition-colors">Pricing</a>
-                    <a href="/blog" class="text-slate-300 hover:text-white transition-colors">Blog</a>
+                    <!-- FIX: /blog → /blog/ to match Netlify final URL and resolve GSC redirect error -->
+                    <a href="/blog/" class="text-slate-300 hover:text-white transition-colors">Blog</a>
                 </div>
                 <div class="flex items-center gap-4">
                     <a href="/app" class="hidden sm:inline-block text-slate-300 hover:text-white transition-colors">Log In</a>
@@ -356,7 +349,6 @@
         </div>
     </header>
 
-    <!-- ACCESSIBILITY FIX: Wrap all content sections in <main> -->
     <main>
 
     <!-- Pain Points Section -->
@@ -598,7 +590,7 @@
                     <p class="text-slate-400 text-sm mb-4">For multi-venue or high-turnover</p>
                     <div class="mb-2">
                         <span id="businessPrice" class="text-4xl font-bold">$899</span>
-                        <span id="businessPeriod" class="text-slate-400">/year</span>
+                        <span id="businessPeriod" content="text-slate-400">/year</span>
                     </div>
                     <p id="businessMonthly" class="text-green-500 text-sm mb-4">Just $75/month</p>
                     <ul class="space-y-3 mb-8 text-slate-300 text-sm">
@@ -743,7 +735,6 @@
     </section>
 
     </main>
-    <!-- END ACCESSIBILITY FIX: Close <main> -->
 
     <!-- Footer -->
     <footer class="bg-slate-800 border-t border-slate-700 py-12 px-6">
@@ -760,7 +751,8 @@
                     <ul class="space-y-2 text-slate-400">
                         <li><a href="/#features" class="hover:text-white transition-colors">Features</a></li>
                         <li><a href="/pricing" class="hover:text-white transition-colors">Pricing</a></li>
-                        <li><a href="/blog" class="hover:text-white transition-colors">Blog</a></li>
+                        <!-- FIX: /blog → /blog/ to match Netlify final URL and resolve GSC redirect error -->
+                        <li><a href="/blog/" class="hover:text-white transition-colors">Blog</a></li>
                         <li><a href="/app" class="hover:text-white transition-colors">Log In</a></li>
                     </ul>
                 </div>
