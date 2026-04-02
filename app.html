@@ -3,38 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fitz HR</title>
-    
+    <title>Fitz HR — Start Free or Log In</title>
+ 
+    <!-- Noindex: app shell, not a rankable content page -->
+    <meta name="robots" content="noindex, follow">
+ 
+    <!-- Open Graph — for social sharing and AI crawlers -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://fitzhr.com/app">
+    <meta property="og:title" content="Fitz HR — Start Free or Log In">
+    <meta property="og:description" content="AI-powered HR for Australian hospitality. Ask any Fair Work question, generate compliant documents, and stay compliant. Free to start.">
+    <meta property="og:image" content="https://fitzhr.com/assets/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:locale" content="en_AU">
+    <meta property="og:site_name" content="Fitz HR">
+ 
+    <!-- Twitter / X -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@FitzHR">
+    <meta name="twitter:url" content="https://fitzhr.com/app">
+    <meta name="twitter:title" content="Fitz HR — Start Free or Log In">
+    <meta name="twitter:description" content="AI-powered HR for Australian hospitality. Free to start.">
+    <meta name="twitter:image" content="https://fitzhr.com/assets/og-image.png">
+ 
     <!-- PWA Manifest -->
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#f59e0b">
-    
+ 
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
     <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
-    
+ 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+ 
     <!-- WEEK 3: Chart.js for Analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
+ 
     <!-- PDF Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-    
-    <!-- Word Document Generation - ✅ USING JSDELIVR -->
+ 
+    <!-- Word Document Generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/html-docx-js@0.3.1/dist/html-docx.js"></script>
-    
+ 
     <!-- Excel/Spreadsheet -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
+ 
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
-    
+ 
     <!-- Stripe.js for Payments -->
-    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://js.stripe.com/v3/">
+    </script>
  
  <style>
 
