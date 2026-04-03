@@ -1174,12 +1174,12 @@ function toggleBilling(type) {
         wrap.style.width = measureWord(titles[current]) + 'px';
     }
 
-    // Measure a word's true width outside the clipped container
+    // Measure a word's true width using the hook element's actual computed font size
     function measureWord(word) {
+        const hookEl = document.getElementById('heroHook');
+        const computed = hookEl ? window.getComputedStyle(hookEl).font : '"Playfair Display",serif';
         const t = document.createElement('span');
-        t.style.cssText = 'position:fixed;top:-9999px;left:-9999px;visibility:hidden;' +
-            'font-family:"Playfair Display",serif;font-weight:700;font-style:italic;' +
-            'font-size:1.85rem;white-space:nowrap;';
+        t.style.cssText = 'position:fixed;top:-9999px;left:-9999px;visibility:hidden;white-space:nowrap;font:' + computed + ';font-style:italic;font-weight:700;';
         t.textContent = word;
         document.body.appendChild(t);
         const w = t.offsetWidth;
