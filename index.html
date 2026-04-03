@@ -205,7 +205,8 @@
         .ticker { position: relative; z-index: 10; margin-top: 56px; padding: 0.45rem 1.5rem; border-bottom: 1px solid var(--rule); background: var(--a06); display: flex; align-items: center; gap: 1rem; overflow: hidden; }
         .ticker-pill { font-family: 'DM Mono', monospace; font-size: 0.52rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--navy); background: var(--amber); padding: 0.18rem 0.5rem; white-space: nowrap; flex-shrink: 0; }
         .ticker-scroll { flex: 1; overflow: hidden; mask-image: linear-gradient(90deg, transparent, black 4%, black 96%, transparent); }
-        .ticker-track { display: flex; gap: 2rem; animation: tscroll 35s linear infinite; white-space: nowrap; }
+        .ticker-track { display: flex; gap: 2rem; animation: tscroll 55s linear infinite; white-space: nowrap; }
+        .ticker-scroll:hover .ticker-track { animation-play-state: paused; }
         .ticker-item { font-family: 'DM Mono', monospace; font-size: 0.56rem; color: var(--w60); letter-spacing: 0.06em; white-space: nowrap; }
         .ticker-item::before { content: '//'; color: var(--amber); opacity: 0.6; margin-right: 0.4rem; }
         @keyframes tscroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
@@ -233,8 +234,10 @@
         .h1-line:nth-child(3) .h1-inner { transition-delay: 0.79s; }
         .hero-h1.in .h1-inner { transform: translateY(0); }
         .hero-h1 em { font-style: italic; color: var(--amber); }
-        .hero-sub { font-family: 'Outfit', sans-serif; font-size: 1.3rem; line-height: 1.65; color: var(--w60); max-width: 30ch; opacity: 0; transform: translateY(14px); transition: opacity 0.7s 0.95s, transform 0.7s 0.95s cubic-bezier(0.16,1,0.3,1); }
+        .hero-sub { font-family: 'Outfit', sans-serif; font-size: 1.3rem; line-height: 1.6; color: var(--w60); max-width: 32ch; margin-bottom: 0.6rem; opacity: 0; transform: translateY(14px); transition: opacity 0.7s 0.95s, transform 0.7s 0.95s cubic-bezier(0.16,1,0.3,1); }
         .hero-sub.in { opacity: 1; transform: translateY(0); }
+        .hero-sub-punch { font-family: 'Outfit', sans-serif; font-size: 1.3rem; line-height: 1.6; color: #fff; font-weight: 700; max-width: 32ch; margin-bottom: 1rem; text-shadow: 0 0 24px rgba(245,158,11,0.18); opacity: 0; transform: translateY(14px); transition: opacity 0.7s 1.0s, transform 0.7s 1.0s cubic-bezier(0.16,1,0.3,1); }
+        .hero-sub-punch.in { opacity: 1; transform: translateY(0); }
         .hero-ctas { margin-top: 2rem; opacity: 0; transform: translateY(14px); transition: opacity 0.7s 1.1s, transform 0.7s 1.1s cubic-bezier(0.16,1,0.3,1); }
         .hero-ctas.in { opacity: 1; transform: translateY(0); }
 
@@ -322,6 +325,62 @@
         .feat-desc { font-size: 1.05rem; color: var(--w60); line-height: 1.5; }
         .feat-arr { color: var(--w30); font-size: 0.9rem; align-self: center; transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), color 0.3s; }
         .feat-row:hover .feat-arr { transform: translateX(4px); color: var(--amber); }
+
+        /* ---- HERO HOOK ---- */
+        .hero-hook { font-family: 'Playfair Display', serif; font-weight: 700; font-style: italic; font-size: 1.85rem; color: var(--amber); line-height: 1.25; margin-top: 1.75rem; margin-bottom: 1.75rem; opacity: 0; transform: translateY(14px); transition: opacity 0.7s 0.88s, transform 0.7s 0.88s cubic-bezier(0.16,1,0.3,1); }
+        .hero-hook.in { opacity: 1; transform: translateY(0); }
+
+        /* ---- SLOT MACHINE ---- */
+        .slot-wrap {
+            display: inline-block;
+            overflow: hidden;
+            height: 1.25em;
+            vertical-align: text-bottom;
+            position: relative;
+            transition: width 0.18s ease;
+        }
+        .slot-drum {
+            display: block;
+            will-change: transform;
+        }
+        .slot-word {
+            display: block;
+            height: 1.25em;
+            line-height: 1.25;
+            white-space: nowrap;
+            color: var(--amber);
+            font-style: italic;
+        }
+        .hero-support { font-family: 'DM Mono', monospace; font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: rgba(255,255,255,0.75); margin-bottom: 1.75rem; opacity: 0; transform: translateY(10px); transition: opacity 0.7s 1.08s, transform 0.7s 1.08s cubic-bezier(0.16,1,0.3,1); }
+        .hero-support.in { opacity: 1; transform: translateY(0); }
+
+        /* ---- CRISIS MODE SECTION ---- */
+        .crisis-section { position: relative; z-index: 10; padding: 3.5rem 1.5rem; border-top: 1px solid var(--rw); background: rgba(239,68,68,0.04); }
+        .crisis-h2 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 2.5rem; line-height: 1.1; margin-bottom: 1.25rem; color: #fff; opacity: 0; transform: translateY(20px); transition: opacity 0.7s, transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+        .crisis-h2.in { opacity: 1; transform: translateY(0); }
+        .crisis-h2 em { font-style: italic; color: var(--amber); }
+        .crisis-body { font-size: 1.05rem; color: var(--w60); line-height: 1.65; margin-bottom: 1.75rem; opacity: 0; transform: translateY(14px); transition: opacity 0.7s 0.1s, transform 0.7s 0.1s cubic-bezier(0.16,1,0.3,1); }
+        .crisis-body.in { opacity: 1; transform: translateY(0); }
+        .crisis-questions { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1.75rem; }
+        .crisis-q { display: flex; align-items: center; gap: 0.75rem; font-size: 1rem; color: #fff; font-weight: 600; opacity: 0; transform: translateX(-20px); transition: opacity 0.5s, transform 0.5s cubic-bezier(0.16,1,0.3,1); }
+        .crisis-q.in { opacity: 1; transform: translateX(0); }
+        .crisis-q:nth-child(1){transition-delay:0.15s} .crisis-q:nth-child(2){transition-delay:0.25s} .crisis-q:nth-child(3){transition-delay:0.35s}
+        .crisis-dot { width: 6px; height: 6px; border-radius: 50%; background: #ef4444; flex-shrink: 0; }
+        .crisis-answer { background: var(--navy2); border: 1px solid var(--rw); border-left: 3px solid var(--amber); padding: 1.25rem; font-size: 1rem; color: var(--w60); line-height: 1.65; opacity: 0; transform: translateY(14px); transition: opacity 0.7s 0.45s, transform 0.7s 0.45s cubic-bezier(0.16,1,0.3,1); }
+        .crisis-answer.in { opacity: 1; transform: translateY(0); }
+        .crisis-answer strong { color: #fff; }
+
+        /* ---- SOCIAL PROOF ---- */
+        .proof-section { position: relative; z-index: 10; padding: 3.5rem 1.5rem; border-top: 1px solid var(--rw); overflow: hidden; }
+        .proof-section::before { content: '\201C'; font-family: 'Playfair Display', serif; font-size: 12rem; line-height: 1; color: var(--amber); opacity: 0.07; position: absolute; top: -1rem; left: 0.5rem; pointer-events: none; }
+        .proof-quote { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.5rem; line-height: 1.45; color: #fff; margin-bottom: 1.5rem; position: relative; z-index: 1; opacity: 0; transform: translateY(20px); transition: opacity 0.8s, transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+        .proof-quote.in { opacity: 1; transform: translateY(0); }
+        .proof-quote em { font-style: normal; color: var(--amber); }
+        .proof-attr { display: flex; align-items: center; gap: 0.75rem; opacity: 0; transform: translateY(14px); transition: opacity 0.7s 0.2s, transform 0.7s 0.2s cubic-bezier(0.16,1,0.3,1); }
+        .proof-attr.in { opacity: 1; transform: translateY(0); }
+        .proof-line { width: 28px; height: 2px; background: var(--amber); flex-shrink: 0; }
+        .proof-name { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--w60); }
+
 
         /* ---- HOW IT WORKS ---- */
         .hiw-h2 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 2.5rem; line-height: 1.2; margin-bottom: 0.5rem; opacity: 0; transform: translateY(20px); transition: opacity 0.7s, transform 0.7s cubic-bezier(0.16,1,0.3,1); }
@@ -527,7 +586,10 @@
             <span class="h1-line"><span class="h1-inner">every venue</span></span>
             <span class="h1-line"><span class="h1-inner"><em>deserves.</em></span></span>
         </h1>
-        <p class="hero-sub" id="heroSub">Award rates, employment contracts, and Fair Work compliance — answered instantly, any hour. Built for Australian pubs, restaurants, cafes and hotels.</p>
+        <p class="hero-hook" id="heroHook">Your <span class="slot-wrap" id="slotWrap"><span class="slot-drum" id="slotDrum"><span class="slot-word">chef</span></span></span> just walked out mid-service. Now what?</p>
+        <p class="hero-sub" id="heroSub">Most HR decisions in hospitality are made on instinct — and that's the problem.<br>That's how venues end up at the Fair Work Commission — dealing with claims, backpay, and months of stress.</p>
+        <p class="hero-sub-punch" id="heroSubPunch">Fitz tells you exactly what to do — before it becomes a Fair Work problem.</p>
+        <p class="hero-support" id="heroSupport">Available 24/7 · Pubs · Restaurants · Cafes · Hotels · Australia</p>
         <div class="hero-ctas" id="heroCtas">
             <a href="/app" class="btn-primary"><span>Start Free — No Card Required</span><span class="arr">→</span></a>
             <a href="#pricing" class="btn-ghost">View Pricing ↓</a>
@@ -566,6 +628,36 @@
 </section>
 
 <!-- ============================================================
+     CRISIS MODE
+     ============================================================ -->
+<section class="crisis-section">
+    <div class="section-label"><span class="sl-text">Crisis Mode</span><div class="sl-line"></div></div>
+    <h2 class="crisis-h2">It's 10pm. Your chef just walked out.<br><em>Now what?</em></h2>
+    <p class="crisis-body">Most venue owners freeze. They guess. They send the wrong message, skip the right process, and create a Fair Work claim they didn't need to have. In hospitality, HR crises don't wait for business hours — and neither does Fitz.</p>
+    <div class="crisis-questions">
+        <div class="crisis-q"><span class="crisis-dot"></span>Can you terminate on the spot — or does that expose you?</div>
+        <div class="crisis-q"><span class="crisis-dot"></span>What do you say, and what should never be in writing?</div>
+        <div class="crisis-q"><span class="crisis-dot"></span>What's the procedural fairness risk if you get this wrong?</div>
+    </div>
+    <div class="crisis-answer">
+        <strong>Fitz guides you through it step by step.</strong> Instant answers grounded in Australian workplace law, with an HR professional callback available within minutes if you need a real person. Any hour. Any situation.
+    </div>
+</section>
+
+<!-- ============================================================
+     SOCIAL PROOF
+     ============================================================ -->
+<section class="proof-section">
+    <div class="section-label"><span class="sl-text">Real Venues. Real Situations.</span><div class="sl-line"></div></div>
+    <p class="proof-quote">&ldquo;We had a kitchen hand walk out mid-Saturday service after an altercation. I was convinced we were going to get a claim lodged against us. Fitz walked me through exactly what to say, what to document, and what to avoid. We handled it correctly. <em>No claim, no drama.</em>&rdquo;</p>
+    <div class="proof-attr">
+        <div class="proof-line"></div>
+        <span class="proof-name">Venue Owner &middot; Inner West Sydney</span>
+    </div>
+
+</section>
+
+<!-- ============================================================
      STATS BAND
      ============================================================ -->
 <div class="stats-band">
@@ -586,11 +678,10 @@
     <h2 class="feat-h2">Everything your venue's HR needs. <em>Nothing it doesn't.</em></h2>
     <p class="feat-sub">Fitz combines AI smarts with real Australian workplace law — instant answers you can actually use.</p>
     <div class="feat-list">
-        <div class="feat-row"><span class="feat-num">01</span><div class="feat-content"><div class="feat-title">Award Rate Calculator</div><div class="feat-desc">Sunday penalties, split shift allowances, evening loadings — calculated correctly under the Hospitality Industry Award.</div></div><span class="feat-arr">→</span></div>
-        <div class="feat-row"><span class="feat-num">02</span><div class="feat-content"><div class="feat-title">Employment Contract Builder</div><div class="feat-desc">Legally compliant contracts in minutes. Answer a few questions — Fitz does the rest.</div></div><span class="feat-arr">→</span></div>
-        <div class="feat-row"><span class="feat-num">03</span><div class="feat-content"><div class="feat-title">Warning Letters &amp; Disciplinary Docs</div><div class="feat-desc">Procedurally fair, legally sound documentation for performance management and termination.</div></div><span class="feat-arr">→</span></div>
-        <div class="feat-row"><span class="feat-num">04</span><div class="feat-content"><div class="feat-title">24/7 AI HR Guidance</div><div class="feat-desc">Ask Fitz anything — from casual stand-down rights to unfair dismissal exposure. Always on.</div></div><span class="feat-arr">→</span></div>
-        <div class="feat-row"><span class="feat-num">05</span><div class="feat-content"><div class="feat-title">Crisis Mode</div><div class="feat-desc">Serious misconduct at 10pm? Step-by-step emergency guidance with HR professional callback.</div></div><span class="feat-arr">→</span></div>
+        <div class="feat-row"><span class="feat-num">01</span><div class="feat-content"><div class="feat-title">Know you're paying staff correctly — every shift</div><div class="feat-desc">Sunday penalties, split shift allowances, evening loadings — calculated correctly under the Hospitality Industry Award.</div></div><span class="feat-arr">→</span></div>
+        <div class="feat-row"><span class="feat-num">02</span><div class="feat-content"><div class="feat-title">Handle new hires correctly from day one</div><div class="feat-desc">Legally compliant employment contracts in minutes, tailored to the correct Award classification and role type.</div></div><span class="feat-arr">→</span></div>
+        <div class="feat-row"><span class="feat-num">03</span><div class="feat-content"><div class="feat-title">Manage staff issues without the legal exposure</div><div class="feat-desc">Procedurally fair warning letters, PIPs, and termination documents — generated for your specific situation.</div></div><span class="feat-arr">→</span></div>
+        <div class="feat-row"><span class="feat-num">04</span><div class="feat-content"><div class="feat-title">Know what to do before you act</div><div class="feat-desc">Ask Fitz anything — from casual stand-down rights to unfair dismissal exposure. Instant answers, 24/7, grounded in Australian law.</div></div><span class="feat-arr">→</span></div>
     </div>
 </section>
 
@@ -877,7 +968,7 @@ window.addEventListener('scroll', () => {
 
 /* ---- HERO ENTRANCE ---- */
 setTimeout(() => {
-    ['vrule', 'eyebrow', 'heroH1', 'heroSub', 'heroCtas', 'fitzHeroWrap']
+    ['vrule', 'eyebrow', 'heroH1', 'heroHook', 'heroSub', 'heroSubPunch', 'heroSupport', 'heroCtas', 'fitzHeroWrap']
         .forEach(id => document.getElementById(id).classList.add('in'));
 }, 80);
 
@@ -890,7 +981,9 @@ document.querySelectorAll(
     '.sl-text, .sl-line, .ru, .pain-card, .feat-row, .stat-item, ' +
     '.feat-h2, .feat-sub, .demo-card, .hiw-step, .hiw-h2, .hiw-sub, ' +
     '.pricing-h2, .pricing-intro, .billing-toggle, .p-card, .credits-box, ' +
-    '.faq-h2, .faq-item, .trust-item'
+    '.faq-h2, .faq-item, .trust-item, ' +
+    '.crisis-h2, .crisis-body, .crisis-q, .crisis-answer, ' +
+    '.proof-quote, .proof-attr'
 ).forEach(el => obs.observe(el));
 
 /* ---- COUNTER ANIMATION ---- */
@@ -1003,5 +1096,108 @@ function toggleBilling(type) {
     });
 }
 </script>
+
+<script>
+/* ---- SLOT MACHINE ---- */
+(function() {
+    const titles = ['chef','barista','waiter','bartender','manager','supervisor','host','sommelier'];
+    const wrap = document.getElementById('slotWrap');
+    const drum = document.getElementById('slotDrum');
+    if (!wrap || !drum) return;
+
+    let current = 0;
+    let spinning = false;
+
+    // Set initial width to first word
+    function initWidth() {
+        wrap.style.width = measureWord(titles[current]) + 'px';
+    }
+
+    // Measure a word's true width outside the clipped container
+    function measureWord(word) {
+        const t = document.createElement('span');
+        t.style.cssText = 'position:fixed;top:-9999px;left:-9999px;visibility:hidden;' +
+            'font-family:"Playfair Display",serif;font-weight:700;font-style:italic;' +
+            'font-size:1.85rem;white-space:nowrap;';
+        t.textContent = word;
+        document.body.appendChild(t);
+        const w = t.offsetWidth;
+        document.body.removeChild(t);
+        return w;
+    }
+
+    // Roll one word in (slides current up, new word comes from below)
+    function rollOne(word, duration) {
+        return new Promise(resolve => {
+            // Measure BEFORE appending to avoid clip contamination
+            const nextW = measureWord(word);
+            const currW = wrap.offsetWidth;
+
+            // Expand container to fit wider word FIRST, force reflow
+            wrap.style.width = Math.max(currW, nextW) + 'px';
+            void wrap.offsetWidth;
+
+            // Now append and roll
+            const nextEl = document.createElement('span');
+            nextEl.className = 'slot-word';
+            nextEl.textContent = word;
+            drum.appendChild(nextEl);
+
+            drum.style.transition = `transform ${duration}ms cubic-bezier(0.4,0,0.15,1)`;
+            drum.style.transform  = 'translateY(-1.25em)';
+
+            setTimeout(() => {
+                drum.style.transition = 'none';
+                drum.style.transform  = 'translateY(0)';
+                if (drum.firstChild) drum.removeChild(drum.firstChild);
+                wrap.style.width = nextW + 'px';
+                resolve();
+            }, duration + 16);
+        });
+    }
+
+    async function spin() {
+        if (spinning) return;
+        spinning = true;
+
+        let target = current;
+        while (target === current) target = Math.floor(Math.random() * titles.length);
+
+        // Sequence: fast random rolls + controlled slowdown into target
+        const fastCount = 5 + Math.floor(Math.random() * 3);
+        const sequence = [];
+        for (let i = 0; i < fastCount; i++) {
+            sequence.push(titles[Math.floor(Math.random() * titles.length)]);
+        }
+        // Last 3 are the slowdown: two random then target
+        sequence.push(titles[Math.floor(Math.random() * titles.length)]);
+        sequence.push(titles[Math.floor(Math.random() * titles.length)]);
+        sequence.push(titles[target]);
+
+        // Durations: fast → slow → landing
+        const durations = sequence.map((_, i) => {
+            const fromEnd = sequence.length - 1 - i;
+            if (fromEnd === 0) return 480;  // landing — slow and satisfying
+            if (fromEnd === 1) return 280;
+            if (fromEnd === 2) return 170;
+            return 95;                       // fast spin
+        });
+
+        for (let i = 0; i < sequence.length; i++) {
+            await rollOne(sequence[i], durations[i]);
+        }
+
+        current = target;
+        spinning = false;
+    }
+
+    setTimeout(() => {
+        initWidth();
+        spin();
+        setInterval(spin, 6500);
+    }, 1700);
+})();
+</script>
+
 </body>
 </html>
