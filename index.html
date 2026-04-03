@@ -3,25 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- ============================================================
-         SEO FIXES APPLIED (Ahrefs Audit — March 2026)
-         1. Title shortened to 51 chars (was 77, limit is 60)
-         2. meta name="title" now matches <title> exactly
-         3. Meta description shortened to 150 chars (was ~200, limit is 160)
-         4. OG title now consistent with <title>
-         5. Twitter title now consistent with <title>
-         6. Structured data: added "image" (fixes rich results error)
-         7. Structured data: expanded offers array (fixes validation error)
-         8. Structured data: added "aggregateRating" placeholder comment
-         ============================================================ -->
-    <!-- ============================================================
-         GSC FIX APPLIED (April 2026)
-         FIX: All internal /blog links updated to /blog/ (trailing slash)
-              to resolve "Redirect error" in Google Search Console.
-              https://fitzhr.com/blog 301 redirects to https://fitzhr.com/blog/
-              Sitemap already references /blog/ — internal links now match.
-         Affected: nav href, footer href
+         SEO — preserved exactly from index.html (April 2026)
+         Visual design merged from new homepage concept
+         Mascot: /assets/fitz-neon-transparent.png (no base64)
+         /blog/ trailing slash throughout (GSC fix)
+         All named anchors: #features #how-it-works #pricing
          ============================================================ -->
 
     <!-- Primary Meta Tags -->
@@ -32,8 +20,8 @@
     <meta name="author" content="Fitz HR">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://fitzhr.com/">
-    
-    <!-- Open Graph / Facebook -->
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://fitzhr.com/">
     <meta property="og:title" content="Fitz HR | AI HR Software for Australian Hospitality">
@@ -62,33 +50,9 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'outfit': ['Outfit', 'sans-serif'],
-                    },
-                    colors: {
-                        amber: {
-                            500: '#f59e0b',
-                            600: '#d97706',
-                        },
-                        slate: {
-                            800: '#1e293b',
-                            900: '#0f172a',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
-    <!-- Structured Data -->
+    <!-- Structured Data — preserved exactly from index.html -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -106,34 +70,10 @@
             "priceCurrency": "AUD",
             "offerCount": "4",
             "offers": [
-                {
-                    "@type": "Offer",
-                    "name": "Free",
-                    "price": "0",
-                    "priceCurrency": "AUD",
-                    "url": "https://fitzhr.com/app"
-                },
-                {
-                    "@type": "Offer",
-                    "name": "Starter",
-                    "price": "249",
-                    "priceCurrency": "AUD",
-                    "url": "https://fitzhr.com/pricing"
-                },
-                {
-                    "@type": "Offer",
-                    "name": "Pro",
-                    "price": "449",
-                    "priceCurrency": "AUD",
-                    "url": "https://fitzhr.com/pricing"
-                },
-                {
-                    "@type": "Offer",
-                    "name": "Business",
-                    "price": "899",
-                    "priceCurrency": "AUD",
-                    "url": "https://fitzhr.com/pricing"
-                }
+                {"@type": "Offer","name": "Free","price": "0","priceCurrency": "AUD","url": "https://fitzhr.com/app"},
+                {"@type": "Offer","name": "Starter","price": "249","priceCurrency": "AUD","url": "https://fitzhr.com/pricing"},
+                {"@type": "Offer","name": "Pro","price": "449","priceCurrency": "AUD","url": "https://fitzhr.com/pricing"},
+                {"@type": "Offer","name": "Business","price": "899","priceCurrency": "AUD","url": "https://fitzhr.com/pricing"}
             ]
         },
         "description": "AI-powered HR software for Australian hospitality businesses. Provides instant HR guidance, award rate calculations, employment contract generation, warning letters, and Fair Work compliance tools specifically for pubs, restaurants, cafes, and hotels.",
@@ -142,14 +82,8 @@
             "name": "Fitz HR",
             "url": "https://fitzhr.com",
             "email": "support@fitzhr.com",
-            "sameAs": [
-                "https://fitzhr.com"
-            ],
-            "address": {
-                "@type": "PostalAddress",
-                "addressCountry": "AU",
-                "addressRegion": "NSW"
-            }
+            "sameAs": ["https://fitzhr.com"],
+            "address": {"@type": "PostalAddress","addressCountry": "AU","addressRegion": "NSW"}
         },
         "featureList": [
             "AI HR Chat trained on Australian workplace law",
@@ -162,57 +96,19 @@
         "keywords": "hospitality HR software, AI HR assistant, Australian hospitality, Fair Work compliance, award rates calculator, employment contracts, pubs restaurants hotels"
     }
     </script>
-
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "FAQPage",
         "mainEntity": [
-            {
-                "@type": "Question",
-                "name": "What HR software is best for hospitality businesses in Australia?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Fitz HR is an AI-powered HR assistant built specifically for pubs, restaurants, cafes, and hotels in Australia. It provides instant answers to HR questions based on Australian workplace law and the Hospitality Industry (General) Award, generates compliant employment contracts and warning letters, and includes an Award Rate Calculator. Start free at fitzhr.com."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "How do I calculate penalty rates for hospitality staff?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Penalty rates under the Hospitality Industry (General) Award are: Saturday 150%, Sunday 175%, Public Holiday 250%. Evening work (7pm-midnight Mon-Fri) has a flat $2.81/hr loading, and night work (midnight-7am) has a $4.22/hr loading. Fitz HR's free Award Wizard calculates the correct rate for any classification, day, and shift type."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Can I generate employment contracts for restaurant staff online?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes. Fitz HR's Employment Contract Builder generates contracts tailored to the Hospitality Industry (General) Award in minutes. You answer a few questions about the role, and it produces a contract with the correct Award classification, pay rates, leave entitlements, and hospitality-specific clauses."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Is there an AI HR assistant for Australian hospitality?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Yes. Fitz HR (fitzhr.com) is an AI-powered HR assistant built specifically for Australian hospitality businesses including pubs, restaurants, cafes, bars, and hotels. It provides instant guidance on award rates, Fair Work compliance, employment contracts, performance management, and more."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Is Fitz HR free?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Fitz HR has a free tier that includes 20 AI chats per month, 1 free template download, and unlimited access to HR tools like the Award Rate Calculator. Paid plans start from $249/year ($21/month) for unlimited chat and full document access."
-                }
-            }
+            {"@type": "Question","name": "What HR software is best for hospitality businesses in Australia?","acceptedAnswer": {"@type": "Answer","text": "Fitz HR is an AI-powered HR assistant built specifically for pubs, restaurants, cafes, and hotels in Australia. It provides instant answers to HR questions based on Australian workplace law and the Hospitality Industry (General) Award, generates compliant employment contracts and warning letters, and includes an Award Rate Calculator. Start free at fitzhr.com."}},
+            {"@type": "Question","name": "How do I calculate penalty rates for hospitality staff?","acceptedAnswer": {"@type": "Answer","text": "Penalty rates under the Hospitality Industry (General) Award are: Saturday 150%, Sunday 175%, Public Holiday 250%. Evening work (7pm-midnight Mon-Fri) has a flat $2.81/hr loading, and night work (midnight-7am) has a $4.22/hr loading. Fitz HR's free Award Wizard calculates the correct rate for any classification, day, and shift type."}},
+            {"@type": "Question","name": "Can I generate employment contracts for restaurant staff online?","acceptedAnswer": {"@type": "Answer","text": "Yes. Fitz HR's Employment Contract Builder generates contracts tailored to the Hospitality Industry (General) Award in minutes. You answer a few questions about the role, and it produces a contract with the correct Award classification, pay rates, leave entitlements, and hospitality-specific clauses."}},
+            {"@type": "Question","name": "Is there an AI HR assistant for Australian hospitality?","acceptedAnswer": {"@type": "Answer","text": "Yes. Fitz HR (fitzhr.com) is an AI-powered HR assistant built specifically for Australian hospitality businesses including pubs, restaurants, cafes, bars, and hotels. It provides instant guidance on award rates, Fair Work compliance, employment contracts, performance management, and more."}},
+            {"@type": "Question","name": "Is Fitz HR free?","acceptedAnswer": {"@type": "Answer","text": "Fitz HR has a free tier that includes 20 AI chats per month, 1 free template download, and unlimited access to HR tools like the Award Rate Calculator. Paid plans start from $249/year ($21/month) for unlimited chat and full document access."}}
         ]
     }
     </script>
-
-    <!-- Organization schema for brand authority signal -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -239,579 +135,878 @@
     </script>
 
     <style>
-        * {
-            font-family: 'Outfit', sans-serif;
+        /* ============================================================
+           MASCOT SYSTEM — uses actual asset file (no base64)
+           ============================================================ */
+        :root {
+            --navy:  #0f172a;
+            --navy2: #141f35;
+            --amber: #f59e0b;
+            --amb2:  #fbbf24;
+            --a12:   rgba(245,158,11,0.12);
+            --a06:   rgba(245,158,11,0.06);
+            --rule:  rgba(245,158,11,0.18);
+            --rw:    rgba(255,255,255,0.08);
+            --w60:   rgba(255,255,255,0.6);
+            --w30:   rgba(255,255,255,0.3);
+            --fitz-img: url("/assets/fitz-neon-transparent.png");
         }
-        html {
-            scroll-behavior: smooth;
+
+        /* ---- RESET & BASE ---- */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: 16px; scroll-behavior: smooth; }
+        body { background: var(--navy); color: #fff; font-family: 'Outfit', sans-serif; overflow-x: hidden; }
+
+        /* ---- GRAIN ---- */
+        .grain {
+            position: fixed; inset: -50%; width: 200%; height: 200%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+            opacity: 0.03; pointer-events: none; z-index: 1000;
+            animation: grain 7s steps(2) infinite;
         }
-        .gradient-text {
-            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        @keyframes grain { 0%{transform:translate(0,0)} 25%{transform:translate(-4%,3%)} 50%{transform:translate(3%,-4%)} 75%{transform:translate(-2%,4%)} }
+
+        /* ---- SCROLL PROGRESS ---- */
+        #spb { position: fixed; top: 0; left: 0; z-index: 9999; height: 2px; width: 0%; background: linear-gradient(90deg, var(--amber), var(--amb2)); box-shadow: 0 0 8px rgba(245,158,11,0.5); }
+
+        /* ---- MASCOT ---- */
+        .fitz-bot { display: inline-block; background: var(--fitz-img) center/contain no-repeat; }
+        .fitz-bot.fitz-hero { width: 500px; height: 500px; }
+        .fitz-bot.fitz-xl   { width: 80px;  height: 80px; }
+        .fitz-bot.fitz-lg   { width: 48px;  height: 48px; }
+        .fitz-bot.fitz-md   { width: 36px;  height: 36px; }
+        .fitz-bot.fitz-sm   { width: 20px;  height: 20px; }
+        .fitz-bot.fitz-xs   { width: 16px;  height: 16px; }
+        .fitz-bot.fitz-cta  { width: 100px; height: 100px; }
+        .fitz-float { animation: fitzFloat 3.5s ease-in-out infinite; filter: drop-shadow(0 0 14px rgba(245,158,11,0.45)); }
+        .fitz-float:hover   { filter: drop-shadow(0 0 24px rgba(245,158,11,0.75)); }
+        @keyframes fitzFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+        .fitz-glow { filter: drop-shadow(0 0 12px rgba(245,158,11,0.45)); animation: fitzGlow 3s ease-in-out infinite; }
+        @keyframes fitzGlow { 0%,100%{filter:drop-shadow(0 0 10px rgba(245,158,11,0.4))} 50%{filter:drop-shadow(0 0 22px rgba(245,158,11,0.75))} }
+
+        /* ---- WORDMARK ---- */
+        .wordmark { font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -2px; display: inline-flex; align-items: baseline; }
+        .wm-f { color: var(--amber); } .wm-itz { color: #ffffff; } .wm-hr { color: var(--amber); margin-left: 0.18em; }
+
+        /* ---- NAV ---- */
+        nav { position: fixed; top: 0; left: 0; right: 0; z-index: 900; display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.5rem; transition: background 0.4s, border-color 0.4s, padding 0.4s, backdrop-filter 0.4s; border-bottom: 1px solid transparent; }
+        nav.scrolled { background: rgba(15,23,42,0.92); backdrop-filter: blur(16px); border-color: var(--rule); padding: 0.7rem 1.5rem; }
+        .nav-logo { font-size: 1.2rem; text-decoration: none; display: flex; align-items: center; gap: 0.5rem; }
+        .nav-fitz { width: 28px; height: 28px; display: inline-block; background: var(--fitz-img) center/contain no-repeat; filter: drop-shadow(0 0 6px rgba(245,158,11,0.5)); }
+        .nav-right { display: flex; align-items: center; gap: 1rem; }
+        .nav-link { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--w60); text-decoration: none; transition: color 0.2s; }
+        .nav-link:hover { color: var(--amber); }
+        .nav-cta { font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--navy); background: var(--amber); border: none; padding: 0.5rem 1rem; text-decoration: none; display: inline-block; position: relative; overflow: hidden; transition: color 0.3s; }
+        .nav-cta::before { content: ''; position: absolute; inset: 0; background: #fff; transform: translateX(-101%); transition: transform 0.4s cubic-bezier(0.16,1,0.3,1); }
+        .nav-cta:hover::before { transform: translateX(0); }
+        .nav-cta span { position: relative; z-index: 1; }
+
+        /* ---- TICKER ---- */
+        .ticker { position: relative; z-index: 10; margin-top: 56px; padding: 0.45rem 1.5rem; border-bottom: 1px solid var(--rule); background: var(--a06); display: flex; align-items: center; gap: 1rem; overflow: hidden; }
+        .ticker-pill { font-family: 'DM Mono', monospace; font-size: 0.52rem; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--navy); background: var(--amber); padding: 0.18rem 0.5rem; white-space: nowrap; flex-shrink: 0; }
+        .ticker-scroll { flex: 1; overflow: hidden; mask-image: linear-gradient(90deg, transparent, black 4%, black 96%, transparent); }
+        .ticker-track { display: flex; gap: 2rem; animation: tscroll 35s linear infinite; white-space: nowrap; }
+        .ticker-item { font-family: 'DM Mono', monospace; font-size: 0.56rem; color: var(--w60); letter-spacing: 0.06em; white-space: nowrap; }
+        .ticker-item::before { content: '//'; color: var(--amber); opacity: 0.6; margin-right: 0.4rem; }
+        @keyframes tscroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+        /* ---- HERO ---- */
+        .hero { position: relative; z-index: 10; min-height: 94vh; display: flex; flex-direction: column; justify-content: center; padding: 4rem 1.5rem 3rem; overflow: hidden; }
+        .orb { position: absolute; border-radius: 50%; pointer-events: none; filter: blur(80px); }
+        .orb-1 { width:300px; height:300px; background:rgba(245,158,11,0.07); top:-80px; right:-100px; }
+        .orb-2 { width:200px; height:200px; background:rgba(30,60,120,0.5); bottom:60px; left:-80px; }
+        .vrule { position: absolute; left: 1.5rem; top: 3rem; bottom: 3rem; width: 2px; background: linear-gradient(180deg, transparent, var(--amber) 25%, var(--amber) 75%, transparent); transform: scaleY(0); transform-origin: top; opacity: 0; transition: transform 1s 0.3s cubic-bezier(0.16,1,0.3,1), opacity 0.3s 0.3s; }
+        .vrule.in { transform: scaleY(1); opacity: 0.6; }
+        .hero-inner { padding-left: 1.25rem; }
+        .eyebrow { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.25rem; opacity: 0; transform: translateY(12px); transition: opacity 0.7s 0.5s, transform 0.7s 0.5s cubic-bezier(0.16,1,0.3,1); }
+        .eyebrow.in { opacity: 1; transform: translateY(0); }
+        .ep { position: relative; width: 8px; height: 8px; }
+        .ep-dot { position: absolute; inset: 0; border-radius: 50%; background: var(--amber); }
+        .ep-ring { position: absolute; inset: -4px; border-radius: 50%; border: 1px solid var(--amber); animation: ringOut 2s ease-out infinite; }
+        @keyframes ringOut { 0%{transform:scale(0.8);opacity:1} 100%{transform:scale(2.2);opacity:0} }
+        .eyebrow-text { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--w60); }
+        .hero-h1 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(2.6rem, 9vw, 3.2rem); line-height: 1.02; letter-spacing: -0.02em; margin-bottom: 1rem; overflow: hidden; }
+        .h1-line { display: block; overflow: hidden; }
+        .h1-inner { display: block; transform: translateY(110%); transition: transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+        .h1-line:nth-child(1) .h1-inner { transition-delay: 0.55s; }
+        .h1-line:nth-child(2) .h1-inner { transition-delay: 0.67s; }
+        .h1-line:nth-child(3) .h1-inner { transition-delay: 0.79s; }
+        .hero-h1.in .h1-inner { transform: translateY(0); }
+        .hero-h1 em { font-style: italic; color: var(--amber); }
+        .hero-sub { font-family: 'Outfit', sans-serif; font-size: 0.92rem; line-height: 1.65; color: var(--w60); max-width: 30ch; opacity: 0; transform: translateY(14px); transition: opacity 0.7s 0.95s, transform 0.7s 0.95s cubic-bezier(0.16,1,0.3,1); }
+        .hero-sub.in { opacity: 1; transform: translateY(0); }
+        .hero-ctas { margin-top: 2rem; opacity: 0; transform: translateY(14px); transition: opacity 0.7s 1.1s, transform 0.7s 1.1s cubic-bezier(0.16,1,0.3,1); }
+        .hero-ctas.in { opacity: 1; transform: translateY(0); }
+
+        .hero-fitz-wrap {
+            position: absolute; right: -250px; top: 40%;
+            transform: translateY(-50%) translateX(20px);
+            opacity: 0;
+            transition: opacity 1.4s 1.3s ease, transform 1.4s 1.3s cubic-bezier(0.16,1,0.3,1);
+            pointer-events: none;
         }
-        .hero-gradient {
-            background: radial-gradient(ellipse at top, #1e293b 0%, #0f172a 70%);
+        @keyframes fitzBreathe {
+            0%,100% { filter: brightness(1.2) sepia(0.4) saturate(2); }
+            50%      { filter: brightness(1.6) sepia(0.5) saturate(2.5); }
         }
-        .card-hover {
-            transition: all 0.3s ease;
+        .hero-fitz-wrap.in {
+            opacity: 0.07; transform: translateY(-50%) translateX(0);
+            animation: fitzBreathe 8s ease-in-out infinite;
         }
-        .card-hover:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
-        }
-        .animate-float {
-            animation: float 6s ease-in-out infinite;
-        }
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        .toggle-btn {
-            transition: all 0.3s ease;
-        }
-        .toggle-btn.active {
-            background: #f59e0b;
-            color: #0f172a;
-        }
+        .scroll-hint { position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.5rem; opacity: 0; animation: fi 0.8s 1.8s forwards; }
+        @keyframes fi { to { opacity: 1; } }
+        .sh-text { font-family: 'DM Mono', monospace; font-size: 0.5rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--w30); }
+        .sh-line { width: 1px; height: 40px; background: linear-gradient(180deg, var(--amber), transparent); animation: shLine 1.8s ease-in-out infinite; }
+        @keyframes shLine { 0%{transform:scaleY(0);transform-origin:top;opacity:1} 50%{transform:scaleY(1);transform-origin:top;opacity:1} 51%{transform:scaleY(1);transform-origin:bottom} 100%{transform:scaleY(0);transform-origin:bottom;opacity:0} }
+
+        /* ---- BUTTONS ---- */
+        .btn-primary { display: flex; align-items: center; justify-content: space-between; padding: 0.95rem 1.25rem; background: var(--amber); color: var(--navy); font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; border: none; cursor: pointer; position: relative; overflow: hidden; transition: color 0.35s; margin-bottom: 0.6rem; }
+        .btn-primary::before { content: ''; position: absolute; inset: 0; background: var(--navy); transform: translateX(-101%); transition: transform 0.45s cubic-bezier(0.16,1,0.3,1); }
+        .btn-primary:hover::before { transform: translateX(0); }
+        .btn-primary:hover { color: var(--amber); }
+        .btn-primary span, .btn-primary .arr { position: relative; z-index: 1; }
+        .btn-primary .arr { transition: transform 0.3s cubic-bezier(0.16,1,0.3,1); }
+        .btn-primary:hover .arr { transform: translateX(5px); }
+        .btn-ghost { display: flex; align-items: center; justify-content: center; gap: 0.4rem; font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--w30); text-decoration: none; transition: color 0.2s; }
+        .btn-ghost:hover { color: var(--amber); }
+
+        /* ---- SECTIONS ---- */
+        .section { position: relative; z-index: 10; padding: 3.5rem 1.5rem; border-top: 1px solid var(--rw); }
+        .section-label { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; }
+        .sl-text { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); opacity: 0; transform: translateX(-10px); transition: opacity 0.6s, transform 0.6s cubic-bezier(0.16,1,0.3,1); }
+        .sl-text.in { opacity: 1; transform: translateX(0); }
+        .sl-line { flex: 1; height: 1px; background: var(--amber); transform: scaleX(0); transform-origin: left; transition: transform 0.8s 0.2s cubic-bezier(0.16,1,0.3,1); }
+        .sl-line.in { transform: scaleX(1); }
+
+        /* ---- PAIN ---- */
+        .pain-h2 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.7rem; line-height: 1.2; margin-bottom: 2rem; }
+        .pain-h2 em { font-style: italic; color: var(--amber); }
+        .pain-cards { display: flex; flex-direction: column; gap: 1px; }
+        .pain-card { background: var(--navy2); border-left: 3px solid transparent; padding: 1.25rem 1.25rem 1.25rem 1rem; position: relative; overflow: hidden; opacity: 0; transition: opacity 0.6s, transform 0.6s cubic-bezier(0.16,1,0.3,1), border-color 0.3s; }
+        .pain-card:nth-child(odd) { transform: translateX(-30px); }
+        .pain-card:nth-child(even) { transform: translateX(30px); }
+        .pain-card.in { opacity: 1; transform: translateX(0); border-color: var(--amber); }
+        .pain-card:nth-child(1){transition-delay:0s} .pain-card:nth-child(2){transition-delay:0.12s} .pain-card:nth-child(3){transition-delay:0.24s}
+        .pain-card::after { content: ''; position: absolute; inset: 0; background: var(--a12); opacity: 0; transition: opacity 0.4s; }
+        .pain-card:hover::after { opacity: 1; }
+        .pain-icon { font-size: 1.4rem; margin-bottom: 0.5rem; position: relative; z-index: 1; display: block; }
+        .pain-title { font-weight: 700; font-size: 0.95rem; color: #fff; margin-bottom: 0.35rem; position: relative; z-index: 1; }
+        .pain-body { font-size: 0.8rem; line-height: 1.55; color: var(--w60); position: relative; z-index: 1; }
+
+        /* ---- STATS BAND ---- */
+        .stats-band { background: var(--amber); padding: 2.5rem 1.5rem; position: relative; z-index: 10; overflow: hidden; }
+        .stats-eyebrow { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(15,23,42,0.6); margin-bottom: 1.5rem; }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem 1rem; }
+        .stat-item { opacity: 0; transform: translateY(16px); transition: opacity 0.6s, transform 0.6s cubic-bezier(0.16,1,0.3,1); }
+        .stat-item:nth-child(1){transition-delay:0.1s} .stat-item:nth-child(2){transition-delay:0.2s} .stat-item:nth-child(3){transition-delay:0.3s} .stat-item:nth-child(4){transition-delay:0.4s}
+        .stat-item.in { opacity: 1; transform: translateY(0); }
+        .stat-num { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 2.4rem; color: var(--navy); line-height: 1; display: block; }
+        .stat-label { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(15,23,42,0.6); margin-top: 0.25rem; display: block; }
+
+        /* ---- FEATURES ---- */
+        .feat-h2 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.7rem; line-height: 1.2; margin-bottom: 0.75rem; opacity: 0; transform: translateY(20px); transition: opacity 0.7s, transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+        .feat-h2.in { opacity: 1; transform: translateY(0); }
+        .feat-h2 em { font-style: italic; color: var(--amber); }
+        .feat-sub { font-size: 0.88rem; color: var(--w60); line-height: 1.6; margin-bottom: 2rem; opacity: 0; transform: translateY(14px); transition: opacity 0.7s 0.1s, transform 0.7s 0.1s cubic-bezier(0.16,1,0.3,1); }
+        .feat-sub.in { opacity: 1; transform: translateY(0); }
+        .feat-list { display: flex; flex-direction: column; }
+        .feat-row { display: flex; align-items: flex-start; gap: 1rem; padding: 1.1rem 0; border-bottom: 1px solid var(--rw); opacity: 0; transform: translateY(16px); transition: opacity 0.6s, transform 0.6s cubic-bezier(0.16,1,0.3,1); cursor: default; }
+        .feat-row:last-child { border-bottom: none; }
+        .feat-row.in { opacity: 1; transform: translateY(0); }
+        .feat-row:nth-child(1){transition-delay:0s} .feat-row:nth-child(2){transition-delay:0.08s} .feat-row:nth-child(3){transition-delay:0.16s} .feat-row:nth-child(4){transition-delay:0.24s} .feat-row:nth-child(5){transition-delay:0.32s}
+        .feat-num { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 1.5rem; color: var(--amber); line-height: 1; min-width: 1.8rem; opacity: 0.4; transition: opacity 0.3s, transform 0.3s; }
+        .feat-row:hover .feat-num { opacity: 1; transform: scale(1.1); }
+        .feat-content { flex: 1; }
+        .feat-title { font-weight: 700; font-size: 0.95rem; color: #fff; margin-bottom: 0.25rem; transition: color 0.3s; }
+        .feat-row:hover .feat-title { color: var(--amber); }
+        .feat-desc { font-size: 0.8rem; color: var(--w60); line-height: 1.5; }
+        .feat-arr { color: var(--w30); font-size: 0.9rem; align-self: center; transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), color 0.3s; }
+        .feat-row:hover .feat-arr { transform: translateX(4px); color: var(--amber); }
+
+        /* ---- HOW IT WORKS ---- */
+        .hiw-h2 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.7rem; line-height: 1.2; margin-bottom: 0.5rem; opacity: 0; transform: translateY(20px); transition: opacity 0.7s, transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+        .hiw-h2.in { opacity: 1; transform: translateY(0); }
+        .hiw-sub { font-size: 0.88rem; color: var(--w60); margin-bottom: 2rem; opacity: 0; transform: translateY(14px); transition: opacity 0.7s 0.1s, transform 0.7s 0.1s cubic-bezier(0.16,1,0.3,1); }
+        .hiw-sub.in { opacity: 1; transform: translateY(0); }
+        .hiw-steps { display: flex; flex-direction: column; gap: 1px; }
+        .hiw-step { display: flex; align-items: flex-start; gap: 1.25rem; padding: 1.25rem; background: var(--navy2); border-left: 3px solid transparent; opacity: 0; transform: translateY(16px); transition: opacity 0.6s, transform 0.6s cubic-bezier(0.16,1,0.3,1), border-color 0.3s; }
+        .hiw-step.in { opacity: 1; transform: translateY(0); border-color: var(--amber); }
+        .hiw-step:nth-child(1){transition-delay:0s} .hiw-step:nth-child(2){transition-delay:0.12s} .hiw-step:nth-child(3){transition-delay:0.24s}
+        .hiw-num { width: 36px; height: 36px; border-radius: 50%; background: var(--amber); color: var(--navy); font-weight: 900; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .hiw-content { flex: 1; padding-top: 0.1rem; }
+        .hiw-title { font-weight: 700; font-size: 0.95rem; color: #fff; margin-bottom: 0.3rem; }
+        .hiw-desc { font-size: 0.8rem; color: var(--w60); line-height: 1.55; }
+
+        /* ---- PRICING ---- */
+        .pricing-section { position: relative; z-index: 10; padding: 3.5rem 1.5rem; border-top: 1px solid var(--rw); }
+        .pricing-h2 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.7rem; line-height: 1.2; margin-bottom: 0.5rem; opacity: 0; transform: translateY(20px); transition: opacity 0.7s, transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+        .pricing-h2.in { opacity: 1; transform: translateY(0); }
+        .pricing-h2 em { font-style: italic; color: var(--amber); }
+        .pricing-intro { font-size: 0.88rem; color: var(--w60); margin-bottom: 1.75rem; opacity: 0; transform: translateY(14px); transition: opacity 0.7s 0.1s, transform 0.7s 0.1s cubic-bezier(0.16,1,0.3,1); }
+        .pricing-intro.in { opacity: 1; transform: translateY(0); }
+        .billing-toggle { display: flex; justify-content: center; margin-bottom: 2rem; opacity: 0; transition: opacity 0.7s 0.2s; }
+        .billing-toggle.in { opacity: 1; }
+        .billing-inner { display: inline-flex; align-items: center; background: var(--navy2); border-radius: 12px; padding: 4px; border: 1px solid var(--rw); }
+        .toggle-btn { padding: 0.55rem 1.1rem; border-radius: 8px; border: none; background: none; color: var(--w60); font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 0.78rem; cursor: pointer; transition: all 0.3s; }
+        .toggle-btn.active { background: var(--amber); color: var(--navy); }
+        .save-badge { background: #166534; color: #86efac; font-family: 'DM Mono', monospace; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; padding: 0.2rem 0.6rem; border-radius: 20px; margin-left: 0.6rem; }
+        .pricing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+        .p-card { background: var(--navy2); border: 1px solid var(--rw); border-radius: 14px; padding: 1.25rem; position: relative; opacity: 0; transform: translateY(20px); transition: opacity 0.6s, transform 0.6s cubic-bezier(0.16,1,0.3,1); }
+        .p-card.in { opacity: 1; transform: translateY(0); }
+        .p-card:nth-child(1){transition-delay:0s} .p-card:nth-child(2){transition-delay:0.1s} .p-card:nth-child(3){transition-delay:0.2s} .p-card:nth-child(4){transition-delay:0.3s}
+        .p-card.featured { border-color: var(--amber); }
+        .p-badge { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--amber); color: var(--navy); font-family: 'DM Mono', monospace; font-size: 0.5rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; padding: 0.18rem 0.7rem; border-radius: 20px; white-space: nowrap; }
+        .p-name { font-weight: 700; font-size: 0.95rem; margin-bottom: 0.2rem; }
+        .p-desc { font-size: 0.68rem; color: var(--w60); margin-bottom: 0.85rem; line-height: 1.4; min-height: 2.4rem; }
+        .p-price { display: flex; align-items: baseline; gap: 0.15rem; margin-bottom: 0.2rem; }
+        .p-num { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 1.8rem; color: #fff; }
+        .p-period { font-size: 0.7rem; color: var(--w60); }
+        .p-mo { font-size: 0.62rem; color: #22c55e; margin-bottom: 0.85rem; min-height: 1rem; }
+        .p-features { list-style: none; margin-bottom: 1.25rem; }
+        .p-features li { font-size: 0.72rem; color: var(--w60); padding: 0.25rem 0; display: flex; align-items: flex-start; gap: 0.4rem; line-height: 1.4; }
+        .p-features .ck { color: #22c55e; flex-shrink: 0; margin-top: 1px; }
+        .p-features .cx { color: rgba(255,255,255,0.18); flex-shrink: 0; margin-top: 1px; }
+        .p-features .ce { color: #f87171; flex-shrink: 0; margin-top: 1px; }
+        .p-btn { display: block; text-align: center; padding: 0.65rem 1rem; border-radius: 8px; font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 0.78rem; text-decoration: none; transition: all 0.3s; letter-spacing: 0.04em; }
+        .p-btn.outline { border: 1px solid var(--rw); color: #fff; }
+        .p-btn.outline:hover { border-color: var(--amber); color: var(--amber); }
+        .p-btn.solid { background: var(--amber); color: var(--navy); }
+        .p-btn.solid:hover { background: var(--amb2); }
+        .credits-box { background: var(--navy2); border: 1px solid var(--rule); border-radius: 12px; padding: 1.25rem; margin-top: 1.5rem; opacity: 0; transform: translateY(14px); transition: opacity 0.6s 0.4s, transform 0.6s 0.4s cubic-bezier(0.16,1,0.3,1); }
+        .credits-box.in { opacity: 1; transform: translateY(0); }
+        .credits-title { font-size: 0.78rem; font-weight: 700; color: var(--amber); text-align: center; margin-bottom: 1rem; }
+        .credits-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; text-align: center; }
+        .cr-icon { font-size: 1.3rem; display: block; margin-bottom: 0.3rem; }
+        .cr-name { font-size: 0.68rem; font-weight: 600; color: #fff; margin-bottom: 0.2rem; }
+        .cr-desc { font-size: 0.6rem; color: var(--w60); line-height: 1.45; }
+        .pricing-guarantee { text-align: center; font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--w30); margin-top: 1.25rem; }
+
+        /* ---- DEMO ---- */
+        .demo-section { position: relative; z-index: 10; padding: 3.5rem 1.5rem; border-top: 1px solid var(--rw); background: var(--navy2); }
+        .demo-card { border: 1px solid var(--rule); border-top: 2px solid var(--amber); opacity: 0; transform: translateY(24px); transition: opacity 0.8s, transform 0.8s cubic-bezier(0.16,1,0.3,1); }
+        .demo-card.in { opacity: 1; transform: translateY(0); }
+        .demo-hdr { display: flex; align-items: center; justify-content: space-between; padding: 0.65rem 1rem; border-bottom: 1px solid var(--rule); background: var(--a12); }
+        .demo-hdr-title { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--amber); }
+        .demo-live { display: flex; align-items: center; gap: 0.35rem; }
+        .demo-dot { width: 5px; height: 5px; border-radius: 50%; background: #22c55e; animation: livePing 1.5s ease-out infinite; }
+        @keyframes livePing { 0%{box-shadow:0 0 0 0 rgba(34,197,94,0.5)} 100%{box-shadow:0 0 0 6px rgba(34,197,94,0)} }
+        .demo-live-text { font-family: 'DM Mono', monospace; font-size: 0.55rem; color: #22c55e; letter-spacing: 0.1em; text-transform: uppercase; }
+        .demo-prog { height: 2px; background: var(--rule); }
+        .demo-prog-fill { height: 100%; background: var(--amber); width: 0%; transition: width 0.1s linear; }
+        .demo-q-area { padding: 1rem 1rem 0.75rem; }
+        .demo-q-lbl { font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--w30); margin-bottom: 0.4rem; }
+        .demo-q-text { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.05rem; color: #fff; line-height: 1.4; min-height: 3rem; }
+        .demo-q-text::before { content: '\201C'; color: var(--amber); margin-right: 1px; }
+        .demo-q-text::after  { content: '\201D'; color: var(--amber); margin-left: 1px; }
+        .tw-cursor { display: inline-block; width: 2px; height: 1em; background: var(--amber); margin-left: 1px; vertical-align: text-bottom; animation: twb 0.7s step-end infinite; }
+        @keyframes twb { 0%,100%{opacity:1} 50%{opacity:0} }
+        .demo-a-area { border-top: 1px solid var(--rule); padding: 0.85rem 1rem; background: rgba(255,255,255,0.02); min-height: 4.5rem; }
+        .demo-a-lbl { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
+        .demo-a-lbl-text { font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber); }
+        .demo-thinking { display: flex; gap: 3px; align-items: center; }
+        .dt-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--amber); animation: dtb 1.1s ease-in-out infinite; }
+        .dt-dot:nth-child(2){animation-delay:0.15s} .dt-dot:nth-child(3){animation-delay:0.3s}
+        @keyframes dtb { 0%,100%{opacity:0.3;transform:translateY(0)} 50%{opacity:1;transform:translateY(-3px)} }
+        .demo-a-text { font-family: 'Outfit', sans-serif; font-size: 0.82rem; line-height: 1.6; color: var(--w60); min-height: 2.5rem; }
+
+        /* ---- FAQ ---- */
+        .faq-section { position: relative; z-index: 10; padding: 3.5rem 1.5rem; border-top: 1px solid var(--rw); }
+        .faq-h2 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.7rem; line-height: 1.2; margin-bottom: 1.75rem; opacity: 0; transform: translateY(20px); transition: opacity 0.7s, transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+        .faq-h2.in { opacity: 1; transform: translateY(0); }
+        .faq-items { display: flex; flex-direction: column; gap: 0.5rem; }
+        .faq-item { background: var(--navy2); border: 1px solid var(--rw); border-radius: 12px; overflow: hidden; opacity: 0; transform: translateY(12px); transition: opacity 0.5s, transform 0.5s cubic-bezier(0.16,1,0.3,1), border-color 0.3s; }
+        .faq-item.in { opacity: 1; transform: translateY(0); }
+        .faq-item:nth-child(1){transition-delay:0s} .faq-item:nth-child(2){transition-delay:0.07s} .faq-item:nth-child(3){transition-delay:0.14s} .faq-item:nth-child(4){transition-delay:0.21s} .faq-item:nth-child(5){transition-delay:0.28s}
+        .faq-item[open] { border-color: var(--rule); }
+        .faq-item summary { padding: 1rem 1.25rem; cursor: pointer; font-weight: 600; font-size: 0.88rem; color: #fff; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+        .faq-item summary::after { content: '+'; color: var(--amber); font-size: 1.2rem; flex-shrink: 0; transition: transform 0.3s; }
+        .faq-item[open] summary::after { transform: rotate(45deg); }
+        .faq-item summary::-webkit-details-marker { display: none; }
+        .faq-answer { padding: 0 1.25rem 1rem; font-size: 0.8rem; color: var(--w60); line-height: 1.65; }
+
+        /* ---- TRUST ---- */
+        .trust-section { position: relative; z-index: 10; padding: 2.5rem 1.5rem; border-top: 1px solid var(--rw); background: var(--navy2); }
+        .trust-badges { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem 2rem; }
+        .trust-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--w60); opacity: 0; transform: translateY(10px); transition: opacity 0.5s, transform 0.5s cubic-bezier(0.16,1,0.3,1); }
+        .trust-item.in { opacity: 1; transform: translateY(0); }
+        .trust-item:nth-child(1){transition-delay:0s} .trust-item:nth-child(2){transition-delay:0.08s} .trust-item:nth-child(3){transition-delay:0.16s} .trust-item:nth-child(4){transition-delay:0.24s}
+        .trust-icon { font-size: 1.1rem; }
+
+        /* ---- CTA ---- */
+        .cta-section { position: relative; z-index: 10; padding: 4.5rem 1.5rem; border-top: 1px solid var(--rw); text-align: center; overflow: hidden; }
+        .cta-h2 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 2rem; line-height: 1.1; margin-bottom: 0.75rem; opacity: 0; transform: translateY(20px); transition: opacity 0.7s, transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+        .cta-h2.in { opacity: 1; transform: translateY(0); }
+        .cta-h2 em { font-style: italic; color: var(--amber); }
+        .cta-sub { font-size: 0.88rem; color: var(--w60); line-height: 1.6; margin-bottom: 2rem; opacity: 0; transform: translateY(14px); transition: opacity 0.7s 0.12s, transform 0.7s 0.12s cubic-bezier(0.16,1,0.3,1); }
+        .cta-sub.in { opacity: 1; transform: translateY(0); }
+        .cta-btns { display: flex; flex-direction: column; gap: 0.6rem; opacity: 0; transform: translateY(14px); transition: opacity 0.7s 0.24s, transform 0.7s 0.24s cubic-bezier(0.16,1,0.3,1); }
+        .cta-btns.in { opacity: 1; transform: translateY(0); }
+        .cta-note { font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--w30); margin-top: 1rem; opacity: 0; transition: opacity 0.7s 0.36s; }
+        .cta-note.in { opacity: 1; }
+
+        /* ---- FOOTER ---- */
+        .site-footer { position: relative; z-index: 10; background: var(--navy2); border-top: 1px solid var(--rule); padding: 3rem 1.5rem 1.5rem; }
+        .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem 1.5rem; margin-bottom: 2rem; }
+        .footer-brand { grid-column: 1 / -1; }
+        .footer-brand-desc { font-size: 0.78rem; color: var(--w60); margin-top: 0.5rem; line-height: 1.5; }
+        .footer-col-title { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); margin-bottom: 0.75rem; }
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.45rem; }
+        .footer-links a { font-size: 0.8rem; color: var(--w60); text-decoration: none; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--amber); }
+        .footer-bottom { border-top: 1px solid var(--rw); padding-top: 1.25rem; display: flex; flex-direction: column; gap: 0.4rem; }
+        .footer-copy { font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.08em; color: var(--w30); }
+
+        /* ---- SHARED REVEAL ---- */
+        .ru { opacity:0; transform:translateY(20px); transition:opacity 0.7s, transform 0.7s cubic-bezier(0.16,1,0.3,1); }
+        .ru.in { opacity:1; transform:translateY(0); }
     </style>
 </head>
-<body class="bg-slate-900 text-white antialiased">
+<body>
+<div class="grain"></div>
+<div id="spb"></div>
 
-    <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800" aria-label="Main navigation">
-        <div class="max-w-6xl mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <a href="/" class="flex items-center text-3xl font-extrabold tracking-tight" style="letter-spacing: -1px;">
-                    <span class="text-amber-500">F</span><span class="text-white">ITZ</span><span class="text-white">&nbsp;</span><span class="text-amber-500">HR</span>
-                </a>
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="#features" class="text-slate-300 hover:text-white transition-colors">Features</a>
-                    <a href="#how-it-works" class="text-slate-300 hover:text-white transition-colors">How It Works</a>
-                    <a href="/pricing" class="text-slate-300 hover:text-white transition-colors">Pricing</a>
-                    <!-- FIX: /blog → /blog/ to match Netlify final URL and resolve GSC redirect error -->
-                    <a href="/blog/" class="text-slate-300 hover:text-white transition-colors">Blog</a>
-                </div>
-                <div class="flex items-center gap-4">
-                    <a href="/app" class="hidden sm:inline-block text-slate-300 hover:text-white transition-colors">Log In</a>
-                    <a href="/app" class="btn-primary px-5 py-2.5 rounded-lg font-semibold text-slate-900">
-                        Get Started Free
-                    </a>
-                </div>
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<nav id="nav">
+    <a href="/" class="nav-logo">
+        <span class="nav-fitz"></span>
+        <span class="wordmark" style="font-size:1.15rem"><span class="wm-f">F</span><span class="wm-itz">ITZ</span><span class="wm-hr">HR</span></span>
+    </a>
+    <div class="nav-right">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#pricing" class="nav-link">Pricing</a>
+        <a href="/blog/" class="nav-link">Blog</a>
+        <a href="/app" class="nav-link">Log In</a>
+        <a href="/app" class="nav-cta"><span>Get Started Free</span></a>
+    </div>
+</nav>
+
+<!-- ============================================================
+     TICKER
+     ============================================================ -->
+<div class="ticker">
+    <span class="ticker-pill">Live</span>
+    <div class="ticker-scroll">
+        <div class="ticker-track">
+            <span class="ticker-item">Sunday penalty rates for casuals</span>
+            <span class="ticker-item">Termination — serious misconduct</span>
+            <span class="ticker-item">Split shift allowance calculation</span>
+            <span class="ticker-item">Probation review — underperformance</span>
+            <span class="ticker-item">Casual conversion entitlements</span>
+            <span class="ticker-item">Fair Work underpayment audit</span>
+            <span class="ticker-item">Kitchen hand Award classification</span>
+            <span class="ticker-item">Annual leave loading — HIGA 2010</span>
+            <span class="ticker-item">Sunday penalty rates for casuals</span>
+            <span class="ticker-item">Termination — serious misconduct</span>
+            <span class="ticker-item">Split shift allowance calculation</span>
+            <span class="ticker-item">Probation review — underperformance</span>
+            <span class="ticker-item">Casual conversion entitlements</span>
+            <span class="ticker-item">Fair Work underpayment audit</span>
+            <span class="ticker-item">Kitchen hand Award classification</span>
+            <span class="ticker-item">Annual leave loading — HIGA 2010</span>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="hero" id="hero">
+    <div class="orb orb-1" id="orb1"></div>
+    <div class="orb orb-2" id="orb2"></div>
+    <div class="vrule" id="vrule"></div>
+    <div class="hero-inner">
+        <div class="eyebrow" id="eyebrow">
+            <div class="ep"><div class="ep-dot"></div><div class="ep-ring"></div></div>
+            <span class="eyebrow-text">Australian Hospitality · HR &amp; Compliance</span>
+        </div>
+        <h1 class="hero-h1" id="heroH1">
+            <span class="h1-line"><span class="h1-inner">The HR desk</span></span>
+            <span class="h1-line"><span class="h1-inner">every venue</span></span>
+            <span class="h1-line"><span class="h1-inner"><em>deserves.</em></span></span>
+        </h1>
+        <p class="hero-sub" id="heroSub">Award rates, employment contracts, and Fair Work compliance — answered instantly, any hour. Built for Australian pubs, restaurants, cafes and hotels.</p>
+        <div class="hero-ctas" id="heroCtas">
+            <a href="/app" class="btn-primary"><span>Start Free — No Card Required</span><span class="arr">→</span></a>
+            <a href="#pricing" class="btn-ghost">View Pricing ↓</a>
+        </div>
+
+    </div>
+    <div class="hero-fitz-wrap" id="fitzHeroWrap">
+        <div class="fitz-bot fitz-hero"></div>
+    </div>
+    <div class="scroll-hint"><span class="sh-text">Scroll</span><div class="sh-line"></div></div>
+</section>
+
+<!-- ============================================================
+     PAIN POINTS
+     ============================================================ -->
+<section class="section">
+    <div class="section-label"><span class="sl-text">The Problem</span><div class="sl-line"></div></div>
+    <h2 class="pain-h2 ru">Running a venue is hard enough <em>without</em> HR keeping you up at night.</h2>
+    <div class="pain-cards">
+        <div class="pain-card">
+            <span class="pain-icon">⚖️</span>
+            <div class="pain-title">Award compliance is a minefield</div>
+            <div class="pain-body">Penalty rates, allowances, casual loading — one miscalculation and you're facing a back-pay claim that wipes out months of margin.</div>
+        </div>
+        <div class="pain-card">
+            <span class="pain-icon">📄</span>
+            <div class="pain-title">Paperwork you didn't sign up for</div>
+            <div class="pain-body">Warning letters, contracts, PIPs — you opened a venue to run a great room, not to become an HR administrator.</div>
+        </div>
+        <div class="pain-card">
+            <span class="pain-icon">🕐</span>
+            <div class="pain-title">HR crises don't keep business hours</div>
+            <div class="pain-body">Your chef walks out at 10pm Saturday. Your HR consultant isn't picking up. You're on your own — until Fitz.</div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     STATS BAND
+     ============================================================ -->
+<div class="stats-band">
+    <div class="stats-eyebrow ru">By the numbers</div>
+    <div class="stats-grid">
+        <div class="stat-item ru"><span class="stat-num counter" data-target="12" data-prefix="$" data-suffix="k">$0k</span><span class="stat-label">Avg. annual savings</span></div>
+        <div class="stat-item ru"><span class="stat-num">&lt;90s</span><span class="stat-label">Response time</span></div>
+        <div class="stat-item ru"><span class="stat-num counter" data-target="24" data-suffix="/7">0/7</span><span class="stat-label">Always available</span></div>
+        <div class="stat-item ru"><span class="stat-num counter" data-target="100" data-suffix="%">0%</span><span class="stat-label">Australian law</span></div>
+    </div>
+</div>
+
+<!-- ============================================================
+     FEATURES
+     ============================================================ -->
+<section class="section" id="features">
+    <div class="section-label"><span class="sl-text">What Fitz Does</span><div class="sl-line"></div></div>
+    <h2 class="feat-h2">Everything your venue's HR needs. <em>Nothing it doesn't.</em></h2>
+    <p class="feat-sub">Fitz combines AI smarts with real Australian workplace law — instant answers you can actually use.</p>
+    <div class="feat-list">
+        <div class="feat-row"><span class="feat-num">01</span><div class="feat-content"><div class="feat-title">Award Rate Calculator</div><div class="feat-desc">Sunday penalties, split shift allowances, evening loadings — calculated correctly under the Hospitality Industry Award.</div></div><span class="feat-arr">→</span></div>
+        <div class="feat-row"><span class="feat-num">02</span><div class="feat-content"><div class="feat-title">Employment Contract Builder</div><div class="feat-desc">Legally compliant contracts in minutes. Answer a few questions — Fitz does the rest.</div></div><span class="feat-arr">→</span></div>
+        <div class="feat-row"><span class="feat-num">03</span><div class="feat-content"><div class="feat-title">Warning Letters &amp; Disciplinary Docs</div><div class="feat-desc">Procedurally fair, legally sound documentation for performance management and termination.</div></div><span class="feat-arr">→</span></div>
+        <div class="feat-row"><span class="feat-num">04</span><div class="feat-content"><div class="feat-title">24/7 AI HR Guidance</div><div class="feat-desc">Ask Fitz anything — from casual stand-down rights to unfair dismissal exposure. Always on.</div></div><span class="feat-arr">→</span></div>
+        <div class="feat-row"><span class="feat-num">05</span><div class="feat-content"><div class="feat-title">Crisis Mode</div><div class="feat-desc">Serious misconduct at 10pm? Step-by-step emergency guidance with HR professional callback.</div></div><span class="feat-arr">→</span></div>
+    </div>
+</section>
+
+<!-- ============================================================
+     HOW IT WORKS
+     ============================================================ -->
+<section class="section" id="how-it-works">
+    <div class="section-label"><span class="sl-text">How It Works</span><div class="sl-line"></div></div>
+    <h2 class="hiw-h2">Get started in <em style="font-style:italic;color:var(--amber)">60 seconds.</em></h2>
+    <p class="hiw-sub">No complex setup. No training required. Just ask.</p>
+    <div class="hiw-steps">
+        <div class="hiw-step">
+            <div class="hiw-num">1</div>
+            <div class="hiw-content">
+                <div class="hiw-title">Ask Your Question</div>
+                <div class="hiw-desc">Type your HR question — anything from "What's the Sunday penalty rate for casuals?" to "How do I manage underperformance?"</div>
             </div>
         </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <header class="hero-gradient pt-32 pb-20 px-6">
-        <div class="max-w-6xl mx-auto">
-            <div class="max-w-3xl mx-auto text-center">
-                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
-                    AI HR Software for<br>
-                    <span class="gradient-text">Pubs, Restaurants & Hotels</span><br>
-                    <span class="text-2xl sm:text-3xl lg:text-4xl font-bold text-slate-300">in Australia</span>
-                </h1>
-                <p class="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">
-                    Award rates, employment contracts, compliance — sorted in 90 seconds. Built specifically for hospitality.
-                </p>
-                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-                    <a href="/app" class="btn-primary px-8 py-4 rounded-xl font-bold text-lg text-slate-900 w-full sm:w-auto text-center">
-                        Start Free
-                    </a>
-                    <a href="/pricing" class="px-8 py-4 rounded-xl font-semibold text-lg border border-slate-600 hover:border-slate-500 transition-colors w-full sm:w-auto text-center">
-                        View Pricing
-                    </a>
-                </div>
-                <div class="flex flex-wrap items-center justify-center gap-8 sm:gap-16 pt-8 border-t border-slate-700/50">
-                    <div class="text-center">
-                        <div class="text-4xl sm:text-5xl font-bold text-amber-500">$12k</div>
-                        <div class="text-base sm:text-lg text-slate-400">Avg. Savings</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-4xl sm:text-5xl font-bold text-amber-500">&lt;90s</div>
-                        <div class="text-base sm:text-lg text-slate-400">Response Time</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-4xl sm:text-5xl font-bold text-amber-500">24/7</div>
-                        <div class="text-base sm:text-lg text-slate-400">Available</div>
-                    </div>
-                </div>
+        <div class="hiw-step">
+            <div class="hiw-num">2</div>
+            <div class="hiw-content">
+                <div class="hiw-title">Get Instant Guidance</div>
+                <div class="hiw-desc">Fitz gives you clear, practical advice based on Australian workplace law and hospitality industry best practices. Under 90 seconds, every time.</div>
             </div>
         </div>
-    </header>
-
-    <main>
-
-    <!-- Pain Points Section -->
-    <section class="py-20 px-6 bg-slate-800/50">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl sm:text-4xl font-bold mb-4">HR Shouldn't Keep You Up at Night</h2>
-                <p class="text-slate-400 text-lg max-w-2xl mx-auto">Running a venue is hard enough without worrying about compliance, documentation, and difficult conversations.</p>
-            </div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
-                    <div class="text-5xl mb-4">🧮</div>
-                    <h3 class="text-xl font-bold mb-3">Award Rates Are Confusing</h3>
-                    <p class="text-slate-400">Penalty rates, allowances, casual loading — one mistake can cost thousands in back-pay claims.</p>
-                </div>
-                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
-                    <div class="text-5xl mb-4">📋</div>
-                    <h3 class="text-xl font-bold mb-3">Documentation Takes Hours</h3>
-                    <p class="text-slate-400">Warning letters, contracts, policies — you didn't open a venue to become a paperwork expert.</p>
-                </div>
-                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
-                    <div class="text-5xl mb-4">⚖️</div>
-                    <h3 class="text-xl font-bold mb-3">Compliance Risks Are Real</h3>
-                    <p class="text-slate-400">Unfair dismissal claims, Fair Work audits, underpayment scandals — the stakes have never been higher.</p>
-                </div>
+        <div class="hiw-step">
+            <div class="hiw-num">3</div>
+            <div class="hiw-content">
+                <div class="hiw-title">Take Action Confidently</div>
+                <div class="hiw-desc">Generate documents, follow step-by-step guides, or escalate to an expert — whatever you need to move forward without risk.</div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <!-- Features Section -->
-    <section id="features" class="py-20 px-6">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Everything You Need to Manage HR</h2>
-                <p class="text-slate-400 text-lg max-w-2xl mx-auto">Fitz combines AI smarts with real HR expertise — so you get instant answers you can trust.</p>
+<!-- ============================================================
+     LIVE DEMO
+     ============================================================ -->
+<section class="demo-section">
+    <div class="section-label"><span class="sl-text">Fitz in Action</span><div class="sl-line"></div></div>
+    <div class="demo-card" id="demoCard">
+        <div class="demo-hdr">
+            <span class="demo-hdr-title">Venue owners are asking Fitz right now</span>
+            <div class="demo-live"><div class="demo-dot"></div><span class="demo-live-text">Live</span></div>
+        </div>
+        <div class="demo-prog"><div class="demo-prog-fill" id="demoProg"></div></div>
+        <div class="demo-q-area">
+            <div class="demo-q-lbl">Question</div>
+            <div class="demo-q-text" id="demoQ"><span class="tw-cursor"></span></div>
+        </div>
+        <div class="demo-a-area">
+            <div class="demo-a-lbl">
+                <span class="demo-a-lbl-text">Fitz</span>
+                <div class="demo-thinking" id="demoThink"><div class="dt-dot"></div><div class="dt-dot"></div><div class="dt-dot"></div></div>
             </div>
-            <div class="grid md:grid-cols-2 gap-8">
-                <div class="card-hover bg-slate-800 border border-slate-700 rounded-2xl p-8">
-                    <div class="w-14 h-14 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6">
-                        <span class="text-3xl">💬</span>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-3">AI HR Chat</h3>
-                    <p class="text-slate-400 mb-4">Ask anything about Australian hospitality HR. Award rates, leave entitlements, performance management — get instant, practical advice.</p>
-                    <ul class="space-y-2 text-slate-300">
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Trained on Australian workplace law</li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Hospitality Award specific</li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Available 24/7</li>
-                    </ul>
-                </div>
-                <div class="card-hover bg-slate-800 border border-slate-700 rounded-2xl p-8">
-                    <div class="w-14 h-14 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6">
-                        <span class="text-3xl">🛠️</span>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-3">HR Document Tools</h3>
-                    <p class="text-slate-400 mb-4">Generate legally-compliant HR documents in minutes. Warning letters, contracts, PIPs — all customised for your situation.</p>
-                    <ul class="space-y-2 text-slate-300">
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Warning letters & PIPs</li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Employment contracts</li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Termination guides</li>
-                    </ul>
-                </div>
-                <div class="card-hover bg-slate-800 border border-slate-700 rounded-2xl p-8">
-                    <div class="w-14 h-14 bg-amber-500/10 rounded-xl flex items-center justify-center mb-6">
-                        <span class="text-3xl">👨‍💼</span>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-3">Expert Document Review</h3>
-                    <p class="text-slate-400 mb-4">Every document can be reviewed by a qualified HR consultant before you use it. Real humans checking real documents.</p>
-                    <ul class="space-y-2 text-slate-300">
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Qualified HR professionals</li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> 24-hour turnaround</li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Included in subscription</li>
-                    </ul>
-                </div>
-                <div class="card-hover bg-slate-800 border border-slate-700 rounded-2xl p-8">
-                    <div class="w-14 h-14 bg-red-500/10 rounded-xl flex items-center justify-center mb-6">
-                        <span class="text-3xl">🚨</span>
-                    </div>
-                    <h3 class="text-2xl font-bold mb-3">Crisis Mode</h3>
-                    <p class="text-slate-400 mb-4">Staff walkout? Theft? Serious misconduct? Get immediate step-by-step guidance to handle urgent situations properly.</p>
-                    <ul class="space-y-2 text-slate-300">
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Step-by-step checklists</li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Legal compliance focus</li>
-                        <li class="flex items-center gap-2"><span class="text-amber-500">✓</span> Escalation paths</li>
-                    </ul>
-                </div>
+            <div class="demo-a-text" id="demoA"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+     PRICING
+     ============================================================ -->
+<section class="pricing-section" id="pricing">
+    <div class="section-label"><span class="sl-text">Pricing</span><div class="sl-line"></div></div>
+    <h2 class="pricing-h2">Simple, <em>transparent</em> pricing.</h2>
+    <p class="pricing-intro">Start free, upgrade when you need more. All plans include unlimited HR tools and the Award Rate Calculator.</p>
+
+    <div class="billing-toggle">
+        <div class="billing-inner">
+            <button id="monthlyBtn" onclick="toggleBilling('monthly')" class="toggle-btn">Monthly</button>
+            <button id="yearlyBtn" onclick="toggleBilling('yearly')" class="toggle-btn active">Yearly</button>
+            <span class="save-badge">Save 20%+</span>
+        </div>
+    </div>
+
+    <div class="pricing-grid">
+        <!-- FREE -->
+        <div class="p-card">
+            <div class="p-name">Free</div>
+            <div class="p-desc">Try Fitz with no commitment</div>
+            <div class="p-price"><span class="p-num">$0</span><span class="p-period">/forever</span></div>
+            <div class="p-mo">&nbsp;</div>
+            <ul class="p-features">
+                <li><span class="ck">✓</span> 20 AI chats/month</li>
+                <li><span class="ck">✓</span> 1 free template download</li>
+                <li><span class="ck">✓</span> Unlimited HR Tools</li>
+                <li><span class="cx">—</span> Expert-reviewed docs</li>
+                <li><span class="ce">🚨</span> Crisis Support <span style="color:var(--w60)">$320</span></li>
+            </ul>
+            <a href="/app" class="p-btn outline">Start Free</a>
+        </div>
+
+        <!-- STARTER -->
+        <div class="p-card">
+            <div class="p-name">Starter</div>
+            <div class="p-desc">For small venues with occasional HR needs</div>
+            <div class="p-price"><span class="p-num" id="starterPrice">$249</span><span class="p-period" id="starterPeriod">/year</span></div>
+            <div class="p-mo" id="starterMo">Just $21/month</div>
+            <ul class="p-features">
+                <li><span class="ck">✓</span> Unlimited AI chat</li>
+                <li><span class="ck">✓</span> All HR templates</li>
+                <li><span class="ck">✓</span> <span id="starterDocs">96</span> <span id="starterDocsPeriod">credits/year</span></li>
+                <li><span class="ck">✓</span> Unlimited HR Tools</li>
+                <li><span class="ce">🚨</span> Crisis Support <span style="color:#22c55e;font-weight:700">10% off</span></li>
+            </ul>
+            <a href="/pricing" class="p-btn outline">Learn More</a>
+        </div>
+
+        <!-- PRO — FEATURED -->
+        <div class="p-card featured">
+            <div class="p-badge">Most Popular</div>
+            <div class="p-name">Pro</div>
+            <div class="p-desc">For busy venues with regular HR needs</div>
+            <div class="p-price"><span class="p-num" id="proPrice">$449</span><span class="p-period" id="proPeriod">/year</span></div>
+            <div class="p-mo" id="proMo">Just $37/month</div>
+            <ul class="p-features">
+                <li><span class="ck">✓</span> Unlimited AI chat</li>
+                <li><span class="ck">✓</span> All HR templates</li>
+                <li><span class="ck">✓</span> <span id="proDocs">240</span> <span id="proDocsPeriod">credits/year</span></li>
+                <li><span class="ck">✓</span> Unlimited HR Tools</li>
+                <li><span class="ce">🚨</span> Crisis Support <span style="color:#22c55e;font-weight:700">25% off</span></li>
+            </ul>
+            <a href="/app" class="p-btn solid">Get Started</a>
+        </div>
+
+        <!-- BUSINESS -->
+        <div class="p-card">
+            <div class="p-name">Business</div>
+            <div class="p-desc">For multi-venue or high-turnover</div>
+            <div class="p-price"><span class="p-num" id="businessPrice">$899</span><span class="p-period" id="businessPeriod">/year</span></div>
+            <div class="p-mo" id="businessMo">Just $75/month</div>
+            <ul class="p-features">
+                <li><span class="ck">✓</span> Unlimited AI chat</li>
+                <li><span class="ck">✓</span> All HR templates</li>
+                <li><span class="ck">✓</span> <span id="businessDocs">600</span> <span id="businessDocsPeriod">credits/year</span></li>
+                <li><span class="ck">✓</span> Unlimited HR Tools</li>
+                <li><span class="ce">🚨</span> Crisis Support <span style="color:#22c55e;font-weight:700">50% off</span></li>
+            </ul>
+            <a href="/pricing" class="p-btn outline">Learn More</a>
+        </div>
+    </div>
+
+    <!-- Credits explainer -->
+    <div class="credits-box" id="creditsBox">
+        <div class="credits-title">💡 What can you do with credits?</div>
+        <div class="credits-grid">
+            <div>
+                <span class="cr-icon">📄</span>
+                <div class="cr-name">Generate Documents</div>
+                <div class="cr-desc">Contracts, position descriptions, onboarding docs, policies</div>
+            </div>
+            <div>
+                <span class="cr-icon">⚠️</span>
+                <div class="cr-name">Expert-Reviewed Docs</div>
+                <div class="cr-desc">Warnings, PIPs, terminations reviewed by qualified HR consultants</div>
+            </div>
+            <div>
+                <span class="cr-icon">👤</span>
+                <div class="cr-name">HR Consultations</div>
+                <div class="cr-desc">Book time with HR professionals for any workplace matter</div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- How It Works -->
-    <section id="how-it-works" class="py-20 px-6 bg-slate-800/50">
-        <div class="max-w-6xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Get Started in 60 Seconds</h2>
-                <p class="text-slate-400 text-lg max-w-2xl mx-auto">No complex setup. No training required. Just ask.</p>
-            </div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center text-2xl font-bold text-slate-900 mx-auto mb-6">1</div>
-                    <h3 class="text-xl font-bold mb-3">Ask Your Question</h3>
-                    <p class="text-slate-400">Type your HR question — anything from "What's the Sunday penalty rate for casuals?" to "How do I manage underperformance?"</p>
-                </div>
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center text-2xl font-bold text-slate-900 mx-auto mb-6">2</div>
-                    <h3 class="text-xl font-bold mb-3">Get Instant Guidance</h3>
-                    <p class="text-slate-400">Fitz gives you clear, practical advice based on Australian workplace law and hospitality industry best practices.</p>
-                </div>
-                <div class="text-center">
-                    <div class="w-16 h-16 bg-amber-500 rounded-full flex items-center justify-center text-2xl font-bold text-slate-900 mx-auto mb-6">3</div>
-                    <h3 class="text-xl font-bold mb-3">Take Action Confidently</h3>
-                    <p class="text-slate-400">Generate documents, follow step-by-step guides, or escalate to an expert — whatever you need to move forward.</p>
-                </div>
-            </div>
-        </div>
-    </section>
+    <div class="pricing-guarantee">All paid plans include a 14-day money-back guarantee · Cancel anytime</div>
+</section>
 
-    <!-- Pricing Preview -->
-    <section class="py-20 px-6">
-        <div class="max-w-7xl mx-auto">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl sm:text-4xl font-bold mb-4">Simple, Transparent Pricing</h2>
-                <p class="text-slate-400 text-lg max-w-2xl mx-auto">Start free, upgrade when you need more. All plans include unlimited AI chat.</p>
-            </div>
+<!-- ============================================================
+     TRUST BADGES
+     ============================================================ -->
+<div class="trust-section">
+    <div class="trust-badges">
+        <div class="trust-item"><span class="trust-icon">🏆</span> Fair Work Compliant</div>
+        <div class="trust-item"><span class="trust-icon">👨‍💼</span> Expert HR Reviewed</div>
+        <div class="trust-item"><span class="trust-icon">🔒</span> Data Secure</div>
+        <div class="trust-item"><span class="trust-icon">🇦🇺</span> Australian Owned</div>
+    </div>
+</div>
 
-            <!-- Billing Toggle -->
-            <div class="flex justify-center mb-12">
-                <div class="inline-flex items-center bg-slate-800 rounded-xl p-1">
-                    <button id="monthlyBtn" onclick="toggleBilling('monthly')" class="toggle-btn px-6 py-3 rounded-lg font-medium text-slate-300">
-                        Monthly
-                    </button>
-                    <button id="yearlyBtn" onclick="toggleBilling('yearly')" class="toggle-btn active px-6 py-3 rounded-lg font-medium">
-                        Yearly
-                    </button>
-                    <span class="bg-green-700 text-white text-xs font-bold px-3 py-1 rounded-full ml-2">
-                        Save 20%+
-                    </span>
-                </div>
-            </div>
+<!-- ============================================================
+     FAQ
+     ============================================================ -->
+<section class="faq-section">
+    <div class="section-label"><span class="sl-text">FAQ</span><div class="sl-line"></div></div>
+    <h2 class="faq-h2">Frequently asked questions.</h2>
+    <div class="faq-items">
+        <details class="faq-item">
+            <summary>What HR software is best for hospitality businesses in Australia?</summary>
+            <div class="faq-answer">Fitz HR is built specifically for pubs, restaurants, cafes, and hotels in Australia. It provides instant answers based on Australian workplace law and the Hospitality Industry (General) Award, generates compliant employment contracts and warning letters, and includes an Award Rate Calculator. Start free at fitzhr.com.</div>
+        </details>
+        <details class="faq-item">
+            <summary>How do I calculate penalty rates for hospitality staff?</summary>
+            <div class="faq-answer">Penalty rates under the Hospitality Industry (General) Award are: Saturday 150%, Sunday 175%, Public Holiday 250%. Evening work (7pm–midnight Mon–Fri) adds a flat $2.81/hr loading, and night work (midnight–7am) adds $4.22/hr. Fitz HR's Award Wizard calculates the correct rate for any classification, day, and shift type.</div>
+        </details>
+        <details class="faq-item">
+            <summary>Can I generate employment contracts for restaurant staff online?</summary>
+            <div class="faq-answer">Yes. Fitz HR's Employment Contract Builder generates contracts tailored to the Hospitality Industry (General) Award in minutes. Answer a few questions about the role and it produces a contract with the correct Award classification, pay rates, leave entitlements, and hospitality-specific clauses.</div>
+        </details>
+        <details class="faq-item">
+            <summary>Is there an AI HR assistant for Australian hospitality?</summary>
+            <div class="faq-answer">Yes. Fitz HR is an AI-powered HR assistant built specifically for Australian hospitality businesses including pubs, restaurants, cafes, bars, and hotels. It covers award rates, Fair Work compliance, employment contracts, performance management, and crisis situations — all tailored to the Hospitality Award.</div>
+        </details>
+        <details class="faq-item">
+            <summary>Is Fitz HR free?</summary>
+            <div class="faq-answer">Yes — the free tier includes 20 AI chats per month, 1 free template download, and unlimited access to HR tools like the Award Rate Calculator. Paid plans start from $249/year ($21/month) for unlimited chat and full document access.</div>
+        </details>
+    </div>
+</section>
 
-            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-                <!-- Free -->
-                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
-                    <h3 class="text-xl font-bold mb-2">Free</h3>
-                    <p class="text-slate-400 text-sm mb-4">Try Fitz with no commitment</p>
-                    <div class="mb-6">
-                        <span class="text-4xl font-bold">$0</span>
-                        <span class="text-slate-400">/forever</span>
-                    </div>
-                    <ul class="space-y-3 mb-8 text-slate-300 text-sm">
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> 20 AI chats/month
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> 1 free template download
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Unlimited HR Tools
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-slate-400">–</span> <span class="text-slate-400">Expert-reviewed docs</span>
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-red-400">🚨</span> Crisis Support <span class="text-slate-400">$320</span>
-                        </li>
-                    </ul>
-                    <a href="/app" class="block text-center py-3 border border-slate-600 rounded-lg hover:border-green-500 hover:text-green-400 transition-colors">
-                        Start Free
-                    </a>
-                </div>
+<!-- ============================================================
+     CTA
+     ============================================================ -->
+<section class="cta-section">
+    <h2 class="cta-h2 ru">Your venue deserves <em>better</em> than guesswork.</h2>
+    <p class="cta-sub ru">Join hospitality venues across Australia using Fitz for their HR. Start free — no credit card, no lock-in.</p>
+    <div class="cta-btns ru">
+        <a href="/app" class="btn-primary"><span>Get Started Free</span><span class="arr">→</span></a>
+        <a href="#pricing" class="btn-ghost">View Pricing</a>
+    </div>
+    <div class="cta-note ru">14-day money-back guarantee on all paid plans · Cancel anytime</div>
+</section>
 
-                <!-- Starter -->
-                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
-                    <h3 class="text-xl font-bold mb-2">Starter</h3>
-                    <p class="text-slate-400 text-sm mb-4">For small venues with occasional HR needs</p>
-                    <div class="mb-2">
-                        <span id="starterPrice" class="text-4xl font-bold">$249</span>
-                        <span id="starterPeriod" class="text-slate-400">/year</span>
-                    </div>
-                    <p id="starterMonthly" class="text-green-500 text-sm mb-4">Just $21/month</p>
-                    <ul class="space-y-3 mb-8 text-slate-300 text-sm">
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Unlimited AI chat
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> All HR templates
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> <span id="starterDocs">96</span> <span id="starterDocsPeriod">credits/year</span>
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Unlimited HR Tools
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-red-400">🚨</span> Crisis Support <span class="text-green-500 font-semibold">10% off</span>
-                        </li>
-                    </ul>
-                    <a href="/pricing" class="block text-center py-3 border border-slate-600 rounded-lg hover:border-amber-500 transition-colors">
-                        Learn More
-                    </a>
-                </div>
-
-                <!-- Pro (Featured) -->
-                <div class="bg-slate-800 border-2 border-amber-500 rounded-2xl p-6 relative">
-                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-900 text-sm font-bold px-4 py-1 rounded-full">
-                        MOST POPULAR
-                    </div>
-                    <h3 class="text-xl font-bold mb-2">Pro</h3>
-                    <p class="text-slate-400 text-sm mb-4">For busy venues with regular HR needs</p>
-                    <div class="mb-2">
-                        <span id="proPrice" class="text-4xl font-bold">$449</span>
-                        <span id="proPeriod" class="text-slate-400">/year</span>
-                    </div>
-                    <p id="proMonthly" class="text-green-500 text-sm mb-4">Just $37/month</p>
-                    <ul class="space-y-3 mb-8 text-slate-300 text-sm">
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Unlimited AI chat
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> All HR templates
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> <span id="proDocs">240</span> <span id="proDocsPeriod">credits/year</span>
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Unlimited HR Tools
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-red-400">🚨</span> Crisis Support <span class="text-green-500 font-semibold">25% off</span>
-                        </li>
-                    </ul>
-                    <a href="/app" class="btn-primary block text-center py-3 rounded-lg font-semibold text-slate-900">
-                        Get Started
-                    </a>
-                </div>
-
-                <!-- Business -->
-                <div class="bg-slate-800 border border-slate-700 rounded-2xl p-6">
-                    <h3 class="text-xl font-bold mb-2">Business</h3>
-                    <p class="text-slate-400 text-sm mb-4">For multi-venue or high-turnover</p>
-                    <div class="mb-2">
-                        <span id="businessPrice" class="text-4xl font-bold">$899</span>
-                        <span id="businessPeriod" content="text-slate-400">/year</span>
-                    </div>
-                    <p id="businessMonthly" class="text-green-500 text-sm mb-4">Just $75/month</p>
-                    <ul class="space-y-3 mb-8 text-slate-300 text-sm">
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Unlimited AI chat
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> All HR templates
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> <span id="businessDocs">600</span> <span id="businessDocsPeriod">credits/year</span>
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-green-500">✓</span> Unlimited HR Tools
-                        </li>
-                        <li class="flex items-center gap-2">
-                            <span class="text-red-400">🚨</span> Crisis Support <span class="text-green-500 font-semibold">50% off</span>
-                        </li>
-                    </ul>
-                    <a href="/pricing" class="block text-center py-3 border border-slate-600 rounded-lg hover:border-amber-500 transition-colors">
-                        Learn More
-                    </a>
-                </div>
-            </div>
-
-            <!-- What are credits? -->
-            <div class="max-w-4xl mx-auto mt-12 bg-slate-800 border border-slate-700 rounded-2xl p-6">
-                <p class="text-amber-500 font-bold text-lg text-center mb-4">💡 What can you do with credits?</p>
-                <div class="grid md:grid-cols-3 gap-6 text-center">
-                    <div>
-                        <span class="text-3xl">📄</span>
-                        <h3 class="text-white font-semibold mt-2">Generate Documents</h3>
-                        <p class="text-slate-400 text-sm">Employment contracts, position descriptions, onboarding docs, policies</p>
-                    </div>
-                    <div>
-                        <span class="text-3xl">⚠️</span>
-                        <h3 class="text-white font-semibold mt-2">Expert-Reviewed Docs</h3>
-                        <p class="text-slate-400 text-sm">Warnings, PIPs, terminations — reviewed by qualified HR consultants</p>
-                    </div>
-                    <div>
-                        <span class="text-3xl">👤</span>
-                        <h3 class="text-white font-semibold mt-2">HR Consultations</h3>
-                        <p class="text-slate-400 text-sm">Book time with HR professionals for any workplace matter</p>
-                    </div>
-                </div>
-            </div>
-
-            <p class="text-center text-slate-400 mt-8">
-                All paid plans include a 14-day money-back guarantee. Cancel anytime.
-            </p>
-        </div>
-    </section>
-
-    <!-- Trust Section -->
-    <section class="py-20 px-6 bg-slate-800/50">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-3xl sm:text-4xl font-bold mb-6">Built Specifically for Australian Hospitality</h2>
-            <p class="text-xl text-slate-300 mb-10">
-                Fitz understands the unique challenges of running a restaurant, cafe, bar, or hotel in Australia. 
-                From the Hospitality Industry (General) Award to state-specific regulations — we've got you covered.
-            </p>
-            <div class="flex flex-wrap items-center justify-center gap-8 text-slate-400">
-                <div class="flex items-center gap-2"><span class="text-2xl">🏆</span><span>Fair Work Compliant</span></div>
-                <div class="flex items-center gap-2"><span class="text-2xl">👨‍💼</span><span>Expert HR Reviewed</span></div>
-                <div class="flex items-center gap-2"><span class="text-2xl">🔒</span><span>Data Secure</span></div>
-                <div class="flex items-center gap-2"><span class="text-2xl">🇦🇺</span><span>Australian Owned</span></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section class="py-20 px-6">
-        <div class="max-w-3xl mx-auto">
-            <h2 class="text-3xl sm:text-4xl font-bold mb-10 text-center">Frequently Asked Questions</h2>
-            
-            <div class="space-y-4">
-                <details class="bg-slate-800/50 rounded-xl border border-slate-700 group">
-                    <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-lg">
-                        What HR software is best for hospitality businesses in Australia?
-                        <span class="text-amber-500 text-2xl group-open:rotate-45 transition-transform">+</span>
-                    </summary>
-                    <div class="px-6 pb-6 text-slate-300">
-                        <p>Fitz HR is an AI-powered HR assistant built specifically for pubs, restaurants, cafes, and hotels in Australia. It provides instant answers to HR questions based on Australian workplace law and the Hospitality Industry (General) Award, generates compliant employment contracts and warning letters, and includes an Award Rate Calculator.</p>
-                    </div>
-                </details>
-
-                <details class="bg-slate-800/50 rounded-xl border border-slate-700 group">
-                    <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-lg">
-                        How do I calculate penalty rates for hospitality staff?
-                        <span class="text-amber-500 text-2xl group-open:rotate-45 transition-transform">+</span>
-                    </summary>
-                    <div class="px-6 pb-6 text-slate-300">
-                        <p>Penalty rates under the Hospitality Industry (General) Award are: Saturday 150%, Sunday 175%, Public Holiday 250%. Evening work (7pm–midnight Mon–Fri) adds a flat $2.81/hr, and night work (midnight–7am) adds $4.22/hr. Fitz HR's free Award Wizard calculates the correct rate for any classification, day, and shift type.</p>
-                    </div>
-                </details>
-
-                <details class="bg-slate-800/50 rounded-xl border border-slate-700 group">
-                    <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-lg">
-                        Can I generate employment contracts for restaurant staff online?
-                        <span class="text-amber-500 text-2xl group-open:rotate-45 transition-transform">+</span>
-                    </summary>
-                    <div class="px-6 pb-6 text-slate-300">
-                        <p>Yes — Fitz HR's Employment Contract Builder generates contracts tailored to the Hospitality Industry (General) Award in minutes. Answer a few questions about the role, and it produces a contract with the correct Award classification, pay rates, leave entitlements, and hospitality-specific clauses.</p>
-                    </div>
-                </details>
-
-                <details class="bg-slate-800/50 rounded-xl border border-slate-700 group">
-                    <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-lg">
-                        Is there an AI HR assistant for Australian hospitality?
-                        <span class="text-amber-500 text-2xl group-open:rotate-45 transition-transform">+</span>
-                    </summary>
-                    <div class="px-6 pb-6 text-slate-300">
-                        <p>Yes. Fitz HR is an AI-powered HR assistant built specifically for Australian hospitality businesses including pubs, restaurants, cafes, bars, and hotels. It covers award rates, Fair Work compliance, employment contracts, performance management, and crisis situations — all tailored to the Hospitality Award.</p>
-                    </div>
-                </details>
-
-                <details class="bg-slate-800/50 rounded-xl border border-slate-700 group">
-                    <summary class="flex items-center justify-between p-6 cursor-pointer font-semibold text-lg">
-                        Is Fitz HR free?
-                        <span class="text-amber-500 text-2xl group-open:rotate-45 transition-transform">+</span>
-                    </summary>
-                    <div class="px-6 pb-6 text-slate-300">
-                        <p>Yes — the free tier includes 20 AI chats per month, 1 free template download, and unlimited access to HR tools like the Award Rate Calculator. Paid plans start from $249/year ($21/month) for unlimited chat and full document access.</p>
-                    </div>
-                </details>
-            </div>
-        </div>
-    </section>
-
-    <!-- Final CTA -->
-    <section class="py-24 px-6">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-3xl sm:text-4xl font-bold mb-6">Ready to Simplify Your HR?</h2>
-            <p class="text-xl text-slate-300 mb-10">
-                Join hospitality venues across Australia who trust Fitz for their HR needs.
-                Get started free — no credit card required.
-            </p>
-            <a href="/app" class="btn-primary inline-block px-10 py-5 rounded-xl font-bold text-xl text-slate-900">
-                Start Free Today →
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="site-footer">
+    <div class="footer-grid">
+        <div class="footer-brand">
+            <a href="/" style="text-decoration:none;">
+                <span class="wordmark" style="font-size:1.15rem"><span class="wm-f">F</span><span class="wm-itz">ITZ</span><span class="wm-hr">HR</span></span>
             </a>
+            <p class="footer-brand-desc">AI-powered HR software for Australian hospitality venues. Fair Work compliance, Award rates, and employment documents — sorted.</p>
         </div>
-    </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-slate-800 border-t border-slate-700 py-12 px-6">
-        <div class="max-w-6xl mx-auto">
-            <div class="grid md:grid-cols-4 gap-8 mb-8">
-                <div>
-                    <a href="/" class="flex items-center text-3xl font-extrabold tracking-tight mb-4" style="letter-spacing: -1px;">
-                        <span class="text-amber-500">F</span><span class="text-white">ITZ</span><span class="text-white">&nbsp;</span><span class="text-amber-500">HR</span>
-                    </a>
-                    <p class="text-slate-400 text-sm">AI-powered HR software for Australian hospitality venues.</p>
-                </div>
-                <div>
-                    <h3 class="font-semibold mb-4 text-base">Product</h3>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><a href="/#features" class="hover:text-white transition-colors">Features</a></li>
-                        <li><a href="/pricing" class="hover:text-white transition-colors">Pricing</a></li>
-                        <!-- FIX: /blog → /blog/ to match Netlify final URL and resolve GSC redirect error -->
-                        <li><a href="/blog/" class="hover:text-white transition-colors">Blog</a></li>
-                        <li><a href="/app" class="hover:text-white transition-colors">Log In</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="font-semibold mb-4 text-base">Legal</h3>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="/terms" class="hover:text-white transition-colors">Terms of Service</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h3 class="font-semibold mb-4 text-base">Contact</h3>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><!--email_off--><a href="mailto:support@fitzhr.com" class="hover:text-white transition-colors">support@fitzhr.com</a><!--/email_off--></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="border-t border-slate-700 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                <p class="text-slate-400 text-sm">© 2026 Fitz HR Pty Ltd (ABN 87 693 882 709). All rights reserved.</p>
-                <p class="text-slate-400 text-sm">Made with ❤️ in Australia</p>
-            </div>
+        <div>
+            <div class="footer-col-title">Product</div>
+            <ul class="footer-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="/pricing">Pricing</a></li>
+                <li><a href="/blog/">Blog</a></li>
+                <li><a href="/app">Log In</a></li>
+            </ul>
         </div>
-    </footer>
+        <div>
+            <div class="footer-col-title">Legal</div>
+            <ul class="footer-links">
+                <li><a href="/privacy">Privacy Policy</a></li>
+                <li><a href="/terms">Terms of Service</a></li>
+            </ul>
+        </div>
+        <div>
+            <div class="footer-col-title">Contact</div>
+            <ul class="footer-links">
+                <li><a href="mailto:support@fitzhr.com">support@fitzhr.com</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <div class="footer-copy">© 2026 Fitz HR Pty Ltd (ABN 87 693 882 709). All rights reserved.</div>
+        <div class="footer-copy">Fair Work Act 2009 · Hospitality Industry (General) Award MA000009 · Built in Australia</div>
+    </div>
+</footer>
 
-    <!-- Billing Toggle Script -->
-    <script>
-        const pricing = {
-            yearly: {
-                starter: { price: '$249', period: '/year', monthly: 'Just $21/month', docs: '96', docsPeriod: 'credits/year' },
-                pro: { price: '$449', period: '/year', monthly: 'Just $37/month', docs: '240', docsPeriod: 'credits/year' },
-                business: { price: '$899', period: '/year', monthly: 'Just $75/month', docs: '600', docsPeriod: 'credits/year' }
-            },
-            monthly: {
-                starter: { price: '$29', period: '/month', monthly: '', docs: '8', docsPeriod: 'credits/month' },
-                pro: { price: '$49', period: '/month', monthly: '', docs: '20', docsPeriod: 'credits/month' },
-                business: { price: '$99', period: '/month', monthly: '', docs: '50', docsPeriod: 'credits/month' }
-            }
-        };
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script>
+/* ---- SCROLL PROGRESS ---- */
+window.addEventListener('scroll', () => {
+    document.getElementById('spb').style.width = (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%';
+}, { passive: true });
 
-        function toggleBilling(type) {
-            const p = pricing[type];
-            document.getElementById('monthlyBtn').classList.toggle('active', type === 'monthly');
-            document.getElementById('yearlyBtn').classList.toggle('active', type === 'yearly');
-            document.getElementById('starterPrice').textContent = p.starter.price;
-            document.getElementById('starterPeriod').textContent = p.starter.period;
-            document.getElementById('starterMonthly').textContent = p.starter.monthly;
-            document.getElementById('starterDocs').textContent = p.starter.docs;
-            document.getElementById('starterDocsPeriod').textContent = p.starter.docsPeriod;
-            document.getElementById('proPrice').textContent = p.pro.price;
-            document.getElementById('proPeriod').textContent = p.pro.period;
-            document.getElementById('proMonthly').textContent = p.pro.monthly;
-            document.getElementById('proDocs').textContent = p.pro.docs;
-            document.getElementById('proDocsPeriod').textContent = p.pro.docsPeriod;
-            document.getElementById('businessPrice').textContent = p.business.price;
-            document.getElementById('businessPeriod').textContent = p.business.period;
-            document.getElementById('businessMonthly').textContent = p.business.monthly;
-            document.getElementById('businessDocs').textContent = p.business.docs;
-            document.getElementById('businessDocsPeriod').textContent = p.business.docsPeriod;
+/* ---- NAV SCROLL STATE ---- */
+window.addEventListener('scroll', () => {
+    document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+/* ---- ORB PARALLAX ---- */
+window.addEventListener('scroll', () => {
+    const sy = window.scrollY;
+    document.getElementById('orb1').style.transform = `translateY(${sy * 0.18}px)`;
+    document.getElementById('orb2').style.transform = `translateY(${sy * -0.1}px)`;
+}, { passive: true });
+
+/* ---- HERO ENTRANCE ---- */
+setTimeout(() => {
+    ['vrule', 'eyebrow', 'heroH1', 'heroSub', 'heroCtas', 'fitzHeroWrap']
+        .forEach(id => document.getElementById(id).classList.add('in'));
+}, 80);
+
+/* ---- INTERSECTION OBSERVER (reveal on scroll) ---- */
+const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll(
+    '.sl-text, .sl-line, .ru, .pain-card, .feat-row, .stat-item, ' +
+    '.feat-h2, .feat-sub, .demo-card, .hiw-step, .hiw-h2, .hiw-sub, ' +
+    '.pricing-h2, .pricing-intro, .billing-toggle, .p-card, .credits-box, ' +
+    '.faq-h2, .faq-item, .trust-item'
+).forEach(el => obs.observe(el));
+
+/* ---- COUNTER ANIMATION ---- */
+function animCounter(el) {
+    const t = parseInt(el.dataset.target);
+    const p = el.dataset.prefix || '';
+    const s = el.dataset.suffix || '';
+    let st = null;
+    (function step(ts) {
+        if (!st) st = ts;
+        const pct = Math.min((ts - st) / 1400, 1);
+        el.textContent = p + Math.round((1 - Math.pow(1 - pct, 3)) * t) + s;
+        if (pct < 1) requestAnimationFrame(step);
+    })(performance.now());
+}
+const cobs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (e.isIntersecting) { animCounter(e.target); cobs.unobserve(e.target); }
+    });
+}, { threshold: 0.5 });
+document.querySelectorAll('.counter').forEach(el => cobs.observe(el));
+
+/* ---- LIVE DEMO TYPEWRITER ---- */
+const QA = [
+    { q: "Can I stand down a casual who no-showed without notice?",        a: "Yes — a casual has no guaranteed hours, so non-attendance doesn't trigger stand-down provisions. Simply don't roster them going forward, but document it in writing." },
+    { q: "What's the Sunday penalty rate for a part-time bar attendant?",  a: "Under the Hospitality Award, Sunday rates for part-time employees are 175% of ordinary rate. For a Level 2 bar attendant that's approximately $36.49/hr at current base rates." },
+    { q: "My chef walked out mid-service — what are my options?",           a: "Issue a written request to return within 3 business days. If no response, this may constitute abandonment of employment, allowing valid termination. Document everything." },
+    { q: "How do I write a valid first warning for repeated lateness?",     a: "A valid written warning must state the specific conduct, improvement required, a clear timeframe, and consequence of further breach. Fitz can generate one in 60 seconds." },
+    { q: "Is the split shift allowance payable if I adjust the roster?",    a: "Yes — if the gap between periods of duty exceeds the minimum break under the Award, the split shift allowance of $13.17 applies regardless of roster changes." }
+];
+let qIdx = 0, demoStarted = false, progRaf;
+const demoQ = document.getElementById('demoQ');
+const demoA = document.getElementById('demoA');
+const demoThink = document.getElementById('demoThink');
+const demoProg = document.getElementById('demoProg');
+
+function typeEl(el, text, speed, cb) {
+    el.innerHTML = '<span class="tw-cursor"></span>';
+    let i = 0;
+    (function tick() {
+        if (i < text.length) {
+            el.innerHTML = text.slice(0, ++i) + '<span class="tw-cursor"></span>';
+            setTimeout(tick, speed + Math.random() * 10);
+        } else {
+            el.innerHTML = text;
+            cb && cb();
         }
-    </script>
+    })();
+}
+function runProg(ms) {
+    cancelAnimationFrame(progRaf);
+    demoProg.style.width = '0%';
+    let s = null;
+    (function step(ts) {
+        if (!s) s = ts;
+        demoProg.style.width = (Math.min((ts - s) / ms, 1) * 100) + '%';
+        if ((ts - s) < ms) progRaf = requestAnimationFrame(step);
+    })(performance.now());
+}
+function runDemo(i) {
+    const { q, a } = QA[i];
+    runProg(q.length * 30 + 900 + a.length * 18 + 3000);
+    demoQ.innerHTML = '<span class="tw-cursor"></span>';
+    demoA.textContent = '';
+    demoThink.style.display = 'none';
+    typeEl(demoQ, q, 28, () => {
+        demoThink.style.display = 'flex';
+        setTimeout(() => {
+            demoThink.style.display = 'none';
+            typeEl(demoA, a, 16, () => {
+                setTimeout(() => { qIdx = (qIdx + 1) % QA.length; runDemo(qIdx); }, 3000);
+            });
+        }, 900);
+    });
+}
+const dobs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+        if (e.isIntersecting && !demoStarted) {
+            demoStarted = true;
+            setTimeout(() => runDemo(0), 600);
+            dobs.unobserve(e.target);
+        }
+    });
+}, { threshold: 0.3 });
+dobs.observe(document.getElementById('demoCard'));
+
+/* ---- PRICING TOGGLE ---- */
+const pricing = {
+    yearly: {
+        starter:  { price: '$249', period: '/year', mo: 'Just $21/month', docs: '96',  docsPeriod: 'credits/year' },
+        pro:      { price: '$449', period: '/year', mo: 'Just $37/month', docs: '240', docsPeriod: 'credits/year' },
+        business: { price: '$899', period: '/year', mo: 'Just $75/month', docs: '600', docsPeriod: 'credits/year' }
+    },
+    monthly: {
+        starter:  { price: '$29', period: '/month', mo: '', docs: '8',  docsPeriod: 'credits/month' },
+        pro:      { price: '$49', period: '/month', mo: '', docs: '20', docsPeriod: 'credits/month' },
+        business: { price: '$99', period: '/month', mo: '', docs: '50', docsPeriod: 'credits/month' }
+    }
+};
+function toggleBilling(type) {
+    const p = pricing[type];
+    document.getElementById('monthlyBtn').classList.toggle('active', type === 'monthly');
+    document.getElementById('yearlyBtn').classList.toggle('active', type === 'yearly');
+    [['starter','Starter'],['pro','Pro'],['business','Business']].forEach(([k, K]) => {
+        document.getElementById(k + 'Price').textContent     = p[k].price;
+        document.getElementById(k + 'Period').textContent    = p[k].period;
+        document.getElementById(k + 'Mo').textContent        = p[k].mo;
+        document.getElementById(k + 'Docs').textContent      = p[k].docs;
+        document.getElementById(k + 'DocsPeriod').textContent = p[k].docsPeriod;
+    });
+}
+</script>
+</body>
+</html>
+ });
+}
+</script>
 </body>
 </html>
