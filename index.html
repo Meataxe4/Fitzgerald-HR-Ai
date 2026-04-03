@@ -505,8 +505,7 @@
 
         /* ---- FOOTER ---- */
         .site-footer { position: relative; z-index: 10; background: var(--navy2); border-top: 1px solid var(--rule); padding: 3rem 1.5rem 1.5rem; overflow: hidden; }
-        .footer-fitz-wrap { position: absolute; right: -220px; top: 50%; transform: translateY(-50%); pointer-events: none; opacity: 0.07; animation: fitzBreathe 8s ease-in-out infinite; }
-        .footer-fitz-wrap .fitz-bot { width: 480px; height: 480px; }
+
         .footer-fitz-wrap { position: absolute; right: -350px; bottom: -60px; width: 700px; height: 700px; background: var(--fitz-img) center/contain no-repeat; opacity: 0.05; pointer-events: none; animation: fitzBreathe 8s ease-in-out infinite; }
         .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem 1.5rem; margin-bottom: 2rem; }
         .footer-brand { grid-column: 1 / -1; }
@@ -522,6 +521,63 @@
         /* ---- SHARED REVEAL ---- */
         .ru { opacity:0; transform:translateY(20px); transition:opacity 0.7s, transform 0.7s cubic-bezier(0.16,1,0.3,1); }
         .ru.in { opacity:1; transform:translateY(0); }
+
+        /* ============================================================
+           MOBILE — max-width 768px
+           Desktop styles are completely untouched above this point
+           ============================================================ */
+        @media (max-width: 768px) {
+
+            /* NAV — hide all links, keep logo + CTA only */
+            .nav-link { display: none; }
+            nav { padding: 0.85rem 1rem; }
+            .nav-logo { font-size: 1rem; gap: 0.35rem; }
+            .nav-fitz { width: 28px; height: 28px; }
+            .nav-cta { font-size: 0.68rem; padding: 0.45rem 0.85rem; letter-spacing: 0.06em; }
+
+            /* TICKER */
+            .ticker { padding: 0.4rem 1rem; margin-top: 48px; }
+
+            /* HERO — reduce headline, hook, hide mascot */
+            .hero { padding: 3rem 1.25rem 2.5rem; min-height: auto; }
+            .hero-inner { padding-left: 0; }
+            .hero-h1 { font-size: clamp(2.6rem, 11vw, 3.5rem); }
+            .hero-hook { font-size: 1.25rem; white-space: nowrap; margin-top: 1.25rem; margin-bottom: 1.25rem; }
+            .hero-sub { font-size: 1rem; max-width: 100%; }
+            .hero-sub-punch { font-size: 1rem; max-width: 100%; }
+            .hero-support { font-size: 0.58rem; }
+            .hero-fitz-wrap { display: none; }
+            .scroll-hint { display: none; }
+
+            /* SECTIONS */
+            .section { padding: 2.5rem 1.25rem; }
+            .pain-h2, .feat-h2, .hiw-h2, .pricing-h2, .faq-h2 { font-size: 1.75rem; }
+            .cta-h2 { font-size: 2rem; }
+
+            /* STATS */
+            .stats-band { padding: 2rem 1.25rem; }
+            .stats-grid { grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+            .stat-num { font-size: 2rem; }
+
+            /* PRICING */
+            .pricing-section { padding: 2.5rem 1.25rem; }
+            .pricing-grid { grid-template-columns: 1fr 1fr; gap: 0.6rem; }
+            .p-num { font-size: 1.8rem; }
+            .credits-grid { grid-template-columns: 1fr; gap: 1rem; }
+
+            /* DEMO */
+            .demo-section { padding: 2.5rem 1.25rem; }
+            .demo-q-text { font-size: 1rem; }
+
+            /* CTA */
+            .cta-section { padding: 3rem 1.25rem; }
+
+            /* FOOTER */
+            .site-footer { padding: 2.5rem 1.25rem 1.25rem; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .footer-brand { grid-column: 1 / -1; }
+        }
+
     </style>
 </head>
 <body>
@@ -912,9 +968,6 @@
      FOOTER
      ============================================================ -->
 <footer class="site-footer">
-    <div class="footer-fitz-wrap">
-        <div class="fitz-bot fitz-hero"></div>
-    </div>
     <div class="footer-grid">
         <div class="footer-brand">
             <a href="/" style="text-decoration:none;">
