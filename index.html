@@ -105,8 +105,47 @@
             {"@type": "Question","name": "How do I calculate penalty rates for hospitality staff?","acceptedAnswer": {"@type": "Answer","text": "Penalty rates under the Hospitality Industry (General) Award are: Saturday 150%, Sunday 175%, Public Holiday 250%. Evening work (7pm-midnight Mon-Fri) has a flat $2.81/hr loading, and night work (midnight-7am) has a $4.22/hr loading. Fitz HR's free Award Wizard calculates the correct rate for any classification, day, and shift type."}},
             {"@type": "Question","name": "Can I generate employment contracts for restaurant staff online?","acceptedAnswer": {"@type": "Answer","text": "Yes. Fitz HR's Employment Contract Builder generates contracts tailored to the Hospitality Industry (General) Award in minutes. You answer a few questions about the role, and it produces a contract with the correct Award classification, pay rates, leave entitlements, and hospitality-specific clauses."}},
             {"@type": "Question","name": "Is there an AI HR assistant for Australian hospitality?","acceptedAnswer": {"@type": "Answer","text": "Yes. Fitz HR (fitzhr.com) is an AI-powered HR assistant built specifically for Australian hospitality businesses including pubs, restaurants, cafes, bars, and hotels. It provides instant guidance on award rates, Fair Work compliance, employment contracts, performance management, and more."}},
-            {"@type": "Question","name": "Is Fitz HR free?","acceptedAnswer": {"@type": "Answer","text": "Fitz HR has a free tier that includes 20 AI chats per month, 1 free template download, and unlimited access to HR tools like the Award Rate Calculator. Paid plans start from $249/year ($21/month) for unlimited chat and full document access."}}
-        ]
+            {"@type": "Question","name": "Is Fitz HR free?","acceptedAnswer": {"@type": "Answer","text": "Fitz HR has a free tier that includes 20 AI chats per month, 1 free template download, and unlimited access to HR tools like the Award Rate Calculator. Paid plans start from $249/year ($21/month) for unlimited chat and full document access."}},
+            {
+                "@type": "Question",
+                "name": "What is Fitz HR?",
+                "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Fitz HR is an AI-powered HR compliance platform built exclusively for Australian hospitality venues including pubs, restaurants, cafes, bars, and hotels. It provides instant guidance on the Hospitality Industry (General) Award MA000009 and the Fair Work Act 2009 (Cth), generates compliant employment documents, and connects venue operators with qualified HR professionals for complex matters. It is not adapted from a generic HR platform \u2014 it was built specifically for the hospitality industry from the ground up."
+                }
+        },
+            {
+                "@type": "Question",
+                "name": "Does Fitz HR cover the Hospitality Industry (General) Award?",
+                "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Yes. Fitz HR is built specifically around the Hospitality Industry (General) Award MA000009 and the Restaurant Industry Award MA000119. Every AI response, document, and tool is aligned to these Awards \u2014 including classification levels, penalty rates (Saturday 150%, Sunday 175%, Public Holiday 250%), evening and night loadings, casual loading, and overtime provisions."
+                }
+        },
+            {
+                "@type": "Question",
+                "name": "Is Fitz HR a replacement for an HR consultant?",
+                "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "For most hospitality venues, yes. Fitz HR combines instant AI guidance for routine HR questions with access to qualified HR professionals for complex investigations, disputes, and crisis situations. The only area Fitz HR does not cover is formal legal representation at the Fair Work Commission, which requires an employment lawyer."
+                }
+        },
+            {
+                "@type": "Question",
+                "name": "How much does Fitz HR cost?",
+                "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Fitz HR starts at $0 per month forever, with paid plans from $249 per year (Starter) and $449 per year (Pro). All plans include unlimited AI HR guidance. There are no lock-in contracts, no termination fees, and a 14-day money-back guarantee. Full pricing is published at fitzhr.com/pricing \u2014 no sales call required."
+                }
+        },
+            {
+                "@type": "Question",
+                "name": "What HR documents can Fitz HR generate?",
+                "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Fitz HR generates compliant warning letters, performance improvement plans (PIPs), employment contracts, termination letters, formal probation review documents, position descriptions, onboarding documents, job advertisements, and training plans \u2014 all aligned to the Hospitality Award and Fair Work Act requirements."
+                }
+        }]
     }
     </script>
     <script type="application/ld+json">
@@ -580,6 +619,329 @@
             .footer-brand { grid-column: 1 / -1; }
         }
 
+
+
+        /* ============================================================
+           ABOUT SECTION
+           ============================================================ */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+
+        .about {
+            background: var(--navy);
+            padding: 7rem 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .about::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(245,158,11,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(245,158,11,0.03) 1px, transparent 1px);
+            background-size: 64px 64px;
+            pointer-events: none;
+        }
+        .about::after {
+            content: '';
+            position: absolute;
+            top: -200px;
+            right: -200px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .about-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        .about-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.56rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--amber);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        .about-label::before {
+            content: '';
+            width: 32px;
+            height: 2px;
+            background: var(--amber);
+            display: inline-block;
+        }
+        .about-heading {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+            font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            max-width: 760px;
+        }
+        .about-heading em { font-style: italic; color: var(--amber); }
+
+        /* SEO keyword paragraph — visible, indexable */
+        .about-seo-para {
+            font-size: 1rem;
+            line-height: 1.75;
+            color: var(--w60);
+            max-width: 680px;
+            margin-bottom: 1.25rem;
+            border-left: 3px solid var(--amber);
+            padding-left: 1.25rem;
+        }
+        .about-seo-para strong { color: #fff; }
+        .about-seo-para a { color: var(--amber); text-decoration: none; }
+        .about-seo-para a:hover { text-decoration: underline; }
+
+        /* Founder/authority signal */
+        .about-authority {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.6rem;
+            letter-spacing: 0.1em;
+            color: var(--w30);
+            text-transform: uppercase;
+            margin-bottom: 4rem;
+            padding-left: 1.25rem;
+            border-left: 1px solid rgba(245,158,11,0.2);
+        }
+
+        /* PILLAR GRID */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1px;
+            margin-bottom: 1px;
+        }
+        @media (max-width: 768px) { .about-grid { grid-template-columns: 1fr; } }
+
+        .pillar {
+            background: var(--navy2);
+            padding: 2.25rem 2rem;
+            position: relative;
+            transition: background 0.25s;
+        }
+        .pillar:hover { background: var(--navy3); }
+        .pillar-num {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.5rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+        .pillar h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1.25;
+            margin-bottom: 0.75rem;
+        }
+        .pillar p { font-size: 0.88rem; color: var(--w60); line-height: 1.65; }
+        .pillar p strong { color: #fff; }
+        .pillar-bar {
+            position: absolute;
+            left: 0; top: 0; bottom: 0;
+            width: 3px;
+            background: var(--amber);
+            opacity: 0;
+            transition: opacity 0.25s;
+        }
+        .pillar:hover .pillar-bar { opacity: 1; }
+
+        /* STATS */
+        .about-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            margin-top: 1px;
+            margin-bottom: 4rem;
+        }
+        @media (max-width: 640px) { .about-stats { grid-template-columns: repeat(2, 1fr); } }
+
+        .stat {
+            background: var(--navy2);
+            padding: 2rem 1.5rem;
+            text-align: center;
+        }
+        .stat-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.4rem;
+            font-weight: 900;
+            color: var(--amber);
+            line-height: 1;
+            margin-bottom: 0.4rem;
+            letter-spacing: -0.02em;
+        }
+        .stat-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.5rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--w30);
+            line-height: 1.55;
+        }
+
+        /* ENTITY BLOCK */
+        .about-entity {
+            background: var(--navy2);
+            border-left: 3px solid rgba(245,158,11,0.3);
+            padding: 1.5rem 2rem;
+            margin-bottom: 4rem;
+            font-size: 0.88rem;
+            color: var(--w60);
+            line-height: 1.7;
+        }
+        .about-entity strong { color: #fff; }
+
+        /* TRUST STRIP */
+        .about-trust {
+            background: var(--navy2);
+            border: 1px solid var(--rule);
+            padding: 1.75rem 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 2.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 4rem;
+        }
+        .trust-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.5rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--w30);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .trust-divider { width: 1px; height: 32px; background: var(--w10); flex-shrink: 0; }
+        .trust-items { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--w60);
+        }
+        .trust-item::before {
+            content: '';
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--green);
+            flex-shrink: 0;
+        }
+
+        /* FAQ SECTION — visible, indexable, schema-powered */
+        .about-faq {
+            margin-bottom: 4rem;
+        }
+        .about-faq-label {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.54rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--amber);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .about-faq-label::before {
+            content: '';
+            width: 24px;
+            height: 2px;
+            background: var(--amber);
+        }
+        .faq-list { display: flex; flex-direction: column; gap: 1px; }
+        .faq-item {
+            background: var(--navy2);
+            border: 1px solid transparent;
+            overflow: hidden;
+        }
+        .faq-item[open] { border-color: var(--rule); }
+        .faq-item summary {
+            padding: 1.1rem 1.5rem;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: #fff;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            user-select: none;
+        }
+        .faq-item summary::-webkit-details-marker { display: none; }
+        .faq-item summary::after {
+            content: '+';
+            color: var(--amber);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+            transition: transform 0.25s;
+        }
+        .faq-item[open] summary::after { transform: rotate(45deg); }
+        .faq-answer {
+            padding: 0 1.5rem 1.1rem;
+            font-size: 0.88rem;
+            color: var(--w60);
+            line-height: 1.7;
+        }
+        .faq-answer strong { color: #fff; }
+        .faq-answer a { color: var(--amber); text-decoration: none; }
+        .faq-answer a:hover { text-decoration: underline; }
+
+        /* CTA ROW */
+        .about-cta-row {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            display: inline-block;
+            background: var(--amber);
+            color: var(--navy);
+            font-weight: 800;
+            font-size: 0.82rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 0.95rem 2.25rem;
+            text-decoration: none;
+            transition: background 0.2s;
+        }
+        .btn-primary:hover { background: var(--amber2); }
+        .btn-ghost {
+            display: inline-block;
+            color: var(--amber);
+            font-family: 'DM Mono', monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(245,158,11,0.3);
+            padding-bottom: 2px;
+            transition: border-color 0.2s;
+        }
+        .btn-ghost:hover { border-color: var(--amber); }
+        .cta-note {
+            font-family: 'DM Mono', monospace;
+            font-size: 0.52rem;
+            letter-spacing: 0.1em;
+            color: var(--w30);
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -596,6 +958,7 @@
     </a>
     <div class="nav-right">
         <a href="#features" class="nav-link">Features</a>
+        <a href="/about" class="nav-link">About</a>
         <a href="#pricing" class="nav-link">Pricing</a>
         <a href="/blog/" class="nav-link">Blog</a>
         <a href="/app" class="nav-link">Log In</a>
@@ -775,6 +1138,55 @@
                 <div class="hiw-desc">Generate documents, follow step-by-step guides, or escalate to an expert — whatever you need to move forward without risk.</div>
             </div>
         </div>
+    </div>
+</section>
+
+
+<section class="about" id="about">
+
+    <!-- Schema microdata -->
+    <meta itemprop="name" content="Fitz HR">
+    <meta itemprop="applicationCategory" content="BusinessApplication">
+    <meta itemprop="url" content="https://fitzhr.com">
+    <meta itemprop="description" content="AI-powered HR compliance software for Australian hospitality venues. Covers the Hospitality Industry (General) Award MA000009, Fair Work Act 2009, document generation, and 24/7 HR professional support.">
+    <meta itemprop="sameAs" content="https://fitzhr.com">
+    <meta itemprop="audience" content="Australian hospitality business owners, restaurant operators, pub managers, cafe owners">
+    <meta itemprop="featureList" content="AI HR guidance, Hospitality Award interpretation, employment document generation, 24/7 HR professional support, Award rate calculator, Crisis Mode callback">
+
+    <div class="about-inner">
+
+        <div class="about-label">About Fitz HR</div>
+
+        <h2 class="about-heading">
+            AI-Powered HR Compliance Software for <em>Hospitality Businesses in Australia</em>
+        </h2>
+
+        <p class="about-seo-para">
+            <strong>Fitz HR is built exclusively for Australian hospitality</strong> &mdash; pubs, restaurants, cafes, and hotels. Instant guidance on the <strong>Hospitality Award MA000009</strong> and <strong>Fair Work Act 2009</strong>, compliant documents in minutes, and qualified HR professionals on call 24/7. Not adapted from a generic HR platform. Built from the ground up for venues like yours.
+        </p>
+
+        <p class="about-authority">
+            Built by hospitality operators and HR professionals with real-world experience in Australian Fair Work compliance &mdash; for venues that can&rsquo;t afford to get it wrong.
+        </p>
+
+        <div class="about-trust">
+            <div class="trust-label">Built on</div>
+            <div class="trust-divider"></div>
+            <div class="trust-items">
+                <div class="trust-item">Fair Work Act 2009 (Cth)</div>
+                <div class="trust-item">Hospitality Award MA000009</div>
+                <div class="trust-item">Restaurant Industry Award MA000119</div>
+                <div class="trust-item">National Employment Standards</div>
+                <div class="trust-item">Fair Work Commission decisions</div>
+            </div>
+        </div>
+
+        <div class="about-cta-row">
+            <a href="/app" class="btn-primary">Try Fitz HR Free &rarr;</a>
+            <a href="/blog/" class="btn-ghost">Browse Hospitality HR Guides &amp; Fair Work Resources</a>
+            <span class="cta-note">No credit card &bull; No sales call &bull; Instant access</span>
+        </div>
+
     </div>
 </section>
 
@@ -981,6 +1393,7 @@
             <div class="footer-col-title">Product</div>
             <ul class="footer-links">
                 <li><a href="#features">Features</a></li>
+                <li><a href="/about">About</a></li>
                 <li><a href="/pricing">Pricing</a></li>
                 <li><a href="/blog/">Blog</a></li>
                 <li><a href="/app">Log In</a></li>
