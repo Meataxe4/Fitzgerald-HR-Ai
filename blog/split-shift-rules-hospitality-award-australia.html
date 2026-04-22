@@ -31,15 +31,132 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- FIXED: BreadcrumbList with proper @type/@id on item objects -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://fitzhr.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://fitzhr.com/blog/"},{"@type":"ListItem","position":3,"name":"Split Shift Rules Under the Hospitality Award","item":"https://fitzhr.com/blog/split-shift-rules-hospitality-award-australia"}]}
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": { "@type": "Thing", "@id": "https://fitzhr.com/" }
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": { "@type": "Thing", "@id": "https://fitzhr.com/blog/" }
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Split Shift Rules Under the Hospitality Award",
+          "item": { "@type": "Thing", "@id": "https://fitzhr.com/blog/split-shift-rules-hospitality-award-australia" }
+        }
+      ]
+    }
     </script>
+
+    <!-- Article schema — unchanged -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"Article","headline":"Split Shift Rules Under the Hospitality Award in Australia (2026)","image":"https://fitzhr.com/assets/og-image.png","author":{"@type":"Organization","name":"Fitz HR","url":"https://fitzhr.com"},"publisher":{"@type":"Organization","name":"Fitz HR","url":"https://fitzhr.com","logo":{"@type":"ImageObject","url":"https://fitzhr.com/assets/favicon.svg"}},"datePublished":"2026-03-23","dateModified":"2026-04-07","description":"Complete guide to split shift rules under the Hospitality Award. Covers allowances, spread of hours, minimum engagement, and common mistakes venues make."}
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Split Shift Rules Under the Hospitality Award in Australia (2026)",
+      "image": "https://fitzhr.com/assets/og-image.png",
+      "author": {
+        "@type": "Organization",
+        "name": "Fitz HR",
+        "url": "https://fitzhr.com"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Fitz HR",
+        "url": "https://fitzhr.com",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://fitzhr.com/assets/favicon.svg"
+        }
+      },
+      "datePublished": "2026-03-23",
+      "dateModified": "2026-04-07",
+      "description": "Complete guide to split shift rules under the Hospitality Award. Covers allowances, spread of hours, minimum engagement, and common mistakes venues make."
+    }
     </script>
+
+    <!-- ADDED: Organization schema — required, was missing from this page -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is a split shift in hospitality in Australia?","acceptedAnswer":{"@type":"Answer","text":"A split shift is a single days work divided into two distinct periods with an unpaid break of more than one hour between them. The Hospitality Industry (General) Award MA000009 allows split shifts but requires a split shift allowance for full-time and part-time employees on every day a split shift is worked."}},{"@type":"Question","name":"Do I have to pay a split shift allowance under the Hospitality Award?","acceptedAnswer":{"@type":"Answer","text":"Yes. Full-time and part-time employees who work a split shift must be paid a split shift allowance under the Hospitality Industry (General) Award MA000009. It is paid on top of ordinary pay for each day a split shift is worked. Casual employees are not entitled to the allowance as their 25% casual loading compensates for irregular patterns."}},{"@type":"Question","name":"What is the maximum spread of hours for a split shift under the Hospitality Award?","acceptedAnswer":{"@type":"Answer","text":"For most hospitality employees the maximum spread of hours is 12 hours, measured from the start of the first period to the end of the last period including the unpaid gap. Work outside this spread may attract additional payment obligations under the Hospitality Industry (General) Award MA000009."}},{"@type":"Question","name":"Can I roster a casual employee on a split shift?","acceptedAnswer":{"@type":"Answer","text":"Yes, casual employees can work split shifts. They are not entitled to the split shift allowance as their 25% loading covers this. The minimum engagement requirement of 2 hours per shift period still applies to each separate period."}},{"@type":"Question","name":"What is the minimum engagement for each part of a split shift?","acceptedAnswer":{"@type":"Answer","text":"Under the Hospitality Industry (General) Award MA000009, the minimum engagement is 2 hours per shift period. Each part of a split shift must provide at least 2 hours of paid work regardless of the actual hours worked during that period."}}]}
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://fitzhr.com/#organization",
+      "name": "Fitz HR",
+      "url": "https://fitzhr.com",
+      "logo": "https://fitzhr.com/assets/favicon.svg",
+      "description": "AI-powered HR software built specifically for Australian hospitality venues including pubs, restaurants, cafes, bars, and hotels.",
+      "email": "support@fitzhr.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "AU",
+        "addressRegion": "NSW"
+      },
+      "areaServed": "AU"
+    }
     </script>
+
+    <!-- FAQPage schema — unchanged -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is a split shift in hospitality in Australia?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "A split shift is a single days work divided into two distinct periods with an unpaid break of more than one hour between them. The Hospitality Industry (General) Award MA000009 allows split shifts but requires a split shift allowance for full-time and part-time employees on every day a split shift is worked."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I have to pay a split shift allowance under the Hospitality Award?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Full-time and part-time employees who work a split shift must be paid a split shift allowance under the Hospitality Industry (General) Award MA000009. It is paid on top of ordinary pay for each day a split shift is worked. Casual employees are not entitled to the allowance as their 25% casual loading compensates for irregular patterns."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the maximum spread of hours for a split shift under the Hospitality Award?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "For most hospitality employees the maximum spread of hours is 12 hours, measured from the start of the first period to the end of the last period including the unpaid gap. Work outside this spread may attract additional payment obligations under the Hospitality Industry (General) Award MA000009."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I roster a casual employee on a split shift?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes, casual employees can work split shifts. They are not entitled to the split shift allowance as their 25% loading covers this. The minimum engagement requirement of 2 hours per shift period still applies to each separate period."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the minimum engagement for each part of a split shift?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Under the Hospitality Industry (General) Award MA000009, the minimum engagement is 2 hours per shift period. Each part of a split shift must provide at least 2 hours of paid work regardless of the actual hours worked during that period."
+          }
+        }
+      ]
+    }
+    </script>
+
     <style>
         :root{--navy:#0f172a;--navy2:#141f35;--amber:#f59e0b;--w60:rgba(255,255,255,0.6);--w30:rgba(255,255,255,0.3);--rule:rgba(245,158,11,0.18);--rw:rgba(255,255,255,0.08);}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -135,7 +252,6 @@
 
     <p style="font-size:0.82rem;color:rgba(255,255,255,0.4);margin-top:-0.5rem;margin-bottom:1.5rem;">Last reviewed against Fair Work Ombudsman guidance &mdash; April 2026</p>
 
-
     <div class="warning-box">
         <p><strong>Risk:</strong> Missing the split shift allowance creates back-pay liabilities across every affected employee, every week &mdash; often unnoticed for years. The allowance is small per occurrence. The compounded liability isn&rsquo;t.</p>
     </div>
@@ -179,7 +295,6 @@
             <tr><td>Casual</td><td>Not entitled</td><td>Covered by 25% casual loading</td></tr>
         </tbody>
     </table>
-
 
     <div style="background:rgba(245,158,11,0.08);border:1px solid var(--rule);border-radius:12px;padding:1.25rem;margin:2rem 0;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
         <p style="margin:0;font-size:0.92rem;color:#fff;">Not sure if your split shift rosters are compliant? Ask Fitz &mdash; get a clear answer based on the Hospitality Award.</p>
