@@ -28,15 +28,140 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- FIXED: BreadcrumbList with proper @type/@id on item objects -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://fitzhr.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://fitzhr.com/blog/"},{"@type":"ListItem","position":3,"name":"What Happens if I Underpay Staff in Australia?","item":"https://fitzhr.com/blog/what-happens-if-you-underpay-staff-australia"}]}
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": { "@type": "Thing", "@id": "https://fitzhr.com/" }
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": { "@type": "Thing", "@id": "https://fitzhr.com/blog/" }
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "What Happens if I Underpay Staff in Australia?",
+          "item": { "@type": "Thing", "@id": "https://fitzhr.com/blog/what-happens-if-you-underpay-staff-australia" }
+        }
+      ]
+    }
     </script>
+
+    <!-- Article schema — unchanged -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"Article","headline":"What Happens if I Underpay Staff in Australia?","image":"https://fitzhr.com/assets/og-image.png","author":{"@type":"Organization","name":"Fitz HR","url":"https://fitzhr.com"},"publisher":{"@type":"Organization","name":"Fitz HR","url":"https://fitzhr.com","logo":{"@type":"ImageObject","url":"https://fitzhr.com/assets/favicon.svg"}},"datePublished":"2026-04-07","dateModified":"2026-04-07","description":"The consequences of underpaying staff in Australia are serious — back-pay, fines, public naming, and criminal charges. Here's what hospitality venue owners need to know."}
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "What Happens if I Underpay Staff in Australia?",
+      "image": "https://fitzhr.com/assets/og-image.png",
+      "author": {
+        "@type": "Organization",
+        "name": "Fitz HR",
+        "url": "https://fitzhr.com"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Fitz HR",
+        "url": "https://fitzhr.com",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://fitzhr.com/assets/favicon.svg"
+        }
+      },
+      "datePublished": "2026-04-07",
+      "dateModified": "2026-04-07",
+      "description": "The consequences of underpaying staff in Australia are serious — back-pay, fines, public naming, and criminal charges. Here's what hospitality venue owners need to know."
+    }
     </script>
+
+    <!-- ADDED: Organization schema — was missing from this page -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What happens if I underpay staff in Australia?","acceptedAnswer":{"@type":"Answer","text":"The consequences of underpaying staff in Australia include back-payment of all underpaid wages plus interest, civil penalties of up to $93,900 per contravention for an individual or $469,500 for a company, public naming on the Fair Work Ombudsman's website, and — for deliberate or systematic underpayment — criminal charges under the Protecting Worker Entitlements Act with penalties of up to $7.8 million for companies."}},{"@type":"Question","name":"How does Fair Work find out about underpayment?","acceptedAnswer":{"@type":"Answer","text":"The Fair Work Ombudsman receives complaints from employees, conducts industry audits (hospitality is a priority sector), investigates anonymous tips, and proactively audits employers based on risk profiling. The FWO also receives referrals from the ATO and other agencies. You do not need an employee to formally complain for an audit to be triggered."}},{"@type":"Question","name":"What is the penalty for underpaying staff in Australia?","acceptedAnswer":{"@type":"Answer","text":"Civil penalties for underpayment are up to $93,900 per contravention for an individual and $469,500 per contravention for a company. Each employee and each pay period can constitute a separate contravention, meaning penalties accumulate quickly. For deliberate wage theft, criminal penalties under the Protecting Worker Entitlements Act can reach $7.8 million for a company."}},{"@type":"Question","name":"Is underpaying staff accidental still a problem?","acceptedAnswer":{"@type":"Answer","text":"Yes. The Fair Work Act does not require intent for civil penalties to apply — ignorance of Award obligations is not a defence. Accidental underpayment still requires full back-payment plus interest. However, deliberate or systematic underpayment attracts higher penalties and may result in criminal prosecution."}},{"@type":"Question","name":"What should I do if I realise I have been underpaying staff?","acceptedAnswer":{"@type":"Answer","text":"Act quickly and voluntarily. Calculate the total underpayment across all affected employees and all relevant periods. Contact each employee and repay the shortfall. Document the error and the correction. Self-reporting to the Fair Work Ombudsman can result in significantly reduced penalties compared to being caught in an audit. Get proper advice before you begin the process."}},{"@type":"Question","name":"What are the most common underpayment mistakes in hospitality?","acceptedAnswer":{"@type":"Answer","text":"The most common underpayment errors in Australian hospitality include: applying the wrong penalty rate (particularly for Sundays and public holidays), not paying the casual loading on top of base rates, missing evening and night shift loadings, not paying split shift allowances, misclassifying employees at the wrong Award level, and failing to pay annual leave loading."}}]}
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://fitzhr.com/#organization",
+      "name": "Fitz HR",
+      "url": "https://fitzhr.com",
+      "logo": "https://fitzhr.com/assets/favicon.svg",
+      "description": "AI-powered HR software built specifically for Australian hospitality venues including pubs, restaurants, cafes, bars, and hotels.",
+      "email": "support@fitzhr.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "AU",
+        "addressRegion": "NSW"
+      },
+      "areaServed": "AU"
+    }
     </script>
+
+    <!-- FAQPage schema — unchanged -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What happens if I underpay staff in Australia?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The consequences of underpaying staff in Australia include back-payment of all underpaid wages plus interest, civil penalties of up to $93,900 per contravention for an individual or $469,500 for a company, public naming on the Fair Work Ombudsman's website, and — for deliberate or systematic underpayment — criminal charges under the Protecting Worker Entitlements Act with penalties of up to $7.8 million for companies."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How does Fair Work find out about underpayment?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Fair Work Ombudsman receives complaints from employees, conducts industry audits (hospitality is a priority sector), investigates anonymous tips, and proactively audits employers based on risk profiling. The FWO also receives referrals from the ATO and other agencies. You do not need an employee to formally complain for an audit to be triggered."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the penalty for underpaying staff in Australia?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Civil penalties for underpayment are up to $93,900 per contravention for an individual and $469,500 per contravention for a company. Each employee and each pay period can constitute a separate contravention, meaning penalties accumulate quickly. For deliberate wage theft, criminal penalties under the Protecting Worker Entitlements Act can reach $7.8 million for a company."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Is underpaying staff accidental still a problem?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. The Fair Work Act does not require intent for civil penalties to apply — ignorance of Award obligations is not a defence. Accidental underpayment still requires full back-payment plus interest. However, deliberate or systematic underpayment attracts higher penalties and may result in criminal prosecution."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What should I do if I realise I have been underpaying staff?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Act quickly and voluntarily. Calculate the total underpayment across all affected employees and all relevant periods. Contact each employee and repay the shortfall. Document the error and the correction. Self-reporting to the Fair Work Ombudsman can result in significantly reduced penalties compared to being caught in an audit. Get proper advice before you begin the process."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What are the most common underpayment mistakes in hospitality?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The most common underpayment errors in Australian hospitality include: applying the wrong penalty rate (particularly for Sundays and public holidays), not paying the casual loading on top of base rates, missing evening and night shift loadings, not paying split shift allowances, misclassifying employees at the wrong Award level, and failing to pay annual leave loading."
+          }
+        }
+      ]
+    }
+    </script>
+
     <style>
         :root { --navy:#0f172a; --navy2:#141f35; --amber:#f59e0b; --w60:rgba(255,255,255,0.6); --w30:rgba(255,255,255,0.3); --rule:rgba(245,158,11,0.18); --rw:rgba(255,255,255,0.08); }
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
@@ -122,7 +247,6 @@
     <h2>The Scale of the Problem</h2>
     <p>Wage theft in Australian hospitality is not a minor compliance footnote. In recent years, high-profile underpayment cases — spanning major hotel chains, restaurant groups, and individual venues — have resulted in back-payments of millions of dollars, significant fines, and public naming on the <strong>Fair Work Ombudsman's</strong> website.</p>
     <p>The most important thing to understand: <strong>you do not need to be deliberately stealing wages for serious consequences to apply.</strong> The <strong>Fair Work Act 2009 (Cth)</strong> does not distinguish between "I meant to underpay" and "I didn't know." Both trigger the same back-payment obligation. Only the penalty differs. Accidental underpayment still triggers full back-payment — and can trigger civil penalties.</p>
-
     <p>We see this most often in venues that think they're "roughly right" on pay — and that's exactly where the risk sits. A rate that works on weekdays quietly fails on Sundays, public holidays, and evening shifts.</p>
 
     <div class="warning-box">
