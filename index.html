@@ -4,14 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <!-- ============================================================
-         SEO — preserved exactly from index.html (April 2026)
-         Visual design merged from new homepage concept
-         Mascot: /assets/fitz-neon-transparent.png (no base64)
-         /blog/ trailing slash throughout (GSC fix)
-         All named anchors: #features #how-it-works #pricing
-         ============================================================ -->
-
     <!-- Primary Meta Tags -->
     <title>Fitz HR | AI HR Software for Australian Hospitality</title>
     <meta name="title" content="Fitz HR | AI HR Software for Australian Hospitality">
@@ -52,11 +44,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700;1,900&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
 
-    <!-- Structured Data — preserved exactly from index.html -->
+    <!-- FIXED: SoftwareApplication — flat Offer, no AggregateOffer, @id added, sameAs removed from publisher -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "SoftwareApplication",
+        "@id": "https://fitzhr.com/#software",
         "name": "Fitz HR",
         "url": "https://fitzhr.com",
         "image": "https://fitzhr.com/assets/og-image.png",
@@ -64,17 +57,10 @@
         "applicationSubCategory": "Human Resources Software",
         "operatingSystem": "Web",
         "offers": {
-            "@type": "AggregateOffer",
-            "lowPrice": "0",
-            "highPrice": "899",
+            "@type": "Offer",
+            "price": "0",
             "priceCurrency": "AUD",
-            "offerCount": "4",
-            "offers": [
-                {"@type": "Offer","name": "Free","price": "0","priceCurrency": "AUD","url": "https://fitzhr.com/app"},
-                {"@type": "Offer","name": "Starter","price": "249","priceCurrency": "AUD","url": "https://fitzhr.com/pricing"},
-                {"@type": "Offer","name": "Pro","price": "449","priceCurrency": "AUD","url": "https://fitzhr.com/pricing"},
-                {"@type": "Offer","name": "Business","price": "899","priceCurrency": "AUD","url": "https://fitzhr.com/pricing"}
-            ]
+            "availability": "https://schema.org/InStock"
         },
         "description": "AI-powered HR software for Australian hospitality businesses. Provides instant HR guidance, award rate calculations, employment contract generation, warning letters, and Fair Work compliance tools specifically for pubs, restaurants, cafes, and hotels.",
         "publisher": {
@@ -82,7 +68,6 @@
             "name": "Fitz HR",
             "url": "https://fitzhr.com",
             "email": "support@fitzhr.com",
-            "sameAs": ["https://fitzhr.com"],
             "address": {"@type": "PostalAddress","addressCountry": "AU","addressRegion": "NSW"}
         },
         "featureList": [
@@ -106,52 +91,19 @@
             {"@type": "Question","name": "Can I generate employment contracts for restaurant staff online?","acceptedAnswer": {"@type": "Answer","text": "Yes. Fitz HR's Employment Contract Builder generates contracts tailored to the Hospitality Industry (General) Award in minutes. You answer a few questions about the role, and it produces a contract with the correct Award classification, pay rates, leave entitlements, and hospitality-specific clauses."}},
             {"@type": "Question","name": "Is there an AI HR assistant for Australian hospitality?","acceptedAnswer": {"@type": "Answer","text": "Yes. Fitz HR (fitzhr.com) is an AI-powered HR assistant built specifically for Australian hospitality businesses including pubs, restaurants, cafes, bars, and hotels. It provides instant guidance on award rates, Fair Work compliance, employment contracts, performance management, and more."}},
             {"@type": "Question","name": "Is Fitz HR free?","acceptedAnswer": {"@type": "Answer","text": "Fitz HR has a free tier that includes 20 AI chats per month, 1 free template download, and unlimited access to HR tools like the Award Rate Calculator. Paid plans start from $249/year ($21/month) for unlimited chat and full document access."}},
-            {
-                "@type": "Question",
-                "name": "What is Fitz HR?",
-                "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Fitz HR is an AI-powered HR compliance platform built exclusively for Australian hospitality venues including pubs, restaurants, cafes, bars, and hotels. It provides instant guidance on the Hospitality Industry (General) Award MA000009 and the Fair Work Act 2009 (Cth), generates compliant employment documents, and connects venue operators with qualified HR professionals for complex matters. It is not adapted from a generic HR platform \u2014 it was built specifically for the hospitality industry from the ground up."
-                }
-        },
-            {
-                "@type": "Question",
-                "name": "Does Fitz HR cover the Hospitality Industry (General) Award?",
-                "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Yes. Fitz HR is built specifically around the Hospitality Industry (General) Award MA000009 and the Restaurant Industry Award MA000119. Every AI response, document, and tool is aligned to these Awards \u2014 including classification levels, penalty rates (Saturday 150%, Sunday 175%, Public Holiday 250%), evening and night loadings, casual loading, and overtime provisions."
-                }
-        },
-            {
-                "@type": "Question",
-                "name": "Is Fitz HR a replacement for an HR consultant?",
-                "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "For most hospitality venues, yes. Fitz HR combines instant AI guidance for routine HR questions with access to qualified HR professionals for complex investigations, disputes, and crisis situations. The only area Fitz HR does not cover is formal legal representation at the Fair Work Commission, which requires an employment lawyer."
-                }
-        },
-            {
-                "@type": "Question",
-                "name": "How much does Fitz HR cost?",
-                "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Fitz HR starts at $0 per month forever, with paid plans from $249 per year (Starter) and $449 per year (Pro). All plans include unlimited AI HR guidance. There are no lock-in contracts, no termination fees, and a 14-day money-back guarantee. Full pricing is published at fitzhr.com/pricing \u2014 no sales call required."
-                }
-        },
-            {
-                "@type": "Question",
-                "name": "What HR documents can Fitz HR generate?",
-                "acceptedAnswer": {
-                        "@type": "Answer",
-                        "text": "Fitz HR generates compliant warning letters, performance improvement plans (PIPs), employment contracts, termination letters, formal probation review documents, position descriptions, onboarding documents, job advertisements, and training plans \u2014 all aligned to the Hospitality Award and Fair Work Act requirements."
-                }
-        }]
+            {"@type": "Question","name": "What is Fitz HR?","acceptedAnswer": {"@type": "Answer","text": "Fitz HR is an AI-powered HR compliance platform built exclusively for Australian hospitality venues including pubs, restaurants, cafes, bars, and hotels. It provides instant guidance on the Hospitality Industry (General) Award MA000009 and the Fair Work Act 2009 (Cth), generates compliant employment documents, and connects venue operators with qualified HR professionals for complex matters. It is not adapted from a generic HR platform \u2014 it was built specifically for the hospitality industry from the ground up."}},
+            {"@type": "Question","name": "Does Fitz HR cover the Hospitality Industry (General) Award?","acceptedAnswer": {"@type": "Answer","text": "Yes. Fitz HR is built specifically around the Hospitality Industry (General) Award MA000009 and the Restaurant Industry Award MA000119. Every AI response, document, and tool is aligned to these Awards \u2014 including classification levels, penalty rates (Saturday 150%, Sunday 175%, Public Holiday 250%), evening and night loadings, casual loading, and overtime provisions."}},
+            {"@type": "Question","name": "Is Fitz HR a replacement for an HR consultant?","acceptedAnswer": {"@type": "Answer","text": "For most hospitality venues, yes. Fitz HR combines instant AI guidance for routine HR questions with access to qualified HR professionals for complex investigations, disputes, and crisis situations. The only area Fitz HR does not cover is formal legal representation at the Fair Work Commission, which requires an employment lawyer."}},
+            {"@type": "Question","name": "How much does Fitz HR cost?","acceptedAnswer": {"@type": "Answer","text": "Fitz HR starts at $0 per month forever, with paid plans from $249 per year (Starter) and $449 per year (Pro). All plans include unlimited AI HR guidance. There are no lock-in contracts, no termination fees, and a 14-day money-back guarantee. Full pricing is published at fitzhr.com/pricing \u2014 no sales call required."}},
+            {"@type": "Question","name": "What HR documents can Fitz HR generate?","acceptedAnswer": {"@type": "Answer","text": "Fitz HR generates compliant warning letters, performance improvement plans (PIPs), employment contracts, termination letters, formal probation review documents, position descriptions, onboarding documents, job advertisements, and training plans \u2014 all aligned to the Hospitality Award and Fair Work Act requirements."}}
+        ]
     }
     </script>
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "Organization",
+        "@id": "https://fitzhr.com/#organization",
         "name": "Fitz HR",
         "url": "https://fitzhr.com",
         "logo": "https://fitzhr.com/assets/favicon.svg",
@@ -420,7 +372,6 @@
         .proof-line { width: 28px; height: 2px; background: var(--amber); flex-shrink: 0; }
         .proof-name { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--w60); }
 
-
         /* ---- HOW IT WORKS ---- */
         .hiw-h2 { font-family: 'Playfair Display', serif; font-weight: 700; font-size: 2.5rem; line-height: 1.2; margin-bottom: 0.5rem; opacity: 0; transform: translateY(20px); transition: opacity 0.7s, transform 0.7s cubic-bezier(0.16,1,0.3,1); }
         .hiw-h2.in { opacity: 1; transform: translateY(0); }
@@ -542,10 +493,33 @@
         .cta-note { font-family: 'DM Mono', monospace; font-size: 0.55rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--w30); margin-top: 1rem; opacity: 0; transition: opacity 0.7s 0.36s; }
         .cta-note.in { opacity: 1; }
 
+        /* ---- ABOUT SECTION ---- */
+        .about { background: var(--navy); padding: 7rem 1.5rem; position: relative; overflow: hidden; border-top: 1px solid var(--rw); }
+        .about::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(245,158,11,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(245,158,11,0.03) 1px, transparent 1px); background-size: 64px 64px; pointer-events: none; }
+        .about::after { content: ''; position: absolute; top: -200px; right: -200px; width: 600px; height: 600px; background: radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 70%); pointer-events: none; }
+        .about-inner { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+        .about-label { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber); display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+        .about-label::before { content: ''; width: 32px; height: 2px; background: var(--amber); display: inline-block; }
+        .about-heading { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(2.2rem, 4.5vw, 3.2rem); line-height: 1.1; letter-spacing: -0.02em; color: #fff; margin-bottom: 1.5rem; max-width: 760px; }
+        .about-heading em { font-style: italic; color: var(--amber); }
+        .about-seo-para { font-size: 1rem; line-height: 1.75; color: var(--w60); max-width: 680px; margin-bottom: 1.25rem; border-left: 3px solid var(--amber); padding-left: 1.25rem; }
+        .about-seo-para strong { color: #fff; }
+        .about-authority { font-family: 'DM Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; color: var(--w30); text-transform: uppercase; margin-bottom: 2rem; padding-left: 1.25rem; border-left: 1px solid rgba(245,158,11,0.2); }
+        .about-trust { background: var(--navy2); border: 1px solid var(--rule); padding: 1.75rem 2.5rem; display: flex; align-items: center; gap: 2.5rem; flex-wrap: wrap; margin-bottom: 2rem; }
+        .trust-label { font-family: 'DM Mono', monospace; font-size: 0.5rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--w30); white-space: nowrap; flex-shrink: 0; }
+        .trust-divider { width: 1px; height: 32px; background: var(--rw); flex-shrink: 0; }
+        .trust-items { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
+        .trust-items .trust-item { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; color: var(--w60); opacity: 1; transform: none; }
+        .trust-items .trust-item::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #22c55e; flex-shrink: 0; }
+        .about-cta-row { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+        .about-btn-primary { display: inline-block; background: var(--amber); color: var(--navy); font-weight: 800; font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.95rem 2.25rem; text-decoration: none; transition: background 0.2s; }
+        .about-btn-primary:hover { background: var(--amb2); }
+        .about-btn-ghost { display: inline-block; color: var(--amber); font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none; border-bottom: 1px solid rgba(245,158,11,0.3); padding-bottom: 2px; transition: border-color 0.2s; }
+        .about-btn-ghost:hover { border-color: var(--amber); }
+        .about-cta-note { font-family: 'DM Mono', monospace; font-size: 0.52rem; letter-spacing: 0.1em; color: var(--w30); text-transform: uppercase; }
+
         /* ---- FOOTER ---- */
         .site-footer { position: relative; z-index: 10; background: var(--navy2); border-top: 1px solid var(--rule); padding: 3rem 1.5rem 1.5rem; overflow: hidden; }
-
-
         .footer-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem 1.5rem; margin-bottom: 2rem; }
         .footer-brand { grid-column: 1 / -1; }
         .footer-brand-desc { font-size: 1rem; color: var(--w60); margin-top: 0.5rem; line-height: 1.5; }
@@ -562,22 +536,15 @@
         .ru.in { opacity:1; transform:translateY(0); }
 
         /* ============================================================
-           MOBILE — max-width 768px
-           Desktop styles are completely untouched above this point
+           MOBILE
            ============================================================ */
         @media (max-width: 768px) {
-
-            /* NAV — hide all links, keep logo + CTA only */
             .nav-link { display: none; }
             nav { padding: 0.85rem 1rem; }
             .nav-logo { font-size: 1rem; gap: 0.35rem; }
             .nav-fitz { width: 28px; height: 28px; }
             .nav-cta { font-size: 0.68rem; padding: 0.45rem 0.85rem; letter-spacing: 0.06em; }
-
-            /* TICKER */
             .ticker { padding: 0.4rem 1rem; margin-top: 48px; }
-
-            /* HERO — reduce headline, hook, hide mascot */
             .hero { padding: 3rem 1.25rem 2.5rem; min-height: auto; }
             .hero-inner { padding-left: 0; }
             .hero-h1 { font-size: clamp(2.6rem, 11vw, 3.5rem); }
@@ -589,358 +556,24 @@
             .hero-fitz-wrap { display: none; }
             .vrule { display: none; }
             .scroll-hint { display: none; }
-
-            /* SECTIONS */
             .section { padding: 2.5rem 1.25rem; }
             .pain-h2, .feat-h2, .hiw-h2, .pricing-h2, .faq-h2 { font-size: 1.75rem; }
             .cta-h2 { font-size: 2rem; }
-
-            /* STATS */
             .stats-band { padding: 2rem 1.25rem; }
             .stats-grid { grid-template-columns: 1fr 1fr; gap: 1.25rem; }
             .stat-num { font-size: 2rem; }
-
-            /* PRICING */
             .pricing-section { padding: 2.5rem 1.25rem; }
             .pricing-grid { grid-template-columns: 1fr 1fr; gap: 0.6rem; }
             .p-num { font-size: 1.8rem; }
             .credits-grid { grid-template-columns: 1fr; gap: 1rem; }
-
-            /* DEMO */
             .demo-section { padding: 2.5rem 1.25rem; }
             .demo-q-text { font-size: 1rem; }
-
-            /* CTA */
             .cta-section { padding: 3rem 1.25rem; }
-
-            /* FOOTER */
             .site-footer { padding: 2.5rem 1.25rem 1.25rem; }
             .footer-grid { grid-template-columns: 1fr 1fr; }
             .footer-brand { grid-column: 1 / -1; }
-        }
-
-
-
-        /* ============================================================
-           ABOUT SECTION
-           ============================================================ */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        
-
-        .about {
-            background: var(--navy);
-            padding: 7rem 1.5rem;
-            position: relative;
-            overflow: hidden;
-        }
-        .about::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background-image:
-                linear-gradient(rgba(245,158,11,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(245,158,11,0.03) 1px, transparent 1px);
-            background-size: 64px 64px;
-            pointer-events: none;
-        }
-        .about::after {
-            content: '';
-            position: absolute;
-            top: -200px;
-            right: -200px;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 70%);
-            pointer-events: none;
-        }
-        .about-inner {
-            max-width: 1100px;
-            margin: 0 auto;
-            position: relative;
-            z-index: 1;
-        }
-        .about-label {
-            font-family: 'DM Mono', monospace;
-            font-size: 0.56rem;
-            letter-spacing: 0.22em;
-            text-transform: uppercase;
-            color: var(--amber);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1.5rem;
-        }
-        .about-label::before {
-            content: '';
-            width: 32px;
-            height: 2px;
-            background: var(--amber);
-            display: inline-block;
-        }
-        .about-heading {
-            font-family: 'Playfair Display', serif;
-            font-weight: 900;
-            font-size: clamp(2.2rem, 4.5vw, 3.2rem);
-            line-height: 1.1;
-            letter-spacing: -0.02em;
-            color: #fff;
-            margin-bottom: 1.5rem;
-            max-width: 760px;
-        }
-        .about-heading em { font-style: italic; color: var(--amber); }
-
-        /* SEO keyword paragraph — visible, indexable */
-        .about-seo-para {
-            font-size: 1rem;
-            line-height: 1.75;
-            color: var(--w60);
-            max-width: 680px;
-            margin-bottom: 1.25rem;
-            border-left: 3px solid var(--amber);
-            padding-left: 1.25rem;
-        }
-        .about-seo-para strong { color: #fff; }
-        .about-seo-para a { color: var(--amber); text-decoration: none; }
-        .about-seo-para a:hover { text-decoration: underline; }
-
-        /* Founder/authority signal */
-        .about-authority {
-            font-family: 'DM Mono', monospace;
-            font-size: 0.6rem;
-            letter-spacing: 0.1em;
-            color: var(--w30);
-            text-transform: uppercase;
-            margin-bottom: 4rem;
-            padding-left: 1.25rem;
-            border-left: 1px solid rgba(245,158,11,0.2);
-        }
-
-        /* PILLAR GRID */
-        .about-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1px;
-            margin-bottom: 1px;
-        }
-        @media (max-width: 768px) { .about-grid { grid-template-columns: 1fr; } }
-
-        .pillar {
-            background: var(--navy2);
-            padding: 2.25rem 2rem;
-            position: relative;
-            transition: background 0.25s;
-        }
-        .pillar:hover { background: var(--navy3); }
-        .pillar-num {
-            font-family: 'DM Mono', monospace;
-            font-size: 0.5rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--amber);
-            margin-bottom: 1rem;
-            opacity: 0.7;
-        }
-        .pillar h3 {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #fff;
-            line-height: 1.25;
-            margin-bottom: 0.75rem;
-        }
-        .pillar p { font-size: 0.88rem; color: var(--w60); line-height: 1.65; }
-        .pillar p strong { color: #fff; }
-        .pillar-bar {
-            position: absolute;
-            left: 0; top: 0; bottom: 0;
-            width: 3px;
-            background: var(--amber);
-            opacity: 0;
-            transition: opacity 0.25s;
-        }
-        .pillar:hover .pillar-bar { opacity: 1; }
-
-        /* STATS */
-        .about-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1px;
-            margin-top: 1px;
-            margin-bottom: 4rem;
-        }
-        @media (max-width: 640px) { .about-stats { grid-template-columns: repeat(2, 1fr); } }
-
-        .stat {
-            background: var(--navy2);
-            padding: 2rem 1.5rem;
-            text-align: center;
-        }
-        .stat-value {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.4rem;
-            font-weight: 900;
-            color: var(--amber);
-            line-height: 1;
-            margin-bottom: 0.4rem;
-            letter-spacing: -0.02em;
-        }
-        .stat-label {
-            font-family: 'DM Mono', monospace;
-            font-size: 0.5rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--w30);
-            line-height: 1.55;
-        }
-
-        /* ENTITY BLOCK */
-        .about-entity {
-            background: var(--navy2);
-            border-left: 3px solid rgba(245,158,11,0.3);
-            padding: 1.5rem 2rem;
-            margin-bottom: 4rem;
-            font-size: 0.88rem;
-            color: var(--w60);
-            line-height: 1.7;
-        }
-        .about-entity strong { color: #fff; }
-
-        /* TRUST STRIP */
-        .about-trust {
-            background: var(--navy2);
-            border: 1px solid var(--rule);
-            padding: 1.75rem 2.5rem;
-            display: flex;
-            align-items: center;
-            gap: 2.5rem;
-            flex-wrap: wrap;
-            margin-bottom: 4rem;
-        }
-        .trust-label {
-            font-family: 'DM Mono', monospace;
-            font-size: 0.5rem;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: var(--w30);
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .trust-divider { width: 1px; height: 32px; background: var(--w10); flex-shrink: 0; }
-        .trust-items { display: flex; align-items: center; gap: 2rem; flex-wrap: wrap; }
-        .trust-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.8rem;
-            color: var(--w60);
-        }
-        .trust-item::before {
-            content: '';
-            width: 5px; height: 5px;
-            border-radius: 50%;
-            background: var(--green);
-            flex-shrink: 0;
-        }
-
-        /* FAQ SECTION — visible, indexable, schema-powered */
-        .about-faq {
-            margin-bottom: 4rem;
-        }
-        .about-faq-label {
-            font-family: 'DM Mono', monospace;
-            font-size: 0.54rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--amber);
-            margin-bottom: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        .about-faq-label::before {
-            content: '';
-            width: 24px;
-            height: 2px;
-            background: var(--amber);
-        }
-        .faq-list { display: flex; flex-direction: column; gap: 1px; }
-        .faq-item {
-            background: var(--navy2);
-            border: 1px solid transparent;
-            overflow: hidden;
-        }
-        .faq-item[open] { border-color: var(--rule); }
-        .faq-item summary {
-            padding: 1.1rem 1.5rem;
-            cursor: pointer;
-            font-weight: 700;
-            font-size: 0.95rem;
-            color: #fff;
-            list-style: none;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 1rem;
-            user-select: none;
-        }
-        .faq-item summary::-webkit-details-marker { display: none; }
-        .faq-item summary::after {
-            content: '+';
-            color: var(--amber);
-            font-size: 1.2rem;
-            flex-shrink: 0;
-            transition: transform 0.25s;
-        }
-        .faq-item[open] summary::after { transform: rotate(45deg); }
-        .faq-answer {
-            padding: 0 1.5rem 1.1rem;
-            font-size: 0.88rem;
-            color: var(--w60);
-            line-height: 1.7;
-        }
-        .faq-answer strong { color: #fff; }
-        .faq-answer a { color: var(--amber); text-decoration: none; }
-        .faq-answer a:hover { text-decoration: underline; }
-
-        /* CTA ROW */
-        .about-cta-row {
-            display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            flex-wrap: wrap;
-        }
-        .btn-primary {
-            display: inline-block;
-            background: var(--amber);
-            color: var(--navy);
-            font-weight: 800;
-            font-size: 0.82rem;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
-            padding: 0.95rem 2.25rem;
-            text-decoration: none;
-            transition: background 0.2s;
-        }
-        .btn-primary:hover { background: var(--amber2); }
-        .btn-ghost {
-            display: inline-block;
-            color: var(--amber);
-            font-family: 'DM Mono', monospace;
-            font-size: 0.62rem;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            text-decoration: none;
-            border-bottom: 1px solid rgba(245,158,11,0.3);
-            padding-bottom: 2px;
-            transition: border-color 0.2s;
-        }
-        .btn-ghost:hover { border-color: var(--amber); }
-        .cta-note {
-            font-family: 'DM Mono', monospace;
-            font-size: 0.52rem;
-            letter-spacing: 0.1em;
-            color: var(--w30);
-            text-transform: uppercase;
+            .about { padding: 4rem 1.25rem; }
+            .about-trust { padding: 1.25rem; gap: 1rem; }
         }
     </style>
 </head>
@@ -948,9 +581,6 @@
 <div class="grain"></div>
 <div id="spb"></div>
 
-<!-- ============================================================
-     NAVIGATION
-     ============================================================ -->
 <nav id="nav">
     <a href="/" class="nav-logo">
         <span class="nav-fitz"></span>
@@ -966,9 +596,6 @@
     </div>
 </nav>
 
-<!-- ============================================================
-     TICKER
-     ============================================================ -->
 <div class="ticker">
     <span class="ticker-pill">Live</span>
     <div class="ticker-scroll">
@@ -993,9 +620,6 @@
     </div>
 </div>
 
-<!-- ============================================================
-     HERO
-     ============================================================ -->
 <section class="hero" id="hero">
     <div class="orb orb-1" id="orb1"></div>
     <div class="orb orb-2" id="orb2"></div>
@@ -1018,7 +642,6 @@
             <a href="/app" class="btn-primary"><span>Start Free — <span class="btn-sub">No Card Required</span></span><span class="arr">→</span></a>
             <a href="#pricing" class="btn-ghost">View Pricing ↓</a>
         </div>
-
     </div>
     <div class="hero-fitz-wrap" id="fitzHeroWrap">
         <div class="fitz-bot fitz-hero"></div>
@@ -1026,9 +649,6 @@
     <div class="scroll-hint"><span class="sh-text">Scroll</span><div class="sh-line"></div></div>
 </section>
 
-<!-- ============================================================
-     PAIN POINTS
-     ============================================================ -->
 <section class="section">
     <div class="section-label"><span class="sl-text">The Problem</span><div class="sl-line"></div></div>
     <h2 class="pain-h2 ru">Running a venue is hard enough <em>without</em> HR keeping you up at night.</h2>
@@ -1051,9 +671,6 @@
     </div>
 </section>
 
-<!-- ============================================================
-     CRISIS MODE
-     ============================================================ -->
 <section class="crisis-section">
     <div class="section-label"><span class="sl-text">Crisis Mode</span><div class="sl-line"></div></div>
     <h2 class="crisis-h2">It's 10pm. Your chef just walked out.<br><em>Now what?</em></h2>
@@ -1068,9 +685,6 @@
     </div>
 </section>
 
-<!-- ============================================================
-     SOCIAL PROOF
-     ============================================================ -->
 <section class="proof-section">
     <div class="section-label"><span class="sl-text">Real Venues. Real Situations.</span><div class="sl-line"></div></div>
     <p class="proof-quote">&ldquo;We had a kitchen hand walk out mid-Saturday service after an altercation. I was convinced we were going to get a claim lodged against us. Fitz walked me through exactly what to say, what to document, and what to avoid. We handled it correctly. <em>No claim, no drama.</em>&rdquo;</p>
@@ -1078,12 +692,8 @@
         <div class="proof-line"></div>
         <span class="proof-name">Venue Owner &middot; Inner West Sydney</span>
     </div>
-
 </section>
 
-<!-- ============================================================
-     STATS BAND
-     ============================================================ -->
 <div class="stats-band">
     <div class="stats-eyebrow ru">By the numbers</div>
     <div class="stats-grid">
@@ -1094,9 +704,6 @@
     </div>
 </div>
 
-<!-- ============================================================
-     FEATURES
-     ============================================================ -->
 <section class="section" id="features">
     <div class="section-label"><span class="sl-text">What Fitz Does</span><div class="sl-line"></div></div>
     <h2 class="feat-h2">Everything your venue's HR needs. <em>Nothing it doesn't.</em></h2>
@@ -1109,9 +716,6 @@
     </div>
 </section>
 
-<!-- ============================================================
-     HOW IT WORKS
-     ============================================================ -->
 <section class="section" id="how-it-works">
     <div class="section-label"><span class="sl-text">How It Works</span><div class="sl-line"></div></div>
     <h2 class="hiw-h2">Get started in <em style="font-style:italic;color:var(--amber)">60 seconds.</em></h2>
@@ -1141,34 +745,19 @@
     </div>
 </section>
 
-
+<!-- FIXED: section has no itemscope microdata — LD+JSON in head is single source of truth -->
 <section class="about" id="about">
-
-    <!-- Schema microdata -->
-    <meta itemprop="name" content="Fitz HR">
-    <meta itemprop="applicationCategory" content="BusinessApplication">
-    <meta itemprop="url" content="https://fitzhr.com">
-    <meta itemprop="description" content="AI-powered HR compliance software for Australian hospitality venues. Covers the Hospitality Industry (General) Award MA000009, Fair Work Act 2009, document generation, and 24/7 HR professional support.">
-    <meta itemprop="sameAs" content="https://fitzhr.com">
-    <meta itemprop="audience" content="Australian hospitality business owners, restaurant operators, pub managers, cafe owners">
-    <meta itemprop="featureList" content="AI HR guidance, Hospitality Award interpretation, employment document generation, 24/7 HR professional support, Award rate calculator, Crisis Mode callback">
-
     <div class="about-inner">
-
         <div class="about-label">About Fitz HR</div>
-
         <h2 class="about-heading">
             AI-Powered HR Compliance Software for <em>Hospitality Businesses in Australia</em>
         </h2>
-
         <p class="about-seo-para">
             <strong>Fitz HR is built exclusively for Australian hospitality</strong> &mdash; pubs, restaurants, cafes, and hotels. Instant guidance on the <strong>Hospitality Award MA000009</strong> and <strong>Fair Work Act 2009</strong>, compliant documents in minutes, and qualified HR professionals on call 24/7. Not adapted from a generic HR platform. Built from the ground up for venues like yours.
         </p>
-
         <p class="about-authority">
             Built by hospitality operators and HR professionals with real-world experience in Australian Fair Work compliance &mdash; for venues that can&rsquo;t afford to get it wrong.
         </p>
-
         <div class="about-trust">
             <div class="trust-label">Built on</div>
             <div class="trust-divider"></div>
@@ -1180,19 +769,14 @@
                 <div class="trust-item">Fair Work Commission decisions</div>
             </div>
         </div>
-
         <div class="about-cta-row">
-            <a href="/app" class="btn-primary">Try Fitz HR Free &rarr;</a>
-            <a href="/blog/" class="btn-ghost">Browse Hospitality HR Guides &amp; Fair Work Resources</a>
-            <span class="cta-note">No credit card &bull; No sales call &bull; Instant access</span>
+            <a href="/app" class="about-btn-primary">Try Fitz HR Free &rarr;</a>
+            <a href="/blog/" class="about-btn-ghost">Browse Hospitality HR Guides &amp; Fair Work Resources</a>
+            <span class="about-cta-note">No credit card &bull; No sales call &bull; Instant access</span>
         </div>
-
     </div>
 </section>
 
-<!-- ============================================================
-     LIVE DEMO
-     ============================================================ -->
 <section class="demo-section">
     <div class="section-label"><span class="sl-text">Fitz in Action</span><div class="sl-line"></div></div>
     <div class="demo-card" id="demoCard">
@@ -1215,14 +799,10 @@
     </div>
 </section>
 
-<!-- ============================================================
-     PRICING
-     ============================================================ -->
 <section class="pricing-section" id="pricing">
     <div class="section-label"><span class="sl-text">Pricing</span><div class="sl-line"></div></div>
     <h2 class="pricing-h2">Simple, <em>transparent</em> pricing.</h2>
     <p class="pricing-intro">Start free, upgrade when you need more. All plans include unlimited HR tools and the Award Rate Calculator.</p>
-
     <div class="billing-toggle">
         <div class="billing-inner">
             <button id="monthlyBtn" onclick="toggleBilling('monthly')" class="toggle-btn">Monthly</button>
@@ -1230,9 +810,7 @@
             <span class="save-badge">Save 20%+</span>
         </div>
     </div>
-
     <div class="pricing-grid">
-        <!-- FREE -->
         <div class="p-card">
             <div class="p-name">Free</div>
             <div class="p-desc">Try Fitz with no commitment</div>
@@ -1247,8 +825,6 @@
             </ul>
             <a href="/app" class="p-btn outline">Start Free</a>
         </div>
-
-        <!-- STARTER -->
         <div class="p-card">
             <div class="p-name">Starter</div>
             <div class="p-desc">For small venues with occasional HR needs</div>
@@ -1263,8 +839,6 @@
             </ul>
             <a href="/pricing" class="p-btn outline">Learn More</a>
         </div>
-
-        <!-- PRO — FEATURED -->
         <div class="p-card featured">
             <div class="p-badge">Most Popular</div>
             <div class="p-name">Pro</div>
@@ -1280,8 +854,6 @@
             </ul>
             <a href="/app" class="p-btn solid">Get Started</a>
         </div>
-
-        <!-- BUSINESS -->
         <div class="p-card">
             <div class="p-name">Business</div>
             <div class="p-desc">For multi-venue or high-turnover</div>
@@ -1297,35 +869,17 @@
             <a href="/pricing" class="p-btn outline">Learn More</a>
         </div>
     </div>
-
-    <!-- Credits explainer -->
     <div class="credits-box" id="creditsBox">
         <div class="credits-title">💡 What can you do with credits?</div>
         <div class="credits-grid">
-            <div>
-                <span class="cr-icon">📄</span>
-                <div class="cr-name">Generate Documents</div>
-                <div class="cr-desc">Contracts, position descriptions, onboarding docs, policies</div>
-            </div>
-            <div>
-                <span class="cr-icon">⚠️</span>
-                <div class="cr-name">Expert-Reviewed Docs</div>
-                <div class="cr-desc">Warnings, PIPs, terminations reviewed by qualified HR consultants</div>
-            </div>
-            <div>
-                <span class="cr-icon">👤</span>
-                <div class="cr-name">HR Consultations</div>
-                <div class="cr-desc">Book time with HR professionals for any workplace matter</div>
-            </div>
+            <div><span class="cr-icon">📄</span><div class="cr-name">Generate Documents</div><div class="cr-desc">Contracts, position descriptions, onboarding docs, policies</div></div>
+            <div><span class="cr-icon">⚠️</span><div class="cr-name">Expert-Reviewed Docs</div><div class="cr-desc">Warnings, PIPs, terminations reviewed by qualified HR consultants</div></div>
+            <div><span class="cr-icon">👤</span><div class="cr-name">HR Consultations</div><div class="cr-desc">Book time with HR professionals for any workplace matter</div></div>
         </div>
     </div>
-
     <div class="pricing-guarantee">All paid plans include a 14-day money-back guarantee · Cancel anytime</div>
 </section>
 
-<!-- ============================================================
-     TRUST BADGES
-     ============================================================ -->
 <div class="trust-section">
     <div class="trust-badges">
         <div class="trust-item"><span class="trust-icon">🏆</span> Fair Work Compliant</div>
@@ -1335,9 +889,6 @@
     </div>
 </div>
 
-<!-- ============================================================
-     FAQ
-     ============================================================ -->
 <section class="faq-section">
     <div class="section-label"><span class="sl-text">FAQ</span><div class="sl-line"></div></div>
     <h2 class="faq-h2">Frequently asked questions.</h2>
@@ -1365,9 +916,6 @@
     </div>
 </section>
 
-<!-- ============================================================
-     CTA
-     ============================================================ -->
 <section class="cta-section">
     <h2 class="cta-h2 ru">Your venue deserves <em>better</em> than guesswork.</h2>
     <p class="cta-sub ru">Join hospitality venues across Australia using Fitz for their HR. Start free — no credit card, no lock-in.</p>
@@ -1378,9 +926,6 @@
     <div class="cta-note ru">14-day money-back guarantee on all paid plans · Cancel anytime</div>
 </section>
 
-<!-- ============================================================
-     FOOTER
-     ============================================================ -->
 <footer class="site-footer">
     <div class="footer-grid">
         <div class="footer-brand">
@@ -1426,13 +971,10 @@
         <div class="footer-copy">© 2026 Fitz HR Pty Ltd (ABN 87 693 882 709). All rights reserved.</div>
         <div class="footer-copy">Fair Work Act 2009 · Hospitality Industry (General) Award MA000009 · Built in Australia</div>
     </div>
-
 </footer>
 
-<!-- ============================================================
-     SCRIPTS
-     ============================================================ -->
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+<script>
 /* ---- SCROLL PROGRESS ---- */
 window.addEventListener('scroll', () => {
     document.getElementById('spb').style.width = (window.scrollY / (document.body.scrollHeight - window.innerHeight) * 100) + '%';
@@ -1456,7 +998,7 @@ setTimeout(() => {
         .forEach(id => document.getElementById(id).classList.add('in'));
 }, 80);
 
-/* ---- INTERSECTION OBSERVER (reveal on scroll) ---- */
+/* ---- INTERSECTION OBSERVER ---- */
 const obs = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
 }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
@@ -1571,10 +1113,10 @@ function toggleBilling(type) {
     const p = pricing[type];
     document.getElementById('monthlyBtn').classList.toggle('active', type === 'monthly');
     document.getElementById('yearlyBtn').classList.toggle('active', type === 'yearly');
-    [['starter','Starter'],['pro','Pro'],['business','Business']].forEach(([k, K]) => {
+    [['starter'],['pro'],['business']].forEach(([k]) => {
         document.getElementById(k + 'Price').textContent     = p[k].price;
         document.getElementById(k + 'Period').textContent    = p[k].period;
-        document.getElementById(k + 'Mo').textContent          = p[k].mo;
+        document.getElementById(k + 'Mo').textContent        = p[k].mo;
         document.getElementById(k + 'Docs').textContent      = p[k].docs;
         document.getElementById(k + 'DocsPeriod').textContent = p[k].docsPeriod;
     });
@@ -1592,12 +1134,10 @@ function toggleBilling(type) {
     let current = 0;
     let spinning = false;
 
-    // Set initial width to first word
     function initWidth() {
         wrap.style.width = measureWord(titles[current]) + 'px';
     }
 
-    // Measure a word's true width using the hook element's actual computed font size
     function measureWord(word) {
         const hookEl = document.getElementById('heroHook');
         const computed = hookEl ? window.getComputedStyle(hookEl).font : '"Playfair Display",serif';
@@ -1610,26 +1150,18 @@ function toggleBilling(type) {
         return w;
     }
 
-    // Roll one word in (slides current up, new word comes from below)
     function rollOne(word, duration) {
         return new Promise(resolve => {
-            // Measure BEFORE appending to avoid clip contamination
             const nextW = measureWord(word);
             const currW = wrap.offsetWidth;
-
-            // Expand container to fit wider word FIRST, force reflow
             wrap.style.width = Math.max(currW, nextW) + 'px';
             void wrap.offsetWidth;
-
-            // Now append and roll
             const nextEl = document.createElement('span');
             nextEl.className = 'slot-word';
             nextEl.textContent = word;
             drum.appendChild(nextEl);
-
             drum.style.transition = `transform ${duration}ms cubic-bezier(0.4,0,0.15,1)`;
             drum.style.transform  = 'translateY(-1.25em)';
-
             setTimeout(() => {
                 drum.style.transition = 'none';
                 drum.style.transform  = 'translateY(0)';
@@ -1643,34 +1175,26 @@ function toggleBilling(type) {
     async function spin() {
         if (spinning) return;
         spinning = true;
-
         let target = current;
         while (target === current) target = Math.floor(Math.random() * titles.length);
-
-        // Sequence: fast random rolls + controlled slowdown into target
         const fastCount = 5 + Math.floor(Math.random() * 3);
         const sequence = [];
         for (let i = 0; i < fastCount; i++) {
             sequence.push(titles[Math.floor(Math.random() * titles.length)]);
         }
-        // Last 3 are the slowdown: two random then target
         sequence.push(titles[Math.floor(Math.random() * titles.length)]);
         sequence.push(titles[Math.floor(Math.random() * titles.length)]);
         sequence.push(titles[target]);
-
-        // Durations: fast → slow → landing
         const durations = sequence.map((_, i) => {
             const fromEnd = sequence.length - 1 - i;
-            if (fromEnd === 0) return 480;  // landing — slow and satisfying
+            if (fromEnd === 0) return 480;
             if (fromEnd === 1) return 280;
             if (fromEnd === 2) return 170;
-            return 95;                       // fast spin
+            return 95;
         });
-
         for (let i = 0; i < sequence.length; i++) {
             await rollOne(sequence[i], durations[i]);
         }
-
         current = target;
         spinning = false;
     }
