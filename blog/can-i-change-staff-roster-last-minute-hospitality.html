@@ -28,15 +28,140 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- FIXED: BreadcrumbList with proper @type/@id on item objects -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://fitzhr.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://fitzhr.com/blog/"},{"@type":"ListItem","position":3,"name":"Can I Change a Roster Last Minute in Australia?","item":"https://fitzhr.com/blog/can-i-change-staff-roster-last-minute-hospitality"}]}
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": { "@type": "Thing", "@id": "https://fitzhr.com/" }
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Blog",
+          "item": { "@type": "Thing", "@id": "https://fitzhr.com/blog/" }
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "name": "Can I Change a Roster Last Minute in Australia?",
+          "item": { "@type": "Thing", "@id": "https://fitzhr.com/blog/can-i-change-staff-roster-last-minute-hospitality" }
+        }
+      ]
+    }
     </script>
+
+    <!-- Article schema — unchanged -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"Article","headline":"Can I Change a Roster Last Minute in Australia?","image":"https://fitzhr.com/assets/og-image.png","author":{"@type":"Organization","name":"Fitz HR","url":"https://fitzhr.com"},"publisher":{"@type":"Organization","name":"Fitz HR","url":"https://fitzhr.com","logo":{"@type":"ImageObject","url":"https://fitzhr.com/assets/favicon.svg"}},"datePublished":"2026-04-07","dateModified":"2026-04-07","description":"Can you change staff rosters at short notice in Australian hospitality? Find out what the Hospitality Award says, when it's lawful, and what you must pay when you do."}
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Can I Change a Roster Last Minute in Australia?",
+      "image": "https://fitzhr.com/assets/og-image.png",
+      "author": {
+        "@type": "Organization",
+        "name": "Fitz HR",
+        "url": "https://fitzhr.com"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "Fitz HR",
+        "url": "https://fitzhr.com",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://fitzhr.com/assets/favicon.svg"
+        }
+      },
+      "datePublished": "2026-04-07",
+      "dateModified": "2026-04-07",
+      "description": "Can you change staff rosters at short notice in Australian hospitality? Find out what the Hospitality Award says, when it's lawful, and what you must pay when you do."
+    }
     </script>
+
+    <!-- ADDED: Organization schema — was missing from this page -->
     <script type="application/ld+json">
-    {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Can I change a roster last minute in Australia?","acceptedAnswer":{"@type":"Answer","text":"It depends on the employee's type and your Award. Casual employees can generally have rosters changed without notice since they have no guaranteed hours. Full-time and part-time employees under the Hospitality Award must be given reasonable notice of roster changes. If you send a part-time employee home early, you must still pay them the minimum engagement period of 3 hours."}},{"@type":"Question","name":"How much notice do I need to give to change a roster under the Hospitality Award?","acceptedAnswer":{"@type":"Answer","text":"The Hospitality Industry (General) Award requires reasonable notice of roster changes. What is 'reasonable' depends on the circumstances, but where practicable, 7 days' notice should be given. For genuine operational reasons, shorter notice may be acceptable — but the employee's agreement is recommended wherever possible."}},{"@type":"Question","name":"Do I have to pay a part-time employee if I send them home early?","acceptedAnswer":{"@type":"Answer","text":"Yes. Under the Hospitality Industry (General) Award, part-time employees have a minimum engagement of 3 hours. If you send a part-time employee home before they have worked 3 hours, you must still pay them for the full 3-hour minimum — even if they only worked 1 hour."}},{"@type":"Question","name":"Can I cancel a casual's shift last minute without paying them?","acceptedAnswer":{"@type":"Answer","text":"If a casual employee has not yet started their shift, you can generally cancel it without payment — casuals have no guaranteed hours. However, if they have already started work, they are entitled to be paid for any time worked. Best practice is to give as much notice as possible to avoid damaging the employment relationship and casual conversion obligations."}},{"@type":"Question","name":"What is the right to disconnect and does it affect rosters?","acceptedAnswer":{"@type":"Answer","text":"The right to disconnect, introduced in 2024, gives employees the right to refuse to monitor or respond to work-related contact outside their working hours. This doesn't prevent you from sending roster changes, but employees may now lawfully choose not to respond to those messages outside their rostered hours — particularly if the request is unreasonable."}},{"@type":"Question","name":"What is the minimum shift for casual employees in hospitality?","acceptedAnswer":{"@type":"Answer","text":"Under the Hospitality Industry (General) Award, casual employees are entitled to a minimum engagement of 2 hours per shift. If you ask a casual to come in and they work less than 2 hours, you must still pay them for 2 hours at the applicable casual rate."}}]}
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "@id": "https://fitzhr.com/#organization",
+      "name": "Fitz HR",
+      "url": "https://fitzhr.com",
+      "logo": "https://fitzhr.com/assets/favicon.svg",
+      "description": "AI-powered HR software built specifically for Australian hospitality venues including pubs, restaurants, cafes, bars, and hotels.",
+      "email": "support@fitzhr.com",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "AU",
+        "addressRegion": "NSW"
+      },
+      "areaServed": "AU"
+    }
     </script>
+
+    <!-- FAQPage schema — unchanged -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Can I change a roster last minute in Australia?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "It depends on the employee's type and your Award. Casual employees can generally have rosters changed without notice since they have no guaranteed hours. Full-time and part-time employees under the Hospitality Award must be given reasonable notice of roster changes. If you send a part-time employee home early, you must still pay them the minimum engagement period of 3 hours."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How much notice do I need to give to change a roster under the Hospitality Award?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The Hospitality Industry (General) Award requires reasonable notice of roster changes. What is 'reasonable' depends on the circumstances, but where practicable, 7 days' notice should be given. For genuine operational reasons, shorter notice may be acceptable — but the employee's agreement is recommended wherever possible."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I have to pay a part-time employee if I send them home early?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes. Under the Hospitality Industry (General) Award, part-time employees have a minimum engagement of 3 hours. If you send a part-time employee home before they have worked 3 hours, you must still pay them for the full 3-hour minimum — even if they only worked 1 hour."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Can I cancel a casual's shift last minute without paying them?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "If a casual employee has not yet started their shift, you can generally cancel it without payment — casuals have no guaranteed hours. However, if they have already started work, they are entitled to be paid for any time worked. Best practice is to give as much notice as possible to avoid damaging the employment relationship and casual conversion obligations."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the right to disconnect and does it affect rosters?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "The right to disconnect, introduced in 2024, gives employees the right to refuse to monitor or respond to work-related contact outside their working hours. This doesn't prevent you from sending roster changes, but employees may now lawfully choose not to respond to those messages outside their rostered hours — particularly if the request is unreasonable."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is the minimum shift for casual employees in hospitality?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Under the Hospitality Industry (General) Award, casual employees are entitled to a minimum engagement of 2 hours per shift. If you ask a casual to come in and they work less than 2 hours, you must still pay them for 2 hours at the applicable casual rate."
+          }
+        }
+      ]
+    }
+    </script>
+
     <style>
         :root { --navy:#0f172a; --navy2:#141f35; --amber:#f59e0b; --w60:rgba(255,255,255,0.6); --w30:rgba(255,255,255,0.3); --rule:rgba(245,158,11,0.18); --rw:rgba(255,255,255,0.08); }
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
