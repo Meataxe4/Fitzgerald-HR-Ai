@@ -199,11 +199,14 @@
 
         /* SECTIONS */
         .section { position: relative; z-index: 10; padding: 3.5rem 1.5rem; border-top: 1px solid var(--rw); }
-        .section-label { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; }
-        .sl-text { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); opacity: 0; transform: translateX(-10px); transition: opacity 0.6s, transform 0.6s cubic-bezier(0.16,1,0.3,1); }
+        .section-label { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 2rem; width: 100%; }
+        .sl-text { font-family: 'DM Mono', monospace; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--amber); opacity: 0; transform: translateX(-10px); transition: opacity 0.6s, transform 0.6s cubic-bezier(0.16,1,0.3,1); white-space: nowrap; flex-shrink: 0; }
         .sl-text.in { opacity: 1; transform: translateX(0); }
-        .sl-line { flex: 1; height: 1px; background: var(--amber); transform: scaleX(0); transform-origin: left; transition: transform 0.8s 0.2s cubic-bezier(0.16,1,0.3,1); }
+        .sl-line { flex: 1; height: 1px; background: var(--amber); transform: scaleX(0); transform-origin: left; transition: transform 0.8s 0.2s cubic-bezier(0.16,1,0.3,1); min-width: 0; }
         .sl-line.in { transform: scaleX(1); }
+        /* Inside flex columns (demo/docbuilder), constrain the line to the copy column only */
+        .fitz-demo-copy .section-label,
+        .docbuilder-copy .section-label { overflow: hidden; }
 
         /* ============================================================
            FITZ IN ACTION — animated phone demo
