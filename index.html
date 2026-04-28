@@ -204,12 +204,6 @@
         .sl-text.in { opacity: 1; transform: translateX(0); }
         .sl-line { flex: 1; height: 1px; background: var(--amber); transform: scaleX(0); transform-origin: left; transition: transform 0.8s 0.2s cubic-bezier(0.16,1,0.3,1); min-width: 0; }
         .sl-line.in { transform: scaleX(1); }
-        /* Inside flex columns, cap the line so it doesn't bleed past the copy column */
-        .fitz-demo-copy .section-label,
-        .docbuilder-copy .section-label { max-width: 100%; }
-        .fitz-demo-copy .sl-line,
-        .docbuilder-copy .sl-line { max-width: 200px; }
-
         /* ============================================================
            FITZ IN ACTION — animated phone demo
            ============================================================ */
@@ -716,12 +710,9 @@
      FITZ IN ACTION — animated phone demo
      ============================================================ -->
 <section class="fitz-demo-section" id="demo">
+    <div class="section-label"><span class="sl-text">See Fitz in Action</span><div class="sl-line"></div></div>
     <div class="fitz-demo-inner">
         <div class="fitz-demo-copy">
-            <div class="section-label">
-                <span class="sl-text">See Fitz in Action</span>
-                <div class="sl-line"></div>
-            </div>
             <h2 class="fitz-demo-h2">Real answers.<br><em>In seconds.</em></h2>
             <p class="fitz-demo-sub">The kind of HR question that hits every venue sooner or later — answered instantly, grounded in Australian law.</p>
             <div class="fitz-demo-scenarios" id="fitzScenarioList">
@@ -902,13 +893,10 @@
      DOCUMENT BUILDER — animated 8-step formal warning demo
      ============================================================ -->
 <section class="docbuilder-section" id="documents">
+    <div class="section-label"><span class="sl-text">Document Builder</span><div class="sl-line"></div></div>
     <div class="docbuilder-inner">
 
         <div class="docbuilder-copy">
-            <div class="section-label">
-                <span class="sl-text">Document Builder</span>
-                <div class="sl-line"></div>
-            </div>
             <h2 class="docbuilder-h2">8 questions.<br><em>One legally sound document.</em></h2>
             <p class="docbuilder-sub">Fitz walks you through every step of a formal warning — then generates a Fair Work compliant letter in seconds.</p>
             <div class="docbuilder-steps-list" id="dbPipList">
@@ -1094,8 +1082,8 @@
 
 <!-- ABOUT / SEO -->
 <section class="about" id="about">
+    <div class="section-label"><span class="sl-text">About Fitz HR</span><div class="sl-line"></div></div>
     <div class="about-inner">
-        <div class="section-label"><span class="sl-text">About Fitz HR</span><div class="sl-line"></div></div>
         <h2 class="about-heading">AI-Powered HR Compliance Software for <em>Hospitality Businesses in Australia</em></h2>
         <p class="about-seo-para"><strong>Fitz HR is built exclusively for Australian hospitality</strong> &mdash; pubs, restaurants, cafes, and hotels. Instant guidance on the <strong>Hospitality Award MA000009</strong> and <strong>Fair Work Act 2009</strong>, compliant documents in minutes, and qualified HR professionals on call 24/7. Not adapted from a generic HR platform. Built from the ground up for venues like yours.</p>
         <p class="about-authority">Built by hospitality operators and HR professionals with real-world experience in Australian Fair Work compliance &mdash; for venues that can&rsquo;t afford to get it wrong.</p>
