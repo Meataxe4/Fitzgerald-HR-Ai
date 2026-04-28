@@ -204,9 +204,11 @@
         .sl-text.in { opacity: 1; transform: translateX(0); }
         .sl-line { flex: 1; height: 1px; background: var(--amber); transform: scaleX(0); transform-origin: left; transition: transform 0.8s 0.2s cubic-bezier(0.16,1,0.3,1); min-width: 0; }
         .sl-line.in { transform: scaleX(1); }
-        /* Inside flex columns (demo/docbuilder), constrain the line to the copy column only */
+        /* Inside flex columns, cap the line so it doesn't bleed past the copy column */
         .fitz-demo-copy .section-label,
-        .docbuilder-copy .section-label { overflow: hidden; }
+        .docbuilder-copy .section-label { max-width: 100%; }
+        .fitz-demo-copy .sl-line,
+        .docbuilder-copy .sl-line { max-width: 200px; }
 
         /* ============================================================
            FITZ IN ACTION — animated phone demo
@@ -432,8 +434,6 @@
         .about { background: var(--navy); padding: 5rem 2rem; position: relative; overflow: hidden; border-top: 1px solid var(--rw); }
         .about::before { content: ''; position: absolute; inset: 0; background-image: linear-gradient(rgba(245,158,11,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(245,158,11,0.03) 1px, transparent 1px); background-size: 64px 64px; pointer-events: none; }
         .about-inner { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
-        .about-label { font-family: 'DM Mono', monospace; font-size: 0.56rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber); display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
-        .about-label::before { content: ''; width: 32px; height: 2px; background: var(--amber); display: inline-block; }
         .about-heading { font-family: 'Playfair Display', serif; font-weight: 900; font-size: clamp(2rem, 4vw, 3rem); line-height: 1.1; letter-spacing: -0.02em; color: #fff; margin-bottom: 1.5rem; max-width: 760px; }
         .about-heading em { font-style: italic; color: var(--amber); }
         .about-seo-para { font-size: 1rem; line-height: 1.75; color: var(--w60); max-width: 680px; margin-bottom: 1.25rem; border-left: 3px solid var(--amber); padding-left: 1.25rem; }
@@ -1095,7 +1095,7 @@
 <!-- ABOUT / SEO -->
 <section class="about" id="about">
     <div class="about-inner">
-        <div class="about-label">About Fitz HR</div>
+        <div class="section-label"><span class="sl-text">About Fitz HR</span><div class="sl-line"></div></div>
         <h2 class="about-heading">AI-Powered HR Compliance Software for <em>Hospitality Businesses in Australia</em></h2>
         <p class="about-seo-para"><strong>Fitz HR is built exclusively for Australian hospitality</strong> &mdash; pubs, restaurants, cafes, and hotels. Instant guidance on the <strong>Hospitality Award MA000009</strong> and <strong>Fair Work Act 2009</strong>, compliant documents in minutes, and qualified HR professionals on call 24/7. Not adapted from a generic HR platform. Built from the ground up for venues like yours.</p>
         <p class="about-authority">Built by hospitality operators and HR professionals with real-world experience in Australian Fair Work compliance &mdash; for venues that can&rsquo;t afford to get it wrong.</p>
