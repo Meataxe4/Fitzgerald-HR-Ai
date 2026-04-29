@@ -16057,11 +16057,92 @@ function showOnboarding() {
     updateOnboardingStep();
 }
 
+const AWARD_VENUE_TYPES = {
+    'Hospitality Industry (General) Award': [
+        { value: 'bar', label: 'Bar' },
+        { value: 'boutique-hotel', label: 'Boutique Hotel' },
+        { value: 'brewery', label: 'Brewery / Brewpub' },
+        { value: 'cinema-fnb', label: 'Cinema with Food & Beverage Service' },
+        { value: 'conference-venue', label: 'Conference Venue' },
+        { value: 'distillery-bar', label: 'Distillery Bar' },
+        { value: 'entertainment-venue', label: 'Entertainment Venue (Comedy Club / Theatre)' },
+        { value: 'function-centre', label: 'Function Centre' },
+        { value: 'hotel-accommodation', label: 'Hotel (Accommodation Venue)' },
+        { value: 'live-music-venue', label: 'Live Music Venue' },
+        { value: 'motel', label: 'Motel' },
+        { value: 'nightclub', label: 'Nightclub' },
+        { value: 'pub', label: 'Pub / Hotel' },
+        { value: 'resort', label: 'Resort' },
+        { value: 'rooftop-bar', label: 'Rooftop Bar' },
+        { value: 'serviced-apartments', label: 'Serviced Apartments' },
+        { value: 'sports-bar', label: 'Sports Bar' },
+    ],
+    'Restaurant Industry Award': [
+        { value: 'bakery-cafe', label: 'Bakery Café' },
+        { value: 'bistro', label: 'Bistro' },
+        { value: 'cafe', label: 'Café' },
+        { value: 'dessert-bar', label: 'Dessert Bar' },
+        { value: 'ice-cream-bar', label: 'Ice Cream / Gelato Bar' },
+        { value: 'juice-bar', label: 'Juice / Smoothie Bar' },
+        { value: 'restaurant', label: 'Restaurant' },
+        { value: 'tea-house', label: 'Tea House' },
+        { value: 'wine-bar', label: 'Wine Bar' },
+    ],
+    'Fast Food Industry Award': [
+        { value: 'bakery-cafe', label: 'Bakery Café' },
+        { value: 'dessert-bar', label: 'Dessert Bar' },
+        { value: 'food-court', label: 'Food Court Outlet' },
+        { value: 'ice-cream-bar', label: 'Ice Cream / Gelato Bar' },
+        { value: 'juice-bar', label: 'Juice / Smoothie Bar' },
+    ],
+};
+
+const ALL_VENUE_TYPES = [
+    { value: 'bakery-cafe', label: 'Bakery Café' },
+    { value: 'bar', label: 'Bar' },
+    { value: 'bistro', label: 'Bistro' },
+    { value: 'boutique-hotel', label: 'Boutique Hotel' },
+    { value: 'brewery', label: 'Brewery / Brewpub' },
+    { value: 'cafe', label: 'Café' },
+    { value: 'cinema-fnb', label: 'Cinema with Food & Beverage Service' },
+    { value: 'conference-venue', label: 'Conference Venue' },
+    { value: 'dessert-bar', label: 'Dessert Bar' },
+    { value: 'distillery-bar', label: 'Distillery Bar' },
+    { value: 'entertainment-venue', label: 'Entertainment Venue (Comedy Club / Theatre)' },
+    { value: 'food-court', label: 'Food Court Outlet' },
+    { value: 'function-centre', label: 'Function Centre' },
+    { value: 'hotel-accommodation', label: 'Hotel (Accommodation Venue)' },
+    { value: 'ice-cream-bar', label: 'Ice Cream / Gelato Bar' },
+    { value: 'juice-bar', label: 'Juice / Smoothie Bar' },
+    { value: 'live-music-venue', label: 'Live Music Venue' },
+    { value: 'motel', label: 'Motel' },
+    { value: 'nightclub', label: 'Nightclub' },
+    { value: 'pub', label: 'Pub / Hotel' },
+    { value: 'resort', label: 'Resort' },
+    { value: 'restaurant', label: 'Restaurant' },
+    { value: 'rooftop-bar', label: 'Rooftop Bar' },
+    { value: 'serviced-apartments', label: 'Serviced Apartments' },
+    { value: 'sports-bar', label: 'Sports Bar' },
+    { value: 'tea-house', label: 'Tea House' },
+    { value: 'wine-bar', label: 'Wine Bar' },
+];
+
+function populateVenueTypeOptions(award) {
+    const venues = AWARD_VENUE_TYPES[award] || ALL_VENUE_TYPES;
+    const select = document.getElementById('onboardingVenueType');
+    if (!select) return;
+    select.innerHTML = '<option value="">Select venue type...</option>' +
+        venues.map(v => `<option value="${v.value}">${v.label}</option>`).join('');
+}
+
 function saveOnboardingAnswer(field, value, isLastStep = false) {
     venueProfile[field] = value;
     if (isLastStep) {
         completeOnboarding();
     } else {
+        if (field === 'primaryAward') {
+            populateVenueTypeOptions(value);
+        }
         onboardingCurrentStep++;
         updateOnboardingStep();
     }
