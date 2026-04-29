@@ -1877,10 +1877,15 @@
                         data-tab="reviews">
                     ✅ Reviews
                 </button>
-                <button onclick="switchAdminTab('charts')" 
-                        class="admin-tab px-3 py-2 text-slate-400 hover:text-purple-400 transition-colors text-sm whitespace-nowrap" 
+                <button onclick="switchAdminTab('charts')"
+                        class="admin-tab px-3 py-2 text-slate-400 hover:text-purple-400 transition-colors text-sm whitespace-nowrap"
                         data-tab="charts">
                     📈 Charts
+                </button>
+                <button onclick="switchAdminTab('devtools')"
+                        class="admin-tab px-3 py-2 text-slate-400 hover:text-purple-400 transition-colors text-sm whitespace-nowrap"
+                        data-tab="devtools">
+                    🛠️ Dev Tools
                 </button>
             </div>
 
@@ -1926,9 +1931,53 @@
                     <div id="reviewsList" class="space-y-2"></div>
                 </div>
 
-                <!-- Charts Tab (NEW) -->
+                <!-- Charts Tab -->
                 <div id="adminChartsTab" class="admin-tab-content hidden">
                     <div id="chartsList" class="space-y-4"></div>
+                </div>
+
+                <!-- Dev Tools Tab -->
+                <div id="adminDevtoolsTab" class="admin-tab-content hidden">
+                    <div class="space-y-4 p-2">
+                        <div class="bg-amber-500/10 border border-amber-500/40 rounded-lg p-3">
+                            <p class="text-amber-400 text-xs font-semibold">⚠️ Admin only — these tools modify user data and cannot be undone.</p>
+                        </div>
+
+                        <!-- Reset My Profile -->
+                        <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                            <h3 class="text-white font-semibold mb-1">🔄 Reset My Profile</h3>
+                            <p class="text-slate-400 text-xs mb-3">Clears your venue profile from localStorage and Firebase, then reloads — onboarding will run again. Use to test different award selections.</p>
+                            <button onclick="adminResetMyProfile()"
+                                    class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-4 py-2 rounded-lg text-sm transition-all">
+                                Reset My Profile & Restart Onboarding
+                            </button>
+                        </div>
+
+                        <!-- Reset Another User -->
+                        <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                            <h3 class="text-white font-semibold mb-1">🔄 Reset Another User's Profile</h3>
+                            <p class="text-slate-400 text-xs mb-3">Enter a Firebase UID to clear their venueProfile from Firestore. They will see onboarding on next login.</p>
+                            <div class="flex gap-2">
+                                <input type="text" id="devResetUid" placeholder="Firebase UID..."
+                                       class="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm">
+                                <button onclick="adminResetUserProfile()"
+                                        class="bg-red-600 hover:bg-red-700 text-white font-bold px-4 py-2 rounded-lg text-sm transition-all">
+                                    Reset
+                                </button>
+                            </div>
+                            <p id="devResetStatus" class="text-xs mt-2 text-slate-500"></p>
+                        </div>
+
+                        <!-- Clear Legal Acceptance -->
+                        <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+                            <h3 class="text-white font-semibold mb-1">📋 Clear My Legal Acceptance</h3>
+                            <p class="text-slate-400 text-xs mb-3">Forces the legal terms modal to show again on next page load (useful for testing that flow).</p>
+                            <button onclick="adminClearLegalAcceptance()"
+                                    class="bg-slate-600 hover:bg-slate-500 text-white font-bold px-4 py-2 rounded-lg text-sm transition-all">
+                                Clear Legal Acceptance
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 

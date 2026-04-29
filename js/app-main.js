@@ -16798,9 +16798,10 @@ function switchAdminTab(tabName) {
         'documents': 'adminDocumentsTab',
         'subscriptions': 'adminSubscriptionsTab',
         'reviews': 'adminReviewsTab',
-        'charts': 'adminChartsTab'
+        'charts': 'adminChartsTab',
+        'devtools': 'adminDevtoolsTab'
     };
-    
+
     document.getElementById(contentMap[tabName]).classList.remove('hidden');
     
     // Load data for selected tab
@@ -16812,6 +16813,63 @@ function switchAdminTab(tabName) {
     if (tabName === 'subscriptions') loadSubscriptions();
     if (tabName === 'reviews') loadExpertReviews();
     if (tabName === 'charts') loadCharts();
+}
+
+// ============================================
+// ADMIN DEV TOOLS
+// ============================================
+
+async function adminResetMyProfile() {
+    if (!currentUser) { showAlert('Not signed in.'); return; }
+    if (!confirm('Reset your venue profile? You will be signed out and onboarding will run again on next login.')) return;
+
+    const userKey = currentUser.uid || currentUser;
+
+    // Clear localStorage
+    localStorage.removeItem('venueProfile_' + userKey);
+    localStorage.removeItem('legalTermsAccepted_' + userKey);
+    localStorage.removeItem('legalTermsAcceptedAt_' + userKey);
+    localStorage.removeItem('fitzTourCompleted');
+    localStorage.removeItem('fitzTourDeclined');
+
+    // Clear venueProfile field in Firebase
+    if (db && currentUser.uid) {
+        try {
+            await db.collection('users').doc(currentUser.uid).update({
+                venueProfile: firebase.firestore.FieldValue.delete()
+            });
+        } catch (e) {}
+    }
+
+    showToast('Profile reset. Reloading...', 'success', 1500);
+    setTimeout(() => window.location.reload(), 1500);
+}
+
+async function adminResetUserProfile() {
+    const uid = document.getElementById('devResetUid').value.trim();
+    const status = document.getElementById('devResetStatus');
+    if (!uid) { status.textContent = '⚠️ Please enter a UID.'; return; }
+    if (!db) { status.textContent = '❌ Firestore not ready.'; return; }
+
+    status.textContent = '⏳ Resetting...';
+    try {
+        await db.collection('users').doc(uid).update({
+            venueProfile: firebase.firestore.FieldValue.delete()
+        });
+        status.textContent = `✅ venueProfile cleared for ${uid}. They will see onboarding on next login.`;
+        status.className = 'text-xs mt-2 text-green-400';
+    } catch (e) {
+        status.textContent = `❌ Error: ${e.message}`;
+        status.className = 'text-xs mt-2 text-red-400';
+    }
+}
+
+function adminClearLegalAcceptance() {
+    if (!currentUser) { showAlert('Not signed in.'); return; }
+    const userKey = currentUser.uid || currentUser;
+    localStorage.removeItem('legalTermsAccepted_' + userKey);
+    localStorage.removeItem('legalTermsAcceptedAt_' + userKey);
+    showToast('Legal acceptance cleared. Reload to see the modal again.', 'success', 3000);
 }
 
 async function loadConversationsAdmin() {
