@@ -16838,8 +16838,9 @@ async function adminResetMyProfile() {
         try {
             await db.collection('users').doc(uid).update({
                 venueProfile: firebase.firestore.FieldValue.delete(),
-                monthlyPromptsUsed: 0,
-                lastConversationId: firebase.firestore.FieldValue.delete()
+                lastConversationId: firebase.firestore.FieldValue.delete(),
+                'credits.monthlyPromptsUsed': 0,
+                'credits.monthlyPromptsReset': new Date().toISOString()
             });
         } catch (e) {}
     }
@@ -16878,16 +16879,13 @@ async function adminResetPromptCounter() {
 
     // Reset in memory
     userCredits.monthlyPromptsUsed = 0;
+    userCredits.monthlyPromptsReset = new Date().toISOString();
 
     // Reset in localStorage
     localStorage.removeItem('fitzCredits_' + userKey);
 
-    // Reset in Firebase
-    if (db && currentUser.uid) {
-        try {
-            await db.collection('users').doc(currentUser.uid).update({ monthlyPromptsUsed: 0 });
-        } catch (e) {}
-    }
+    // Sync to Firebase using the correct credits sub-object path
+    await syncCreditsToFirebase();
 
     updateCreditsDisplay();
     showToast('Prompt counter reset to 20.', 'success', 2000);
