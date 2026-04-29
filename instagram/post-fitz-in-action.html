@@ -6,19 +6,21 @@
 <link rel="stylesheet" href="_shared.css">
 <style>
     .frame {
-        padding: 80px 72px 72px;
+        padding: 64px 72px 56px;
         display: grid;
         grid-template-rows: auto auto 1fr auto;
-        gap: 36px;
+        gap: 28px;
+        height: 100%;
     }
     .top { display: flex; justify-content: space-between; align-items: center; }
     .label-row { display: flex; align-items: center; gap: 18px; margin-top: 8px; }
-    h1.headline { font-size: 110px; }
-    .stage { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 48px; align-items: center; }
-    .stage-copy { display: flex; flex-direction: column; gap: 28px; }
+    h1.headline { font-size: 96px; }
+    .stage { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: stretch; min-height: 0; }
+    .stage-copy { display: flex; flex-direction: column; gap: 24px; justify-content: center; }
     .scen-wrap { margin-top: 4px; }
-    .phone-wrap { display: flex; justify-content: center; align-items: center; }
-    .fitz-phone { width: 400px; }
+    .phone-wrap { display: flex; justify-content: center; align-items: stretch; }
+    .fitz-phone { width: 420px; }
+    .fitz-ph-body { min-height: 0; flex: 1; }
     .footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--rule); padding-top: 24px; }
 </style>
 </head>
