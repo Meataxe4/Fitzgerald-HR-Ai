@@ -1620,7 +1620,7 @@
         </div>
 
         <div id="onboardingStepContent" class="space-y-6">
-            <div class="onboarding-step" data-step="1">
+            <div class="onboarding-step" data-onboarding-step="1">
                 <h3 class="text-xl font-bold text-white mb-4">First, let's get your details</h3>
                 <div class="space-y-4">
                     <div>
@@ -1642,12 +1642,43 @@
                 </button>
             </div>
 
-            <div class="onboarding-step hidden" data-step="3">
+            <div class="onboarding-step hidden" data-onboarding-step="3">
                 <h3 class="text-xl font-bold text-white mb-4">What type of venue do you run?</h3>
-                <div id="onboardingVenueTypeOptions" class="space-y-2 max-h-80 overflow-y-auto pr-1"></div>
+                <div class="space-y-2 max-h-72 overflow-y-auto pr-1">
+                    <!-- Hospitality Award venues -->
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('bar')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Bar</button>
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('boutique-hotel')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Boutique Hotel</button>
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('brewery')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Brewery / Brewpub</button>
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('cinema-fnb')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Cinema with Food &amp; Beverage Service</button>
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('conference-venue')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Conference Venue</button>
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('distillery-bar')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Distillery Bar</button>
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('entertainment-venue')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Entertainment Venue (Comedy Club / Theatre)</button>
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('function-centre')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Function Centre</button>
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('hotel-accommodation')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Hotel (Accommodation Venue)</button>
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('live-music-venue')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Live Music Venue</button>
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('motel')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Motel</button>
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('nightclub')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Nightclub</button>
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('pub')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Pub / Hotel</button>
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('resort')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Resort</button>
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('rooftop-bar')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Rooftop Bar</button>
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('serviced-apartments')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Serviced Apartments</button>
+                    <button data-award="hospitality" onclick="saveOnboardingVenueTypeDirect('sports-bar')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Sports Bar</button>
+                    <!-- Restaurant Award venues -->
+                    <button data-award="restaurant" onclick="saveOnboardingVenueTypeDirect('bakery-cafe')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Bakery Café</button>
+                    <button data-award="restaurant" onclick="saveOnboardingVenueTypeDirect('bistro')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Bistro</button>
+                    <button data-award="restaurant" onclick="saveOnboardingVenueTypeDirect('cafe')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Café</button>
+                    <button data-award="restaurant" onclick="saveOnboardingVenueTypeDirect('dessert-bar')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Dessert Bar</button>
+                    <button data-award="restaurant" onclick="saveOnboardingVenueTypeDirect('ice-cream-bar')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Ice Cream / Gelato Bar</button>
+                    <button data-award="restaurant" onclick="saveOnboardingVenueTypeDirect('juice-bar')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Juice / Smoothie Bar</button>
+                    <button data-award="restaurant" onclick="saveOnboardingVenueTypeDirect('restaurant')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Restaurant</button>
+                    <button data-award="restaurant" onclick="saveOnboardingVenueTypeDirect('tea-house')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Tea House</button>
+                    <button data-award="restaurant" onclick="saveOnboardingVenueTypeDirect('wine-bar')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">Wine Bar</button>
+                    <!-- Fast Food Award venues -->
+                    <button data-award="fastfood" onclick="saveOnboardingVenueTypeDirect('food-court')" class="venue-type-btn w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold hidden">Food Court Outlet</button>
+                </div>
             </div>
 
-            <div class="onboarding-step hidden" data-step="4">
+            <div class="onboarding-step hidden" data-onboarding-step="4">
                 <h3 class="text-xl font-bold text-white mb-4">Where is your venue located?</h3>
                 <select id="onboardingLocation" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white mb-4">
                     <option value="">Select state...</option>
@@ -1668,7 +1699,7 @@
                 </button>
             </div>
 
-            <div class="onboarding-step hidden" data-step="5">
+            <div class="onboarding-step hidden" data-onboarding-step="5">
                 <h3 class="text-xl font-bold text-white mb-4">How many staff do you have?</h3>
                 <div class="grid grid-cols-2 gap-3">
                     <button onclick="saveOnboardingAnswer('staffCount', '1-5')" class="p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all">
@@ -1690,7 +1721,7 @@
                 </div>
             </div>
 
-            <div class="onboarding-step hidden" data-step="2">
+            <div class="onboarding-step hidden" data-onboarding-step="2">
                 <h3 class="text-xl font-bold text-white mb-2">Which award covers most of your staff?</h3>
                 <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4 text-sm text-amber-300">
                     <strong>💡 Why this matters:</strong> Your Modern Award determines pay rates, penalty rates, and entitlements. Selecting the correct award ensures Fitz gives you accurate, compliant advice tailored to your specific obligations. This step is required.
@@ -1718,7 +1749,7 @@
                 </div>
             </div>
 
-            <div class="onboarding-step hidden" data-step="6">
+            <div class="onboarding-step hidden" data-onboarding-step="6">
                 <h3 class="text-xl font-bold text-white mb-4">What's your biggest HR challenge?</h3>
                 <div class="space-y-2">
                     <button onclick="saveOnboardingAnswer('mainChallenge', 'rostering', true)" 
