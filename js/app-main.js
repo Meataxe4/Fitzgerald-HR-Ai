@@ -16821,29 +16821,35 @@ function switchAdminTab(tabName) {
 
 async function adminResetMyProfile() {
     if (!currentUser) { showAlert('Not signed in.'); return; }
-    if (!confirm('Reset your venue profile? You will be signed out and onboarding will run again on next login.')) return;
+    if (!confirm('Complete reset: clears your profile, all conversations, and prompt counter. Onboarding will run again. Continue?')) return;
 
-    const userKey = currentUser.uid || currentUser;
+    const uid = currentUser.uid;
 
-    // Clear localStorage
-    localStorage.removeItem('venueProfile_' + userKey);
-    localStorage.removeItem('legalTermsAccepted_' + userKey);
-    localStorage.removeItem('legalTermsAcceptedAt_' + userKey);
-    localStorage.removeItem('fitzTourCompleted');
-    localStorage.removeItem('fitzTourDeclined');
-    localStorage.removeItem('fitzCredits_' + userKey);
-
-    // Clear venueProfile + reset prompt counter in Firebase
-    if (db && currentUser.uid) {
+    // 1. Delete all Firebase conversations for this user
+    if (db && uid) {
         try {
-            await db.collection('users').doc(currentUser.uid).update({
+            const convSnap = await db.collection('users').doc(uid).collection('conversations').get();
+            const batch = db.batch();
+            convSnap.forEach(doc => batch.delete(doc.ref));
+            if (!convSnap.empty) await batch.commit();
+        } catch (e) {}
+
+        // 2. Reset user document fields
+        try {
+            await db.collection('users').doc(uid).update({
                 venueProfile: firebase.firestore.FieldValue.delete(),
-                monthlyPromptsUsed: 0
+                monthlyPromptsUsed: 0,
+                lastConversationId: firebase.firestore.FieldValue.delete()
             });
         } catch (e) {}
     }
 
-    showToast('Profile reset. Reloading...', 'success', 1500);
+    // 3. Clear everything from localStorage (reuse existing thorough clear)
+    const savedUser = currentUser;
+    clearLocalUserData();
+    currentUser = savedUser; // keep auth session so reload works
+
+    showToast('Complete reset done. Reloading...', 'success', 1500);
     setTimeout(() => window.location.reload(), 1500);
 }
 
