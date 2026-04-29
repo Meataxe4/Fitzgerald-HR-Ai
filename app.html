@@ -1724,7 +1724,10 @@
             </div>
 
             <div class="onboarding-step hidden" data-step="5">
-                <h3 class="text-xl font-bold text-white mb-4">Which award covers most of your staff?</h3>
+                <h3 class="text-xl font-bold text-white mb-2">Which award covers most of your staff?</h3>
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4 text-sm text-amber-300">
+                    <strong>💡 Why this matters:</strong> Your Modern Award determines pay rates, penalty rates, and entitlements. Selecting the correct award ensures Fitz gives you accurate, compliant advice tailored to your specific obligations. This step is required.
+                </div>
                 <div class="space-y-3">
                     <button onclick="saveOnboardingAnswer('primaryAward', 'Hospitality Industry (General) Award')" 
                             class="w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
@@ -1767,7 +1770,7 @@
             </div>
         </div>
 
-        <button onclick="skipOnboarding()" class="mt-4 text-slate-400 hover:text-white text-sm">
+        <button id="skipOnboardingBtn" onclick="skipOnboarding()" class="mt-4 text-slate-400 hover:text-white text-sm">
             Skip for now →
         </button>
     </div>

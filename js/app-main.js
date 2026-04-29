@@ -16115,11 +16115,15 @@ function updateOnboardingStep() {
     document.querySelectorAll('.onboarding-step').forEach(step => step.classList.add('hidden'));
     const current = document.querySelector(`[data-step="${onboardingCurrentStep}"]`);
     if (current) current.classList.remove('hidden');
-    
+
     document.getElementById('onboardingStep').textContent = onboardingCurrentStep;
     const progress = Math.round((onboardingCurrentStep / ONBOARDING_STEPS) * 100);
     document.getElementById('onboardingProgress').textContent = `${progress}% Complete`;
     document.getElementById('onboardingProgressBar').style.width = `${progress}%`;
+
+    // Hide skip button once the user reaches the Award step (step 5) — it's mandatory
+    const skipBtn = document.getElementById('skipOnboardingBtn');
+    if (skipBtn) skipBtn.classList.toggle('hidden', onboardingCurrentStep >= 5);
 }
 
 function completeOnboarding() {
@@ -16192,6 +16196,10 @@ All my advice will be tailored for your venue. Update these anytime in ⚙️ Se
 }
 
 function skipOnboarding() {
+    if (onboardingCurrentStep >= 5) {
+        showAlert('Please select your Modern Award to continue — this ensures Fitz gives you accurate advice tailored to your specific award obligations.');
+        return;
+    }
     if (confirm('Skip onboarding? You can complete it later in Settings.')) {
         document.getElementById('venueOnboardingModal').classList.add('hidden');
         addMessage('assistant', 'No problem! Set up your venue profile anytime in ⚙️ Settings. What can I help you with?');
@@ -16470,6 +16478,18 @@ function showVenueSettings() {
                     <option value="30+" ${venueProfile.staffCount === '30+' ? 'selected' : ''}>30+ staff</option>
                 </select>
             </div>
+
+            <div>
+                <label class="block text-slate-300 text-sm mb-2">Modern Award</label>
+                <select id="settingsPrimaryAward" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
+                    <option value="">Select award...</option>
+                    <option value="Hospitality Industry (General) Award" ${venueProfile.primaryAward === 'Hospitality Industry (General) Award' ? 'selected' : ''}>Hospitality Industry (General) Award (MA000009)</option>
+                    <option value="Restaurant Industry Award" ${venueProfile.primaryAward === 'Restaurant Industry Award' ? 'selected' : ''}>Restaurant Industry Award (MA000119)</option>
+                    <option value="Fast Food Industry Award" ${venueProfile.primaryAward === 'Fast Food Industry Award' ? 'selected' : ''}>Fast Food Industry Award</option>
+                    <option value="Not sure" ${venueProfile.primaryAward === 'Not sure' ? 'selected' : ''}>Not sure</option>
+                </select>
+                <p class="text-xs text-slate-400 mt-1">Changing your award updates pay rate calculations and advice throughout the app.</p>
+            </div>
         </div>
     `;
     
@@ -16477,12 +16497,15 @@ function showVenueSettings() {
 }
 
 function saveVenueSettings() {
+    const previousAward = venueProfile.primaryAward;
+
     venueProfile.userName = document.getElementById('settingsUserName').value.trim();
     venueProfile.venueName = document.getElementById('settingsVenueName').value.trim();
     venueProfile.venueType = document.getElementById('settingsVenueType').value;
     venueProfile.location = document.getElementById('settingsLocation').value;
     venueProfile.city = document.getElementById('settingsCity').value.trim();
     venueProfile.staffCount = document.getElementById('settingsStaffCount').value;
+    venueProfile.primaryAward = document.getElementById('settingsPrimaryAward').value || previousAward;
     venueProfile.setupComplete = true;
     
     // Use currentUser.uid for Firebase users, or currentUser as string for access code users
@@ -16500,7 +16523,14 @@ function saveVenueSettings() {
     
     // Update sidebar venue name
     updateSidebarVenueName();
-    
+
+    // If the award changed, reload rates and update alert text
+    if (venueProfile.primaryAward !== previousAward) {
+        loadAwardRates();
+        const alertEl = document.getElementById('awardRateAlertText');
+        if (alertEl) alertEl.textContent = `${getAwardContext().name} rates increase on 1 July 2026`;
+    }
+
     closeVenueSettings();
     showAlert('✅ Venue settings saved!');
 }
