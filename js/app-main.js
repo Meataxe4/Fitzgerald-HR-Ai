@@ -16121,9 +16121,6 @@ function updateOnboardingStep() {
     document.getElementById('onboardingProgress').textContent = `${progress}% Complete`;
     document.getElementById('onboardingProgressBar').style.width = `${progress}%`;
 
-    // Hide skip button once the user reaches the Award step (step 5) — it's mandatory
-    const skipBtn = document.getElementById('skipOnboardingBtn');
-    if (skipBtn) skipBtn.classList.toggle('hidden', onboardingCurrentStep >= 5);
 }
 
 function completeOnboarding() {
@@ -16196,14 +16193,7 @@ All my advice will be tailored for your venue. Update these anytime in ⚙️ Se
 }
 
 function skipOnboarding() {
-    if (onboardingCurrentStep >= 5) {
-        showAlert('Please select your Modern Award to continue — this ensures Fitz gives you accurate advice tailored to your specific award obligations.');
-        return;
-    }
-    if (confirm('Skip onboarding? You can complete it later in Settings.')) {
-        document.getElementById('venueOnboardingModal').classList.add('hidden');
-        addMessage('assistant', 'No problem! Set up your venue profile anytime in ⚙️ Settings. What can I help you with?');
-    }
+    // Onboarding is mandatory — skipping is disabled
 }
 
 // Quick Action Prompts - shown after onboarding
