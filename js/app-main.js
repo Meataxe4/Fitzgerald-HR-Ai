@@ -16831,12 +16831,14 @@ async function adminResetMyProfile() {
     localStorage.removeItem('legalTermsAcceptedAt_' + userKey);
     localStorage.removeItem('fitzTourCompleted');
     localStorage.removeItem('fitzTourDeclined');
+    localStorage.removeItem('fitzCredits_' + userKey);
 
-    // Clear venueProfile field in Firebase
+    // Clear venueProfile + reset prompt counter in Firebase
     if (db && currentUser.uid) {
         try {
             await db.collection('users').doc(currentUser.uid).update({
-                venueProfile: firebase.firestore.FieldValue.delete()
+                venueProfile: firebase.firestore.FieldValue.delete(),
+                monthlyPromptsUsed: 0
             });
         } catch (e) {}
     }
@@ -16862,6 +16864,27 @@ async function adminResetUserProfile() {
         status.textContent = `❌ Error: ${e.message}`;
         status.className = 'text-xs mt-2 text-red-400';
     }
+}
+
+async function adminResetPromptCounter() {
+    if (!currentUser) { showAlert('Not signed in.'); return; }
+    const userKey = currentUser.uid || currentUser;
+
+    // Reset in memory
+    userCredits.monthlyPromptsUsed = 0;
+
+    // Reset in localStorage
+    localStorage.removeItem('fitzCredits_' + userKey);
+
+    // Reset in Firebase
+    if (db && currentUser.uid) {
+        try {
+            await db.collection('users').doc(currentUser.uid).update({ monthlyPromptsUsed: 0 });
+        } catch (e) {}
+    }
+
+    updateCreditsDisplay();
+    showToast('Prompt counter reset to 20.', 'success', 2000);
 }
 
 function adminClearLegalAcceptance() {
