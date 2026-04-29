@@ -1,0 +1,145 @@
+/* ============================================================
+   Fitz HR — Instagram asset shared styles
+   Mirrors the design tokens used across the marketing site.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,800;0,900;1,700;1,900&family=Outfit:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&display=swap');
+
+:root {
+    --navy:  #0f172a;
+    --navy2: #141f35;
+    --amber: #f59e0b;
+    --amb2:  #fbbf24;
+    --a12:   rgba(245,158,11,0.12);
+    --a06:   rgba(245,158,11,0.06);
+    --rule:  rgba(245,158,11,0.18);
+    --rw:    rgba(255,255,255,0.08);
+    --w60:   rgba(255,255,255,0.6);
+    --w30:   rgba(255,255,255,0.3);
+    --fitz-img: url("../assets/fitz-neon-transparent.png");
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #1a1a1a; }
+body { font-family: 'Outfit', sans-serif; color: #fff; display: flex; align-items: flex-start; justify-content: center; padding: 24px; min-height: 100vh; }
+
+/* Each .ig-frame is sized to an exact Instagram canvas dimension. */
+.ig-frame {
+    background: var(--navy);
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 80px rgba(0,0,0,0.7);
+}
+.ig-square   { width: 1080px; height: 1080px; }
+.ig-portrait { width: 1080px; height: 1350px; }
+.ig-story    { width: 1080px; height: 1920px; }
+
+/* Background ambience */
+.bg-grain { position: absolute; inset: -50%; width: 200%; height: 200%; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E"); opacity: 0.04; pointer-events: none; }
+.bg-orb { position: absolute; border-radius: 50%; pointer-events: none; filter: blur(110px); }
+.bg-orb-amber { background: rgba(245,158,11,0.16); }
+.bg-orb-blue  { background: rgba(30,60,120,0.55); }
+.bg-vrule { position: absolute; left: 56px; top: 80px; bottom: 80px; width: 3px; background: linear-gradient(180deg, transparent, var(--amber) 25%, var(--amber) 75%, transparent); opacity: 0.55; }
+
+/* Wordmark / logo block */
+.fitz-bot { display: inline-block; background: var(--fitz-img) center/contain no-repeat; }
+.wordmark { font-family: 'Outfit', sans-serif; font-weight: 800; letter-spacing: -2px; display: inline-flex; align-items: baseline; line-height: 1; }
+.wm-f { color: var(--amber); }
+.wm-itz { color: #ffffff; }
+.wm-hr { color: var(--amber); margin-left: 0.18em; }
+
+.brand-row { display: flex; align-items: center; gap: 18px; }
+.brand-row .fitz-bot { width: 64px; height: 64px; filter: drop-shadow(0 0 10px rgba(245,158,11,0.5)); }
+.brand-row .wordmark { font-size: 56px; }
+
+/* Eyebrow / pulse marker */
+.eyebrow { display: inline-flex; align-items: center; gap: 14px; }
+.ep { position: relative; width: 12px; height: 12px; }
+.ep-dot { position: absolute; inset: 0; border-radius: 50%; background: var(--amber); }
+.ep-ring { position: absolute; inset: -6px; border-radius: 50%; border: 2px solid var(--amber); animation: ringOut 2s ease-out infinite; opacity: 0.7; }
+@keyframes ringOut { 0%{transform:scale(0.8);opacity:1} 100%{transform:scale(2.2);opacity:0} }
+.eyebrow-text { font-family: 'DM Mono', monospace; font-size: 18px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--w60); }
+
+/* Section label (matches "See Fitz in Action" rule) */
+.section-label { display: inline-flex; align-items: center; gap: 16px; }
+.sl-text { font-family: 'DM Mono', monospace; font-size: 16px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--amber); }
+.sl-line { width: 80px; height: 1px; background: var(--amber); opacity: 0.45; }
+
+/* Big serif headline */
+.headline { font-family: 'Playfair Display', serif; font-weight: 900; line-height: 1.02; letter-spacing: -0.02em; color: #fff; }
+.headline em { font-style: italic; color: var(--amber); }
+
+/* Hook line (the italic Playfair sub) */
+.hook { font-family: 'Playfair Display', serif; font-weight: 700; font-style: italic; color: var(--w60); line-height: 1.3; }
+.hook .accent { color: var(--amber); }
+
+/* Buttons / pills */
+.btn-primary {
+    display: inline-flex; align-items: center; justify-content: space-between; gap: 18px;
+    padding: 22px 28px; background: var(--amber); color: var(--navy);
+    font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 22px;
+    letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none;
+}
+.btn-primary .arr { font-weight: 800; }
+
+.url-pill { font-family: 'DM Mono', monospace; font-size: 18px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--amber); border: 1px solid var(--rule); padding: 10px 20px; display: inline-block; background: var(--a06); }
+
+.tag-pill { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; color: var(--navy); background: var(--amber); padding: 6px 12px; }
+
+/* Caption / footer copy */
+.caption { font-family: 'DM Mono', monospace; font-size: 14px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--w60); }
+.body-copy { font-family: 'Outfit', sans-serif; font-size: 24px; line-height: 1.55; color: var(--w60); }
+
+/* Phone mock — same metrics as the homepage Fitz-in-Action phone */
+.fitz-phone {
+    width: 380px; background: #0d1424; border: 12px solid #1f2937;
+    border-radius: 44px; padding: 0; overflow: hidden;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 2px rgba(245,158,11,0.18);
+    position: relative;
+}
+.fitz-ph-header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; background: #0f172a; border-bottom: 1px solid rgba(255,255,255,0.08); }
+.fitz-ph-menu { display: flex; flex-direction: column; gap: 3px; }
+.fitz-ph-line { width: 18px; height: 2px; background: var(--amber); border-radius: 2px; }
+.fitz-ph-logo { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 18px; letter-spacing: -1px; }
+.fpl-fitz { color: var(--amber); }
+.fpl-hr { color: #fff; margin-left: 4px; }
+.fitz-ph-actions { display: flex; gap: 6px; }
+.fitz-ph-btn { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+.fitz-ph-red { background: rgba(239,68,68,0.18); }
+.fitz-ph-purple { background: rgba(168,85,247,0.18); }
+.fitz-ph-gray { background: rgba(148,163,184,0.18); }
+.fitz-ph-body { padding: 18px 14px; min-height: 360px; display: flex; flex-direction: column; gap: 12px; background: #0d1424; }
+
+.fitz-msg-user { display: flex; justify-content: flex-end; }
+.fitz-msg-user-bubble { background: #f59e0b; color: #0f172a; font-size: 15px; font-weight: 600; padding: 12px 15px; border-radius: 18px 18px 4px 18px; max-width: 82%; line-height: 1.45; }
+.fitz-msg-fitz { display: flex; }
+.fitz-msg-fitz-bubble { background: #243044; border-radius: 4px 18px 18px 18px; padding: 14px 16px; font-size: 15px; color: #e2e8f0; line-height: 1.6; max-width: 90%; }
+.fitz-msg-fitz-bubble strong { color: #fff; }
+.fitz-msg-fitz-name { color: #f59e0b; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 6px; font-family: 'DM Mono', monospace; }
+
+.fitz-ph-footer { padding: 12px 14px; background: #0f172a; border-top: 1px solid rgba(255,255,255,0.08); }
+.fitz-ph-input-row { display: flex; align-items: center; gap: 10px; background: #1f2937; border-radius: 24px; padding: 10px 14px; }
+.fitz-ph-plus { color: var(--amber); font-size: 18px; font-weight: 700; }
+.fitz-ph-input { flex: 1; color: rgba(255,255,255,0.4); font-size: 13px; }
+.fitz-ph-mic { color: rgba(255,255,255,0.6); }
+.fitz-ph-send { width: 26px; height: 26px; border-radius: 50%; background: var(--amber); display: flex; align-items: center; justify-content: center; }
+
+/* Doc preview pill (mirrors the demo's generated-document card) */
+.fitz-doc-pill { margin-top: 10px; display: flex; align-items: center; gap: 8px; background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.22); border-radius: 12px; padding: 10px 12px; }
+.fitz-doc-pill-name { flex: 1; font-size: 13px; color: #fff; font-weight: 600; }
+.fitz-doc-pill-btn { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber); }
+
+/* Scenario menu (matches site numbered list) */
+.scenarios { display: flex; flex-direction: column; border-left: 2px solid var(--rule); }
+.scenario { display: flex; align-items: center; gap: 16px; padding: 14px 22px; border-left: 2px solid transparent; margin-left: -2px; }
+.scenario.active { border-left-color: var(--amber); background: var(--a06); }
+.scenario .num { font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.16em; color: var(--w30); }
+.scenario.active .num { color: var(--amber); }
+.scenario .label { font-family: 'Outfit', sans-serif; font-weight: 600; font-size: 18px; color: var(--w60); }
+.scenario.active .label { color: #fff; }
+
+/* Stat tile */
+.stat { display: flex; flex-direction: column; gap: 8px; }
+.stat .num { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 88px; line-height: 1; color: #fff; }
+.stat .num em { color: var(--amber); font-style: normal; }
+.stat .lbl { font-family: 'DM Mono', monospace; font-size: 14px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--w60); }

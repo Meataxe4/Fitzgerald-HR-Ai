@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<title>Fitz HR · Instagram asset kit</title>
+<link rel="stylesheet" href="_shared.css">
+<style>
+    body { display: block; padding: 56px 64px; background: #0a0f1c; }
+    .gallery { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 56px; }
+    h1 { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 56px; line-height: 1.05; letter-spacing: -0.02em; }
+    h1 em { color: var(--amber); font-style: italic; }
+    h2 { font-family: 'Outfit', sans-serif; font-weight: 800; font-size: 24px; letter-spacing: -0.01em; }
+    p, li { font-family: 'Outfit', sans-serif; color: var(--w60); line-height: 1.6; font-size: 17px; }
+    code { font-family: 'DM Mono', monospace; color: var(--amber); background: var(--a06); padding: 2px 6px; border: 1px solid var(--rule); }
+    .meta { display: grid; grid-template-columns: 200px 1fr; gap: 8px 24px; padding: 18px 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+    .meta dt { font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--amber); }
+    .meta dd { font-family: 'Outfit', sans-serif; color: #fff; font-size: 16px; }
+    .asset { display: grid; grid-template-columns: 360px 1fr; gap: 40px; padding: 40px; border: 1px solid var(--rule); background: rgba(255,255,255,0.02); }
+    .asset .preview { background: var(--navy); border: 1px solid var(--rw); display: flex; align-items: center; justify-content: center; min-height: 240px; padding: 18px; }
+    .asset iframe { border: 0; transform-origin: top left; }
+    .asset .right { display: flex; flex-direction: column; gap: 18px; }
+    .pill-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pill { font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--amber); border: 1px solid var(--rule); padding: 5px 10px; background: var(--a06); }
+    .pill.solid { background: var(--amber); color: var(--navy); border-color: var(--amber); }
+    .open-btn { font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--navy); background: var(--amber); padding: 10px 16px; text-decoration: none; display: inline-block; align-self: flex-start; }
+    .copy { background: rgba(255,255,255,0.04); padding: 16px 18px; border-left: 2px solid var(--amber); white-space: pre-wrap; font-family: 'Outfit', sans-serif; font-size: 15px; color: #e5e7eb; line-height: 1.6; }
+    .hashtags { color: var(--amber); font-family: 'DM Mono', monospace; font-size: 13px; letter-spacing: 0.06em; word-break: break-word; }
+    .intro { display: flex; flex-direction: column; gap: 18px; max-width: 820px; }
+    .review { background: var(--a06); border: 1px solid var(--rule); padding: 22px 26px; }
+    .review h2 { color: var(--amber); margin-bottom: 10px; }
+    .review ul { padding-left: 20px; }
+</style>
+</head>
+<body>
+
+<div class="gallery">
+
+    <header class="intro">
+        <div class="brand-row">
+            <span class="fitz-bot" style="width:48px;height:48px;"></span>
+            <span class="wordmark" style="font-size:36px;"><span class="wm-f">F</span><span class="wm-itz">itz</span><span class="wm-hr">HR</span></span>
+        </div>
+        <h1>Instagram <em>asset kit.</em></h1>
+        <p>Six on-brand templates built directly from the homepage design tokens — same Playfair / Outfit / DM Mono stack, same amber-on-navy palette, same Fitz mascot, same phone-mock chat that runs in the live "See Fitz in Action" demo.</p>
+
+        <div class="meta">
+            <dt>Brand voice</dt><dd>Calm, dry, Australian. Hospitality-first. No fluff.</dd>
+            <dt>Colour</dt><dd>Navy <code>#0f172a</code> · Amber <code>#f59e0b</code></dd>
+            <dt>Type</dt><dd>Playfair Display (display) · Outfit (UI) · DM Mono (caption)</dd>
+            <dt>CTA URL</dt><dd>fitzhr.com</dd>
+            <dt>Export</dt><dd>Open the HTML file → screenshot the <code>.ig-frame</code> div at 100% zoom (Chrome DevTools → "Capture node screenshot") to get a pixel-perfect 1080-wide PNG.</dd>
+        </div>
+
+        <div class="review">
+            <h2>Code review notes</h2>
+            <ul>
+                <li><strong>Design system is solid.</strong> The site already exposes a clean token set (<code>--navy</code>, <code>--amber</code>, <code>--rule</code>, <code>--w60</code>) — these templates reuse them verbatim so anything you tweak on the site flows through.</li>
+                <li><strong>Demo section is the strongest hook.</strong> The phone-mock chat with typed answers + auto-cycling scenarios is the single best ad format you have. <code>post-fitz-in-action.html</code> turns it into a static frame; ideal as carousel slide 1.</li>
+                <li><strong>Slot-machine hook ("your <em>chef</em> is a no-show…")</strong> is the strongest single line on the homepage. <code>ad-square-no-show.html</code> leans on it for the paid ad.</li>
+                <li><strong>Stats band</strong> ($12k saved, &lt;90s, 24/7, 100% AU law) — high-converting "by the numbers" social tile.</li>
+                <li><strong>Watch-outs:</strong> <code>index.html</code> is 1,690 lines with all CSS + JS inline. Fine for a single-page marketing site, but the demo animation logic (lines 1526–1686) would be easier to maintain in <code>js/</code>.</li>
+            </ul>
+        </div>
+    </header>
+
+    <!-- ============================================================ -->
+    <!-- 1. Fitz in Action (the headline asset)                        -->
+    <!-- ============================================================ -->
+    <section class="asset">
+        <div class="preview">
+            <iframe src="post-fitz-in-action.html" width="1080" height="1350" style="transform: scale(0.296);" scrolling="no"></iframe>
+        </div>
+        <div class="right">
+            <div class="pill-row">
+                <span class="pill solid">Feed Post</span>
+                <span class="pill">1080 × 1350</span>
+                <span class="pill">Carousel slide 1</span>
+            </div>
+            <h2>Fitz in Action — Real answers, in seconds.</h2>
+            <p>Direct port of the homepage <code>#demo</code> section. The live phone mock + numbered scenario list reads as authentically as the website itself, so users who tap through to fitzhr.com get an instantly familiar layout.</p>
+            <a class="open-btn" href="post-fitz-in-action.html" target="_blank">Open template →</a>
+            <h2>Caption</h2>
+            <div class="copy">Real HR answers. In seconds.
+
+Sunday penalty rate? Casual contract? First written warning?
+Ask Fitz once and get an Australia-specific answer — grounded in the Hospitality Award and the Fair Work Act.
+
+→ Try Fitz free at fitzhr.com (no card required)</div>
+            <h2>Hashtags</h2>
+            <p class="hashtags">#HospitalityAU #PublifeAU #RestaurantOwner #CafeOwner #SmallBusinessAU #FairWork #HospitalityAward #HRforhospitality #AustralianHospitality #VenueOwner</p>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 2. Square ad — the slot-machine "chef no-show" hook           -->
+    <!-- ============================================================ -->
+    <section class="asset">
+        <div class="preview">
+            <iframe src="ad-square-no-show.html" width="1080" height="1080" style="transform: scale(0.296);" scrolling="no"></iframe>
+        </div>
+        <div class="right">
+            <div class="pill-row">
+                <span class="pill solid">Paid Ad</span>
+                <span class="pill">1080 × 1080</span>
+                <span class="pill">Cold-traffic</span>
+            </div>
+            <h2>"Your chef is a no-show." — Hero ad.</h2>
+            <p>Lifts the homepage hero verbatim — same H1, same italic-amber slot-machine hook, same primary CTA. Built for cold-traffic Meta campaigns where the headline has to work on its own.</p>
+            <a class="open-btn" href="ad-square-no-show.html" target="_blank">Open template →</a>
+            <h2>Primary text (Meta Ad)</h2>
+            <div class="copy">It's 10pm Saturday. Your chef walks. Your HR consultant isn't picking up.
+
+Fitz is. He'll tell you exactly what to do — Australian-law accurate, written for hospitality, available 24/7.
+
+Free forever. No card required.</div>
+            <h2>Headline (40 char)</h2>
+            <div class="copy">The HR desk every venue deserves.</div>
+            <h2>Description (30 char)</h2>
+            <div class="copy">Free. No card. AU law.</div>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 3. Penalty rates                                              -->
+    <!-- ============================================================ -->
+    <section class="asset">
+        <div class="preview">
+            <iframe src="post-penalty-rates.html" width="1080" height="1350" style="transform: scale(0.296);" scrolling="no"></iframe>
+        </div>
+        <div class="right">
+            <div class="pill-row">
+                <span class="pill solid">Feed Post</span>
+                <span class="pill">1080 × 1350</span>
+                <span class="pill">Educational</span>
+            </div>
+            <h2>Sunday penalty rates — value content.</h2>
+            <p>"Save this post" educational format. The phone mock answers a real award question with the actual figure ($38.20/hr Level 2 bar attendant), which is what makes it screenshot-worthy.</p>
+            <a class="open-btn" href="post-penalty-rates.html" target="_blank">Open template →</a>
+            <h2>Caption</h2>
+            <div class="copy">Sunday penalty rate, casual bar attendant — what does it actually cost you?
+
+Hospitality Award: 175% of ordinary + 25% casual loading.
+Level 2 bar attendant ≈ $38.20/hr.
+
+Save this post. Or just ask Fitz next time — he tracks every award update for you.
+
+→ fitzhr.com</div>
+            <h2>Hashtags</h2>
+            <p class="hashtags">#HospitalityAward #PenaltyRates #FairWork #PublifeAU #BarOwner #PubManager #PayrollAU #HRAustralia #SmallBizAU #PubCulture</p>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 4. Warning letter / Document Builder                          -->
+    <!-- ============================================================ -->
+    <section class="asset">
+        <div class="preview">
+            <iframe src="post-warning-letter.html" width="1080" height="1350" style="transform: scale(0.296);" scrolling="no"></iframe>
+        </div>
+        <div class="right">
+            <div class="pill-row">
+                <span class="pill solid">Feed Post</span>
+                <span class="pill">1080 × 1350</span>
+                <span class="pill">Document builder</span>
+            </div>
+            <h2>First Written Warning — feature spotlight.</h2>
+            <p>Showcases the document-builder side of Fitz: ask a question, get a procedurally fair, audit-ready letter back. Pair with the IG Action ad for retargeting.</p>
+            <a class="open-btn" href="post-warning-letter.html" target="_blank">Open template →</a>
+            <h2>Caption</h2>
+            <div class="copy">Staff member late four times this month?
+
+Don't fire off an email you'll regret. Don't paste together a template you found on Reddit. Ask Fitz — he'll guide you through the formal performance process and draft a procedurally-fair First Written Warning in 60 seconds.
+
+Eight questions. One legally sound document.
+
+→ fitzhr.com</div>
+            <h2>Hashtags</h2>
+            <p class="hashtags">#FairWork #UnfairDismissal #HospitalityHR #VenueManager #RestaurantOwnerLife #PerformanceManagement #HRtemplates #SmallBusinessAU #HospoLife</p>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 5. Stats post                                                 -->
+    <!-- ============================================================ -->
+    <section class="asset">
+        <div class="preview">
+            <iframe src="post-stats.html" width="1080" height="1080" style="transform: scale(0.296);" scrolling="no"></iframe>
+        </div>
+        <div class="right">
+            <div class="pill-row">
+                <span class="pill solid">Feed Post</span>
+                <span class="pill">1080 × 1080</span>
+                <span class="pill">Conversion</span>
+            </div>
+            <h2>By the numbers — conversion tile.</h2>
+            <p>Mirrors the homepage stats band. Works as carousel slide 3, or as a standalone re-engagement post for warm audiences.</p>
+            <a class="open-btn" href="post-stats.html" target="_blank">Open template →</a>
+            <h2>Caption</h2>
+            <div class="copy">An HR desk that pays for itself in week one.
+
+$12k average annual savings.
+&lt;90 second response time.
+24/7 availability.
+100% Australian law.
+
+Free forever. Paid plans from $249/year — every plan unlimited AI chat.
+
+→ fitzhr.com</div>
+            <h2>Hashtags</h2>
+            <p class="hashtags">#SmallBusinessAU #HospitalityAU #VenueOwner #CostSaving #HRAustralia #Restaurateur #PubLife #CafeBusiness</p>
+        </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <!-- 6. Story — pain point                                         -->
+    <!-- ============================================================ -->
+    <section class="asset">
+        <div class="preview">
+            <iframe src="story-pain-point.html" width="1080" height="1920" style="transform: scale(0.208);" scrolling="no"></iframe>
+        </div>
+        <div class="right">
+            <div class="pill-row">
+                <span class="pill solid">Story / Reel cover</span>
+                <span class="pill">1080 × 1920</span>
+                <span class="pill">Top-of-funnel</span>
+            </div>
+            <h2>"Running a venue is hard enough…" — Story.</h2>
+            <p>Same 9:16 layout-language as the homepage Problem section. Use as a story cover or reel thumbnail to drive traffic to the fitzhr.com link sticker.</p>
+            <a class="open-btn" href="story-pain-point.html" target="_blank">Open template →</a>
+            <h2>Caption / sticker text</h2>
+            <div class="copy">When the chef walks at 10pm Saturday — Fitz is on. fitzhr.com</div>
+            <h2>Hashtags</h2>
+            <p class="hashtags">#HospitalityAU #VenueLife #PublifeAU #RestaurantOwner #SmallBusinessOwner #HospoLife #FairWork #HRAustralia</p>
+        </div>
+    </section>
+
+</div>
+
+</body>
+</html>
