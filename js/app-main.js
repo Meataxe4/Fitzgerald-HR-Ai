@@ -16057,39 +16057,11 @@ function showOnboarding() {
     updateOnboardingStep();
 }
 
-function populateVenueTypeOptions(award) {
-    var awardKey = 'all';
-    if (award) {
-        var a = award.toLowerCase();
-        if (a.includes('restaurant')) awardKey = 'restaurant';
-        else if (a.includes('fast food')) awardKey = 'fastfood';
-        else if (a.includes('hospitality')) awardKey = 'hospitality';
-    }
-    document.querySelectorAll('.venue-type-btn').forEach(function(btn) {
-        var btnAward = btn.getAttribute('data-award');
-        if (awardKey === 'all' || btnAward === awardKey) {
-            btn.classList.remove('hidden');
-        } else {
-            btn.classList.add('hidden');
-        }
-    });
-}
-
-
-
-function saveOnboardingVenueTypeDirect(value) {
-    venueProfile.venueType = value;
-    onboardingCurrentStep++;
-    updateOnboardingStep();
-}
 function saveOnboardingAnswer(field, value, isLastStep = false) {
     venueProfile[field] = value;
     if (isLastStep) {
         completeOnboarding();
     } else {
-        if (field === 'primaryAward') {
-            populateVenueTypeOptions(value);
-        }
         onboardingCurrentStep++;
         updateOnboardingStep();
     }
@@ -16141,7 +16113,7 @@ function saveOnboardingVenueType() {
 
 function updateOnboardingStep() {
     document.querySelectorAll('.onboarding-step').forEach(step => step.classList.add('hidden'));
-    const current = document.querySelector(`[data-onboarding-step="${onboardingCurrentStep}"]`);
+    const current = document.querySelector(`[data-step="${onboardingCurrentStep}"]`);
     if (current) current.classList.remove('hidden');
 
     document.getElementById('onboardingStep').textContent = onboardingCurrentStep;
@@ -16149,10 +16121,6 @@ function updateOnboardingStep() {
     document.getElementById('onboardingProgress').textContent = `${progress}% Complete`;
     document.getElementById('onboardingProgressBar').style.width = `${progress}%`;
 
-    // Step 3 is venue type — populate options based on the award selected in step 2
-    if (onboardingCurrentStep === 3) {
-        populateVenueTypeOptions(venueProfile.primaryAward);
-    }
 }
 
 function completeOnboarding() {
