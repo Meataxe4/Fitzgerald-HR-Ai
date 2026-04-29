@@ -16127,10 +16127,17 @@ function populateVenueTypeOptions(award) {
         { value: 'wine-bar', label: 'Wine Bar' }
     ];
     var venues = venuesByAward[award] || allVenues;
-    var select = document.getElementById('onboardingVenueType');
-    if (!select) return;
-    select.innerHTML = '<option value="">Select venue type...</option>' +
-        venues.map(function(v) { return '<option value="' + v.value + '">' + v.label + '</option>'; }).join('');
+    var container = document.getElementById('onboardingVenueTypeOptions');
+    if (!container) return;
+    container.innerHTML = venues.map(function(v) {
+        return '<button onclick="saveOnboardingVenueTypeDirect(\'' + v.value + '\')" class="w-full p-3 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left font-semibold">' + v.label + '</button>';
+    }).join('');
+}
+
+function saveOnboardingVenueTypeDirect(value) {
+    venueProfile.venueType = value;
+    onboardingCurrentStep++;
+    updateOnboardingStep();
 }
 function saveOnboardingAnswer(field, value, isLastStep = false) {
     venueProfile[field] = value;
