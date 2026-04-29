@@ -34,6 +34,7 @@
         :root{--navy:#0f172a;--navy2:#141f35;--amber:#f59e0b;--w60:rgba(255,255,255,0.6);--w30:rgba(255,255,255,0.3);--rule:rgba(245,158,11,0.18);--rw:rgba(255,255,255,0.08);--green:#22c55e;}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
         body{background:var(--navy);color:#fff;font-family:'Outfit',sans-serif;line-height:1.7;}
+        html{scroll-behavior:smooth;scroll-padding-top:80px;}
         .nav{background:rgba(15,23,42,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--rule);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
         .nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-1px;text-decoration:none;display:inline-flex;}
         .wm-f,.wm-hr{color:var(--amber);}.wm-itz{color:#fff;}
@@ -135,7 +136,7 @@
         </p>
     </div>
 
-    <h2>Penalty Rates <em>(2026)</em></h2>
+    <h2 id="penalty-rates">Penalty Rates <em>(2026)</em></h2>
     <p>Penalty rates under the Hospitality Award apply on top of ordinary rates for full-time and part-time employees. Casual employees receive their 25% casual loading on top of these rates.</p>
 
     <table class="rate-table">
@@ -172,7 +173,7 @@
         <li>Catering operations</li>
         <li>Functions and events venues</li>
     </ul>
-    <p>It does not cover employees covered by the Restaurant Industry Award MA000119, or those working under a registered enterprise agreement that covers the same conditions.</p>
+    <p>It does not cover employees covered by the Restaurant Industry Award MA000119, or those working under a registered enterprise agreement that covers the same conditions. If you&rsquo;re unsure which Award covers your venue, see the full breakdown in <a href="/blog/hospitality-award-vs-restaurant-award-difference">Hospitality Award vs Restaurant Award — key differences</a>.</p>
 
     <h2>Key Provisions — <em>Topic by Topic</em></h2>
     <p>The Award contains specific provisions across all major HR topics. Each links to a detailed guide:</p>
@@ -183,10 +184,10 @@
             <h3>Break Entitlements by Shift Length</h3>
             <p>Paid vs unpaid breaks, timing requirements, and what happens when breaks are missed.</p>
         </a>
-        <a href="/blog/split-shift-rules-hospitality-award-australia" class="hub-card">
-            <div class="hub-label">Rostering</div>
-            <h3>Split Shift Rules &amp; Allowances</h3>
-            <p>The split shift allowance, maximum spread of hours, and minimum engagement requirements.</p>
+        <a href="/blog/split-shift-rules-hospitality-award-australia" class="hub-card" id="minimum-engagement">
+            <div class="hub-label">Rostering &middot; Minimum Engagement</div>
+            <h3>Split Shifts &amp; Minimum Engagement</h3>
+            <p>The split shift allowance, maximum spread of hours, and minimum engagement requirements (2hr casual, 3hr part-time).</p>
         </a>
         <a href="/blog/casual-conversion-rules-hospitality-award-australia" class="hub-card">
             <div class="hub-label">Casual Employment</div>
@@ -218,6 +219,7 @@
         <li><strong>Incorrect employee classification</strong> — classifying employees below their actual skill and responsibility level creates ongoing underpayment exposure across every shift worked</li>
         <li><strong>Recording rostered hours rather than actual hours</strong> — record-keeping obligations under the Fair Work Act 2009 (Cth) require actual start and finish times. Rostered hours are not sufficient</li>
         <li><strong>Absorbing casual loading into a flat rate</strong> — the 25% casual loading under MA000009 must be applied on top of the ordinary rate and all applicable penalty rates. Absorbing it into a single flat rate may still constitute underpayment when penalty rates apply</li>
+        <li><strong>Applying the wrong Award entirely</strong> — confusing MA000009 with the Restaurant Industry Award MA000119 is a foundational error that compounds across every payroll cycle. See <a href="/blog/hospitality-award-vs-restaurant-award-difference">Hospitality vs Restaurant Award — key differences</a></li>
     </ul>
     <p>See the <a href="/fair-work-compliance-hospitality">complete Fair Work compliance guide for hospitality</a> and the <a href="/blog/fair-work-fines-hospitality-australia">Fair Work fines guide for Australian venues</a>.</p>
 
