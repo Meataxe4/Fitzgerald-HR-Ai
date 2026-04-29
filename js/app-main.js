@@ -16202,6 +16202,10 @@ function updateOnboardingStep() {
     document.getElementById('onboardingProgress').textContent = `${progress}% Complete`;
     document.getElementById('onboardingProgressBar').style.width = `${progress}%`;
 
+    // Step 3 is venue type — populate options based on the award selected in step 2
+    if (onboardingCurrentStep === 3) {
+        populateVenueTypeOptions(venueProfile.primaryAward);
+    }
 }
 
 function completeOnboarding() {
