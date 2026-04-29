@@ -922,6 +922,99 @@ let onboardingCurrentStep = 1;
 const ONBOARDING_STEPS = 6;
 
 // ========================================
+// VENUE TYPE CATALOGUE + AWARD MAPPING
+// ========================================
+// Single source of truth for venue type options. Each entry has the slug
+// stored on venueProfile.venueType, the label shown in dropdowns, and the
+// short label used in chat / prompts.
+const VENUE_OPTIONS = [
+    { value: 'bakery-cafe',         label: 'Bakery Café',                                  short: 'bakery café' },
+    { value: 'bar',                 label: 'Bar',                                          short: 'bar' },
+    { value: 'bistro',              label: 'Bistro',                                       short: 'bistro' },
+    { value: 'boutique-hotel',      label: 'Boutique Hotel',                               short: 'boutique hotel' },
+    { value: 'brewery',             label: 'Brewery / Brewpub',                            short: 'brewery/brewpub' },
+    { value: 'cafe',                label: 'Café',                                         short: 'café' },
+    { value: 'cinema-fnb',          label: 'Cinema with Food & Beverage Service',          short: 'cinema with F&B service' },
+    { value: 'conference-venue',    label: 'Conference Venue',                             short: 'conference venue' },
+    { value: 'dessert-bar',         label: 'Dessert Bar',                                  short: 'dessert bar' },
+    { value: 'distillery-bar',      label: 'Distillery Bar',                               short: 'distillery bar' },
+    { value: 'entertainment-venue', label: 'Entertainment Venue (Comedy Club / Theatre)',  short: 'entertainment venue' },
+    { value: 'food-court',          label: 'Food Court Outlet',                            short: 'food court outlet' },
+    { value: 'function-centre',     label: 'Function Centre',                              short: 'function centre' },
+    { value: 'hotel-accommodation', label: 'Hotel (Accommodation Venue)',                  short: 'hotel (accommodation)' },
+    { value: 'ice-cream-bar',       label: 'Ice Cream / Gelato Bar',                       short: 'ice cream/gelato bar' },
+    { value: 'juice-bar',           label: 'Juice / Smoothie Bar',                         short: 'juice/smoothie bar' },
+    { value: 'live-music-venue',    label: 'Live Music Venue',                             short: 'live music venue' },
+    { value: 'motel',               label: 'Motel',                                        short: 'motel' },
+    { value: 'nightclub',           label: 'Nightclub',                                    short: 'nightclub' },
+    { value: 'pub',                 label: 'Pub / Hotel',                                  short: 'pub/hotel' },
+    { value: 'resort',              label: 'Resort',                                       short: 'resort' },
+    { value: 'restaurant',          label: 'Restaurant',                                   short: 'restaurant' },
+    { value: 'rooftop-bar',         label: 'Rooftop Bar',                                  short: 'rooftop bar' },
+    { value: 'serviced-apartments', label: 'Serviced Apartments',                          short: 'serviced apartments' },
+    { value: 'sports-bar',          label: 'Sports Bar',                                   short: 'sports bar' },
+    { value: 'tea-house',           label: 'Tea House',                                    short: 'tea house' },
+    { value: 'wine-bar',            label: 'Wine Bar',                                     short: 'wine bar' }
+];
+
+// Venues commonly covered by each Modern Award. Some venues legitimately
+// appear under more than one Award because the right Award depends on what
+// staff actually do (a wine bar with a kitchen, a brewery with a restaurant,
+// etc). The dropdown shows these primary matches first, with everything else
+// available under an "Other venue types" group as a fallback.
+const AWARD_VENUE_MAP = {
+    'Hospitality Industry (General) Award': [
+        'pub', 'bar', 'sports-bar', 'rooftop-bar', 'wine-bar', 'distillery-bar',
+        'nightclub', 'live-music-venue', 'entertainment-venue', 'brewery',
+        'hotel-accommodation', 'boutique-hotel', 'motel', 'resort',
+        'serviced-apartments', 'function-centre', 'conference-venue', 'cinema-fnb'
+    ],
+    'Restaurant Industry Award': [
+        'restaurant', 'cafe', 'bistro', 'bakery-cafe', 'wine-bar', 'brewery',
+        'tea-house', 'dessert-bar', 'ice-cream-bar', 'juice-bar',
+        'function-centre', 'cinema-fnb'
+    ],
+    'Fast Food Industry Award': [
+        'food-court', 'bakery-cafe', 'dessert-bar', 'ice-cream-bar',
+        'juice-bar', 'cinema-fnb'
+    ]
+};
+
+// Render the venue-type dropdown filtered by Award. When awardName matches a
+// known Award, the primary matches appear at the top in alphabetical order
+// and the remaining venues appear under an "Other venue types" optgroup.
+// For "Not sure" or any unknown award, the full list is shown alphabetically.
+function populateVenueTypeDropdown(selectEl, awardName, currentValue) {
+    if (!selectEl) return;
+    const selected = currentValue || '';
+    const sortByLabel = (a, b) => a.label.localeCompare(b.label);
+    const primarySlugs = AWARD_VENUE_MAP[awardName];
+
+    let html = '<option value="">Select venue type...</option>';
+
+    if (primarySlugs && primarySlugs.length) {
+        const primary = VENUE_OPTIONS
+            .filter(v => primarySlugs.includes(v.value))
+            .sort(sortByLabel);
+        const other = VENUE_OPTIONS
+            .filter(v => !primarySlugs.includes(v.value))
+            .sort(sortByLabel);
+        const optionTag = (v) =>
+            `<option value="${v.value}"${v.value === selected ? ' selected' : ''}>${v.label}</option>`;
+        html += `<optgroup label="Common for this Award">${primary.map(optionTag).join('')}</optgroup>`;
+        html += `<optgroup label="Other venue types">${other.map(optionTag).join('')}</optgroup>`;
+    } else {
+        html += VENUE_OPTIONS
+            .slice()
+            .sort(sortByLabel)
+            .map(v => `<option value="${v.value}"${v.value === selected ? ' selected' : ''}>${v.label}</option>`)
+            .join('');
+    }
+
+    selectEl.innerHTML = html;
+}
+
+// ========================================
 // ADMIN ANALYTICS TRACKING
 // ========================================
 
@@ -16121,6 +16214,20 @@ function updateOnboardingStep() {
     document.getElementById('onboardingProgress').textContent = `${progress}% Complete`;
     document.getElementById('onboardingProgressBar').style.width = `${progress}%`;
 
+    if (onboardingCurrentStep === 3) {
+        const select = document.getElementById('onboardingVenueType');
+        const hint = document.getElementById('onboardingVenueTypeHint');
+        populateVenueTypeDropdown(select, venueProfile.primaryAward, venueProfile.venueType);
+        if (hint) {
+            if (AWARD_VENUE_MAP[venueProfile.primaryAward]) {
+                hint.textContent = `Showing venues commonly covered by the ${venueProfile.primaryAward}. If yours isn't listed, choose from "Other venue types".`;
+                hint.classList.remove('hidden');
+            } else {
+                hint.textContent = '';
+                hint.classList.add('hidden');
+            }
+        }
+    }
 }
 
 function completeOnboarding() {
@@ -16347,41 +16454,16 @@ function showRandomQuickPrompts() {
 }
 
 function getVenueTypeLabel(type) {
-    const labels = { 
-        'bakery-cafe': 'bakery café',
-        'bar': 'bar',
-        'bistro': 'bistro',
-        'boutique-hotel': 'boutique hotel',
-        'brewery': 'brewery/brewpub',
-        'cafe': 'café',
-        'cinema-fnb': 'cinema with F&B service',
-        'conference-venue': 'conference venue',
-        'dessert-bar': 'dessert bar',
-        'distillery-bar': 'distillery bar',
-        'entertainment-venue': 'entertainment venue',
-        'food-court': 'food court outlet',
-        'function-centre': 'function centre',
-        'hotel-accommodation': 'hotel (accommodation)',
-        'ice-cream-bar': 'ice cream/gelato bar',
-        'juice-bar': 'juice/smoothie bar',
-        'live-music-venue': 'live music venue',
-        'motel': 'motel',
-        'nightclub': 'nightclub',
-        'pub': 'pub/hotel',
-        'resort': 'resort',
-        'restaurant': 'restaurant',
-        'rooftop-bar': 'rooftop bar',
-        'serviced-apartments': 'serviced apartments',
-        'sports-bar': 'sports bar',
-        'tea-house': 'tea house',
-        'wine-bar': 'wine bar',
-        // Legacy values for backwards compatibility
+    const match = VENUE_OPTIONS.find(v => v.value === type);
+    if (match) return match.short;
+    // Legacy slugs from earlier onboarding versions
+    const legacy = {
         'hotel': 'hotel/pub',
         'fastfood': 'fast food venue',
         'club': 'club/bar',
         'other': 'hospitality venue'
     };
-    return labels[type] || type || 'hospitality venue';
+    return legacy[type] || type || 'hospitality venue';
 }
 
 function showVenueSettings() {
@@ -16408,33 +16490,6 @@ function showVenueSettings() {
                 <label class="block text-slate-300 text-sm mb-2">Venue Type</label>
                 <select id="settingsVenueType" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
                     <option value="">Select venue type...</option>
-                    <option value="bakery-cafe" ${venueProfile.venueType === 'bakery-cafe' ? 'selected' : ''}>Bakery Café</option>
-                    <option value="bar" ${venueProfile.venueType === 'bar' ? 'selected' : ''}>Bar</option>
-                    <option value="bistro" ${venueProfile.venueType === 'bistro' ? 'selected' : ''}>Bistro</option>
-                    <option value="boutique-hotel" ${venueProfile.venueType === 'boutique-hotel' ? 'selected' : ''}>Boutique Hotel</option>
-                    <option value="brewery" ${venueProfile.venueType === 'brewery' ? 'selected' : ''}>Brewery / Brewpub</option>
-                    <option value="cafe" ${venueProfile.venueType === 'cafe' ? 'selected' : ''}>Café</option>
-                    <option value="cinema-fnb" ${venueProfile.venueType === 'cinema-fnb' ? 'selected' : ''}>Cinema with Food & Beverage Service</option>
-                    <option value="conference-venue" ${venueProfile.venueType === 'conference-venue' ? 'selected' : ''}>Conference Venue</option>
-                    <option value="dessert-bar" ${venueProfile.venueType === 'dessert-bar' ? 'selected' : ''}>Dessert Bar</option>
-                    <option value="distillery-bar" ${venueProfile.venueType === 'distillery-bar' ? 'selected' : ''}>Distillery Bar</option>
-                    <option value="entertainment-venue" ${venueProfile.venueType === 'entertainment-venue' ? 'selected' : ''}>Entertainment Venue (Comedy Club / Theatre)</option>
-                    <option value="food-court" ${venueProfile.venueType === 'food-court' ? 'selected' : ''}>Food Court Outlet</option>
-                    <option value="function-centre" ${venueProfile.venueType === 'function-centre' ? 'selected' : ''}>Function Centre</option>
-                    <option value="hotel-accommodation" ${venueProfile.venueType === 'hotel-accommodation' ? 'selected' : ''}>Hotel (Accommodation Venue)</option>
-                    <option value="ice-cream-bar" ${venueProfile.venueType === 'ice-cream-bar' ? 'selected' : ''}>Ice Cream / Gelato Bar</option>
-                    <option value="juice-bar" ${venueProfile.venueType === 'juice-bar' ? 'selected' : ''}>Juice / Smoothie Bar</option>
-                    <option value="live-music-venue" ${venueProfile.venueType === 'live-music-venue' ? 'selected' : ''}>Live Music Venue</option>
-                    <option value="motel" ${venueProfile.venueType === 'motel' ? 'selected' : ''}>Motel</option>
-                    <option value="nightclub" ${venueProfile.venueType === 'nightclub' ? 'selected' : ''}>Nightclub</option>
-                    <option value="pub" ${venueProfile.venueType === 'pub' ? 'selected' : ''}>Pub / Hotel</option>
-                    <option value="resort" ${venueProfile.venueType === 'resort' ? 'selected' : ''}>Resort</option>
-                    <option value="restaurant" ${venueProfile.venueType === 'restaurant' ? 'selected' : ''}>Restaurant</option>
-                    <option value="rooftop-bar" ${venueProfile.venueType === 'rooftop-bar' ? 'selected' : ''}>Rooftop Bar</option>
-                    <option value="serviced-apartments" ${venueProfile.venueType === 'serviced-apartments' ? 'selected' : ''}>Serviced Apartments</option>
-                    <option value="sports-bar" ${venueProfile.venueType === 'sports-bar' ? 'selected' : ''}>Sports Bar</option>
-                    <option value="tea-house" ${venueProfile.venueType === 'tea-house' ? 'selected' : ''}>Tea House</option>
-                    <option value="wine-bar" ${venueProfile.venueType === 'wine-bar' ? 'selected' : ''}>Wine Bar</option>
                 </select>
             </div>
             
@@ -16482,7 +16537,16 @@ function showVenueSettings() {
             </div>
         </div>
     `;
-    
+
+    const venueSelect = content.querySelector('#settingsVenueType');
+    const awardSelect = content.querySelector('#settingsPrimaryAward');
+    populateVenueTypeDropdown(venueSelect, venueProfile.primaryAward, venueProfile.venueType);
+    if (awardSelect) {
+        awardSelect.addEventListener('change', () => {
+            populateVenueTypeDropdown(venueSelect, awardSelect.value, venueSelect.value);
+        });
+    }
+
     modal.classList.remove('hidden');
 }
 
