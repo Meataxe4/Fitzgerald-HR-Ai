@@ -1918,7 +1918,7 @@ This is a supportive probation review document — NOT a disciplinary document. 
 
 VENUE CONTEXT:
 ${venueContext}
-Award: Hospitality Industry (General) Award MA000009
+Award: ${getAwardContext().fullName}
 Manager/Reviewer: ${data.managerName || '[Manager Name]'}
 
 EMPLOYEE DETAILS:
@@ -3443,7 +3443,7 @@ function getStep1Template() {
             <label class="form-label required">Modern Award</label>
             <input type="text" class="form-input" id="awardName" name="awardName" 
                    value="${data.awardName}" 
-                   placeholder="e.g., Hospitality Industry (General) Award">
+                   placeholder="e.g., Hospitality Industry (General) Award / Restaurant Industry Award">
             <span class="form-hint">
                 Not sure? 
                 <button class="btn btn-link" style="padding: 0; display: inline;" onclick="openAwardWizardFromContract(); return false;">Use Award Wizard</button>
@@ -3457,7 +3457,7 @@ function getStep1Template() {
             </button>
             <div class="help-content">
                 <p>A Modern Award is a legal document that sets out minimum pay rates and conditions of employment for a particular industry or occupation in Australia.</p>
-                <p>The Hospitality Industry (General) Award covers most hospitality businesses including restaurants, cafes, hotels, catering, and clubs.</p>
+                <p>Common awards: <strong>Hospitality Industry (General) Award MA000009</strong> — hotels, pubs, bars, clubs, accommodation. <strong>Restaurant Industry Award MA000119</strong> — restaurants, cafes, bistros with table service.</p>
             </div>
         </div>
         

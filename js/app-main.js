@@ -46,7 +46,8 @@ const CONFIG = {
     
     // API endpoints
     API: {
-        RATES_URL: 'https://raw.githubusercontent.com/Meataxe4/Fitz-HR-Ai/main/hospitality-award-rates.json',
+        HOSPITALITY_RATES_URL: '/hospitality-award-rates.json',
+        RESTAURANT_RATES_URL: '/restaurant-award-rates.json',
         CHAT_ENDPOINT: '/.netlify/functions/chat',
         CRISIS_ENDPOINT: '/.netlify/functions/telegram-crisis'
     },
@@ -1289,7 +1290,7 @@ function detectToolNeeds(message) {
                 'am i paying right', 'paying too little', 'paying correctly'
             ],
             title: '🧙 Award Wizard',
-            description: 'Find the correct pay rates and classifications under the Hospitality Award',
+            description: `Find the correct pay rates and classifications under the ${getAwardContext().name}`,
             action: 'openAwardWizard()',
             buttonText: 'Open Award Wizard',
             color: 'amber'
@@ -1727,23 +1728,31 @@ function openDocumentBuilderFor(documentType) {
 // ========================================
 
 let awardRates = null; // Global variable to store rates
-// Rate URL now in CONFIG object - see line 1169
+
+// Returns award name, MA code, and full name based on the user's venueProfile
+function getAwardContext() {
+    const award = (venueProfile && venueProfile.primaryAward) || 'Hospitality Industry (General) Award';
+    const isRestaurant = award.toLowerCase().includes('restaurant');
+    return {
+        name: award,
+        code: isRestaurant ? 'MA000119' : 'MA000009',
+        fullName: isRestaurant
+            ? 'Restaurant Industry Award MA000119'
+            : 'Hospitality Industry (General) Award MA000009'
+    };
+}
 
 // Fetch rates on page load
-/**
- * Loads award rates from GitHub with automatic retry
- * Falls back to hardcoded rates if GitHub is unavailable
- * @returns {Promise<boolean>} True if loaded from GitHub, false if using fallback
- */
 async function loadAwardRates() {
     try {
-        const response = await fetchWithRetry(CONFIG.API.RATES_URL);
+        const isRestaurant = venueProfile && venueProfile.primaryAward &&
+            venueProfile.primaryAward.toLowerCase().includes('restaurant');
+        const url = isRestaurant ? CONFIG.API.RESTAURANT_RATES_URL : CONFIG.API.HOSPITALITY_RATES_URL;
+        const response = await fetchWithRetry(url);
         if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to load rates`);
-        
         awardRates = await response.json();
         return true;
     } catch (error) {
-        // Fallback to basic rates if GitHub fails
         awardRates = getFallbackRates();
         return false;
     }
@@ -2180,7 +2189,7 @@ const hrTemplates = {
                 <p><strong>Position:</strong> ${data.position || '[Position Title]'}</p>
                 <p><strong>Start Date:</strong> ${data.startDate || '[Start Date]'}</p>
                 <p><strong>Employment Type:</strong> ${data.employmentType || '[Full-time/Part-time/Casual]'}</p>
-                <p><strong>Applicable Award:</strong> ${data.award || 'Hospitality Industry (General) Award'}</p>
+                <p><strong>Applicable Award:</strong> ${data.award || getAwardContext().fullName}</p>
                 
                 <h2>1. Position and Duties</h2>
                 <p>${data.duties || '[Insert comprehensive list of key duties, responsibilities, and reporting lines]'}</p>
@@ -2188,7 +2197,7 @@ const hrTemplates = {
                 <h2>2. Remuneration and Benefits</h2>
                 <p><strong>Base Rate of Pay:</strong> ${data.baseRate || '[Rate]'} per ${data.payPeriod || 'hour'}</p>
                 <p>Payment will be made ${data.paymentFrequency || 'fortnightly'} via direct deposit.</p>
-                <p>In addition to the base rate, you will receive applicable penalty rates, loadings, and allowances as prescribed by the ${data.award || 'Hospitality Industry (General) Award'}.</p>
+                <p>In addition to the base rate, you will receive applicable penalty rates, loadings, and allowances as prescribed by the ${data.award || getAwardContext().fullName}.</p>
                 
                 <h2>3. Hours of Work</h2>
                 <p>${data.hoursOfWork || '[Specify ordinary hours, roster arrangements, and any requirements for availability]'}</p>
@@ -4705,7 +4714,7 @@ Generate the ACTUAL LETTER with real content based on the information provided b
 
 VENUE CONTEXT:
 ${venueContext}
-Award: Hospitality Industry (General) Award MA000009
+Award: ${getAwardContext().fullName}
 Manager: ${venueProfile.userName || '[Manager Name]'}
 
 EMPLOYEE DETAILS:
@@ -5329,7 +5338,7 @@ THIS IS A TEMPLATE & CONVERSATION GUIDE — the manager will use this during the
 
 VENUE CONTEXT:
 ${venueContext}
-Award: Hospitality Industry (General) Award MA000009
+Award: ${getAwardContext().fullName}
 
 EMPLOYEE DETAILS:
 - Employee Name: ${data.employeeName}
@@ -5526,7 +5535,7 @@ Generate the ACTUAL PIP DOCUMENT with real content based on the information prov
 
 VENUE CONTEXT:
 ${venueContext}
-Award: Hospitality Industry (General) Award MA000009
+Award: ${getAwardContext().fullName}
 Manager: ${data.managerName || venueProfile.userName || '[Manager Name]'}
 
 EMPLOYEE DETAILS:
@@ -11362,7 +11371,8 @@ async function callClaudeAPI(message) {
             body: JSON.stringify({
                 message: venueContext + message,
                 history: conversationHistory.filter(m => m.role !== 'system'),
-                user: currentUser
+                user: currentUser,
+                primaryAward: venueProfile.primaryAward || null
             })
         });
 
@@ -16115,6 +16125,9 @@ function updateOnboardingStep() {
 function completeOnboarding() {
     venueProfile.setupComplete = true;
     venueProfile.setupDate = new Date().toISOString();
+
+    // Reload rates for the selected award (Restaurant Award uses a different rates file)
+    loadAwardRates();
     
     // Use currentUser.uid for Firebase users, or currentUser as string for access code users
     const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
@@ -16134,6 +16147,12 @@ function completeOnboarding() {
     setTimeout(() => {
         updateSidebarVenueName();
     }, 500);
+
+    // Update award rate alert text to reflect the user's actual award
+    const alertEl = document.getElementById('awardRateAlertText');
+    if (alertEl) {
+        alertEl.textContent = `${getAwardContext().name} rates increase on 1 July 2026`;
+    }
     
     // Also force refresh the credits display in case it wasn't showing
     setTimeout(() => {
@@ -16198,15 +16217,15 @@ function showQuickActionPrompts() {
         prompts.push({icon: '⚠️', label: 'Staff always late', text: 'I have a staff member who is always late. What should I do?'});
         prompts.push({icon: '📝', label: 'Write a warning', text: 'Can you help me write a warning letter for an employee?'});
     } else if (challenge === 'awards') {
-        prompts.push({icon: '💰', label: 'Check pay rates', text: 'What should I pay a casual waiter under the Hospitality Award?'});
+        prompts.push({icon: '💰', label: 'Check pay rates', text: `What should I pay a casual waiter under the ${getAwardContext().name}?`});
         prompts.push({icon: '🌙', label: 'Penalty rates', text: 'What are the penalty rates for weekend and public holiday work?'});
     } else if (challenge === 'rostering') {
-        prompts.push({icon: '📅', label: 'Roster rules', text: 'What are the minimum shift length rules under the Hospitality Award?'});
-        prompts.push({icon: '⏰', label: 'Overtime rules', text: 'When does overtime kick in for hospitality workers?'});
+        prompts.push({icon: '📅', label: 'Roster rules', text: `What are the minimum shift length rules under the ${getAwardContext().name}?`});
+        prompts.push({icon: '⏰', label: 'Overtime rules', text: 'When does overtime kick in for my award?'});
     } else {
         // Default prompts if no challenge selected
         prompts.push({icon: '👋', label: 'Hiring new staff', text: 'What do I need to do when hiring a new employee?'});
-        prompts.push({icon: '💰', label: 'Check pay rates', text: 'What should I pay a casual waiter under the Hospitality Award?'});
+        prompts.push({icon: '💰', label: 'Check pay rates', text: `What should I pay a casual waiter under the ${getAwardContext().name}?`});
     }
     
     // Add one more common prompt to make 3 total
@@ -16281,14 +16300,14 @@ function showRandomQuickPrompts() {
     
     // Pool of general HR prompts
     var allPrompts = [
-        {icon: '💰', label: 'Casual pay rates', text: 'What should I pay a casual employee under the Hospitality Award?'},
+        {icon: '💰', label: 'Casual pay rates', text: `What should I pay a casual employee under the ${getAwardContext().name}?`},
         {icon: '🌙', label: 'Penalty rates', text: 'What are the penalty rates for weekend and public holiday work?'},
         {icon: '📝', label: 'Write a warning', text: 'Can you help me write a warning letter for an employee?'},
         {icon: '⚠️', label: 'Late employee', text: 'I have a staff member who is always late. What should I do?'},
         {icon: '👋', label: 'Hiring checklist', text: 'What do I need to do when hiring a new employee?'},
         {icon: '🏥', label: 'Sick leave', text: 'How does sick leave work for casual employees?'},
-        {icon: '📅', label: 'Minimum shifts', text: 'What is the minimum shift length under the Hospitality Award?'},
-        {icon: '⏰', label: 'Overtime rules', text: 'When does overtime kick in for hospitality workers?'},
+        {icon: '📅', label: 'Minimum shifts', text: `What is the minimum shift length under the ${getAwardContext().name}?`},
+        {icon: '⏰', label: 'Overtime rules', text: 'When does overtime kick in under my award?'},
         {icon: '📋', label: 'Casual conversion', text: 'When do I need to offer casual conversion to my staff?'},
         {icon: '📊', label: 'Redundancy', text: 'What is the process for making someone redundant?'},
         {icon: '🔥', label: 'Termination', text: 'What is the correct process to terminate an employee?'},
@@ -18275,7 +18294,7 @@ function showWizardResults() {
     // Build a simple result for now to ensure display works
     let resultRate = 0;
     let resultTitle = 'Classification';
-    let resultAward = 'Hospitality Industry (General) Award MA000009';
+    let resultAward = getAwardContext().fullName;
     let penaltiesHTML = '<div>Standard rates apply</div>';
     let stepsHTML = '<li>Verify rate with Fair Work</li>';
     
@@ -18414,10 +18433,10 @@ function showJuniorRedirect() {
                         <p class="font-semibold text-green-400 mb-3">
                             📖 View Full Junior Rates in the Award
                         </p>
-                        <a href="https://awards.fairwork.gov.au/MA000009.html" 
+                        <a href="${'https://awards.fairwork.gov.au/' + getAwardContext().code + '.html'}"
                            target="_blank"
                            class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg transition-all">
-                            Open Hospitality Industry Award →
+                            Open ${getAwardContext().name} →
                         </a>
                         <p class="text-xs text-slate-400 mt-2">
                             Opens in new tab • Fair Work Ombudsman official website
@@ -18492,7 +18511,7 @@ function showJuniorRedirect() {
 function calculateAwardClassification(data) {
     if (!awardRates || !awardRates.rates) {
         return {
-            award: 'Hospitality Industry (General) Award MA000009',
+            award: getAwardContext().fullName,
             level: 'Error - Rates Not Loaded',
             rate: 0,
             penalties: ['Please refresh the page to load award rates'],
@@ -18666,7 +18685,7 @@ function calculateAwardClassification(data) {
     penalties.push(`Overtime: First 2 hours at 150%, thereafter 200%`);
     
     const result = {
-    award: 'Hospitality Industry (General) Award MA000009',
+    award: getAwardContext().fullName,
     level: title,
     rate: baseRate,
         penalties: penalties,
