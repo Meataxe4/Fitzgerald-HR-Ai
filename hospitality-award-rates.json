@@ -5,9 +5,12 @@
   "next_review_date": "2026-07-01",
   "version": "2025-2026",
   "penalty_rates": {
-    "saturday": 1.5,
-    "sunday": 1.75,
-    "public_holiday": 2.5,
+    "saturday_full_time_part_time": 1.25,
+    "saturday_casual": 1.5,
+    "sunday_full_time_part_time": 1.5,
+    "sunday_casual": 1.75,
+    "public_holiday_full_time_part_time": 2.25,
+    "public_holiday_casual": 2.5,
     "evening_after_7pm_loading": 2.81,
     "night_midnight_to_7am_loading": 4.22,
     "overtime_first_2hrs": 1.5,
@@ -18,12 +21,14 @@
   "minimum_engagement": {
     "full_time_hours_per_shift": 4,
     "part_time_hours_per_shift": 3,
-    "casual_hours_per_shift": 2
+    "casual_hours_per_shift": 2,
+    "public_holiday_full_time_part_time": 4,
+    "public_holiday_casual": 2
   },
   "notes": [
     "Rates effective from 1 July 2025 to 30 June 2026",
-    "Casual rates include 25% casual loading",
-    "Penalty rates apply to base rate (before casual loading for casuals)",
+    "Casual penalty percentages already include the 25% casual loading - do not stack the loading on top of these percentages",
+    "Evening and night loadings are flat dollar amounts per hour, not percentages, and apply only to weekday ordinary hours (Mon-Fri)",
     "Superannuation: 12%"
   ],
   "rates": [
