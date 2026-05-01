@@ -13071,35 +13071,54 @@ function openRosterStressTester() {
 
 function openAwardWizard() {
     trackToolUsage('awardWizardModal');
-    
+
     // Reset wizard state
     wizardData = {};
     currentWizardStep = 1;
-    
+
     // Reset UI to step 1
     const wizardModal = document.getElementById('awardWizardModal');
     if (wizardModal) {
         // Show modal
         wizardModal.classList.remove('hidden');
-        
+
         // Reset all steps visibility
         wizardModal.querySelectorAll('.wizard-step').forEach(step => {
             step.classList.add('hidden');
         });
-        
+
         // Show step 1
         const step1 = wizardModal.querySelector('[data-step="1"]');
         if (step1) step1.classList.remove('hidden');
-        
+
         // Hide back button
         const backBtn = document.getElementById('wizardBackBtn');
         if (backBtn) backBtn.classList.add('hidden');
-        
+
         // Reset progress bar
         document.getElementById('wizardCurrentStep').textContent = '1';
         document.getElementById('wizardProgress').textContent = '20% Complete';
         document.getElementById('wizardProgressBar').style.width = '20%';
+
+        // Tailor late-night labels to the user's award
+        applyWizardAwardLabels(wizardModal);
     }
+}
+
+// Adjusts wizard step-3 evening/night labels based on the user's award.
+// Restaurant Award MA000119: evening = after 10pm, night = midnight-6am.
+// Hospitality Award MA000009: evening = 7pm-midnight, night = midnight-7am.
+function applyWizardAwardLabels(scope) {
+    const root = scope || document;
+    const isRestaurantAward = (getAwardContext().code === 'MA000119');
+    const eveningLabel = isRestaurantAward ? '10pm to midnight' : '7pm to midnight';
+    const nightLabel = isRestaurantAward ? 'Midnight to 6am' : 'Midnight to 7am';
+
+    const eveningBtn = root.querySelector('button[onclick="wizardAnswer(\'hours\', \'weekday-evening\')"] .text-xs');
+    if (eveningBtn) eveningBtn.textContent = eveningLabel;
+
+    const nightBtn = root.querySelector('button[onclick="wizardAnswer(\'hours\', \'weekday-night\')"] .text-xs');
+    if (nightBtn) nightBtn.textContent = nightLabel;
 }
 
 function openRosterOptimizer() {
@@ -18704,8 +18723,11 @@ function calculateAwardClassification(data) {
     };
     
     const levelPrefix = levelMap[data.experience] || 'introductory';
-    // Role to classification mapping
-    const roleSuffixes = {
+
+    const isRestaurantAward = (getAwardContext().code === 'MA000119');
+
+    // Role to classification mapping — Hospitality Industry (General) Award MA000009
+    const hospitalityRoleSuffixes = {
         'cook': {
             'introductory': 'introductory',
             'level_1': 'level_1.food_beverage_grade1',
@@ -18788,10 +18810,88 @@ function calculateAwardClassification(data) {
             'level_6': 'level_3.timekeeper_security_grade2'
         }
     };
-    
+
+    // Role to classification mapping — Restaurant Industry Award MA000119
+    // Classifications match the keys in /restaurant-award-rates.json
+    const restaurantRoleSuffixes = {
+        'cook': {
+            'introductory': 'introductory',
+            'level_1': 'level_1.food_beverage_grade1',
+            'level_2': 'level_2.cook_grade1',
+            'level_3': 'level_3.cook_grade2',
+            'level_4': 'level_4.cook_grade3_commis',
+            'level_5': 'level_5.cook_grade4_demi_chef',
+            'level_6': 'level_6.cook_grade5_chef_de_partie'
+        },
+        'waiter': {
+            'introductory': 'introductory',
+            'level_1': 'level_1.food_beverage_grade1',
+            'level_2': 'level_2.food_beverage_grade2',
+            'level_3': 'level_3.food_beverage_grade3',
+            'level_4': 'level_4.food_beverage_grade4',
+            'level_5': 'level_5.food_beverage_supervisor_grade2',
+            'level_6': 'level_6.food_beverage_supervisor_grade3'
+        },
+        'bartender': {
+            'introductory': 'introductory',
+            'level_1': 'level_1.food_beverage_grade1',
+            'level_2': 'level_2.food_beverage_grade2',
+            'level_3': 'level_3.food_beverage_grade3',
+            'level_4': 'level_4.food_beverage_grade4',
+            'level_5': 'level_5.food_beverage_supervisor_grade2',
+            'level_6': 'level_6.food_beverage_supervisor_grade3'
+        },
+        'barista': {
+            'introductory': 'introductory',
+            'level_1': 'level_1.food_beverage_grade1',
+            'level_2': 'level_2.food_beverage_grade2',
+            'level_3': 'level_3.food_beverage_grade3',
+            'level_4': 'level_4.food_beverage_grade4',
+            'level_5': 'level_5.food_beverage_supervisor_grade2',
+            'level_6': 'level_6.food_beverage_supervisor_grade3'
+        },
+        'kitchen-hand': {
+            'introductory': 'introductory',
+            'level_1': 'level_1.kitchen_attendant_grade1',
+            'level_2': 'level_2.kitchen_attendant_grade2',
+            'level_3': 'level_3.kitchen_attendant_grade3',
+            'level_4': 'level_3.kitchen_attendant_grade3',
+            'level_5': 'level_3.kitchen_attendant_grade3',
+            'level_6': 'level_3.kitchen_attendant_grade3'
+        },
+        'supervisor': {
+            'introductory': 'level_2.food_beverage_grade2',
+            'level_1': 'level_3.food_beverage_grade3',
+            'level_2': 'level_4.food_beverage_supervisor_grade1',
+            'level_3': 'level_5.food_beverage_supervisor_grade2',
+            'level_4': 'level_5.food_beverage_supervisor_grade2',
+            'level_5': 'level_6.food_beverage_supervisor_grade3',
+            'level_6': 'level_6.food_beverage_supervisor_grade3'
+        }
+        // Restaurant Award MA000119 does not cover receptionists, housekeepers
+        // or doorperson/security roles — those sit under MA000009.
+    };
+
+    const roleSuffixes = isRestaurantAward ? restaurantRoleSuffixes : hospitalityRoleSuffixes;
+
     let classificationPath;
     if (roleSuffixes[data.role] && roleSuffixes[data.role][levelPrefix]) {
         classificationPath = roleSuffixes[data.role][levelPrefix];
+    } else if (isRestaurantAward && ['receptionist', 'housekeeper', 'security'].includes(data.role)) {
+        // Role not covered by the Restaurant Award — surface a clear message
+        return {
+            award: getAwardContext().fullName,
+            level: 'Role not covered by Restaurant Award',
+            rate: 0,
+            penalties: [
+                `The ${data.role} role is not covered by the Restaurant Industry Award MA000119.`,
+                'It is typically covered by the Hospitality Industry (General) Award MA000009.'
+            ],
+            nextSteps: [
+                'Switch your venue award to "Hospitality Industry (General) Award" in Settings, or',
+                'Contact Fitz HR for advice: support@fitzhr.com'
+            ]
+        };
     } else {
         classificationPath = 'introductory';
     }
@@ -18829,7 +18929,18 @@ function calculateAwardClassification(data) {
     // Calculate penalties
     const penalties = [];
     const penaltyRates = awardRates.penalty_rates;
-    
+
+    // Award-specific late-night windows:
+    //   Restaurant Award MA000119: evening = after 10pm, night = midnight-6am (Mon-Fri)
+    //   Hospitality Award MA000009: evening = 7pm-midnight, night = midnight-7am (Mon-Fri)
+    const eveningLoading = penaltyRates.evening_after_10pm_loading
+        ?? penaltyRates.evening_after_7pm_loading;
+    const nightLoading = penaltyRates.night_midnight_to_6am_loading
+        ?? penaltyRates.night_midnight_to_7am_loading;
+    const eveningWindowLabel = isRestaurantAward ? '10pm-midnight' : '7pm-midnight';
+    const nightWindowLabel = isRestaurantAward ? 'midnight-6am' : 'midnight-7am';
+
+    // Headline penalty for the hours the user actually selected
     if (data.hours === 'saturday') {
         const saturdayRate = baseRate * penaltyRates.saturday;
         penalties.push(`Saturday: ${(penaltyRates.saturday * 100)}% = $${saturdayRate.toFixed(2)}/hr`);
@@ -18837,21 +18948,45 @@ function calculateAwardClassification(data) {
         const sundayRate = baseRate * penaltyRates.sunday;
         penalties.push(`Sunday: ${(penaltyRates.sunday * 100)}% = $${sundayRate.toFixed(2)}/hr`);
     } else if (data.hours === 'public-holiday') {
-        const publicHolRate = baseRate * penaltyRates.public_holiday;
-        penalties.push(`Public Holiday: ${(penaltyRates.public_holiday * 100)}% = $${publicHolRate.toFixed(2)}/hr`);
+        // Restaurant Award has separate FT/PT (225%) and casual (250%) public holiday rates
+        const phMultiplier = (isCasual && typeof penaltyRates.public_holiday_casual === 'number')
+            ? penaltyRates.public_holiday_casual
+            : penaltyRates.public_holiday;
+        const publicHolRate = baseRate * phMultiplier;
+        const phLabel = (isCasual && typeof penaltyRates.public_holiday_casual === 'number')
+            ? 'Public Holiday (casual)'
+            : 'Public Holiday';
+        penalties.push(`${phLabel}: ${(phMultiplier * 100)}% = $${publicHolRate.toFixed(2)}/hr`);
     } else if (data.hours === 'weekday-evening') {
-        const eveningRate = baseRate + penaltyRates.evening_after_7pm_loading;
-        penalties.push(`Evening (7pm-midnight): +$${penaltyRates.evening_after_7pm_loading.toFixed(2)}/hr = $${eveningRate.toFixed(2)}/hr`);
+        if (typeof eveningLoading === 'number') {
+            const eveningRate = baseRate + eveningLoading;
+            penalties.push(`Evening (${eveningWindowLabel}): +$${eveningLoading.toFixed(2)}/hr = $${eveningRate.toFixed(2)}/hr`);
+        }
     } else if (data.hours === 'weekday-night') {
-        const nightRate = baseRate + penaltyRates.night_midnight_to_7am_loading;
-        penalties.push(`Night (midnight-7am): +$${penaltyRates.night_midnight_to_7am_loading.toFixed(2)}/hr = $${nightRate.toFixed(2)}/hr`);
+        if (typeof nightLoading === 'number') {
+            const nightRate = baseRate + nightLoading;
+            penalties.push(`Night (${nightWindowLabel}): +$${nightLoading.toFixed(2)}/hr = $${nightRate.toFixed(2)}/hr`);
+        }
     }
-    
+
     if (isCasual) {
         penalties.push(`Casual Loading: 25% (already included in base rate of $${baseRate.toFixed(2)}/hr)`);
     }
-    
+
     penalties.push(`Overtime: First 2 hours at 150%, thereafter 200%`);
+
+    // Always include the full late-night loading reference so users see the
+    // flat-dollar additions even when they did not pick "evening" or "night"
+    // for their hours. These are flat $/hr additions on top of the base rate
+    // (Mon-Fri only — weekend / public holiday rates supersede).
+    if (typeof eveningLoading === 'number' && data.hours !== 'weekday-evening') {
+        const eveningRate = baseRate + eveningLoading;
+        penalties.push(`Late-night reference — Evening (${eveningWindowLabel}, Mon-Fri): +$${eveningLoading.toFixed(2)}/hr flat loading = $${eveningRate.toFixed(2)}/hr`);
+    }
+    if (typeof nightLoading === 'number' && data.hours !== 'weekday-night') {
+        const nightRate = baseRate + nightLoading;
+        penalties.push(`Late-night reference — Night (${nightWindowLabel}, Mon-Fri): +$${nightLoading.toFixed(2)}/hr flat loading = $${nightRate.toFixed(2)}/hr`);
+    }
     
     const result = {
     award: getAwardContext().fullName,
@@ -19073,8 +19208,12 @@ function resetWizard() {
         updateWizardStep();
         
         // Reopen modal
-        document.getElementById('awardWizardModal').classList.remove('hidden');
-        
+        const reopenedModal = document.getElementById('awardWizardModal');
+        reopenedModal.classList.remove('hidden');
+
+        // Re-apply award-specific labels (resetWizard rebuilds the step HTML)
+        applyWizardAwardLabels(reopenedModal);
+
     }, 150);
 }
 // ========================================
