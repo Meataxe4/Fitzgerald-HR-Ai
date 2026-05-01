@@ -18961,11 +18961,15 @@ function calculateAwardClassification(data) {
         if (typeof eveningLoading === 'number') {
             const eveningRate = baseRate + eveningLoading;
             penalties.push(`Evening (${eveningWindowLabel}): +$${eveningLoading.toFixed(2)}/hr = $${eveningRate.toFixed(2)}/hr`);
+        } else {
+            penalties.push(`Evening loading unavailable — the loaded rates file (${awardRates.award_name || 'unknown'}) does not contain an evening loading for this award. Refresh the page or check Settings → Award.`);
         }
     } else if (data.hours === 'weekday-night') {
         if (typeof nightLoading === 'number') {
             const nightRate = baseRate + nightLoading;
             penalties.push(`Night (${nightWindowLabel}): +$${nightLoading.toFixed(2)}/hr = $${nightRate.toFixed(2)}/hr`);
+        } else {
+            penalties.push(`Night loading unavailable — the loaded rates file (${awardRates.award_name || 'unknown'}) does not contain a night loading for this award. Refresh the page or check Settings → Award.`);
         }
     }
 
@@ -20196,6 +20200,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (saved) {
             try {
                 venueProfile = JSON.parse(saved);
+                // Re-fetch rates now that we know the user's actual award.
+                // The initial loadAwardRates() call at script-load runs before
+                // venueProfile is restored, so it always grabs Hospitality JSON.
+                // Restaurant Award users need the MA000119 rates file, otherwise
+                // the wizard's evening/night penalties (which only exist in the
+                // Restaurant JSON as evening_after_10pm_loading / night_midnight_to_6am_loading)
+                // resolve to undefined and the result card silently drops them.
+                if (venueProfile && venueProfile.primaryAward) {
+                    loadAwardRates();
+                }
             } catch (e) {
             }
         }
