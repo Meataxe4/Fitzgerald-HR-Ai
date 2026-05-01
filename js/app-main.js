@@ -18940,6 +18940,7 @@ function calculateAwardClassification(data) {
     const eveningWindowLabel = isRestaurantAward ? '10pm-midnight' : '7pm-midnight';
     const nightWindowLabel = isRestaurantAward ? 'midnight-6am' : 'midnight-7am';
 
+    // Headline penalty for the hours the user actually selected
     if (data.hours === 'saturday') {
         const saturdayRate = baseRate * penaltyRates.saturday;
         penalties.push(`Saturday: ${(penaltyRates.saturday * 100)}% = $${saturdayRate.toFixed(2)}/hr`);
@@ -18973,6 +18974,19 @@ function calculateAwardClassification(data) {
     }
 
     penalties.push(`Overtime: First 2 hours at 150%, thereafter 200%`);
+
+    // Always include the full late-night loading reference so users see the
+    // flat-dollar additions even when they did not pick "evening" or "night"
+    // for their hours. These are flat $/hr additions on top of the base rate
+    // (Mon-Fri only — weekend / public holiday rates supersede).
+    if (typeof eveningLoading === 'number' && data.hours !== 'weekday-evening') {
+        const eveningRate = baseRate + eveningLoading;
+        penalties.push(`Late-night reference — Evening (${eveningWindowLabel}, Mon-Fri): +$${eveningLoading.toFixed(2)}/hr flat loading = $${eveningRate.toFixed(2)}/hr`);
+    }
+    if (typeof nightLoading === 'number' && data.hours !== 'weekday-night') {
+        const nightRate = baseRate + nightLoading;
+        penalties.push(`Late-night reference — Night (${nightWindowLabel}, Mon-Fri): +$${nightLoading.toFixed(2)}/hr flat loading = $${nightRate.toFixed(2)}/hr`);
+    }
     
     const result = {
     award: getAwardContext().fullName,
