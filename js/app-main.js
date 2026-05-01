@@ -13069,12 +13069,27 @@ function openRosterStressTester() {
     if (modal) modal.classList.remove('hidden');
 }
 
-function openAwardWizard() {
+async function openAwardWizard() {
     trackToolUsage('awardWizardModal');
 
     // Reset wizard state
     wizardData = {};
     currentWizardStep = 1;
+
+    // Make sure the rates JSON loaded matches the user's award before the
+    // wizard runs. If primaryAward says Restaurant but we have Hospitality
+    // rates (or vice versa), re-fetch and wait for it so the user can never
+    // see mixed evening/night windows.
+    try {
+        const expectedCode = getAwardContext().code;
+        const loadedMa = awardRates && (awardRates.ma_number
+            || (awardRates.award_name && awardRates.award_name.match(/MA\d{6}/)?.[0]));
+        if (!awardRates || !loadedMa || loadedMa !== expectedCode) {
+            await loadAwardRates();
+        }
+    } catch (e) {
+        // Non-fatal — wizard will still show its mismatch guard if needed
+    }
 
     // Reset UI to step 1
     const wizardModal = document.getElementById('awardWizardModal');
@@ -18930,15 +18945,42 @@ function calculateAwardClassification(data) {
     const penalties = [];
     const penaltyRates = awardRates.penalty_rates;
 
-    // Award-specific late-night windows:
-    //   Restaurant Award MA000119: evening = after 10pm, night = midnight-6am (Mon-Fri)
-    //   Hospitality Award MA000009: evening = 7pm-midnight, night = midnight-7am (Mon-Fri)
-    const eveningLoading = penaltyRates.evening_after_10pm_loading
-        ?? penaltyRates.evening_after_7pm_loading;
-    const nightLoading = penaltyRates.night_midnight_to_6am_loading
-        ?? penaltyRates.night_midnight_to_7am_loading;
-    const eveningWindowLabel = isRestaurantAward ? '10pm-midnight' : '7pm-midnight';
-    const nightWindowLabel = isRestaurantAward ? 'midnight-6am' : 'midnight-7am';
+    // Hard guard: if the user's profile says Restaurant Award but the loaded
+    // rates JSON is for the Hospitality Award (load-order race or stale fetch),
+    // refuse to compute — wrong loadings would silently apply.
+    const loadedMaNumber = awardRates.ma_number
+        || (awardRates.award_name && awardRates.award_name.match(/MA\d{6}/)?.[0])
+        || null;
+    if (isRestaurantAward && loadedMaNumber && loadedMaNumber !== 'MA000119') {
+        // Trigger a re-fetch so the next attempt gets the right JSON
+        if (typeof loadAwardRates === 'function') loadAwardRates();
+        return {
+            award: getAwardContext().fullName,
+            level: 'Award rates mismatch',
+            rate: 0,
+            penalties: [
+                `Loaded rates are for ${awardRates.award_name || 'a different award'} but your venue is on the Restaurant Industry Award MA000119.`,
+                'Refreshing rates now — please close this wizard and reopen it.'
+            ],
+            nextSteps: ['Close the wizard, wait 2 seconds, then reopen.']
+        };
+    }
+
+    // Derive late-night windows from the loaded JSON itself, not from the
+    // user's award flag. This guarantees labels and values are consistent —
+    // if the Restaurant JSON is loaded the label is always 10pm-midnight /
+    // midnight-6am; if the Hospitality JSON is loaded it's 7pm-midnight /
+    // midnight-7am. There is no path that mixes them.
+    const has10pmLoading = typeof penaltyRates.evening_after_10pm_loading === 'number';
+    const has6amLoading = typeof penaltyRates.night_midnight_to_6am_loading === 'number';
+    const eveningLoading = has10pmLoading
+        ? penaltyRates.evening_after_10pm_loading
+        : penaltyRates.evening_after_7pm_loading;
+    const nightLoading = has6amLoading
+        ? penaltyRates.night_midnight_to_6am_loading
+        : penaltyRates.night_midnight_to_7am_loading;
+    const eveningWindowLabel = has10pmLoading ? '10pm-midnight' : '7pm-midnight';
+    const nightWindowLabel = has6amLoading ? 'midnight-6am' : 'midnight-7am';
 
     // Headline penalty for the hours the user actually selected
     if (data.hours === 'saturday') {
