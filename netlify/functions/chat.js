@@ -1,6 +1,89 @@
 // netlify/functions/chat.js
 // This file handles secure communication with Claude API
 
+// Source-of-truth award data — bundled into the function via esbuild.
+// If these JSON files change, the chat prompt facts update automatically
+// without any code change here.
+const restaurantRates = require('../../restaurant-award-rates.json');
+const hospitalityRates = require('../../hospitality-award-rates.json');
+
+// Builds the PENALTY RATES section of the system prompt from a rates JSON.
+function buildPenaltyRateFacts(rates, awardLabel) {
+  const p = rates.penalty_rates || {};
+  const lines = [`PENALTY RATES — ${awardLabel} (use these exact figures when discussing multipliers/loadings):`];
+
+  if (typeof p.saturday === 'number') {
+    lines.push(`- Saturday: ${Math.round(p.saturday * 100)}% of base rate`);
+  }
+  if (typeof p.sunday === 'number') {
+    lines.push(`- Sunday: ${Math.round(p.sunday * 100)}% of base rate`);
+  }
+  if (typeof p.public_holiday === 'number' && typeof p.public_holiday_casual === 'number') {
+    lines.push(`- Public holiday (full-time / part-time): ${Math.round(p.public_holiday * 100)}% of base rate`);
+    lines.push(`- Public holiday (casual): ${Math.round(p.public_holiday_casual * 100)}% of base rate`);
+  } else if (typeof p.public_holiday === 'number') {
+    lines.push(`- Public holiday: ${Math.round(p.public_holiday * 100)}% of base rate`);
+  }
+
+  // Late-night windows — derived from which keys exist in the JSON, so the
+  // text always matches the data.
+  if (typeof p.evening_after_10pm_loading === 'number') {
+    lines.push(`- Late evening loading (Mon-Fri, after 10pm to midnight): +$${p.evening_after_10pm_loading.toFixed(2)}/hr flat loading on top of base rate`);
+  } else if (typeof p.evening_after_7pm_loading === 'number') {
+    lines.push(`- Evening loading (Mon-Fri, 7pm to midnight): +$${p.evening_after_7pm_loading.toFixed(2)}/hr flat loading on top of base rate`);
+  }
+  if (typeof p.night_midnight_to_6am_loading === 'number') {
+    lines.push(`- Night loading (Mon-Fri, midnight to 6am): +$${p.night_midnight_to_6am_loading.toFixed(2)}/hr flat loading on top of base rate`);
+  } else if (typeof p.night_midnight_to_7am_loading === 'number') {
+    lines.push(`- Night loading (Mon-Fri, midnight to 7am): +$${p.night_midnight_to_7am_loading.toFixed(2)}/hr flat loading on top of base rate`);
+  }
+
+  if (typeof p.overtime_first_2hrs === 'number' && typeof p.overtime_after_2hrs === 'number') {
+    lines.push(`- Overtime: first 2 hours at ${Math.round(p.overtime_first_2hrs * 100)}%, thereafter ${Math.round(p.overtime_after_2hrs * 100)}%`);
+  }
+  if (typeof rates.casual_loading === 'number') {
+    lines.push(`- Casual loading: ${Math.round(rates.casual_loading * 100)}% (applies to base rate before penalties)`);
+  }
+
+  if (rates.ma_number === 'MA000119') {
+    lines.push(`NOTE: The Restaurant Award's late-night windows differ from the Hospitality Award — evening loading only applies AFTER 10pm (not from 7pm), and night loading runs to 6am (not 7am). Weekend and public holiday rates supersede the late-night loadings.`);
+  } else {
+    lines.push(`NOTE: Weekend and public holiday rates supersede the late-night loadings.`);
+  }
+
+  return lines.join('\n');
+}
+
+// Builds the MINIMUM ENGAGEMENT section of the system prompt from a rates JSON.
+function buildMinimumEngagementFacts(rates, awardLabel) {
+  const m = rates.minimum_engagement || {};
+  const lines = [`MINIMUM ENGAGEMENT — ${awardLabel} (use these exact figures):`];
+  const isMA119 = rates.ma_number === 'MA000119';
+  const ftClause = isMA119 ? ' (clause 11)' : '';
+  const ptClause = isMA119 ? ' (clause 12)' : ' (clause 12)';
+  const casClause = isMA119
+    ? ' (clause 13.5 — "An employer must not engage a casual employee for less than 2 consecutive hours of work")'
+    : ' (clause 11.4)';
+
+  if (typeof m.full_time_hours_per_shift === 'number') {
+    lines.push(`- Full-time employees: minimum ${m.full_time_hours_per_shift} consecutive hours per engagement${ftClause}.`);
+  }
+  if (typeof m.part_time_hours_per_shift === 'number') {
+    lines.push(`- Part-time employees: minimum ${m.part_time_hours_per_shift} consecutive hours per engagement${ptClause}.`);
+  }
+  if (typeof m.casual_hours_per_shift === 'number') {
+    lines.push(`- Casual employees: minimum ${m.casual_hours_per_shift} consecutive hours per engagement${casClause}.`);
+  }
+  if (typeof m.public_holiday_casual === 'number') {
+    lines.push(`- Public holiday casual minimum: ${m.public_holiday_casual} hours.`);
+  }
+  if (typeof m.public_holiday_full_time_part_time === 'number') {
+    lines.push(`- Public holiday full-time / part-time minimum: ${m.public_holiday_full_time_part_time} hours.`);
+  }
+  lines.push(`The casual minimum applies even if the employee is sent home early — they must still be paid for the minimum.`);
+  return lines.join('\n');
+}
+
 exports.handler = async (event, context) => {
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
@@ -58,28 +141,12 @@ exports.handler = async (event, context) => {
       ? 'restaurants, cafes, bistros, and table-service food venues'
       : 'hotels, restaurants, cafes, pubs, bars, and other hospitality venues';
 
-    // Award-specific penalty-rate facts (multipliers and flat $/hr loadings only —
-    // never specific base dollar rates, per the rates policy).
-    const penaltyRateFacts = isRestaurantAward
-      ? `PENALTY RATES — Restaurant Industry Award MA000119 (use these exact figures when discussing multipliers/loadings):
-- Saturday: 150% of base rate
-- Sunday: 175% of base rate
-- Public holiday (full-time / part-time): 225% of base rate
-- Public holiday (casual): 250% of base rate
-- Late evening loading (Mon-Fri, after 10pm to midnight): +$2.81/hr flat loading on top of base rate
-- Night loading (Mon-Fri, midnight to 6am): +$4.22/hr flat loading on top of base rate
-- Overtime: first 2 hours at 150%, thereafter 200%
-- Casual loading: 25% (applies to base rate before penalties)
-NOTE: The Restaurant Award's late-night windows differ from the Hospitality Award — evening loading only applies AFTER 10pm (not from 7pm), and night loading runs to 6am (not 7am). Weekend and public holiday rates supersede the late-night loadings.`
-      : `PENALTY RATES — Hospitality Industry (General) Award MA000009 (use these exact figures when discussing multipliers/loadings):
-- Saturday: 150% of base rate
-- Sunday: 175% of base rate
-- Public holiday: 250% of base rate
-- Evening loading (Mon-Fri, 7pm to midnight): +$2.81/hr flat loading on top of base rate
-- Night loading (Mon-Fri, midnight to 7am): +$4.22/hr flat loading on top of base rate
-- Overtime: first 2 hours at 150%, thereafter 200%
-- Casual loading: 25% (applies to base rate before penalties)
-NOTE: Weekend and public holiday rates supersede the late-night loadings.`;
+    // Award-specific facts — sourced from the rates JSON files at module load,
+    // so any future change to penalty rates / minimum engagement / loadings
+    // updates this prompt automatically with no code edit required.
+    const ratesData = isRestaurantAward ? restaurantRates : hospitalityRates;
+    const penaltyRateFacts = buildPenaltyRateFacts(ratesData, awardFullName);
+    const minimumEngagementFacts = buildMinimumEngagementFacts(ratesData, awardFullName);
 
     // System prompt for Fitz HR Assistant
     const systemPrompt = `You are Fitz, an expert AI HR assistant specialising in Australian hospitality industry HR. You work for Fitz HR, a boutique consultancy focused on ${industrySector}. You are the friendly, knowledgeable avatar helping managers and owners with their HR challenges.
@@ -87,6 +154,11 @@ NOTE: Weekend and public holiday rates supersede the late-night loadings.`;
 IMPORTANT — THIS USER'S AWARD: All advice, rates, classifications, and compliance guidance must reference the **${awardFullName}**. Do NOT reference a different award unless explicitly asked to compare. If the user asks about pay rates, classifications, or compliance, always frame your answer in terms of ${awardFullName}.
 
 ${penaltyRateFacts}
+
+${minimumEngagementFacts}
+
+CRITICAL — MINIMUM ENGAGEMENT QUESTIONS:
+When a user asks about minimum shift length, minimum engagement, "shortest shift", "send someone home early", or "minimum hours per shift", you MUST quote the figures from the MINIMUM ENGAGEMENT section above for ${awardFullName}. Do NOT say "no minimum is specified" or "this depends on the contract" — the modern award sets explicit minimums and they always apply.
 
 Your expertise includes:
 - Fair Work Act and Modern Awards (especially ${awardFullName})

@@ -19033,7 +19033,24 @@ function calculateAwardClassification(data) {
         const nightRate = baseRate + nightLoading;
         penalties.push(`Late-night reference — Night (${nightWindowLabel}, Mon-Fri): +$${nightLoading.toFixed(2)}/hr flat loading = $${nightRate.toFixed(2)}/hr`);
     }
-    
+
+    // Minimum engagement (read from JSON if present, otherwise fall back to
+    // the figures published by Fair Work for each award).
+    const minEng = awardRates.minimum_engagement || {};
+    const ftMin = minEng.full_time_hours_per_shift ?? 4;
+    const ptMin = minEng.part_time_hours_per_shift ?? 3;
+    const casMin = minEng.casual_hours_per_shift ?? 2;
+    const employmentLabel = isCasual
+        ? 'Casual'
+        : (data.employment === 'part-time' ? 'Part-time' : 'Full-time');
+    const employmentMin = isCasual
+        ? casMin
+        : (data.employment === 'part-time' ? ptMin : ftMin);
+    penalties.push(`Minimum engagement: ${employmentLabel} employees must be engaged for at least ${employmentMin} consecutive hours per shift (${isRestaurantAward ? 'MA000119 cl. 13.5 / 11 / 12' : 'MA000009 cl. 11.4 / 12'}).`);
+    if (isRestaurantAward && minEng.public_holiday_casual) {
+        penalties.push(`Public holiday minimum engagement: Full-time/part-time ${minEng.public_holiday_full_time_part_time || 4}hrs, casual ${minEng.public_holiday_casual}hrs.`);
+    }
+
     const result = {
     award: getAwardContext().fullName,
     level: title,
