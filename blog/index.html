@@ -145,17 +145,24 @@
         .topic-card:hover,.topic-card:focus-visible{border-color:rgba(245,158,11,0.2);background:#1a2847;}
 
         /* SEARCH */
-        .blog-search{margin:1.5rem 0 0.5rem;position:relative;}
-        .blog-search input{width:100%;background:var(--navy2);border:1px solid var(--rw);color:#fff;font-family:'Outfit',sans-serif;font-size:0.92rem;padding:0.85rem 1rem 0.85rem 2.6rem;border-radius:8px;transition:border-color 0.2s;}
-        .blog-search input::placeholder{color:rgba(255,255,255,0.35);}
-        .blog-search input:focus{outline:none;border-color:var(--amber);}
-        .blog-search-icon{position:absolute;left:0.95rem;top:50%;transform:translateY(-50%);color:var(--w60);font-size:0.95rem;pointer-events:none;}
-        .blog-search-clear{position:absolute;right:0.6rem;top:50%;transform:translateY(-50%);background:transparent;border:none;color:var(--w60);font-size:1.1rem;cursor:pointer;padding:0.25rem 0.5rem;display:none;}
-        .blog-search-clear:hover{color:var(--amber);}
+        .blog-search{margin:1.75rem 0 0.5rem;position:relative;border-radius:14px;background:linear-gradient(180deg,rgba(245,158,11,0.18),rgba(245,158,11,0));padding:1px;}
+        .blog-search-inner{background:#0c1424;border:1px solid rgba(245,158,11,0.35);border-radius:13px;display:flex;align-items:center;padding:0.4rem 0.5rem 0.4rem 1rem;gap:0.5rem;transition:border-color 0.2s,box-shadow 0.2s;}
+        .blog-search:focus-within .blog-search-inner{border-color:var(--amber);box-shadow:0 0 0 4px rgba(245,158,11,0.18);}
+        .blog-search input{flex:1;background:transparent;border:none;color:#fff;font-family:'Outfit',sans-serif;font-size:1rem;font-weight:600;padding:0.85rem 0.4rem;letter-spacing:-0.005em;}
+        .blog-search input::placeholder{color:rgba(255,255,255,0.45);font-weight:500;}
+        .blog-search input:focus{outline:none;}
+        .blog-search-icon{color:var(--amber);font-size:1.05rem;flex-shrink:0;line-height:1;}
+        .blog-search-kbd{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.08em;color:var(--w60);background:rgba(255,255,255,0.06);border:1px solid var(--rw);border-radius:5px;padding:0.25rem 0.5rem;flex-shrink:0;text-transform:uppercase;}
+        .blog-search-clear{background:transparent;border:none;color:var(--w60);font-size:1.4rem;line-height:1;cursor:pointer;padding:0.4rem 0.6rem;display:none;border-radius:6px;}
+        .blog-search-clear:hover{color:var(--amber);background:rgba(245,158,11,0.08);}
         .blog-search.has-value .blog-search-clear{display:block;}
-        .blog-search-status{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.1em;color:var(--w30);margin-top:0.5rem;min-height:1em;}
-        .post-card.is-hidden,.compare-card.is-hidden,.post-card-hero.is-hidden,.situation-card.is-hidden{display:none;}
-        .section-label.is-hidden{display:none;}
+        .blog-search.has-value .blog-search-kbd{display:none;}
+        .blog-search-status{font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;color:var(--w60);margin-top:0.7rem;min-height:1em;text-transform:uppercase;}
+        .blog-search.has-value .blog-search-status{color:var(--amber);}
+        .post-card.is-hidden,.compare-card.is-hidden,.post-card-hero.is-hidden,.situation-card.is-hidden,.topic-card.is-hidden{display:none!important;}
+        .section-label.is-hidden,.section-block.is-hidden{display:none!important;}
+        body.is-searching .decision-block,body.is-searching .topic-guides-intro{display:none;}
+        body.is-searching .deferred{content-visibility:visible;}
 
         /* Below-the-fold rendering optimisation */
         .deferred{content-visibility:auto;contain-intrinsic-size:1px 1200px;}
@@ -216,17 +223,20 @@
     </div>
 
     <div class="blog-search" id="blog-search">
-        <span class="blog-search-icon" aria-hidden="true">&#9906;</span>
-        <label for="blog-search-input" class="visually-hidden" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Search the blog</label>
-        <input id="blog-search-input" type="search" autocomplete="off" placeholder="Search 33 hospitality HR guides &mdash; e.g. casual conversion, Sunday rates, no-show" aria-controls="blog-search-status" />
-        <button type="button" class="blog-search-clear" id="blog-search-clear" aria-label="Clear search">&times;</button>
+        <div class="blog-search-inner">
+            <span class="blog-search-icon" aria-hidden="true">&#9906;</span>
+            <label for="blog-search-input" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Search the blog</label>
+            <input id="blog-search-input" type="search" autocomplete="off" placeholder="Search 33 guides &mdash; casual conversion, Sunday rates, no-show, warning letter&hellip;" aria-controls="blog-search-status" />
+            <span class="blog-search-kbd" aria-hidden="true">/ to focus</span>
+            <button type="button" class="blog-search-clear" id="blog-search-clear" aria-label="Clear search">&times;</button>
+        </div>
         <div class="blog-search-status" id="blog-search-status" aria-live="polite"></div>
     </div>
 
         <!-- ============================================================
          TOPIC GUIDES — Pillar page entry points
     ============================================================ -->
-    <div style="padding:2.5rem 1.5rem 0;max-width:900px;margin:0 auto;">
+    <div class="topic-guides-intro" style="padding:2.5rem 1.5rem 0;max-width:900px;margin:0 auto;">
         <div style="font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.2em;text-transform:uppercase;color:#f59e0b;margin-bottom:1rem;display:flex;align-items:center;gap:0.6rem;">
             <span style="width:24px;height:2px;background:#f59e0b;display:inline-block;"></span>
             Topic Guides
@@ -605,19 +615,23 @@
     var status = document.getElementById('blog-search-status');
     if (!wrap || !input) return;
 
-    var cards = [].slice.call(document.querySelectorAll('.post-card, .post-card-hero, .compare-card, .situation-card'));
+    var CARD_SELECTOR = '.post-card, .post-card-hero, .compare-card, .situation-card, .topic-card';
+    var cards = [].slice.call(document.querySelectorAll(CARD_SELECTOR));
     cards.forEach(function(card){
-        var anchor = card.tagName === 'A' ? card : card.querySelector('a[href^="/blog/"], a[href^="/compare/"]');
+        var anchor = card.tagName === 'A' ? card : card.querySelector('a[href^="/blog/"], a[href^="/compare/"], a[href^="/hospitality-"], a[href^="/restaurant-"], a[href^="/fair-work-"], a[href^="/unfair-"]');
         var href = anchor ? anchor.getAttribute('href') : '';
         var text = (card.innerText || card.textContent || '').toLowerCase();
-        card._search = text + ' ' + href.toLowerCase();
+        card._search = text + ' ' + (href || '').toLowerCase();
     });
     var sectionLabels = [].slice.call(document.querySelectorAll('.section-label'));
+    var totalCount = cards.length;
 
     function applyFilter(q){
         q = q.trim().toLowerCase();
-        wrap.classList.toggle('has-value', q.length > 0);
-        if (!q){
+        var hasQuery = q.length > 0;
+        wrap.classList.toggle('has-value', hasQuery);
+        document.body.classList.toggle('is-searching', hasQuery);
+        if (!hasQuery){
             cards.forEach(function(c){ c.classList.remove('is-hidden'); });
             sectionLabels.forEach(function(l){ l.classList.remove('is-hidden'); });
             status.textContent = '';
@@ -630,30 +644,29 @@
             c.classList.toggle('is-hidden', !hit);
             if (hit) matches++;
         });
-        // Hide section labels whose following cards (until next label) are all hidden
         sectionLabels.forEach(function(label){
             var n = label.nextElementSibling;
             var anyVisible = false;
             while (n && !n.classList.contains('section-label')){
-                if (n.classList.contains('post-card') || n.classList.contains('post-card-hero') || n.classList.contains('compare-card') || n.classList.contains('situation-card')){
-                    if (!n.classList.contains('is-hidden')) anyVisible = true;
-                }
-                // Also descend into grid containers
-                if (!anyVisible){
-                    var inner = n.querySelectorAll ? n.querySelectorAll('.post-card, .post-card-hero, .compare-card, .situation-card') : [];
-                    for (var i=0;i<inner.length;i++){ if (!inner[i].classList.contains('is-hidden')){ anyVisible = true; break; } }
-                }
+                var inner = n.querySelectorAll ? n.querySelectorAll(CARD_SELECTOR) : [];
+                for (var i=0;i<inner.length;i++){ if (!inner[i].classList.contains('is-hidden')){ anyVisible = true; break; } }
+                if (!anyVisible && n.matches && n.matches(CARD_SELECTOR) && !n.classList.contains('is-hidden')) anyVisible = true;
+                if (anyVisible) break;
                 n = n.nextElementSibling;
             }
             label.classList.toggle('is-hidden', !anyVisible);
         });
-        status.textContent = matches + ' result' + (matches === 1 ? '' : 's') + ' for "' + q + '"';
+        status.textContent = matches === 0
+            ? 'No results for &ldquo;' + q + '&rdquo; &mdash; try different keywords'
+            : 'Showing ' + matches + ' of ' + totalCount + ' guides matching &ldquo;' + q + '&rdquo;';
+        // innerHTML so the &ldquo; entities render
+        status.innerHTML = status.textContent;
     }
 
     var t;
     input.addEventListener('input', function(){
         clearTimeout(t);
-        t = setTimeout(function(){ applyFilter(input.value); }, 80);
+        t = setTimeout(function(){ applyFilter(input.value); }, 60);
     });
     clearBtn.addEventListener('click', function(){
         input.value = '';
@@ -661,7 +674,18 @@
         input.focus();
     });
     input.addEventListener('keydown', function(e){
-        if (e.key === 'Escape'){ input.value=''; applyFilter(''); }
+        if (e.key === 'Escape'){ input.value=''; applyFilter(''); input.blur(); }
+    });
+    // Global '/' to focus search (skip when typing in another field)
+    document.addEventListener('keydown', function(e){
+        if (e.key === '/' && document.activeElement !== input){
+            var tag = (document.activeElement && document.activeElement.tagName) || '';
+            if (tag !== 'INPUT' && tag !== 'TEXTAREA' && !document.activeElement.isContentEditable){
+                e.preventDefault();
+                input.focus();
+                input.select();
+            }
+        }
     });
 })();
 </script>
