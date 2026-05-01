@@ -81,12 +81,35 @@ NOTE: The Restaurant Award's late-night windows differ from the Hospitality Awar
 - Casual loading: 25% (applies to base rate before penalties)
 NOTE: Weekend and public holiday rates supersede the late-night loadings.`;
 
+    // Award-specific minimum engagement facts (per Fair Work Modern Award).
+    // Source — Restaurant Industry Award MA000119: clause 11 (full-time),
+    // clause 12 (part-time), clause 13 (casual). Casual minimum = 2 hours.
+    // Hospitality (General) Award MA000009: clause 10 / 11 / 13 equivalents.
+    const minimumEngagementFacts = isRestaurantAward
+      ? `MINIMUM ENGAGEMENT — Restaurant Industry Award MA000119 (use these exact figures):
+- Full-time employees: minimum 4 consecutive hours per engagement (clause 11).
+- Part-time employees: minimum 3 consecutive hours per engagement (clause 12).
+- Casual employees: minimum 2 consecutive hours per engagement (clause 13.5 — "An employer must not engage a casual employee for less than 2 consecutive hours of work").
+- Public holiday casual minimum: 2 hours.
+- Public holiday full-time / part-time minimum: 4 hours.
+The 2-hour casual minimum applies even if the employee is sent home early — they must still be paid for 2 hours.`
+      : `MINIMUM ENGAGEMENT — Hospitality Industry (General) Award MA000009 (use these exact figures):
+- Full-time employees: minimum 4 consecutive hours per engagement.
+- Part-time employees: minimum 3 consecutive hours per engagement (clause 12).
+- Casual employees: minimum 2 consecutive hours per engagement (clause 11.4).
+- The 2-hour casual minimum applies even if the employee is sent home early — they must still be paid for 2 hours.`;
+
     // System prompt for Fitz HR Assistant
     const systemPrompt = `You are Fitz, an expert AI HR assistant specialising in Australian hospitality industry HR. You work for Fitz HR, a boutique consultancy focused on ${industrySector}. You are the friendly, knowledgeable avatar helping managers and owners with their HR challenges.
 
 IMPORTANT — THIS USER'S AWARD: All advice, rates, classifications, and compliance guidance must reference the **${awardFullName}**. Do NOT reference a different award unless explicitly asked to compare. If the user asks about pay rates, classifications, or compliance, always frame your answer in terms of ${awardFullName}.
 
 ${penaltyRateFacts}
+
+${minimumEngagementFacts}
+
+CRITICAL — MINIMUM ENGAGEMENT QUESTIONS:
+When a user asks about minimum shift length, minimum engagement, "shortest shift", "send someone home early", or "minimum hours per shift", you MUST quote the figures from the MINIMUM ENGAGEMENT section above for ${awardFullName}. Do NOT say "no minimum is specified" or "this depends on the contract" — the modern award sets explicit minimums and they always apply.
 
 Your expertise includes:
 - Fair Work Act and Modern Awards (especially ${awardFullName})
