@@ -58,10 +58,35 @@ exports.handler = async (event, context) => {
       ? 'restaurants, cafes, bistros, and table-service food venues'
       : 'hotels, restaurants, cafes, pubs, bars, and other hospitality venues';
 
+    // Award-specific penalty-rate facts (multipliers and flat $/hr loadings only —
+    // never specific base dollar rates, per the rates policy).
+    const penaltyRateFacts = isRestaurantAward
+      ? `PENALTY RATES — Restaurant Industry Award MA000119 (use these exact figures when discussing multipliers/loadings):
+- Saturday: 150% of base rate
+- Sunday: 175% of base rate
+- Public holiday (full-time / part-time): 225% of base rate
+- Public holiday (casual): 250% of base rate
+- Late evening loading (Mon-Fri, after 10pm to midnight): +$2.81/hr flat loading on top of base rate
+- Night loading (Mon-Fri, midnight to 6am): +$4.22/hr flat loading on top of base rate
+- Overtime: first 2 hours at 150%, thereafter 200%
+- Casual loading: 25% (applies to base rate before penalties)
+NOTE: The Restaurant Award's late-night windows differ from the Hospitality Award — evening loading only applies AFTER 10pm (not from 7pm), and night loading runs to 6am (not 7am). Weekend and public holiday rates supersede the late-night loadings.`
+      : `PENALTY RATES — Hospitality Industry (General) Award MA000009 (use these exact figures when discussing multipliers/loadings):
+- Saturday: 150% of base rate
+- Sunday: 175% of base rate
+- Public holiday: 250% of base rate
+- Evening loading (Mon-Fri, 7pm to midnight): +$2.81/hr flat loading on top of base rate
+- Night loading (Mon-Fri, midnight to 7am): +$4.22/hr flat loading on top of base rate
+- Overtime: first 2 hours at 150%, thereafter 200%
+- Casual loading: 25% (applies to base rate before penalties)
+NOTE: Weekend and public holiday rates supersede the late-night loadings.`;
+
     // System prompt for Fitz HR Assistant
     const systemPrompt = `You are Fitz, an expert AI HR assistant specialising in Australian hospitality industry HR. You work for Fitz HR, a boutique consultancy focused on ${industrySector}. You are the friendly, knowledgeable avatar helping managers and owners with their HR challenges.
 
 IMPORTANT — THIS USER'S AWARD: All advice, rates, classifications, and compliance guidance must reference the **${awardFullName}**. Do NOT reference a different award unless explicitly asked to compare. If the user asks about pay rates, classifications, or compliance, always frame your answer in terms of ${awardFullName}.
+
+${penaltyRateFacts}
 
 Your expertise includes:
 - Fair Work Act and Modern Awards (especially ${awardFullName})
@@ -106,7 +131,7 @@ WHEN USERS ASK ABOUT PAY RATES, WAGES, SALARIES, OR "HOW MUCH TO PAY":
 
 ✅ EXCEPTIONS - You MAY mention:
 - General educational ranges: "${awardName} rates generally range from $24-35/hour depending on the classification"
-- Penalty rate multipliers: "Saturday is 150% of the base rate"
+- Penalty rate multipliers and flat loadings as listed in the PENALTY RATES section above (always cite them in the context of ${awardFullName})
 - Casual loading percentages: "Casual employees receive a 25% loading"
 - General award structures without specific dollar amounts
 
