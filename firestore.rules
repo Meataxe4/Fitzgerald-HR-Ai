@@ -1,0 +1,139 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ========================================
+    // ADMIN CHECK
+    // ========================================
+    // Email-based admin. If the admin email ever changes, update it here
+    // and redeploy with `firebase deploy --only firestore:rules`.
+    // email_verified guards against providers that allow unverified emails.
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'blakefitzgerald4@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    // ========================================
+    // BILLING FIELD LOCKDOWN
+    // ========================================
+    // These fields control paid features and credits. The Stripe webhook
+    // (Admin SDK in netlify/functions/stripe-webhook.js) bypasses rules and
+    // can still write them. Listing them here blocks malicious clients from
+    // self-upgrading via DevTools.
+    function billingFields() {
+      return [
+        'credits',
+        'subscriptionTier',
+        'subscriptionStatus',
+        'subscriptionStartDate',
+        'subscriptionPeriodEnd',
+        'cancelAtPeriodEnd',
+        'billingCycle',
+        'billingInterval',
+        'stripeCustomerId',
+        'stripeSubscriptionId',
+        'reviewCredits',
+        'reviewCreditsUsed',
+        'purchasedCredits',
+        'bonusPrompts',
+        'lastCreditRefresh',
+        'lastRenewalDate',
+        'monthlyPromptsUsed',
+        'monthlyPromptsReset',
+        'lowRiskDocsUsed'
+      ];
+    }
+
+    function touchesBillingFields() {
+      return request.resource.data.diff(resource.data)
+        .affectedKeys().hasAny(billingFields());
+    }
+
+    // ========================================
+    // USER DATA - Private to each user
+    // ========================================
+    match /users/{userId} {
+      // Read: self or admin
+      allow read: if (request.auth != null && request.auth.uid == userId)
+                  || isAdmin();
+
+      // Initial sign-up: client cannot set any billing fields on creation
+      allow create: if request.auth != null
+                    && request.auth.uid == userId
+                    && !request.resource.data.keys().hasAny(billingFields());
+
+      // Self-update: allowed only if NOT modifying billing fields
+      allow update: if request.auth != null
+                    && request.auth.uid == userId
+                    && !touchesBillingFields();
+
+      // Admin can do anything (including billing adjustments)
+      allow write: if isAdmin();
+
+      // Subcollections: conversations, contracts, checklists, trainingPlans, etc.
+      match /{subcollection}/{document=**} {
+        allow read, write: if (request.auth != null && request.auth.uid == userId)
+                            || isAdmin();
+      }
+    }
+
+    // ========================================
+    // GENERATED DOCUMENTS - User-specific
+    // ========================================
+    match /generated_documents/{docId} {
+      allow read: if request.auth != null
+                    && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null
+                      && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null
+                              && resource.data.userId == request.auth.uid;
+
+      // Admin override
+      allow read, write: if isAdmin();
+    }
+
+    // ========================================
+    // CONFIG - read-only for authenticated users
+    // ========================================
+    match /config/{document} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // ========================================
+    // FEEDBACK - submit-only, admin-readable
+    // ========================================
+    match /feedback/{docId} {
+      // Submitter must stamp their own uid (prevents impersonation)
+      allow create: if request.auth != null
+                      && request.resource.data.userId == request.auth.uid;
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // ========================================
+    // REVIEW REQUESTS
+    // ========================================
+    match /reviewRequests/{refNumber} {
+      // Submitter must stamp their own uid
+      allow create: if request.auth != null
+                      && request.resource.data.userId == request.auth.uid;
+
+      // Read: own request or admin
+      allow read: if (request.auth != null
+                      && resource.data.userId == request.auth.uid)
+                  || isAdmin();
+
+      // Only admin can mutate after creation
+      allow update, delete: if isAdmin();
+    }
+
+    // ========================================
+    // DENY ALL OTHER ACCESS
+    // ========================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
