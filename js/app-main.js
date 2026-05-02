@@ -201,9 +201,25 @@ function initializeSupabase() {
         if (typeof supabase === 'undefined') {
             return false;
         }
-        
-        // Create client
-        supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+
+        // Create client with Firebase JWT integration. The accessToken callback
+        // runs on every Supabase request — if a Firebase user is signed in,
+        // their ID token is sent as a Bearer token so Supabase RLS policies
+        // can use auth.uid() (which resolves to the Firebase UID once the
+        // Firebase third-party auth provider is configured in Supabase).
+        // Returns null when no user is signed in, falling back to anon access.
+        supabaseClient = supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey, {
+            accessToken: async () => {
+                try {
+                    if (typeof firebase === 'undefined' || !firebase.auth) return null;
+                    const user = firebase.auth().currentUser;
+                    if (!user) return null;
+                    return await user.getIdToken();
+                } catch (e) {
+                    return null;
+                }
+            }
+        });
         return true;
     } catch (error) {
         return false;
