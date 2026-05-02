@@ -1,0 +1,90 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ========================================
+    // ADMIN CHECK
+    // ========================================
+    // Email-based admin. If the admin email ever changes, update it here
+    // and redeploy with `firebase deploy --only firestore:rules`.
+    // email_verified guards against providers that allow unverified emails.
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email == 'blakefitzgerald4@gmail.com'
+        && request.auth.token.email_verified == true;
+    }
+
+    // ========================================
+    // USER DATA - Private to each user
+    // ========================================
+    match /users/{userId} {
+      // Self or admin can read/write
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if isAdmin();
+
+      // Subcollections (conversations, contracts, checklists, trainingPlans, etc.)
+      match /{subcollection}/{document=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if isAdmin();
+      }
+    }
+
+    // ========================================
+    // GENERATED DOCUMENTS - User-specific
+    // ========================================
+    match /generated_documents/{docId} {
+      allow read: if request.auth != null
+                    && resource.data.userId == request.auth.uid;
+      allow create: if request.auth != null
+                      && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if request.auth != null
+                              && resource.data.userId == request.auth.uid;
+
+      // Admin override
+      allow read, write: if isAdmin();
+    }
+
+    // ========================================
+    // CONFIG - read-only for authenticated users
+    // ========================================
+    match /config/{document} {
+      allow read: if request.auth != null;
+      allow write: if isAdmin();
+    }
+
+    // ========================================
+    // FEEDBACK - submit-only, admin-readable
+    // ========================================
+    match /feedback/{docId} {
+      // Submitter must stamp their own uid (prevents impersonation)
+      allow create: if request.auth != null
+                      && request.resource.data.userId == request.auth.uid;
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // ========================================
+    // REVIEW REQUESTS
+    // ========================================
+    match /reviewRequests/{refNumber} {
+      // Submitter must stamp their own uid (prevents impersonation)
+      allow create: if request.auth != null
+                      && request.resource.data.userId == request.auth.uid;
+
+      // Read: own request or admin
+      allow read: if (request.auth != null
+                      && resource.data.userId == request.auth.uid)
+                  || isAdmin();
+
+      // Only admin can mutate after creation
+      allow update, delete: if isAdmin();
+    }
+
+    // ========================================
+    // DENY ALL OTHER ACCESS
+    // ========================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

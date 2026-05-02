@@ -101,13 +101,20 @@ exports.handler = async (event, context) => {
     const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
     let stripeEvent;
 
+    // Fail closed: signature verification is mandatory. Without this, anyone
+    // who finds the webhook URL can POST a fake checkout.session.completed
+    // and grant themselves a paid subscription.
+    if (!endpointSecret) {
+        console.error('❌ STRIPE_WEBHOOK_SECRET not configured — refusing to process webhook');
+        return { statusCode: 500, headers, body: JSON.stringify({ error: 'Webhook secret not configured' }) };
+    }
+    if (!sig) {
+        console.error('❌ Missing stripe-signature header — refusing to process webhook');
+        return { statusCode: 400, headers, body: JSON.stringify({ error: 'Missing stripe-signature header' }) };
+    }
+
     try {
-        if (endpointSecret && sig) {
-            stripeEvent = stripe.webhooks.constructEvent(event.body, sig, endpointSecret);
-        } else {
-            stripeEvent = JSON.parse(event.body);
-            console.warn('⚠️ Webhook signature verification skipped');
-        }
+        stripeEvent = stripe.webhooks.constructEvent(event.body, sig, endpointSecret);
     } catch (err) {
         console.error('Webhook signature verification failed:', err.message);
         return { statusCode: 400, headers, body: JSON.stringify({ error: err.message }) };
