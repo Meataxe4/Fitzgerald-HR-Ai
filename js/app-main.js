@@ -16651,7 +16651,7 @@ function closeVenueSettings() {
 async function trackConversation(userMessage, assistantResponse) {
     const conversation = {
         timestamp: new Date().toISOString(),
-        user_code: currentUser,
+        user_code: currentUser?.uid || currentUser,
         user_message: userMessage,
         assistant_response: assistantResponse,
         theme: detectTheme(userMessage),
@@ -16690,7 +16690,7 @@ async function trackConversation(userMessage, assistantResponse) {
     }
     
     // 5. Update user profile
-    updateUserProfile(currentUser, userMessage);
+    updateUserProfile(currentUser?.uid || currentUser, userMessage);
 }
 
 function detectTheme(message) {
@@ -16760,7 +16760,7 @@ async function trackHighRiskTopic(message) {
     
     const highRiskEntry = {
         timestamp: new Date().toISOString(),
-        user_code: currentUser,
+        user_code: currentUser?.uid || currentUser,
         category: risk.category,
         title: risk.title,
         severity: risk.severity,
@@ -19648,7 +19648,7 @@ async function confirmLogout(type) {
     closeLogoutModal();
     
     // Store current user for tracking before clearing
-    const loggedOutUser = currentUser;
+    const loggedOutUser = currentUser?.uid || currentUser;
     
     if (type === 'soft') {
         // ✅ SOFT LOGOUT - Keep access code stored for auto-login
