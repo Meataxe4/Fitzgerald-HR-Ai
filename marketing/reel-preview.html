@@ -1,0 +1,466 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Fitz HR — Instagram Reel Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --orange: #f59e0b;       /* fitz amber-500 */
+    --orange-deep: #d97706;
+    --slate-900: #0f172a;
+    --slate-800: #1e293b;
+    --slate-700: #334155;
+    --slate-300: #cbd5e1;
+    --white: #ffffff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: #111;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: var(--white);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  /* The reel canvas — exact 1080x1920. We scale it down for screen viewing */
+  .reel {
+    position: relative;
+    width: 1080px;
+    height: 1920px;
+    overflow: hidden;
+    border-radius: 32px;
+    transform-origin: top center;
+    /* Default scale fits ~960px tall; tweak with the slider */
+    --scale: 0.5;
+    transform: scale(var(--scale));
+    margin-bottom: calc((var(--scale) - 1) * 1920px);
+  }
+
+  /* Background — moody pub. Replace url() with a real photo for production. */
+  .bg {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.4) 45%, rgba(0,0,0,0.7) 100%),
+      radial-gradient(ellipse at 50% 30%, #5a3a1f 0%, #2a1a10 45%, #0a0604 100%);
+  }
+  .bg::after {
+    /* timber slat texture suggestion */
+    content: "";
+    position: absolute; inset: 0;
+    background-image: repeating-linear-gradient(90deg,
+      rgba(255,180,90,0.04) 0 8px,
+      rgba(0,0,0,0.12) 8px 22px);
+    mix-blend-mode: overlay;
+    opacity: 0.7;
+  }
+
+  /* Status bar */
+  .statusbar {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 110px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 60px;
+    color: var(--white);
+    font-weight: 600;
+    font-size: 32px;
+    z-index: 5;
+  }
+  .statusbar .pill {
+    display: inline-flex; align-items: center; gap: 14px;
+    background: #000; border-radius: 999px; padding: 10px 22px; height: 56px;
+  }
+  .dot { width: 22px; height: 22px; border-radius: 50%; background: #22c55e; }
+  .pill-right { color: #22c55e; }
+
+  /* Sponsor row (handle + close) */
+  .sponsor {
+    position: absolute; top: 150px; left: 0; right: 0;
+    padding: 0 36px;
+    display: flex; align-items: center; gap: 18px;
+    z-index: 5;
+  }
+  .sponsor .avatar {
+    width: 76px; height: 76px; border-radius: 50%;
+    background: var(--orange);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 900; font-size: 38px;
+    border: 2px solid rgba(255,255,255,0.25);
+  }
+  .sponsor .handle { font-weight: 600; font-size: 32px; color: #fff; }
+  .sponsor .spacer { flex: 1; }
+  .sponsor .icon-btn { color: #fff; font-size: 38px; opacity: 0.95; padding: 0 14px; }
+
+  /* Centered brand */
+  .brand {
+    position: absolute; top: 280px; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: center; gap: 22px;
+    z-index: 4;
+  }
+  .brand .mark {
+    width: 96px; height: 96px; border-radius: 50%;
+    background: var(--orange);
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-weight: 900; font-size: 52px;
+    box-shadow: 0 0 40px rgba(245,158,11,0.45);
+  }
+  .brand .wordmark {
+    font-weight: 900; font-size: 88px; letter-spacing: -2px;
+  }
+  .brand .wordmark .fitz { color: var(--orange); }
+  .brand .wordmark .hr { color: #fff; }
+
+  /* Headline */
+  .headline {
+    position: absolute; top: 430px; left: 0; right: 0;
+    text-align: center;
+    font-weight: 900;
+    line-height: 0.95;
+    letter-spacing: -3px;
+    z-index: 4;
+    text-shadow: 0 4px 24px rgba(0,0,0,0.6);
+  }
+  .headline .l1, .headline .l2 { color: #fff; font-size: 130px; }
+  .headline .l3 { color: var(--orange); font-size: 150px; margin-top: 6px; }
+
+  /* Subtitle */
+  .subtitle {
+    position: absolute; top: 880px; left: 0; right: 0;
+    text-align: center;
+    font-weight: 600; font-size: 38px; color: #fff;
+    text-shadow: 0 2px 12px rgba(0,0,0,0.7);
+    z-index: 4;
+  }
+
+  /* Feature pills */
+  .pills {
+    position: absolute; top: 950px; left: 0; right: 0;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 18px 16px;
+    padding: 0 80px;
+    z-index: 4;
+  }
+  .pill-chip {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.22);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    font-weight: 700; font-size: 32px;
+    padding: 16px 28px;
+    border-radius: 999px;
+  }
+  .pill-chip .em { font-size: 32px; }
+
+  /* Phone mockup */
+  .phone {
+    position: absolute; left: 50%; top: 1170px;
+    transform: translateX(-50%);
+    width: 440px; height: 900px;
+    background: #0b1220;
+    border-radius: 56px;
+    border: 8px solid #111827;
+    box-shadow:
+      0 30px 60px rgba(0,0,0,0.6),
+      0 10px 30px rgba(0,0,0,0.5),
+      inset 0 0 0 2px rgba(255,255,255,0.04);
+    overflow: hidden;
+    z-index: 3;
+  }
+  .phone .notch {
+    position: absolute; top: 14px; left: 50%; transform: translateX(-50%);
+    width: 130px; height: 30px; background: #000; border-radius: 999px; z-index: 6;
+  }
+  .phone .screen {
+    position: absolute; inset: 0;
+    background: #0f172a;
+    color: #fff;
+    padding: 64px 0 0 0;
+    display: flex; flex-direction: column;
+  }
+
+  /* In-phone Fitz HR chat replication */
+  .app-header {
+    display: flex; align-items: center; gap: 10px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #1e293b;
+  }
+  .hamburger {
+    width: 40px; height: 40px; border-radius: 8px;
+    background: #1e293b; display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .app-title { font-weight: 800; font-size: 22px; letter-spacing: 0.5px; }
+  .app-title .fitz { color: var(--orange); }
+  .app-title .hr { color: #fff; margin-left: 4px; }
+  .header-spacer { flex: 1; }
+  .header-btn {
+    width: 40px; height: 40px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+  }
+  .btn-urgent { background: #dc2626; color: #fff; box-shadow: 0 0 18px rgba(220,38,38,0.55); }
+  .btn-call { background: #6d28d9; color: #fff; box-shadow: 0 0 14px rgba(109,40,217,0.55); }
+  .btn-tools { background: #1e293b; color: #cbd5e1; }
+
+  .greeting-card {
+    margin: 18px 14px;
+    background: rgba(30,41,59,0.7);
+    border: 1px solid #334155;
+    border-radius: 18px;
+    padding: 18px;
+    font-size: 14.5px; line-height: 1.45;
+    color: #e2e8f0;
+    position: relative;
+  }
+  .greeting-card .star {
+    position: absolute; right: 14px; top: 14px; color: #94a3b8; font-size: 16px;
+  }
+  .greeting-card p { margin-bottom: 10px; }
+  .greeting-card p:last-child { margin-bottom: 0; }
+
+  .quick {
+    margin: 20px 14px 0;
+    color: #94a3b8; font-size: 13px; font-weight: 600;
+  }
+  .quick-pills {
+    margin: 10px 14px 0;
+    display: flex; flex-wrap: wrap; gap: 8px;
+  }
+  .qpill {
+    background: #1e293b;
+    color: #e2e8f0;
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 13px; font-weight: 600;
+  }
+
+  .input-bar {
+    margin-top: auto;
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px 18px;
+    border-top: 1px solid #1e293b;
+  }
+  .input-plus { width: 36px; height: 36px; border-radius: 8px; background: #1e293b; display:flex; align-items:center; justify-content:center; font-size:18px; }
+  .input-field {
+    flex: 1;
+    background: #1e293b;
+    color: #94a3b8;
+    border-radius: 999px;
+    padding: 10px 16px;
+    font-size: 13px;
+  }
+  .input-mic { width: 36px; height: 36px; border-radius: 50%; display:flex; align-items:center; justify-content:center; font-size:16px; color:#cbd5e1; }
+  .input-send { width: 40px; height: 40px; border-radius: 50%; background: var(--orange); color: #fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:900; }
+
+  /* CTA */
+  .cta {
+    position: absolute; left: 50%; top: 2090px;
+    transform: translateX(-50%);
+    background: #fff; color: #111;
+    border-radius: 999px;
+    padding: 24px 56px;
+    display: inline-flex; align-items: center; gap: 18px;
+    font-weight: 700; font-size: 44px;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.45);
+    z-index: 4;
+  }
+  /* clamp into viewport — pull above baseline if needed */
+  .cta { top: 2095px; }
+
+  /* Sponsored banner */
+  .sponsored {
+    position: absolute; left: 0; right: 0; bottom: 110px;
+    background: linear-gradient(90deg, var(--orange) 0%, var(--orange-deep) 100%);
+    padding: 22px 28px;
+    display: flex; align-items: center; gap: 18px;
+    z-index: 5;
+    border-top: 1px solid rgba(0,0,0,0.15);
+  }
+  .sponsored .mini {
+    width: 56px; height: 56px; border-radius: 50%;
+    background: #fff; color: var(--orange);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 28px;
+  }
+  .sponsored .text {
+    flex: 1; color: #fff; font-weight: 700; font-size: 32px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .sponsored .url { color: #fff; font-weight: 800; font-size: 30px; }
+
+  .started {
+    position: absolute; left: 0; right: 0; bottom: 175px;
+    text-align: left; padding: 0 36px;
+    color: rgba(255,255,255,0.65); font-weight: 700; font-size: 30px;
+    z-index: 4;
+  }
+
+  /* Action rail (Ad label + icons) */
+  .action-rail {
+    position: absolute; left: 0; right: 0; bottom: 30px;
+    display: flex; align-items: center; padding: 0 36px;
+    z-index: 6;
+  }
+  .ad-label { color: #fff; font-weight: 700; font-size: 30px; opacity: 0.95; }
+  .icons { margin-left: auto; display: flex; gap: 28px; color: #fff; font-size: 36px; }
+
+  /* Off-canvas controls (NOT part of the reel) */
+  .controls {
+    position: fixed; top: 12px; left: 12px; z-index: 99;
+    background: rgba(0,0,0,0.7); padding: 10px 14px; border-radius: 8px;
+    color: #fff; font-size: 13px;
+    display: flex; gap: 12px; align-items: center;
+  }
+  .controls input { width: 140px; }
+  .controls button {
+    background: var(--orange); color: #111; border: 0; padding: 6px 12px;
+    border-radius: 6px; font-weight: 700; cursor: pointer;
+  }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .controls { display: none; }
+    .reel { transform: none !important; margin-bottom: 0; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="controls">
+  <label>Scale <input id="scale" type="range" min="0.2" max="1" step="0.05" value="0.5" /></label>
+  <span id="scaleVal">50%</span>
+  <button onclick="window.print()">Export PNG (Print → Save as PDF/PNG)</button>
+</div>
+
+<div class="reel" id="reel">
+  <div class="bg"></div>
+
+  <!-- Status bar -->
+  <div class="statusbar">
+    <span>9:04</span>
+    <span class="pill"><span class="dot"></span></span>
+    <span class="pill-right">Printing &nbsp; ●</span>
+  </div>
+
+  <!-- Sponsor row -->
+  <div class="sponsor">
+    <div class="avatar">F</div>
+    <div class="handle">fitzhr</div>
+    <div class="spacer"></div>
+    <div class="icon-btn">…</div>
+    <div class="icon-btn">×</div>
+  </div>
+
+  <!-- Brand -->
+  <div class="brand">
+    <div class="mark">F</div>
+    <div class="wordmark"><span class="fitz">fitz</span><span class="hr"> hr</span></div>
+  </div>
+
+  <!-- Headline -->
+  <div class="headline">
+    <div class="l1">One AI.</div>
+    <div class="l2">Every award.</div>
+    <div class="l3">Zero fines.</div>
+  </div>
+
+  <!-- Subtitle -->
+  <div class="subtitle">The #1 HR app for Australian hospitality</div>
+
+  <!-- Feature pills -->
+  <div class="pills">
+    <div class="pill-chip"><span class="em">📜</span> Awards</div>
+    <div class="pill-chip"><span class="em">💰</span> Pay Rates</div>
+    <div class="pill-chip"><span class="em">📝</span> Warnings</div>
+    <div class="pill-chip"><span class="em">🔥</span> Termination</div>
+    <div class="pill-chip"><span class="em">📄</span> Contracts</div>
+    <div class="pill-chip"><span class="em">🚨</span> Crisis Mode</div>
+  </div>
+
+  <!-- Phone mockup -->
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+      <div class="app-header">
+        <div class="hamburger">☰</div>
+        <div class="app-title"><span class="fitz">FITZ</span><span class="hr">HR</span></div>
+        <div class="header-spacer"></div>
+        <div class="header-btn btn-urgent">🚨</div>
+        <div class="header-btn btn-call">📞</div>
+        <div class="header-btn btn-tools">🛠</div>
+      </div>
+
+      <div class="greeting-card">
+        <span class="star">☆</span>
+        <p>👋 G'day! I'm Fitz, your hospitality HR assistant.</p>
+        <p>Ask me anything about awards, compliance, or employment law.</p>
+        <p>🚨 Urgent/Critical Situations: Use the red URGENT button above for immediate crisis response.</p>
+        <p>What HR topic would you like to learn about today?</p>
+      </div>
+
+      <div class="quick">💡 Quick questions:</div>
+      <div class="quick-pills">
+        <div class="qpill">🌙 Penalty rates</div>
+        <div class="qpill">💰 Casual pay rates</div>
+        <div class="qpill">📅 Minimum shifts</div>
+      </div>
+
+      <div class="input-bar">
+        <div class="input-plus">+</div>
+        <div class="input-field">Ask about HR, contracts, compliance…</div>
+        <div class="input-mic">🎙</div>
+        <div class="input-send">→</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta">🔗 Learn more</div>
+
+  <!-- Started text behind sponsored bar -->
+  <div class="started">Get started free</div>
+
+  <!-- Sponsored banner -->
+  <div class="sponsored">
+    <div class="mini">F</div>
+    <div class="text">#1 AI HR app for hospitality: Awards, Pay, Compliance…</div>
+    <div class="url">fitzhr.com →</div>
+  </div>
+
+  <!-- Action rail -->
+  <div class="action-rail">
+    <span class="ad-label">Ad</span>
+    <div class="icons">
+      <span>♡</span><span>💬</span><span>▽</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  const reel = document.getElementById('reel');
+  const slider = document.getElementById('scale');
+  const out = document.getElementById('scaleVal');
+  function setScale(v) {
+    reel.style.setProperty('--scale', v);
+    out.textContent = Math.round(v * 100) + '%';
+  }
+  slider.addEventListener('input', e => setScale(parseFloat(e.target.value)));
+  // Auto-fit on load
+  function autoFit() {
+    const vw = window.innerWidth - 48;
+    const vh = window.innerHeight - 48;
+    const s = Math.min(vw / 1080, vh / 1920, 1);
+    slider.value = s.toFixed(2);
+    setScale(s);
+  }
+  window.addEventListener('resize', autoFit);
+  autoFit();
+</script>
+</body>
+</html>
