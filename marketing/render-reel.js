@@ -48,33 +48,37 @@ async function main() {
     });
     const page = await browser.newPage();
     await page.setViewport({ width: STAGE_W, height: STAGE_H, deviceScaleFactor: 1 });
+    page.setDefaultNavigationTimeout(120000);
 
     const cdp = await page.createCDPSession();
 
-    // Pause virtual time so the page renders the very first frame before
-    // any setTimeout fires, then step through frames deterministically.
-    await cdp.send('Emulation.setVirtualTimePolicy', { policy: 'pause' });
-
+    // Navigate FIRST under normal real time so the load event + webfonts can
+    // resolve. Pausing virtual time before navigation deadlocks the load.
     const url = 'file://' + HTML_FILE.replace(/\\/g, '/');
-    await page.goto(url, { waitUntil: 'load' });
+    await page.goto(url, { waitUntil: 'load', timeout: 120000 });
+    await page.evaluateHandle('document.fonts.ready');
 
-    // Advance ~1.5s of virtual time to let webfonts fully paint before the reel
-    // starts (the slot kicks off at t=1500ms).
+    // Reload with virtual time paused so animations restart at t=0 and we can
+    // step through them deterministically. We use 'advance' with a budget per
+    // step; when the budget expires the policy auto-pauses again.
     await cdp.send('Emulation.setVirtualTimePolicy', {
         policy: 'advance',
-        budget: 200
+        budget: 5000
     });
-    await new Promise(r => cdp.once('Emulation.virtualTimeBudgetExpired', r));
+    await page.reload({ waitUntil: 'load', timeout: 120000 });
+    await new Promise(r => cdp.once('Emulation.virtualTimeBudgetExpired', r))
+        .catch(() => {}); // already expired during reload is fine
     await page.evaluateHandle('document.fonts.ready');
 
     console.log(`Capturing ${TOTAL_FRAMES} frames at ${FPS} fps (${DURATION_S}s)…`);
     const startTime = Date.now();
     for (let i = 0; i < TOTAL_FRAMES; i++) {
+        const expired = new Promise(r => cdp.once('Emulation.virtualTimeBudgetExpired', r));
         await cdp.send('Emulation.setVirtualTimePolicy', {
             policy: 'advance',
             budget: FRAME_MS
         });
-        await new Promise(r => cdp.once('Emulation.virtualTimeBudgetExpired', r));
+        await expired;
 
         const filePath = path.join(FRAMES_DIR, `frame-${String(i).padStart(5, '0')}.png`);
         await page.screenshot({ path: filePath, type: 'png' });
