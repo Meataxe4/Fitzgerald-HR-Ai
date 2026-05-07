@@ -6,18 +6,8 @@
 <title>Fitz HR — Hero Reel (9:16 animated, screen-record to MP4)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,800;0,900;1,800;1,900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,800;0,900;1,800;1,900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* Drop a Robotica font file at assets/fonts/Robotica.woff2 (and .woff)
-   for the brand wordmark to render correctly. Falls back to Archivo Black. */
-@font-face {
-    font-family: 'Robotica';
-    src: url('../assets/fonts/Robotica.woff2') format('woff2'),
-         url('../assets/fonts/Robotica.woff')  format('woff');
-    font-weight: 400 900;
-    font-display: swap;
-}
-
 :root {
     --navy:  #0b1220;
     --navy2: #141f35;
@@ -77,21 +67,23 @@ body { display: flex; align-items: center; justify-content: center; font-family:
     text-align: center;
 }
 
-/* Wordmark FITZ HR — Robotica (with Archivo Black fallback) */
+/* Wordmark FITZ HR — same as index.html: Outfit 800, F+HR amber, ITZ white */
 .wordmark {
-    font-family: 'Robotica', 'Archivo Black', 'Outfit', sans-serif;
-    font-weight: 900;
-    font-size: 168px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 180px;
     line-height: 1;
-    letter-spacing: -0.01em;
+    letter-spacing: -6px;
     margin-bottom: 50px;
-    text-transform: uppercase;
+    display: inline-flex;
+    align-items: baseline;
     opacity: 0;
     transform: translateY(20px);
     animation: fadeUp 0.9s 0.15s cubic-bezier(0.16,1,0.3,1) forwards;
 }
-.wordmark .fitz { color: #fff; }
-.wordmark .hr { color: var(--amber); margin-left: 0.18em; }
+.wm-f   { color: var(--amber); }
+.wm-itz { color: #ffffff; }
+.wm-hr  { color: var(--amber); margin-left: 0.18em; }
 
 /* Headline lines */
 .line {
@@ -181,19 +173,19 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 .pill .ico { font-size: 24px; line-height: 1; }
 
 /* ============================================================
-   PHONE — ported from index.html (.fitz-phone) at 1.6× scale
+   PHONE — ported from index.html (.fitz-phone) at ~1.2× scale
    ============================================================ */
 .fitz-phone {
     background: #1a2235;
-    border-radius: 70px;
+    border-radius: 52px;
     overflow: hidden;
-    width: 512px;
-    height: 1008px;
-    border: 13px solid #0d1421;
+    width: 384px;
+    height: 756px;
+    border: 10px solid #0d1421;
     display: flex; flex-direction: column;
     box-shadow:
-        0 0 0 2px rgba(255,255,255,0.06),
-        0 60px 120px rgba(0,0,0,0.7);
+        0 0 0 1px rgba(255,255,255,0.06),
+        0 50px 100px rgba(0,0,0,0.7);
     opacity: 0;
     transform: translateY(40px) scale(0.96);
     animation: phoneIn 1.0s 1.7s cubic-bezier(0.16,1,0.3,1) forwards;
@@ -201,34 +193,33 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 }
 .fitz-ph-header {
     background: #1a2235;
-    padding: 22px 26px 19px;
+    padding: 17px 19px 14px;
     display: flex; align-items: center; justify-content: space-between;
     border-bottom: 1px solid rgba(255,255,255,0.07);
     flex-shrink: 0;
 }
 .fitz-ph-menu {
-    width: 64px; height: 64px;
+    width: 48px; height: 48px;
     background: #2a3547;
-    border-radius: 18px;
+    border-radius: 13px;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 6px;
+    gap: 5px;
 }
-.fitz-ph-line { width: 26px; height: 3px; background: #fff; border-radius: 1px; }
+.fitz-ph-line { width: 19px; height: 2px; background: #fff; border-radius: 1px; }
 .fitz-ph-logo {
-    font-family: 'Robotica', 'Archivo Black', 'Outfit', sans-serif;
-    font-weight: 900;
-    font-size: 32px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 800;
+    font-size: 24px;
     letter-spacing: -0.5px;
-    text-transform: uppercase;
 }
 .fpl-fitz { color: var(--amber); }
-.fpl-hr   { color: #fff; margin-left: 5px; }
-.fitz-ph-actions { display: flex; gap: 11px; }
+.fpl-hr   { color: #fff; margin-left: 4px; }
+.fitz-ph-actions { display: flex; gap: 8px; }
 .fitz-ph-btn {
-    width: 67px; height: 67px;
-    border-radius: 19px;
+    width: 50px; height: 50px;
+    border-radius: 14px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 27px;
+    font-size: 20px;
 }
 .fitz-ph-red    { background: #dc2626; }
 .fitz-ph-purple { background: #7c3aed; }
@@ -236,58 +227,58 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 
 .fitz-ph-body {
     flex: 1; overflow: hidden;
-    padding: 26px 22px;
+    padding: 19px 17px;
     display: flex; flex-direction: column;
-    gap: 22px;
+    gap: 17px;
 }
 .fitz-ph-bubble {
     background: #243044;
-    border-radius: 28px;
-    padding: 26px;
+    border-radius: 22px;
+    padding: 19px;
     color: #e2e8f0;
-    font-size: 21px; line-height: 1.6;
+    font-size: 16px; line-height: 1.6;
     position: relative;
 }
 .fitz-ph-star {
-    position: absolute; top: 21px; right: 21px;
-    font-size: 22px; color: #4b5563;
+    position: absolute; top: 16px; right: 16px;
+    font-size: 17px; color: #4b5563;
 }
 .fitz-ph-quick-label {
-    color: #94a3b8; font-size: 19px; font-weight: 500;
-    margin-top: 4px;
+    color: #94a3b8; font-size: 14px; font-weight: 500;
+    margin-top: 2px;
 }
-.fitz-ph-chips { display: flex; flex-wrap: wrap; gap: 11px; }
+.fitz-ph-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .fitz-ph-chip {
     background: #243044;
     border: 1px solid #334155;
-    border-radius: 35px;
-    padding: 13px 22px;
+    border-radius: 26px;
+    padding: 10px 17px;
     color: #e2e8f0;
-    font-size: 19px; font-weight: 500;
+    font-size: 14px; font-weight: 500;
 }
 
 .fitz-ph-footer {
     flex-shrink: 0;
     background: #1a2235;
-    padding: 16px 21px 22px;
+    padding: 12px 16px 17px;
     border-top: 1px solid rgba(255,255,255,0.07);
 }
-.fitz-ph-input-row { display: flex; align-items: center; gap: 13px; }
-.fitz-ph-plus { color: #94a3b8; font-size: 35px; width: 51px; text-align: center; }
+.fitz-ph-input-row { display: flex; align-items: center; gap: 10px; }
+.fitz-ph-plus { color: #94a3b8; font-size: 26px; width: 38px; text-align: center; }
 .fitz-ph-input {
     flex: 1;
     background: #243044;
     border: 1px solid #334155;
-    border-radius: 38px;
-    padding: 16px 22px;
+    border-radius: 28px;
+    padding: 12px 17px;
     color: #94a3b8;
-    font-size: 19px;
+    font-size: 14px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     font-family: 'Outfit', sans-serif;
 }
-.fitz-ph-mic { color: #94a3b8; font-size: 27px; width: 48px; text-align: center; }
+.fitz-ph-mic { color: #94a3b8; font-size: 20px; width: 36px; text-align: center; }
 .fitz-ph-send {
-    width: 64px; height: 64px;
+    width: 48px; height: 48px;
     background: var(--amber);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
@@ -314,7 +305,7 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 
     <div class="frame">
         <div class="wordmark">
-            <span class="fitz">FITZ</span><span class="hr">HR</span>
+            <span class="wm-f">F</span><span class="wm-itz">ITZ</span><span class="wm-hr">HR</span>
         </div>
 
         <div class="line line-1">One app.</div>
@@ -365,7 +356,7 @@ body { display: flex; align-items: center; justify-content: center; font-family:
                     <span class="fitz-ph-plus">+</span>
                     <div class="fitz-ph-input">Ask about HR, contracts, compliance…</div>
                     <span class="fitz-ph-mic">🎤</span>
-                    <div class="fitz-ph-send"><svg viewBox="0 0 24 24" fill="#000" width="22" height="22"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></div>
+                    <div class="fitz-ph-send"><svg viewBox="0 0 24 24" fill="#000" width="16" height="16"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></div>
                 </div>
             </div>
         </div>
