@@ -417,10 +417,10 @@ body { display: flex; align-items: center; justify-content: center; font-family:
         const n = sequence.length;
         for (let i = 0; i < n; i++) {
             const fromEnd = n - 1 - i;
-            if (fromEnd === 0)      durations.push(620);
-            else if (fromEnd === 1) durations.push(380);
-            else if (fromEnd === 2) durations.push(240);
-            else                    durations.push(170);
+            if (fromEnd === 0)      durations.push(900);
+            else if (fromEnd === 1) durations.push(560);
+            else if (fromEnd === 2) durations.push(360);
+            else                    durations.push(260);
         }
         for (let i = 0; i < sequence.length; i++) {
             await rollOne(sequence[i], durations[i]);
@@ -436,7 +436,7 @@ body { display: flex; align-items: center; justify-content: center; font-family:
         wrap.style.width = measureWord(phrases[0]) + 'px';
         await new Promise(r => setTimeout(r, 400));
         runReel();
-    }, 9000);
+    }, 11000);
 })();
 </script>
 </body>
