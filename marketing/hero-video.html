@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fitz HR — Hero Reel (9:16 animated, screen-record to MP4)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@0,800;0,900;1,800;1,900&display=swap" rel="stylesheet">
+<style>
+:root {
+    --navy:  #0b1220;
+    --navy2: #141f35;
+    --amber: #f59e0b;
+    --amb2:  #fbbf24;
+    --w90:   rgba(255,255,255,0.92);
+    --w70:   rgba(255,255,255,0.72);
+    --w12:   rgba(255,255,255,0.12);
+    --w08:   rgba(255,255,255,0.08);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #000; overflow: hidden; height: 100%; }
+body { display: flex; align-items: center; justify-content: center; font-family: 'Outfit', system-ui, sans-serif; color: #fff; }
+
+/* 9:16 stage — 1080x1920 nominal. Scales to fit viewport. */
+.stage {
+    width: 1080px; height: 1920px;
+    position: relative; overflow: hidden;
+    transform-origin: center center;
+    background: #0a0e17;
+}
+@media (max-aspect-ratio: 9/16) {
+    .stage { transform: scale(calc(100vw / 1080)); }
+}
+@media (min-aspect-ratio: 9/16) {
+    .stage { transform: scale(calc(100vh / 1920)); }
+}
+
+/* Background — moody pub: layered gradients to evoke timber + pendant warmth */
+.bg {
+    position: absolute; inset: 0;
+    background:
+        radial-gradient(ellipse 60% 40% at 50% 25%, rgba(245,158,11,0.18) 0%, rgba(245,158,11,0) 60%),
+        radial-gradient(ellipse 80% 50% at 50% 90%, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 70%),
+        linear-gradient(180deg, #0a0e17 0%, #14110a 45%, #1a1208 70%, #050505 100%);
+}
+.bg::after {
+    content: ''; position: absolute; inset: 0;
+    background:
+        radial-gradient(circle 80px at 18% 18%, rgba(255,180,90,0.35), rgba(255,180,90,0) 70%),
+        radial-gradient(circle 60px at 82% 22%, rgba(255,180,90,0.25), rgba(255,180,90,0) 70%),
+        radial-gradient(circle 70px at 50% 12%, rgba(255,200,120,0.25), rgba(255,200,120,0) 70%);
+    filter: blur(2px);
+    opacity: 0.8;
+}
+.bg-dim {
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.35) 50%, rgba(0,0,0,0.7) 100%);
+}
+
+/* Content */
+.frame {
+    position: relative; z-index: 2;
+    height: 100%; width: 100%;
+    padding: 140px 70px 80px;
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center;
+}
+
+/* Wordmark FITZ HR */
+.wordmark {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 168px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    margin-bottom: 60px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.9s 0.15s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.wordmark .fitz { color: #fff; }
+.wordmark .hr { color: var(--amber); margin-left: 0.18em; }
+
+/* Headline lines */
+.line {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 116px;
+    line-height: 1.05;
+    letter-spacing: -0.015em;
+    color: #fff;
+    opacity: 0;
+    transform: translateY(20px);
+}
+.line-1 { animation: fadeUp 0.8s 0.45s cubic-bezier(0.16,1,0.3,1) forwards; margin-bottom: 8px; }
+.line-2 { animation: fadeUp 0.8s 0.7s cubic-bezier(0.16,1,0.3,1) forwards; margin-bottom: 26px; }
+
+/* Slot machine line — orange */
+.slot-line {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: 116px;
+    line-height: 1.1;
+    letter-spacing: -0.015em;
+    color: var(--amber);
+    margin-bottom: 44px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.8s 0.95s cubic-bezier(0.16,1,0.3,1) forwards;
+    display: flex; justify-content: center; align-items: center;
+    width: 100%; min-height: 1.25em;
+}
+.slot-wrap {
+    display: inline-block;
+    overflow: hidden;
+    height: 1.25em;
+    position: relative;
+    transition: width 0.18s ease;
+    vertical-align: middle;
+}
+.slot-drum { display: block; will-change: transform; }
+.slot-word {
+    display: block;
+    height: 1.25em;
+    line-height: 1.25;
+    white-space: nowrap;
+    color: var(--amber);
+    text-shadow: 0 0 30px rgba(245,158,11,0.35);
+}
+
+/* Subtitle */
+.subtitle {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 38px;
+    color: var(--w90);
+    letter-spacing: 0.01em;
+    margin-bottom: 50px;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: fadeUp 0.7s 1.2s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+/* Pills */
+.pills {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 18px 18px;
+    max-width: 920px;
+    margin-bottom: 70px;
+    opacity: 0;
+    transform: translateY(14px);
+    animation: fadeUp 0.7s 1.45s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.pill {
+    display: inline-flex; align-items: center; gap: 12px;
+    padding: 18px 28px;
+    background: rgba(20,25,40,0.65);
+    border: 1px solid var(--w12);
+    border-radius: 999px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 600;
+    font-size: 30px;
+    color: #fff;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+.pill .ico { font-size: 28px; line-height: 1; }
+
+/* Phone mockup */
+.phone {
+    position: relative;
+    width: 380px; height: 770px;
+    background: linear-gradient(180deg, #1a1f2e 0%, #0f1420 100%);
+    border-radius: 56px;
+    border: 8px solid #1a1f2e;
+    box-shadow:
+        0 40px 80px rgba(0,0,0,0.7),
+        0 0 0 2px rgba(255,255,255,0.04),
+        inset 0 0 0 2px rgba(255,255,255,0.04);
+    padding: 22px 18px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(40px) scale(0.96);
+    animation: phoneIn 1.0s 1.7s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.phone::before {
+    content: ''; position: absolute;
+    top: 14px; left: 50%; transform: translateX(-50%);
+    width: 100px; height: 28px;
+    background: #000; border-radius: 999px;
+    z-index: 3;
+}
+.phone-inner {
+    width: 100%; height: 100%;
+    background: #0f1420;
+    border-radius: 36px;
+    padding: 58px 18px 18px;
+    display: flex; flex-direction: column;
+    gap: 12px;
+}
+.phone-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 6px 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.phone-header .brand { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 18px; color: #fff; letter-spacing: -0.01em; }
+.phone-header .brand span { color: var(--amber); }
+.phone-header .siren {
+    font-size: 11px; font-weight: 700;
+    background: #ef4444; color: #fff;
+    padding: 4px 8px; border-radius: 6px;
+    letter-spacing: 0.05em;
+}
+.bubble {
+    background: rgba(245,158,11,0.10);
+    border: 1px solid rgba(245,158,11,0.25);
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-size: 12.5px; line-height: 1.45;
+    color: var(--w90);
+}
+.bubble strong { color: var(--amber); }
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.chip {
+    font-size: 11px; font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #fff;
+}
+.chip.amber { background: rgba(245,158,11,0.14); border-color: rgba(245,158,11,0.35); color: var(--amb2); }
+.input-row {
+    margin-top: auto;
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 999px;
+}
+.input-row .placeholder { font-size: 12px; color: rgba(255,255,255,0.4); flex: 1; }
+.send {
+    width: 28px; height: 28px; border-radius: 50%;
+    background: var(--amber);
+    display: flex; align-items: center; justify-content: center;
+    color: #0f1420; font-weight: 900; font-size: 14px;
+}
+
+@keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes phoneIn {
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes pulseGlow {
+    0%, 100% { text-shadow: 0 0 30px rgba(245,158,11,0.35); }
+    50%      { text-shadow: 0 0 50px rgba(245,158,11,0.6); }
+}
+.slot-line.locked .slot-word { animation: pulseGlow 2.4s ease-in-out infinite; }
+</style>
+</head>
+<body>
+<div class="stage">
+    <div class="bg"></div>
+    <div class="bg-dim"></div>
+
+    <div class="frame">
+        <div class="wordmark">
+            <span class="fitz">FITZ</span><span class="hr">HR</span>
+        </div>
+
+        <div class="line line-1">One app.</div>
+        <div class="line line-2">Hospo focused.</div>
+
+        <div class="slot-line" id="slotLine">
+            <span class="slot-wrap" id="slotWrap"><span class="slot-drum" id="slotDrum"><span class="slot-word">No guessing</span></span></span>
+        </div>
+
+        <div class="subtitle">Built for Australian Hospitality</div>
+
+        <div class="pills">
+            <span class="pill"><span class="ico">📜</span>Awards</span>
+            <span class="pill"><span class="ico">💰</span>Pay Rates</span>
+            <span class="pill"><span class="ico">📝</span>Warnings</span>
+            <span class="pill"><span class="ico">📄</span>Contracts</span>
+            <span class="pill"><span class="ico">🔥</span>Termination</span>
+            <span class="pill"><span class="ico">🚨</span>Crisis Mode</span>
+        </div>
+
+        <div class="phone">
+            <div class="phone-inner">
+                <div class="phone-header">
+                    <div class="brand">FITZ <span>HR</span></div>
+                    <div class="siren">URGENT</div>
+                </div>
+                <div class="bubble">
+                    <strong>G'day! I'm Fitz</strong>, your hospitality HR assistant. Ask me anything about awards, compliance or employment law.
+                </div>
+                <div class="bubble" style="background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.06);">
+                    <strong style="color:#fff;">Urgent HR situation?</strong><br>
+                    Use the red URGENT button above for an immediate crisis response.
+                </div>
+                <div class="bubble" style="background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.06);">
+                    What would you like me to help with today?
+                    <div class="chip-row" style="margin-top:8px;">
+                        <span class="chip">📝 Write a warning</span>
+                        <span class="chip amber">🔥 Termination</span>
+                    </div>
+                    <div class="chip-row">
+                        <span class="chip">💵 Casual pay rates</span>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <span class="placeholder">Ask Fitz anything…</span>
+                    <span class="send">↑</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+/* SLOT MACHINE — rolls through phrases and lands on "No compliance risk." */
+(function() {
+    /* Order of the reel. The final landing word is the last entry. */
+    const phrases = [
+        'No guessing',
+        'Hospitality Award',
+        'Restaurant Award',
+        'Fair Work proof',
+        'No compliance risk.'
+    ];
+    const wrap = document.getElementById('slotWrap');
+    const drum = document.getElementById('slotDrum');
+    const line = document.getElementById('slotLine');
+    if (!wrap || !drum) return;
+
+    function measureWord(word) {
+        const computed = window.getComputedStyle(line).font;
+        const t = document.createElement('span');
+        t.style.cssText = 'position:fixed;top:-9999px;left:-9999px;visibility:hidden;white-space:nowrap;font:'+computed+';';
+        t.textContent = word;
+        document.body.appendChild(t);
+        const w = t.offsetWidth;
+        document.body.removeChild(t);
+        return w;
+    }
+
+    function rollOne(word, duration) {
+        return new Promise(resolve => {
+            const nextW = measureWord(word);
+            wrap.style.width = Math.max(wrap.offsetWidth, nextW) + 'px';
+            void wrap.offsetWidth;
+            const nextEl = document.createElement('span');
+            nextEl.className = 'slot-word';
+            nextEl.textContent = word;
+            drum.appendChild(nextEl);
+            drum.style.transition = `transform ${duration}ms cubic-bezier(0.4,0,0.15,1)`;
+            drum.style.transform = 'translateY(-1.25em)';
+            setTimeout(() => {
+                drum.style.transition = 'none';
+                drum.style.transform = 'translateY(0)';
+                if (drum.firstChild) drum.removeChild(drum.firstChild);
+                wrap.style.width = nextW + 'px';
+                resolve();
+            }, duration + 16);
+        });
+    }
+
+    async function runReel() {
+        /* lock the initial width to the first phrase */
+        wrap.style.width = measureWord(phrases[0]) + 'px';
+        /* Build a sequence: visit each phrase, ease into the final landing. */
+        const sequence = phrases.slice(1); // we start displaying phrases[0]
+        /* Per-roll duration: fast at start, slow into the lock. */
+        const durations = [];
+        const n = sequence.length;
+        for (let i = 0; i < n; i++) {
+            const fromEnd = n - 1 - i;
+            if (fromEnd === 0)      durations.push(620);
+            else if (fromEnd === 1) durations.push(380);
+            else if (fromEnd === 2) durations.push(240);
+            else                    durations.push(170);
+        }
+        for (let i = 0; i < sequence.length; i++) {
+            await rollOne(sequence[i], durations[i]);
+        }
+        line.classList.add('locked');
+    }
+
+    /* Kick off after the headline has settled in. */
+    setTimeout(runReel, 1500);
+
+    /* Optional: loop the reel every 9s so screen-recording captures multiple cycles. */
+    setInterval(async () => {
+        if (drum.firstChild) {
+            drum.firstChild.textContent = phrases[0];
+        }
+        line.classList.remove('locked');
+        wrap.style.width = measureWord(phrases[0]) + 'px';
+        await new Promise(r => setTimeout(r, 400));
+        runReel();
+    }, 9000);
+})();
+</script>
+</body>
+</html>

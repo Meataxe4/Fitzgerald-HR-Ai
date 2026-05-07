@@ -110,6 +110,23 @@ Same 3-line cadence as Pebb. Pick the line-3 punch that lands hardest with venue
 - [ ] Wordmark `FITZ HR` (orange/white split — matches the app header)
 - [ ] Export: `marketing/exports/fitz-hr-reel-v1.mp4` (or `.png` if static)
 
+## Animated hero (slot-machine variant)
+
+`marketing/hero-video.html` is a self-contained 9:16 (1080×1920) animated frame
+that recreates the static promo with a slot-machine roll on the orange
+landing line. The reel cycles every 9s through:
+
+1. `No guessing`
+2. `Hospitality Award`
+3. `Restaurant Award`
+4. `Fair Work proof`
+5. `No compliance risk.` ← **lock**
+
+Record to MP4 either by:
+- Opening the file in Chrome at 1080×1920 and screen-recording (QuickTime,
+  OBS) — easiest path.
+- Headless render via Puppeteer + ffmpeg if a clean export is needed.
+
 ## Production notes
 
 - Headline weight: 900 (Inter Black or Sora Black). The Pebb reel uses an extra-condensed black for the orange "Zero chaos." line — do the same on `Zero fines.` so it screams.
