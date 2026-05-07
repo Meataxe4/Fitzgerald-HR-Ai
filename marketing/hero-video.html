@@ -60,14 +60,18 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 
 /* Content — Instagram Reels safe zone: 14% top + 14% bottom = 268.8px each.
    Pad to 280 to give a small safety margin so nothing collides with the
-   ad-label / mute button at top or the caption / action rail at bottom. */
+   ad-label / mute button at top or the caption / action rail at bottom.
+   The whole frame fades in as one unit so every element appears together. */
 .frame {
     position: relative; z-index: 2;
     height: 100%; width: 100%;
     padding: 280px 40px 280px;
     display: flex; flex-direction: column; align-items: center;
     text-align: center;
+    opacity: 0;
+    animation: fadeIn 0.6s 0.2s ease-out forwards;
 }
+@keyframes fadeIn { to { opacity: 1; } }
 
 /* Wordmark FITZ HR — same as index.html: Outfit 800, F+HR amber, ITZ white */
 .wordmark {
@@ -79,9 +83,6 @@ body { display: flex; align-items: center; justify-content: center; font-family:
     margin-bottom: 24px;
     display: inline-flex;
     align-items: baseline;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeUp 0.9s 0.2s cubic-bezier(0.16,1,0.3,1) forwards;
 }
 .wm-f   { color: var(--amber); }
 .wm-itz { color: #ffffff; }
@@ -95,11 +96,9 @@ body { display: flex; align-items: center; justify-content: center; font-family:
     line-height: 1.05;
     letter-spacing: -0.015em;
     color: #fff;
-    opacity: 0;
-    transform: translateY(20px);
 }
-.line-1 { animation: fadeUp 0.9s 0.2s cubic-bezier(0.16,1,0.3,1) forwards; margin-bottom: 4px; }
-.line-2 { animation: fadeUp 0.9s 0.2s cubic-bezier(0.16,1,0.3,1) forwards; margin-bottom: 16px; }
+.line-1 { margin-bottom: 4px; }
+.line-2 { margin-bottom: 16px; }
 
 /* Slot machine line — orange, sized to fit the longest phrase */
 .slot-line {
@@ -110,9 +109,6 @@ body { display: flex; align-items: center; justify-content: center; font-family:
     letter-spacing: -0.015em;
     color: var(--amber);
     margin-bottom: 24px;
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeUp 0.9s 0.2s cubic-bezier(0.16,1,0.3,1) forwards;
     display: flex; justify-content: center; align-items: center;
     width: 100%; min-height: 1.25em;
     padding: 0 10px;
@@ -143,9 +139,6 @@ body { display: flex; align-items: center; justify-content: center; font-family:
     color: var(--w90);
     letter-spacing: 0.01em;
     margin-bottom: 22px;
-    opacity: 0;
-    transform: translateY(14px);
-    animation: fadeUp 0.9s 0.2s cubic-bezier(0.16,1,0.3,1) forwards;
 }
 
 /* Pills */
@@ -154,9 +147,6 @@ body { display: flex; align-items: center; justify-content: center; font-family:
     gap: 12px;
     max-width: 920px;
     margin-bottom: 24px;
-    opacity: 0;
-    transform: translateY(14px);
-    animation: fadeUp 0.9s 0.2s cubic-bezier(0.16,1,0.3,1) forwards;
 }
 .pill {
     display: inline-flex; align-items: center; gap: 9px;
@@ -188,9 +178,6 @@ body { display: flex; align-items: center; justify-content: center; font-family:
         0 0 0 1.5px rgba(255,255,255,0.18),
         0 0 80px rgba(245,158,11,0.18),
         0 50px 100px rgba(0,0,0,0.8);
-    opacity: 0;
-    transform: translateY(40px) scale(0.96);
-    animation: phoneIn 1.0s 0.2s cubic-bezier(0.16,1,0.3,1) forwards;
     flex-shrink: 0;
     margin-top: auto;
     position: relative;
@@ -303,12 +290,6 @@ body { display: flex; align-items: center; justify-content: center; font-family:
     flex-shrink: 0;
 }
 
-@keyframes fadeUp {
-    to { opacity: 1; transform: translateY(0); }
-}
-@keyframes phoneIn {
-    to { opacity: 1; transform: translateY(0) scale(1); }
-}
 </style>
 </head>
 <body>
@@ -354,8 +335,7 @@ body { display: flex; align-items: center; justify-content: center; font-family:
                 <div class="fitz-ph-bubble">
                     <span class="fitz-ph-star">☆</span>
                     👋 G'day! I'm Fitz, your hospitality HR assistant.<br><br>
-                    Ask me anything about awards, compliance, or employment law.<br><br>
-                    🚨 Use the red URGENT button for immediate crisis response.
+                    Ask me anything about awards, compliance, or employment law.
                 </div>
                 <div class="fitz-ph-quick-label">💡 Quick questions:</div>
                 <div class="fitz-ph-chips">
@@ -430,10 +410,10 @@ body { display: flex; align-items: center; justify-content: center; font-family:
         const n = sequence.length;
         for (let i = 0; i < n; i++) {
             const fromEnd = n - 1 - i;
-            if (fromEnd === 0)      durations.push(1300);
-            else if (fromEnd === 1) durations.push(820);
-            else if (fromEnd === 2) durations.push(540);
-            else                    durations.push(400);
+            if (fromEnd === 0)      durations.push(1900);
+            else if (fromEnd === 1) durations.push(1200);
+            else if (fromEnd === 2) durations.push(820);
+            else                    durations.push(580);
         }
         for (let i = 0; i < sequence.length; i++) {
             await rollOne(sequence[i], durations[i]);
@@ -449,7 +429,7 @@ body { display: flex; align-items: center; justify-content: center; font-family:
         wrap.style.width = measureWord(phrases[0]) + 'px';
         await new Promise(r => setTimeout(r, 400));
         runReel();
-    }, 14000);
+    }, 16000);
 })();
 </script>
 </body>
