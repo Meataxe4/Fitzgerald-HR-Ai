@@ -58,11 +58,13 @@ body { display: flex; align-items: center; justify-content: center; font-family:
     background: linear-gradient(180deg, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0.18) 50%, rgba(0,0,0,0.45) 100%);
 }
 
-/* Content */
+/* Content — Instagram Reels safe zone: 14% top + 14% bottom = 268.8px each.
+   Pad to 280 to give a small safety margin so nothing collides with the
+   ad-label / mute button at top or the caption / action rail at bottom. */
 .frame {
     position: relative; z-index: 2;
     height: 100%; width: 100%;
-    padding: 180px 40px 90px;
+    padding: 280px 40px 280px;
     display: flex; flex-direction: column; align-items: center;
     text-align: center;
 }
@@ -71,10 +73,10 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 .wordmark {
     font-family: 'Outfit', sans-serif;
     font-weight: 800;
-    font-size: 180px;
+    font-size: 150px;
     line-height: 1;
-    letter-spacing: -6px;
-    margin-bottom: 50px;
+    letter-spacing: -5px;
+    margin-bottom: 24px;
     display: inline-flex;
     align-items: baseline;
     opacity: 0;
@@ -89,25 +91,25 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 .line {
     font-family: 'Playfair Display', serif;
     font-weight: 900;
-    font-size: 110px;
+    font-size: 92px;
     line-height: 1.05;
     letter-spacing: -0.015em;
     color: #fff;
     opacity: 0;
     transform: translateY(20px);
 }
-.line-1 { animation: fadeUp 0.9s 0.2s cubic-bezier(0.16,1,0.3,1) forwards; margin-bottom: 6px; }
-.line-2 { animation: fadeUp 0.9s 0.2s cubic-bezier(0.16,1,0.3,1) forwards; margin-bottom: 22px; }
+.line-1 { animation: fadeUp 0.9s 0.2s cubic-bezier(0.16,1,0.3,1) forwards; margin-bottom: 4px; }
+.line-2 { animation: fadeUp 0.9s 0.2s cubic-bezier(0.16,1,0.3,1) forwards; margin-bottom: 16px; }
 
 /* Slot machine line — orange, sized to fit the longest phrase */
 .slot-line {
     font-family: 'Playfair Display', serif;
     font-weight: 900;
-    font-size: 92px;
+    font-size: 80px;
     line-height: 1.1;
     letter-spacing: -0.015em;
     color: var(--amber);
-    margin-bottom: 36px;
+    margin-bottom: 24px;
     opacity: 0;
     transform: translateY(20px);
     animation: fadeUp 0.9s 0.2s cubic-bezier(0.16,1,0.3,1) forwards;
@@ -137,10 +139,10 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 .subtitle {
     font-family: 'Outfit', sans-serif;
     font-weight: 600;
-    font-size: 36px;
+    font-size: 32px;
     color: var(--w90);
     letter-spacing: 0.01em;
-    margin-bottom: 38px;
+    margin-bottom: 22px;
     opacity: 0;
     transform: translateY(14px);
     animation: fadeUp 0.9s 0.2s cubic-bezier(0.16,1,0.3,1) forwards;
@@ -149,38 +151,38 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 /* Pills */
 .pills {
     display: flex; flex-wrap: wrap; justify-content: center;
-    gap: 14px;
+    gap: 12px;
     max-width: 920px;
-    margin-bottom: 44px;
+    margin-bottom: 24px;
     opacity: 0;
     transform: translateY(14px);
     animation: fadeUp 0.9s 0.2s cubic-bezier(0.16,1,0.3,1) forwards;
 }
 .pill {
-    display: inline-flex; align-items: center; gap: 10px;
-    padding: 14px 24px;
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 11px 20px;
     background: rgba(20,25,40,0.65);
     border: 1px solid var(--w12);
     border-radius: 999px;
     font-family: 'Outfit', sans-serif;
     font-weight: 600;
-    font-size: 26px;
+    font-size: 23px;
     color: #fff;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
-.pill .ico { font-size: 24px; line-height: 1; }
+.pill .ico { font-size: 22px; line-height: 1; }
 
 /* ============================================================
    PHONE — ported from index.html (.fitz-phone) at ~1.2× scale
    ============================================================ */
 .fitz-phone {
     background: #1a2235;
-    border-radius: 52px;
+    border-radius: 48px;
     overflow: hidden;
-    width: 384px;
-    height: 696px;
-    border: 10px solid #2a3547;
+    width: 360px;
+    height: 620px;
+    border: 9px solid #2a3547;
     display: flex; flex-direction: column;
     box-shadow:
         0 0 0 1.5px rgba(255,255,255,0.18),
