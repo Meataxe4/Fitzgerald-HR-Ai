@@ -118,7 +118,7 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 .slot-wrap {
     display: inline-block;
     overflow: hidden;
-    height: 1.25em;
+    height: 1.4em;
     max-width: 100%;
     position: relative;
     transition: width 0.18s ease;
@@ -127,8 +127,8 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 .slot-drum { display: block; will-change: transform; }
 .slot-word {
     display: block;
-    height: 1.25em;
-    line-height: 1.25;
+    height: 1.4em;
+    line-height: 1.4;
     white-space: nowrap;
     color: var(--amber);
 }
@@ -393,7 +393,7 @@ body { display: flex; align-items: center; justify-content: center; font-family:
             nextEl.textContent = word;
             drum.appendChild(nextEl);
             drum.style.transition = `transform ${duration}ms cubic-bezier(0.4,0,0.15,1)`;
-            drum.style.transform = 'translateY(-1.25em)';
+            drum.style.transform = 'translateY(-1.4em)';
             setTimeout(() => {
                 drum.style.transition = 'none';
                 drum.style.transform = 'translateY(0)';
