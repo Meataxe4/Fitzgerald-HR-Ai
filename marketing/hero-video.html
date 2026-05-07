@@ -6,8 +6,18 @@
 <title>Fitz HR — Hero Reel (9:16 animated, screen-record to MP4)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@0,800;0,900;1,800;1,900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Outfit:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,800;0,900;1,800;1,900&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+/* Drop a Robotica font file at assets/fonts/Robotica.woff2 (and .woff)
+   for the brand wordmark to render correctly. Falls back to Archivo Black. */
+@font-face {
+    font-family: 'Robotica';
+    src: url('../assets/fonts/Robotica.woff2') format('woff2'),
+         url('../assets/fonts/Robotica.woff')  format('woff');
+    font-weight: 400 900;
+    font-display: swap;
+}
+
 :root {
     --navy:  #0b1220;
     --navy2: #141f35;
@@ -40,7 +50,7 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 .bg {
     position: absolute; inset: 0;
     background:
-        radial-gradient(ellipse 60% 40% at 50% 25%, rgba(245,158,11,0.18) 0%, rgba(245,158,11,0) 60%),
+        radial-gradient(ellipse 60% 40% at 50% 22%, rgba(245,158,11,0.18) 0%, rgba(245,158,11,0) 60%),
         radial-gradient(ellipse 80% 50% at 50% 90%, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0) 70%),
         linear-gradient(180deg, #0a0e17 0%, #14110a 45%, #1a1208 70%, #050505 100%);
 }
@@ -62,19 +72,20 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 .frame {
     position: relative; z-index: 2;
     height: 100%; width: 100%;
-    padding: 140px 70px 80px;
+    padding: 110px 40px 70px;
     display: flex; flex-direction: column; align-items: center;
     text-align: center;
 }
 
-/* Wordmark FITZ HR */
+/* Wordmark FITZ HR — Robotica (with Archivo Black fallback) */
 .wordmark {
-    font-family: 'Playfair Display', serif;
+    font-family: 'Robotica', 'Archivo Black', 'Outfit', sans-serif;
     font-weight: 900;
     font-size: 168px;
     line-height: 1;
-    letter-spacing: -0.02em;
-    margin-bottom: 60px;
+    letter-spacing: -0.01em;
+    margin-bottom: 50px;
+    text-transform: uppercase;
     opacity: 0;
     transform: translateY(20px);
     animation: fadeUp 0.9s 0.15s cubic-bezier(0.16,1,0.3,1) forwards;
@@ -86,35 +97,37 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 .line {
     font-family: 'Playfair Display', serif;
     font-weight: 900;
-    font-size: 116px;
+    font-size: 110px;
     line-height: 1.05;
     letter-spacing: -0.015em;
     color: #fff;
     opacity: 0;
     transform: translateY(20px);
 }
-.line-1 { animation: fadeUp 0.8s 0.45s cubic-bezier(0.16,1,0.3,1) forwards; margin-bottom: 8px; }
-.line-2 { animation: fadeUp 0.8s 0.7s cubic-bezier(0.16,1,0.3,1) forwards; margin-bottom: 26px; }
+.line-1 { animation: fadeUp 0.8s 0.45s cubic-bezier(0.16,1,0.3,1) forwards; margin-bottom: 6px; }
+.line-2 { animation: fadeUp 0.8s 0.7s cubic-bezier(0.16,1,0.3,1) forwards; margin-bottom: 22px; }
 
-/* Slot machine line — orange */
+/* Slot machine line — orange, sized to fit the longest phrase */
 .slot-line {
     font-family: 'Playfair Display', serif;
     font-weight: 900;
-    font-size: 116px;
+    font-size: 92px;
     line-height: 1.1;
     letter-spacing: -0.015em;
     color: var(--amber);
-    margin-bottom: 44px;
+    margin-bottom: 36px;
     opacity: 0;
     transform: translateY(20px);
     animation: fadeUp 0.8s 0.95s cubic-bezier(0.16,1,0.3,1) forwards;
     display: flex; justify-content: center; align-items: center;
     width: 100%; min-height: 1.25em;
+    padding: 0 10px;
 }
 .slot-wrap {
     display: inline-block;
     overflow: hidden;
     height: 1.25em;
+    max-width: 100%;
     position: relative;
     transition: width 0.18s ease;
     vertical-align: middle;
@@ -133,10 +146,10 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 .subtitle {
     font-family: 'Outfit', sans-serif;
     font-weight: 600;
-    font-size: 38px;
+    font-size: 36px;
     color: var(--w90);
     letter-spacing: 0.01em;
-    margin-bottom: 50px;
+    margin-bottom: 38px;
     opacity: 0;
     transform: translateY(14px);
     animation: fadeUp 0.7s 1.2s cubic-bezier(0.16,1,0.3,1) forwards;
@@ -145,106 +158,140 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 /* Pills */
 .pills {
     display: flex; flex-wrap: wrap; justify-content: center;
-    gap: 18px 18px;
+    gap: 14px;
     max-width: 920px;
-    margin-bottom: 70px;
+    margin-bottom: 44px;
     opacity: 0;
     transform: translateY(14px);
     animation: fadeUp 0.7s 1.45s cubic-bezier(0.16,1,0.3,1) forwards;
 }
 .pill {
-    display: inline-flex; align-items: center; gap: 12px;
-    padding: 18px 28px;
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 14px 24px;
     background: rgba(20,25,40,0.65);
     border: 1px solid var(--w12);
     border-radius: 999px;
     font-family: 'Outfit', sans-serif;
     font-weight: 600;
-    font-size: 30px;
+    font-size: 26px;
     color: #fff;
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
-.pill .ico { font-size: 28px; line-height: 1; }
+.pill .ico { font-size: 24px; line-height: 1; }
 
-/* Phone mockup */
-.phone {
-    position: relative;
-    width: 380px; height: 770px;
-    background: linear-gradient(180deg, #1a1f2e 0%, #0f1420 100%);
-    border-radius: 56px;
-    border: 8px solid #1a1f2e;
-    box-shadow:
-        0 40px 80px rgba(0,0,0,0.7),
-        0 0 0 2px rgba(255,255,255,0.04),
-        inset 0 0 0 2px rgba(255,255,255,0.04);
-    padding: 22px 18px;
+/* ============================================================
+   PHONE — ported from index.html (.fitz-phone) at 1.6× scale
+   ============================================================ */
+.fitz-phone {
+    background: #1a2235;
+    border-radius: 70px;
     overflow: hidden;
+    width: 512px;
+    height: 1008px;
+    border: 13px solid #0d1421;
+    display: flex; flex-direction: column;
+    box-shadow:
+        0 0 0 2px rgba(255,255,255,0.06),
+        0 60px 120px rgba(0,0,0,0.7);
     opacity: 0;
     transform: translateY(40px) scale(0.96);
     animation: phoneIn 1.0s 1.7s cubic-bezier(0.16,1,0.3,1) forwards;
+    flex-shrink: 0;
 }
-.phone::before {
-    content: ''; position: absolute;
-    top: 14px; left: 50%; transform: translateX(-50%);
-    width: 100px; height: 28px;
-    background: #000; border-radius: 999px;
-    z-index: 3;
-}
-.phone-inner {
-    width: 100%; height: 100%;
-    background: #0f1420;
-    border-radius: 36px;
-    padding: 58px 18px 18px;
-    display: flex; flex-direction: column;
-    gap: 12px;
-}
-.phone-header {
+.fitz-ph-header {
+    background: #1a2235;
+    padding: 22px 26px 19px;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 4px 6px 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    flex-shrink: 0;
 }
-.phone-header .brand { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 18px; color: #fff; letter-spacing: -0.01em; }
-.phone-header .brand span { color: var(--amber); }
-.phone-header .siren {
-    font-size: 11px; font-weight: 700;
-    background: #ef4444; color: #fff;
-    padding: 4px 8px; border-radius: 6px;
-    letter-spacing: 0.05em;
+.fitz-ph-menu {
+    width: 64px; height: 64px;
+    background: #2a3547;
+    border-radius: 18px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 6px;
 }
-.bubble {
-    background: rgba(245,158,11,0.10);
-    border: 1px solid rgba(245,158,11,0.25);
-    border-radius: 14px;
-    padding: 12px 14px;
-    font-size: 12.5px; line-height: 1.45;
-    color: var(--w90);
+.fitz-ph-line { width: 26px; height: 3px; background: #fff; border-radius: 1px; }
+.fitz-ph-logo {
+    font-family: 'Robotica', 'Archivo Black', 'Outfit', sans-serif;
+    font-weight: 900;
+    font-size: 32px;
+    letter-spacing: -0.5px;
+    text-transform: uppercase;
 }
-.bubble strong { color: var(--amber); }
-.chip-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-.chip {
-    font-size: 11px; font-weight: 600;
-    padding: 6px 10px;
-    border-radius: 999px;
-    background: rgba(255,255,255,0.06);
-    border: 1px solid rgba(255,255,255,0.08);
-    color: #fff;
-}
-.chip.amber { background: rgba(245,158,11,0.14); border-color: rgba(245,158,11,0.35); color: var(--amb2); }
-.input-row {
-    margin-top: auto;
-    display: flex; align-items: center; gap: 8px;
-    padding: 10px 12px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 999px;
-}
-.input-row .placeholder { font-size: 12px; color: rgba(255,255,255,0.4); flex: 1; }
-.send {
-    width: 28px; height: 28px; border-radius: 50%;
-    background: var(--amber);
+.fpl-fitz { color: var(--amber); }
+.fpl-hr   { color: #fff; margin-left: 5px; }
+.fitz-ph-actions { display: flex; gap: 11px; }
+.fitz-ph-btn {
+    width: 67px; height: 67px;
+    border-radius: 19px;
     display: flex; align-items: center; justify-content: center;
-    color: #0f1420; font-weight: 900; font-size: 14px;
+    font-size: 27px;
+}
+.fitz-ph-red    { background: #dc2626; }
+.fitz-ph-purple { background: #7c3aed; }
+.fitz-ph-gray   { background: #2a3547; }
+
+.fitz-ph-body {
+    flex: 1; overflow: hidden;
+    padding: 26px 22px;
+    display: flex; flex-direction: column;
+    gap: 22px;
+}
+.fitz-ph-bubble {
+    background: #243044;
+    border-radius: 28px;
+    padding: 26px;
+    color: #e2e8f0;
+    font-size: 21px; line-height: 1.6;
+    position: relative;
+}
+.fitz-ph-star {
+    position: absolute; top: 21px; right: 21px;
+    font-size: 22px; color: #4b5563;
+}
+.fitz-ph-quick-label {
+    color: #94a3b8; font-size: 19px; font-weight: 500;
+    margin-top: 4px;
+}
+.fitz-ph-chips { display: flex; flex-wrap: wrap; gap: 11px; }
+.fitz-ph-chip {
+    background: #243044;
+    border: 1px solid #334155;
+    border-radius: 35px;
+    padding: 13px 22px;
+    color: #e2e8f0;
+    font-size: 19px; font-weight: 500;
+}
+
+.fitz-ph-footer {
+    flex-shrink: 0;
+    background: #1a2235;
+    padding: 16px 21px 22px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+}
+.fitz-ph-input-row { display: flex; align-items: center; gap: 13px; }
+.fitz-ph-plus { color: #94a3b8; font-size: 35px; width: 51px; text-align: center; }
+.fitz-ph-input {
+    flex: 1;
+    background: #243044;
+    border: 1px solid #334155;
+    border-radius: 38px;
+    padding: 16px 22px;
+    color: #94a3b8;
+    font-size: 19px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    font-family: 'Outfit', sans-serif;
+}
+.fitz-ph-mic { color: #94a3b8; font-size: 27px; width: 48px; text-align: center; }
+.fitz-ph-send {
+    width: 64px; height: 64px;
+    background: var(--amber);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
 }
 
 @keyframes fadeUp {
@@ -288,32 +335,37 @@ body { display: flex; align-items: center; justify-content: center; font-family:
             <span class="pill"><span class="ico">🚨</span>Crisis Mode</span>
         </div>
 
-        <div class="phone">
-            <div class="phone-inner">
-                <div class="phone-header">
-                    <div class="brand">FITZ <span>HR</span></div>
-                    <div class="siren">URGENT</div>
+        <!-- Phone — same markup as index.html .fitz-phone -->
+        <div class="fitz-phone">
+            <div class="fitz-ph-header">
+                <div class="fitz-ph-menu"><div class="fitz-ph-line"></div><div class="fitz-ph-line"></div><div class="fitz-ph-line"></div></div>
+                <div class="fitz-ph-logo"><span class="fpl-fitz">FITZ</span><span class="fpl-hr">HR</span></div>
+                <div class="fitz-ph-actions">
+                    <div class="fitz-ph-btn fitz-ph-red">🚨</div>
+                    <div class="fitz-ph-btn fitz-ph-purple">📞</div>
+                    <div class="fitz-ph-btn fitz-ph-gray">🔧</div>
                 </div>
-                <div class="bubble">
-                    <strong>G'day! I'm Fitz</strong>, your hospitality HR assistant. Ask me anything about awards, compliance or employment law.
+            </div>
+            <div class="fitz-ph-body">
+                <div class="fitz-ph-bubble">
+                    <span class="fitz-ph-star">☆</span>
+                    👋 G'day! I'm Fitz, your hospitality HR assistant.<br><br>
+                    Ask me anything about awards, compliance, or employment law.<br><br>
+                    🚨 Use the red URGENT button for immediate crisis response.
                 </div>
-                <div class="bubble" style="background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.06);">
-                    <strong style="color:#fff;">Urgent HR situation?</strong><br>
-                    Use the red URGENT button above for an immediate crisis response.
+                <div class="fitz-ph-quick-label">💡 Quick questions:</div>
+                <div class="fitz-ph-chips">
+                    <div class="fitz-ph-chip">🌙 Penalty rates</div>
+                    <div class="fitz-ph-chip">💰 Casual pay rates</div>
+                    <div class="fitz-ph-chip">📅 Minimum shifts</div>
                 </div>
-                <div class="bubble" style="background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.06);">
-                    What would you like me to help with today?
-                    <div class="chip-row" style="margin-top:8px;">
-                        <span class="chip">📝 Write a warning</span>
-                        <span class="chip amber">🔥 Termination</span>
-                    </div>
-                    <div class="chip-row">
-                        <span class="chip">💵 Casual pay rates</span>
-                    </div>
-                </div>
-                <div class="input-row">
-                    <span class="placeholder">Ask Fitz anything…</span>
-                    <span class="send">↑</span>
+            </div>
+            <div class="fitz-ph-footer">
+                <div class="fitz-ph-input-row">
+                    <span class="fitz-ph-plus">+</span>
+                    <div class="fitz-ph-input">Ask about HR, contracts, compliance…</div>
+                    <span class="fitz-ph-mic">🎤</span>
+                    <div class="fitz-ph-send"><svg viewBox="0 0 24 24" fill="#000" width="22" height="22"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg></div>
                 </div>
             </div>
         </div>
@@ -323,7 +375,6 @@ body { display: flex; align-items: center; justify-content: center; font-family:
 <script>
 /* SLOT MACHINE — rolls through phrases and lands on "No compliance risk." */
 (function() {
-    /* Order of the reel. The final landing word is the last entry. */
     const phrases = [
         'No guessing',
         'Hospitality Award',
@@ -369,11 +420,8 @@ body { display: flex; align-items: center; justify-content: center; font-family:
     }
 
     async function runReel() {
-        /* lock the initial width to the first phrase */
         wrap.style.width = measureWord(phrases[0]) + 'px';
-        /* Build a sequence: visit each phrase, ease into the final landing. */
-        const sequence = phrases.slice(1); // we start displaying phrases[0]
-        /* Per-roll duration: fast at start, slow into the lock. */
+        const sequence = phrases.slice(1);
         const durations = [];
         const n = sequence.length;
         for (let i = 0; i < n; i++) {
@@ -389,14 +437,10 @@ body { display: flex; align-items: center; justify-content: center; font-family:
         line.classList.add('locked');
     }
 
-    /* Kick off after the headline has settled in. */
     setTimeout(runReel, 1500);
 
-    /* Optional: loop the reel every 9s so screen-recording captures multiple cycles. */
     setInterval(async () => {
-        if (drum.firstChild) {
-            drum.firstChild.textContent = phrases[0];
-        }
+        if (drum.firstChild) drum.firstChild.textContent = phrases[0];
         line.classList.remove('locked');
         wrap.style.width = measureWord(phrases[0]) + 'px';
         await new Promise(r => setTimeout(r, 400));
