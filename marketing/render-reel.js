@@ -12,6 +12,7 @@
  */
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 const { pathToFileURL } = require('url');
 const { spawn } = require('child_process');
@@ -24,7 +25,9 @@ const DURATION_S = 14;          // matches the slot-machine loop interval
 const FRAME_MS = 1000 / TARGET_FPS;
 
 const OUT_DIR    = path.join(__dirname, 'exports');
-const FRAMES_DIR = path.join(OUT_DIR, 'frames');
+// Frames go to OS temp (not the project) so OneDrive / cloud-sync doesn't
+// throttle every disk write. Only the final MP4 lands in the project.
+const FRAMES_DIR = path.join(os.tmpdir(), `fitz-reel-frames-${process.pid}`);
 const OUT_FILE   = path.join(OUT_DIR, 'fitz-hr-reel.mp4');
 const HTML_FILE  = path.join(__dirname, 'hero-video.html');
 
@@ -44,6 +47,8 @@ async function main() {
 
     fs.rmSync(FRAMES_DIR, { recursive: true, force: true });
     fs.mkdirSync(FRAMES_DIR, { recursive: true });
+    fs.mkdirSync(OUT_DIR, { recursive: true });
+    console.log(`Frames staged in ${FRAMES_DIR}`);
 
     const browser = await puppeteer.launch({
         headless: 'new',
