@@ -11,6 +11,7 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const path = require('path');
+const { pathToFileURL } = require('url');
 const { spawn } = require('child_process');
 
 const STAGE_W = 1080;
@@ -54,7 +55,9 @@ async function main() {
 
     // Navigate FIRST under normal real time so the load event + webfonts can
     // resolve. Pausing virtual time before navigation deadlocks the load.
-    const url = 'file://' + HTML_FILE.replace(/\\/g, '/');
+    // pathToFileURL handles spaces in paths (e.g. "FitzHR Marketing").
+    const url = pathToFileURL(HTML_FILE).href;
+    console.log(`Loading ${url}`);
     await page.goto(url, { waitUntil: 'load', timeout: 120000 });
     await page.evaluateHandle('document.fonts.ready');
 
