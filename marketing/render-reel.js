@@ -2,11 +2,12 @@
 /**
  * Render marketing/hero-video.html to a 1080x1920 MP4.
  *
- * Uses Puppeteer with Chrome's virtual-time control so animations advance
- * deterministically (one frame == one tick), then ffmpeg encodes the PNG
- * sequence to MP4. Output: marketing/exports/fitz-hr-reel.mp4
+ * Uses Puppeteer's CDP screencast to stream frames from headless Chrome at
+ * the compositor's native rate, then ffmpeg encodes the JPEG sequence to MP4
+ * at the actual capture FPS so playback speed matches the live page.
  *
- * Requires: node, puppeteer (auto-installed via npm), and ffmpeg on PATH.
+ * Output: marketing/exports/fitz-hr-reel.mp4
+ * Requires: node, puppeteer (auto-installed via npm), ffmpeg on PATH.
  */
 const puppeteer = require('puppeteer');
 const fs = require('fs');
@@ -16,10 +17,8 @@ const { spawn } = require('child_process');
 
 const STAGE_W = 1080;
 const STAGE_H = 1920;
-const FPS = 30;
+const TARGET_FPS = 30;          // output framerate
 const DURATION_S = 14;          // matches the slot-machine loop interval
-const FRAME_MS = 1000 / FPS;
-const TOTAL_FRAMES = FPS * DURATION_S;
 
 const OUT_DIR    = path.join(__dirname, 'exports');
 const FRAMES_DIR = path.join(OUT_DIR, 'frames');
@@ -31,7 +30,7 @@ async function ensureFfmpeg() {
         const test = spawn('ffmpeg', ['-version']);
         test.on('error', () => reject(new Error(
             'ffmpeg not found on PATH. Install it: https://ffmpeg.org/download.html ' +
-            '(Windows: `winget install ffmpeg`; macOS: `brew install ffmpeg`).'
+            '(Windows: `winget install Gyan.FFmpeg`; macOS: `brew install ffmpeg`).'
         )));
         test.on('exit', code => code === 0 ? resolve() : reject(new Error('ffmpeg exited ' + code)));
     });
@@ -45,6 +44,7 @@ async function main() {
 
     const browser = await puppeteer.launch({
         headless: 'new',
+        protocolTimeout: 300000,
         args: ['--font-render-hinting=none', '--disable-web-security']
     });
     const page = await browser.newPage();
@@ -53,55 +53,61 @@ async function main() {
 
     const cdp = await page.createCDPSession();
 
-    // Navigate FIRST under normal real time so the load event + webfonts can
-    // resolve. Pausing virtual time before navigation deadlocks the load.
-    // pathToFileURL handles spaces in paths (e.g. "FitzHR Marketing").
     const url = pathToFileURL(HTML_FILE).href;
     console.log(`Loading ${url}`);
-    await page.goto(url, { waitUntil: 'load', timeout: 120000 });
+    await page.goto(url, { waitUntil: 'load' });
+    await page.evaluateHandle('document.fonts.ready');
+    await new Promise(r => setTimeout(r, 300));
+
+    // Reload so animations restart at t=0 right before we start recording.
+    await page.reload({ waitUntil: 'load' });
     await page.evaluateHandle('document.fonts.ready');
 
-    // Reload with virtual time paused so animations restart at t=0 and we can
-    // step through them deterministically. We use 'advance' with a budget per
-    // step; when the budget expires the policy auto-pauses again.
-    await cdp.send('Emulation.setVirtualTimePolicy', {
-        policy: 'advance',
-        budget: 5000
-    });
-    await page.reload({ waitUntil: 'load', timeout: 120000 });
-    await new Promise(r => cdp.once('Emulation.virtualTimeBudgetExpired', r))
-        .catch(() => {}); // already expired during reload is fine
-    await page.evaluateHandle('document.fonts.ready');
-
-    console.log(`Capturing ${TOTAL_FRAMES} frames at ${FPS} fps (${DURATION_S}s)…`);
-    const startTime = Date.now();
-    for (let i = 0; i < TOTAL_FRAMES; i++) {
-        const expired = new Promise(r => cdp.once('Emulation.virtualTimeBudgetExpired', r));
-        await cdp.send('Emulation.setVirtualTimePolicy', {
-            policy: 'advance',
-            budget: FRAME_MS
-        });
-        await expired;
-
-        const filePath = path.join(FRAMES_DIR, `frame-${String(i).padStart(5, '0')}.png`);
-        await page.screenshot({ path: filePath, type: 'png' });
-
-        if (i % 15 === 0 || i === TOTAL_FRAMES - 1) {
-            const pct = Math.round(((i + 1) / TOTAL_FRAMES) * 100);
-            process.stdout.write(`\r  frame ${i + 1}/${TOTAL_FRAMES} (${pct}%)`);
+    let frameIndex = 0;
+    cdp.on('Page.screencastFrame', async ({ data, sessionId }) => {
+        const filePath = path.join(FRAMES_DIR, `frame-${String(frameIndex).padStart(5, '0')}.jpg`);
+        fs.writeFileSync(filePath, Buffer.from(data, 'base64'));
+        frameIndex++;
+        if (frameIndex % 10 === 0) {
+            process.stdout.write(`\r  frame ${frameIndex}`);
         }
-    }
+        try {
+            await cdp.send('Page.screencastFrameAck', { sessionId });
+        } catch (_) { /* session may be closing */ }
+    });
+
+    console.log(`Recording for ${DURATION_S}s…`);
+    const recordingStart = Date.now();
+    await cdp.send('Page.startScreencast', {
+        format: 'jpeg',
+        quality: 95,
+        everyNthFrame: 1
+    });
+
+    await new Promise(r => setTimeout(r, DURATION_S * 1000));
+
+    await cdp.send('Page.stopScreencast');
+    // Give pending frame acks a moment to drain.
+    await new Promise(r => setTimeout(r, 250));
+    const elapsed = (Date.now() - recordingStart) / 1000;
+    const actualFps = frameIndex / elapsed;
     process.stdout.write('\n');
-    console.log(`Captured in ${((Date.now() - startTime) / 1000).toFixed(1)}s`);
+    console.log(`Captured ${frameIndex} frames in ${elapsed.toFixed(1)}s (${actualFps.toFixed(1)} fps)`);
 
     await browser.close();
 
-    console.log('Encoding MP4 with ffmpeg…');
+    if (frameIndex < 30) {
+        throw new Error(`Only ${frameIndex} frames captured — something went wrong.`);
+    }
+
+    console.log(`Encoding MP4 (input ${actualFps.toFixed(2)} fps, output ${TARGET_FPS} fps)…`);
     await new Promise((resolve, reject) => {
         const ff = spawn('ffmpeg', [
             '-y',
-            '-framerate', String(FPS),
-            '-i', path.join(FRAMES_DIR, 'frame-%05d.png'),
+            // input frame rate matches actual capture rate so timing is real
+            '-framerate', actualFps.toFixed(3),
+            '-i', path.join(FRAMES_DIR, 'frame-%05d.jpg'),
+            '-vf', `fps=${TARGET_FPS}`,
             '-c:v', 'libx264',
             '-pix_fmt', 'yuv420p',
             '-crf', '18',
