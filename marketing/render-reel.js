@@ -24,12 +24,23 @@ const OUTPUT_FPS = 30;
 const DURATION_S = 14;          // matches the slot-machine loop interval
 const FRAME_MS = 1000 / TARGET_FPS;
 
+// CLI flags: --html=path, --out=path, --width=N, --height=N, --duration=N
+const opts = {};
+process.argv.slice(2).forEach(a => {
+    const m = a.match(/^--([^=]+)=(.*)$/);
+    if (m) opts[m[1]] = m[2];
+});
+
+const W = parseInt(opts.width)  || STAGE_W;
+const H = parseInt(opts.height) || STAGE_H;
+const D = parseInt(opts.duration) || DURATION_S;
+
 const OUT_DIR    = path.join(__dirname, 'exports');
 // Frames go to OS temp (not the project) so OneDrive / cloud-sync doesn't
 // throttle every disk write. Only the final MP4 lands in the project.
 const FRAMES_DIR = path.join(os.tmpdir(), `fitz-reel-frames-${process.pid}`);
-const OUT_FILE   = path.join(OUT_DIR, 'fitz-hr-reel.mp4');
-const HTML_FILE  = path.join(__dirname, 'hero-video.html');
+const OUT_FILE   = path.resolve(opts.out  || path.join(OUT_DIR, 'fitz-hr-reel.mp4'));
+const HTML_FILE  = path.resolve(opts.html || path.join(__dirname, 'hero-video.html'));
 
 async function ensureFfmpeg() {
     return new Promise((resolve, reject) => {
@@ -63,7 +74,7 @@ async function main() {
         ]
     });
     const page = await browser.newPage();
-    await page.setViewport({ width: STAGE_W, height: STAGE_H, deviceScaleFactor: 1 });
+    await page.setViewport({ width: W, height: H, deviceScaleFactor: 1 });
     page.setDefaultNavigationTimeout(120000);
 
     const url = pathToFileURL(HTML_FILE).href;
@@ -76,10 +87,10 @@ async function main() {
     await page.reload({ waitUntil: 'load' });
     await page.evaluateHandle('document.fonts.ready');
 
-    console.log(`Recording for ${DURATION_S}s at up to ${TARGET_FPS} fps…`);
+    console.log(`Recording ${W}x${H} for ${D}s at up to ${TARGET_FPS} fps…`);
     const recordingStart = Date.now();
     let i = 0;
-    while (Date.now() - recordingStart < DURATION_S * 1000) {
+    while (Date.now() - recordingStart < D * 1000) {
         const targetMs = i * FRAME_MS;
         const elapsed = Date.now() - recordingStart;
         const wait = targetMs - elapsed;
