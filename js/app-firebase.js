@@ -11,6 +11,18 @@ const firebaseConfig = {
 // Use existing currentUser from line 4714
 let auth, db, storage, currentSubscription = null;
 
+// ========================================
+// FITZ WATCH - FEATURE FLAG ALLOWLIST
+// ========================================
+// Reference list of who is intended to have which preview flags. This is
+// NOT auto-applied on login — firestore.rules blocks client writes to the
+// featureFlags array. To grant a flag, add it manually via the Firestore
+// console: users/{uid}.featureFlags = ['fitz_watch_preview'].
+// Phase 1+ may introduce a Cloud Function to auto-merge from this list.
+const ALLOWLISTED_EMAILS = {
+    'blakefitzgerald4@gmail.com': ['fitz_watch_preview']
+};
+
 try {
   firebase.initializeApp(firebaseConfig);
   auth = firebase.auth();
@@ -289,7 +301,12 @@ if (auth) {
                     
                     if (userDoc.exists) {
                         const userData = userDoc.data();
-                        
+
+                        // Load Fitz Watch feature flags into session cache.
+                        if (typeof loadFeatureFlags === 'function') {
+                            loadFeatureFlags(userData);
+                        }
+
                         // Check for truthy value (handles boolean true, string "true", etc.)
                         if (userData.legalTermsAccepted === true || userData.legalTermsAccepted === 'true') {
                             localStorage.setItem('legalTermsAccepted_' + user.uid, 'true');

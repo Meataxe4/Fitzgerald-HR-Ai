@@ -2099,6 +2099,153 @@
 <!-- NEW MODAL: AWARD WIZARD -->
 <!-- ========================================== -->
 
+<!-- ============================================================================ -->
+<!-- FITZ WATCH — Pre-flight setup (Step 1)                                       -->
+<!-- Collects 10 venue-profile fields needed for compliance gap detection.        -->
+<!-- Sprint 1: feature-flag gated, opened via window.openFitzWatch() from devtools-->
+<!-- ============================================================================ -->
+<div id="fitzWatchPreflightModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between mb-2">
+            <div>
+                <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                    <span>🛡️</span> Fitz Watch — Setup
+                </h2>
+                <p class="text-slate-400 text-sm">Before we begin, we need a few details about your venue to detect risks accurately.</p>
+            </div>
+            <button onclick="closeFitzWatchPreflight()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+        <p class="text-xs text-slate-500 mb-6">Takes about 90 seconds. We won't ask again.</p>
+
+        <form id="fitzWatchPreflightForm" onsubmit="submitFitzWatchPreflight(event)" class="space-y-6">
+
+            <!-- Section A: Workforce mix -->
+            <section>
+                <h3 class="text-sm font-semibold text-amber-400 uppercase tracking-wide mb-3">Workforce mix</h3>
+                <div class="grid grid-cols-3 gap-3">
+                    <label class="block">
+                        <span class="text-sm text-slate-300">Casual</span>
+                        <input type="number" name="casual_count" min="0" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">
+                        <span class="text-xs text-red-400 hidden" data-error-for="casual_count"></span>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm text-slate-300">Part-time</span>
+                        <input type="number" name="part_time_count" min="0" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">
+                        <span class="text-xs text-red-400 hidden" data-error-for="part_time_count"></span>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm text-slate-300">Full-time</span>
+                        <input type="number" name="full_time_count" min="0" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">
+                        <span class="text-xs text-red-400 hidden" data-error-for="full_time_count"></span>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Section B: Pay & payroll setup -->
+            <section>
+                <h3 class="text-sm font-semibold text-amber-400 uppercase tracking-wide mb-3">Pay &amp; payroll setup</h3>
+                <div class="space-y-3">
+                    <label class="block">
+                        <span class="text-sm text-slate-300">Do any of your full-time staff get paid an annualised salary covering Award entitlements?</span>
+                        <div class="mt-2 space-y-1">
+                            <label class="flex items-center gap-2 text-sm text-slate-300"><input type="radio" name="annualised_wage_used" value="yes" required> Yes, some are on annualised wages</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-300"><input type="radio" name="annualised_wage_used" value="no"> No, everyone's paid hourly or standard salary</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-300"><input type="radio" name="annualised_wage_used" value="unsure"> Not sure</label>
+                        </div>
+                        <span class="text-xs text-red-400 hidden" data-error-for="annualised_wage_used"></span>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm text-slate-300">Payroll software</span>
+                        <select name="payroll_software" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">
+                            <option value="">Select…</option>
+                            <option value="xero">Xero</option>
+                            <option value="myob">MYOB</option>
+                            <option value="keypay">KeyPay / Employment Hero Payroll</option>
+                            <option value="adp">ADP</option>
+                            <option value="employment_hero">Employment Hero</option>
+                            <option value="manual">Manual / spreadsheet</option>
+                            <option value="other">Other</option>
+                            <option value="unsure">Not sure</option>
+                        </select>
+                        <span class="text-xs text-red-400 hidden" data-error-for="payroll_software"></span>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm text-slate-300">Super clearing house</span>
+                        <select name="super_clearing_house" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">
+                            <option value="">Select…</option>
+                            <option value="beam">Beam</option>
+                            <option value="ato_sbsch">ATO Small Business Clearing House</option>
+                            <option value="payroll_builtin">Built into payroll software</option>
+                            <option value="other">Other</option>
+                            <option value="unsure">Not sure</option>
+                        </select>
+                        <span class="text-xs text-red-400 hidden" data-error-for="super_clearing_house"></span>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Section C: Records & insurance -->
+            <section>
+                <h3 class="text-sm font-semibold text-amber-400 uppercase tracking-wide mb-3">Records &amp; insurance</h3>
+                <div class="space-y-3">
+                    <label class="block">
+                        <span class="text-sm text-slate-300">How do you record staff time worked?</span>
+                        <div class="mt-2 space-y-1">
+                            <label class="flex items-center gap-2 text-sm text-slate-300"><input type="radio" name="time_records_method" value="digital_signed" required> Digital time clock with employee sign-off</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-300"><input type="radio" name="time_records_method" value="paper_signed"> Paper timesheets signed by employees</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-300"><input type="radio" name="time_records_method" value="manager_no_signoff"> Manager records hours — no employee sign-off</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-300"><input type="radio" name="time_records_method" value="none"> We don't keep formal time records</label>
+                            <label class="flex items-center gap-2 text-sm text-slate-300"><input type="radio" name="time_records_method" value="unsure"> Not sure</label>
+                        </div>
+                        <span class="text-xs text-red-400 hidden" data-error-for="time_records_method"></span>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm text-slate-300">When does your workers compensation insurance renew?</span>
+                        <select name="insurance_renewal_month" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">
+                            <option value="">Select month…</option>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                        <span class="text-xs text-red-400 hidden" data-error-for="insurance_renewal_month"></span>
+                    </label>
+                </div>
+            </section>
+
+            <!-- Section D: Business details -->
+            <section>
+                <h3 class="text-sm font-semibold text-amber-400 uppercase tracking-wide mb-3">Business details</h3>
+                <div class="space-y-3">
+                    <label class="block">
+                        <span class="text-sm text-slate-300">ABN</span>
+                        <input type="text" name="venue_abn" inputmode="numeric" pattern="[0-9 ]{11,14}" placeholder="11 digits" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">
+                        <span class="text-xs text-red-400 hidden" data-error-for="venue_abn"></span>
+                    </label>
+                    <label class="block">
+                        <span class="text-sm text-slate-300">Trading address</span>
+                        <input type="text" name="venue_address" placeholder="Street, suburb, state, postcode" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">
+                        <span class="text-xs text-red-400 hidden" data-error-for="venue_address"></span>
+                    </label>
+                </div>
+            </section>
+
+            <div class="flex justify-end gap-3 pt-4 border-t border-slate-700">
+                <button type="button" onclick="closeFitzWatchPreflight()" class="px-4 py-2 text-slate-400 hover:text-white text-sm">Cancel</button>
+                <button type="submit" class="px-6 py-2 bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold rounded-lg transition-all">Continue →</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div id="awardWizardModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
     <div id="awardWizardContainer" class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 fade-in max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between mb-6">
