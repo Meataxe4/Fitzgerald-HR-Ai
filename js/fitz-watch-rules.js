@@ -282,7 +282,7 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         question: 'How is the casual public holiday rate configured in your payroll?',
         options: [
             { value: '250_all_inclusive_119',     label: '250% all-inclusive (MA000119 Restaurant)' },
-            { value: '275_all_inclusive_009',     label: '275% all-inclusive (MA000009 Hospitality)' },
+            { value: '225_all_inclusive_009',     label: '225% all-inclusive (MA000009 Hospitality)' },
             { value: '25_loading_plus_penalty',   label: '25% casual loading + PH penalty stacked' },
             { value: 'unsure_need_help',          label: "I'm not sure" }
         ],
@@ -303,7 +303,7 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
             if (response === '250_all_inclusive_119') {
                 return awards.indexOf('MA000119') !== -1 ? null : { severity: 'critical', severityLabel: 'Wrong Award rate' };
             }
-            if (response === '275_all_inclusive_009') {
+            if (response === '225_all_inclusive_009') {
                 return awards.indexOf('MA000009') !== -1 ? null : { severity: 'critical', severityLabel: 'Wrong Award rate' };
             }
             return { severity: 'high' };

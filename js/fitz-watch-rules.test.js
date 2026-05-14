@@ -250,7 +250,7 @@ function runFitzWatchTests(verbose) {
     // ============================================================
     console.log('%cAP-005 wrong-award detection', 'color: #94a3b8');
     const r7 = detectGaps(FW_TEST_PROFILE_KNOWN_BAD, {  // MA000119
-        'AP-005': _resp('275_all_inclusive_009')  // wrong rate for MA000119
+        'AP-005': _resp('225_all_inclusive_009')  // wrong rate for MA000119
     });
     check('AP-005: wrong-award rate produces critical gap',
         _gapById(r7.gaps, 'AP-005') && _gapById(r7.gaps, 'AP-005').severity === 'critical'

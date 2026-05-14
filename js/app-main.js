@@ -22042,7 +22042,12 @@ function submitFitzWatchPreflight(event) {
 
     closeFitzWatchPreflight();
     if (typeof showNotification === 'function') {
-        showNotification('Fitz Watch setup saved.', 'success');
+        showNotification('Setup saved — starting your assessment.', 'success');
+    }
+    // Auto-advance into the questionnaire so the user has one continuous flow
+    // (pre-flight → assessment → dashboard) rather than a dead-end "saved" toast.
+    if (typeof openFitzWatchQuestionnaire === 'function') {
+        openFitzWatchQuestionnaire();
     }
 }
 
@@ -22112,9 +22117,9 @@ function renderFitzWatchQuestion() {
         const checked = existingValue === opt.value ? 'checked' : '';
         const labelClass = isSkip ? 'text-slate-500' : 'text-slate-200';
         optionsHtml +=
-            '<label class="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-700/50 cursor-pointer transition-colors">' +
+            '<label class="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-700/50 cursor-pointer transition-colors" onclick="setTimeout(_fwqUpdateNextButton, 0)">' +
                 '<input type="radio" name="fwqResponse" value="' + _fwEscapeHtml(opt.value) + '" ' + checked +
-                    ' onchange="_fwqUpdateNextButton()" class="mt-1 accent-amber-500">' +
+                    ' onchange="_fwqUpdateNextButton()" onclick="_fwqUpdateNextButton()" class="mt-1 accent-amber-500">' +
                 '<span class="text-sm ' + labelClass + '">' + _fwEscapeHtml(opt.label) + '</span>' +
             '</label>';
     }
@@ -22160,7 +22165,20 @@ function _fwqUpdateNextButton() {
     const nextBtn = document.getElementById('fwqNextBtn');
     if (!nextBtn) return;
     const selected = document.querySelector('input[name="fwqResponse"]:checked');
-    nextBtn.disabled = !selected;
+    const enabled = !!selected;
+    nextBtn.disabled = !enabled;
+    // Explicit class swap because Tailwind disabled: variant doesn't always
+    // produce an obvious visual difference on amber buttons. Make the disabled
+    // state look unambiguously inactive (slate, not faded amber).
+    if (enabled) {
+        nextBtn.classList.remove('bg-slate-700', 'text-slate-500', 'cursor-not-allowed', 'opacity-50');
+        nextBtn.classList.add('bg-amber-500', 'hover:bg-amber-400', 'text-slate-900');
+    } else {
+        nextBtn.classList.remove('bg-amber-500', 'hover:bg-amber-400', 'text-slate-900');
+        nextBtn.classList.add('bg-slate-700', 'text-slate-500', 'cursor-not-allowed', 'opacity-50');
+    }
+    const hint = document.getElementById('fwqHint');
+    if (hint) hint.classList.toggle('hidden', enabled);
 }
 
 async function fitzWatchQuestionnaireNext() {
