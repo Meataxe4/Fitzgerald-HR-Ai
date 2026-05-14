@@ -21817,3 +21817,236 @@ function resetAIImport() {
     parsedAIData = null;
 }
 
+// ============================================================================
+// FITZ WATCH — Compliance risk dashboard
+// ----------------------------------------------------------------------------
+// Sprint 1 (data layer): feature flag helpers, question response storage,
+// and the pre-flight setup flow. UI surfaces (questionnaire, dashboard, home
+// widget) ship in Sprints 2 and 3. For Phase 0, the only allowlisted user is
+// blakefitzgerald4@gmail.com. Flags are managed manually via Firestore console.
+// ============================================================================
+
+// ---- Step 2: Feature flag layer --------------------------------------------
+
+let _featureFlagsCache = null;
+
+function loadFeatureFlags(userProfile) {
+    const flags = (userProfile && Array.isArray(userProfile.featureFlags))
+        ? userProfile.featureFlags
+        : [];
+    _featureFlagsCache = new Set(flags);
+}
+
+function hasFeature(flagName) {
+    return _featureFlagsCache !== null && _featureFlagsCache.has(flagName);
+}
+
+// ---- Step 3: Question response storage -------------------------------------
+// Path: users/{uid}/fitzWatchResponses/{questionId}
+// Doc shape: { questionId, domain, response, lastAnsweredAt, confidence, skipUntil }
+
+let _fitzWatchResponsesCache = null;
+
+function invalidateFitzWatchResponsesCache() {
+    _fitzWatchResponsesCache = null;
+}
+
+function getFitzWatchResponsesCache() {
+    return _fitzWatchResponsesCache || {};
+}
+
+async function loadFitzWatchResponses() {
+    if (!currentUser || !db) {
+        _fitzWatchResponsesCache = {};
+        return _fitzWatchResponsesCache;
+    }
+    try {
+        const snapshot = await db
+            .collection('users').doc(currentUser.uid)
+            .collection('fitzWatchResponses')
+            .get();
+        const map = {};
+        snapshot.forEach(function(doc) {
+            map[doc.id] = doc.data();
+        });
+        _fitzWatchResponsesCache = map;
+        return map;
+    } catch (error) {
+        console.warn('Fitz Watch: failed to load responses', error);
+        _fitzWatchResponsesCache = {};
+        return _fitzWatchResponsesCache;
+    }
+}
+
+async function saveFitzWatchResponse(questionId, domain, response) {
+    if (!currentUser || !db) return { success: false };
+    if (!questionId || !domain || !response) {
+        console.warn('Fitz Watch: saveFitzWatchResponse missing required fields', { questionId, domain, response });
+        return { success: false };
+    }
+    const FOURTEEN_DAYS_MS = 14 * 24 * 60 * 60 * 1000;
+    const skipUntilMs = response === 'skip_for_now' ? (Date.now() + FOURTEEN_DAYS_MS) : null;
+    const payload = {
+        questionId: questionId,
+        domain: domain,
+        response: response,
+        lastAnsweredAt: firebase.firestore.FieldValue.serverTimestamp(),
+        confidence: 'attested',
+        skipUntil: skipUntilMs ? firebase.firestore.Timestamp.fromMillis(skipUntilMs) : null
+    };
+    try {
+        await db
+            .collection('users').doc(currentUser.uid)
+            .collection('fitzWatchResponses').doc(questionId)
+            .set(payload, { merge: true });
+        invalidateFitzWatchResponsesCache();
+        return { success: true };
+    } catch (error) {
+        console.warn('Fitz Watch: failed to save response', questionId, error);
+        return { success: false, error: error };
+    }
+}
+
+// ---- Step 1: Pre-flight setup ----------------------------------------------
+// The pre-flight collects 10 venue-profile fields needed for accurate gap
+// detection. Persists into venueProfile (existing localStorage + appState
+// cloud-sync pattern), so the values are available to other tools too.
+
+function fitzWatchPreflightComplete() {
+    if (!venueProfile) return false;
+    const required = [
+        'venue_abn', 'venue_address',
+        'casual_count', 'part_time_count', 'full_time_count',
+        'annualised_wage_used', 'payroll_software', 'super_clearing_house',
+        'time_records_method', 'insurance_renewal_month'
+    ];
+    return required.every(function(f) {
+        const v = venueProfile[f];
+        return v !== undefined && v !== null && v !== '';
+    }) && venueProfile.fitzWatchSetupComplete === true;
+}
+
+// Entry router. Routes the user to pre-flight, questionnaire, or dashboard.
+// Sprint 1 only renders pre-flight; later sprints add questionnaire/dashboard.
+function openFitzWatch() {
+    if (!hasFeature('fitz_watch_preview')) {
+        console.info('Fitz Watch: feature flag not granted for this user');
+        return;
+    }
+    if (!fitzWatchPreflightComplete()) {
+        openFitzWatchPreflight();
+        return;
+    }
+    // Sprint 2 will route to questionnaire/dashboard from here.
+    console.info('Fitz Watch: pre-flight complete. Questionnaire & dashboard ship in Sprint 2/3.');
+    showNotification('Fitz Watch pre-flight already complete. Questionnaire coming in Sprint 2.', 'info');
+}
+
+function openFitzWatchPreflight() {
+    const modal = document.getElementById('fitzWatchPreflightModal');
+    if (!modal) {
+        console.warn('Fitz Watch: pre-flight modal element not found');
+        return;
+    }
+    // Pre-fill existing values (if user is editing rather than first-time setup)
+    const form = document.getElementById('fitzWatchPreflightForm');
+    if (form && venueProfile) {
+        Array.from(form.elements).forEach(function(el) {
+            if (el.name && venueProfile[el.name] !== undefined && venueProfile[el.name] !== null) {
+                el.value = venueProfile[el.name];
+            }
+        });
+    }
+    modal.classList.remove('hidden');
+}
+
+function closeFitzWatchPreflight() {
+    const modal = document.getElementById('fitzWatchPreflightModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function validateFitzWatchPreflight(values) {
+    const errors = {};
+    const abn = (values.venue_abn || '').replace(/\s/g, '');
+    if (!/^\d{11}$/.test(abn)) errors.venue_abn = 'ABN must be 11 digits.';
+    if (!values.venue_address || values.venue_address.trim().length < 5) errors.venue_address = 'Enter a trading address.';
+    const ints = ['casual_count', 'part_time_count', 'full_time_count'];
+    ints.forEach(function(k) {
+        const n = parseInt(values[k], 10);
+        if (isNaN(n) || n < 0) errors[k] = 'Enter a whole number 0 or greater.';
+    });
+    if (!['yes', 'no', 'unsure'].includes(values.annualised_wage_used)) errors.annualised_wage_used = 'Choose one.';
+    const enums = {
+        payroll_software: ['xero', 'myob', 'keypay', 'adp', 'employment_hero', 'manual', 'other', 'unsure'],
+        super_clearing_house: ['beam', 'ato_sbsch', 'payroll_builtin', 'other', 'unsure'],
+        time_records_method: ['digital_signed', 'paper_signed', 'manager_no_signoff', 'none', 'unsure']
+    };
+    Object.keys(enums).forEach(function(k) {
+        if (!enums[k].includes(values[k])) errors[k] = 'Choose one.';
+    });
+    const month = parseInt(values.insurance_renewal_month, 10);
+    if (isNaN(month) || month < 1 || month > 12) errors.insurance_renewal_month = 'Choose a month.';
+    return errors;
+}
+
+function submitFitzWatchPreflight(event) {
+    if (event) event.preventDefault();
+    const form = document.getElementById('fitzWatchPreflightForm');
+    if (!form) return;
+    const values = {};
+    Array.from(form.elements).forEach(function(el) {
+        if (el.name) values[el.name] = el.value;
+    });
+    const errors = validateFitzWatchPreflight(values);
+    // Surface inline errors
+    Array.from(form.querySelectorAll('[data-error-for]')).forEach(function(el) {
+        const field = el.getAttribute('data-error-for');
+        el.textContent = errors[field] || '';
+        el.classList.toggle('hidden', !errors[field]);
+    });
+    if (Object.keys(errors).length > 0) return;
+
+    // Merge into venueProfile and persist via existing pattern
+    venueProfile = Object.assign({}, venueProfile, {
+        venue_abn: values.venue_abn.replace(/\s/g, ''),
+        venue_address: values.venue_address.trim(),
+        casual_count: parseInt(values.casual_count, 10),
+        part_time_count: parseInt(values.part_time_count, 10),
+        full_time_count: parseInt(values.full_time_count, 10),
+        annualised_wage_used: values.annualised_wage_used,
+        payroll_software: values.payroll_software,
+        super_clearing_house: values.super_clearing_house,
+        time_records_method: values.time_records_method,
+        insurance_renewal_month: parseInt(values.insurance_renewal_month, 10),
+        fitzWatchSetupComplete: true,
+        fitzWatchSetupDate: new Date().toISOString()
+    });
+
+    // Persist to localStorage — the wrapped setItem auto-syncs to Firestore
+    // via debouncedSync() (see app-firebase.js localStorage override).
+    if (currentUser && currentUser.uid) {
+        try {
+            localStorage.setItem('venueProfile_' + currentUser.uid, JSON.stringify(venueProfile));
+        } catch (e) {
+            console.warn('Fitz Watch: failed to persist pre-flight', e);
+        }
+    }
+
+    closeFitzWatchPreflight();
+    if (typeof showNotification === 'function') {
+        showNotification('Fitz Watch setup saved.', 'success');
+    }
+}
+
+// Expose Sprint 1 entry point for manual testing from devtools.
+// Sprint 2/3 will wire this to a Tools tile and home widget.
+if (typeof window !== 'undefined') {
+    window.openFitzWatch = openFitzWatch;
+    window.openFitzWatchPreflight = openFitzWatchPreflight;
+    window.closeFitzWatchPreflight = closeFitzWatchPreflight;
+    window.submitFitzWatchPreflight = submitFitzWatchPreflight;
+    window.hasFeature = hasFeature;
+    window.saveFitzWatchResponse = saveFitzWatchResponse;
+    window.loadFitzWatchResponses = loadFitzWatchResponses;
+}
+

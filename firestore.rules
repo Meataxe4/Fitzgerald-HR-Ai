@@ -17,12 +17,30 @@ service cloud.firestore {
     // ========================================
     // USER DATA - Private to each user
     // ========================================
+    // featureFlags is server/admin-managed only — clients can read but cannot
+    // self-grant flags. Phase 0 flag management is via Firestore console.
+    function clientFlagsUnchanged() {
+      return !('featureFlags' in request.resource.data)
+        || (resource != null
+            && resource.data.featureFlags == request.resource.data.featureFlags);
+    }
+
     match /users/{userId} {
-      // Self or admin can read/write
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      // Self can read; admin can read/write anything
+      allow read: if request.auth != null && request.auth.uid == userId;
       allow read, write: if isAdmin();
 
-      // Subcollections (conversations, contracts, checklists, trainingPlans, etc.)
+      // Self can create/update only if they don't mutate featureFlags
+      allow create: if request.auth != null
+                      && request.auth.uid == userId
+                      && clientFlagsUnchanged();
+      allow update: if request.auth != null
+                      && request.auth.uid == userId
+                      && clientFlagsUnchanged();
+      allow delete: if request.auth != null && request.auth.uid == userId;
+
+      // Subcollections (conversations, contracts, checklists, trainingPlans,
+      // fitzWatchResponses, etc.) — wide-open within the user's own scope.
       match /{subcollection}/{document=**} {
         allow read, write: if request.auth != null && request.auth.uid == userId;
         allow read, write: if isAdmin();
