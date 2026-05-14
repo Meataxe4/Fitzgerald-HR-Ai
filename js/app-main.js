@@ -21927,7 +21927,6 @@ function fitzWatchPreflightComplete() {
 }
 
 // Entry router. Routes the user to pre-flight, questionnaire, or dashboard.
-// Sprint 1 only renders pre-flight; later sprints add questionnaire/dashboard.
 function openFitzWatch() {
     if (!hasFeature('fitz_watch_preview')) {
         console.info('Fitz Watch: feature flag not granted for this user');
@@ -21937,9 +21936,18 @@ function openFitzWatch() {
         openFitzWatchPreflight();
         return;
     }
-    // Sprint 2 will route to questionnaire/dashboard from here.
-    console.info('Fitz Watch: pre-flight complete. Questionnaire & dashboard ship in Sprint 2/3.');
-    showNotification('Fitz Watch pre-flight already complete. Questionnaire coming in Sprint 2.', 'info');
+    loadFitzWatchResponses().then(function(responses) {
+        const profile = venueProfile || {};
+        const applicable = (typeof getQuestionRegistry === 'function')
+            ? getQuestionRegistry().filter(function(r) { return r.conditional(profile); })
+            : [];
+        const unanswered = applicable.filter(function(r) { return !responses[r.id]; });
+        if (unanswered.length > 0) {
+            openFitzWatchQuestionnaire();
+        } else {
+            openFitzWatchDashboard();
+        }
+    });
 }
 
 function openFitzWatchPreflight() {
@@ -22038,13 +22046,404 @@ function submitFitzWatchPreflight(event) {
     }
 }
 
-// Expose Sprint 1 entry point for manual testing from devtools.
-// Sprint 2/3 will wire this to a Tools tile and home widget.
+// ============================================================================
+// SPRINT 3 — Questionnaire UI (Step 5), Dashboard view (Step 6), Tools tile (7)
+// ============================================================================
+
+function _fwEscapeHtml(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// ---- Step 5: Questionnaire UI ----------------------------------------------
+
+let _fwqState = { rules: [], currentIndex: 0, completed: false };
+
+async function openFitzWatchQuestionnaire() {
+    if (!hasFeature('fitz_watch_preview')) return;
+    await loadFitzWatchResponses();
+    const responses = getFitzWatchResponsesCache();
+    const profile = venueProfile || {};
+    const applicable = (typeof getQuestionRegistry === 'function')
+        ? getQuestionRegistry().filter(function(r) { return r.conditional(profile); })
+        : [];
+    if (applicable.length === 0) {
+        if (typeof showNotification === 'function') {
+            showNotification('No applicable Fitz Watch questions for this venue profile.', 'info');
+        }
+        return;
+    }
+    _fwqState.rules = applicable;
+    _fwqState.completed = false;
+    let unansweredIdx = -1;
+    for (let i = 0; i < applicable.length; i++) {
+        if (!responses[applicable[i].id]) { unansweredIdx = i; break; }
+    }
+    _fwqState.currentIndex = unansweredIdx === -1 ? 0 : unansweredIdx;
+    const modal = document.getElementById('fitzWatchQuestionnaireModal');
+    if (modal) modal.classList.remove('hidden');
+    renderFitzWatchQuestion();
+}
+
+function closeFitzWatchQuestionnaire() {
+    const modal = document.getElementById('fitzWatchQuestionnaireModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function renderFitzWatchQuestion() {
+    const total = _fwqState.rules.length;
+    const idx = _fwqState.currentIndex;
+    if (idx >= total) { renderFitzWatchCompletion(); return; }
+    const rule = _fwqState.rules[idx];
+    const responses = getFitzWatchResponsesCache();
+    const existing = responses[rule.id];
+    const existingValue = existing ? existing.response : null;
+
+    let optionsHtml = '';
+    let skipSeparatorAdded = false;
+    for (let i = 0; i < rule.options.length; i++) {
+        const opt = rule.options[i];
+        const isSkip = opt.value === 'skip_for_now';
+        if (isSkip && !skipSeparatorAdded) {
+            skipSeparatorAdded = true;
+            optionsHtml += '<div class="border-t border-slate-700 my-3"></div>';
+        }
+        const checked = existingValue === opt.value ? 'checked' : '';
+        const labelClass = isSkip ? 'text-slate-500' : 'text-slate-200';
+        optionsHtml +=
+            '<label class="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-700/50 cursor-pointer transition-colors">' +
+                '<input type="radio" name="fwqResponse" value="' + _fwEscapeHtml(opt.value) + '" ' + checked +
+                    ' onchange="_fwqUpdateNextButton()" class="mt-1 accent-amber-500">' +
+                '<span class="text-sm ' + labelClass + '">' + _fwEscapeHtml(opt.label) + '</span>' +
+            '</label>';
+    }
+
+    const anchor = rule.statutoryAnchor || {};
+    const anchorParts = [];
+    if (anchor.act) anchorParts.push(anchor.act);
+    if (anchor.section) anchorParts.push(anchor.section);
+    const anchorStr = anchorParts.join('; ') || 'see relevant Award';
+
+    const body = document.getElementById('fwqBody');
+    if (!body) return;
+    body.innerHTML =
+        '<div class="text-xs text-slate-500 uppercase tracking-wide mb-2">Award &amp; Pay · ' + _fwEscapeHtml(rule.title) + '</div>' +
+        '<h3 class="text-lg font-bold text-white mb-4">' + _fwEscapeHtml(rule.question) + '</h3>' +
+        '<div class="space-y-1 mb-4">' + optionsHtml + '</div>' +
+        '<details class="text-sm text-slate-400 mt-4">' +
+            '<summary class="cursor-pointer hover:text-slate-300 select-none">▸ Why we\'re asking</summary>' +
+            '<div class="mt-3 space-y-2 pl-3 border-l-2 border-slate-600">' +
+                '<p><span class="text-slate-500">Statutory anchor:</span> ' + _fwEscapeHtml(anchorStr) + '</p>' +
+                '<p><span class="text-slate-500">Why it matters:</span> ' + _fwEscapeHtml(rule.consequence || '') + '</p>' +
+                '<p class="text-amber-400/80"><span class="text-amber-500">⏱ Why now:</span> ' + _fwEscapeHtml(rule.urgencyDriver || '') + '</p>' +
+            '</div>' +
+        '</details>';
+
+    const curEl = document.getElementById('fwqCurrent');
+    const totalEl = document.getElementById('fwqTotal');
+    const bar = document.getElementById('fwqProgressBar');
+    if (curEl) curEl.textContent = idx + 1;
+    if (totalEl) totalEl.textContent = total;
+    if (bar) bar.style.width = ((idx + 1) / total * 100) + '%';
+
+    const backBtn = document.getElementById('fwqBackBtn');
+    if (backBtn) backBtn.disabled = idx === 0;
+    const footer = document.getElementById('fwqFooter');
+    if (footer) footer.style.display = '';
+    const nextBtn = document.getElementById('fwqNextBtn');
+    if (nextBtn) nextBtn.textContent = (idx === total - 1) ? 'Finish →' : 'Next →';
+    _fwqUpdateNextButton();
+}
+
+function _fwqUpdateNextButton() {
+    const nextBtn = document.getElementById('fwqNextBtn');
+    if (!nextBtn) return;
+    const selected = document.querySelector('input[name="fwqResponse"]:checked');
+    nextBtn.disabled = !selected;
+}
+
+async function fitzWatchQuestionnaireNext() {
+    const idx = _fwqState.currentIndex;
+    if (idx >= _fwqState.rules.length) return;
+    const rule = _fwqState.rules[idx];
+    const selected = document.querySelector('input[name="fwqResponse"]:checked');
+    if (!selected) return;
+    await saveFitzWatchResponse(rule.id, rule.domain, selected.value);
+    _fwqState.currentIndex++;
+    if (_fwqState.currentIndex >= _fwqState.rules.length) {
+        renderFitzWatchCompletion();
+    } else {
+        renderFitzWatchQuestion();
+    }
+}
+
+function fitzWatchQuestionnaireBack() {
+    if (_fwqState.currentIndex > 0) {
+        _fwqState.currentIndex--;
+        renderFitzWatchQuestion();
+    }
+}
+
+function renderFitzWatchCompletion() {
+    _fwqState.completed = true;
+    const body = document.getElementById('fwqBody');
+    if (body) {
+        body.innerHTML =
+            '<div class="text-center py-8">' +
+                '<div class="text-5xl mb-3">✓</div>' +
+                '<h3 class="text-xl font-bold text-white mb-2">Award &amp; Pay questionnaire complete</h3>' +
+                '<p class="text-slate-400 mb-6">We\'ve analysed your responses against:</p>' +
+                '<ul class="text-sm text-slate-300 mb-8 space-y-1 inline-block text-left">' +
+                    '<li>· Fair Work Act 2009</li>' +
+                    '<li>· Modern Awards MA000119 &amp; MA000009</li>' +
+                    '<li>· FWO 6-year limitation period (s544)</li>' +
+                '</ul>' +
+                '<div><button onclick="closeFitzWatchQuestionnaire(); openFitzWatchDashboard();" class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold rounded-lg transition-all">View your dashboard →</button></div>' +
+            '</div>';
+    }
+    const footer = document.getElementById('fwqFooter');
+    if (footer) footer.style.display = 'none';
+    const bar = document.getElementById('fwqProgressBar');
+    if (bar) bar.style.width = '100%';
+}
+
+// ---- Step 6: Dashboard view -----------------------------------------------
+
+async function openFitzWatchDashboard() {
+    if (!hasFeature('fitz_watch_preview')) return;
+    await loadFitzWatchResponses();
+    const modal = document.getElementById('fitzWatchDashboardModal');
+    if (modal) modal.classList.remove('hidden');
+    renderFitzWatchDashboard();
+}
+
+function closeFitzWatchDashboard() {
+    const modal = document.getElementById('fitzWatchDashboardModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function _fwFormatDate(ms) {
+    try {
+        return new Date(ms).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+    } catch (e) { return ''; }
+}
+
+function _fwLatestAttestationMs(responses) {
+    let latest = 0;
+    Object.keys(responses).forEach(function(k) {
+        const r = responses[k];
+        if (!r || !r.lastAnsweredAt) return;
+        const ms = typeof r.lastAnsweredAt.toMillis === 'function'
+            ? r.lastAnsweredAt.toMillis()
+            : Number(r.lastAnsweredAt);
+        if (ms && ms > latest) latest = ms;
+    });
+    return latest || null;
+}
+
+const _FW_SEV_BADGE = {
+    critical: { dot: '●', class: 'bg-red-900/30 border-red-500 text-red-300' },
+    high:     { dot: '●', class: 'bg-amber-900/30 border-amber-500 text-amber-300' },
+    medium:   { dot: '●', class: 'bg-yellow-900/30 border-yellow-600 text-yellow-300' },
+    low:      { dot: '✓', class: 'bg-emerald-900/30 border-emerald-500 text-emerald-300' }
+};
+
+const _FW_FIX_CTA_LABEL = {
+    ask_fitz:     'Get help from Fitz',
+    generate_doc: 'Generate document',
+    fix_in_app:   'Fix in Fitz',
+    review_now:   'Start review',
+    external:     'Open resource'
+};
+
+function renderFitzWatchDashboard() {
+    const profile = venueProfile || {};
+    const responses = getFitzWatchResponsesCache();
+    const result = (typeof detectGaps === 'function')
+        ? detectGaps(profile, responses, [])
+        : { gaps: [], outstanding: [] };
+    const applicable = (typeof getQuestionRegistry === 'function')
+        ? getQuestionRegistry().filter(function(r) { return r.conditional(profile); })
+        : [];
+    const answeredCount = Object.keys(responses).filter(function(id) {
+        return applicable.some(function(r) { return r.id === id; });
+    }).length;
+
+    // Meta line
+    const meta = document.getElementById('fwDashboardMeta');
+    if (meta) {
+        const latest = _fwLatestAttestationMs(responses);
+        const base = latest ? 'Based on your responses as of ' + _fwFormatDate(latest) + ' · ' : '';
+        meta.innerHTML = base +
+            '<a href="#" onclick="closeFitzWatchDashboard(); openFitzWatchQuestionnaire(); return false;" class="text-amber-400 hover:text-amber-300">Update answers</a>';
+    }
+
+    // Re-attestation banner
+    let staleCount = 0;
+    if (typeof isResponseStale === 'function') {
+        result.gaps.forEach(function(g) {
+            const r = responses[g.gap_id];
+            if (r && isResponseStale(r, g.severity)) staleCount++;
+        });
+    }
+    const banner = document.getElementById('fwDashboardReattestation');
+    if (banner) {
+        if (staleCount > 0) {
+            banner.querySelector('div').textContent = '⟳ ' + staleCount + ' question' + (staleCount === 1 ? '' : 's') + ' due for re-attestation';
+            banner.classList.remove('hidden');
+        } else {
+            banner.classList.add('hidden');
+        }
+    }
+
+    // Body
+    const body = document.getElementById('fwDashboardBody');
+    if (!body) return;
+
+    // State A — pre-flight done, zero responses
+    if (answeredCount === 0) {
+        body.innerHTML =
+            '<div class="text-center py-10 bg-slate-700/30 rounded-xl border border-slate-700">' +
+                '<div class="text-4xl mb-3">📋</div>' +
+                '<h3 class="text-lg font-bold text-white mb-2">Award &amp; Pay assessment</h3>' +
+                '<p class="text-slate-400 mb-2">Run the assessment to detect compliance gaps in your venue.</p>' +
+                '<p class="text-xs text-slate-500 mb-6">' + applicable.length + ' questions · about 6 minutes</p>' +
+                '<button onclick="closeFitzWatchDashboard(); openFitzWatchQuestionnaire();" class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold rounded-lg transition-all">Run assessment →</button>' +
+            '</div>';
+        return;
+    }
+
+    // Domain severity rollup
+    const domainSeverity = (typeof rollupDomainSeverity === 'function')
+        ? rollupDomainSeverity(result.gaps, 'award_pay')
+        : 'low';
+    const counts = { critical: 0, high: 0, medium: 0, low: 0 };
+    result.gaps.forEach(function(g) { counts[g.severity] = (counts[g.severity] || 0) + 1; });
+    const sevBadge = _FW_SEV_BADGE[domainSeverity] || _FW_SEV_BADGE.low;
+    const domainLabel = (typeof FITZ_WATCH_SEVERITY_LABELS !== 'undefined') ? FITZ_WATCH_SEVERITY_LABELS[domainSeverity] : domainSeverity;
+
+    let html = '<div class="p-5 rounded-xl border ' + sevBadge.class + '">' +
+        '<div class="flex items-center justify-between mb-2">' +
+            '<div class="font-semibold text-lg">Award &amp; Pay</div>' +
+            '<div class="text-sm uppercase tracking-wide font-semibold">' + sevBadge.dot + ' ' + domainLabel + '</div>' +
+        '</div>' +
+        '<div class="text-sm opacity-80">' +
+            answeredCount + ' of ' + applicable.length + ' questions answered · ' +
+            counts.critical + ' critical, ' + counts.high + ' high, ' + counts.medium + ' medium, ' + counts.low + ' low' +
+        '</div>' +
+        '</div>';
+
+    // State C — all clear
+    if (result.gaps.length === 0 && result.outstanding.length === 0) {
+        html += '<div class="p-5 rounded-xl bg-emerald-900/20 border border-emerald-700 text-emerald-200 text-sm">' +
+            '<strong>✓ No gaps detected in Award &amp; Pay.</strong> Verify with your adviser if your circumstances change. We\'ll re-check key questions every 30 days.' +
+            '</div>';
+        body.innerHTML = html;
+        return;
+    }
+
+    // Gap groups by severity
+    ['critical', 'high', 'medium', 'low'].forEach(function(sev) {
+        const sevGaps = result.gaps.filter(function(g) { return g.severity === sev; });
+        if (sevGaps.length === 0) return;
+        html += '<div class="pt-2">' +
+            '<div class="text-xs font-semibold uppercase tracking-wide mb-2 ' + (sev === 'critical' ? 'text-red-400' : sev === 'high' ? 'text-amber-400' : sev === 'medium' ? 'text-yellow-400' : 'text-emerald-400') + '">' +
+                sev.toUpperCase() + ' (' + sevGaps.length + ')' +
+            '</div>' +
+            '<div class="space-y-3">' + sevGaps.map(_fwRenderGapCard).join('') + '</div>' +
+            '</div>';
+    });
+
+    // Outstanding
+    if (result.outstanding.length > 0) {
+        html += '<div class="pt-2">' +
+            '<div class="p-4 rounded-xl bg-slate-700/30 border border-slate-700">' +
+                '<div class="font-semibold text-slate-300 mb-1">Outstanding questions (' + result.outstanding.length + ')</div>' +
+                '<p class="text-sm text-slate-400 mb-3">These haven\'t been answered yet — your dashboard will update once you complete them.</p>' +
+                '<button onclick="closeFitzWatchDashboard(); openFitzWatchQuestionnaire();" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition-all">Continue questionnaire →</button>' +
+            '</div>' +
+            '</div>';
+    }
+
+    body.innerHTML = html;
+}
+
+function _fwRenderGapCard(gap) {
+    const sevBadge = _FW_SEV_BADGE[gap.severity] || _FW_SEV_BADGE.low;
+    const ctaLabel = _FW_FIX_CTA_LABEL[gap.fix_action] || 'Get help';
+    const anchor = gap.statutory_anchor || {};
+    const anchorParts = [];
+    if (anchor.act) anchorParts.push(anchor.act);
+    if (anchor.section) anchorParts.push(anchor.section);
+    const anchorStr = anchorParts.join('; ') || 'see Award';
+    const affectedStr = gap.affected_count != null
+        ? 'Affects ~' + gap.affected_count + ' employee' + (gap.affected_count === 1 ? '' : 's')
+        : 'Applies to your venue';
+    const ctaClass = gap.fix_action_visual_signal === 'needs_review'
+        ? 'border border-amber-500 text-amber-400 hover:bg-amber-500/10'
+        : gap.fix_action_visual_signal === 'external'
+            ? 'text-amber-400 hover:text-amber-300'
+            : 'bg-amber-500 hover:bg-amber-400 text-slate-900';
+
+    return '<div class="p-4 rounded-xl border ' + sevBadge.class.replace('text-', 'border-').replace('bg-', 'bg-') + ' bg-slate-800/60">' +
+        '<div class="flex items-start justify-between gap-3 mb-2">' +
+            '<div class="flex items-start gap-2">' +
+                '<span class="text-xl leading-none">' + sevBadge.dot + '</span>' +
+                '<div>' +
+                    '<div class="font-semibold text-white">' + _fwEscapeHtml(gap.title) + '</div>' +
+                    '<div class="text-xs text-slate-400 mt-0.5">' + _fwEscapeHtml(anchorStr) + '</div>' +
+                '</div>' +
+            '</div>' +
+        '</div>' +
+        '<p class="text-sm text-slate-300 mb-2">' + _fwEscapeHtml(gap.consequence || '') + '</p>' +
+        '<p class="text-xs text-amber-400/80 mb-2">⏱ ' + _fwEscapeHtml(gap.urgency_driver || '') + '</p>' +
+        '<div class="flex items-center justify-between flex-wrap gap-2 mt-3">' +
+            '<div class="text-xs text-slate-500">' + _fwEscapeHtml(affectedStr) + ' · Verify with your adviser if unsure</div>' +
+            '<button onclick="_fwHandleFixAction(\'' + _fwEscapeHtml(gap.gap_id) + '\')" class="px-4 py-2 text-sm font-semibold rounded-lg transition-all ' + ctaClass + '">' + _fwEscapeHtml(ctaLabel) + ' →</button>' +
+        '</div>' +
+    '</div>';
+}
+
+// Sprint 4 (Step 8) will wire fix actions to chat/document builder. For now,
+// show the engineered fix payload in a notification + console for inspection.
+function _fwHandleFixAction(gapId) {
+    const responses = getFitzWatchResponsesCache();
+    const result = detectGaps(venueProfile || {}, responses, []);
+    const gap = result.gaps.find(function(g) { return g.gap_id === gapId; });
+    if (!gap) return;
+    console.log('--- Fitz Watch fix payload for ' + gapId + ' ---');
+    console.log(gap.fix_payload);
+    if (typeof showNotification === 'function') {
+        showNotification('Fix flow ships in Sprint 4. The pre-loaded prompt is logged to console for review.', 'info');
+    }
+}
+
+// ---- Step 7: Tools tile visibility (flag-gated) ---------------------------
+
+function showFitzWatchToolTileIfFlagged() {
+    if (!hasFeature('fitz_watch_preview')) return;
+    const tile = document.getElementById('fitzWatchToolTile');
+    if (tile) tile.classList.remove('hidden');
+    const mobileTile = document.getElementById('fitzWatchToolTileMobile');
+    if (mobileTile) mobileTile.classList.remove('hidden');
+}
+
+// Expose to window for devtools + onclick handlers
 if (typeof window !== 'undefined') {
     window.openFitzWatch = openFitzWatch;
     window.openFitzWatchPreflight = openFitzWatchPreflight;
     window.closeFitzWatchPreflight = closeFitzWatchPreflight;
     window.submitFitzWatchPreflight = submitFitzWatchPreflight;
+    window.openFitzWatchQuestionnaire = openFitzWatchQuestionnaire;
+    window.closeFitzWatchQuestionnaire = closeFitzWatchQuestionnaire;
+    window.fitzWatchQuestionnaireNext = fitzWatchQuestionnaireNext;
+    window.fitzWatchQuestionnaireBack = fitzWatchQuestionnaireBack;
+    window._fwqUpdateNextButton = _fwqUpdateNextButton;
+    window.openFitzWatchDashboard = openFitzWatchDashboard;
+    window.closeFitzWatchDashboard = closeFitzWatchDashboard;
+    window._fwHandleFixAction = _fwHandleFixAction;
+    window.showFitzWatchToolTileIfFlagged = showFitzWatchToolTileIfFlagged;
     window.hasFeature = hasFeature;
     window.saveFitzWatchResponse = saveFitzWatchResponse;
     window.loadFitzWatchResponses = loadFitzWatchResponses;
