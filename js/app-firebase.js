@@ -302,9 +302,13 @@ if (auth) {
                     if (userDoc.exists) {
                         const userData = userDoc.data();
 
-                        // Load Fitz Watch feature flags into session cache.
+                        // Load Fitz Watch feature flags into session cache and
+                        // reveal the flag-gated Tools tile if granted.
                         if (typeof loadFeatureFlags === 'function') {
                             loadFeatureFlags(userData);
+                        }
+                        if (typeof showFitzWatchToolTileIfFlagged === 'function') {
+                            showFitzWatchToolTileIfFlagged();
                         }
 
                         // Check for truthy value (handles boolean true, string "true", etc.)
