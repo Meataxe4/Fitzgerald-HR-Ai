@@ -1161,6 +1161,245 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         },
         fixAction: 'ask_fitz',
         defaultAction: 'Help me set up a termination documentation framework that satisfies FW Act s535 and FWC unfair dismissal evidence requirements. Cover what to file (warning records, performance docs, written notice, final pay calc), how long to retain, and how to handle existing gaps in historical termination files.'
+    },
+
+    // ========================================================================
+    // PHASE 1c — WHS & Psychosocial (Domain 2)
+    // 6 rules per spec section 5. Vic has the Psychological Health
+    // Regulations 2025 already in force (1 Dec 2025) — psychosocial rules
+    // are heightened to critical for Vic venues regardless of reform date.
+    // NSW's Codes-of-Practice enforceable benchmark (1 July 2026) lights
+    // up via the existing nsw_codes_enforceable reform record which links
+    // WHS-001..005 in recommended_actions — activeReforms hook bumps NSW
+    // severity during the 90-day window.
+    // ========================================================================
+
+    // WHS-001 — Psychosocial hazard risk register ----------------------------
+    {
+        id: 'WHS-001',
+        domain: 'whs_psychosocial',
+        title: 'Psychosocial hazard risk register',
+        question: 'Do you have a documented psychosocial hazard risk register for your venue, covering customer aggression, sexual harassment, high job demands, bullying, exposure to traumatic incidents, low support, fatigue, and isolation?',
+        options: [
+            { value: 'yes',              label: 'Yes — documented register in place' },
+            { value: 'partial',          label: 'Partial — some hazards identified, no formal register' },
+            { value: 'no',               label: 'No — no register' },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'NSW Workplace Protections Act 2025; Vic OHS (Psychological Health) Regulations 2025; Model WHS framework',
+            section: 'ISO 45003 reference; WorkSafe Vic Compliance Code for Psychological Health',
+            jurisdiction: 'VIC (in force); NSW (Codes enforceable from 1 July 2026); national (Model WHS baseline)'
+        },
+        consequence: 'Required evidence in psychosocial hazard investigations — absence typically shifts evidentiary burden against the employer. WorkSafe Vic has actively prosecuted employers for psychosocial duty failures since November 2023.',
+        urgencyDriver: 'Vic regulations already in force; NSW Codes of Practice become enforceable benchmark within the next quarter.',
+        affectedCount: function() { return null; },
+        detect: function(response, profile) {
+            const state = String((profile || {}).state || (profile || {}).location || '').toUpperCase();
+            const isVic = state === 'VIC';
+            switch (response) {
+                case 'yes': return null;
+                case 'partial': return { severity: isVic ? 'high' : 'medium' };
+                case 'no':
+                case 'unsure_need_help': return { severity: isVic ? 'critical' : 'high' };
+                default: return { severity: 'high' };
+            }
+        },
+        // Phase 2 doc: psychosocial_risk_register.
+        fixAction: 'ask_fitz',
+        defaultAction: 'Help me draft a hospitality-specific psychosocial hazard risk register covering customer aggression, sexual harassment, high job demands, bullying, traumatic incidents, low support, fatigue, and isolation. Include the hierarchy of controls and a consultation record. Reference the Vic OHS (Psychological Health) Regulations 2025 and the Model WHS framework.'
+    },
+
+    // WHS-002 — Psychosocial risk control measures ---------------------------
+    {
+        id: 'WHS-002',
+        domain: 'whs_psychosocial',
+        title: 'Psychosocial risk control measures',
+        question: 'Have you implemented controls following the hierarchy of controls (not relying on training or policies alone) for the psychosocial hazards in your register?',
+        options: [
+            { value: 'yes',              label: 'Yes — controls applied per hierarchy of controls' },
+            { value: 'training_only',    label: 'Training and policies only — no engineering/admin controls' },
+            { value: 'no',               label: 'No controls implemented' },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        // Cross-rule conditional: only shows if WHS-001 was answered yes/partial.
+        // If the user doesn't even have a register yet, asking about controls
+        // for hazards-they-haven't-identified is premature.
+        conditional: function(profile, responses) {
+            const w1 = responses && responses['WHS-001'];
+            return !!(w1 && (w1.response === 'yes' || w1.response === 'partial'));
+        },
+        statutoryAnchor: {
+            act: 'Vic OHS (Psychological Health) Regulations 2025; Model WHS Act hierarchy of controls',
+            section: 'reg 5 (control duty); elimination → substitution → engineering → admin → PPE/training',
+            jurisdiction: 'VIC (in force); national (Model WHS baseline)'
+        },
+        consequence: "Training alone does not satisfy 'reasonably practicable' under the Vic regulations — WorkSafe Vic has prosecuted employers who relied predominantly on training as the psychosocial control.",
+        urgencyDriver: 'Vic operators are already exposed; NSW operators move to enforceable benchmark within the next quarter.',
+        affectedCount: function() { return null; },
+        detect: function(response, profile) {
+            const state = String((profile || {}).state || (profile || {}).location || '').toUpperCase();
+            const isVic = state === 'VIC';
+            switch (response) {
+                case 'yes': return null;
+                case 'training_only': return { severity: isVic ? 'critical' : 'high', severityLabel: 'Training-only is insufficient' };
+                case 'no':
+                case 'unsure_need_help': return { severity: 'critical' };
+                default: return { severity: 'high' };
+            }
+        },
+        fixAction: 'ask_fitz',
+        defaultAction: 'Help me design hierarchy-of-controls measures for the psychosocial hazards in my venue beyond training — elimination, substitution, engineering, admin controls. Reference the Vic OHS (Psychological Health) Regulations 2025 requirement that training cannot be the predominant control.'
+    },
+
+    // WHS-003 — Bullying and harassment policy ------------------------------
+    {
+        id: 'WHS-003',
+        domain: 'whs_psychosocial',
+        title: 'Bullying, harassment, and sexual harassment policy',
+        question: 'Do you have a current bullying, harassment, and sexual harassment policy with clear reporting pathways and consequences?',
+        options: [
+            { value: 'yes',              label: 'Yes — current policy in place' },
+            { value: 'outdated',         label: 'Outdated — exists but hasn\'t been reviewed in years' },
+            { value: 'no',               label: 'No — no policy' },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'Fair Work Act 2009 s789FC (anti-bullying jurisdiction); Sex Discrimination Act 1984; Respect@Work positive duty',
+            section: 'positive duty under SDA s47C; AHRC guidance',
+            jurisdiction: 'national'
+        },
+        consequence: 'Required for positive duty compliance and FWC anti-bullying defence — absence frequently cited as an aggravating factor in adverse findings.',
+        urgencyDriver: 'Required to be current at the time of any complaint — outdated policies are treated as effectively absent.',
+        affectedCount: function() { return null; },
+        detect: function(response) {
+            switch (response) {
+                case 'yes': return null;
+                case 'outdated': return { severity: 'medium' };
+                case 'no':
+                case 'unsure_need_help': return { severity: 'high' };
+                default: return { severity: 'high' };
+            }
+        },
+        // Phase 2 doc: bullying_harassment_policy.
+        fixAction: 'ask_fitz',
+        defaultAction: 'Help me draft a bullying, harassment, and sexual harassment policy that satisfies the positive duty under the Sex Discrimination Act and the FWC anti-bullying jurisdiction. Include reporting pathways (multiple, including external), the investigation procedure, confidentiality, victimisation protection, consequences for substantiated breaches, and training commitments.'
+    },
+
+    // WHS-004 — Customer aggression incident procedure ----------------------
+    {
+        id: 'WHS-004',
+        domain: 'whs_psychosocial',
+        title: 'Customer aggression incident procedure',
+        question: 'Do you have written procedures for handling customer aggression incidents (verbal abuse, threats, physical violence) including reporting, escalation, and worker support?',
+        options: [
+            { value: 'yes',              label: 'Yes — documented procedures' },
+            { value: 'partial',          label: 'Partial — informal practices, not documented' },
+            { value: 'no',               label: 'No procedures' },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        // Only applicable to licensed / late-night venues where customer
+        // aggression is an identified psychosocial hazard.
+        conditional: function(profile) {
+            const venueType = String((profile || {}).venueType || '').toLowerCase();
+            const aggressionExposedVenues = [
+                'pub', 'bar', 'sports-bar', 'wine-bar', 'rooftop-bar',
+                'distillery-bar', 'brewery', 'nightclub',
+                'live-music-venue', 'entertainment-venue',
+                'hotel-accommodation', 'boutique-hotel', 'motel', 'resort'
+            ];
+            return aggressionExposedVenues.indexOf(venueType) !== -1;
+        },
+        statutoryAnchor: {
+            act: 'Model WHS Act s19 (primary duty)',
+            section: 'psychosocial hazard regulations; State liquor licensing duties',
+            jurisdiction: 'national'
+        },
+        consequence: 'Customer aggression is an identified psychosocial hazard in licensed venues — absence of procedures creates direct regulator exposure under WHS primary duty.',
+        urgencyDriver: 'Applies every trading session; the next late-night shift creates new exposure.',
+        affectedCount: function(profile) { return profile && profile.staffCount ? profile.staffCount : null; },
+        detect: function(response) {
+            switch (response) {
+                case 'yes': return null;
+                case 'partial': return { severity: 'medium' };
+                case 'no':
+                case 'unsure_need_help': return { severity: 'high' };
+                default: return { severity: 'high' };
+            }
+        },
+        // Phase 2 doc: customer_aggression_procedure.
+        fixAction: 'ask_fitz',
+        defaultAction: 'Help me draft customer aggression incident procedures for my licensed venue covering verbal aggression (de-escalation, withdrawal of service), threats of violence (000 protocol, evacuation), physical violence (police, scene security, worker support), post-incident worker support (immediate, 24-48h, ongoing), and the notifiable-incident assessment.'
+    },
+
+    // WHS-005 — Manager psychosocial training -------------------------------
+    {
+        id: 'WHS-005',
+        domain: 'whs_psychosocial',
+        title: 'Manager psychosocial training',
+        question: "Have your managers been trained on psychosocial hazard identification, the 'reasonable management action taken reasonably' standard, and how to handle complaints?",
+        options: [
+            { value: 'yes',              label: 'Yes — all managers trained' },
+            { value: 'partial',          label: 'Partial — some managers trained' },
+            { value: 'no',               label: 'No — no manager training' },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'Model WHS Act consultation duties',
+            section: 'reasonable management action defence (NSW workers comp, post-1 July 2026)',
+            jurisdiction: 'national (heightened in NSW)'
+        },
+        consequence: 'Untrained managers create vicarious liability for the venue and significantly weaken the reasonable management action defence — frequently challenged in psychological injury claims.',
+        urgencyDriver: 'Each untrained manager performance conversation creates exposure on the conversation date.',
+        affectedCount: function() { return null; },
+        detect: function(response) {
+            switch (response) {
+                case 'yes': return null;
+                case 'partial': return { severity: 'medium' };
+                case 'no':
+                case 'unsure_need_help': return { severity: 'high' };
+                default: return { severity: 'medium' };
+            }
+        },
+        fixAction: 'ask_fitz',
+        defaultAction: 'Build me a psychosocial training brief for my venue managers — covering hazard identification, the "reasonable management action taken reasonably" standard, how to handle complaints, and how to document conversations contemporaneously for the workers comp defence.'
+    },
+
+    // WHS-006 — Notifiable incident reporting -------------------------------
+    {
+        id: 'WHS-006',
+        domain: 'whs_psychosocial',
+        title: 'Notifiable incident reporting',
+        question: 'Do you know which incidents must be reported to the WHS regulator within the notification timeframes?',
+        options: [
+            { value: 'yes',              label: 'Yes — categories and timeframes are documented' },
+            { value: 'partial',          label: 'Partial — some awareness, not formalised' },
+            { value: 'no',               label: "No — we don't know the categories" },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'Model WHS Act ss35-39 (notifiable incidents)',
+            section: 'State WHS regulator notification timeframes',
+            jurisdiction: 'national (varies by State)'
+        },
+        consequence: 'Failure to notify is a separate contravention — civil penalty exposure independent of the underlying incident.',
+        urgencyDriver: 'Notification windows are tight (immediate for serious incidents); knowing the categories before an incident occurs is the only viable preparation.',
+        affectedCount: function() { return null; },
+        detect: function(response) {
+            switch (response) {
+                case 'yes': return null;
+                case 'partial':
+                case 'no':
+                case 'unsure_need_help': return { severity: 'medium' };
+                default: return { severity: 'medium' };
+            }
+        },
+        fixAction: 'ask_fitz',
+        defaultAction: 'Show me the notifiable incident categories and reporting timeframes for my state under the WHS Act ss35-39. Include practical hospitality examples (workplace injury, dangerous incident, fatality) and the immediate notification protocol.'
     }
 ];
 
@@ -1238,7 +1477,10 @@ function detectGaps(profile, responses, activeReforms) {
 
     for (let i = 0; i < FITZ_WATCH_QUESTION_REGISTRY.length; i++) {
         const rule = FITZ_WATCH_QUESTION_REGISTRY[i];
-        if (typeof rule.conditional === 'function' && !rule.conditional(profile)) continue;
+        // Pass responses to conditional so cross-rule dependencies (e.g.
+        // WHS-002 only shows if WHS-001 was answered yes/partial) can be
+        // expressed cleanly. Existing rules ignore the second arg.
+        if (typeof rule.conditional === 'function' && !rule.conditional(profile, responses)) continue;
 
         const responseDoc = responses[rule.id];
         if (!responseDoc) {
