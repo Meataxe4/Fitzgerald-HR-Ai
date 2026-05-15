@@ -302,11 +302,37 @@ if (auth) {
                     if (userDoc.exists) {
                         const userData = userDoc.data();
 
-                        // Load Fitz Watch feature flags into session cache and
-                        // reveal the flag-gated Tools tile if granted.
+                        // Load Fitz Watch feature flags into session cache.
                         if (typeof loadFeatureFlags === 'function') {
                             loadFeatureFlags(userData);
                         }
+
+                        // CRITICAL ORDER: load venueProfile BEFORE showing the
+                        // Fitz Watch tile. Otherwise the tile becomes clickable
+                        // while venueProfile is still in its initial empty state
+                        // and openFitzWatch routes the user to pre-flight even
+                        // when they've already completed it.
+                        const localVenueKey = 'venueProfile_' + user.uid;
+                        const cloudVenueProfile =
+                            (userData.appState && userData.appState.venueProfile) ||
+                            userData.venueProfile;
+                        if (!localStorage.getItem(localVenueKey)
+                                && cloudVenueProfile
+                                && Object.keys(cloudVenueProfile).length > 0) {
+                            localStorage.setItem(localVenueKey, JSON.stringify(cloudVenueProfile));
+                        }
+                        // Eagerly populate the venueProfile global so any tile
+                        // click sees the right state immediately.
+                        try {
+                            const eagerSaved = localStorage.getItem(localVenueKey);
+                            if (eagerSaved) {
+                                const parsed = JSON.parse(eagerSaved);
+                                if (parsed && typeof parsed === 'object') {
+                                    venueProfile = Object.assign({}, venueProfile, parsed);
+                                }
+                            }
+                        } catch (e) { /* tolerate */ }
+
                         if (typeof showFitzWatchToolTileIfFlagged === 'function') {
                             showFitzWatchToolTileIfFlagged();
                         }
@@ -327,22 +353,9 @@ if (auth) {
                         if (userData.lastConversationId) {
                             localStorage.setItem('fitz_currentConversationId_' + user.uid, userData.lastConversationId);
                         }
-                        
-                        // Restore venue profile from Firestore ONLY when localStorage
-                        // is empty (fresh browser / new device). On same-browser
-                        // refresh we keep localStorage authoritative because the
-                        // debouncedSync write-back can be up to 2s behind — and
-                        // overwriting local with stale cloud data would wipe
-                        // fields like fitzWatchSetupComplete that the user just
-                        // saved seconds before refreshing.
-                        const localVenueKey = 'venueProfile_' + user.uid;
-                        const localExists = !!localStorage.getItem(localVenueKey);
-                        const cloudVenueProfile =
-                            (userData.appState && userData.appState.venueProfile) ||
-                            userData.venueProfile;
-                        if (!localExists && cloudVenueProfile && Object.keys(cloudVenueProfile).length > 0) {
-                            localStorage.setItem(localVenueKey, JSON.stringify(cloudVenueProfile));
-                        }
+
+                        // (venue profile is loaded earlier — see the eager
+                        // populate block above the legalTermsAccepted check.)
                     }
                 } catch (e) {
                 }
