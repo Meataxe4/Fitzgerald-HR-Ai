@@ -22095,7 +22095,7 @@ function submitFitzWatchPreflight(event) {
 
 // Sprint version marker — prints once on script load so we can confirm which
 // build the browser is actually running.
-console.log('[Fitz Watch] app-main.js loaded — build 20260515-12');
+console.log('[Fitz Watch] app-main.js loaded — build 20260515-13');
 
 function _fwEscapeHtml(s) {
     return String(s == null ? '' : s)

@@ -1330,7 +1330,10 @@ const FitzTour = {
                 background: #475569;
             }
             
-            /* Initial Prompt */
+            /* Initial Prompt — pointer-events: none in idle state so the
+               invisible div doesn't swallow clicks meant for elements
+               beneath it (e.g. the Fitz Watch Next button which sits in
+               the same bottom-right region). */
             .fitz-tour-prompt {
                 position: fixed;
                 bottom: 100px;
@@ -1342,12 +1345,14 @@ const FitzTour = {
                 padding: 24px;
                 max-width: 340px;
                 opacity: 0;
+                pointer-events: none;
                 transform: translateY(20px) scale(0.95);
                 transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
                 box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.5), 0 0 30px rgba(245, 158, 11, 0.15);
             }
             .fitz-tour-prompt.active {
                 opacity: 1;
+                pointer-events: auto;
                 transform: translateY(0) scale(1);
             }
             .fitz-tour-prompt-close {
