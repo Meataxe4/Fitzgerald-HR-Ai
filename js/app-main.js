@@ -23063,7 +23063,11 @@ function _fwChatRenderTyping() {
     const wrap = document.createElement('div');
     wrap.id = '_fwChatTyping';
     wrap.className = 'flex justify-start';
-    wrap.innerHTML = '<div class="p-3 rounded-lg text-sm bg-slate-700/60 text-slate-400 border border-slate-600 italic">Fitz is thinking…</div>';
+    wrap.innerHTML = '<div class="px-4 py-3 rounded-lg bg-slate-700/60 border border-slate-600 inline-flex items-center gap-1.5">' +
+            '<span class="fw-chat-dot"></span>' +
+            '<span class="fw-chat-dot"></span>' +
+            '<span class="fw-chat-dot"></span>' +
+        '</div>';
     messagesEl.appendChild(wrap);
     messagesEl.scrollTop = messagesEl.scrollHeight;
     return wrap;
