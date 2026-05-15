@@ -2886,8 +2886,9 @@ Be as specific as possible!"></textarea>
 
 <!-- Template Selection Screen -->
 <div id="documentTemplateSelection" class="space-y-4">
-    <p class="text-slate-300 mb-4">Choose a document type:</p>
-    
+    <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-400 pt-2">Performance &amp; Conduct</h3>
+    <p class="text-slate-400 text-xs mb-2">Performance management and disciplinary documents.</p>
+
     <!-- 1. Record of Discussion - GREEN -->
     <button onclick="selectDocumentType('recordOfDiscussion')" 
         class="w-full text-left p-6 bg-slate-700 hover:bg-green-600 rounded-lg transition-all border-2 border-transparent hover:border-green-500">
@@ -2981,6 +2982,128 @@ Be as specific as possible!"></textarea>
                     <span class="px-2 py-1 bg-red-600/30 text-red-300 text-xs rounded font-bold">CRITICAL RISK</span>
                     <span class="text-slate-500 text-xs">• Senior Consultant required • Full compliance review</span>
                 </div>
+            </div>
+        </div>
+    </button>
+
+    <!-- ===================================================================== -->
+    <!-- COMPLIANCE FRAMEWORKS (Subscription required, 0 credit cost)         -->
+    <!-- ===================================================================== -->
+    <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-400 pt-6">Compliance Frameworks</h3>
+    <p class="text-slate-400 text-xs mb-2">Organisation-level policies and procedures. <span class="text-amber-300">Subscription required.</span></p>
+
+    <button onclick="openComplianceDocFromBuilder('warning_procedure_policy')" class="w-full text-left p-5 bg-slate-700 hover:bg-amber-700 rounded-lg transition-all border-2 border-transparent hover:border-amber-500">
+        <div class="flex items-start gap-3">
+            <div class="text-3xl">⚖️</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold mb-0.5">Warning Procedure Policy</h3>
+                <p class="text-slate-300 text-sm">FWC procedural fairness framework · TM-001</p>
+                <p class="text-slate-500 text-xs mt-1">Last reviewed: 15 May 2026</p>
+            </div>
+        </div>
+    </button>
+
+    <button onclick="openComplianceDocFromBuilder('bullying_harassment_policy')" class="w-full text-left p-5 bg-slate-700 hover:bg-amber-700 rounded-lg transition-all border-2 border-transparent hover:border-amber-500">
+        <div class="flex items-start gap-3">
+            <div class="text-3xl">🛡️</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold mb-0.5">Bullying &amp; Harassment Policy</h3>
+                <p class="text-slate-300 text-sm">FWA + SDA-compliant policy with reporting paths · WHS-003</p>
+                <p class="text-slate-500 text-xs mt-1">Last reviewed: 15 May 2026</p>
+            </div>
+        </div>
+    </button>
+
+    <button onclick="openComplianceDocFromBuilder('psychosocial_risk_register')" class="w-full text-left p-5 bg-slate-700 hover:bg-amber-700 rounded-lg transition-all border-2 border-transparent hover:border-amber-500">
+        <div class="flex items-start gap-3">
+            <div class="text-3xl">📋</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold mb-0.5">Psychosocial Hazard Risk Register</h3>
+                <p class="text-slate-300 text-sm">Hospitality-specific framework register · WHS-001</p>
+                <p class="text-slate-500 text-xs mt-1">Last reviewed: 15 May 2026</p>
+            </div>
+        </div>
+    </button>
+
+    <button onclick="openComplianceDocFromBuilder('customer_aggression_procedure')" class="w-full text-left p-5 bg-slate-700 hover:bg-amber-700 rounded-lg transition-all border-2 border-transparent hover:border-amber-500">
+        <div class="flex items-start gap-3">
+            <div class="text-3xl">🚨</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold mb-0.5">Customer Aggression Procedure</h3>
+                <p class="text-slate-300 text-sm">Response framework for licensed/late-night venues · WHS-004</p>
+                <p class="text-slate-500 text-xs mt-1">Last reviewed: 15 May 2026</p>
+            </div>
+        </div>
+    </button>
+
+    <button onclick="openComplianceDocFromBuilder('psychological_injury_claim_procedure')" class="w-full text-left p-5 bg-slate-700 hover:bg-amber-700 rounded-lg transition-all border-2 border-transparent hover:border-amber-500">
+        <div class="flex items-start gap-3">
+            <div class="text-3xl">🧠</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold mb-0.5">Psychological Injury Claim Procedure</h3>
+                <p class="text-slate-300 text-sm">Receive, investigate, respond — NSW post-1 July 2026 aware · WC-003</p>
+                <p class="text-slate-500 text-xs mt-1">Last reviewed: 15 May 2026</p>
+            </div>
+        </div>
+    </button>
+
+    <!-- ===================================================================== -->
+    <!-- COMPLIANCE DOCUMENTS (Subscription required, 0 credit cost)          -->
+    <!-- ===================================================================== -->
+    <h3 class="text-xs font-semibold uppercase tracking-wide text-amber-400 pt-6">Compliance Documents</h3>
+    <p class="text-slate-400 text-xs mb-2">Per-employee signed agreements. <span class="text-amber-300">Subscription required.</span></p>
+
+    <button onclick="openComplianceDocFromBuilder('clause_20_annualised_wage_agreement')" class="w-full text-left p-5 bg-slate-700 hover:bg-amber-700 rounded-lg transition-all border-2 border-transparent hover:border-amber-500">
+        <div class="flex items-start gap-3">
+            <div class="text-3xl">📜</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold mb-0.5">Clause 20 Annualised Wage Agreement</h3>
+                <p class="text-slate-300 text-sm">MA000119 / MA000009 written agreement · AP-002</p>
+                <p class="text-slate-500 text-xs mt-1">Last reviewed: 15 May 2026</p>
+            </div>
+        </div>
+    </button>
+
+    <button onclick="openComplianceDocFromBuilder('clause_20_weekly_time_record')" class="w-full text-left p-5 bg-slate-700 hover:bg-amber-700 rounded-lg transition-all border-2 border-transparent hover:border-amber-500">
+        <div class="flex items-start gap-3">
+            <div class="text-3xl">📅</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold mb-0.5">Clause 20 Weekly Time Record</h3>
+                <p class="text-slate-300 text-sm">Signed weekly time record template · AP-003</p>
+                <p class="text-slate-500 text-xs mt-1">Last reviewed: 15 May 2026</p>
+            </div>
+        </div>
+    </button>
+
+    <button onclick="openComplianceDocFromBuilder('schedule_g_h_cash_out_agreement')" class="w-full text-left p-5 bg-slate-700 hover:bg-amber-700 rounded-lg transition-all border-2 border-transparent hover:border-amber-500">
+        <div class="flex items-start gap-3">
+            <div class="text-3xl">💰</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold mb-0.5">Annual Leave Cash-Out Agreement</h3>
+                <p class="text-slate-300 text-sm">FW Act s93 + Schedule G/H · LM-002</p>
+                <p class="text-slate-500 text-xs mt-1">Last reviewed: 15 May 2026</p>
+            </div>
+        </div>
+    </button>
+
+    <button onclick="openComplianceDocFromBuilder('employment_contract_probation_clause')" class="w-full text-left p-5 bg-slate-700 hover:bg-amber-700 rounded-lg transition-all border-2 border-transparent hover:border-amber-500">
+        <div class="flex items-start gap-3">
+            <div class="text-3xl">📝</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold mb-0.5">Employment Contract — Probation Clause</h3>
+                <p class="text-slate-300 text-sm">Probation clause for insertion into contract · TM-002</p>
+                <p class="text-slate-500 text-xs mt-1">Last reviewed: 15 May 2026</p>
+            </div>
+        </div>
+    </button>
+
+    <button onclick="openComplianceDocFromBuilder('schedule_g_leave_in_advance_agreement')" class="w-full text-left p-5 bg-slate-700 hover:bg-amber-700 rounded-lg transition-all border-2 border-transparent hover:border-amber-500">
+        <div class="flex items-start gap-3">
+            <div class="text-3xl">📆</div>
+            <div class="flex-1">
+                <h3 class="text-white font-bold mb-0.5">Leave-in-Advance Agreement</h3>
+                <p class="text-slate-300 text-sm">Schedule G + FW Act s324 deduction authority · LM-004</p>
+                <p class="text-slate-500 text-xs mt-1">Last reviewed: 15 May 2026</p>
             </div>
         </div>
     </button>
@@ -5894,10 +6017,10 @@ Be as specific as possible!"></textarea>
     </div>
 </div>
 
-<script src="/js/fitz-watch-rules.js?v=20260515-25"></script>
-<script src="/js/fitz-watch-rules.test.js?v=20260515-25"></script>
-<script src="/js/fitz-watch-countdown.js?v=20260515-25"></script>
-<script src="/js/app-main.js?v=20260515-25"></script>
+<script src="/js/fitz-watch-rules.js?v=20260515-26"></script>
+<script src="/js/fitz-watch-rules.test.js?v=20260515-26"></script>
+<script src="/js/fitz-watch-countdown.js?v=20260515-26"></script>
+<script src="/js/app-main.js?v=20260515-26"></script>
 
 
 <!-- Profile Modal -->
