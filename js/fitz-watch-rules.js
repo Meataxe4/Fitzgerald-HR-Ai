@@ -868,6 +868,150 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         },
         fixAction: 'ask_fitz',
         defaultAction: 'Help me set up a 7-year retention framework for time and wage records under FW Act s535 and Fair Work Regulations. Cover storage, indexing, and what to do about gaps in historical records.'
+    },
+
+    // ========================================================================
+    // PHASE 1e — Leave Management (Domain 6)
+    // 4 rules per spec section 9. LM-002 wires up the existing Doc 3
+    // (schedule_g_h_cash_out_agreement) that's been homeless since Sprint 4.
+    // ========================================================================
+
+    // LM-001 — Leave loading on termination payouts -------------------------
+    {
+        id: 'LM-001',
+        domain: 'leave_management',
+        title: 'Leave loading on termination payouts',
+        question: 'Are leave loading payments (typically 17.5% under the Award, or the shiftworker penalty if higher) correctly configured for accrued annual leave paid out on termination?',
+        options: [
+            { value: 'yes',              label: 'Yes — leave loading + super on loading paid on termination' },
+            { value: 'no',               label: 'No — base rate only, no loading paid' },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'Fair Work Act 2009',
+            section: 's90 (termination payouts); MA000119/MA000009 leave loading clauses; ATO SGR 2009/2 (super on loading)',
+            jurisdiction: 'national'
+        },
+        consequence: 'Common back-pay claim trigger when employees leave the business. Also creates super-on-leave-loading exposure under SGR 2009/2 — double exposure on top of the underpaid loading.',
+        urgencyDriver: 'Triggered on every termination involving accrued leave; the next departure creates new exposure if unaddressed.',
+        affectedCount: function(profile) { return profile && profile.staffCount ? profile.staffCount : null; },
+        detect: function(response) {
+            switch (response) {
+                case 'yes': return null;
+                case 'unsure_need_help': return { severity: 'medium' };
+                case 'no': return { severity: 'critical' };
+                default: return { severity: 'high' };
+            }
+        },
+        fixAction: 'ask_fitz',
+        defaultAction: 'Help me configure leave loading payments on termination correctly under MA000119/MA000009 — including the 17.5% standard Award rate (or shiftworker penalty if higher), and the super-on-loading obligation under SGR 2009/2. Cover both the going-forward fix and how to handle any historical underpayment.'
+    },
+
+    // LM-002 — Cashing out written agreements (wires Doc 3) -----------------
+    {
+        id: 'LM-002',
+        domain: 'leave_management',
+        title: 'Annual leave cash-out written agreements',
+        question: 'For any annual leave cashed out, do you have a separate written agreement under Schedule G (MA000009) / Schedule H (MA000119) that leaves the employee with at least 4 weeks accrued?',
+        options: [
+            { value: 'yes',              label: 'Yes — written agreement for every cash-out, residual ≥ 4 weeks' },
+            { value: 'no_cashing_out',   label: "Not applicable — we don't cash out leave" },
+            { value: 'no',               label: 'No — we cash out without a written agreement' },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'Fair Work Act 2009',
+            section: 's93 (4-week residual minimum); MA000119 Schedule H; MA000009 Schedule G',
+            jurisdiction: 'national'
+        },
+        consequence: 'Unauthorised cash-out is a contravention of both NES and Award provisions — civil penalty exposure per contravention, plus any back-pay owed to restore the leave balance.',
+        urgencyDriver: 'Triggered on every cash-out event; existing unauthorised cash-outs may require remediation.',
+        affectedCount: function() { return null; },
+        detect: function(response) {
+            switch (response) {
+                case 'yes':
+                case 'no_cashing_out': return null;
+                case 'unsure_need_help': return { severity: 'high' };
+                case 'no': return { severity: 'critical' };
+                default: return { severity: 'high' };
+            }
+        },
+        // Wires up Doc 3 from Sprint 4 (built but previously homeless).
+        fixAction: 'generate_doc',
+        fixPayloadDoc: { templateId: 'schedule_g_h_cash_out_agreement' },
+        defaultAction: 'Help me draft a Schedule G/H cash-out agreement for an employee. Must include the s93 4-week residual minimum check, the payment calculation (base rate + 17.5% loading or shiftworker penalty), and a clear single-use statement.'
+    },
+
+    // LM-003 — Excessive leave balance review -------------------------------
+    {
+        id: 'LM-003',
+        domain: 'leave_management',
+        title: 'Excessive leave balance review',
+        question: 'Have you reviewed employees with excessive annual leave balances (more than 8 weeks for non-shiftworkers, or 10 weeks for shiftworkers) in the last 12 months?',
+        options: [
+            { value: 'yes',                  label: 'Yes — reviewed within the last 12 months' },
+            { value: 'no_excess_balances',   label: 'Not applicable — no employees with excess balances' },
+            { value: 'no',                   label: "No — haven't reviewed" },
+            { value: 'unsure_need_help',     label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'Modern Award',
+            section: 'MA000119 / MA000009 excessive leave clauses',
+            jurisdiction: 'national'
+        },
+        consequence: 'Accumulating leave liabilities create balance-sheet exposure and trigger formal consultation obligations once the threshold is exceeded.',
+        urgencyDriver: 'Required every 12 months; the next review point is the trigger for any consultation process.',
+        affectedCount: function() { return null; },
+        detect: function(response) {
+            switch (response) {
+                case 'yes':
+                case 'no_excess_balances': return null;
+                case 'no':
+                case 'unsure_need_help': return { severity: 'medium' };
+                default: return { severity: 'medium' };
+            }
+        },
+        fixAction: 'ask_fitz',
+        defaultAction: 'Help me review employees with excessive annual leave balances under MA000119/MA000009 — the 8-week (non-shiftworker) / 10-week (shiftworker) thresholds — and walk me through the Award consultation process for directing employees to take leave.'
+    },
+
+    // LM-004 — Leave-in-advance written agreements --------------------------
+    {
+        id: 'LM-004',
+        domain: 'leave_management',
+        title: 'Leave-in-advance written agreements',
+        question: 'For any annual leave taken in advance (before it has accrued), do you have a written agreement under Schedule G enabling deduction of the un-accrued leave on termination?',
+        options: [
+            { value: 'yes',                label: 'Yes — written agreement for every advance, with deduction authority' },
+            { value: 'no_advance_leave',   label: "Not applicable — we don't grant leave in advance" },
+            { value: 'no',                 label: 'No — we grant advance leave without a written agreement' },
+            { value: 'unsure_need_help',   label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'Fair Work Act 2009',
+            section: 's324 (authorised deductions); MA000119 Schedule G',
+            jurisdiction: 'national'
+        },
+        consequence: 'Without the written agreement, deducting un-accrued leave from final pay is an unauthorised deduction — exposes the employer to a back-pay claim for the deducted amount.',
+        urgencyDriver: 'Required to be in place at the time leave-in-advance is granted; retrospective agreements are treated as weaker evidence.',
+        affectedCount: function() { return null; },
+        // Future Phase 2 doc: schedule_g_leave_in_advance_agreement. Until
+        // that template ships, ask_fitz fallback.
+        fixAction: 'ask_fitz',
+        detect: function(response) {
+            switch (response) {
+                case 'yes':
+                case 'no_advance_leave': return null;
+                case 'no':
+                case 'unsure_need_help': return { severity: 'high' };
+                default: return { severity: 'high' };
+            }
+        },
+        defaultAction: 'Help me draft a Schedule G leave-in-advance written agreement that satisfies FW Act s324 — must include the specific amount of leave, the recovery timeline, and the explicit deduction authority for any un-accrued balance on termination.'
     }
 ];
 
