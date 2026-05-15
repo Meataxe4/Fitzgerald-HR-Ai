@@ -22093,6 +22093,10 @@ function submitFitzWatchPreflight(event) {
 // SPRINT 3 — Questionnaire UI (Step 5), Dashboard view (Step 6), Tools tile (7)
 // ============================================================================
 
+// Sprint version marker — prints once on script load so we can confirm which
+// build the browser is actually running.
+console.log('[Fitz Watch] app-main.js loaded — build 20260515-13');
+
 function _fwEscapeHtml(s) {
     return String(s == null ? '' : s)
         .replace(/&/g, '&amp;').replace(/</g, '&lt;')
@@ -22195,10 +22199,13 @@ function renderFitzWatchQuestion() {
         }
         const checked = existingValue === opt.value ? 'checked' : '';
         const labelClass = isSkip ? 'text-slate-500' : 'text-slate-200';
+        const inputId = 'fwq_' + rule.id + '_' + i;
+        // Label uses `for` to associate explicitly with the input id (fixes
+        // Chrome accessibility warning even though the input is nested).
         optionsHtml +=
-            '<label class="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-700/50 cursor-pointer transition-colors" onclick="setTimeout(_fwqUpdateNextButton, 0)">' +
-                '<input type="radio" name="fwqResponse" value="' + _fwEscapeHtml(opt.value) + '" ' + checked +
-                    ' onchange="_fwqUpdateNextButton()" onclick="_fwqUpdateNextButton()" class="mt-1 accent-amber-500">' +
+            '<label for="' + inputId + '" class="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-700/50 cursor-pointer transition-colors">' +
+                '<input id="' + inputId + '" type="radio" name="fwqResponse" value="' + _fwEscapeHtml(opt.value) + '" ' + checked +
+                    ' class="mt-1 accent-amber-500">' +
                 '<span class="text-sm ' + labelClass + '">' + _fwEscapeHtml(opt.label) + '</span>' +
             '</label>';
     }
