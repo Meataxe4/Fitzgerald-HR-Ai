@@ -21950,18 +21950,33 @@ function openFitzWatch() {
     });
 }
 
-function openFitzWatchPreflight() {
+// Tracks whether the user opened pre-flight as initial setup (auto-advance
+// into questionnaire on submit) or as an edit from the dashboard (return to
+// dashboard on submit). 'initial' is the default.
+let _fwPreflightSource = 'initial';
+
+function openFitzWatchPreflight(source) {
+    _fwPreflightSource = (source === 'edit') ? 'edit' : 'initial';
     const modal = document.getElementById('fitzWatchPreflightModal');
     if (!modal) {
         console.warn('Fitz Watch: pre-flight modal element not found');
         return;
     }
-    // Pre-fill existing values (if user is editing rather than first-time setup)
+    // Pre-fill existing values (if user is editing rather than first-time setup).
+    // Radios need .checked = (el.value === stored); plain .value doesn't select
+    // them. Other inputs (text, number, select) accept .value directly.
     const form = document.getElementById('fitzWatchPreflightForm');
     if (form && venueProfile) {
         Array.from(form.elements).forEach(function(el) {
-            if (el.name && venueProfile[el.name] !== undefined && venueProfile[el.name] !== null) {
-                el.value = venueProfile[el.name];
+            if (!el.name) return;
+            const stored = venueProfile[el.name];
+            if (stored === undefined || stored === null) return;
+            if (el.type === 'radio') {
+                el.checked = String(el.value) === String(stored);
+            } else if (el.type === 'checkbox') {
+                el.checked = !!stored;
+            } else {
+                el.value = stored;
             }
         });
     }
@@ -22041,14 +22056,18 @@ function submitFitzWatchPreflight(event) {
     }
 
     closeFitzWatchPreflight();
-    if (typeof showNotification === 'function') {
-        showNotification('Setup saved — starting your assessment.', 'success');
+    if (_fwPreflightSource === 'edit') {
+        if (typeof showNotification === 'function') {
+            showNotification('Venue profile updated.', 'success');
+        }
+        if (typeof openFitzWatchDashboard === 'function') openFitzWatchDashboard();
+    } else {
+        if (typeof showNotification === 'function') {
+            showNotification('Setup saved — starting your assessment.', 'success');
+        }
+        if (typeof openFitzWatchQuestionnaire === 'function') openFitzWatchQuestionnaire();
     }
-    // Auto-advance into the questionnaire so the user has one continuous flow
-    // (pre-flight → assessment → dashboard) rather than a dead-end "saved" toast.
-    if (typeof openFitzWatchQuestionnaire === 'function') {
-        openFitzWatchQuestionnaire();
-    }
+    _fwPreflightSource = 'initial';
 }
 
 // ============================================================================
@@ -22161,21 +22180,21 @@ function renderFitzWatchQuestion() {
     _fwqUpdateNextButton();
 }
 
+// The Next button is always clickable. We don't use the disabled attribute
+// because some browsers + Tailwind class state get into a fight where the
+// button looks active but stops responding. Validation happens inside the
+// click handler instead, with a friendly toast on no-selection.
 function _fwqUpdateNextButton() {
     const nextBtn = document.getElementById('fwqNextBtn');
     if (!nextBtn) return;
     const selected = document.querySelector('input[name="fwqResponse"]:checked');
     const enabled = !!selected;
-    nextBtn.disabled = !enabled;
-    // Explicit class swap because Tailwind disabled: variant doesn't always
-    // produce an obvious visual difference on amber buttons. Make the disabled
-    // state look unambiguously inactive (slate, not faded amber).
     if (enabled) {
-        nextBtn.classList.remove('bg-slate-700', 'text-slate-500', 'cursor-not-allowed', 'opacity-50');
+        nextBtn.classList.remove('bg-slate-700', 'text-slate-500');
         nextBtn.classList.add('bg-amber-500', 'hover:bg-amber-400', 'text-slate-900');
     } else {
         nextBtn.classList.remove('bg-amber-500', 'hover:bg-amber-400', 'text-slate-900');
-        nextBtn.classList.add('bg-slate-700', 'text-slate-500', 'cursor-not-allowed', 'opacity-50');
+        nextBtn.classList.add('bg-slate-700', 'text-slate-500');
     }
     const hint = document.getElementById('fwqHint');
     if (hint) hint.classList.toggle('hidden', enabled);
@@ -22186,7 +22205,14 @@ async function fitzWatchQuestionnaireNext() {
     if (idx >= _fwqState.rules.length) return;
     const rule = _fwqState.rules[idx];
     const selected = document.querySelector('input[name="fwqResponse"]:checked');
-    if (!selected) return;
+    if (!selected) {
+        if (typeof showNotification === 'function') {
+            showNotification('Please select an option to continue.', 'warning');
+        }
+        const hint = document.getElementById('fwqHint');
+        if (hint) hint.classList.remove('hidden');
+        return;
+    }
     await saveFitzWatchResponse(rule.id, rule.domain, selected.value);
     _fwqState.currentIndex++;
     if (_fwqState.currentIndex >= _fwqState.rules.length) {
@@ -22319,9 +22345,12 @@ function renderFitzWatchDashboard() {
     const body = document.getElementById('fwDashboardBody');
     if (!body) return;
 
+    // Always render the venue-profile summary at the top (collapsible).
+    const profileSummaryHtml = _fwRenderProfileSummary(profile);
+
     // State A — pre-flight done, zero responses
     if (answeredCount === 0) {
-        body.innerHTML =
+        body.innerHTML = profileSummaryHtml +
             '<div class="text-center py-10 bg-slate-700/30 rounded-xl border border-slate-700">' +
                 '<div class="text-4xl mb-3">📋</div>' +
                 '<h3 class="text-lg font-bold text-white mb-2">Award &amp; Pay assessment</h3>' +
@@ -22341,7 +22370,8 @@ function renderFitzWatchDashboard() {
     const sevBadge = _FW_SEV_BADGE[domainSeverity] || _FW_SEV_BADGE.low;
     const domainLabel = (typeof FITZ_WATCH_SEVERITY_LABELS !== 'undefined') ? FITZ_WATCH_SEVERITY_LABELS[domainSeverity] : domainSeverity;
 
-    let html = '<div class="p-5 rounded-xl border ' + sevBadge.class + '">' +
+    let html = profileSummaryHtml +
+        '<div class="p-5 rounded-xl border ' + sevBadge.class + '">' +
         '<div class="flex items-center justify-between mb-2">' +
             '<div class="font-semibold text-lg">Award &amp; Pay</div>' +
             '<div class="text-sm uppercase tracking-wide font-semibold">' + sevBadge.dot + ' ' + domainLabel + '</div>' +
@@ -22385,6 +22415,78 @@ function renderFitzWatchDashboard() {
     }
 
     body.innerHTML = html;
+}
+
+// Venue-profile summary panel — sits at the top of the dashboard. Collapsed
+// by default so it doesn't dominate the dashboard. Pencil opens the pre-flight
+// modal in edit mode (returns to dashboard on save).
+const _FW_PROFILE_LABEL_MAPS = {
+    annualised_wage_used: { yes: 'Yes', no: 'No', unsure: 'Not sure' },
+    payroll_software: {
+        xero: 'Xero', myob: 'MYOB', keypay: 'KeyPay / Employment Hero Payroll',
+        adp: 'ADP', employment_hero: 'Employment Hero',
+        manual: 'Manual / spreadsheet', other: 'Other', unsure: 'Not sure'
+    },
+    super_clearing_house: {
+        beam: 'Beam', ato_sbsch: 'ATO Small Business Clearing House',
+        payroll_builtin: 'Built into payroll software',
+        other: 'Other', unsure: 'Not sure'
+    },
+    time_records_method: {
+        digital_signed: 'Digital time clock, employee sign-off',
+        paper_signed: 'Paper timesheets signed by employees',
+        manager_no_signoff: 'Manager records hours — no sign-off',
+        none: 'No formal time records',
+        unsure: 'Not sure'
+    },
+    insurance_renewal_month: ['', 'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December']
+};
+
+function _fwProfileValueOrDash(profile, key) {
+    const raw = profile[key];
+    if (raw === undefined || raw === null || raw === '') return '—';
+    const map = _FW_PROFILE_LABEL_MAPS[key];
+    if (!map) return String(raw);
+    if (Array.isArray(map)) return map[Number(raw)] || String(raw);
+    return map[raw] || String(raw);
+}
+
+function _fwRenderProfileSummary(profile) {
+    profile = profile || {};
+    const venueLine = (profile.venueName || 'Your venue') +
+        (profile.state ? ' · ' + profile.state : '') +
+        (profile.primaryAward ? ' · ' + profile.primaryAward : '');
+    const staffLine = (profile.staffCount != null ? profile.staffCount + ' total' : '—') + ' (' +
+        (profile.casual_count || 0) + ' casual, ' +
+        (profile.part_time_count || 0) + ' part-time, ' +
+        (profile.full_time_count || 0) + ' full-time)';
+    const rows = [
+        ['ABN', profile.venue_abn || '—'],
+        ['Trading address', profile.venue_address || '—'],
+        ['Staff', staffLine],
+        ['Annualised wage in use', _fwProfileValueOrDash(profile, 'annualised_wage_used')],
+        ['Payroll software', _fwProfileValueOrDash(profile, 'payroll_software')],
+        ['Super clearing house', _fwProfileValueOrDash(profile, 'super_clearing_house')],
+        ['Time records method', _fwProfileValueOrDash(profile, 'time_records_method')],
+        ['Insurance renewal', _fwProfileValueOrDash(profile, 'insurance_renewal_month')]
+    ];
+    const rowsHtml = rows.map(function(r) {
+        return '<div class="flex justify-between gap-3 py-1.5 text-sm border-b border-slate-700/50 last:border-b-0">' +
+            '<span class="text-slate-400">' + _fwEscapeHtml(r[0]) + '</span>' +
+            '<span class="text-slate-200 text-right">' + _fwEscapeHtml(r[1]) + '</span>' +
+            '</div>';
+    }).join('');
+    return '<details class="p-4 bg-slate-700/30 rounded-xl border border-slate-700">' +
+        '<summary class="flex items-center justify-between cursor-pointer select-none">' +
+            '<div class="flex items-center gap-2">' +
+                '<span class="text-slate-300 font-semibold text-sm">📋 Venue profile</span>' +
+                '<span class="text-xs text-slate-500">' + _fwEscapeHtml(venueLine) + '</span>' +
+            '</div>' +
+            '<button onclick="event.preventDefault(); event.stopPropagation(); closeFitzWatchDashboard(); openFitzWatchPreflight(\'edit\');" class="text-amber-400 hover:text-amber-300 text-sm" title="Edit venue profile">✏️ Edit</button>' +
+        '</summary>' +
+        '<div class="mt-3 pt-3 border-t border-slate-700">' + rowsHtml + '</div>' +
+    '</details>';
 }
 
 function _fwRenderGapCard(gap) {
