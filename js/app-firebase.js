@@ -328,9 +328,14 @@ if (auth) {
                             localStorage.setItem('fitz_currentConversationId_' + user.uid, userData.lastConversationId);
                         }
                         
-                        // Also load venue profile if present
-                        if (userData.venueProfile) {
-                            localStorage.setItem('venueProfile_' + user.uid, JSON.stringify(userData.venueProfile));
+                        // Also load venue profile if present. Canonical path is
+                        // userData.appState.venueProfile (where saveAllDataToCloud
+                        // writes it). Older accounts may have it at the root.
+                        const cloudVenueProfile =
+                            (userData.appState && userData.appState.venueProfile) ||
+                            userData.venueProfile;
+                        if (cloudVenueProfile && Object.keys(cloudVenueProfile).length > 0) {
+                            localStorage.setItem('venueProfile_' + user.uid, JSON.stringify(cloudVenueProfile));
                         }
                     }
                 } catch (e) {
