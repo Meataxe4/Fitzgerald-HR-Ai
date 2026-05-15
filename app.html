@@ -2053,19 +2053,11 @@
                     </div>
                 </button>
                 
-                <button onclick="openToolFromMobile('recruitmentToolkit')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
-                    <span class="text-2xl">🔍</span>
+                <button onclick="openHireAndOnboard(); document.getElementById('mobileToolsModal').classList.add('hidden');" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
+                    <span class="text-2xl">👥</span>
                     <div>
-                        <div class="font-semibold">Recruitment Toolkit</div>
-                        <div class="text-sm text-slate-400">Job descriptions, interviews & reference checks</div>
-                    </div>
-                </button>
-                
-                <button onclick="openToolFromMobile('newEmployeeToolkit')" class="w-full text-left px-6 py-4 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 rounded-xl text-white flex items-center gap-4 touch-manipulation border border-slate-700 transition-all">
-                    <span class="text-2xl">🌟</span>
-                    <div>
-                        <div class="font-semibold">New Employee Toolkit</div>
-                        <div class="text-sm text-slate-400">Create employment contracts</div>
+                        <div class="font-semibold">Hire &amp; Onboard</div>
+                        <div class="text-sm text-slate-400">Candidate to confirmed employee</div>
                     </div>
                 </button>
                 
@@ -5902,10 +5894,10 @@ Be as specific as possible!"></textarea>
     </div>
 </div>
 
-<script src="/js/fitz-watch-rules.js?v=20260515-14"></script>
-<script src="/js/fitz-watch-rules.test.js?v=20260515-14"></script>
-<script src="/js/fitz-watch-countdown.js?v=20260515-14"></script>
-<script src="/js/app-main.js?v=20260515-14"></script>
+<script src="/js/fitz-watch-rules.js?v=20260515-15"></script>
+<script src="/js/fitz-watch-rules.test.js?v=20260515-15"></script>
+<script src="/js/fitz-watch-countdown.js?v=20260515-15"></script>
+<script src="/js/app-main.js?v=20260515-15"></script>
 
 
 <!-- Profile Modal -->
@@ -6057,12 +6049,12 @@ Be as specific as possible!"></textarea>
                 </div>
             </button>
             
-            <button onclick="openNewEmployeeToolkit(); closeToolsMenu();" class="text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
+            <button onclick="openHireAndOnboard(); closeToolsMenu();" class="text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
                 <div class="flex items-start gap-3">
-                    <span class="text-3xl">🌟</span>
+                    <span class="text-3xl">👥</span>
                     <div>
-                        <div class="font-semibold text-white mb-1">New Employee Toolkit</div>
-                        <div class="text-sm text-slate-400">Create Fair Work compliant employment contracts</div>
+                        <div class="font-semibold text-white mb-1">Hire &amp; Onboard</div>
+                        <div class="text-sm text-slate-400">Candidate to confirmed employee — all in one place</div>
                     </div>
                 </div>
             </button>
@@ -6121,15 +6113,8 @@ Be as specific as possible!"></textarea>
                 </div>
             </button>
             
-            <button onclick="openRecruitmentToolkit(); closeToolsMenu();" class="text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
-                <div class="flex items-start gap-3">
-                    <span class="text-3xl">🔍</span>
-                    <div>
-                        <div class="font-semibold text-white mb-1">Recruitment Toolkit</div>
-                        <div class="text-sm text-slate-400">Job descriptions, interviews & reference checks</div>
-                    </div>
-                </div>
-            </button>
+            <!-- Recruitment Toolkit tile merged into Hire & Onboard in Sprint 6 -->
+
             
             <button onclick="openIntegrationHub(); closeToolsMenu();" class="text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.02] border border-slate-600 hover:border-amber-500">
                 <div class="flex items-start gap-3">
@@ -6708,6 +6693,106 @@ Be as specific as possible!"></textarea>
             <p class="text-amber-400 text-sm mb-2">📢 Ready to advertise this role?</p>
             <button onclick="closePositionDescriptionPreview(); openJobDescriptionBuilder();" class="text-amber-400 hover:text-amber-300 font-medium">
                 Create a Job Advertisement →
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ============================================================================ -->
+<!-- HIRE & ONBOARD (Sprint 6) — merged Recruitment + New Employee Toolkit       -->
+<!-- ============================================================================ -->
+<div id="hireAndOnboardModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
+    <div class="bg-slate-800 rounded-2xl p-6 max-w-3xl w-full border border-amber-500 fade-in max-h-[92vh] overflow-y-auto">
+        <div class="flex items-start justify-between mb-3">
+            <div>
+                <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
+                    <span>👥</span> Hire &amp; Onboard
+                </h2>
+                <p class="text-slate-400 text-sm">Everything you need from candidate to confirmed employee.</p>
+            </div>
+            <button onclick="closeHireAndOnboard()" class="text-slate-400 hover:text-white text-2xl">×</button>
+        </div>
+        <!-- Tab nav -->
+        <div class="flex gap-6 border-b border-slate-700 mb-5">
+            <button id="hireOnboardTabPre" onclick="hireOnboardSwitchTab('pre')" class="px-1 pb-2 -mb-px text-sm font-medium border-b-2 border-amber-500 text-amber-400 transition-colors">Pre-hire</button>
+            <button id="hireOnboardTabPost" onclick="hireOnboardSwitchTab('post')" class="px-1 pb-2 -mb-px text-sm font-medium border-b-2 border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-600 transition-colors">Post-hire</button>
+        </div>
+        <!-- Pre-hire panel -->
+        <div id="hireOnboardPanelPre" class="space-y-3">
+            <button onclick="closeHireAndOnboard(); openPositionDescriptionBuilder();" class="w-full text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.01] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl">📋</span>
+                    <div>
+                        <div class="font-semibold text-white mb-1">Position Description Builder</div>
+                        <div class="text-sm text-slate-400">Internal position descriptions with KPIs and accountabilities</div>
+                    </div>
+                </div>
+            </button>
+            <button onclick="closeHireAndOnboard(); openJobDescriptionBuilder();" class="w-full text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.01] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl">📢</span>
+                    <div>
+                        <div class="font-semibold text-white mb-1">Job Advertisement Builder</div>
+                        <div class="text-sm text-slate-400">Engaging job ads for Seek, Indeed, LinkedIn</div>
+                    </div>
+                </div>
+            </button>
+            <button onclick="closeHireAndOnboard(); openInterviewQuestionsGenerator();" class="w-full text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.01] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl">💬</span>
+                    <div>
+                        <div class="font-semibold text-white mb-1">Interview Questions Generator</div>
+                        <div class="text-sm text-slate-400">STAR-method questions with red flags and ideal answers</div>
+                    </div>
+                </div>
+            </button>
+            <button onclick="closeHireAndOnboard(); openReferenceCheckForm();" class="w-full text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.01] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl">📞</span>
+                    <div>
+                        <div class="font-semibold text-white mb-1">Reference Check Form</div>
+                        <div class="text-sm text-slate-400">Pre-filled reference check with rating scales</div>
+                    </div>
+                </div>
+            </button>
+        </div>
+        <!-- Post-hire panel -->
+        <div id="hireOnboardPanelPost" class="hidden space-y-3">
+            <button onclick="closeHireAndOnboard(); openEmploymentContractBuilder();" class="w-full text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.01] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl">📝</span>
+                    <div>
+                        <div class="font-semibold text-white mb-1">Employment Contract Builder</div>
+                        <div class="text-sm text-slate-400">Fair Work compliant contracts with Award integration</div>
+                    </div>
+                </div>
+            </button>
+            <button onclick="closeHireAndOnboard(); openOnboardingChecklist();" class="w-full text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.01] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl">✅</span>
+                    <div>
+                        <div class="font-semibold text-white mb-1">AI-Enhanced Onboarding Checklist</div>
+                        <div class="text-sm text-slate-400">Role-adaptive checklist with AI assistance</div>
+                    </div>
+                </div>
+            </button>
+            <button onclick="closeHireAndOnboard(); openTrainingPlan();" class="w-full text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.01] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl">🎓</span>
+                    <div>
+                        <div class="font-semibold text-white mb-1">AI-Enhanced Training Plan Generator</div>
+                        <div class="text-sm text-slate-400">Week-by-week training plans for new hires</div>
+                    </div>
+                </div>
+            </button>
+            <button onclick="closeHireAndOnboard(); openProbationCheckIn();" class="w-full text-left p-5 bg-slate-700/50 hover:bg-slate-700 rounded-xl transition-all hover:scale-[1.01] border border-slate-600 hover:border-amber-500">
+                <div class="flex items-start gap-3">
+                    <span class="text-3xl">🔄</span>
+                    <div>
+                        <div class="font-semibold text-white mb-1">Probation Check-In Builder</div>
+                        <div class="text-sm text-slate-400">Structured probation reviews with procedural fairness</div>
+                    </div>
+                </div>
             </button>
         </div>
     </div>
