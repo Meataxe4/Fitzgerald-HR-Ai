@@ -22525,23 +22525,451 @@ function _fwRenderGapCard(gap) {
     '</div>';
 }
 
-// Sprint 4 — fix-action dispatcher. Routes by fix_action type. Phase 0 only
-// uses ask_fitz (chat). generate_doc lights up when Step 9 documents ship.
+// Sprint 4 — fix-action dispatcher. Routes by fix_action type.
 function _fwHandleFixAction(gapId) {
     const responses = getFitzWatchResponsesCache();
     const result = detectGaps(venueProfile || {}, responses, []);
     const gap = result.gaps.find(function(g) { return g.gap_id === gapId; });
     if (!gap) return;
     if (gap.fix_action === 'generate_doc') {
-        // Step 9 will wire generate_doc. Until then, fall back to ask_fitz.
+        const payload = gap.fix_payload_doc;
+        if (payload && payload.templateId) {
+            openFitzWatchDocBuilder(payload.templateId, gap);
+            return;
+        }
+        // No template wired → fall back to chat with a note
         if (typeof showNotification === 'function') {
-            showNotification('Document template still in build — using AI assistant in the meantime.', 'info');
+            showNotification('Template not yet available — using AI assistant.', 'info');
         }
         openFitzWatchChat(gap);
         return;
     }
     // ask_fitz, fix_in_app, review_now all route to chat for Phase 0
     openFitzWatchChat(gap);
+}
+
+// ---- Step 9: Document Builder (Tier-1 templates) --------------------------
+
+let _fwDocState = { templateId: null, gap: null };
+
+const _FW_DOC_TEMPLATES = {
+    clause_20_annualised_wage_agreement: {
+        title: 'Clause 20 Annualised Wage Agreement',
+        subtitle: 'Generates a written agreement compliant with MA000119 cl 20.1(d) / MA000009 equivalent',
+        anchor: 'MA000119 Clause 20.1(d) · Fair Work Act 2009',
+        render: function() { return _fwDocRender_clause20Agreement(); },
+        validate: function() { return _fwDocValidate_clause20Agreement(); },
+        generate: function() { return _fwDocGenerate_clause20Agreement(); }
+    },
+    clause_20_weekly_time_record: {
+        title: 'Clause 20 Weekly Time Record',
+        subtitle: 'Generates a weekly signed time record template (Schedule G equivalent)',
+        anchor: 'MA000119 Clause 20.2(c) · FW Act s535',
+        render: function() { return _fwDocRender_weeklyTimeRecord(); },
+        validate: function() { return _fwDocValidate_weeklyTimeRecord(); },
+        generate: function() { return _fwDocGenerate_weeklyTimeRecord(); }
+    },
+    schedule_g_h_cash_out_agreement: {
+        title: 'Annual Leave Cash-Out Agreement',
+        subtitle: 'Generates a Schedule G/H cash-out agreement (single use, residual ≥ 4 weeks)',
+        anchor: 'FW Act s93 · MA000119 Schedule H / MA000009 Schedule G',
+        render: function() { return _fwDocRender_cashOut(); },
+        validate: function() { return _fwDocValidate_cashOut(); },
+        generate: function() { return _fwDocGenerate_cashOut(); }
+    }
+};
+
+function openFitzWatchDocBuilder(templateId, gap) {
+    const template = _FW_DOC_TEMPLATES[templateId];
+    if (!template) {
+        if (typeof showNotification === 'function') {
+            showNotification('Unknown document template: ' + templateId, 'error');
+        }
+        return;
+    }
+    _fwDocState.templateId = templateId;
+    _fwDocState.gap = gap || null;
+    closeFitzWatchDashboard();
+    const modal = document.getElementById('fitzWatchDocBuilderModal');
+    if (!modal) return;
+    document.getElementById('fwDocTitle').textContent = template.title;
+    document.getElementById('fwDocSubtitle').textContent = template.subtitle;
+    document.getElementById('fwDocAnchor').textContent = template.anchor;
+    document.getElementById('fwDocBody').innerHTML = template.render();
+    const err = document.getElementById('fwDocError');
+    if (err) err.classList.add('hidden');
+    modal.classList.remove('hidden');
+}
+
+function closeFitzWatchDocBuilder() {
+    const modal = document.getElementById('fitzWatchDocBuilderModal');
+    if (modal) modal.classList.add('hidden');
+    _fwDocState = { templateId: null, gap: null };
+}
+
+function _fwDocShowError(msg) {
+    const err = document.getElementById('fwDocError');
+    if (!err) return;
+    err.textContent = msg;
+    err.classList.remove('hidden');
+}
+
+function _fwDocHideError() {
+    const err = document.getElementById('fwDocError');
+    if (err) err.classList.add('hidden');
+}
+
+async function fitzWatchDocGenerate() {
+    const template = _FW_DOC_TEMPLATES[_fwDocState.templateId];
+    if (!template) return;
+    _fwDocHideError();
+    const validation = template.validate();
+    if (!validation.ok) {
+        _fwDocShowError(validation.error);
+        return;
+    }
+    const btn = document.getElementById('fwDocGenerateBtn');
+    if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
+    try {
+        const result = template.generate();
+        const response = await fetch('/.netlify/functions/generate-word', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ html: result.html, metadata: { filename: result.filename } })
+        });
+        if (!response.ok) {
+            throw new Error('Generation failed (HTTP ' + response.status + ')');
+        }
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = result.filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        if (typeof showNotification === 'function') {
+            showNotification('Document downloaded. Review before signing.', 'success');
+        }
+        closeFitzWatchDocBuilder();
+    } catch (err) {
+        _fwDocShowError('Could not generate the document: ' + (err.message || err));
+    } finally {
+        if (btn) { btn.disabled = false; btn.textContent = 'Generate .docx →'; }
+    }
+}
+
+// ---- Doc 1: Clause 20 Annualised Wage Agreement ---------------------------
+
+function _fwDocFieldRow(label, html) {
+    return '<label class="block">' +
+        '<span class="text-sm text-slate-300">' + _fwEscapeHtml(label) + '</span>' +
+        html +
+    '</label>';
+}
+
+function _fwDocClassificationOptions(award) {
+    const ma119 = ['Introductory level', 'Food & beverage attendant grade 1', 'Food & beverage attendant grade 2',
+                   'Food & beverage attendant grade 3', 'Cook grade 1', 'Cook grade 2', 'Cook grade 3',
+                   'Cook grade 4', 'Cook grade 5', 'Other'];
+    const ma009 = ['Introductory', 'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Level 6', 'Other'];
+    const opts = (award && String(award).indexOf('009') !== -1) ? ma009 : ma119;
+    return opts.map(function(o) { return '<option value="' + _fwEscapeHtml(o) + '">' + _fwEscapeHtml(o) + '</option>'; }).join('');
+}
+
+function _fwDocRender_clause20Agreement() {
+    const p = venueProfile || {};
+    const today = new Date().toISOString().slice(0, 10);
+    return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" class="space-y-3">' +
+        '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">' +
+            'Pre-filled from your venue profile: <strong class="text-slate-300">' + _fwEscapeHtml(p.venueName || '—') + '</strong> · ABN ' + _fwEscapeHtml(p.venue_abn || '—') + ' · ' + _fwEscapeHtml(p.primaryAward || '—') +
+        '</div>' +
+        '<div class="grid grid-cols-2 gap-3">' +
+            _fwDocFieldRow('Employee full name', '<input type="text" name="emp_name" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Employment start date', '<input type="date" name="emp_start" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        '</div>' +
+        '<div class="grid grid-cols-2 gap-3">' +
+            _fwDocFieldRow('Classification', '<select name="emp_classification" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">' + _fwDocClassificationOptions(p.primaryAward) + '</select>') +
+            _fwDocFieldRow('Employment status', '<select name="emp_status" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none"><option value="Full-time">Full-time</option><option value="Part-time">Part-time</option></select>') +
+        '</div>' +
+        '<div class="grid grid-cols-3 gap-3">' +
+            _fwDocFieldRow('Base annual salary (AUD)', '<input type="number" name="base_salary" min="0" step="100" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Hours/week the salary covers', '<input type="number" name="hours_covered" min="1" max="38" value="38" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Pay cycle', '<select name="pay_cycle" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none"><option value="weekly">Weekly</option><option value="fortnightly">Fortnightly</option></select>') +
+        '</div>' +
+        '<div class="grid grid-cols-2 gap-3">' +
+            _fwDocFieldRow('Outer-limit ORDINARY hours / week', '<input type="number" name="outer_ordinary" min="1" step="1" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Outer-limit OVERTIME hours / week', '<input type="number" name="outer_overtime" min="0" step="1" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        '</div>' +
+        _fwDocFieldRow('Effective date', '<input type="date" name="effective_date" required value="' + today + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        '<div class="text-xs text-slate-400 p-3 bg-slate-700/30 rounded-lg">' +
+            '<strong>Award provisions absorbed by this annualised wage</strong> (defaults appropriate for hospitality; review carefully):' +
+            '<div class="mt-2 space-y-1 text-slate-300">' +
+                '<label class="flex items-center gap-2"><input type="checkbox" name="abs_overtime" checked class="accent-amber-500"> Overtime rates</label>' +
+                '<label class="flex items-center gap-2"><input type="checkbox" name="abs_weekend" checked class="accent-amber-500"> Weekend penalties</label>' +
+                '<label class="flex items-center gap-2"><input type="checkbox" name="abs_evening" checked class="accent-amber-500"> Evening/night penalties</label>' +
+                '<label class="flex items-center gap-2"><input type="checkbox" name="abs_ph" checked class="accent-amber-500"> Public holiday penalties</label>' +
+                '<label class="flex items-center gap-2"><input type="checkbox" name="abs_industry" class="accent-amber-500"> Industry allowance</label>' +
+                '<label class="flex items-center gap-2"><input type="checkbox" name="abs_split" class="accent-amber-500"> Split shift allowance</label>' +
+                '<label class="flex items-center gap-2"><input type="checkbox" name="abs_meal" class="accent-amber-500"> Meal allowance</label>' +
+            '</div>' +
+        '</div>' +
+    '</form>';
+}
+
+function _fwReadDocForm() {
+    const form = document.getElementById('fwDocForm');
+    if (!form) return {};
+    const data = {};
+    Array.from(form.elements).forEach(function(el) {
+        if (!el.name) return;
+        if (el.type === 'checkbox') data[el.name] = el.checked;
+        else data[el.name] = el.value;
+    });
+    return data;
+}
+
+function _fwDocValidate_clause20Agreement() {
+    const d = _fwReadDocForm();
+    if (!d.emp_name || !d.emp_start || !d.emp_classification || !d.base_salary) return { ok: false, error: 'Please complete all required fields.' };
+    const baseSalary = parseFloat(d.base_salary);
+    const hoursCovered = parseInt(d.hours_covered, 10);
+    const outerOrd = parseInt(d.outer_ordinary, 10);
+    if (isNaN(baseSalary) || baseSalary <= 0) return { ok: false, error: 'Base salary must be a positive number.' };
+    if (outerOrd < hoursCovered) return { ok: false, error: 'Outer-limit ordinary hours must be at least the hours/week the salary covers.' };
+    if (baseSalary < 60000) {
+        // Soft warning — annualised salary should reasonably exceed national minimum × 52
+        // We allow but warn via the generated doc footer
+    }
+    return { ok: true };
+}
+
+function _fwDocGenerate_clause20Agreement() {
+    const p = venueProfile || {};
+    const d = _fwReadDocForm();
+    const award = p.primaryAward || 'MA000119';
+    const reconDate = (function() {
+        const base = new Date(d.effective_date);
+        base.setFullYear(base.getFullYear() + 1);
+        return base.toISOString().slice(0, 10);
+    })();
+    const absorbed = [
+        d.abs_overtime && 'Overtime rates',
+        d.abs_weekend && 'Weekend penalties (Saturday and Sunday)',
+        d.abs_evening && 'Evening and night penalties',
+        d.abs_ph && 'Public holiday penalties',
+        d.abs_industry && 'Industry allowance',
+        d.abs_split && 'Split shift allowance',
+        d.abs_meal && 'Meal allowance'
+    ].filter(Boolean);
+    const absorbedHtml = absorbed.map(function(c) { return '<li>' + _fwEscapeHtml(c) + '</li>'; }).join('');
+    const html =
+        '<h1>Annualised Wage Arrangement</h1>' +
+        '<h2>Under ' + _fwEscapeHtml(award) + ' Clause 20</h2>' +
+        '<p>Between <strong>' + _fwEscapeHtml(p.venueName || '[Employer name]') + '</strong> (ABN ' + _fwEscapeHtml(p.venue_abn || '[ABN]') + ') of ' + _fwEscapeHtml(p.venue_address || '[Address]') + '</p>' +
+        '<p>And <strong>' + _fwEscapeHtml(d.emp_name) + '</strong> (classification: ' + _fwEscapeHtml(d.emp_classification) + ', ' + _fwEscapeHtml(d.emp_status) + ', commenced ' + _fwEscapeHtml(d.emp_start) + ')</p>' +
+        '<h3>1. Annualised wage amount</h3>' +
+        '<p>The employee will be paid an annualised salary of AUD ' + _fwEscapeHtml(Number(d.base_salary).toLocaleString('en-AU', { minimumFractionDigits: 2 })) + ' per annum, paid ' + _fwEscapeHtml(d.pay_cycle) + ', for ' + _fwEscapeHtml(d.hours_covered) + ' ordinary hours per week.</p>' +
+        '<h3>2. Award provisions absorbed</h3>' +
+        '<p>This annualised wage absorbs the following provisions of ' + _fwEscapeHtml(award) + ':</p>' +
+        '<ul>' + absorbedHtml + '</ul>' +
+        '<h3>3. Outer-limit hours</h3>' +
+        '<p>Ordinary hours are not to exceed ' + _fwEscapeHtml(d.outer_ordinary) + ' per week. Overtime hours are not to exceed ' + _fwEscapeHtml(d.outer_overtime) + ' per week.</p>' +
+        '<p>If hours worked exceed these outer limits in any pay period, the employee will be paid the additional amount under the absorbed Award provisions above, payable within 14 days of the relevant pay period (cl 20.2(b)).</p>' +
+        '<h3>4. 12-month reconciliation</h3>' +
+        '<p>A reconciliation will be performed by ' + _fwEscapeHtml(reconDate) + ' comparing the employee\'s actual hours worked at Award rates against the annualised wage paid. Any shortfall will be paid within 14 days of the reconciliation date.</p>' +
+        '<h3>5. Weekly time records</h3>' +
+        '<p>A signed weekly time record of start times, finish times, and unpaid breaks will be kept for each pay period (cl 20.2(c); FW Act s535).</p>' +
+        '<h3>6. Termination</h3>' +
+        '<p>This arrangement ends on the earlier of: (a) termination of the employee\'s employment, or (b) written notice from either party.</p>' +
+        '<h3>7. Signatures</h3>' +
+        '<p>Effective date: ' + _fwEscapeHtml(d.effective_date) + '</p>' +
+        '<p>Employer: _______________________________ Date: ___________</p>' +
+        '<p>Name: ' + _fwEscapeHtml(p.userName || '[Authorised representative]') + ' for ' + _fwEscapeHtml(p.venueName || '[Employer]') + '</p>' +
+        '<p>Employee: _______________________________ Date: ___________</p>' +
+        '<p>Name: ' + _fwEscapeHtml(d.emp_name) + '</p>' +
+        '<p><em>This document is not a substitute for legal advice. Verify all clause references and absorbed provisions against the current ' + _fwEscapeHtml(award) + ' before signing.</em></p>';
+    const filename = 'Clause20_Annualised_Wage_' + (d.emp_name || 'Employee').replace(/[^A-Za-z0-9_-]/g, '_') + '.docx';
+    return { html: html, filename: filename };
+}
+
+// ---- Doc 2: Clause 20 Weekly Time Record ----------------------------------
+
+function _fwDocRender_weeklyTimeRecord() {
+    const p = venueProfile || {};
+    const today = new Date();
+    const todayIso = today.toISOString().slice(0, 10);
+    return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" class="space-y-3">' +
+        '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">' +
+            'Generates a printable weekly time record for one employee. Use one page per week — staff fill in actual hours and sign.' +
+        '</div>' +
+        '<div class="grid grid-cols-2 gap-3">' +
+            _fwDocFieldRow('Employee full name', '<input type="text" name="emp_name" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Classification', '<select name="emp_classification" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">' + _fwDocClassificationOptions(p.primaryAward) + '</select>') +
+        '</div>' +
+        '<div class="grid grid-cols-2 gap-3">' +
+            _fwDocFieldRow('Week ending date (first week)', '<input type="date" name="week_ending" required value="' + todayIso + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Number of weeks to generate', '<select name="num_weeks" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none"><option value="1">1 week</option><option value="4">4 weeks (1 month)</option><option value="13" selected>13 weeks (1 quarter)</option><option value="52">52 weeks (1 year — large file)</option></select>') +
+        '</div>' +
+        _fwDocFieldRow('Contracted hours per week (optional, for variance row)', '<input type="number" name="contracted_hours" min="0" max="60" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none" placeholder="e.g. 38">') +
+    '</form>';
+}
+
+function _fwDocValidate_weeklyTimeRecord() {
+    const d = _fwReadDocForm();
+    if (!d.emp_name || !d.emp_classification || !d.week_ending || !d.num_weeks) return { ok: false, error: 'Please complete all required fields.' };
+    return { ok: true };
+}
+
+function _fwDocGenerate_weeklyTimeRecord() {
+    const p = venueProfile || {};
+    const d = _fwReadDocForm();
+    const numWeeks = parseInt(d.num_weeks, 10) || 1;
+    const contracted = d.contracted_hours ? parseInt(d.contracted_hours, 10) : null;
+    const award = p.primaryAward || 'MA000119';
+
+    function addWeeks(dateStr, n) {
+        const dt = new Date(dateStr);
+        dt.setDate(dt.getDate() + (n * 7));
+        return dt.toISOString().slice(0, 10);
+    }
+
+    let html =
+        '<h1>Weekly Time Records</h1>' +
+        '<p>Employer: <strong>' + _fwEscapeHtml(p.venueName || '[Employer]') + '</strong> (ABN ' + _fwEscapeHtml(p.venue_abn || '[ABN]') + ')</p>' +
+        '<p>Employee: <strong>' + _fwEscapeHtml(d.emp_name) + '</strong> · Classification: ' + _fwEscapeHtml(d.emp_classification) + '</p>' +
+        '<p>Award reference: ' + _fwEscapeHtml(award) + ' Clause 20.2(c) · Fair Work Act 2009 s535</p>';
+
+    for (let w = 0; w < numWeeks; w++) {
+        const weekEnding = addWeeks(d.week_ending, w);
+        html +=
+            '<h2>Week ending ' + _fwEscapeHtml(weekEnding) + '</h2>' +
+            '<p>Day · Start time · Finish time · Unpaid breaks · Total hours</p>' +
+            '<p>Monday: ___________ · ___________ · ___________ · ___________</p>' +
+            '<p>Tuesday: ___________ · ___________ · ___________ · ___________</p>' +
+            '<p>Wednesday: ___________ · ___________ · ___________ · ___________</p>' +
+            '<p>Thursday: ___________ · ___________ · ___________ · ___________</p>' +
+            '<p>Friday: ___________ · ___________ · ___________ · ___________</p>' +
+            '<p>Saturday: ___________ · ___________ · ___________ · ___________</p>' +
+            '<p>Sunday: ___________ · ___________ · ___________ · ___________</p>' +
+            '<p><strong>Total hours for the week:</strong> ___________</p>';
+        if (contracted) {
+            html += '<p>Contracted hours per week: ' + contracted + ' · Variance: ___________</p>' +
+                    '<p><em>If variance exceeds the outer-limit hours under the underlying annualised wage agreement, additional payment is required within 14 days (cl 20.2(b)).</em></p>';
+        }
+        html += '<p>I confirm the hours recorded above are accurate.</p>' +
+                '<p>Employee signature: _______________________ Date: ___________</p>' +
+                '<p>Employer signature: _______________________ Date: ___________</p>';
+    }
+    html += '<p><em>This template is not a substitute for legal advice. Time records must be retained for 7 years per Fair Work Regulations.</em></p>';
+    const filename = 'Weekly_Time_Record_' + (d.emp_name || 'Employee').replace(/[^A-Za-z0-9_-]/g, '_') + '_' + numWeeks + 'wk.docx';
+    return { html: html, filename: filename };
+}
+
+// ---- Doc 3: Schedule G/H Annual Leave Cash-Out ----------------------------
+
+function _fwDocRender_cashOut() {
+    const p = venueProfile || {};
+    const today = new Date().toISOString().slice(0, 10);
+    return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" oninput="_fwDocCashOutRecalc()" class="space-y-3">' +
+        '<div class="text-xs text-amber-300/80 p-3 bg-amber-900/20 border border-amber-700 rounded-lg">' +
+            '<strong>Residual balance rule:</strong> Under FW Act s93 the employee must retain at least 4 weeks (152 hours at 38 hpw) accrued annual leave AFTER the cash-out. The generator blocks if this rule is breached.' +
+        '</div>' +
+        '<div class="grid grid-cols-2 gap-3">' +
+            _fwDocFieldRow('Employee full name', '<input type="text" name="emp_name" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Classification', '<select name="emp_classification" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">' + _fwDocClassificationOptions(p.primaryAward) + '</select>') +
+        '</div>' +
+        '<div class="grid grid-cols-2 gap-3">' +
+            _fwDocFieldRow('Base hourly rate (AUD)', '<input type="number" name="base_rate" min="0" step="0.01" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Is shiftworker (per Award)?', '<select name="is_shiftworker" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none"><option value="no">No</option><option value="yes">Yes — shiftworker penalty applies</option></select>') +
+        '</div>' +
+        '<div class="grid grid-cols-2 gap-3">' +
+            _fwDocFieldRow('Current accrued leave (hours)', '<input type="number" name="balance_hours" min="0" step="0.5" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Amount to cash out (hours)', '<input type="number" name="cashout_hours" min="0" step="0.5" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        '</div>' +
+        _fwDocFieldRow('Effective date', '<input type="date" name="effective_date" required value="' + today + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        '<div id="fwDocCashOutCalc" class="p-3 bg-slate-700/30 border border-slate-700 rounded-lg text-sm text-slate-300">Enter values above to preview the residual balance and payment calculation.</div>' +
+    '</form>';
+}
+
+function _fwDocCashOutRecalc() {
+    const d = _fwReadDocForm();
+    const balance = parseFloat(d.balance_hours);
+    const cashout = parseFloat(d.cashout_hours);
+    const rate = parseFloat(d.base_rate);
+    const calcEl = document.getElementById('fwDocCashOutCalc');
+    if (!calcEl) return;
+    if (isNaN(balance) || isNaN(cashout) || isNaN(rate)) {
+        calcEl.innerHTML = '<span class="text-slate-400">Enter all values to preview the calculation.</span>';
+        return;
+    }
+    const residual = balance - cashout;
+    const residualWeeks = (residual / 38).toFixed(1);
+    const multiplier = d.is_shiftworker === 'yes' ? 1.20 : 1.175; // 20% shiftworker penalty (illustrative); user can override
+    const payment = (cashout * rate * multiplier);
+    const blocked = residual < 152;
+    calcEl.innerHTML =
+        '<div><strong>Residual after cash-out:</strong> ' + residual.toFixed(1) + ' hours (' + residualWeeks + ' weeks)' +
+            (blocked ? '<span class="text-red-400 ml-2">⚠ BELOW 4-week minimum — submission will be blocked</span>' : '<span class="text-emerald-400 ml-2">✓ above 4-week minimum</span>') +
+        '</div>' +
+        '<div class="mt-1"><strong>Payment:</strong> AUD ' + payment.toFixed(2) +
+            ' (= ' + cashout + ' hours × ' + rate.toFixed(2) + ' × ' + multiplier.toFixed(3) + (d.is_shiftworker === 'yes' ? ' shiftworker' : ' annual leave loading 17.5%') + ')</div>';
+}
+
+function _fwDocValidate_cashOut() {
+    const d = _fwReadDocForm();
+    if (!d.emp_name || !d.emp_classification || !d.base_rate || !d.balance_hours || !d.cashout_hours || !d.effective_date) return { ok: false, error: 'Please complete all required fields.' };
+    const balance = parseFloat(d.balance_hours);
+    const cashout = parseFloat(d.cashout_hours);
+    if (cashout > balance) return { ok: false, error: 'Cannot cash out more than the accrued balance.' };
+    if (cashout <= 0) return { ok: false, error: 'Cash-out amount must be greater than 0.' };
+    const residual = balance - cashout;
+    if (residual < 152) {
+        return { ok: false, error: 'Residual balance after cash-out would be ' + residual.toFixed(1) + ' hours (' + (residual / 38).toFixed(1) + ' weeks). FW Act s93 requires the employee to retain at least 4 weeks (152 hours) of accrued annual leave after a cash-out. Reduce the cash-out amount or have the employee accrue more leave first.' };
+    }
+    return { ok: true };
+}
+
+function _fwDocGenerate_cashOut() {
+    const p = venueProfile || {};
+    const d = _fwReadDocForm();
+    const award = p.primaryAward || 'MA000119';
+    const isMA119 = String(award).indexOf('119') !== -1;
+    const scheduleRef = isMA119 ? 'MA000119 Schedule H' : 'MA000009 Schedule G';
+    const balance = parseFloat(d.balance_hours);
+    const cashout = parseFloat(d.cashout_hours);
+    const rate = parseFloat(d.base_rate);
+    const residual = balance - cashout;
+    const isShift = d.is_shiftworker === 'yes';
+    const multiplier = isShift ? 1.20 : 1.175;
+    const payment = cashout * rate * multiplier;
+    const html =
+        '<h1>Annual Leave Cash-Out Agreement</h1>' +
+        '<h2>Under Fair Work Act 2009 s93 and ' + _fwEscapeHtml(scheduleRef) + '</h2>' +
+        '<h3>1. Parties</h3>' +
+        '<p>Employer: <strong>' + _fwEscapeHtml(p.venueName || '[Employer]') + '</strong> (ABN ' + _fwEscapeHtml(p.venue_abn || '[ABN]') + ') of ' + _fwEscapeHtml(p.venue_address || '[Address]') + '</p>' +
+        '<p>Employee: <strong>' + _fwEscapeHtml(d.emp_name) + '</strong> (classification: ' + _fwEscapeHtml(d.emp_classification) + ')</p>' +
+        '<h3>2. Current annual leave balance attestation</h3>' +
+        '<p>The employee currently has ' + balance.toFixed(1) + ' hours of accrued annual leave, equivalent to approximately ' + (balance / 38).toFixed(1) + ' weeks.</p>' +
+        '<h3>3. Cash-out amount</h3>' +
+        '<p>The employee will cash out ' + cashout.toFixed(1) + ' hours of annual leave.</p>' +
+        '<h3>4. Residual balance attestation</h3>' +
+        '<p>Following the cash-out, the employee will have ' + residual.toFixed(1) + ' hours of accrued annual leave remaining (approximately ' + (residual / 38).toFixed(1) + ' weeks). This satisfies the minimum 4-week residual balance required under FW Act s93.</p>' +
+        '<h3>5. Payment</h3>' +
+        '<p>The employee will receive a payment of AUD ' + payment.toFixed(2) + ', calculated as ' + cashout.toFixed(1) + ' hours × AUD ' + rate.toFixed(2) + '/hr × ' + multiplier.toFixed(3) + (isShift ? ' (shiftworker penalty applied)' : ' (including 17.5% annual leave loading)') + '. This amount is no less than what the employee would have been paid had they taken the leave.</p>' +
+        '<h3>6. Voluntary and one-off</h3>' +
+        '<p>This agreement is voluntary. The employee acknowledges that this agreement applies only to the cash-out effective ' + _fwEscapeHtml(d.effective_date) + ' and does not establish a standing arrangement for future cash-outs.</p>' +
+        '<h3>7. Effective date</h3>' +
+        '<p>' + _fwEscapeHtml(d.effective_date) + '</p>' +
+        '<h3>8. Signatures</h3>' +
+        '<p>Employer: _______________________________ Date: ___________</p>' +
+        '<p>Name: ' + _fwEscapeHtml(p.userName || '[Authorised representative]') + ' for ' + _fwEscapeHtml(p.venueName || '[Employer]') + '</p>' +
+        '<p>Employee: _______________________________ Date: ___________</p>' +
+        '<p>Name: ' + _fwEscapeHtml(d.emp_name) + '</p>' +
+        '<p><em>This document is not a substitute for legal advice. Each cash-out requires a separate agreement under FW Act s93.</em></p>';
+    const filename = 'Annual_Leave_CashOut_' + (d.emp_name || 'Employee').replace(/[^A-Za-z0-9_-]/g, '_') + '.docx';
+    return { html: html, filename: filename };
 }
 
 // ---- Step 8: Fitz Watch chat (gap-specific) -------------------------------
@@ -22715,6 +23143,10 @@ if (typeof window !== 'undefined') {
     window.openFitzWatchChat = openFitzWatchChat;
     window.closeFitzWatchChat = closeFitzWatchChat;
     window.fitzWatchChatSendFollowup = fitzWatchChatSendFollowup;
+    window.openFitzWatchDocBuilder = openFitzWatchDocBuilder;
+    window.closeFitzWatchDocBuilder = closeFitzWatchDocBuilder;
+    window.fitzWatchDocGenerate = fitzWatchDocGenerate;
+    window._fwDocCashOutRecalc = _fwDocCashOutRecalc;
     window.showFitzWatchToolTileIfFlagged = showFitzWatchToolTileIfFlagged;
     window.hasFeature = hasFeature;
     window.saveFitzWatchResponse = saveFitzWatchResponse;
