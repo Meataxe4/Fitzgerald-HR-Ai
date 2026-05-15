@@ -62,7 +62,8 @@ const FW_TEST_PROFILE_CONDITIONAL = {
     insurance_renewal_month: 3
 };
 
-// All-worst-case responses for the known-bad profile
+// All-worst-case responses for the known-bad NSW profile.
+// Now includes Phase 1a Workers Comp responses.
 const FW_TEST_RESPONSES_KNOWN_BAD = {
     'AP-001': _resp('over_12_months'),
     'AP-002': _resp('no'),
@@ -75,7 +76,11 @@ const FW_TEST_RESPONSES_KNOWN_BAD = {
     'AP-009': _resp('no'),
     'AP-010': _resp('no'),
     'AP-011': _resp('yes'),
-    'AP-012': _resp('yes')
+    'AP-012': _resp('yes'),
+    'WC-001': _resp('no'),
+    'WC-002': _resp('unsure_need_help'),
+    'WC-003': _resp('no'),
+    'WC-004': _resp('no')
 };
 
 // All-best-case responses for the known-OK profile
@@ -91,7 +96,11 @@ const FW_TEST_RESPONSES_KNOWN_OK = {
     'AP-009': _resp('yes'),
     'AP-010': _resp('yes'),
     'AP-011': _resp('no'),
-    'AP-012': _resp('no')
+    'AP-012': _resp('no'),
+    'WC-001': _resp('na'),
+    'WC-002': _resp('before_30_june_2026'),
+    'WC-003': _resp('yes'),
+    'WC-004': _resp('yes')
 };
 
 // ---- Assertions ------------------------------------------------------------
@@ -135,7 +144,7 @@ function runFitzWatchTests(verbose) {
         return { id: g.gap_id, severity: g.severity, label: g.severity_label, action: g.fix_action };
     }));
 
-    check('Known-bad: produces 12 gaps (all rules trigger)', r1.gaps.length === 12, 'got ' + r1.gaps.length);
+    check('Known-bad: produces 16 gaps (12 AP + 4 WC, all rules trigger)', r1.gaps.length === 16, 'got ' + r1.gaps.length);
     check('Known-bad: outstanding is empty', r1.outstanding.length === 0);
     check('Known-bad: AP-001 critical (over 12 months)',
         _gapById(r1.gaps, 'AP-001') && _gapById(r1.gaps, 'AP-001').severity === 'critical');
@@ -204,8 +213,14 @@ function runFitzWatchTests(verbose) {
         outstandingIds.indexOf('AP-006') !== -1);
     check('Conditional: AP-001 IS in outstanding (always applies)',
         outstandingIds.indexOf('AP-001') !== -1);
-    check('Conditional: total applicable rules = 8',
-        outstandingIds.length === 8, 'got ' + outstandingIds.length);
+    check('Conditional: total applicable rules = 10 (8 AP + WC-001 + WC-003; WC-002/004 NSW-only filtered out)',
+        outstandingIds.length === 10, 'got ' + outstandingIds.length);
+    check('Conditional: WC-002 NOT applicable to VIC venue',
+        outstandingIds.indexOf('WC-002') === -1);
+    check('Conditional: WC-004 NOT applicable to VIC venue',
+        outstandingIds.indexOf('WC-004') === -1);
+    check('Conditional: WC-001 IS applicable to all venues',
+        outstandingIds.indexOf('WC-001') !== -1);
 
     // ============================================================
     // Test profile 4 — Severity escalation hook
@@ -270,11 +285,72 @@ function runFitzWatchTests(verbose) {
     check('AP-005: correct rate produces no gap', _gapById(r8.gaps, 'AP-005') === null);
 
     // ============================================================
+    // Phase 1a — Workers Comp domain
+    // ============================================================
+    console.log('%cPhase 1a: Workers Comp rules', 'color: #94a3b8');
+
+    // Non-NSW venue — WC-002 and WC-004 should be filtered out
+    const VIC_PROFILE = Object.assign({}, FW_TEST_PROFILE_KNOWN_BAD, { state: 'VIC' });
+    const wcResultVic = detectGaps(VIC_PROFILE, {
+        'WC-001': _resp('no'),
+        'WC-003': _resp('no')
+    }, []);
+    const vicOutstandingIds = wcResultVic.outstanding.map(function(o) { return o.questionId; });
+    check('VIC: WC-002 NOT in outstanding (NSW-only rule)',
+        vicOutstandingIds.indexOf('WC-002') === -1);
+    check('VIC: WC-004 NOT in outstanding (NSW-only rule)',
+        vicOutstandingIds.indexOf('WC-004') === -1);
+    check('VIC: WC-001 IS in gaps (universal rule)',
+        wcResultVic.gaps.find(function(g) { return g.gap_id === 'WC-001'; }) != null);
+    check('VIC: WC-001 "no" produces HIGH (not critical — non-NSW baseline)',
+        wcResultVic.gaps.find(function(g) { return g.gap_id === 'WC-001'; }).severity === 'high');
+    check('VIC: WC-003 "no" produces HIGH (not critical — non-NSW baseline)',
+        wcResultVic.gaps.find(function(g) { return g.gap_id === 'WC-003'; }).severity === 'high');
+
+    // NSW venue — WC-001 should escalate to critical for "no" response
+    const NSW_PROFILE = Object.assign({}, FW_TEST_PROFILE_KNOWN_BAD, { state: 'NSW' });
+    const wcResultNsw = detectGaps(NSW_PROFILE, {
+        'WC-001': _resp('no'),
+        'WC-002': _resp('unsure_need_help'),
+        'WC-003': _resp('no'),
+        'WC-004': _resp('no')
+    }, []);
+    const nswOutstandingIds = wcResultNsw.outstanding.map(function(o) { return o.questionId; });
+    check('NSW: WC-002 NOT in outstanding (answered)',
+        nswOutstandingIds.indexOf('WC-002') === -1);
+    check('NSW: WC-004 IS available (NSW-specific rule)',
+        wcResultNsw.gaps.find(function(g) { return g.gap_id === 'WC-004'; }) != null);
+    check('NSW: WC-001 "no" produces CRITICAL (NSW heightened)',
+        wcResultNsw.gaps.find(function(g) { return g.gap_id === 'WC-001'; }).severity === 'critical');
+    check('NSW: WC-001 critical has "Defence at risk" label',
+        wcResultNsw.gaps.find(function(g) { return g.gap_id === 'WC-001'; }).severity_label === 'Defence at risk');
+    check('NSW: WC-003 "no" produces CRITICAL (NSW heightened)',
+        wcResultNsw.gaps.find(function(g) { return g.gap_id === 'WC-003'; }).severity === 'critical');
+    check('NSW: WC-004 "no" produces HIGH',
+        wcResultNsw.gaps.find(function(g) { return g.gap_id === 'WC-004'; }).severity === 'high');
+    check('NSW: WC-002 unsure produces MEDIUM',
+        wcResultNsw.gaps.find(function(g) { return g.gap_id === 'WC-002'; }).severity === 'medium');
+
+    // WC-001 "na" / "yes" produces no gap regardless of state
+    const wcResultNa = detectGaps(NSW_PROFILE, {
+        'WC-001': _resp('na'),
+        'WC-003': _resp('yes')
+    }, []);
+    check('NSW: WC-001 "na" produces no gap',
+        wcResultNa.gaps.find(function(g) { return g.gap_id === 'WC-001'; }) == null);
+    check('NSW: WC-003 "yes" produces no gap',
+        wcResultNa.gaps.find(function(g) { return g.gap_id === 'WC-003'; }) == null);
+
+    // Workers Comp domain rollup
+    check('NSW: workers_comp domain rollup = critical',
+        rollupDomainSeverity(wcResultNsw.gaps, 'workers_comp') === 'critical');
+
+    // ============================================================
     // Registry sanity
     // ============================================================
     console.log('%cRegistry sanity', 'color: #94a3b8');
     const registry = getQuestionRegistry();
-    check('Registry: 12 questions', registry.length === 12);
+    check('Registry: 16 questions (12 AP + 4 WC)', registry.length === 16);
     check('Registry: every rule has id, domain, question, options, conditional, detect, statutoryAnchor, fixAction',
         registry.every(function(r) {
             return r.id && r.domain && r.question && Array.isArray(r.options)
@@ -284,7 +360,7 @@ function runFitzWatchTests(verbose) {
     check('Registry: every rule has at least 3 options',
         registry.every(function(r) { return r.options.length >= 3; }));
     check('Registry: ids are unique',
-        new Set(registry.map(function(r) { return r.id; })).size === 12);
+        new Set(registry.map(function(r) { return r.id; })).size === 16);
 
     // ---- Summary -----------------------------------------------------------
     const total = passed + failed;
