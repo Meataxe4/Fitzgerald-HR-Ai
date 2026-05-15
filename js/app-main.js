@@ -22106,7 +22106,7 @@ function submitFitzWatchPreflight(event) {
 
 // Sprint version marker — prints once on script load so we can confirm which
 // build the browser is actually running.
-console.log('[Fitz Watch] app-main.js loaded — build 20260515-21 (Phase 1e — Leave Management)');
+console.log('[Fitz Watch] app-main.js loaded — build 20260515-22 (Phase 1d — Termination + cascade UX)');
 
 function _fwEscapeHtml(s) {
     return String(s == null ? '' : s)
@@ -22365,6 +22365,11 @@ async function openFitzWatchDashboard() {
 function closeFitzWatchDashboard() {
     const modal = document.getElementById('fitzWatchDashboardModal');
     if (modal) modal.classList.add('hidden');
+    // Reset the cascade so next dashboard open auto-expands the highest-
+    // severity domain again. Without this, a user who collapsed everything
+    // sees an empty dashboard on next open.
+    _fwExpandedDomainInitialised = false;
+    _fwExpandedDomain = null;
 }
 
 function _fwFormatDate(ms) {
@@ -22515,8 +22520,23 @@ const _FW_DOMAINS = [
     { id: 'award_pay',        label: 'Award & Pay' },
     { id: 'workers_comp',     label: 'Workers Compensation' },
     { id: 'payroll_super',    label: 'Payroll & Super' },
+    { id: 'termination',      label: 'Termination' },
     { id: 'leave_management', label: 'Leave Management' }
 ];
+
+// Severity order for sorting/comparison
+const _FW_SEVERITY_RANK = { critical: 4, high: 3, medium: 2, low: 1 };
+
+// Expanded-domain state for the cascade UX. null = none expanded. On first
+// render with gaps present, defaults to the highest-severity applicable
+// domain so the user lands on the most urgent issues without clicking.
+let _fwExpandedDomain = null;
+let _fwExpandedDomainInitialised = false;
+
+function fitzWatchToggleDomain(domainId) {
+    _fwExpandedDomain = (_fwExpandedDomain === domainId) ? null : domainId;
+    renderFitzWatchDashboard();
+}
 
 function _fwRenderRisksTab(profile, result, applicable, answeredCount) {
     // State A — pre-flight done, zero responses
@@ -22530,60 +22550,88 @@ function _fwRenderRisksTab(profile, result, applicable, answeredCount) {
             '</div>';
     }
 
-    let html = '<div class="space-y-4">';
-
-    // Per-domain severity cards. Render one card per domain that has at least
-    // one applicable rule (so non-NSW venues don't see a stub Workers Comp
-    // card when no WC rules apply to them after conditionals).
-    _FW_DOMAINS.forEach(function(d) {
+    // Compute per-domain stats once. Used both for the cards and for the
+    // default-expansion logic.
+    const responses = getFitzWatchResponsesCache();
+    const domainData = _FW_DOMAINS.map(function(d) {
         const dApplicable = applicable.filter(function(r) { return r.domain === d.id; });
-        if (dApplicable.length === 0) return;
+        if (dApplicable.length === 0) return null;
         const dGaps = result.gaps.filter(function(g) { return g.domain === d.id; });
-        const dAnswered = dApplicable.filter(function(r) {
-            const responses = getFitzWatchResponsesCache();
-            return !!responses[r.id];
-        }).length;
+        const dAnswered = dApplicable.filter(function(r) { return !!responses[r.id]; }).length;
         const dSev = (typeof rollupDomainSeverity === 'function')
             ? rollupDomainSeverity(dGaps, d.id)
             : 'low';
         const dCounts = { critical: 0, high: 0, medium: 0, low: 0 };
         dGaps.forEach(function(g) { dCounts[g.severity] = (dCounts[g.severity] || 0) + 1; });
-        const sevBadge = _FW_SEV_BADGE[dSev] || _FW_SEV_BADGE.low;
-        const dLabel = (typeof FITZ_WATCH_SEVERITY_LABELS !== 'undefined') ? FITZ_WATCH_SEVERITY_LABELS[dSev] : dSev;
-        html += '<div class="p-5 rounded-xl border ' + sevBadge.class + '">' +
-            '<div class="flex items-center justify-between mb-2">' +
-                '<div class="font-semibold text-lg">' + _fwEscapeHtml(d.label) + '</div>' +
-                '<div class="text-sm uppercase tracking-wide font-semibold">' + sevBadge.dot + ' ' + dLabel + '</div>' +
-            '</div>' +
-            '<div class="text-sm opacity-80">' +
-                dAnswered + ' of ' + dApplicable.length + ' questions answered · ' +
-                dCounts.critical + ' critical, ' + dCounts.high + ' high, ' + dCounts.medium + ' medium, ' + dCounts.low + ' low' +
-            '</div>' +
-        '</div>';
-    });
+        return { meta: d, applicable: dApplicable, gaps: dGaps, answered: dAnswered, severity: dSev, counts: dCounts };
+    }).filter(Boolean);
 
-    // State C — all clear
-    if (result.gaps.length === 0 && result.outstanding.length === 0) {
-        html += '<div class="p-5 rounded-xl bg-emerald-900/20 border border-emerald-700 text-emerald-200 text-sm">' +
-            '<strong>✓ No gaps detected.</strong> Verify with your adviser if your circumstances change. We\'ll re-check key questions every 30 days.' +
-            '</div>' +
-            '</div>';
-        return html;
+    // First render with gaps: auto-expand the highest-severity domain so the
+    // user lands on the most urgent items. After that, click toggles control.
+    if (!_fwExpandedDomainInitialised) {
+        _fwExpandedDomainInitialised = true;
+        let topRank = 0;
+        domainData.forEach(function(s) {
+            const rank = _FW_SEVERITY_RANK[s.severity] || 0;
+            if (s.gaps.length > 0 && rank > topRank) {
+                topRank = rank;
+                _fwExpandedDomain = s.meta.id;
+            }
+        });
     }
 
-    // Gap groups by severity (cross-domain). Each card carries its domain
-    // label so cross-domain grouping doesn't lose the context.
-    ['critical', 'high', 'medium', 'low'].forEach(function(sev) {
-        const sevGaps = result.gaps.filter(function(g) { return g.severity === sev; });
-        if (sevGaps.length === 0) return;
-        html += '<div class="pt-2">' +
-            '<div class="text-xs font-semibold uppercase tracking-wide mb-2 ' + (sev === 'critical' ? 'text-red-400' : sev === 'high' ? 'text-amber-400' : sev === 'medium' ? 'text-yellow-400' : 'text-emerald-400') + '">' +
-                sev.toUpperCase() + ' (' + sevGaps.length + ')' +
-            '</div>' +
-            '<div class="space-y-3">' + sevGaps.map(_fwRenderGapCard).join('') + '</div>' +
+    let html = '<div class="space-y-3">';
+
+    domainData.forEach(function(s) {
+        const isExpanded = _fwExpandedDomain === s.meta.id;
+        const sevBadge = _FW_SEV_BADGE[s.severity] || _FW_SEV_BADGE.low;
+        const dLabel = (typeof FITZ_WATCH_SEVERITY_LABELS !== 'undefined') ? FITZ_WATCH_SEVERITY_LABELS[s.severity] : s.severity;
+        const chevron = isExpanded ? '▾' : '▸';
+        const hasGaps = s.gaps.length > 0;
+        const subline = hasGaps
+            ? s.counts.critical + ' critical · ' + s.counts.high + ' high · ' + s.counts.medium + ' medium'
+            : (s.answered === s.applicable.length ? 'No gaps detected' : s.answered + ' of ' + s.applicable.length + ' questions answered');
+
+        // Clickable domain card
+        html += '<div>' +
+            '<button onclick="fitzWatchToggleDomain(\'' + s.meta.id + '\')" class="w-full text-left p-4 rounded-xl border ' + sevBadge.class + ' hover:brightness-110 transition-all">' +
+                '<div class="flex items-center justify-between gap-3">' +
+                    '<div class="flex items-center gap-3">' +
+                        '<span class="text-lg font-mono">' + chevron + '</span>' +
+                        '<div>' +
+                            '<div class="font-semibold">' + _fwEscapeHtml(s.meta.label) + '</div>' +
+                            '<div class="text-xs opacity-80">' + _fwEscapeHtml(subline) + '</div>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="text-xs uppercase tracking-wide font-semibold whitespace-nowrap">' + sevBadge.dot + ' ' + _fwEscapeHtml(dLabel) + '</div>' +
+                '</div>' +
+            '</button>';
+
+        // Expanded panel — gaps for this domain, grouped by severity within
+        if (isExpanded && hasGaps) {
+            html += '<div class="mt-2 ml-3 pl-3 border-l-2 ' + sevBadge.class.split(' ')[1] + ' space-y-3 pb-2">';
+            ['critical', 'high', 'medium', 'low'].forEach(function(sev) {
+                const sevGaps = s.gaps.filter(function(g) { return g.severity === sev; });
+                if (sevGaps.length === 0) return;
+                html += '<div>' +
+                    '<div class="text-xs font-semibold uppercase tracking-wide mb-2 ' +
+                        (sev === 'critical' ? 'text-red-400' : sev === 'high' ? 'text-amber-400' : sev === 'medium' ? 'text-yellow-400' : 'text-emerald-400') +
+                    '">' + sev.toUpperCase() + ' (' + sevGaps.length + ')</div>' +
+                    '<div class="space-y-3">' + sevGaps.map(_fwRenderGapCard).join('') + '</div>' +
+                '</div>';
+            });
+            html += '</div>';
+        } else if (isExpanded && !hasGaps && s.answered === s.applicable.length) {
+            html += '<div class="mt-2 ml-3 pl-3 border-l-2 border-emerald-700 pb-2">' +
+                '<div class="p-3 rounded-lg bg-emerald-900/20 border border-emerald-700 text-emerald-200 text-sm">' +
+                    '✓ No gaps detected in this domain.' +
+                '</div>' +
             '</div>';
+        }
+        html += '</div>';
     });
 
+    // Outstanding section — cross-domain summary, always at the bottom
     if (result.outstanding.length > 0) {
         html += '<div class="pt-2">' +
             '<div class="p-4 rounded-xl bg-slate-700/30 border border-slate-700">' +
@@ -22591,6 +22639,11 @@ function _fwRenderRisksTab(profile, result, applicable, answeredCount) {
                 '<p class="text-sm text-slate-400 mb-3">These haven\'t been answered yet — your dashboard will update once you complete them.</p>' +
                 '<button onclick="closeFitzWatchDashboard(); openFitzWatchQuestionnaire();" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition-all">Continue questionnaire →</button>' +
             '</div>' +
+            '</div>';
+    } else if (result.gaps.length === 0) {
+        // True all-clear — no gaps and no outstanding
+        html += '<div class="p-5 rounded-xl bg-emerald-900/20 border border-emerald-700 text-emerald-200 text-sm">' +
+            '<strong>✓ No gaps detected anywhere.</strong> Verify with your adviser if your circumstances change. We\'ll re-check key questions every 30 days.' +
             '</div>';
     }
 
@@ -22827,7 +22880,7 @@ function _fwRenderGapCard(gap) {
             : 'bg-amber-500 hover:bg-amber-400 text-slate-900';
 
     // Domain label so cross-domain severity grouping is still self-explanatory.
-    const domainLabelMap = { award_pay: 'Award & Pay', workers_comp: 'Workers Comp', payroll_super: 'Payroll & Super', leave_management: 'Leave Management' };
+    const domainLabelMap = { award_pay: 'Award & Pay', workers_comp: 'Workers Comp', payroll_super: 'Payroll & Super', termination: 'Termination', leave_management: 'Leave Management' };
     const domainLabel = domainLabelMap[gap.domain] || gap.domain;
     return '<div class="p-4 rounded-xl border ' + sevBadge.class.replace('text-', 'border-').replace('bg-', 'bg-') + ' bg-slate-800/60">' +
         '<div class="flex items-start justify-between gap-3 mb-2">' +
@@ -23543,6 +23596,7 @@ if (typeof window !== 'undefined') {
     window.fitzWatchChatRetryLast = fitzWatchChatRetryLast;
     window._fwDismissChangedPrompt = _fwDismissChangedPrompt;
     window.fitzWatchSwitchTab = fitzWatchSwitchTab;
+    window.fitzWatchToggleDomain = fitzWatchToggleDomain;
     window._fwSwitchHolidayState = _fwSwitchHolidayState;
     window.openFitzWatchDocBuilder = openFitzWatchDocBuilder;
     window.closeFitzWatchDocBuilder = closeFitzWatchDocBuilder;

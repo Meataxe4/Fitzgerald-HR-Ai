@@ -1012,6 +1012,155 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
             }
         },
         defaultAction: 'Help me draft a Schedule G leave-in-advance written agreement that satisfies FW Act s324 — must include the specific amount of leave, the recovery timeline, and the explicit deduction authority for any un-accrued balance on termination.'
+    },
+
+    // ========================================================================
+    // PHASE 1d — Termination (Domain 5)
+    // 4 rules per spec section 8. TM-001 / TM-002 are flagged generate_doc in
+    // the spec but those templates (warning_procedure_policy,
+    // employment_contract_probation_clause) aren't built yet. Shipping with
+    // ask_fitz fallback; Phase 2 doc sprint will swap them.
+    // ========================================================================
+
+    // TM-001 — Warning procedure --------------------------------------------
+    {
+        id: 'TM-001',
+        domain: 'termination',
+        title: 'Warning procedure before termination',
+        question: 'Do you have a documented procedure for issuing performance warnings before termination?',
+        options: [
+            { value: 'yes',              label: 'Yes — documented warning procedure in place' },
+            { value: 'partial',          label: 'Partial — informal process, not documented' },
+            { value: 'no',               label: 'No — no warning procedure' },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'Fair Work Act 2009',
+            section: 'unfair dismissal jurisdiction; procedural fairness factors (Selvachandran)',
+            jurisdiction: 'national'
+        },
+        consequence: 'Procedural fairness gaps significantly weaken unfair dismissal defence. Frequently challenged in unfair dismissal claims where documentation is missing.',
+        urgencyDriver: 'Required to be in place before any performance conversation begins.',
+        affectedCount: function() { return null; },
+        detect: function(response) {
+            switch (response) {
+                case 'yes': return null;
+                case 'partial':
+                case 'unsure_need_help': return { severity: 'medium' };
+                case 'no': return { severity: 'high' };
+                default: return { severity: 'medium' };
+            }
+        },
+        // Phase 2 doc: warning_procedure_policy + Warning Pack companion docs.
+        fixAction: 'ask_fitz',
+        defaultAction: 'Help me draft a warning procedure policy that meets the FWC unfair dismissal procedural fairness factors — including the stages (informal → first written warning → second → final → show-cause → termination), what each written warning must contain, and the procedural fairness requirements (right to representation, opportunity to respond, sufficient time to improve).'
+    },
+
+    // TM-002 — Probation period alignment with MEP --------------------------
+    {
+        id: 'TM-002',
+        domain: 'termination',
+        title: 'Probation period alignment with Minimum Employment Period',
+        question: 'Does the probation period in your employment contracts align with the statutory Minimum Employment Period (6 months for non-small business; 12 months for small business of fewer than 15 employees)?',
+        options: [
+            { value: 'yes',              label: 'Yes — probation matches the MEP' },
+            { value: 'no',               label: 'No — mismatch between probation and MEP' },
+            { value: 'na',               label: "Not applicable — we don't use probation periods" },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'Fair Work Act 2009',
+            section: 's383 (Minimum Employment Period); s23 (small business definition: <15 employees)',
+            jurisdiction: 'national'
+        },
+        consequence: 'Mismatched probation creates operational confusion and weakens "decline to confirm" termination outcomes. Frequently litigated when probation periods extend beyond the MEP without legal review.',
+        urgencyDriver: 'Applies to every new contract issued; the next hire creates new exposure if unaddressed.',
+        affectedCount: function(profile) {
+            const total = profile && (profile.staffCount || profile.employee_count_total);
+            return total || null;
+        },
+        detect: function(response) {
+            switch (response) {
+                case 'yes':
+                case 'na': return null;
+                case 'no':
+                case 'unsure_need_help': return { severity: 'medium' };
+                default: return { severity: 'medium' };
+            }
+        },
+        // Phase 2 doc: employment_contract_probation_clause.
+        fixAction: 'ask_fitz',
+        defaultAction: 'Help me draft a probation clause for our employment contracts that aligns with the statutory MEP under FW Act s383. Use my staff count to determine whether the 6-month (non-small business) or 12-month (small business, <15 employees) MEP applies, and walk me through how to handle the "decline to confirm" decision at the end of probation.'
+    },
+
+    // TM-003 — Notice period configuration -----------------------------------
+    {
+        id: 'TM-003',
+        domain: 'termination',
+        title: 'Notice period configuration (FW Act s117)',
+        question: 'Are notice periods in your payroll and contracts configured correctly for length-of-service tiers under FW Act s117 (1 week up to 1 year; up to 5 weeks for 5+ years; plus an extra week for over-45s with 2+ years service)?',
+        options: [
+            { value: 'yes',              label: 'Yes — all tiers configured correctly' },
+            { value: 'partial',          label: 'Partial — base tiers configured, age uplift missing' },
+            { value: 'no',               label: 'No — incorrect or single-tier configuration' },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'Fair Work Act 2009',
+            section: 's117 (notice of termination); MA000119 cl 35; MA000009 equivalent',
+            jurisdiction: 'national'
+        },
+        consequence: 'Underpaid notice on termination creates per-employee back-pay claims. Common audit finding when employees leave the business.',
+        urgencyDriver: 'Triggered on every termination; the next departure creates new exposure if unaddressed.',
+        affectedCount: function(profile) { return profile && profile.staffCount ? profile.staffCount : null; },
+        detect: function(response) {
+            switch (response) {
+                case 'yes': return null;
+                case 'partial':
+                case 'unsure_need_help': return { severity: 'medium' };
+                case 'no': return { severity: 'high' };
+                default: return { severity: 'medium' };
+            }
+        },
+        fixAction: 'ask_fitz',
+        defaultAction: 'Help me configure NES notice periods correctly across length-of-service tiers per FW Act s117 — including the over-45s + 2-years-of-service age uplift. Walk me through how to verify the current payroll configuration is right.'
+    },
+
+    // TM-004 — Termination documentation ------------------------------------
+    {
+        id: 'TM-004',
+        domain: 'termination',
+        title: 'Termination documentation retention',
+        question: 'Do you keep complete termination files (warning records, performance documentation, written notice, final pay calculation) for at least 7 years?',
+        options: [
+            { value: 'yes',              label: 'Yes — complete files retained 7 years' },
+            { value: 'partial',          label: 'Partial — some files retained' },
+            { value: 'no',               label: 'No — minimal or no termination files retained' },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'Fair Work Act 2009',
+            section: 's535 (record keeping); FWC unfair dismissal evidence requirements',
+            jurisdiction: 'national'
+        },
+        consequence: 'Without complete termination files, employer cannot defend an unfair dismissal application. Frequently challenged in unfair dismissal claims where documentation is missing.',
+        urgencyDriver: 'Required to be complete on the termination date; retrospective documentation is treated as significantly weaker evidence.',
+        affectedCount: function() { return null; },
+        detect: function(response) {
+            switch (response) {
+                case 'yes': return null;
+                case 'partial': return { severity: 'medium' };
+                case 'no':
+                case 'unsure_need_help': return { severity: 'high' };
+                default: return { severity: 'medium' };
+            }
+        },
+        fixAction: 'ask_fitz',
+        defaultAction: 'Help me set up a termination documentation framework that satisfies FW Act s535 and FWC unfair dismissal evidence requirements. Cover what to file (warning records, performance docs, written notice, final pay calc), how long to retain, and how to handle existing gaps in historical termination files.'
     }
 ];
 

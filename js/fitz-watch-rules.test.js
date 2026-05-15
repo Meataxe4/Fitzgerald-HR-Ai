@@ -88,7 +88,11 @@ const FW_TEST_RESPONSES_KNOWN_BAD = {
     'LM-001': _resp('no'),
     'LM-002': _resp('no'),
     'LM-003': _resp('no'),
-    'LM-004': _resp('no')
+    'LM-004': _resp('no'),
+    'TM-001': _resp('no'),
+    'TM-002': _resp('no'),
+    'TM-003': _resp('no'),
+    'TM-004': _resp('no')
 };
 
 // All-best-case responses for the known-OK profile
@@ -116,7 +120,11 @@ const FW_TEST_RESPONSES_KNOWN_OK = {
     'LM-001': _resp('yes'),
     'LM-002': _resp('no_cashing_out'),
     'LM-003': _resp('no_excess_balances'),
-    'LM-004': _resp('no_advance_leave')
+    'LM-004': _resp('no_advance_leave'),
+    'TM-001': _resp('yes'),
+    'TM-002': _resp('yes'),
+    'TM-003': _resp('yes'),
+    'TM-004': _resp('yes')
 };
 
 // ---- Assertions ------------------------------------------------------------
@@ -160,7 +168,7 @@ function runFitzWatchTests(verbose) {
         return { id: g.gap_id, severity: g.severity, label: g.severity_label, action: g.fix_action };
     }));
 
-    check('Known-bad: produces 24 gaps (12 AP + 4 WC + 4 PS + 4 LM, all rules trigger)', r1.gaps.length === 24, 'got ' + r1.gaps.length);
+    check('Known-bad: produces 28 gaps (12 AP + 4 WC + 4 PS + 4 LM + 4 TM, all rules trigger)', r1.gaps.length === 28, 'got ' + r1.gaps.length);
     check('Known-bad: outstanding is empty', r1.outstanding.length === 0);
     check('Known-bad: AP-001 critical (over 12 months)',
         _gapById(r1.gaps, 'AP-001') && _gapById(r1.gaps, 'AP-001').severity === 'critical');
@@ -229,8 +237,8 @@ function runFitzWatchTests(verbose) {
         outstandingIds.indexOf('AP-006') !== -1);
     check('Conditional: AP-001 IS in outstanding (always applies)',
         outstandingIds.indexOf('AP-001') !== -1);
-    check('Conditional: total applicable rules = 18 (8 AP + WC-001 + WC-003 + 4 PS + 4 LM; WC-002/004 NSW-only filtered out)',
-        outstandingIds.length === 18, 'got ' + outstandingIds.length);
+    check('Conditional: total applicable rules = 22 (8 AP + WC-001 + WC-003 + 4 PS + 4 LM + 4 TM; WC-002/004 NSW-only filtered out)',
+        outstandingIds.length === 22, 'got ' + outstandingIds.length);
     check('Conditional: WC-002 NOT applicable to VIC venue',
         outstandingIds.indexOf('WC-002') === -1);
     check('Conditional: WC-004 NOT applicable to VIC venue',
@@ -446,11 +454,37 @@ function runFitzWatchTests(verbose) {
         rollupDomainSeverity(lmResult.gaps, 'leave_management') === 'critical');
 
     // ============================================================
+    // Phase 1d — Termination domain
+    // ============================================================
+    console.log('%cPhase 1d: Termination rules', 'color: #94a3b8');
+
+    const tmResult = detectGaps(FW_TEST_PROFILE_KNOWN_BAD, {
+        'TM-001': _resp('no'),
+        'TM-002': _resp('no'),
+        'TM-003': _resp('no'),
+        'TM-004': _resp('no')
+    }, []);
+    check('TM-001 "no" produces HIGH (no warning procedure)',
+        tmResult.gaps.find(function(g) { return g.gap_id === 'TM-001'; }).severity === 'high');
+    check('TM-002 "no" produces MEDIUM (probation/MEP mismatch)',
+        tmResult.gaps.find(function(g) { return g.gap_id === 'TM-002'; }).severity === 'medium');
+    check('TM-003 "no" produces HIGH (notice period misconfigured)',
+        tmResult.gaps.find(function(g) { return g.gap_id === 'TM-003'; }).severity === 'high');
+    check('TM-004 "no" produces HIGH (no termination files)',
+        tmResult.gaps.find(function(g) { return g.gap_id === 'TM-004'; }).severity === 'high');
+    check('TM-002 "na" produces no gap',
+        detectGaps(FW_TEST_PROFILE_KNOWN_BAD, { 'TM-002': _resp('na') }, []).gaps.find(function(g) { return g.gap_id === 'TM-002'; }) == null);
+    check('termination domain rollup = high',
+        rollupDomainSeverity(tmResult.gaps, 'termination') === 'high');
+    check('termination applies to all states (TM-001 in outstanding for VIC venue)',
+        detectGaps(VIC_PROFILE, {}, []).outstanding.find(function(o) { return o.questionId === 'TM-001'; }) != null);
+
+    // ============================================================
     // Registry sanity
     // ============================================================
     console.log('%cRegistry sanity', 'color: #94a3b8');
     const registry = getQuestionRegistry();
-    check('Registry: 24 questions (12 AP + 4 WC + 4 PS + 4 LM)', registry.length === 24);
+    check('Registry: 28 questions (12 AP + 4 WC + 4 PS + 4 LM + 4 TM)', registry.length === 28);
     check('Registry: every rule has id, domain, question, options, conditional, detect, statutoryAnchor, fixAction',
         registry.every(function(r) {
             return r.id && r.domain && r.question && Array.isArray(r.options)
@@ -460,7 +494,7 @@ function runFitzWatchTests(verbose) {
     check('Registry: every rule has at least 3 options',
         registry.every(function(r) { return r.options.length >= 3; }));
     check('Registry: ids are unique',
-        new Set(registry.map(function(r) { return r.id; })).size === 24);
+        new Set(registry.map(function(r) { return r.id; })).size === 28);
 
     // ---- Summary -----------------------------------------------------------
     const total = passed + failed;
