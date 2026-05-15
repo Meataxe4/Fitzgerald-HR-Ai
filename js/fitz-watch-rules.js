@@ -715,6 +715,159 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         },
         fixAction: 'ask_fitz',
         defaultAction: 'Build me a manager briefing on the NSW workers comp reforms commencing 1 July 2026 — WPI thresholds, 130-week cap, amended reasonable management action defence ("significant cause" test). Include practical scenarios for hospitality managers.'
+    },
+
+    // ========================================================================
+    // PHASE 1b — Payroll & Super (Domain 4)
+    // 4 rules per spec section 7. Payday super commences 1 July 2026 (national);
+    // PS-001 severity escalates as the date approaches and crosses commencement.
+    // The reform record payday_super_2026 already links PS-001/002/003, so the
+    // existing activeReforms hook adds a further bump during the 90-day window.
+    // ========================================================================
+
+    // PS-001 — Payday super configuration -----------------------------------
+    {
+        id: 'PS-001',
+        domain: 'payroll_super',
+        title: 'Payday super configuration',
+        question: 'Is your payroll system configured to remit super at the same time as wages (per pay cycle), ready for 1 July 2026 commencement?',
+        options: [
+            { value: 'yes',              label: 'Yes — already configured and tested' },
+            { value: 'scheduled',        label: 'Scheduled — work planned but not complete' },
+            { value: 'not_yet',          label: 'Not yet — no work started' },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'Treasury Laws Amendment (Payday Super) Act',
+            section: '(1 July 2026 commencement)',
+            jurisdiction: 'national'
+        },
+        consequence: 'Triggers Super Guarantee Charge with ATO interest and admin components from the first missed payment. May also give rise to Fair Work Act exposure where super forms part of contractual or EA entitlements.',
+        urgencyDriver: 'Commences in less than 90 days; configuration testing must happen before live cutover.',
+        affectedCount: function(profile) { return profile && profile.staffCount ? profile.staffCount : null; },
+        detect: function(response) {
+            // Inline date check so severity stays correct even after the
+            // activeReforms 30-day post-commencement window expires. Spec
+            // section 7.1: not_yet escalates from medium (pre-window) to high
+            // (<90 days pre-commencement) to critical (post-1 July 2026).
+            const target = new Date('2026-07-01T00:00:00');
+            const daysUntil = Math.floor((target.getTime() - Date.now()) / (24 * 60 * 60 * 1000));
+            switch (response) {
+                case 'yes': return null;
+                case 'scheduled': return { severity: 'medium' };
+                case 'not_yet':
+                    if (daysUntil < 0) return { severity: 'critical', severityLabel: 'In force — not configured' };
+                    if (daysUntil < 90) return { severity: 'high' };
+                    return { severity: 'medium' };
+                case 'unsure_need_help': return { severity: 'high' };
+                default: return { severity: 'high' };
+            }
+        },
+        fixAction: 'ask_fitz',
+        defaultAction: 'Walk me through configuring payday super in my payroll software before 1 July 2026 commencement. Include the data points to test, the cutover plan, and what to do if my clearing house can\'t handle per-pay-cycle remittance.'
+    },
+
+    // PS-002 — Super clearing house capacity --------------------------------
+    {
+        id: 'PS-002',
+        domain: 'payroll_super',
+        title: 'Super clearing house capacity',
+        question: 'Have you confirmed your super clearing house can handle weekly/fortnightly remittance frequency under the new payday super regime?',
+        options: [
+            { value: 'yes',              label: 'Yes — confirmed in writing with the clearing house' },
+            { value: 'checking',         label: "Currently checking — haven't received confirmation yet" },
+            { value: 'no',               label: 'No — clearing house can\'t handle the frequency' },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'SuperStream compliance',
+            section: 'employer obligations',
+            jurisdiction: 'national'
+        },
+        consequence: 'Clearing house failures become ATO compliance events under payday super — the employer remains liable for the SGC regardless of clearing house failure.',
+        urgencyDriver: 'Capacity confirmation required before 1 July 2026 cutover; smaller providers may struggle with the volume increase.',
+        affectedCount: function() { return null; },
+        detect: function(response) {
+            switch (response) {
+                case 'yes': return null;
+                case 'checking': return { severity: 'medium' };
+                case 'no': return { severity: 'high' };
+                case 'unsure_need_help': return { severity: 'medium' };
+                default: return { severity: 'medium' };
+            }
+        },
+        fixAction: 'ask_fitz',
+        defaultAction: 'How do I confirm my super clearing house can handle per-pay-cycle remittance under payday super? Walk me through the questions to ask the provider and what to do if they can\'t.'
+    },
+
+    // PS-003 — Super on OTE compliance --------------------------------------
+    {
+        id: 'PS-003',
+        domain: 'payroll_super',
+        title: 'Super on Ordinary Time Earnings (OTE)',
+        question: 'Are you paying 12% Super Guarantee on all ordinary time earnings — including penalty rates on ordinary hours, casual loading, and leave loading?',
+        options: [
+            { value: 'yes',              label: 'Yes — super calculated on all OTE components' },
+            { value: 'partial',          label: 'Partial — super on base but not all loadings/penalties' },
+            { value: 'no',               label: 'No — super on base only' },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'Superannuation Guarantee (Administration) Act 1992',
+            section: 'OTE definition; ATO ruling SGR 2009/2',
+            jurisdiction: 'national'
+        },
+        consequence: 'ATO Super Guarantee Charge with admin components and interest payable. Back-pay super liability accumulates with every pay run — common audit finding under FWO/ATO joint operations.',
+        urgencyDriver: 'Applies to every pay run; correction stops the accumulation immediately.',
+        affectedCount: function(profile) { return profile && profile.staffCount ? profile.staffCount : null; },
+        detect: function(response) {
+            switch (response) {
+                case 'yes': return null;
+                case 'partial':
+                case 'no':
+                case 'unsure_need_help': return { severity: 'high' };
+                default: return { severity: 'high' };
+            }
+        },
+        fixAction: 'ask_fitz',
+        defaultAction: 'Help me verify our super is calculated correctly on all Ordinary Time Earnings components per ATO ruling SGR 2009/2 — penalty rates on ordinary hours, casual loading, leave loading. Walk me through how to audit a recent pay run.'
+    },
+
+    // PS-004 — Record retention ---------------------------------------------
+    {
+        id: 'PS-004',
+        domain: 'payroll_super',
+        title: 'Time and wage record retention',
+        question: 'Do you retain time and wage records for 7 years as required under the Fair Work Regulations?',
+        options: [
+            { value: 'yes',              label: 'Yes — 7 years retained' },
+            { value: 'partial',          label: 'Partial — some records retained, gaps exist' },
+            { value: 'no',               label: "No — we don't retain records that long" },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'Fair Work Act 2009',
+            section: 's535; Fair Work Regulations reg 3.34, 3.42, 3.46',
+            jurisdiction: 'national'
+        },
+        consequence: 'Without records, the employer cannot defend against an underpayment claim. Absence typically shifts evidentiary burden against employer for the entire affected period.',
+        urgencyDriver: '7-year retention applies retrospectively; gaps in historical records compound exposure on any claim filed within the limitation period.',
+        affectedCount: function() { return null; },
+        detect: function(response) {
+            switch (response) {
+                case 'yes': return null;
+                case 'partial':
+                case 'unsure_need_help': return { severity: 'medium' };
+                case 'no': return { severity: 'critical' };
+                default: return { severity: 'medium' };
+            }
+        },
+        fixAction: 'ask_fitz',
+        defaultAction: 'Help me set up a 7-year retention framework for time and wage records under FW Act s535 and Fair Work Regulations. Cover storage, indexing, and what to do about gaps in historical records.'
     }
 ];
 

@@ -80,7 +80,11 @@ const FW_TEST_RESPONSES_KNOWN_BAD = {
     'WC-001': _resp('no'),
     'WC-002': _resp('unsure_need_help'),
     'WC-003': _resp('no'),
-    'WC-004': _resp('no')
+    'WC-004': _resp('no'),
+    'PS-001': _resp('not_yet'),
+    'PS-002': _resp('no'),
+    'PS-003': _resp('no'),
+    'PS-004': _resp('no')
 };
 
 // All-best-case responses for the known-OK profile
@@ -100,7 +104,11 @@ const FW_TEST_RESPONSES_KNOWN_OK = {
     'WC-001': _resp('na'),
     'WC-002': _resp('before_30_june_2026'),
     'WC-003': _resp('yes'),
-    'WC-004': _resp('yes')
+    'WC-004': _resp('yes'),
+    'PS-001': _resp('yes'),
+    'PS-002': _resp('yes'),
+    'PS-003': _resp('yes'),
+    'PS-004': _resp('yes')
 };
 
 // ---- Assertions ------------------------------------------------------------
@@ -144,7 +152,7 @@ function runFitzWatchTests(verbose) {
         return { id: g.gap_id, severity: g.severity, label: g.severity_label, action: g.fix_action };
     }));
 
-    check('Known-bad: produces 16 gaps (12 AP + 4 WC, all rules trigger)', r1.gaps.length === 16, 'got ' + r1.gaps.length);
+    check('Known-bad: produces 20 gaps (12 AP + 4 WC + 4 PS, all rules trigger)', r1.gaps.length === 20, 'got ' + r1.gaps.length);
     check('Known-bad: outstanding is empty', r1.outstanding.length === 0);
     check('Known-bad: AP-001 critical (over 12 months)',
         _gapById(r1.gaps, 'AP-001') && _gapById(r1.gaps, 'AP-001').severity === 'critical');
@@ -213,8 +221,8 @@ function runFitzWatchTests(verbose) {
         outstandingIds.indexOf('AP-006') !== -1);
     check('Conditional: AP-001 IS in outstanding (always applies)',
         outstandingIds.indexOf('AP-001') !== -1);
-    check('Conditional: total applicable rules = 10 (8 AP + WC-001 + WC-003; WC-002/004 NSW-only filtered out)',
-        outstandingIds.length === 10, 'got ' + outstandingIds.length);
+    check('Conditional: total applicable rules = 14 (8 AP + WC-001 + WC-003 + 4 PS; WC-002/004 NSW-only filtered out)',
+        outstandingIds.length === 14, 'got ' + outstandingIds.length);
     check('Conditional: WC-002 NOT applicable to VIC venue',
         outstandingIds.indexOf('WC-002') === -1);
     check('Conditional: WC-004 NOT applicable to VIC venue',
@@ -346,11 +354,54 @@ function runFitzWatchTests(verbose) {
         rollupDomainSeverity(wcResultNsw.gaps, 'workers_comp') === 'critical');
 
     // ============================================================
+    // Phase 1b — Payroll & Super domain
+    // ============================================================
+    console.log('%cPhase 1b: Payroll & Super rules', 'color: #94a3b8');
+
+    const psResult = detectGaps(FW_TEST_PROFILE_KNOWN_BAD, {
+        'PS-001': _resp('not_yet'),
+        'PS-002': _resp('no'),
+        'PS-003': _resp('partial'),
+        'PS-004': _resp('no')
+    }, []);
+
+    // PS-001 — date-aware severity. Today is < 90 days from 2026-07-01 so
+    // not_yet should be 'high' (or 'critical' if test runs post-commencement).
+    const ps001 = psResult.gaps.find(function(g) { return g.gap_id === 'PS-001'; });
+    const target = new Date('2026-07-01T00:00:00');
+    const daysToCommencement = Math.floor((target.getTime() - Date.now()) / (24 * 60 * 60 * 1000));
+    const expectedPs001 = daysToCommencement < 0 ? 'critical' : (daysToCommencement < 90 ? 'high' : 'medium');
+    check('PS-001 not_yet severity matches days-to-commencement window',
+        ps001 && ps001.severity === expectedPs001,
+        'got ' + (ps001 && ps001.severity) + ' for ' + daysToCommencement + ' days until commencement');
+
+    check('PS-002 "no" produces HIGH',
+        psResult.gaps.find(function(g) { return g.gap_id === 'PS-002'; }).severity === 'high');
+    check('PS-003 "partial" produces HIGH (super on OTE)',
+        psResult.gaps.find(function(g) { return g.gap_id === 'PS-003'; }).severity === 'high');
+    check('PS-004 "no" produces CRITICAL (7-year record retention)',
+        psResult.gaps.find(function(g) { return g.gap_id === 'PS-004'; }).severity === 'critical');
+
+    // All-good responses produce no gaps
+    const psResultOk = detectGaps(FW_TEST_PROFILE_KNOWN_BAD, {
+        'PS-001': _resp('yes'),
+        'PS-002': _resp('yes'),
+        'PS-003': _resp('yes'),
+        'PS-004': _resp('yes')
+    }, []);
+    check('PS all-yes produces no gaps',
+        psResultOk.gaps.filter(function(g) { return g.domain === 'payroll_super'; }).length === 0);
+
+    // Payroll & Super applies universally — not state-gated
+    check('payroll_super applies to all states (PS-001 in outstanding for VIC venue)',
+        detectGaps(VIC_PROFILE, {}, []).outstanding.find(function(o) { return o.questionId === 'PS-001'; }) != null);
+
+    // ============================================================
     // Registry sanity
     // ============================================================
     console.log('%cRegistry sanity', 'color: #94a3b8');
     const registry = getQuestionRegistry();
-    check('Registry: 16 questions (12 AP + 4 WC)', registry.length === 16);
+    check('Registry: 20 questions (12 AP + 4 WC + 4 PS)', registry.length === 20);
     check('Registry: every rule has id, domain, question, options, conditional, detect, statutoryAnchor, fixAction',
         registry.every(function(r) {
             return r.id && r.domain && r.question && Array.isArray(r.options)
@@ -360,7 +411,7 @@ function runFitzWatchTests(verbose) {
     check('Registry: every rule has at least 3 options',
         registry.every(function(r) { return r.options.length >= 3; }));
     check('Registry: ids are unique',
-        new Set(registry.map(function(r) { return r.id; })).size === 16);
+        new Set(registry.map(function(r) { return r.id; })).size === 20);
 
     // ---- Summary -----------------------------------------------------------
     const total = passed + failed;
