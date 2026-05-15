@@ -89,7 +89,9 @@ Questions should:
     const maxTokens = taskType === 'interviewQuestions' ? 1500 : 2000;
 
     const message = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      // Upgraded from claude-sonnet-4-20250514 to claude-sonnet-4-6 (Sonnet 4.6)
+      // for better instruction-following and tighter output. Same pricing tier.
+      model: 'claude-sonnet-4-6',
       max_tokens: maxTokens,
       temperature: 0.7,
       system: systemPrompt,

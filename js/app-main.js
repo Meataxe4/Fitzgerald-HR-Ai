@@ -22525,18 +22525,167 @@ function _fwRenderGapCard(gap) {
     '</div>';
 }
 
-// Sprint 4 (Step 8) will wire fix actions to chat/document builder. For now,
-// show the engineered fix payload in a notification + console for inspection.
+// Sprint 4 — fix-action dispatcher. Routes by fix_action type. Phase 0 only
+// uses ask_fitz (chat). generate_doc lights up when Step 9 documents ship.
 function _fwHandleFixAction(gapId) {
     const responses = getFitzWatchResponsesCache();
     const result = detectGaps(venueProfile || {}, responses, []);
     const gap = result.gaps.find(function(g) { return g.gap_id === gapId; });
     if (!gap) return;
-    console.log('--- Fitz Watch fix payload for ' + gapId + ' ---');
-    console.log(gap.fix_payload);
-    if (typeof showNotification === 'function') {
-        showNotification('Fix flow ships in Sprint 4. The pre-loaded prompt is logged to console for review.', 'info');
+    if (gap.fix_action === 'generate_doc') {
+        // Step 9 will wire generate_doc. Until then, fall back to ask_fitz.
+        if (typeof showNotification === 'function') {
+            showNotification('Document template still in build — using AI assistant in the meantime.', 'info');
+        }
+        openFitzWatchChat(gap);
+        return;
     }
+    // ask_fitz, fix_in_app, review_now all route to chat for Phase 0
+    openFitzWatchChat(gap);
+}
+
+// ---- Step 8: Fitz Watch chat (gap-specific) -------------------------------
+
+let _fwChatState = { gap: null, history: [] };
+
+function openFitzWatchChat(gap) {
+    if (!gap) return;
+    _fwChatState.gap = gap;
+    _fwChatState.history = [];
+
+    // Close dashboard so the chat modal isn't stacked under it
+    closeFitzWatchDashboard();
+
+    const modal = document.getElementById('fitzWatchChatModal');
+    if (!modal) return;
+
+    // Gap context badge
+    const badge = document.getElementById('fwChatGapBadge');
+    if (badge) {
+        badge.classList.remove('hidden');
+        const titleEl = document.getElementById('fwChatGapTitle');
+        const metaEl = document.getElementById('fwChatGapMeta');
+        if (titleEl) titleEl.textContent = gap.title || gap.gap_id;
+        if (metaEl) {
+            metaEl.textContent = ' · ' + (gap.gap_id || '') + ' · ' + (gap.severity || '') + ' · ' + (gap.domain || '').replace('_', ' ');
+        }
+    }
+
+    const messagesEl = document.getElementById('fwChatMessages');
+    if (messagesEl) messagesEl.innerHTML = '';
+
+    modal.classList.remove('hidden');
+
+    // Auto-submit the engineered prompt as the first user message
+    fitzWatchChatSendMessage(gap.fix_payload, /*isInitial*/ true);
+}
+
+function closeFitzWatchChat() {
+    const modal = document.getElementById('fitzWatchChatModal');
+    if (modal) modal.classList.add('hidden');
+    _fwChatState = { gap: null, history: [] };
+}
+
+function _fwChatRenderMessage(role, content) {
+    const messagesEl = document.getElementById('fwChatMessages');
+    if (!messagesEl) return;
+    const isUser = role === 'user';
+    const wrap = document.createElement('div');
+    wrap.className = 'flex ' + (isUser ? 'justify-end' : 'justify-start');
+    const bubble = document.createElement('div');
+    bubble.className = 'max-w-[85%] p-3 rounded-lg text-sm whitespace-pre-wrap ' +
+        (isUser ? 'bg-amber-500/20 text-amber-100 border border-amber-700' : 'bg-slate-700/60 text-slate-200 border border-slate-600');
+    bubble.textContent = content;
+    wrap.appendChild(bubble);
+    messagesEl.appendChild(wrap);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return bubble;
+}
+
+function _fwChatRenderTyping() {
+    const messagesEl = document.getElementById('fwChatMessages');
+    if (!messagesEl) return null;
+    const wrap = document.createElement('div');
+    wrap.id = '_fwChatTyping';
+    wrap.className = 'flex justify-start';
+    wrap.innerHTML = '<div class="p-3 rounded-lg text-sm bg-slate-700/60 text-slate-400 border border-slate-600 italic">Fitz is thinking…</div>';
+    messagesEl.appendChild(wrap);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return wrap;
+}
+
+function _fwChatRemoveTyping() {
+    const el = document.getElementById('_fwChatTyping');
+    if (el && el.parentNode) el.parentNode.removeChild(el);
+}
+
+async function fitzWatchChatSendMessage(messageText, isInitial) {
+    if (!messageText) return;
+    _fwChatRenderMessage('user', messageText);
+    _fwChatState.history.push({ role: 'user', content: messageText });
+    _fwChatRenderTyping();
+
+    const gap = _fwChatState.gap;
+    const profile = venueProfile || {};
+    const venueCtx = {
+        state: profile.state || profile.location || null,
+        venueType: profile.venueType || null,
+        primaryAward: profile.primaryAward || null,
+        staffCount: profile.staffCount || null,
+        casual_count: profile.casual_count != null ? profile.casual_count : null,
+        part_time_count: profile.part_time_count != null ? profile.part_time_count : null,
+        full_time_count: profile.full_time_count != null ? profile.full_time_count : null,
+        annualised_wage_used: profile.annualised_wage_used || null,
+        payroll_software: profile.payroll_software || null,
+        time_records_method: profile.time_records_method || null
+    };
+    const gapCtx = gap ? {
+        gapId: gap.gap_id,
+        title: gap.title,
+        severity: gap.severity,
+        domain: gap.domain,
+        statutoryAnchor: gap.statutory_anchor
+    } : null;
+
+    // Send last 10 turns minus the just-pushed user message (the function
+    // appends current message itself)
+    const historyForApi = _fwChatState.history.slice(0, -1).slice(-10);
+
+    try {
+        const response = await fetch('/.netlify/functions/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: messageText,
+                history: historyForApi,
+                user: currentUser ? { uid: currentUser.uid, email: currentUser.email } : null,
+                primaryAward: profile.primaryAward || null,
+                venueContext: venueCtx,
+                gapContext: gapCtx
+            })
+        });
+        _fwChatRemoveTyping();
+        if (!response.ok) {
+            _fwChatRenderMessage('assistant', 'Sorry — the AI assistant failed to respond (HTTP ' + response.status + '). Try again in a moment.');
+            return;
+        }
+        const data = await response.json();
+        const reply = (data.message || data.response || data.text || '').trim() || 'No response received.';
+        _fwChatRenderMessage('assistant', reply);
+        _fwChatState.history.push({ role: 'assistant', content: reply });
+    } catch (err) {
+        _fwChatRemoveTyping();
+        _fwChatRenderMessage('assistant', 'Sorry — request failed (' + (err.message || err) + '). Check your connection.');
+    }
+}
+
+function fitzWatchChatSendFollowup() {
+    const input = document.getElementById('fwChatInput');
+    if (!input) return;
+    const text = input.value.trim();
+    if (!text) return;
+    input.value = '';
+    fitzWatchChatSendMessage(text, false);
 }
 
 // ---- Step 7: Tools tile visibility (flag-gated) ---------------------------
@@ -22563,6 +22712,9 @@ if (typeof window !== 'undefined') {
     window.openFitzWatchDashboard = openFitzWatchDashboard;
     window.closeFitzWatchDashboard = closeFitzWatchDashboard;
     window._fwHandleFixAction = _fwHandleFixAction;
+    window.openFitzWatchChat = openFitzWatchChat;
+    window.closeFitzWatchChat = closeFitzWatchChat;
+    window.fitzWatchChatSendFollowup = fitzWatchChatSendFollowup;
     window.showFitzWatchToolTileIfFlagged = showFitzWatchToolTileIfFlagged;
     window.hasFeature = hasFeature;
     window.saveFitzWatchResponse = saveFitzWatchResponse;
