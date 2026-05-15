@@ -194,9 +194,8 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
                 default: return { severity: 'high' };
             }
         },
-        // Phase 0 = ask_fitz. Step 9 (Sprint 4) will swap this to generate_doc
-        // with templateId 'clause_20_annualised_wage_agreement'.
-        fixAction: 'ask_fitz',
+        fixAction: 'generate_doc',
+        fixPayloadDoc: { templateId: 'clause_20_annualised_wage_agreement' },
         defaultAction: 'Help me draft a Clause 20-compliant annualised wage agreement that lists the absorbed Award provisions, sets outer-limit hours, and meets MA000119 cl 20.1(d) requirements. Use my venue and full-time staff details from above.'
     },
 
@@ -231,9 +230,8 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
                 default: return { severity: 'high' };
             }
         },
-        // Phase 0 = ask_fitz. Step 9 (Sprint 4) will swap this to generate_doc
-        // with templateId 'clause_20_weekly_time_record'.
-        fixAction: 'ask_fitz',
+        fixAction: 'generate_doc',
+        fixPayloadDoc: { templateId: 'clause_20_weekly_time_record' },
         defaultAction: 'Help me set up a Schedule G-compliant weekly time record template for our annualised wage staff. The template must capture start/finish times and unpaid breaks daily, total weekly hours, and have employee + employer signature lines. Reference MA000119 cl 20.2(c) and FW Act s535.'
     },
 
@@ -620,7 +618,9 @@ function buildGapObject(rule, gapFields, response, profile, activeReforms) {
         fixable_in_app: fixAction !== 'external',
         fix_action: fixAction,
         fix_action_visual_signal: visualSignal,
-        fix_payload: buildFix(rule, response, profile)
+        fix_payload: buildFix(rule, response, profile),
+        // For generate_doc rules — used by the Document Builder router
+        fix_payload_doc: rule.fixPayloadDoc || null
     };
 }
 

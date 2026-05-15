@@ -84,6 +84,42 @@ function buildMinimumEngagementFacts(rates, awardLabel) {
   return lines.join('\n');
 }
 
+// ============================================================================
+// FITZ WATCH context block — builds a focused system addendum when a chat
+// request comes from a gap card. Tells Claude to (a) treat the user's
+// structured brief as established facts, (b) stay anchored to the gap's
+// statutory citation, and (c) produce a specific, actionable response.
+// ============================================================================
+function buildFitzWatchContextBlock(venueContext, gapContext) {
+  const lines = ['=== FITZ WATCH CONTEXT ==='];
+  lines.push('The user is asking from inside Fitz Watch — the compliance risk dashboard.');
+  lines.push('Their first message contains a structured brief with [VENUE CONTEXT], [GAP CONTEXT], and [ACTION] blocks.');
+  lines.push('Treat the facts in [VENUE CONTEXT] as authoritative — do NOT re-ask the user for their state, award coverage, staff count, payroll software, or anything else listed there.');
+  lines.push('');
+  if (gapContext) {
+    lines.push('Active gap details:');
+    if (gapContext.gapId)    lines.push('- Gap ID: ' + gapContext.gapId);
+    if (gapContext.title)    lines.push('- Gap title: ' + gapContext.title);
+    if (gapContext.severity) lines.push('- Severity: ' + gapContext.severity);
+    if (gapContext.domain)   lines.push('- Domain: ' + gapContext.domain);
+    if (gapContext.statutoryAnchor) {
+      const a = gapContext.statutoryAnchor;
+      const anchorBits = [];
+      if (a.act) anchorBits.push(a.act);
+      if (a.section) anchorBits.push(a.section);
+      if (anchorBits.length) lines.push('- Statutory anchor: ' + anchorBits.join('; '));
+    }
+    lines.push('');
+  }
+  lines.push('Produce a tight, practical response. Include:');
+  lines.push('1. The specific steps the user should take to close this gap.');
+  lines.push('2. The data they need to gather from payroll / time records / contracts.');
+  lines.push('3. What they should check first.');
+  lines.push('4. Any documents they need to draft or generate.');
+  lines.push('Keep statutory citations accurate to the anchor above. Do not invent clause numbers.');
+  return lines.join('\n');
+}
+
 exports.handler = async (event, context) => {
   // Only allow POST requests
   if (event.httpMethod !== 'POST') {
@@ -106,8 +142,10 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    // Parse request body
-    const { message, history, user, primaryAward } = JSON.parse(event.body);
+    // Parse request body. venueContext and gapContext are optional Fitz Watch
+    // additions (Sprint 4). Existing chat callers send only the original four
+    // fields and continue to behave identically.
+    const { message, history, user, primaryAward, venueContext, gapContext } = JSON.parse(event.body);
 
     // Validate input
     if (!message || typeof message !== 'string') {
@@ -399,7 +437,31 @@ Remember: You're a support tool provided by Fitz HR, not a replacement for human
       content: message
     });
 
-    // Call Claude API
+    // Build the system blocks. The main award-aware system prompt is sent
+    // as a cacheable block; the Anthropic API charges ~10% of the input
+    // cost for cache hits, so multi-turn conversations on the same award
+    // get a substantial discount after the first turn. An optional Fitz
+    // Watch context block is added when the caller is asking from a gap
+    // card — that block tells Claude to treat the user's [VENUE CONTEXT]
+    // and [GAP CONTEXT] as authoritative and not re-ask.
+    const systemBlocks = [
+      {
+        type: 'text',
+        text: systemPrompt,
+        cache_control: { type: 'ephemeral' }
+      }
+    ];
+    if (gapContext || venueContext) {
+      systemBlocks.push({
+        type: 'text',
+        text: buildFitzWatchContextBlock(venueContext, gapContext)
+      });
+    }
+
+    // Call Claude API. Model upgraded from claude-sonnet-4-20250514 to
+    // claude-sonnet-4-6 (Sonnet 4.6) for better instruction-following on
+    // structured prompts (the gap context briefs) and tighter statutory
+    // citation accuracy.
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -408,9 +470,9 @@ Remember: You're a support tool provided by Fitz HR, not a replacement for human
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1500,
-        system: systemPrompt,
+        system: systemBlocks,
         messages: messages
       })
     });
@@ -437,11 +499,15 @@ Remember: You're a support tool provided by Fitz HR, not a replacement for human
       .map(block => block.text)
       .join('\n');
 
-    // Log usage for monitoring (optional)
+    // Log usage for monitoring. cache_read_input_tokens > 0 confirms prompt
+    // caching is working (Sprint 4 added cache_control to the system prompt).
     console.log('Usage:', {
       user: user,
       inputTokens: data.usage?.input_tokens || 0,
       outputTokens: data.usage?.output_tokens || 0,
+      cacheReadTokens: data.usage?.cache_read_input_tokens || 0,
+      cacheCreateTokens: data.usage?.cache_creation_input_tokens || 0,
+      hasGapContext: !!gapContext,
       timestamp: new Date().toISOString()
     });
 

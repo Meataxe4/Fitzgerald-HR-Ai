@@ -165,6 +165,14 @@ function runFitzWatchTests(verbose) {
         r1.gaps.every(function(g) { return typeof g.fix_payload === 'string' && g.fix_payload.length > 100; }));
     check('Known-bad: every gap has visual signal',
         r1.gaps.every(function(g) { return ['fix_now_in_fitz', 'needs_review', 'external'].indexOf(g.fix_action_visual_signal) !== -1; }));
+    check('Known-bad: AP-002 routes to generate_doc with template ID',
+        _gapById(r1.gaps, 'AP-002') && _gapById(r1.gaps, 'AP-002').fix_action === 'generate_doc'
+            && _gapById(r1.gaps, 'AP-002').fix_payload_doc
+            && _gapById(r1.gaps, 'AP-002').fix_payload_doc.templateId === 'clause_20_annualised_wage_agreement');
+    check('Known-bad: AP-003 routes to generate_doc with template ID',
+        _gapById(r1.gaps, 'AP-003') && _gapById(r1.gaps, 'AP-003').fix_action === 'generate_doc'
+            && _gapById(r1.gaps, 'AP-003').fix_payload_doc
+            && _gapById(r1.gaps, 'AP-003').fix_payload_doc.templateId === 'clause_20_weekly_time_record');
 
     // ============================================================
     // Test profile 2 — Known-OK (all-best responses)
