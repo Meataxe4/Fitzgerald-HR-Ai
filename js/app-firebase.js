@@ -328,14 +328,20 @@ if (auth) {
                             localStorage.setItem('fitz_currentConversationId_' + user.uid, userData.lastConversationId);
                         }
                         
-                        // Also load venue profile if present. Canonical path is
-                        // userData.appState.venueProfile (where saveAllDataToCloud
-                        // writes it). Older accounts may have it at the root.
+                        // Restore venue profile from Firestore ONLY when localStorage
+                        // is empty (fresh browser / new device). On same-browser
+                        // refresh we keep localStorage authoritative because the
+                        // debouncedSync write-back can be up to 2s behind — and
+                        // overwriting local with stale cloud data would wipe
+                        // fields like fitzWatchSetupComplete that the user just
+                        // saved seconds before refreshing.
+                        const localVenueKey = 'venueProfile_' + user.uid;
+                        const localExists = !!localStorage.getItem(localVenueKey);
                         const cloudVenueProfile =
                             (userData.appState && userData.appState.venueProfile) ||
                             userData.venueProfile;
-                        if (cloudVenueProfile && Object.keys(cloudVenueProfile).length > 0) {
-                            localStorage.setItem('venueProfile_' + user.uid, JSON.stringify(cloudVenueProfile));
+                        if (!localExists && cloudVenueProfile && Object.keys(cloudVenueProfile).length > 0) {
+                            localStorage.setItem(localVenueKey, JSON.stringify(cloudVenueProfile));
                         }
                     }
                 } catch (e) {
