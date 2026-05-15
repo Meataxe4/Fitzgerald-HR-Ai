@@ -21913,20 +21913,18 @@ async function saveFitzWatchResponse(questionId, domain, response) {
 // cloud-sync pattern), so the values are available to other tools too.
 
 function fitzWatchPreflightComplete() {
-    if (!venueProfile) return false;
-    const required = [
-        'venue_abn', 'venue_address',
-        'casual_count', 'part_time_count', 'full_time_count',
-        'annualised_wage_used', 'payroll_software', 'super_clearing_house',
-        'time_records_method', 'insurance_renewal_month'
-    ];
-    return required.every(function(f) {
-        const v = venueProfile[f];
-        return v !== undefined && v !== null && v !== '';
-    }) && venueProfile.fitzWatchSetupComplete === true;
+    // Single source of truth: the user has explicitly completed pre-flight
+    // at some point. Individual fields can be missing or updated later via
+    // the venue-profile pencil. Requiring every field on every load creates
+    // a brittle gate that re-asks the questionnaire if any one field gets
+    // cleared or never finishes syncing back from Firestore.
+    return !!(venueProfile && venueProfile.fitzWatchSetupComplete === true);
 }
 
-// Entry router. Routes the user to pre-flight, questionnaire, or dashboard.
+// Entry router. After first-time pre-flight, always lands on the dashboard.
+// The dashboard's own empty/partial states surface "Run assessment" and
+// "Continue questionnaire" CTAs so the user can answer questions when they
+// choose — rather than the questionnaire ambushing them on every reload.
 function openFitzWatch() {
     if (!hasFeature('fitz_watch_preview')) {
         console.info('Fitz Watch: feature flag not granted for this user');
@@ -21936,18 +21934,7 @@ function openFitzWatch() {
         openFitzWatchPreflight();
         return;
     }
-    loadFitzWatchResponses().then(function(responses) {
-        const profile = venueProfile || {};
-        const applicable = (typeof getQuestionRegistry === 'function')
-            ? getQuestionRegistry().filter(function(r) { return r.conditional(profile); })
-            : [];
-        const unanswered = applicable.filter(function(r) { return !responses[r.id]; });
-        if (unanswered.length > 0) {
-            openFitzWatchQuestionnaire();
-        } else {
-            openFitzWatchDashboard();
-        }
-    });
+    openFitzWatchDashboard();
 }
 
 // Tracks whether the user opened pre-flight as initial setup (auto-advance
@@ -22348,9 +22335,16 @@ function renderFitzWatchDashboard() {
     // Always render the venue-profile summary at the top (collapsible).
     const profileSummaryHtml = _fwRenderProfileSummary(profile);
 
+    // "Has anything changed?" prompt — shown once per session. Helps the user
+    // catch the case where their staff mix / payroll / time records method
+    // changed since they last logged in, which would invalidate prior gap
+    // detection. Click "Yes" → pre-flight in edit mode; "No" → hides for
+    // the rest of this session via sessionStorage.
+    const changedPromptHtml = _fwRenderChangedPrompt();
+
     // State A — pre-flight done, zero responses
     if (answeredCount === 0) {
-        body.innerHTML = profileSummaryHtml +
+        body.innerHTML = profileSummaryHtml + changedPromptHtml +
             '<div class="text-center py-10 bg-slate-700/30 rounded-xl border border-slate-700">' +
                 '<div class="text-4xl mb-3">📋</div>' +
                 '<h3 class="text-lg font-bold text-white mb-2">Award &amp; Pay assessment</h3>' +
@@ -22370,7 +22364,7 @@ function renderFitzWatchDashboard() {
     const sevBadge = _FW_SEV_BADGE[domainSeverity] || _FW_SEV_BADGE.low;
     const domainLabel = (typeof FITZ_WATCH_SEVERITY_LABELS !== 'undefined') ? FITZ_WATCH_SEVERITY_LABELS[domainSeverity] : domainSeverity;
 
-    let html = profileSummaryHtml +
+    let html = profileSummaryHtml + changedPromptHtml +
         '<div class="p-5 rounded-xl border ' + sevBadge.class + '">' +
         '<div class="flex items-center justify-between mb-2">' +
             '<div class="font-semibold text-lg">Award &amp; Pay</div>' +
@@ -22487,6 +22481,39 @@ function _fwRenderProfileSummary(profile) {
         '</summary>' +
         '<div class="mt-3 pt-3 border-t border-slate-700">' + rowsHtml + '</div>' +
     '</details>';
+}
+
+// "Has anything changed?" banner. Shown once per browser session. Dismissed
+// via sessionStorage so it reappears next session. If pre-flight was just
+// completed in this session (within last 60s), don't show — pointless.
+function _fwRenderChangedPrompt() {
+    try {
+        if (sessionStorage.getItem('fwChangedPromptDismissed') === '1') return '';
+    } catch (e) { /* sessionStorage unavailable; show prompt anyway */ }
+
+    const setupAt = venueProfile && venueProfile.fitzWatchSetupDate ? Date.parse(venueProfile.fitzWatchSetupDate) : 0;
+    if (setupAt && (Date.now() - setupAt) < 60 * 1000) return ''; // just set up
+
+    const lastDateStr = setupAt ? _fwFormatDate(setupAt) : null;
+    const subline = lastDateStr
+        ? 'You last reviewed your venue profile on ' + lastDateStr + '.'
+        : 'Make sure your venue profile is up to date before relying on the risk picture below.';
+
+    return '<div class="p-4 bg-amber-900/15 border border-amber-700/50 rounded-xl flex items-start justify-between gap-3 flex-wrap">' +
+        '<div class="flex-1 min-w-[240px]">' +
+            '<div class="font-semibold text-amber-200 text-sm mb-1">Has your workforce or circumstances changed since your last review?</div>' +
+            '<div class="text-xs text-amber-300/70">' + _fwEscapeHtml(subline) + ' Update your profile so the risks reflect today\'s reality.</div>' +
+        '</div>' +
+        '<div class="flex items-center gap-2">' +
+            '<button onclick="_fwDismissChangedPrompt()" class="px-3 py-1.5 text-xs text-slate-400 hover:text-white">No, nothing\'s changed</button>' +
+            '<button onclick="closeFitzWatchDashboard(); openFitzWatchPreflight(\'edit\');" class="px-3 py-1.5 text-xs bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold rounded-lg">Yes, update profile →</button>' +
+        '</div>' +
+    '</div>';
+}
+
+function _fwDismissChangedPrompt() {
+    try { sessionStorage.setItem('fwChangedPromptDismissed', '1'); } catch (e) {}
+    renderFitzWatchDashboard();
 }
 
 function _fwRenderGapCard(gap) {
@@ -23173,6 +23200,7 @@ if (typeof window !== 'undefined') {
     window.closeFitzWatchChat = closeFitzWatchChat;
     window.fitzWatchChatSendFollowup = fitzWatchChatSendFollowup;
     window.fitzWatchChatRetryLast = fitzWatchChatRetryLast;
+    window._fwDismissChangedPrompt = _fwDismissChangedPrompt;
     window.openFitzWatchDocBuilder = openFitzWatchDocBuilder;
     window.closeFitzWatchDocBuilder = closeFitzWatchDocBuilder;
     window.fitzWatchDocGenerate = fitzWatchDocGenerate;
