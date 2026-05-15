@@ -316,10 +316,14 @@ if (auth) {
                         const cloudVenueProfile =
                             (userData.appState && userData.appState.venueProfile) ||
                             userData.venueProfile;
+                        console.log('[Fitz Watch DIAGNOSTIC] auth handler — cloudVenueProfile keys:', cloudVenueProfile ? Object.keys(cloudVenueProfile) : 'none');
+                        console.log('[Fitz Watch DIAGNOSTIC] auth handler — cloudVenueProfile.fitzWatchSetupComplete:', cloudVenueProfile && cloudVenueProfile.fitzWatchSetupComplete);
+                        console.log('[Fitz Watch DIAGNOSTIC] auth handler — localStorage already has venueProfile:', !!localStorage.getItem(localVenueKey));
                         if (!localStorage.getItem(localVenueKey)
                                 && cloudVenueProfile
                                 && Object.keys(cloudVenueProfile).length > 0) {
                             localStorage.setItem(localVenueKey, JSON.stringify(cloudVenueProfile));
+                            console.log('[Fitz Watch DIAGNOSTIC] auth handler — restored localStorage from Firestore');
                         }
                         // Eagerly populate the venueProfile global so any tile
                         // click sees the right state immediately.
@@ -329,9 +333,14 @@ if (auth) {
                                 const parsed = JSON.parse(eagerSaved);
                                 if (parsed && typeof parsed === 'object') {
                                     venueProfile = Object.assign({}, venueProfile, parsed);
+                                    console.log('[Fitz Watch DIAGNOSTIC] auth handler — venueProfile global set; fitzWatchSetupComplete:', venueProfile.fitzWatchSetupComplete);
                                 }
+                            } else {
+                                console.warn('[Fitz Watch DIAGNOSTIC] auth handler — localStorage empty after restore attempt');
                             }
-                        } catch (e) { /* tolerate */ }
+                        } catch (e) {
+                            console.error('[Fitz Watch DIAGNOSTIC] auth handler error:', e);
+                        }
 
                         if (typeof showFitzWatchToolTileIfFlagged === 'function') {
                             showFitzWatchToolTileIfFlagged();

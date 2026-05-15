@@ -21936,16 +21936,26 @@ function openFitzWatch() {
     // so the user doesn't get bounced into pre-flight unnecessarily.
     if (currentUser && currentUser.uid) {
         try {
-            const saved = localStorage.getItem('venueProfile_' + currentUser.uid);
-            if (saved) {
-                const parsed = JSON.parse(saved);
+            const raw = localStorage.getItem('venueProfile_' + currentUser.uid);
+            console.log('[Fitz Watch DIAGNOSTIC] localStorage venueProfile_' + currentUser.uid + ':', raw);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                console.log('[Fitz Watch DIAGNOSTIC] parsed keys:', Object.keys(parsed || {}));
+                console.log('[Fitz Watch DIAGNOSTIC] parsed.fitzWatchSetupComplete:', parsed && parsed.fitzWatchSetupComplete);
                 if (parsed && typeof parsed === 'object') {
                     venueProfile = Object.assign({}, venueProfile, parsed);
                 }
+            } else {
+                console.warn('[Fitz Watch DIAGNOSTIC] localStorage venueProfile_ is EMPTY for this user.');
             }
-        } catch (e) { /* tolerate */ }
+        } catch (e) {
+            console.error('[Fitz Watch DIAGNOSTIC] error reading localStorage:', e);
+        }
+    } else {
+        console.warn('[Fitz Watch DIAGNOSTIC] currentUser not set at openFitzWatch — auth hasn\'t resolved yet?');
     }
     console.log('[Fitz Watch] openFitzWatch — venueProfile.fitzWatchSetupComplete =', venueProfile && venueProfile.fitzWatchSetupComplete);
+    console.log('[Fitz Watch DIAGNOSTIC] venueProfile keys:', Object.keys(venueProfile || {}));
     if (!fitzWatchPreflightComplete()) {
         openFitzWatchPreflight();
         return;
@@ -22052,10 +22062,16 @@ function submitFitzWatchPreflight(event) {
     // via debouncedSync() (see app-firebase.js localStorage override).
     if (currentUser && currentUser.uid) {
         try {
-            localStorage.setItem('venueProfile_' + currentUser.uid, JSON.stringify(venueProfile));
+            const json = JSON.stringify(venueProfile);
+            localStorage.setItem('venueProfile_' + currentUser.uid, json);
+            // Sanity check — read it back and confirm the field is there.
+            const verify = JSON.parse(localStorage.getItem('venueProfile_' + currentUser.uid) || '{}');
+            console.log('[Fitz Watch DIAGNOSTIC] saved venueProfile, fitzWatchSetupComplete after readback:', verify.fitzWatchSetupComplete);
         } catch (e) {
             console.warn('Fitz Watch: failed to persist pre-flight', e);
         }
+    } else {
+        console.warn('[Fitz Watch DIAGNOSTIC] currentUser missing at submit — venueProfile NOT persisted to localStorage.');
     }
 
     closeFitzWatchPreflight();
