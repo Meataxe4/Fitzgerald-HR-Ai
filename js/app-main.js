@@ -21926,10 +21926,9 @@ function fitzWatchPreflightComplete() {
 // "Continue questionnaire" CTAs so the user can answer questions when they
 // choose — rather than the questionnaire ambushing them on every reload.
 function openFitzWatch() {
-    if (!hasFeature('fitz_watch_preview')) {
-        console.info('Fitz Watch: feature flag not granted for this user');
-        return;
-    }
+    // Phase C — generally available for all authenticated users. The
+    // hasFeature() guard is retired here; the helper itself stays for future
+    // preview features (the next domain rollout might want a flag).
     // Defensive re-read of venueProfile from localStorage. The auth-state
     // change handler eagerly loads it before showing the tile, but if
     // anything overwrites the global between then and now, this catches it
@@ -22107,7 +22106,7 @@ function submitFitzWatchPreflight(event) {
 
 // Sprint version marker — prints once on script load so we can confirm which
 // build the browser is actually running.
-console.log('[Fitz Watch] app-main.js loaded — build 20260515-16');
+console.log('[Fitz Watch] app-main.js loaded — build 20260515-17 (Phase C — GA)');
 
 function _fwEscapeHtml(s) {
     return String(s == null ? '' : s)
@@ -22120,7 +22119,6 @@ function _fwEscapeHtml(s) {
 let _fwqState = { rules: [], currentIndex: 0, completed: false };
 
 async function openFitzWatchQuestionnaire() {
-    if (!hasFeature('fitz_watch_preview')) return;
     await loadFitzWatchResponses();
     const responses = getFitzWatchResponsesCache();
     const profile = venueProfile || {};
@@ -22348,7 +22346,6 @@ function renderFitzWatchCompletion() {
 // ---- Step 6: Dashboard view -----------------------------------------------
 
 async function openFitzWatchDashboard() {
-    if (!hasFeature('fitz_watch_preview')) return;
     await loadFitzWatchResponses();
     const modal = document.getElementById('fitzWatchDashboardModal');
     if (modal) modal.classList.remove('hidden');
@@ -23440,10 +23437,12 @@ function fitzWatchChatSendFollowup() {
     fitzWatchChatSendMessage(text, false);
 }
 
-// ---- Step 7: Tools tile visibility (flag-gated) ---------------------------
+// ---- Tools tile visibility ------------------------------------------------
+// Phase C — Fitz Watch is generally available for every authenticated user.
+// The hasFeature() helper stays in place for future preview features; this
+// function just always shows the tile now.
 
 function showFitzWatchToolTileIfFlagged() {
-    if (!hasFeature('fitz_watch_preview')) return;
     const tile = document.getElementById('fitzWatchToolTile');
     if (tile) tile.classList.remove('hidden');
     const mobileTile = document.getElementById('fitzWatchToolTileMobile');
