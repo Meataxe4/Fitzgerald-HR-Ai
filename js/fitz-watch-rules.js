@@ -385,7 +385,7 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         id: 'AP-008',
         domain: 'award_pay',
         title: 'Casual conversion eligibility review',
-        question: 'When did you last review casual conversion eligibility for your casuals under the post-February 2025 framework (FW Act s66B)?',
+        question: 'When did you last review casual conversion eligibility for your casuals under FW Act s66B?',
         options: [
             { value: 'within_6_months',  label: 'Within the last 6 months' },
             { value: '6_to_12_months',   label: '6 to 12 months ago' },
@@ -683,7 +683,7 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         id: 'WC-004',
         domain: 'workers_comp',
         title: 'Manager briefing on NSW workers comp reforms',
-        question: 'Have you briefed your managers on the new NSW workers compensation framework (WPI thresholds, 130-week cap, amended reasonable management action defence) effective 1 July 2026?',
+        question: 'Have you briefed your managers on the current NSW workers compensation framework — covering WPI thresholds, weekly-benefit caps, and the reasonable management action defence?',
         options: [
             { value: 'yes',              label: 'Yes — all managers briefed' },
             { value: 'partial',          label: 'Partial — some managers briefed' },
@@ -730,7 +730,7 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         id: 'PS-001',
         domain: 'payroll_super',
         title: 'Payday super configuration',
-        question: 'Is your payroll system configured to remit super at the same time as wages (per pay cycle), ready for 1 July 2026 commencement?',
+        question: 'Is your payroll system configured to remit super at the same time as wages, as required under the payday super regime?',
         options: [
             { value: 'yes',              label: 'Yes — already configured and tested' },
             { value: 'scheduled',        label: 'Scheduled — work planned but not complete' },
@@ -841,7 +841,7 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         id: 'PS-004',
         domain: 'payroll_super',
         title: 'Time and wage record retention',
-        question: 'Do you retain time and wage records for 7 years as required under the Fair Work Regulations?',
+        question: 'Do you retain time and wage records for the period required under the Fair Work Regulations?',
         options: [
             { value: 'yes',              label: 'Yes — 7 years retained' },
             { value: 'partial',          label: 'Partial — some records retained, gaps exist' },
@@ -881,7 +881,7 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         id: 'LM-001',
         domain: 'leave_management',
         title: 'Leave loading on termination payouts',
-        question: 'Are leave loading payments (typically 17.5% under the Award, or the shiftworker penalty if higher) correctly configured for accrued annual leave paid out on termination?',
+        question: 'Are leave loading payments correctly configured for accrued annual leave paid out on termination, including super on the loading?',
         options: [
             { value: 'yes',              label: 'Yes — leave loading + super on loading paid on termination' },
             { value: 'no',               label: 'No — base rate only, no loading paid' },
@@ -949,7 +949,7 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         id: 'LM-003',
         domain: 'leave_management',
         title: 'Excessive leave balance review',
-        question: 'Have you reviewed employees with excessive annual leave balances (more than 8 weeks for non-shiftworkers, or 10 weeks for shiftworkers) in the last 12 months?',
+        question: 'Have you reviewed employees with excessive annual leave balances under the Award’s thresholds in the last 12 months?',
         options: [
             { value: 'yes',                  label: 'Yes — reviewed within the last 12 months' },
             { value: 'no_excess_balances',   label: 'Not applicable — no employees with excess balances' },
@@ -1062,7 +1062,7 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         id: 'TM-002',
         domain: 'termination',
         title: 'Probation period alignment with Minimum Employment Period',
-        question: 'Does the probation period in your employment contracts align with the statutory Minimum Employment Period (6 months for non-small business; 12 months for small business of fewer than 15 employees)?',
+        question: 'Does the probation period in your employment contracts align with the statutory Minimum Employment Period under FW Act s383 (which depends on your small-business status)?',
         options: [
             { value: 'yes',              label: 'Yes — probation matches the MEP' },
             { value: 'no',               label: 'No — mismatch between probation and MEP' },
@@ -1100,7 +1100,7 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         id: 'TM-003',
         domain: 'termination',
         title: 'Notice period configuration (FW Act s117)',
-        question: 'Are notice periods in your payroll and contracts configured correctly for length-of-service tiers under FW Act s117 (1 week up to 1 year; up to 5 weeks for 5+ years; plus an extra week for over-45s with 2+ years service)?',
+        question: 'Are notice periods in your payroll and contracts configured correctly for the length-of-service tiers under FW Act s117, including the age-based uplift?',
         options: [
             { value: 'yes',              label: 'Yes — all tiers configured correctly' },
             { value: 'partial',          label: 'Partial — base tiers configured, age uplift missing' },
@@ -1134,7 +1134,7 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         id: 'TM-004',
         domain: 'termination',
         title: 'Termination documentation retention',
-        question: 'Do you keep complete termination files (warning records, performance documentation, written notice, final pay calculation) for at least 7 years?',
+        question: 'Do you keep complete termination files (warning records, performance documentation, written notice, final pay calculation) for the period required under the Fair Work Regulations?',
         options: [
             { value: 'yes',              label: 'Yes — complete files retained 7 years' },
             { value: 'partial',          label: 'Partial — some files retained' },

@@ -22106,7 +22106,7 @@ function submitFitzWatchPreflight(event) {
 
 // Sprint version marker — prints once on script load so we can confirm which
 // build the browser is actually running.
-console.log('[Fitz Watch] app-main.js loaded — build 20260515-22 (Phase 1d — Termination + cascade UX)');
+console.log('[Fitz Watch] app-main.js loaded — build 20260515-23 (cascade refinements + question future-proofing)');
 
 function _fwEscapeHtml(s) {
     return String(s == null ? '' : s)
@@ -22365,10 +22365,6 @@ async function openFitzWatchDashboard() {
 function closeFitzWatchDashboard() {
     const modal = document.getElementById('fitzWatchDashboardModal');
     if (modal) modal.classList.add('hidden');
-    // Reset the cascade so next dashboard open auto-expands the highest-
-    // severity domain again. Without this, a user who collapsed everything
-    // sees an empty dashboard on next open.
-    _fwExpandedDomainInitialised = false;
     _fwExpandedDomain = null;
 }
 
@@ -22527,11 +22523,9 @@ const _FW_DOMAINS = [
 // Severity order for sorting/comparison
 const _FW_SEVERITY_RANK = { critical: 4, high: 3, medium: 2, low: 1 };
 
-// Expanded-domain state for the cascade UX. null = none expanded. On first
-// render with gaps present, defaults to the highest-severity applicable
-// domain so the user lands on the most urgent issues without clicking.
+// Expanded-domain state for the cascade UX. null = all collapsed. User
+// elects which domain to expand by clicking; no auto-expansion.
 let _fwExpandedDomain = null;
-let _fwExpandedDomainInitialised = false;
 
 function fitzWatchToggleDomain(domainId) {
     _fwExpandedDomain = (_fwExpandedDomain === domainId) ? null : domainId;
@@ -22551,7 +22545,7 @@ function _fwRenderRisksTab(profile, result, applicable, answeredCount) {
     }
 
     // Compute per-domain stats once. Used both for the cards and for the
-    // default-expansion logic.
+    // severity-descending sort.
     const responses = getFitzWatchResponsesCache();
     const domainData = _FW_DOMAINS.map(function(d) {
         const dApplicable = applicable.filter(function(r) { return r.domain === d.id; });
@@ -22566,21 +22560,31 @@ function _fwRenderRisksTab(profile, result, applicable, answeredCount) {
         return { meta: d, applicable: dApplicable, gaps: dGaps, answered: dAnswered, severity: dSev, counts: dCounts };
     }).filter(Boolean);
 
-    // First render with gaps: auto-expand the highest-severity domain so the
-    // user lands on the most urgent items. After that, click toggles control.
-    if (!_fwExpandedDomainInitialised) {
-        _fwExpandedDomainInitialised = true;
-        let topRank = 0;
-        domainData.forEach(function(s) {
-            const rank = _FW_SEVERITY_RANK[s.severity] || 0;
-            if (s.gaps.length > 0 && rank > topRank) {
-                topRank = rank;
-                _fwExpandedDomain = s.meta.id;
-            }
-        });
-    }
+    // Sort: most critical at the top, defensible/compliant at the bottom.
+    // Stable sort on severity rank desc, then alphabetical on label as a
+    // tiebreaker so the order is deterministic across re-renders.
+    domainData.sort(function(a, b) {
+        const rankDiff = (_FW_SEVERITY_RANK[b.severity] || 0) - (_FW_SEVERITY_RANK[a.severity] || 0);
+        if (rankDiff !== 0) return rankDiff;
+        return String(a.meta.label).localeCompare(String(b.meta.label));
+    });
 
     let html = '<div class="space-y-3">';
+
+    // Outstanding section — at the top now (was at the bottom). Surfaces the
+    // "you still have unanswered questions" cue before users start digging
+    // into existing gaps.
+    if (result.outstanding.length > 0) {
+        html += '<div class="p-4 rounded-xl bg-slate-700/30 border border-slate-700">' +
+            '<div class="flex items-center justify-between gap-3">' +
+                '<div>' +
+                    '<div class="font-semibold text-slate-300">Outstanding questions (' + result.outstanding.length + ')</div>' +
+                    '<p class="text-sm text-slate-400">These haven\'t been answered yet — your dashboard will update once you complete them.</p>' +
+                '</div>' +
+                '<button onclick="closeFitzWatchDashboard(); openFitzWatchQuestionnaire();" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition-all whitespace-nowrap">Continue →</button>' +
+            '</div>' +
+        '</div>';
+    }
 
     domainData.forEach(function(s) {
         const isExpanded = _fwExpandedDomain === s.meta.id;
@@ -22631,17 +22635,10 @@ function _fwRenderRisksTab(profile, result, applicable, answeredCount) {
         html += '</div>';
     });
 
-    // Outstanding section — cross-domain summary, always at the bottom
-    if (result.outstanding.length > 0) {
-        html += '<div class="pt-2">' +
-            '<div class="p-4 rounded-xl bg-slate-700/30 border border-slate-700">' +
-                '<div class="font-semibold text-slate-300 mb-1">Outstanding questions (' + result.outstanding.length + ')</div>' +
-                '<p class="text-sm text-slate-400 mb-3">These haven\'t been answered yet — your dashboard will update once you complete them.</p>' +
-                '<button onclick="closeFitzWatchDashboard(); openFitzWatchQuestionnaire();" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition-all">Continue questionnaire →</button>' +
-            '</div>' +
-            '</div>';
-    } else if (result.gaps.length === 0) {
-        // True all-clear — no gaps and no outstanding
+    // True all-clear — no gaps and no outstanding. Cheerful summary at the
+    // bottom (still after the per-domain cards, in case the user wants to
+    // verify each domain).
+    if (result.gaps.length === 0 && result.outstanding.length === 0) {
         html += '<div class="p-5 rounded-xl bg-emerald-900/20 border border-emerald-700 text-emerald-200 text-sm">' +
             '<strong>✓ No gaps detected anywhere.</strong> Verify with your adviser if your circumstances change. We\'ll re-check key questions every 30 days.' +
             '</div>';
