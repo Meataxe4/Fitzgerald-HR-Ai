@@ -22095,7 +22095,7 @@ function submitFitzWatchPreflight(event) {
 
 // Sprint version marker — prints once on script load so we can confirm which
 // build the browser is actually running.
-console.log('[Fitz Watch] app-main.js loaded — build 20260515-13');
+console.log('[Fitz Watch] app-main.js loaded — build 20260515-14');
 
 function _fwEscapeHtml(s) {
     return String(s == null ? '' : s)
@@ -22382,11 +22382,30 @@ const _FW_FIX_CTA_LABEL = {
     external:     'Open resource'
 };
 
-function renderFitzWatchDashboard() {
+// Active tab state. Persists across re-renders so toggling stays consistent.
+let _fwActiveTab = 'risks';
+
+function fitzWatchSwitchTab(tab) {
+    _fwActiveTab = tab;
+    renderFitzWatchDashboard();
+}
+
+async function renderFitzWatchDashboard() {
     const profile = venueProfile || {};
     const responses = getFitzWatchResponsesCache();
+    // Sprint 5 — pull in active reforms for severity escalation
+    let activeReforms = [];
+    let applicableReforms = [];
+    try {
+        if (typeof getActiveReformsForEscalation === 'function') {
+            activeReforms = await getActiveReformsForEscalation(profile);
+        }
+        if (typeof getApplicableReforms === 'function') {
+            applicableReforms = await getApplicableReforms(profile);
+        }
+    } catch (e) { /* tolerate */ }
     const result = (typeof detectGaps === 'function')
-        ? detectGaps(profile, responses, [])
+        ? detectGaps(profile, responses, activeReforms)
         : { gaps: [], outstanding: [] };
     const applicable = (typeof getQuestionRegistry === 'function')
         ? getQuestionRegistry().filter(function(r) { return r.conditional(profile); })
@@ -22426,30 +22445,64 @@ function renderFitzWatchDashboard() {
     const body = document.getElementById('fwDashboardBody');
     if (!body) return;
 
-    // Always render the venue-profile summary at the top (collapsible).
+    // Always rendered above the tabs
     const profileSummaryHtml = _fwRenderProfileSummary(profile);
-
-    // "Has anything changed?" prompt — shown once per session. Helps the user
-    // catch the case where their staff mix / payroll / time records method
-    // changed since they last logged in, which would invalidate prior gap
-    // detection. Click "Yes" → pre-flight in edit mode; "No" → hides for
-    // the rest of this session via sessionStorage.
     const changedPromptHtml = _fwRenderChangedPrompt();
 
+    // Build tab nav with counts on each tab
+    const risksCount = result.gaps.length;
+    const changesCount = applicableReforms.length;
+    const tabNavHtml = _fwRenderTabNav(_fwActiveTab, risksCount, changesCount);
+
+    let panelHtml = '';
+    if (_fwActiveTab === 'changes') {
+        panelHtml = _fwRenderChangesTab(profile, applicableReforms);
+    } else if (_fwActiveTab === 'dates') {
+        panelHtml = _fwRenderDatesTab(profile);
+    } else {
+        // Default — "risks" tab. Contains the original dashboard content.
+        panelHtml = _fwRenderRisksTab(profile, result, applicable, answeredCount);
+    }
+
+    body.innerHTML = profileSummaryHtml + changedPromptHtml + tabNavHtml + panelHtml;
+}
+
+// ---- Tab nav rendering ----------------------------------------------------
+
+function _fwRenderTabNav(active, risksCount, changesCount) {
+    const tabs = [
+        { id: 'risks',   label: 'Your risks',       count: risksCount },
+        { id: 'changes', label: 'Upcoming changes', count: changesCount },
+        { id: 'dates',   label: 'Dates & reminders', count: null }
+    ];
+    const buttons = tabs.map(function(t) {
+        const isActive = t.id === active;
+        const activeClass = isActive
+            ? 'border-amber-500 text-amber-400'
+            : 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-600';
+        const badge = (t.count != null && t.count > 0)
+            ? ' <span class="ml-1 text-xs opacity-70">(' + t.count + ')</span>'
+            : '';
+        return '<button onclick="fitzWatchSwitchTab(\'' + t.id + '\')" class="px-1 pb-2 -mb-px text-sm font-medium border-b-2 ' + activeClass + ' transition-colors">' +
+            _fwEscapeHtml(t.label) + badge + '</button>';
+    }).join('');
+    return '<div class="flex gap-6 border-b border-slate-700 mb-4">' + buttons + '</div>';
+}
+
+// ---- Tab 1: Your risks ---------------------------------------------------
+
+function _fwRenderRisksTab(profile, result, applicable, answeredCount) {
     // State A — pre-flight done, zero responses
     if (answeredCount === 0) {
-        body.innerHTML = profileSummaryHtml + changedPromptHtml +
-            '<div class="text-center py-10 bg-slate-700/30 rounded-xl border border-slate-700">' +
+        return '<div class="text-center py-10 bg-slate-700/30 rounded-xl border border-slate-700">' +
                 '<div class="text-4xl mb-3">📋</div>' +
                 '<h3 class="text-lg font-bold text-white mb-2">Award &amp; Pay assessment</h3>' +
                 '<p class="text-slate-400 mb-2">Run the assessment to detect compliance gaps in your venue.</p>' +
                 '<p class="text-xs text-slate-500 mb-6">' + applicable.length + ' questions · about 6 minutes</p>' +
                 '<button onclick="closeFitzWatchDashboard(); openFitzWatchQuestionnaire();" class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold rounded-lg transition-all">Run assessment →</button>' +
             '</div>';
-        return;
     }
 
-    // Domain severity rollup
     const domainSeverity = (typeof rollupDomainSeverity === 'function')
         ? rollupDomainSeverity(result.gaps, 'award_pay')
         : 'low';
@@ -22458,28 +22511,27 @@ function renderFitzWatchDashboard() {
     const sevBadge = _FW_SEV_BADGE[domainSeverity] || _FW_SEV_BADGE.low;
     const domainLabel = (typeof FITZ_WATCH_SEVERITY_LABELS !== 'undefined') ? FITZ_WATCH_SEVERITY_LABELS[domainSeverity] : domainSeverity;
 
-    let html = profileSummaryHtml + changedPromptHtml +
+    let html = '<div class="space-y-4">' +
         '<div class="p-5 rounded-xl border ' + sevBadge.class + '">' +
-        '<div class="flex items-center justify-between mb-2">' +
-            '<div class="font-semibold text-lg">Award &amp; Pay</div>' +
-            '<div class="text-sm uppercase tracking-wide font-semibold">' + sevBadge.dot + ' ' + domainLabel + '</div>' +
-        '</div>' +
-        '<div class="text-sm opacity-80">' +
-            answeredCount + ' of ' + applicable.length + ' questions answered · ' +
-            counts.critical + ' critical, ' + counts.high + ' high, ' + counts.medium + ' medium, ' + counts.low + ' low' +
-        '</div>' +
+            '<div class="flex items-center justify-between mb-2">' +
+                '<div class="font-semibold text-lg">Award &amp; Pay</div>' +
+                '<div class="text-sm uppercase tracking-wide font-semibold">' + sevBadge.dot + ' ' + domainLabel + '</div>' +
+            '</div>' +
+            '<div class="text-sm opacity-80">' +
+                answeredCount + ' of ' + applicable.length + ' questions answered · ' +
+                counts.critical + ' critical, ' + counts.high + ' high, ' + counts.medium + ' medium, ' + counts.low + ' low' +
+            '</div>' +
         '</div>';
 
     // State C — all clear
     if (result.gaps.length === 0 && result.outstanding.length === 0) {
         html += '<div class="p-5 rounded-xl bg-emerald-900/20 border border-emerald-700 text-emerald-200 text-sm">' +
             '<strong>✓ No gaps detected in Award &amp; Pay.</strong> Verify with your adviser if your circumstances change. We\'ll re-check key questions every 30 days.' +
+            '</div>' +
             '</div>';
-        body.innerHTML = html;
-        return;
+        return html;
     }
 
-    // Gap groups by severity
     ['critical', 'high', 'medium', 'low'].forEach(function(sev) {
         const sevGaps = result.gaps.filter(function(g) { return g.severity === sev; });
         if (sevGaps.length === 0) return;
@@ -22491,7 +22543,6 @@ function renderFitzWatchDashboard() {
             '</div>';
     });
 
-    // Outstanding
     if (result.outstanding.length > 0) {
         html += '<div class="pt-2">' +
             '<div class="p-4 rounded-xl bg-slate-700/30 border border-slate-700">' +
@@ -22502,7 +22553,114 @@ function renderFitzWatchDashboard() {
             '</div>';
     }
 
-    body.innerHTML = html;
+    return html + '</div>';
+}
+
+// ---- Tab 2: Upcoming changes -----------------------------------------------
+
+function _fwRenderChangesTab(profile, reforms) {
+    if (!reforms || reforms.length === 0) {
+        return '<div class="text-center py-10 bg-slate-700/30 rounded-xl border border-slate-700">' +
+                '<div class="text-3xl mb-3">📅</div>' +
+                '<p class="text-slate-300">No upcoming regulatory changes affect your venue right now.</p>' +
+                '<p class="text-xs text-slate-500 mt-2">This list is updated quarterly. Major reforms are added when announced.</p>' +
+            '</div>';
+    }
+    return '<div class="space-y-3">' + reforms.map(_fwRenderReformCard).join('') + '</div>';
+}
+
+function _fwRenderReformCard(reform) {
+    const days = _fwDaysUntilDate(reform.commencement_date);
+    const isPast = days < 0;
+    const isImminent = days >= 0 && days <= 90;
+    const dotClass = isImminent ? 'text-amber-400' : 'text-slate-500';
+    const cardClass = isImminent
+        ? 'bg-amber-900/15 border-amber-700/50'
+        : 'bg-slate-700/30 border-slate-700';
+    const daysText = isPast
+        ? Math.abs(days) + ' days ago · in force'
+        : days === 0
+            ? 'today'
+            : 'in ' + days + ' days';
+    const dateLabel = (function() {
+        try { return new Date(reform.commencement_date + 'T00:00:00').toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' }); }
+        catch (e) { return reform.commencement_date; }
+    })();
+    const jurisdiction = reform.jurisdiction === 'national' ? 'National' : reform.jurisdiction;
+    const actionLine = (reform.recommended_actions && reform.recommended_actions.length > 0)
+        ? 'Action items will activate when the relevant Fitz Watch domain ships (' + reform.recommended_actions.length + ' linked items).'
+        : 'No Fitz Watch action items linked yet.';
+    return '<div class="p-4 rounded-xl border ' + cardClass + '">' +
+        '<div class="flex items-start gap-2 mb-1">' +
+            '<span class="text-lg leading-none ' + dotClass + '">●</span>' +
+            '<div class="flex-1">' +
+                '<div class="text-xs text-slate-500">' + _fwEscapeHtml(daysText) + ' · ' + _fwEscapeHtml(dateLabel) + ' · ' + _fwEscapeHtml(jurisdiction) + '</div>' +
+                '<div class="font-semibold text-white mt-0.5">' + _fwEscapeHtml(reform.name) + '</div>' +
+            '</div>' +
+        '</div>' +
+        '<p class="text-sm text-slate-300 mt-2">' + _fwEscapeHtml(reform.summary || '') + '</p>' +
+        '<p class="text-xs text-slate-500 mt-2">' + _fwEscapeHtml(actionLine) + '</p>' +
+    '</div>';
+}
+
+// ---- Tab 3: Dates & reminders ---------------------------------------------
+
+function _fwRenderDatesTab(profile) {
+    let overrideState = null;
+    try { overrideState = sessionStorage.getItem('fwHolidayStateOverride'); } catch (e) {}
+    const state = overrideState || profile.state || profile.location || 'NSW';
+    const allStates = ['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'NT', 'ACT'];
+    const stateOpts = allStates.map(function(s) {
+        return '<option value="' + s + '"' + (s === String(state).toUpperCase() ? ' selected' : '') + '>' + s + '</option>';
+    }).join('');
+    const holidays = (typeof getPublicHolidaysForState === 'function')
+        ? getPublicHolidaysForState(state)
+        : [];
+
+    const now = Date.now();
+    const future = holidays.filter(function(h) {
+        return new Date(h.date + 'T00:00:00').getTime() >= now - 24 * 60 * 60 * 1000;
+    });
+
+    const rowsHtml = future.length === 0
+        ? '<p class="text-sm text-slate-400">No upcoming public holidays for the rest of 2026.</p>'
+        : future.map(function(h) {
+            const days = _fwDaysUntilDate(h.date);
+            const dateLabel = (function() {
+                try { return new Date(h.date + 'T00:00:00').toLocaleDateString('en-AU', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }); }
+                catch (e) { return h.date; }
+            })();
+            const daysText = days === 0 ? 'today' : days === 1 ? 'tomorrow' : 'in ' + days + ' days';
+            return '<div class="flex items-center justify-between py-2 border-b border-slate-700/50 last:border-b-0 text-sm">' +
+                '<div>' +
+                    '<div class="text-slate-200">' + _fwEscapeHtml(h.name) + '</div>' +
+                    '<div class="text-xs text-slate-500">' + _fwEscapeHtml(dateLabel) + '</div>' +
+                '</div>' +
+                '<div class="text-amber-400 text-xs whitespace-nowrap">' + _fwEscapeHtml(daysText) + '</div>' +
+            '</div>';
+        }).join('');
+
+    return '<div class="space-y-4">' +
+        '<div class="p-4 rounded-xl bg-slate-700/30 border border-slate-700">' +
+            '<div class="flex items-center justify-between mb-3">' +
+                '<div class="font-semibold text-slate-300">Public holidays — ' + _fwEscapeHtml(String(state).toUpperCase()) + '</div>' +
+                '<select onchange="_fwSwitchHolidayState(this.value)" class="bg-slate-700 text-white text-sm rounded border border-slate-600 px-2 py-1">' + stateOpts + '</select>' +
+            '</div>' +
+            '<div>' + rowsHtml + '</div>' +
+            '<p class="text-xs text-slate-500 mt-3">Staff working public holidays are entitled to penalty rates under your Award. Source: Fair Work Ombudsman 2026 public holiday list.</p>' +
+        '</div>' +
+        '<div class="p-4 rounded-xl bg-slate-700/30 border border-slate-700">' +
+            '<div class="font-semibold text-slate-300 mb-2">Custom reminders</div>' +
+            '<p class="text-sm text-slate-400">Custom reminder delivery is coming in a future release. Public holidays and regulatory changes are already shown.</p>' +
+        '</div>' +
+    '</div>';
+}
+
+function _fwSwitchHolidayState(state) {
+    // Temporary preview override — doesn't change the user's venue profile.
+    // Persisted in sessionStorage for this dashboard session.
+    try { sessionStorage.setItem('fwHolidayStateOverride', state); } catch (e) {}
+    renderFitzWatchDashboard();
 }
 
 // Venue-profile summary panel — sits at the top of the dashboard. Collapsed
@@ -23299,6 +23457,8 @@ if (typeof window !== 'undefined') {
     window.fitzWatchChatSendFollowup = fitzWatchChatSendFollowup;
     window.fitzWatchChatRetryLast = fitzWatchChatRetryLast;
     window._fwDismissChangedPrompt = _fwDismissChangedPrompt;
+    window.fitzWatchSwitchTab = fitzWatchSwitchTab;
+    window._fwSwitchHolidayState = _fwSwitchHolidayState;
     window.openFitzWatchDocBuilder = openFitzWatchDocBuilder;
     window.closeFitzWatchDocBuilder = closeFitzWatchDocBuilder;
     window.fitzWatchDocGenerate = fitzWatchDocGenerate;
