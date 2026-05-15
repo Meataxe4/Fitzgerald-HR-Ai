@@ -458,10 +458,11 @@ Remember: You're a support tool provided by Fitz HR, not a replacement for human
       });
     }
 
-    // Call Claude API. Model upgraded from claude-sonnet-4-20250514 to
-    // claude-sonnet-4-6 (Sonnet 4.6) for better instruction-following on
-    // structured prompts (the gap context briefs) and tighter statutory
-    // citation accuracy.
+    // Call Claude API. Reverted from claude-sonnet-4-6 to the dated Sonnet 4
+    // ID (claude-sonnet-4-20250514) which we know is a valid API alias.
+    // The unversioned 'claude-sonnet-4-6' alias was returning 504s — likely
+    // the Anthropic API doesn't accept it as written. Re-attempt the upgrade
+    // when we have a confirmed-valid latest-Sonnet API model ID.
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -470,7 +471,7 @@ Remember: You're a support tool provided by Fitz HR, not a replacement for human
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 1500,
         system: systemBlocks,
         messages: messages
