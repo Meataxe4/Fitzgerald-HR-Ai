@@ -22106,7 +22106,7 @@ function submitFitzWatchPreflight(event) {
 
 // Sprint version marker — prints once on script load so we can confirm which
 // build the browser is actually running.
-console.log('[Fitz Watch] app-main.js loaded — build 20260515-25 (Phase 2 — all 10 documents shipped)');
+console.log('[Fitz Watch] app-main.js loaded — build 20260515-26 (Document Builder catalog + subscription gate)');
 
 function _fwEscapeHtml(s) {
     return String(s == null ? '' : s)
@@ -23031,6 +23031,9 @@ function openFitzWatchDocBuilder(templateId, gap) {
     document.getElementById('fwDocBody').innerHTML = template.render();
     const err = document.getElementById('fwDocError');
     if (err) err.classList.add('hidden');
+    // Make sure the Generate button is visible — it gets hidden when a free
+    // tier user lands on the blur-preview step. Reset on every open.
+    _fwResetDocBuilderButton();
     modal.classList.remove('hidden');
 }
 
@@ -23061,10 +23064,25 @@ async function fitzWatchDocGenerate() {
         _fwDocShowError(validation.error);
         return;
     }
+    // Subscription gate — applies to all compliance documents regardless of
+    // entry point (Document Builder tile, Fitz Watch dashboard gap card,
+    // direct console call). Free tier sees a blurred preview of the
+    // generated doc with a subscribe CTA. Paid tier downloads as today.
+    if (_fwIsComplianceDoc(_fwDocState.templateId) && !_fwHasComplianceAccess()) {
+        const preview = template.generate();
+        preview.html = preview.html + _fwVersionFooter();
+        _fwShowComplianceBlurPreview(preview, _fwDocState.templateId);
+        return;
+    }
     const btn = document.getElementById('fwDocGenerateBtn');
     if (btn) { btn.disabled = true; btn.textContent = 'Generating…'; }
     try {
         const result = template.generate();
+        // Append template version footer to every compliance doc so operators
+        // know which review cycle the statutory references reflect.
+        if (_fwIsComplianceDoc(_fwDocState.templateId)) {
+            result.html = result.html + _fwVersionFooter();
+        }
         const response = await fetch('/.netlify/functions/generate-word', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -23411,6 +23429,111 @@ function _fwDocGenerate_cashOut() {
 // builds the form HTML; validate returns {ok, error}; generate returns
 // {html, filename} for the existing /.netlify/functions/generate-word endpoint.
 // ============================================================================
+
+// ============================================================================
+// Compliance documents subscription gate
+// ----------------------------------------------------------------------------
+// All 10 compliance documents (Sprint 4 Tier-1 + Phase 2) require a paid
+// subscription tier. No credit cost. No free-tier trial. Free tier sees the
+// tiles for upsell discoverability but every generate attempt routes to the
+// upgrade flow.
+// ============================================================================
+const _FW_COMPLIANCE_TEMPLATE_IDS = new Set([
+    'clause_20_annualised_wage_agreement',
+    'clause_20_weekly_time_record',
+    'schedule_g_h_cash_out_agreement',
+    'psychosocial_risk_register',
+    'bullying_harassment_policy',
+    'customer_aggression_procedure',
+    'psychological_injury_claim_procedure',
+    'warning_procedure_policy',
+    'employment_contract_probation_clause',
+    'schedule_g_leave_in_advance_agreement'
+]);
+
+// Template versioning. Manual quarterly review cadence. Bump this date when
+// statutory references are reviewed and confirmed current.
+const _FW_TEMPLATE_REVIEW_DATE = '15 May 2026';
+
+function _fwIsComplianceDoc(templateId) {
+    return _FW_COMPLIANCE_TEMPLATE_IDS.has(templateId);
+}
+
+// Renders a preview of the generated HTML inline in the doc-builder modal
+// with the lower portion gradient-faded behind a subscribe CTA. Matches the
+// Document Builder blur-on-locked pattern used for credit-gated documents.
+function _fwShowComplianceBlurPreview(result, templateId) {
+    const template = _FW_DOC_TEMPLATES[templateId] || {};
+    const body = document.getElementById('fwDocBody');
+    if (!body) return;
+    body.innerHTML =
+        '<div class="space-y-3">' +
+            '<div class="p-3 bg-amber-900/20 border border-amber-700 rounded-lg text-amber-200 text-sm">' +
+                '🔒 <strong>Subscription required</strong> to download this compliance document. Preview below.' +
+            '</div>' +
+            '<div class="relative">' +
+                '<div class="p-5 bg-slate-900/80 rounded-lg border border-slate-700 max-h-[320px] overflow-hidden text-slate-200 fw-compliance-preview">' +
+                    result.html +
+                '</div>' +
+                '<div class="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-slate-800 via-slate-800/95 to-transparent pointer-events-none rounded-b-lg"></div>' +
+            '</div>' +
+            '<div class="text-center pt-2 space-y-2">' +
+                '<button onclick="_fwShowSubscriptionGate(\'' + _fwEscapeHtml(templateId) + '\')" class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold rounded-lg transition-all">🔓 Subscribe to unlock</button>' +
+                '<p class="text-xs text-slate-500">All compliance documents are included with every paid subscription. No per-document cost.</p>' +
+            '</div>' +
+        '</div>';
+    // Hide the standard Generate button now that the preview is the action
+    const btn = document.getElementById('fwDocGenerateBtn');
+    if (btn) btn.style.display = 'none';
+}
+
+// Reset preview button visibility when the doc modal re-opens (so a free
+// user who saw the gate and then opens a different template sees the Generate
+// button normally).
+function _fwResetDocBuilderButton() {
+    const btn = document.getElementById('fwDocGenerateBtn');
+    if (btn) btn.style.display = '';
+}
+
+function _fwHasComplianceAccess() {
+    const tier = (typeof userCredits !== 'undefined' && userCredits && (userCredits.subscriptionTier || userCredits.tier)) || 'free';
+    return tier !== 'free';
+}
+
+function _fwShowSubscriptionGate(templateId) {
+    const template = _FW_DOC_TEMPLATES[templateId];
+    const title = template ? template.title : 'Compliance document';
+    // Reuse the existing subscription flow if present; otherwise simple notify.
+    if (typeof showSubscriptionOptions === 'function') {
+        if (typeof showNotification === 'function') {
+            showNotification(title + ' requires a subscription to generate.', 'info');
+        }
+        showSubscriptionOptions();
+        return;
+    }
+    if (typeof showNotification === 'function') {
+        showNotification('Compliance documents require a subscription. Upgrade to Starter, Pro, or Business to unlock.', 'warning');
+    }
+}
+
+// Document Builder tile click — gate first, then open the existing
+// compliance-doc wizard. Closes the Document Builder modal on success so
+// the doc-builder modal opens cleanly on top.
+function openComplianceDocFromBuilder(templateId) {
+    if (!_fwHasComplianceAccess()) {
+        _fwShowSubscriptionGate(templateId);
+        return;
+    }
+    const builderModal = document.getElementById('documentBuilderModal');
+    if (builderModal) builderModal.classList.add('hidden');
+    openFitzWatchDocBuilder(templateId, null);
+}
+
+// Versioning footer appended to every compliance doc's HTML output.
+function _fwVersionFooter() {
+    return '<p><em>Template version: ' + _FW_TEMPLATE_REVIEW_DATE +
+        '. Statutory references current as of this date. Review and update with your adviser before signing.</em></p>';
+}
 
 function _fwTodayIso() { return new Date().toISOString().slice(0, 10); }
 function _fwAddMonths(dateStr, months) {
@@ -24097,6 +24220,8 @@ if (typeof window !== 'undefined') {
     window.closeFitzWatchDocBuilder = closeFitzWatchDocBuilder;
     window.fitzWatchDocGenerate = fitzWatchDocGenerate;
     window._fwDocCashOutRecalc = _fwDocCashOutRecalc;
+    window.openComplianceDocFromBuilder = openComplianceDocFromBuilder;
+    window._fwShowSubscriptionGate = _fwShowSubscriptionGate;
     window.showFitzWatchToolTileIfFlagged = showFitzWatchToolTileIfFlagged;
     window.hasFeature = hasFeature;
     window.saveFitzWatchResponse = saveFitzWatchResponse;
