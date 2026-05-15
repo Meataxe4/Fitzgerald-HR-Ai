@@ -22220,10 +22220,19 @@ function _fwqUpdateNextButton() {
 }
 
 async function fitzWatchQuestionnaireNext() {
+    console.log('[Fitz Watch DIAGNOSTIC] Next clicked — _fwqState:', JSON.stringify({
+        currentIndex: _fwqState.currentIndex,
+        rulesCount: _fwqState.rules ? _fwqState.rules.length : 'undefined',
+        completed: _fwqState.completed
+    }));
     const idx = _fwqState.currentIndex;
-    if (idx >= _fwqState.rules.length) return;
+    if (!_fwqState.rules || idx >= _fwqState.rules.length) {
+        console.warn('[Fitz Watch DIAGNOSTIC] Next aborted — rules empty or index out of bounds');
+        return;
+    }
     const rule = _fwqState.rules[idx];
     const selected = document.querySelector('input[name="fwqResponse"]:checked');
+    console.log('[Fitz Watch DIAGNOSTIC] Next — rule.id:', rule && rule.id, ' selected:', selected && selected.value);
     if (!selected) {
         if (typeof showNotification === 'function') {
             showNotification('Please select an option to continue.', 'warning');
@@ -22232,7 +22241,12 @@ async function fitzWatchQuestionnaireNext() {
         if (hint) hint.classList.remove('hidden');
         return;
     }
-    await saveFitzWatchResponse(rule.id, rule.domain, selected.value);
+    try {
+        const saveResult = await saveFitzWatchResponse(rule.id, rule.domain, selected.value);
+        console.log('[Fitz Watch DIAGNOSTIC] Next — saveFitzWatchResponse result:', saveResult);
+    } catch (e) {
+        console.error('[Fitz Watch DIAGNOSTIC] Next — saveFitzWatchResponse threw:', e);
+    }
     _fwqState.currentIndex++;
     if (_fwqState.currentIndex >= _fwqState.rules.length) {
         renderFitzWatchCompletion();

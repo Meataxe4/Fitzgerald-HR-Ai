@@ -319,11 +319,23 @@ if (auth) {
                         console.log('[Fitz Watch DIAGNOSTIC] auth handler — cloudVenueProfile keys:', cloudVenueProfile ? Object.keys(cloudVenueProfile) : 'none');
                         console.log('[Fitz Watch DIAGNOSTIC] auth handler — cloudVenueProfile.fitzWatchSetupComplete:', cloudVenueProfile && cloudVenueProfile.fitzWatchSetupComplete);
                         console.log('[Fitz Watch DIAGNOSTIC] auth handler — localStorage already has venueProfile:', !!localStorage.getItem(localVenueKey));
-                        if (!localStorage.getItem(localVenueKey)
-                                && cloudVenueProfile
-                                && Object.keys(cloudVenueProfile).length > 0) {
-                            localStorage.setItem(localVenueKey, JSON.stringify(cloudVenueProfile));
-                            console.log('[Fitz Watch DIAGNOSTIC] auth handler — restored localStorage from Firestore');
+                        // Merge cloud venueProfile INTO localStorage. This handles
+                        // the case where localStorage has old onboarding fields
+                        // but is missing Fitz Watch fields that were saved to
+                        // Firestore. Local wins for fields it has; cloud fills
+                        // in fields local lacks (like fitzWatchSetupComplete).
+                        const cloudKeys = cloudVenueProfile ? Object.keys(cloudVenueProfile) : [];
+                        let localData = {};
+                        try {
+                            const raw = localStorage.getItem(localVenueKey);
+                            if (raw) localData = JSON.parse(raw) || {};
+                        } catch (e) { localData = {}; }
+                        if (cloudVenueProfile && cloudKeys.length > 0) {
+                            // Object.assign: later args win, so local overrides cloud
+                            // on conflict (preserving any unsynced local edits).
+                            const merged = Object.assign({}, cloudVenueProfile, localData);
+                            localStorage.setItem(localVenueKey, JSON.stringify(merged));
+                            console.log('[Fitz Watch DIAGNOSTIC] auth handler — merged cloud + local; fitzWatchSetupComplete:', merged.fitzWatchSetupComplete);
                         }
                         // Eagerly populate the venueProfile global so any tile
                         // click sees the right state immediately.
