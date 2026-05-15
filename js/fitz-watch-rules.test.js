@@ -92,7 +92,15 @@ const FW_TEST_RESPONSES_KNOWN_BAD = {
     'TM-001': _resp('no'),
     'TM-002': _resp('no'),
     'TM-003': _resp('no'),
-    'TM-004': _resp('no')
+    'TM-004': _resp('no'),
+    // WHS — known-bad profile is NSW restaurant (not in WHS-004 venue list)
+    // so WHS-004 will be filtered out by conditional. WHS-002 requires WHS-001
+    // = yes/partial; we answer WHS-001 = partial so WHS-002 surfaces too.
+    'WHS-001': _resp('partial'),
+    'WHS-002': _resp('no'),
+    'WHS-003': _resp('no'),
+    'WHS-005': _resp('no'),
+    'WHS-006': _resp('no')
 };
 
 // All-best-case responses for the known-OK profile
@@ -124,7 +132,13 @@ const FW_TEST_RESPONSES_KNOWN_OK = {
     'TM-001': _resp('yes'),
     'TM-002': _resp('yes'),
     'TM-003': _resp('yes'),
-    'TM-004': _resp('yes')
+    'TM-004': _resp('yes'),
+    // WHS — best-case: register in place + controls applied + everything else yes
+    'WHS-001': _resp('yes'),
+    'WHS-002': _resp('yes'),
+    'WHS-003': _resp('yes'),
+    'WHS-005': _resp('yes'),
+    'WHS-006': _resp('yes')
 };
 
 // ---- Assertions ------------------------------------------------------------
@@ -168,7 +182,10 @@ function runFitzWatchTests(verbose) {
         return { id: g.gap_id, severity: g.severity, label: g.severity_label, action: g.fix_action };
     }));
 
-    check('Known-bad: produces 28 gaps (12 AP + 4 WC + 4 PS + 4 LM + 4 TM, all rules trigger)', r1.gaps.length === 28, 'got ' + r1.gaps.length);
+    // Known-bad is a NSW "restaurant" venue. WHS-004 (customer aggression) is
+    // conditional on licensed/late-night venue types — restaurant is excluded,
+    // so it doesn't surface here. Hence 33 gaps not 34.
+    check('Known-bad: produces 33 gaps (12 AP + 4 WC + 4 PS + 4 LM + 4 TM + 5 WHS; WHS-004 filtered for "restaurant" venue type)', r1.gaps.length === 33, 'got ' + r1.gaps.length);
     check('Known-bad: outstanding is empty', r1.outstanding.length === 0);
     check('Known-bad: AP-001 critical (over 12 months)',
         _gapById(r1.gaps, 'AP-001') && _gapById(r1.gaps, 'AP-001').severity === 'critical');
@@ -237,8 +254,8 @@ function runFitzWatchTests(verbose) {
         outstandingIds.indexOf('AP-006') !== -1);
     check('Conditional: AP-001 IS in outstanding (always applies)',
         outstandingIds.indexOf('AP-001') !== -1);
-    check('Conditional: total applicable rules = 22 (8 AP + WC-001 + WC-003 + 4 PS + 4 LM + 4 TM; WC-002/004 NSW-only filtered out)',
-        outstandingIds.length === 22, 'got ' + outstandingIds.length);
+    check('Conditional: total applicable rules = 26 (8 AP + WC-001 + WC-003 + 4 PS + 4 LM + 4 TM + 4 WHS; WHS-002 filtered no WHS-001 response; WHS-004 filtered "cafe" not in licensed-venue list; WC-002/004 NSW-only filtered)',
+        outstandingIds.length === 26, 'got ' + outstandingIds.length);
     check('Conditional: WC-002 NOT applicable to VIC venue',
         outstandingIds.indexOf('WC-002') === -1);
     check('Conditional: WC-004 NOT applicable to VIC venue',
@@ -480,11 +497,82 @@ function runFitzWatchTests(verbose) {
         detectGaps(VIC_PROFILE, {}, []).outstanding.find(function(o) { return o.questionId === 'TM-001'; }) != null);
 
     // ============================================================
+    // Phase 1c — WHS & Psychosocial domain
+    // ============================================================
+    console.log('%cPhase 1c: WHS & Psychosocial rules', 'color: #94a3b8');
+
+    // Non-Vic / non-NSW baseline severities — using QLD profile (cafe)
+    const QLD_PROFILE = Object.assign({}, FW_TEST_PROFILE_CONDITIONAL, { state: 'QLD' });
+    const whsBaseline = detectGaps(QLD_PROFILE, {
+        'WHS-001': _resp('no'),
+        'WHS-003': _resp('no'),
+        'WHS-005': _resp('no')
+    }, []);
+    check('QLD: WHS-001 "no" produces HIGH (national baseline)',
+        whsBaseline.gaps.find(function(g) { return g.gap_id === 'WHS-001'; }).severity === 'high');
+    check('QLD: WHS-003 "no" produces HIGH',
+        whsBaseline.gaps.find(function(g) { return g.gap_id === 'WHS-003'; }).severity === 'high');
+
+    // Vic — psychosocial regs already in force, severity heightened
+    const VIC_PROFILE_FRESH = Object.assign({}, FW_TEST_PROFILE_CONDITIONAL, { state: 'VIC' });
+    const whsVic = detectGaps(VIC_PROFILE_FRESH, {
+        'WHS-001': _resp('no'),
+        'WHS-002': _resp('training_only')   // requires WHS-001=yes/partial — skipped here
+    }, []);
+    check('VIC: WHS-001 "no" produces CRITICAL (Vic regs in force)',
+        whsVic.gaps.find(function(g) { return g.gap_id === 'WHS-001'; }).severity === 'critical');
+
+    // Cross-rule conditional: WHS-002 only shows if WHS-001 = yes/partial
+    const whsCondNoRegister = detectGaps(VIC_PROFILE_FRESH, { 'WHS-001': _resp('no') }, []);
+    check('WHS-002 NOT applicable when WHS-001 = "no" (cross-rule conditional)',
+        whsCondNoRegister.outstanding.find(function(o) { return o.questionId === 'WHS-002'; }) == null
+        && whsCondNoRegister.gaps.find(function(g) { return g.gap_id === 'WHS-002'; }) == null);
+
+    const whsCondWithRegister = detectGaps(VIC_PROFILE_FRESH, {
+        'WHS-001': _resp('partial'),
+        'WHS-002': _resp('training_only')
+    }, []);
+    check('WHS-002 IS applicable when WHS-001 = "partial"',
+        whsCondWithRegister.gaps.find(function(g) { return g.gap_id === 'WHS-002'; }) != null);
+    check('VIC: WHS-002 "training_only" produces CRITICAL (Vic regs)',
+        whsCondWithRegister.gaps.find(function(g) { return g.gap_id === 'WHS-002'; }).severity === 'critical');
+
+    // Non-Vic training_only is still HIGH (national hierarchy-of-controls baseline)
+    const whsTrainingNonVic = detectGaps(QLD_PROFILE, {
+        'WHS-001': _resp('partial'),
+        'WHS-002': _resp('training_only')
+    }, []);
+    check('QLD: WHS-002 "training_only" produces HIGH (non-Vic)',
+        whsTrainingNonVic.gaps.find(function(g) { return g.gap_id === 'WHS-002'; }).severity === 'high');
+
+    // WHS-004 venue-type conditional — only licensed/late-night venues
+    const pubProfile = Object.assign({}, FW_TEST_PROFILE_CONDITIONAL, { venueType: 'pub' });
+    const cafeProfile = Object.assign({}, FW_TEST_PROFILE_CONDITIONAL, { venueType: 'cafe' });
+    check('WHS-004 IS applicable to pub',
+        detectGaps(pubProfile, {}, []).outstanding.find(function(o) { return o.questionId === 'WHS-004'; }) != null);
+    check('WHS-004 NOT applicable to cafe',
+        detectGaps(cafeProfile, {}, []).outstanding.find(function(o) { return o.questionId === 'WHS-004'; }) == null);
+    check('WHS-004 IS applicable to nightclub',
+        detectGaps(Object.assign({}, cafeProfile, { venueType: 'nightclub' }), {}, []).outstanding.find(function(o) { return o.questionId === 'WHS-004'; }) != null);
+
+    // WHS-006 — always medium (or no gap)
+    check('WHS-006 "no" produces MEDIUM (not high — notifiable framework is universal)',
+        detectGaps(QLD_PROFILE, { 'WHS-006': _resp('no') }, []).gaps.find(function(g) { return g.gap_id === 'WHS-006'; }).severity === 'medium');
+
+    check('whs_psychosocial domain rollup = critical (Vic with no register)',
+        rollupDomainSeverity(detectGaps(VIC_PROFILE_FRESH, {
+            'WHS-001': _resp('no'),
+            'WHS-003': _resp('no'),
+            'WHS-005': _resp('no'),
+            'WHS-006': _resp('no')
+        }, []).gaps, 'whs_psychosocial') === 'critical');
+
+    // ============================================================
     // Registry sanity
     // ============================================================
     console.log('%cRegistry sanity', 'color: #94a3b8');
     const registry = getQuestionRegistry();
-    check('Registry: 28 questions (12 AP + 4 WC + 4 PS + 4 LM + 4 TM)', registry.length === 28);
+    check('Registry: 34 questions (12 AP + 4 WC + 4 PS + 4 LM + 4 TM + 6 WHS)', registry.length === 34);
     check('Registry: every rule has id, domain, question, options, conditional, detect, statutoryAnchor, fixAction',
         registry.every(function(r) {
             return r.id && r.domain && r.question && Array.isArray(r.options)
@@ -494,7 +582,7 @@ function runFitzWatchTests(verbose) {
     check('Registry: every rule has at least 3 options',
         registry.every(function(r) { return r.options.length >= 3; }));
     check('Registry: ids are unique',
-        new Set(registry.map(function(r) { return r.id; })).size === 28);
+        new Set(registry.map(function(r) { return r.id; })).size === 34);
 
     // ---- Summary -----------------------------------------------------------
     const total = passed + failed;
