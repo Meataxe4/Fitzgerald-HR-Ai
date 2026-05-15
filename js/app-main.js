@@ -23047,8 +23047,13 @@ function _fwChatRemoveTyping() {
     if (el && el.parentNode) el.parentNode.removeChild(el);
 }
 
+// Tracks the last user message so the Try-Again button can replay it without
+// the user having to retype.
+let _fwChatLastSent = null;
+
 async function fitzWatchChatSendMessage(messageText, isInitial) {
     if (!messageText) return;
+    _fwChatLastSent = messageText;
     _fwChatRenderMessage('user', messageText);
     _fwChatState.history.push({ role: 'user', content: messageText });
     _fwChatRenderTyping();
@@ -23094,7 +23099,9 @@ async function fitzWatchChatSendMessage(messageText, isInitial) {
         });
         _fwChatRemoveTyping();
         if (!response.ok) {
-            _fwChatRenderMessage('assistant', 'Sorry — the AI assistant failed to respond (HTTP ' + response.status + '). Try again in a moment.');
+            _fwChatRenderError('The AI assistant failed to respond (HTTP ' + response.status + ').');
+            // Pop the failed user turn from history so retries don't compound it
+            _fwChatState.history.pop();
             return;
         }
         const data = await response.json();
@@ -23103,8 +23110,30 @@ async function fitzWatchChatSendMessage(messageText, isInitial) {
         _fwChatState.history.push({ role: 'assistant', content: reply });
     } catch (err) {
         _fwChatRemoveTyping();
-        _fwChatRenderMessage('assistant', 'Sorry — request failed (' + (err.message || err) + '). Check your connection.');
+        _fwChatRenderError('Request failed (' + (err.message || err) + '). Check your connection.');
+        _fwChatState.history.pop();
     }
+}
+
+// Renders an error bubble with a Try Again button that replays the last sent
+// message. Saves the user from having to retype an engineered prompt after a
+// transient failure.
+function _fwChatRenderError(text) {
+    const messagesEl = document.getElementById('fwChatMessages');
+    if (!messagesEl) return;
+    const wrap = document.createElement('div');
+    wrap.className = 'flex justify-start';
+    wrap.innerHTML = '<div class="max-w-[85%] p-3 rounded-lg text-sm bg-red-900/30 border border-red-700 text-red-200">' +
+        '<div class="font-semibold mb-1">⚠ ' + _fwEscapeHtml(text) + '</div>' +
+        '<button onclick="fitzWatchChatRetryLast()" class="mt-1 px-3 py-1 bg-red-700 hover:bg-red-600 text-white text-xs rounded">Try again</button>' +
+    '</div>';
+    messagesEl.appendChild(wrap);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+}
+
+function fitzWatchChatRetryLast() {
+    if (!_fwChatLastSent) return;
+    fitzWatchChatSendMessage(_fwChatLastSent, false);
 }
 
 function fitzWatchChatSendFollowup() {
@@ -23143,6 +23172,7 @@ if (typeof window !== 'undefined') {
     window.openFitzWatchChat = openFitzWatchChat;
     window.closeFitzWatchChat = closeFitzWatchChat;
     window.fitzWatchChatSendFollowup = fitzWatchChatSendFollowup;
+    window.fitzWatchChatRetryLast = fitzWatchChatRetryLast;
     window.openFitzWatchDocBuilder = openFitzWatchDocBuilder;
     window.closeFitzWatchDocBuilder = closeFitzWatchDocBuilder;
     window.fitzWatchDocGenerate = fitzWatchDocGenerate;
