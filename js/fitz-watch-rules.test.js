@@ -568,6 +568,33 @@ function runFitzWatchTests(verbose) {
         }, []).gaps, 'whs_psychosocial') === 'critical');
 
     // ============================================================
+    // Phase 2 documents — verify all 7 new generate_doc wirings
+    // ============================================================
+    console.log('%cPhase 2 documents: generate_doc wirings', 'color: #94a3b8');
+
+    const docWirings = [
+        { rule: 'WHS-001', response: 'no', template: 'psychosocial_risk_register' },
+        { rule: 'WHS-003', response: 'no', template: 'bullying_harassment_policy' },
+        { rule: 'WHS-004', response: 'no', template: 'customer_aggression_procedure' },
+        { rule: 'WC-003',  response: 'no', template: 'psychological_injury_claim_procedure' },
+        { rule: 'TM-001',  response: 'no', template: 'warning_procedure_policy' },
+        { rule: 'TM-002',  response: 'no', template: 'employment_contract_probation_clause' },
+        { rule: 'LM-004',  response: 'no', template: 'schedule_g_leave_in_advance_agreement' }
+    ];
+    const pubProfileForDocs = Object.assign({}, FW_TEST_PROFILE_KNOWN_BAD, { venueType: 'pub' });
+    docWirings.forEach(function(w) {
+        const responses = {};
+        responses[w.rule] = _resp(w.response);
+        // WHS-002 requires WHS-001 yes/partial, but we're testing WHS-001
+        // not WHS-002, so OK. WHS-004 needs licensed venue type — using pub.
+        const r = detectGaps(pubProfileForDocs, responses, []);
+        const g = r.gaps.find(function(x) { return x.gap_id === w.rule; });
+        check(w.rule + ' routes to generate_doc with template ' + w.template,
+            g && g.fix_action === 'generate_doc'
+            && g.fix_payload_doc && g.fix_payload_doc.templateId === w.template);
+    });
+
+    // ============================================================
     // Registry sanity
     // ============================================================
     console.log('%cRegistry sanity', 'color: #94a3b8');

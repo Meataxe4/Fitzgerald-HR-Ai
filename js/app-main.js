@@ -22106,7 +22106,7 @@ function submitFitzWatchPreflight(event) {
 
 // Sprint version marker — prints once on script load so we can confirm which
 // build the browser is actually running.
-console.log('[Fitz Watch] app-main.js loaded — build 20260515-24 (Phase 1c — WHS & Psychosocial · all 6 domains live)');
+console.log('[Fitz Watch] app-main.js loaded — build 20260515-25 (Phase 2 — all 10 documents shipped)');
 
 function _fwEscapeHtml(s) {
     return String(s == null ? '' : s)
@@ -22951,6 +22951,64 @@ const _FW_DOC_TEMPLATES = {
         render: function() { return _fwDocRender_cashOut(); },
         validate: function() { return _fwDocValidate_cashOut(); },
         generate: function() { return _fwDocGenerate_cashOut(); }
+    },
+
+    // ====== Phase 2 documents ============================================
+    psychosocial_risk_register: {
+        title: 'Psychosocial Hazard Risk Register',
+        subtitle: 'Hospitality-specific psychosocial risk register framework (WHS-001)',
+        anchor: 'Vic OHS (Psychological Health) Regs 2025 · Model WHS Act · NSW Workplace Protections Act 2025',
+        render: function() { return _fwDocRender_psychoRegister(); },
+        validate: function() { return _fwDocValidate_psychoRegister(); },
+        generate: function() { return _fwDocGenerate_psychoRegister(); }
+    },
+    bullying_harassment_policy: {
+        title: 'Bullying, Harassment & Sexual Harassment Policy',
+        subtitle: 'FWA + SDA-compliant policy with reporting pathways',
+        anchor: 'FW Act s789FC · Sex Discrimination Act s47C · Respect@Work positive duty',
+        render: function() { return _fwDocRender_bullyingPolicy(); },
+        validate: function() { return _fwDocValidate_bullyingPolicy(); },
+        generate: function() { return _fwDocGenerate_bullyingPolicy(); }
+    },
+    customer_aggression_procedure: {
+        title: 'Customer Aggression Incident Procedure',
+        subtitle: 'For licensed/late-night venues — response + worker support framework',
+        anchor: 'WHS Act s19 (primary duty) · psychosocial hazard regulations',
+        render: function() { return _fwDocRender_customerAggression(); },
+        validate: function() { return _fwDocValidate_customerAggression(); },
+        generate: function() { return _fwDocGenerate_customerAggression(); }
+    },
+    psychological_injury_claim_procedure: {
+        title: 'Psychological Injury Claim Management Procedure',
+        subtitle: 'Receive, investigate, respond — built for the post-1 July 2026 NSW framework',
+        anchor: 'NSW Workers Comp Act · SIRA guidance · reasonable management action defence',
+        render: function() { return _fwDocRender_psychInjuryProc(); },
+        validate: function() { return _fwDocValidate_psychInjuryProc(); },
+        generate: function() { return _fwDocGenerate_psychInjuryProc(); }
+    },
+    warning_procedure_policy: {
+        title: 'Warning Procedure Policy',
+        subtitle: 'Performance management framework aligned to FWC procedural fairness',
+        anchor: 'FW Act unfair dismissal jurisdiction · Selvachandran procedural fairness factors',
+        render: function() { return _fwDocRender_warningProcedure(); },
+        validate: function() { return _fwDocValidate_warningProcedure(); },
+        generate: function() { return _fwDocGenerate_warningProcedure(); }
+    },
+    employment_contract_probation_clause: {
+        title: 'Employment Contract — Probation Clause',
+        subtitle: 'Probation clause aligned to the statutory Minimum Employment Period',
+        anchor: 'FW Act s383 (MEP) · s23 (small business definition)',
+        render: function() { return _fwDocRender_probationClause(); },
+        validate: function() { return _fwDocValidate_probationClause(); },
+        generate: function() { return _fwDocGenerate_probationClause(); }
+    },
+    schedule_g_leave_in_advance_agreement: {
+        title: 'Leave-in-Advance Agreement (Schedule G)',
+        subtitle: 'Schedule G written agreement with FW Act s324 deduction authority',
+        anchor: 'FW Act s324 (authorised deductions) · MA000119 Schedule G',
+        render: function() { return _fwDocRender_leaveInAdvance(); },
+        validate: function() { return _fwDocValidate_leaveInAdvance(); },
+        generate: function() { return _fwDocGenerate_leaveInAdvance(); }
     }
 };
 
@@ -23345,6 +23403,445 @@ function _fwDocGenerate_cashOut() {
         '<p><em>This document is not a substitute for legal advice. Each cash-out requires a separate agreement under FW Act s93.</em></p>';
     const filename = 'Annual_Leave_CashOut_' + (d.emp_name || 'Employee').replace(/[^A-Za-z0-9_-]/g, '_') + '.docx';
     return { html: html, filename: filename };
+}
+
+// ============================================================================
+// PHASE 2 — Document templates (7 templates covering WHS, WC, TM, LM)
+// Compact, focused versions. Each follows the standard pattern: render
+// builds the form HTML; validate returns {ok, error}; generate returns
+// {html, filename} for the existing /.netlify/functions/generate-word endpoint.
+// ============================================================================
+
+function _fwTodayIso() { return new Date().toISOString().slice(0, 10); }
+function _fwAddMonths(dateStr, months) {
+    const d = new Date(dateStr || _fwTodayIso());
+    d.setMonth(d.getMonth() + months);
+    return d.toISOString().slice(0, 10);
+}
+function _fwVenueLine() {
+    const p = venueProfile || {};
+    return _fwEscapeHtml(p.venueName || '[Employer]') + ' (ABN ' + _fwEscapeHtml(p.venue_abn || '[ABN]') + ') of ' + _fwEscapeHtml(p.venue_address || '[Address]');
+}
+function _fwSignatureBlock(employeeName) {
+    const p = venueProfile || {};
+    return '<p>Employer: _______________________________ Date: ___________</p>' +
+        '<p>Name: ' + _fwEscapeHtml(p.userName || '[Authorised representative]') + ' for ' + _fwEscapeHtml(p.venueName || '[Employer]') + '</p>' +
+        (employeeName ? '<p>Employee: _______________________________ Date: ___________</p><p>Name: ' + _fwEscapeHtml(employeeName) + '</p>' : '');
+}
+
+// ====== Doc: Psychosocial Risk Register (WHS-001) ===========================
+const _FW_PSYCHO_HAZARDS = [
+    'Customer aggression / verbal abuse',
+    'Sexual harassment (by customers or colleagues)',
+    'Exposure to traumatic incidents (medical emergencies, fights)',
+    'High job demands during peak service',
+    'Low job control for junior staff',
+    'Poor support during incidents',
+    'Fatigue from late-night / split-shift / consecutive-day work',
+    'Isolation (solo close-out, kitchen working alone)',
+    'Bullying within staff hierarchy',
+    'Vicarious trauma (witnessing customer incidents)'
+];
+
+function _fwDocRender_psychoRegister() {
+    const p = venueProfile || {};
+    return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" class="space-y-3">' +
+        '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">Pre-filled from your venue profile: <strong class="text-slate-300">' + _fwEscapeHtml(p.venueName || '—') + '</strong> · ' + _fwEscapeHtml(p.state || '—') + '. The register lists hospitality-specific hazards by default; you fill in risk ratings and controls in Word.</div>' +
+        _fwDocFieldRow('Responsible person (for the register)', '<input type="text" name="responsible_person" value="' + _fwEscapeHtml(p.userName || '') + '" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        '<div class="grid grid-cols-2 gap-3">' +
+            _fwDocFieldRow('Register effective date', '<input type="date" name="effective_date" required value="' + _fwTodayIso() + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Next review date', '<input type="date" name="review_date" required value="' + _fwAddMonths(null, 6) + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        '</div>' +
+        '<div class="text-xs text-slate-400 p-3 bg-slate-700/30 rounded-lg">' +
+            '<strong>Identified hazards</strong> (hospitality default — uncheck any not relevant):' +
+            '<div class="mt-2 space-y-1 text-slate-300">' +
+                _FW_PSYCHO_HAZARDS.map(function(h, i) {
+                    return '<label class="flex items-center gap-2"><input type="checkbox" name="hazard_' + i + '" checked class="accent-amber-500"> ' + _fwEscapeHtml(h) + '</label>';
+                }).join('') +
+            '</div>' +
+        '</div>' +
+    '</form>';
+}
+function _fwDocValidate_psychoRegister() {
+    const d = _fwReadDocForm();
+    if (!d.responsible_person || !d.effective_date || !d.review_date) return { ok: false, error: 'All fields required.' };
+    return { ok: true };
+}
+function _fwDocGenerate_psychoRegister() {
+    const p = venueProfile || {}; const d = _fwReadDocForm();
+    const selectedHazards = _FW_PSYCHO_HAZARDS.filter(function(_, i) { return d['hazard_' + i] === true; });
+    let html =
+        '<h1>Psychosocial Hazard Risk Register</h1>' +
+        '<p>Employer: <strong>' + _fwVenueLine() + '</strong></p>' +
+        '<p>Venue type: ' + _fwEscapeHtml(p.venueType || '[venue type]') + ' · State: ' + _fwEscapeHtml(p.state || '[state]') + '</p>' +
+        '<p>Responsible person: <strong>' + _fwEscapeHtml(d.responsible_person) + '</strong></p>' +
+        '<p>Effective date: ' + _fwEscapeHtml(d.effective_date) + ' · Next review: ' + _fwEscapeHtml(d.review_date) + '</p>' +
+        '<h2>Methodology</h2>' +
+        '<p>Hazards identified through consultation with workers and Health and Safety Representatives, incident data, and industry guidance (WorkSafe Vic Compliance Code for Psychological Health; SafeWork Australia Model Code).</p>' +
+        '<h2>Identified hazards and required controls</h2>';
+    selectedHazards.forEach(function(h) {
+        html +=
+            '<h3>' + _fwEscapeHtml(h) + '</h3>' +
+            '<p>Risk rating (likelihood × consequence): __________</p>' +
+            '<p>Workers affected: __________</p>' +
+            '<p>Existing controls: __________</p>' +
+            '<p>Additional controls required (per hierarchy of controls — elimination → substitution → engineering → administrative → PPE/training): __________</p>' +
+            '<p>Review trigger / date: __________</p>';
+    });
+    html +=
+        '<h2>Consultation record</h2>' +
+        '<p>Workers and HSRs consulted on: __________ Method: __________</p>' +
+        '<h2>Review schedule and triggers</h2>' +
+        '<ul>' +
+            '<li>Scheduled review by: ' + _fwEscapeHtml(d.review_date) + '</li>' +
+            '<li>Trigger: any notifiable incident</li>' +
+            '<li>Trigger: any psychosocial complaint or claim</li>' +
+            '<li>Trigger: significant change to venue operations or workforce</li>' +
+        '</ul>' +
+        '<h2>Sign-off</h2>' +
+        _fwSignatureBlock(null) +
+        '<p><em>This register is a framework. Risk ratings and specific controls must be completed by the venue based on operational realities. Not a substitute for legal advice.</em></p>';
+    return { html: html, filename: 'Psychosocial_Risk_Register_' + (p.venueName || 'Venue').replace(/[^A-Za-z0-9_-]/g, '_') + '.docx' };
+}
+
+// ====== Doc: Bullying & Harassment Policy (WHS-003) =========================
+function _fwDocRender_bullyingPolicy() {
+    const p = venueProfile || {};
+    return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" class="space-y-3">' +
+        '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">Pre-filled: <strong class="text-slate-300">' + _fwEscapeHtml(p.venueName || '—') + '</strong>. Provide the named reporting contact and an alternative pathway in case the named person is the issue.</div>' +
+        _fwDocFieldRow('Approval authority (signed by)', '<input type="text" name="approver" value="' + _fwEscapeHtml(p.userName || '') + '" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        _fwDocFieldRow('Primary reporting contact (name + title)', '<input type="text" name="primary_contact" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none" placeholder="e.g. Jane Smith, Venue Manager">') +
+        _fwDocFieldRow('Alternative reporting path', '<input type="text" name="alternative_contact" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none" placeholder="e.g. External HR consultant, EAP, Fair Work Ombudsman">') +
+        '<div class="grid grid-cols-2 gap-3">' +
+            _fwDocFieldRow('Effective date', '<input type="date" name="effective_date" required value="' + _fwTodayIso() + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Next review date', '<input type="date" name="review_date" required value="' + _fwAddMonths(null, 12) + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        '</div>' +
+    '</form>';
+}
+function _fwDocValidate_bullyingPolicy() {
+    const d = _fwReadDocForm();
+    if (!d.approver || !d.primary_contact || !d.alternative_contact) return { ok: false, error: 'All fields required.' };
+    return { ok: true };
+}
+function _fwDocGenerate_bullyingPolicy() {
+    const p = venueProfile || {}; const d = _fwReadDocForm();
+    const html =
+        '<h1>Bullying, Harassment and Sexual Harassment Policy</h1>' +
+        '<p>Employer: <strong>' + _fwVenueLine() + '</strong></p>' +
+        '<p>Effective date: ' + _fwEscapeHtml(d.effective_date) + ' · Review date: ' + _fwEscapeHtml(d.review_date) + '</p>' +
+        '<h2>1. Purpose and policy statement</h2>' +
+        '<p>' + _fwEscapeHtml(p.venueName || 'The venue') + ' has a zero-tolerance position on workplace bullying, harassment, and sexual harassment. Every worker has the right to a safe workplace.</p>' +
+        '<h2>2. Definitions</h2>' +
+        '<p><strong>Bullying:</strong> Repeated unreasonable behaviour by a person or group directed at a worker that creates a risk to health and safety.</p>' +
+        '<p><strong>Harassment:</strong> Unwelcome conduct that is humiliating, intimidating or offensive.</p>' +
+        '<p><strong>Sexual harassment:</strong> Unwelcome sexual advances, unwelcome requests for sexual favours, or other unwelcome conduct of a sexual nature (Sex Discrimination Act s28A).</p>' +
+        '<p><strong>Discrimination:</strong> Less favourable treatment because of a protected attribute (race, sex, age, disability, sexual orientation, religion, etc.).</p>' +
+        '<h2>3. Behaviour that is NOT bullying</h2>' +
+        '<p>Reasonable management action taken in a reasonable manner — including performance management, lawful direction, and disciplinary action — does not constitute bullying.</p>' +
+        '<h2>4. Reporting procedures</h2>' +
+        '<p>Workers experiencing or witnessing bullying, harassment or sexual harassment have multiple reporting paths:</p>' +
+        '<ul>' +
+            '<li><strong>Primary contact:</strong> ' + _fwEscapeHtml(d.primary_contact) + '</li>' +
+            '<li><strong>Alternative path (if primary is the issue):</strong> ' + _fwEscapeHtml(d.alternative_contact) + '</li>' +
+            '<li><strong>External avenues:</strong> Fair Work Commission (FW Act s789FC anti-bullying jurisdiction); Australian Human Rights Commission; the relevant state/territory anti-discrimination body</li>' +
+        '</ul>' +
+        '<h2>5. Investigation procedure</h2>' +
+        '<p>All reports will be acknowledged within 2 working days, investigated promptly, and handled with appropriate confidentiality. Procedural fairness applies to all parties — both the complainant and any respondent.</p>' +
+        '<h2>6. Confidentiality</h2>' +
+        '<p>Information disclosed during a report or investigation will be shared only with those who need to know to investigate and respond.</p>' +
+        '<h2>7. Protection from victimisation</h2>' +
+        '<p>Victimisation of any worker who makes a complaint in good faith, or who participates in an investigation, is itself a breach of this policy and may result in disciplinary action.</p>' +
+        '<h2>8. Consequences for substantiated breaches</h2>' +
+        '<p>Depending on severity, consequences may include training, formal warning, demotion, suspension, or termination of employment. Serious misconduct may justify summary dismissal.</p>' +
+        '<h2>9. Training and awareness</h2>' +
+        '<p>All workers receive this policy at induction. Refresher training is provided annually. Managers receive additional training on handling complaints and on the positive duty under the Sex Discrimination Act s47C.</p>' +
+        '<h2>10. Sign-off</h2>' +
+        '<p>Approved by: <strong>' + _fwEscapeHtml(d.approver) + '</strong> · Date: ' + _fwEscapeHtml(d.effective_date) + '</p>' +
+        '<p><em>This policy is not a substitute for legal advice. Verify against current FW Act anti-bullying jurisdiction and your jurisdiction\'s anti-discrimination framework before signing.</em></p>';
+    return { html: html, filename: 'Bullying_Harassment_Policy_' + (p.venueName || 'Venue').replace(/[^A-Za-z0-9_-]/g, '_') + '.docx' };
+}
+
+// ====== Doc: Customer Aggression Procedure (WHS-004) ========================
+function _fwDocRender_customerAggression() {
+    const p = venueProfile || {};
+    return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" class="space-y-3">' +
+        '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">For licensed/late-night venues. Generates a procedure covering verbal, threat, and physical aggression with post-incident worker support.</div>' +
+        _fwDocFieldRow('Trading hours', '<input type="text" name="trading_hours" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none" placeholder="e.g. 11am–2am daily">') +
+        _fwDocFieldRow('Security arrangements', '<select name="security" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none"><option value="in_house">In-house security</option><option value="contracted">Contracted licensed security</option><option value="none">No dedicated security</option></select>') +
+        _fwDocFieldRow('Local police (non-emergency) number', '<input type="text" name="police_number" value="131444" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        _fwDocFieldRow('Employee Assistance Program (EAP) contact (optional)', '<input type="text" name="eap_contact" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none" placeholder="Provider name + phone">') +
+        _fwDocFieldRow('Effective date', '<input type="date" name="effective_date" required value="' + _fwTodayIso() + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+    '</form>';
+}
+function _fwDocValidate_customerAggression() {
+    const d = _fwReadDocForm();
+    if (!d.trading_hours || !d.security || !d.police_number) return { ok: false, error: 'All required fields must be completed.' };
+    return { ok: true };
+}
+function _fwDocGenerate_customerAggression() {
+    const p = venueProfile || {}; const d = _fwReadDocForm();
+    const securityLabel = { in_house: 'In-house security staff', contracted: 'Contracted licensed security', none: 'No dedicated security' }[d.security] || d.security;
+    const html =
+        '<h1>Customer Aggression Incident Procedure</h1>' +
+        '<p>Employer: <strong>' + _fwVenueLine() + '</strong></p>' +
+        '<p>Trading hours: ' + _fwEscapeHtml(d.trading_hours) + ' · Security: ' + _fwEscapeHtml(securityLabel) + '</p>' +
+        '<p>Effective date: ' + _fwEscapeHtml(d.effective_date) + '</p>' +
+        '<h2>1. Purpose</h2>' +
+        '<p>To establish a documented, repeatable response to customer aggression incidents that protects workers and discharges the venue\'s primary duty under WHS Act s19.</p>' +
+        '<h2>2. Types of aggression covered</h2>' +
+        '<ul>' +
+            '<li>Verbal abuse (raised voices, swearing, abusive language)</li>' +
+            '<li>Threats (of violence, of physical harm, of consequence)</li>' +
+            '<li>Sexual harassment by customers</li>' +
+            '<li>Physical violence (pushing, hitting, weapons)</li>' +
+        '</ul>' +
+        '<h2>3. Prevention measures</h2>' +
+        '<ul>' +
+            '<li>RSA-trained service of alcohol; pace-of-service controls</li>' +
+            '<li>Clear signage on expected customer behaviour</li>' +
+            '<li>Venue layout, lighting, and circulation supporting safe service</li>' +
+            '<li>Buddy system for high-risk shifts and close-out</li>' +
+        '</ul>' +
+        '<h2>4. Response procedures</h2>' +
+        '<h3>Verbal aggression</h3>' +
+        '<p>De-escalate; offer warning; withdraw service; ask customer to leave. Document the incident at the end of shift.</p>' +
+        '<h3>Threat of violence</h3>' +
+        '<p>Immediately call security (if on-site) and police: <strong>' + _fwEscapeHtml(d.police_number) + '</strong> (non-emergency) or 000 (emergency). Evacuate area if necessary. Preserve any CCTV.</p>' +
+        '<h3>Physical violence</h3>' +
+        '<p>Call 000. Secure the scene. Render first aid. Support affected workers. Do not engage physically unless protecting self or others. Preserve CCTV and witness statements.</p>' +
+        '<h2>5. Post-incident worker support</h2>' +
+        '<ul>' +
+            '<li><strong>Immediate:</strong> First aid, debrief, send affected worker home if needed (paid)</li>' +
+            '<li><strong>24-48 hours:</strong> Manager check-in; offer counselling/EAP referral' + (d.eap_contact ? ' (' + _fwEscapeHtml(d.eap_contact) + ')' : '') + '</li>' +
+            '<li><strong>Ongoing:</strong> Workers comp claim support; modified duties if needed; psychosocial risk review</li>' +
+        '</ul>' +
+        '<h2>6. Reporting and documentation</h2>' +
+        '<p>All incidents are recorded in the venue\'s incident register within 24 hours, including date/time, parties, response, and witnesses.</p>' +
+        '<h2>7. Notifiable incident assessment</h2>' +
+        '<p>For any serious injury, dangerous incident, or fatality — assess against WHS Act ss35-39 notifiable incident categories and report to the regulator within the required timeframe.</p>' +
+        '<h2>8. Review triggers</h2>' +
+        '<ul><li>After every serious incident</li><li>Annually as part of psychosocial risk register review</li></ul>' +
+        '<h2>9. Sign-off</h2>' +
+        _fwSignatureBlock(null) +
+        '<p><em>This procedure is a framework. Tailor to your venue\'s specific operational risks. Not a substitute for legal advice or for jurisdiction-specific liquor licensing requirements.</em></p>';
+    return { html: html, filename: 'Customer_Aggression_Procedure_' + (p.venueName || 'Venue').replace(/[^A-Za-z0-9_-]/g, '_') + '.docx' };
+}
+
+// ====== Doc: Psychological Injury Claim Procedure (WC-003) ==================
+function _fwDocRender_psychInjuryProc() {
+    const p = venueProfile || {};
+    const insurer = (p.state || '').toUpperCase() === 'NSW' ? 'icare NSW' : '';
+    return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" class="space-y-3">' +
+        '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">Generates a documented process for receiving, investigating, and responding to psychological injury claims. Aligned to the post-1 July 2026 NSW framework where applicable.</div>' +
+        _fwDocFieldRow('Workers compensation insurer', '<input type="text" name="insurer" value="' + _fwEscapeHtml(insurer) + '" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none" placeholder="e.g. icare NSW, EML, Allianz">') +
+        _fwDocFieldRow('Internal claim contact (HR or owner)', '<input type="text" name="internal_contact" value="' + _fwEscapeHtml(p.userName || '') + '" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        _fwDocFieldRow('EAP provider (optional)', '<input type="text" name="eap" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        _fwDocFieldRow('Effective date', '<input type="date" name="effective_date" required value="' + _fwTodayIso() + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+    '</form>';
+}
+function _fwDocValidate_psychInjuryProc() {
+    const d = _fwReadDocForm();
+    if (!d.insurer || !d.internal_contact) return { ok: false, error: 'Insurer and internal contact required.' };
+    return { ok: true };
+}
+function _fwDocGenerate_psychInjuryProc() {
+    const p = venueProfile || {}; const d = _fwReadDocForm();
+    const isNSW = (p.state || '').toUpperCase() === 'NSW';
+    const html =
+        '<h1>Psychological Injury Claim Management Procedure</h1>' +
+        '<p>Employer: <strong>' + _fwVenueLine() + '</strong></p>' +
+        '<p>Effective date: ' + _fwEscapeHtml(d.effective_date) + ' · Insurer: ' + _fwEscapeHtml(d.insurer) + '</p>' +
+        '<h2>1. Purpose</h2>' +
+        '<p>To manage psychological injury claims and complaints in a way that supports affected workers, preserves the reasonable management action defence, and complies with workers compensation law.</p>' +
+        '<h2>2. Scope</h2>' +
+        '<p>This procedure applies to all psychological injury claims and complaints, whether lodged via the workers comp insurer or raised internally.</p>' +
+        '<h2>3. Receiving a claim or complaint</h2>' +
+        '<p>The internal contact is <strong>' + _fwEscapeHtml(d.internal_contact) + '</strong>. Acknowledge receipt within 24 hours. Confirm confidentiality and offer immediate support (paid leave, EAP referral' + (d.eap ? ' — ' + _fwEscapeHtml(d.eap) : '') + ').</p>' +
+        '<h2>4. Notifying the workers comp insurer</h2>' +
+        '<p>Notify ' + _fwEscapeHtml(d.insurer) + ' within the statutory timeframe (typically 48 hours for NSW). Provide initial incident details and worker contact.</p>' +
+        '<h2>5. Investigating the underlying allegations</h2>' +
+        '<p>Preserve all contemporaneous documentation — performance management records, communications, witness accounts. Conduct a fair and impartial investigation. Allow the respondent procedural fairness.</p>' +
+        '<h2>6. The reasonable management action defence</h2>' +
+        (isNSW
+            ? '<p>Under the post-1 July 2026 NSW framework, the test is whether the management action was a <em>significant cause</em> of the injury. Documentation must show: (a) the basis for the action (performance gap, conduct issue, organisational change), and (b) the manner in which it was carried out (procedural fairness, reasonable communication, opportunity to respond).</p>'
+            : '<p>Workers compensation legislation generally excludes psychological injuries arising from reasonable management action taken in a reasonable manner. Documentation must demonstrate both the basis for the action and the manner of its delivery.</p>') +
+        '<h2>7. Worker support during the claim process</h2>' +
+        '<ul>' +
+            '<li>Maintain regular contact with the worker without pressuring return-to-work</li>' +
+            '<li>Continue salary continuance until insurer determination</li>' +
+            '<li>Offer EAP support throughout</li>' +
+        '</ul>' +
+        '<h2>8. Return-to-work planning</h2>' +
+        '<p>Once the worker is fit, develop a return-to-work plan in consultation with the worker, treating practitioner, and insurer. Modified duties may apply.</p>' +
+        '<h2>9. Record-keeping</h2>' +
+        '<p>All records — communications, investigations, return-to-work plans — retained for 7 years minimum.</p>' +
+        '<h2>10. Review triggers</h2>' +
+        '<ul><li>Annually</li><li>After every claim outcome</li><li>After significant legislative change</li></ul>' +
+        '<h2>11. Sign-off</h2>' +
+        _fwSignatureBlock(null) +
+        '<p><em>This procedure is a framework. Tailor to your venue\'s operational context. Not a substitute for legal advice. Verify against current state workers compensation law before signing.</em></p>';
+    return { html: html, filename: 'Psych_Injury_Claim_Procedure_' + (p.venueName || 'Venue').replace(/[^A-Za-z0-9_-]/g, '_') + '.docx' };
+}
+
+// ====== Doc: Warning Procedure Policy (TM-001) ==============================
+function _fwDocRender_warningProcedure() {
+    const p = venueProfile || {};
+    return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" class="space-y-3">' +
+        '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">Generates a documented warning procedure aligned to FWC unfair dismissal procedural fairness factors (Selvachandran).</div>' +
+        _fwDocFieldRow('Approval authority', '<input type="text" name="approver" value="' + _fwEscapeHtml(p.userName || '') + '" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        '<div class="grid grid-cols-2 gap-3">' +
+            _fwDocFieldRow('Effective date', '<input type="date" name="effective_date" required value="' + _fwTodayIso() + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Next review date', '<input type="date" name="review_date" required value="' + _fwAddMonths(null, 12) + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        '</div>' +
+    '</form>';
+}
+function _fwDocValidate_warningProcedure() {
+    const d = _fwReadDocForm();
+    if (!d.approver) return { ok: false, error: 'Approval authority required.' };
+    return { ok: true };
+}
+function _fwDocGenerate_warningProcedure() {
+    const p = venueProfile || {}; const d = _fwReadDocForm();
+    const html =
+        '<h1>Warning Procedure Policy</h1>' +
+        '<p>Employer: <strong>' + _fwVenueLine() + '</strong></p>' +
+        '<p>Effective date: ' + _fwEscapeHtml(d.effective_date) + ' · Review date: ' + _fwEscapeHtml(d.review_date) + '</p>' +
+        '<h2>1. Purpose</h2>' +
+        '<p>To establish a fair, consistent, and defensible process for managing employee performance and conduct, in line with the procedural fairness factors applied by the Fair Work Commission in unfair dismissal matters (Selvachandran v Peterson Plastics Pty Ltd).</p>' +
+        '<h2>2. Scope</h2>' +
+        '<p>This policy applies to all employees covered by the National Employment Standards. It does not apply to summary dismissal for serious misconduct, where the matters justify immediate termination without notice.</p>' +
+        '<h2>3. Types of performance issue covered</h2>' +
+        '<ul>' +
+            '<li>Performance shortfalls against role expectations</li>' +
+            '<li>Minor misconduct (lateness, attendance, attitude)</li>' +
+            '<li>Repeated breaches of policy</li>' +
+            '<li>Failure to meet KPIs</li>' +
+        '</ul>' +
+        '<h2>4. Procedure</h2>' +
+        '<h3>Stage 1: Informal conversation</h3><p>Manager raises the concern verbally with the employee. Documents date, content, and any agreed actions in a file note.</p>' +
+        '<h3>Stage 2: First written warning</h3><p>Issued if Stage 1 doesn\'t resolve the issue or if the conduct warrants a written response from the outset. Details required below.</p>' +
+        '<h3>Stage 3: Second written warning</h3><p>Issued for continued or escalated issues. Includes a clear statement that further breaches may result in termination.</p>' +
+        '<h3>Stage 4: Final written warning</h3><p>The last stage before termination. Explicit warning that termination will follow if the conduct continues.</p>' +
+        '<h3>Stage 5: Show-cause meeting</h3><p>Employee is given written notice of the proposed termination and a meaningful opportunity to respond before the decision is made.</p>' +
+        '<h3>Stage 6: Termination</h3><p>If the decision is to terminate, written notice is provided and final pay is calculated per the NES.</p>' +
+        '<h2>5. Required content of every written warning</h2>' +
+        '<ul>' +
+            '<li>Date of the warning</li>' +
+            '<li>Specific conduct or performance described in factual terms</li>' +
+            '<li>Expected improvement (measurable where possible)</li>' +
+            '<li>Timeframe for improvement</li>' +
+            '<li>Consequences if no improvement</li>' +
+        '</ul>' +
+        '<h2>6. Procedural fairness requirements</h2>' +
+        '<ul>' +
+            '<li>Right to a support person at any formal meeting</li>' +
+            '<li>Reasonable notice of meetings (typically 24 hours)</li>' +
+            '<li>Genuine opportunity to respond to concerns</li>' +
+            '<li>Sufficient time to demonstrate improvement</li>' +
+            '<li>Procedural fairness applies even where summary dismissal is contemplated</li>' +
+        '</ul>' +
+        '<h2>7. Record-keeping</h2>' +
+        '<p>All warnings, meeting notes, and supporting documentation are retained on the employee\'s personnel file for the period required under the Fair Work Regulations.</p>' +
+        '<h2>8. Sign-off</h2>' +
+        '<p>Approved by: <strong>' + _fwEscapeHtml(d.approver) + '</strong> · Date: ' + _fwEscapeHtml(d.effective_date) + '</p>' +
+        '<p><em>This policy is a framework. Specific cases may warrant deviation (e.g. summary dismissal for serious misconduct). Not a substitute for legal advice.</em></p>';
+    return { html: html, filename: 'Warning_Procedure_Policy_' + (p.venueName || 'Venue').replace(/[^A-Za-z0-9_-]/g, '_') + '.docx' };
+}
+
+// ====== Doc: Probation Clause (TM-002) =====================================
+function _fwDocRender_probationClause() {
+    const p = venueProfile || {};
+    const isSmall = Number(p.staffCount) < 15;
+    return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" class="space-y-3">' +
+        '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">Generates a probation clause for insertion into an employment contract. Statutory Minimum Employment Period for your business is <strong class="text-amber-400">' + (isSmall ? '12 months (small business <15 employees)' : '6 months (non-small business)') + '</strong>.</div>' +
+        '<div class="grid grid-cols-2 gap-3">' +
+            _fwDocFieldRow('Employee name', '<input type="text" name="emp_name" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Employment start date', '<input type="date" name="emp_start" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        '</div>' +
+        '<div class="grid grid-cols-2 gap-3">' +
+            _fwDocFieldRow('Probation period length (months)', '<input type="number" name="probation_months" min="1" max="12" required value="' + (isSmall ? 12 : 6) + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Notice period during probation (working days)', '<input type="number" name="notice_days" min="1" max="14" required value="5" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        '</div>' +
+    '</form>';
+}
+function _fwDocValidate_probationClause() {
+    const d = _fwReadDocForm();
+    if (!d.emp_name || !d.emp_start || !d.probation_months || !d.notice_days) return { ok: false, error: 'All fields required.' };
+    return { ok: true };
+}
+function _fwDocGenerate_probationClause() {
+    const p = venueProfile || {}; const d = _fwReadDocForm();
+    const isSmall = Number(p.staffCount) < 15;
+    const mep = isSmall ? '12 months' : '6 months';
+    const endDate = (function() { const dt = new Date(d.emp_start); dt.setMonth(dt.getMonth() + Number(d.probation_months)); return dt.toISOString().slice(0, 10); })();
+    const html =
+        '<h1>Probation Clause</h1>' +
+        '<p>For insertion into the employment contract between <strong>' + _fwVenueLine() + '</strong> and <strong>' + _fwEscapeHtml(d.emp_name) + '</strong> (commencing ' + _fwEscapeHtml(d.emp_start) + ').</p>' +
+        '<h2>1. Probation period</h2>' +
+        '<p>The Employee\'s first <strong>' + _fwEscapeHtml(d.probation_months) + ' months</strong> of employment is a probationary period, ending on ' + _fwEscapeHtml(endDate) + '. This aligns with the statutory Minimum Employment Period of ' + _fwEscapeHtml(mep) + ' applicable to this employer under FW Act s383.</p>' +
+        '<h2>2. Review milestones</h2>' +
+        '<p>The Employer will conduct review meetings at approximately one month, three months, and at the end of the probation period to provide feedback on performance and address any concerns.</p>' +
+        '<h2>3. Notice during probation</h2>' +
+        '<p>Either party may terminate this employment during the probation period by giving <strong>' + _fwEscapeHtml(d.notice_days) + ' working days</strong> written notice (or payment in lieu).</p>' +
+        '<h2>4. Confirmation of employment</h2>' +
+        '<p>The Employer will confirm employment in writing no later than the end of the probation period. The Employee\'s employment is not automatically confirmed by passage of time — a positive confirmation decision is required.</p>' +
+        '<h2>5. Non-confirmation</h2>' +
+        '<p>If the Employer decides not to confirm employment at the end of the probation period, the Employer will provide written notice. A decision not to confirm constitutes termination of employment and the notice period under clause 3 applies. The Employee will be paid any accrued entitlements per the NES.</p>' +
+        '<p><em>This clause is a framework. Tailor specific dates, review milestones, and notice periods to the role. Not a substitute for legal advice. The relationship between probation and the FW Act s383 MEP should be reviewed for each individual employee.</em></p>';
+    return { html: html, filename: 'Probation_Clause_' + (d.emp_name || 'Employee').replace(/[^A-Za-z0-9_-]/g, '_') + '.docx' };
+}
+
+// ====== Doc: Leave-in-Advance Agreement (LM-004) ===========================
+function _fwDocRender_leaveInAdvance() {
+    return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" class="space-y-3">' +
+        '<div class="text-xs text-amber-300/80 p-3 bg-amber-900/20 border border-amber-700 rounded-lg"><strong>FW Act s324 authority:</strong> This agreement provides explicit written authority to deduct any un-accrued leave balance from final pay on termination. Must be signed BEFORE the leave is granted.</div>' +
+        '<div class="grid grid-cols-2 gap-3">' +
+            _fwDocFieldRow('Employee full name', '<input type="text" name="emp_name" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Classification', '<input type="text" name="emp_classification" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        '</div>' +
+        '<div class="grid grid-cols-2 gap-3">' +
+            _fwDocFieldRow('Leave granted in advance (hours)', '<input type="number" name="advance_hours" min="0.5" step="0.5" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Current accrued balance (hours)', '<input type="number" name="current_balance" min="0" step="0.5" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        '</div>' +
+        '<div class="grid grid-cols-2 gap-3">' +
+            _fwDocFieldRow('Expected recovery date', '<input type="date" name="recovery_date" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+            _fwDocFieldRow('Effective date', '<input type="date" name="effective_date" required value="' + _fwTodayIso() + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
+        '</div>' +
+    '</form>';
+}
+function _fwDocValidate_leaveInAdvance() {
+    const d = _fwReadDocForm();
+    if (!d.emp_name || !d.advance_hours || !d.current_balance) return { ok: false, error: 'All fields required.' };
+    return { ok: true };
+}
+function _fwDocGenerate_leaveInAdvance() {
+    const p = venueProfile || {}; const d = _fwReadDocForm();
+    const negativeBalance = Number(d.current_balance) - Number(d.advance_hours);
+    const html =
+        '<h1>Annual Leave in Advance Agreement</h1>' +
+        '<h2>Under FW Act s324 and MA000119 Schedule G</h2>' +
+        '<h3>1. Parties</h3>' +
+        '<p>Employer: <strong>' + _fwVenueLine() + '</strong></p>' +
+        '<p>Employee: <strong>' + _fwEscapeHtml(d.emp_name) + '</strong> (classification: ' + _fwEscapeHtml(d.emp_classification) + ')</p>' +
+        '<h3>2. Leave granted in advance</h3>' +
+        '<p>The Employer agrees to grant the Employee <strong>' + _fwEscapeHtml(d.advance_hours) + ' hours</strong> of annual leave in advance of accrual.</p>' +
+        '<h3>3. Current and post-advance balance</h3>' +
+        '<p>Current accrued balance: ' + _fwEscapeHtml(d.current_balance) + ' hours</p>' +
+        '<p>Balance after advance leave is taken: <strong>' + negativeBalance + ' hours</strong> (which may be negative).</p>' +
+        '<h3>4. Expected recovery</h3>' +
+        '<p>Through normal accrual the negative balance is expected to be eliminated by approximately <strong>' + _fwEscapeHtml(d.recovery_date) + '</strong>.</p>' +
+        '<h3>5. Deduction authority on termination</h3>' +
+        '<p>The Employee specifically authorises the Employer, under FW Act s324(1)(b), to deduct from the Employee\'s final pay (and any accrued entitlements payable on termination) the dollar value of any un-recovered advance leave balance. This authority applies only to the advance leave described in clause 2 above.</p>' +
+        '<h3>6. Alternative — repayment</h3>' +
+        '<p>The Employee may, at the Employee\'s election, repay the un-recovered amount directly rather than have it deducted from final pay.</p>' +
+        '<h3>7. Employee acknowledgement</h3>' +
+        '<p>The Employee acknowledges they have read this agreement, understand the deduction authority granted, and agree voluntarily.</p>' +
+        '<h3>8. Effective date</h3>' +
+        '<p>' + _fwEscapeHtml(d.effective_date) + '</p>' +
+        '<h3>9. Signatures</h3>' +
+        _fwSignatureBlock(d.emp_name) +
+        '<p><em>This document is not a substitute for legal advice. FW Act s324 requires authorisations to be principally for the employee\'s benefit OR specifically authorised by award/EA. Verify before signing.</em></p>';
+    return { html: html, filename: 'Leave_In_Advance_' + (d.emp_name || 'Employee').replace(/[^A-Za-z0-9_-]/g, '_') + '.docx' };
 }
 
 // ---- Step 8: Fitz Watch chat (gap-specific) -------------------------------

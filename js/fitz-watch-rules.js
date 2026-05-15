@@ -662,9 +662,8 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         consequence: 'Frequently challenged in psychological injury claims — early documentation determines claim outcomes and premium impact. The post-1 July 2026 NSW framework adds a 31% WPI threshold and 130-week cap, raising the stakes.',
         urgencyDriver: 'Required to be in place before any claim is lodged. Reactive setup after a claim significantly weakens the response.',
         affectedCount: function() { return null; },
-        // Phase 1b will swap this to generate_doc with template
-        // 'psychological_injury_claim_procedure'.
-        fixAction: 'ask_fitz',
+        fixAction: 'generate_doc',
+        fixPayloadDoc: { templateId: 'psychological_injury_claim_procedure' },
         detect: function(response, profile) {
             const isNSW = String((profile || {}).state || (profile || {}).location || '').toUpperCase() === 'NSW';
             switch (response) {
@@ -999,9 +998,8 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         consequence: 'Without the written agreement, deducting un-accrued leave from final pay is an unauthorised deduction — exposes the employer to a back-pay claim for the deducted amount.',
         urgencyDriver: 'Required to be in place at the time leave-in-advance is granted; retrospective agreements are treated as weaker evidence.',
         affectedCount: function() { return null; },
-        // Future Phase 2 doc: schedule_g_leave_in_advance_agreement. Until
-        // that template ships, ask_fitz fallback.
-        fixAction: 'ask_fitz',
+        fixAction: 'generate_doc',
+        fixPayloadDoc: { templateId: 'schedule_g_leave_in_advance_agreement' },
         detect: function(response) {
             switch (response) {
                 case 'yes':
@@ -1052,8 +1050,8 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
                 default: return { severity: 'medium' };
             }
         },
-        // Phase 2 doc: warning_procedure_policy + Warning Pack companion docs.
-        fixAction: 'ask_fitz',
+        fixAction: 'generate_doc',
+        fixPayloadDoc: { templateId: 'warning_procedure_policy' },
         defaultAction: 'Help me draft a warning procedure policy that meets the FWC unfair dismissal procedural fairness factors — including the stages (informal → first written warning → second → final → show-cause → termination), what each written warning must contain, and the procedural fairness requirements (right to representation, opportunity to respond, sufficient time to improve).'
     },
 
@@ -1090,8 +1088,8 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
                 default: return { severity: 'medium' };
             }
         },
-        // Phase 2 doc: employment_contract_probation_clause.
-        fixAction: 'ask_fitz',
+        fixAction: 'generate_doc',
+        fixPayloadDoc: { templateId: 'employment_contract_probation_clause' },
         defaultAction: 'Help me draft a probation clause for our employment contracts that aligns with the statutory MEP under FW Act s383. Use my staff count to determine whether the 6-month (non-small business) or 12-month (small business, <15 employees) MEP applies, and walk me through how to handle the "decline to confirm" decision at the end of probation.'
     },
 
@@ -1206,8 +1204,8 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
                 default: return { severity: 'high' };
             }
         },
-        // Phase 2 doc: psychosocial_risk_register.
-        fixAction: 'ask_fitz',
+        fixAction: 'generate_doc',
+        fixPayloadDoc: { templateId: 'psychosocial_risk_register' },
         defaultAction: 'Help me draft a hospitality-specific psychosocial hazard risk register covering customer aggression, sexual harassment, high job demands, bullying, traumatic incidents, low support, fatigue, and isolation. Include the hierarchy of controls and a consultation record. Reference the Vic OHS (Psychological Health) Regulations 2025 and the Model WHS framework.'
     },
 
@@ -1283,8 +1281,8 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
                 default: return { severity: 'high' };
             }
         },
-        // Phase 2 doc: bullying_harassment_policy.
-        fixAction: 'ask_fitz',
+        fixAction: 'generate_doc',
+        fixPayloadDoc: { templateId: 'bullying_harassment_policy' },
         defaultAction: 'Help me draft a bullying, harassment, and sexual harassment policy that satisfies the positive duty under the Sex Discrimination Act and the FWC anti-bullying jurisdiction. Include reporting pathways (multiple, including external), the investigation procedure, confidentiality, victimisation protection, consequences for substantiated breaches, and training commitments.'
     },
 
@@ -1329,8 +1327,8 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
                 default: return { severity: 'high' };
             }
         },
-        // Phase 2 doc: customer_aggression_procedure.
-        fixAction: 'ask_fitz',
+        fixAction: 'generate_doc',
+        fixPayloadDoc: { templateId: 'customer_aggression_procedure' },
         defaultAction: 'Help me draft customer aggression incident procedures for my licensed venue covering verbal aggression (de-escalation, withdrawal of service), threats of violence (000 protocol, evacuation), physical violence (police, scene security, worker support), post-incident worker support (immediate, 24-48h, ongoing), and the notifiable-incident assessment.'
     },
 
