@@ -807,7 +807,7 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         id: 'PS-003',
         domain: 'payroll_super',
         title: 'Super on Ordinary Time Earnings (OTE)',
-        question: 'Are you paying 12% Super Guarantee on all ordinary time earnings — including penalty rates on ordinary hours, casual loading, and leave loading?',
+        question: 'Are you paying Super Guarantee as per Australian Taxation Office guidance on all ordinary time earnings — including penalty rates on ordinary hours, casual loading, and leave loading?',
         options: [
             { value: 'yes',              label: 'Yes — super calculated on all OTE components' },
             { value: 'partial',          label: 'Partial — super on base but not all loadings/penalties' },
