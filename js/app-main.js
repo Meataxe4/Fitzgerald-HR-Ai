@@ -22126,7 +22126,48 @@ async function openFitzWatchQuestionnaire() {
     _fwqState.currentIndex = unansweredIdx === -1 ? 0 : unansweredIdx;
     const modal = document.getElementById('fitzWatchQuestionnaireModal');
     if (modal) modal.classList.remove('hidden');
+    // Belt-and-braces: attach Next / Back / radio handlers via addEventListener
+    // rather than relying solely on inline onclick attributes. Fixes the case
+    // where global function exposure is delayed or a stray JS error kills the
+    // inline handler chain.
+    _fwqAttachHandlers();
     renderFitzWatchQuestion();
+}
+
+function _fwqAttachHandlers() {
+    const nextBtn = document.getElementById('fwqNextBtn');
+    if (nextBtn && !nextBtn._fwqWired) {
+        nextBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('[Fitz Watch DIAGNOSTIC] Next button click event captured');
+            fitzWatchQuestionnaireNext();
+        });
+        nextBtn._fwqWired = true;
+    }
+    const backBtn = document.getElementById('fwqBackBtn');
+    if (backBtn && !backBtn._fwqWired) {
+        backBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            fitzWatchQuestionnaireBack();
+        });
+        backBtn._fwqWired = true;
+    }
+    // Radio change listener via delegation on the body so re-renders don't
+    // need to re-bind individual radios.
+    const body = document.getElementById('fwqBody');
+    if (body && !body._fwqDelegated) {
+        body.addEventListener('change', function(e) {
+            if (e.target && e.target.name === 'fwqResponse') {
+                _fwqUpdateNextButton();
+            }
+        });
+        body.addEventListener('click', function(e) {
+            // Catch label clicks too — radios in labels fire change but some
+            // browsers don't always; this is a safety net.
+            setTimeout(_fwqUpdateNextButton, 0);
+        });
+        body._fwqDelegated = true;
+    }
 }
 
 function closeFitzWatchQuestionnaire() {
