@@ -21930,6 +21930,22 @@ function openFitzWatch() {
         console.info('Fitz Watch: feature flag not granted for this user');
         return;
     }
+    // Defensive re-read of venueProfile from localStorage. The auth-state
+    // change handler eagerly loads it before showing the tile, but if
+    // anything overwrites the global between then and now, this catches it
+    // so the user doesn't get bounced into pre-flight unnecessarily.
+    if (currentUser && currentUser.uid) {
+        try {
+            const saved = localStorage.getItem('venueProfile_' + currentUser.uid);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                if (parsed && typeof parsed === 'object') {
+                    venueProfile = Object.assign({}, venueProfile, parsed);
+                }
+            }
+        } catch (e) { /* tolerate */ }
+    }
+    console.log('[Fitz Watch] openFitzWatch — venueProfile.fitzWatchSetupComplete =', venueProfile && venueProfile.fitzWatchSetupComplete);
     if (!fitzWatchPreflightComplete()) {
         openFitzWatchPreflight();
         return;
