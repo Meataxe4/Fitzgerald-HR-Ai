@@ -22030,8 +22030,20 @@ function submitFitzWatchPreflight(event) {
     const form = document.getElementById('fitzWatchPreflightForm');
     if (!form) return;
     const values = {};
+    // For radio groups (multiple inputs sharing the same `name`), only the
+    // CHECKED one represents the user's selection. The previous version
+    // overwrote values[name] on every iteration, so the last radio in DOM
+    // order always won — silently writing the wrong value for
+    // annualised_wage_used and time_records_method. Skip unchecked radios.
     Array.from(form.elements).forEach(function(el) {
-        if (el.name) values[el.name] = el.value;
+        if (!el.name) return;
+        if (el.type === 'radio') {
+            if (el.checked) values[el.name] = el.value;
+        } else if (el.type === 'checkbox') {
+            values[el.name] = el.checked;
+        } else {
+            values[el.name] = el.value;
+        }
     });
     const errors = validateFitzWatchPreflight(values);
     // Surface inline errors
@@ -22095,7 +22107,7 @@ function submitFitzWatchPreflight(event) {
 
 // Sprint version marker — prints once on script load so we can confirm which
 // build the browser is actually running.
-console.log('[Fitz Watch] app-main.js loaded — build 20260515-15');
+console.log('[Fitz Watch] app-main.js loaded — build 20260515-16');
 
 function _fwEscapeHtml(s) {
     return String(s == null ? '' : s)
