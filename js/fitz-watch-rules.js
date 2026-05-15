@@ -559,6 +559,162 @@ const FITZ_WATCH_QUESTION_REGISTRY = [
         },
         fixAction: 'ask_fitz',
         defaultAction: 'Help me set up an audit-trail system for time record edits so managers can correct genuine errors without compromising record integrity under FW Act s535. Cover the controls, the log format, and the review cadence.'
+    },
+
+    // ========================================================================
+    // PHASE 1a — Workers Compensation Readiness (Domain 3)
+    // 4 rules per spec section 6. Severity escalation for NSW comes from the
+    // regulatory countdown engine (nsw_wc_reform_2026 links WC-001/003/004
+    // and commences 1 July 2026 — the activeReforms hook bumps severity for
+    // venues with state=NSW during the 90-day pre-commencement window).
+    // ========================================================================
+
+    // WC-001 — Reasonable management action documentation -------------------
+    {
+        id: 'WC-001',
+        domain: 'workers_comp',
+        title: 'Reasonable management action documentation',
+        question: 'For any performance management, disciplinary, or organisational change action taken in the last 12 months, do you have contemporaneous written documentation showing the basis for the action and the manner in which it was carried out?',
+        options: [
+            { value: 'yes',              label: 'Yes — all such actions are contemporaneously documented' },
+            { value: 'partial',          label: 'Partial — some documented, some not' },
+            { value: 'no',               label: 'No — no formal documentation' },
+            { value: 'na',               label: 'Not applicable — no performance or disciplinary actions in the period' },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'NSW Workers Compensation Act',
+            section: '(post-1 July 2026 amendments); reasonable management action defence',
+            jurisdiction: 'NSW (heightened); national (baseline)'
+        },
+        consequence: "The 'reasonable management action taken in a reasonable manner' defence collapses without contemporaneous documentation. Frequently challenged in psychological injury claims, particularly under the post-1 July 2026 NSW framework.",
+        urgencyDriver: 'Documentation must be contemporaneous — retrospective documentation post-incident is treated as significantly weaker evidence.',
+        affectedCount: function() { return null; },
+        detect: function(response, profile) {
+            const isNSW = String((profile || {}).state || (profile || {}).location || '').toUpperCase() === 'NSW';
+            switch (response) {
+                case 'yes':
+                case 'na': return null;
+                case 'partial': return { severity: isNSW ? 'high' : 'medium' };
+                case 'no':
+                case 'unsure_need_help': return { severity: isNSW ? 'critical' : 'high', severityLabel: isNSW ? 'Defence at risk' : 'Likely breach' };
+                default: return { severity: 'high' };
+            }
+        },
+        fixAction: 'ask_fitz',
+        defaultAction: 'Help me build a reasonable management action documentation framework — what to capture before, during, and after any performance management or disciplinary conversation. Include the contemporaneous-documentation principle and the post-1 July 2026 NSW framework where applicable.'
+    },
+
+    // WC-002 — Insurance renewal awareness (NSW only) -----------------------
+    {
+        id: 'WC-002',
+        domain: 'workers_comp',
+        title: 'Workers compensation insurance renewal timing',
+        question: 'When does your workers compensation insurance renew?',
+        options: [
+            { value: 'before_30_june_2026', label: 'Before 30 June 2026 (pre-reform excess arrangements apply)' },
+            { value: 'on_or_after_30_june_2026', label: 'On or after 30 June 2026 (new excess arrangements apply)' },
+            { value: 'unsure_need_help',      label: "I'm not sure" }
+        ],
+        conditional: function(profile) {
+            const state = String((profile || {}).state || (profile || {}).location || '').toUpperCase();
+            return state === 'NSW';
+        },
+        statutoryAnchor: {
+            act: 'icare NSW',
+            section: 'employer excess arrangements (1 July 2026 reform)',
+            jurisdiction: 'NSW'
+        },
+        consequence: 'Renewal timing determines which employer excess framework applies — pre-reform vs. post-reform. Operational financial impact.',
+        urgencyDriver: 'Confirm before next renewal cycle to budget accurately and ensure correct excess arrangements.',
+        affectedCount: function() { return null; },
+        detect: function(response) {
+            switch (response) {
+                case 'before_30_june_2026':
+                case 'on_or_after_30_june_2026': return null;
+                case 'unsure_need_help': return { severity: 'medium' };
+                default: return { severity: 'medium' };
+            }
+        },
+        fixAction: 'ask_fitz',
+        defaultAction: 'Help me confirm my workers compensation renewal date and explain which employer excess framework will apply (pre-reform vs post-1 July 2026 NSW reform) and the operational financial impact.'
+    },
+
+    // WC-003 — Psychological injury claim management ------------------------
+    {
+        id: 'WC-003',
+        domain: 'workers_comp',
+        title: 'Psychological injury claim management process',
+        question: 'Do you have a documented process for receiving, investigating, and responding to psychological injury claims and complaints?',
+        options: [
+            { value: 'yes',              label: 'Yes — documented process in place' },
+            { value: 'partial',          label: 'Partial — informal process exists' },
+            { value: 'no',               label: 'No — no documented process' },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function() { return true; },
+        statutoryAnchor: {
+            act: 'NSW Workers Comp Act',
+            section: 'psychological injury reforms (1 July 2026); SIRA guidance',
+            jurisdiction: 'NSW (heightened); national (baseline)'
+        },
+        consequence: 'Frequently challenged in psychological injury claims — early documentation determines claim outcomes and premium impact. The post-1 July 2026 NSW framework adds a 31% WPI threshold and 130-week cap, raising the stakes.',
+        urgencyDriver: 'Required to be in place before any claim is lodged. Reactive setup after a claim significantly weakens the response.',
+        affectedCount: function() { return null; },
+        // Phase 1b will swap this to generate_doc with template
+        // 'psychological_injury_claim_procedure'.
+        fixAction: 'ask_fitz',
+        detect: function(response, profile) {
+            const isNSW = String((profile || {}).state || (profile || {}).location || '').toUpperCase() === 'NSW';
+            switch (response) {
+                case 'yes': return null;
+                case 'partial': return { severity: isNSW ? 'high' : 'medium' };
+                case 'no':
+                case 'unsure_need_help': return { severity: isNSW ? 'critical' : 'high' };
+                default: return { severity: 'high' };
+            }
+        },
+        defaultAction: 'Help me build a documented process for receiving, investigating, and responding to psychological injury claims and complaints. Include the post-1 July 2026 NSW framework (31% WPI threshold, 130-week cap, amended reasonable management action defence) and SIRA guidance.'
+    },
+
+    // WC-004 — Manager briefing on workers comp reforms (NSW only) ----------
+    {
+        id: 'WC-004',
+        domain: 'workers_comp',
+        title: 'Manager briefing on NSW workers comp reforms',
+        question: 'Have you briefed your managers on the new NSW workers compensation framework (WPI thresholds, 130-week cap, amended reasonable management action defence) effective 1 July 2026?',
+        options: [
+            { value: 'yes',              label: 'Yes — all managers briefed' },
+            { value: 'partial',          label: 'Partial — some managers briefed' },
+            { value: 'scheduled',        label: 'Scheduled — briefing planned but not delivered' },
+            { value: 'no',               label: 'No — no briefing planned' },
+            { value: 'unsure_need_help', label: "I'm not sure" }
+        ],
+        conditional: function(profile) {
+            const state = String((profile || {}).state || (profile || {}).location || '').toUpperCase();
+            return state === 'NSW';
+        },
+        statutoryAnchor: {
+            act: 'NSW Workers Compensation Legislation Amendment Acts',
+            section: '(Nov 2025 + Feb 2026)',
+            jurisdiction: 'NSW'
+        },
+        consequence: 'Manager actions taken without awareness of the new framework risk undermining the reasonable management action defence — frequently challenged in psychological injury claims under the new framework.',
+        urgencyDriver: 'Reform commences in less than 90 days. Manager training is the single highest-leverage preparation.',
+        affectedCount: function() { return null; },
+        detect: function(response) {
+            switch (response) {
+                case 'yes': return null;
+                case 'partial':
+                case 'scheduled': return { severity: 'medium' };
+                case 'no':
+                case 'unsure_need_help': return { severity: 'high' };
+                default: return { severity: 'high' };
+            }
+        },
+        fixAction: 'ask_fitz',
+        defaultAction: 'Build me a manager briefing on the NSW workers comp reforms commencing 1 July 2026 — WPI thresholds, 130-week cap, amended reasonable management action defence ("significant cause" test). Include practical scenarios for hospitality managers.'
     }
 ];
 

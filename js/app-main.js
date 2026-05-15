@@ -22106,7 +22106,7 @@ function submitFitzWatchPreflight(event) {
 
 // Sprint version marker — prints once on script load so we can confirm which
 // build the browser is actually running.
-console.log('[Fitz Watch] app-main.js loaded — build 20260515-17 (Phase C — GA)');
+console.log('[Fitz Watch] app-main.js loaded — build 20260515-18 (Phase 1a — Workers Comp)');
 
 function _fwEscapeHtml(s) {
     return String(s == null ? '' : s)
@@ -22115,6 +22115,16 @@ function _fwEscapeHtml(s) {
 }
 
 // ---- Step 5: Questionnaire UI ----------------------------------------------
+
+// Friendly domain labels for the questionnaire header and gap cards.
+const _FW_DOMAIN_LABELS = {
+    award_pay: 'Award & Pay',
+    workers_comp: 'Workers Compensation',
+    whs_psychosocial: 'WHS & Psychosocial',
+    payroll_super: 'Payroll & Super',
+    termination: 'Termination',
+    leave_management: 'Leave Management'
+};
 
 let _fwqState = { rules: [], currentIndex: 0, completed: false };
 
@@ -22229,7 +22239,7 @@ function renderFitzWatchQuestion() {
     const body = document.getElementById('fwqBody');
     if (!body) return;
     body.innerHTML =
-        '<div class="text-xs text-slate-500 uppercase tracking-wide mb-2">Award &amp; Pay · ' + _fwEscapeHtml(rule.title) + '</div>' +
+        '<div class="text-xs text-slate-500 uppercase tracking-wide mb-2">' + _fwEscapeHtml(_FW_DOMAIN_LABELS[rule.domain] || rule.domain) + ' · ' + _fwEscapeHtml(rule.title) + '</div>' +
         '<h3 class="text-lg font-bold text-white mb-4">' + _fwEscapeHtml(rule.question) + '</h3>' +
         '<div class="space-y-1 mb-4">' + optionsHtml + '</div>' +
         '<details class="text-sm text-slate-400 mt-4">' +
@@ -22500,47 +22510,67 @@ function _fwRenderTabNav(active, risksCount, changesCount) {
 
 // ---- Tab 1: Your risks ---------------------------------------------------
 
+// Domain display metadata. Add new domains here when they ship.
+const _FW_DOMAINS = [
+    { id: 'award_pay',   label: 'Award & Pay' },
+    { id: 'workers_comp', label: 'Workers Compensation' }
+];
+
 function _fwRenderRisksTab(profile, result, applicable, answeredCount) {
     // State A — pre-flight done, zero responses
     if (answeredCount === 0) {
         return '<div class="text-center py-10 bg-slate-700/30 rounded-xl border border-slate-700">' +
                 '<div class="text-4xl mb-3">📋</div>' +
-                '<h3 class="text-lg font-bold text-white mb-2">Award &amp; Pay assessment</h3>' +
+                '<h3 class="text-lg font-bold text-white mb-2">Compliance assessment</h3>' +
                 '<p class="text-slate-400 mb-2">Run the assessment to detect compliance gaps in your venue.</p>' +
-                '<p class="text-xs text-slate-500 mb-6">' + applicable.length + ' questions · about 6 minutes</p>' +
+                '<p class="text-xs text-slate-500 mb-6">' + applicable.length + ' questions · about ' + Math.max(3, Math.round(applicable.length * 0.5)) + ' minutes</p>' +
                 '<button onclick="closeFitzWatchDashboard(); openFitzWatchQuestionnaire();" class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold rounded-lg transition-all">Run assessment →</button>' +
             '</div>';
     }
 
-    const domainSeverity = (typeof rollupDomainSeverity === 'function')
-        ? rollupDomainSeverity(result.gaps, 'award_pay')
-        : 'low';
-    const counts = { critical: 0, high: 0, medium: 0, low: 0 };
-    result.gaps.forEach(function(g) { counts[g.severity] = (counts[g.severity] || 0) + 1; });
-    const sevBadge = _FW_SEV_BADGE[domainSeverity] || _FW_SEV_BADGE.low;
-    const domainLabel = (typeof FITZ_WATCH_SEVERITY_LABELS !== 'undefined') ? FITZ_WATCH_SEVERITY_LABELS[domainSeverity] : domainSeverity;
+    let html = '<div class="space-y-4">';
 
-    let html = '<div class="space-y-4">' +
-        '<div class="p-5 rounded-xl border ' + sevBadge.class + '">' +
+    // Per-domain severity cards. Render one card per domain that has at least
+    // one applicable rule (so non-NSW venues don't see a stub Workers Comp
+    // card when no WC rules apply to them after conditionals).
+    _FW_DOMAINS.forEach(function(d) {
+        const dApplicable = applicable.filter(function(r) { return r.domain === d.id; });
+        if (dApplicable.length === 0) return;
+        const dGaps = result.gaps.filter(function(g) { return g.domain === d.id; });
+        const dAnswered = dApplicable.filter(function(r) {
+            const responses = getFitzWatchResponsesCache();
+            return !!responses[r.id];
+        }).length;
+        const dSev = (typeof rollupDomainSeverity === 'function')
+            ? rollupDomainSeverity(dGaps, d.id)
+            : 'low';
+        const dCounts = { critical: 0, high: 0, medium: 0, low: 0 };
+        dGaps.forEach(function(g) { dCounts[g.severity] = (dCounts[g.severity] || 0) + 1; });
+        const sevBadge = _FW_SEV_BADGE[dSev] || _FW_SEV_BADGE.low;
+        const dLabel = (typeof FITZ_WATCH_SEVERITY_LABELS !== 'undefined') ? FITZ_WATCH_SEVERITY_LABELS[dSev] : dSev;
+        html += '<div class="p-5 rounded-xl border ' + sevBadge.class + '">' +
             '<div class="flex items-center justify-between mb-2">' +
-                '<div class="font-semibold text-lg">Award &amp; Pay</div>' +
-                '<div class="text-sm uppercase tracking-wide font-semibold">' + sevBadge.dot + ' ' + domainLabel + '</div>' +
+                '<div class="font-semibold text-lg">' + _fwEscapeHtml(d.label) + '</div>' +
+                '<div class="text-sm uppercase tracking-wide font-semibold">' + sevBadge.dot + ' ' + dLabel + '</div>' +
             '</div>' +
             '<div class="text-sm opacity-80">' +
-                answeredCount + ' of ' + applicable.length + ' questions answered · ' +
-                counts.critical + ' critical, ' + counts.high + ' high, ' + counts.medium + ' medium, ' + counts.low + ' low' +
+                dAnswered + ' of ' + dApplicable.length + ' questions answered · ' +
+                dCounts.critical + ' critical, ' + dCounts.high + ' high, ' + dCounts.medium + ' medium, ' + dCounts.low + ' low' +
             '</div>' +
         '</div>';
+    });
 
     // State C — all clear
     if (result.gaps.length === 0 && result.outstanding.length === 0) {
         html += '<div class="p-5 rounded-xl bg-emerald-900/20 border border-emerald-700 text-emerald-200 text-sm">' +
-            '<strong>✓ No gaps detected in Award &amp; Pay.</strong> Verify with your adviser if your circumstances change. We\'ll re-check key questions every 30 days.' +
+            '<strong>✓ No gaps detected.</strong> Verify with your adviser if your circumstances change. We\'ll re-check key questions every 30 days.' +
             '</div>' +
             '</div>';
         return html;
     }
 
+    // Gap groups by severity (cross-domain). Each card carries its domain
+    // label so cross-domain grouping doesn't lose the context.
     ['critical', 'high', 'medium', 'low'].forEach(function(sev) {
         const sevGaps = result.gaps.filter(function(g) { return g.severity === sev; });
         if (sevGaps.length === 0) return;
@@ -22794,11 +22824,15 @@ function _fwRenderGapCard(gap) {
             ? 'text-amber-400 hover:text-amber-300'
             : 'bg-amber-500 hover:bg-amber-400 text-slate-900';
 
+    // Domain label so cross-domain severity grouping is still self-explanatory.
+    const domainLabelMap = { award_pay: 'Award & Pay', workers_comp: 'Workers Comp' };
+    const domainLabel = domainLabelMap[gap.domain] || gap.domain;
     return '<div class="p-4 rounded-xl border ' + sevBadge.class.replace('text-', 'border-').replace('bg-', 'bg-') + ' bg-slate-800/60">' +
         '<div class="flex items-start justify-between gap-3 mb-2">' +
             '<div class="flex items-start gap-2">' +
                 '<span class="text-xl leading-none">' + sevBadge.dot + '</span>' +
                 '<div>' +
+                    '<div class="text-xs uppercase tracking-wide text-slate-500 mb-0.5">' + _fwEscapeHtml(domainLabel) + ' · ' + _fwEscapeHtml(gap.gap_id) + '</div>' +
                     '<div class="font-semibold text-white">' + _fwEscapeHtml(gap.title) + '</div>' +
                     '<div class="text-xs text-slate-400 mt-0.5">' + _fwEscapeHtml(anchorStr) + '</div>' +
                 '</div>' +
