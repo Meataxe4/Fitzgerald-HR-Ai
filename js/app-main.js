@@ -22095,7 +22095,7 @@ function submitFitzWatchPreflight(event) {
 
 // Sprint version marker — prints once on script load so we can confirm which
 // build the browser is actually running.
-console.log('[Fitz Watch] app-main.js loaded — build 20260515-14');
+console.log('[Fitz Watch] app-main.js loaded — build 20260515-15');
 
 function _fwEscapeHtml(s) {
     return String(s == null ? '' : s)
@@ -23438,8 +23438,46 @@ function showFitzWatchToolTileIfFlagged() {
     if (mobileTile) mobileTile.classList.remove('hidden');
 }
 
+// ---- Sprint 6: Hire & Onboard merged tool ----------------------------------
+
+function openHireAndOnboard() {
+    const modal = document.getElementById('hireAndOnboardModal');
+    if (modal) modal.classList.remove('hidden');
+    // Default to pre-hire tab on each open
+    hireOnboardSwitchTab('pre');
+}
+
+function closeHireAndOnboard() {
+    const modal = document.getElementById('hireAndOnboardModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function hireOnboardSwitchTab(tab) {
+    const pre = document.getElementById('hireOnboardPanelPre');
+    const post = document.getElementById('hireOnboardPanelPost');
+    const preTab = document.getElementById('hireOnboardTabPre');
+    const postTab = document.getElementById('hireOnboardTabPost');
+    if (!pre || !post || !preTab || !postTab) return;
+    const activeCls = 'border-amber-500 text-amber-400';
+    const inactiveCls = 'border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-600';
+    if (tab === 'post') {
+        pre.classList.add('hidden');
+        post.classList.remove('hidden');
+        preTab.className = 'px-1 pb-2 -mb-px text-sm font-medium border-b-2 ' + inactiveCls + ' transition-colors';
+        postTab.className = 'px-1 pb-2 -mb-px text-sm font-medium border-b-2 ' + activeCls + ' transition-colors';
+    } else {
+        post.classList.add('hidden');
+        pre.classList.remove('hidden');
+        postTab.className = 'px-1 pb-2 -mb-px text-sm font-medium border-b-2 ' + inactiveCls + ' transition-colors';
+        preTab.className = 'px-1 pb-2 -mb-px text-sm font-medium border-b-2 ' + activeCls + ' transition-colors';
+    }
+}
+
 // Expose to window for devtools + onclick handlers
 if (typeof window !== 'undefined') {
+    window.openHireAndOnboard = openHireAndOnboard;
+    window.closeHireAndOnboard = closeHireAndOnboard;
+    window.hireOnboardSwitchTab = hireOnboardSwitchTab;
     window.openFitzWatch = openFitzWatch;
     window.openFitzWatchPreflight = openFitzWatchPreflight;
     window.closeFitzWatchPreflight = closeFitzWatchPreflight;
