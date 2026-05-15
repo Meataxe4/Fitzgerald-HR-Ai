@@ -84,7 +84,11 @@ const FW_TEST_RESPONSES_KNOWN_BAD = {
     'PS-001': _resp('not_yet'),
     'PS-002': _resp('no'),
     'PS-003': _resp('no'),
-    'PS-004': _resp('no')
+    'PS-004': _resp('no'),
+    'LM-001': _resp('no'),
+    'LM-002': _resp('no'),
+    'LM-003': _resp('no'),
+    'LM-004': _resp('no')
 };
 
 // All-best-case responses for the known-OK profile
@@ -108,7 +112,11 @@ const FW_TEST_RESPONSES_KNOWN_OK = {
     'PS-001': _resp('yes'),
     'PS-002': _resp('yes'),
     'PS-003': _resp('yes'),
-    'PS-004': _resp('yes')
+    'PS-004': _resp('yes'),
+    'LM-001': _resp('yes'),
+    'LM-002': _resp('no_cashing_out'),
+    'LM-003': _resp('no_excess_balances'),
+    'LM-004': _resp('no_advance_leave')
 };
 
 // ---- Assertions ------------------------------------------------------------
@@ -152,7 +160,7 @@ function runFitzWatchTests(verbose) {
         return { id: g.gap_id, severity: g.severity, label: g.severity_label, action: g.fix_action };
     }));
 
-    check('Known-bad: produces 20 gaps (12 AP + 4 WC + 4 PS, all rules trigger)', r1.gaps.length === 20, 'got ' + r1.gaps.length);
+    check('Known-bad: produces 24 gaps (12 AP + 4 WC + 4 PS + 4 LM, all rules trigger)', r1.gaps.length === 24, 'got ' + r1.gaps.length);
     check('Known-bad: outstanding is empty', r1.outstanding.length === 0);
     check('Known-bad: AP-001 critical (over 12 months)',
         _gapById(r1.gaps, 'AP-001') && _gapById(r1.gaps, 'AP-001').severity === 'critical');
@@ -221,8 +229,8 @@ function runFitzWatchTests(verbose) {
         outstandingIds.indexOf('AP-006') !== -1);
     check('Conditional: AP-001 IS in outstanding (always applies)',
         outstandingIds.indexOf('AP-001') !== -1);
-    check('Conditional: total applicable rules = 14 (8 AP + WC-001 + WC-003 + 4 PS; WC-002/004 NSW-only filtered out)',
-        outstandingIds.length === 14, 'got ' + outstandingIds.length);
+    check('Conditional: total applicable rules = 18 (8 AP + WC-001 + WC-003 + 4 PS + 4 LM; WC-002/004 NSW-only filtered out)',
+        outstandingIds.length === 18, 'got ' + outstandingIds.length);
     check('Conditional: WC-002 NOT applicable to VIC venue',
         outstandingIds.indexOf('WC-002') === -1);
     check('Conditional: WC-004 NOT applicable to VIC venue',
@@ -397,11 +405,52 @@ function runFitzWatchTests(verbose) {
         detectGaps(VIC_PROFILE, {}, []).outstanding.find(function(o) { return o.questionId === 'PS-001'; }) != null);
 
     // ============================================================
+    // Phase 1e — Leave Management domain
+    // ============================================================
+    console.log('%cPhase 1e: Leave Management rules', 'color: #94a3b8');
+
+    const lmResult = detectGaps(FW_TEST_PROFILE_KNOWN_BAD, {
+        'LM-001': _resp('no'),
+        'LM-002': _resp('no'),
+        'LM-003': _resp('no'),
+        'LM-004': _resp('no')
+    }, []);
+
+    check('LM-001 "no" produces CRITICAL (leave loading on termination)',
+        lmResult.gaps.find(function(g) { return g.gap_id === 'LM-001'; }).severity === 'critical');
+    check('LM-002 "no" produces CRITICAL (unauthorised cash-out)',
+        lmResult.gaps.find(function(g) { return g.gap_id === 'LM-002'; }).severity === 'critical');
+    check('LM-002 routes to generate_doc with cash-out template (Doc 3)',
+        lmResult.gaps.find(function(g) { return g.gap_id === 'LM-002'; }).fix_action === 'generate_doc'
+        && lmResult.gaps.find(function(g) { return g.gap_id === 'LM-002'; }).fix_payload_doc
+        && lmResult.gaps.find(function(g) { return g.gap_id === 'LM-002'; }).fix_payload_doc.templateId === 'schedule_g_h_cash_out_agreement');
+    check('LM-003 "no" produces MEDIUM (excess balance review)',
+        lmResult.gaps.find(function(g) { return g.gap_id === 'LM-003'; }).severity === 'medium');
+    check('LM-004 "no" produces HIGH (leave-in-advance agreements)',
+        lmResult.gaps.find(function(g) { return g.gap_id === 'LM-004'; }).severity === 'high');
+
+    // "Not applicable" responses produce no gap
+    const lmResultNa = detectGaps(FW_TEST_PROFILE_KNOWN_BAD, {
+        'LM-002': _resp('no_cashing_out'),
+        'LM-003': _resp('no_excess_balances'),
+        'LM-004': _resp('no_advance_leave')
+    }, []);
+    check('LM-002 "no_cashing_out" produces no gap',
+        lmResultNa.gaps.find(function(g) { return g.gap_id === 'LM-002'; }) == null);
+    check('LM-003 "no_excess_balances" produces no gap',
+        lmResultNa.gaps.find(function(g) { return g.gap_id === 'LM-003'; }) == null);
+    check('LM-004 "no_advance_leave" produces no gap',
+        lmResultNa.gaps.find(function(g) { return g.gap_id === 'LM-004'; }) == null);
+
+    check('leave_management domain rollup = critical',
+        rollupDomainSeverity(lmResult.gaps, 'leave_management') === 'critical');
+
+    // ============================================================
     // Registry sanity
     // ============================================================
     console.log('%cRegistry sanity', 'color: #94a3b8');
     const registry = getQuestionRegistry();
-    check('Registry: 20 questions (12 AP + 4 WC + 4 PS)', registry.length === 20);
+    check('Registry: 24 questions (12 AP + 4 WC + 4 PS + 4 LM)', registry.length === 24);
     check('Registry: every rule has id, domain, question, options, conditional, detect, statutoryAnchor, fixAction',
         registry.every(function(r) {
             return r.id && r.domain && r.question && Array.isArray(r.options)
@@ -411,7 +460,7 @@ function runFitzWatchTests(verbose) {
     check('Registry: every rule has at least 3 options',
         registry.every(function(r) { return r.options.length >= 3; }));
     check('Registry: ids are unique',
-        new Set(registry.map(function(r) { return r.id; })).size === 20);
+        new Set(registry.map(function(r) { return r.id; })).size === 24);
 
     // ---- Summary -----------------------------------------------------------
     const total = passed + failed;

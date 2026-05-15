@@ -22106,7 +22106,7 @@ function submitFitzWatchPreflight(event) {
 
 // Sprint version marker — prints once on script load so we can confirm which
 // build the browser is actually running.
-console.log('[Fitz Watch] app-main.js loaded — build 20260515-19 (Phase 1b — Payroll & Super)');
+console.log('[Fitz Watch] app-main.js loaded — build 20260515-21 (Phase 1e — Leave Management)');
 
 function _fwEscapeHtml(s) {
     return String(s == null ? '' : s)
@@ -22512,9 +22512,10 @@ function _fwRenderTabNav(active, risksCount, changesCount) {
 
 // Domain display metadata. Add new domains here when they ship.
 const _FW_DOMAINS = [
-    { id: 'award_pay',     label: 'Award & Pay' },
-    { id: 'workers_comp',  label: 'Workers Compensation' },
-    { id: 'payroll_super', label: 'Payroll & Super' }
+    { id: 'award_pay',        label: 'Award & Pay' },
+    { id: 'workers_comp',     label: 'Workers Compensation' },
+    { id: 'payroll_super',    label: 'Payroll & Super' },
+    { id: 'leave_management', label: 'Leave Management' }
 ];
 
 function _fwRenderRisksTab(profile, result, applicable, answeredCount) {
@@ -22826,7 +22827,7 @@ function _fwRenderGapCard(gap) {
             : 'bg-amber-500 hover:bg-amber-400 text-slate-900';
 
     // Domain label so cross-domain severity grouping is still self-explanatory.
-    const domainLabelMap = { award_pay: 'Award & Pay', workers_comp: 'Workers Comp', payroll_super: 'Payroll & Super' };
+    const domainLabelMap = { award_pay: 'Award & Pay', workers_comp: 'Workers Comp', payroll_super: 'Payroll & Super', leave_management: 'Leave Management' };
     const domainLabel = domainLabelMap[gap.domain] || gap.domain;
     return '<div class="p-4 rounded-xl border ' + sevBadge.class.replace('text-', 'border-').replace('bg-', 'bg-') + ' bg-slate-800/60">' +
         '<div class="flex items-start justify-between gap-3 mb-2">' +
