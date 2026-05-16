@@ -154,15 +154,18 @@ async function createOrUpdateUserProfile(user) {
         if (!doc.exists) {
             // New user - start on free tier (subscriptions handled via Stripe)
             await userRef.set({
-                uid: user.uid, 
-                email: user.email, 
-                displayName: user.displayName, 
+                uid: user.uid,
+                email: user.email,
+                displayName: user.displayName,
                 photoURL: user.photoURL,
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(),
                 subscriptionTier: 'free',
                 subscriptionStatus: 'active'
             });
+            if (typeof fbq === 'function') {
+                try { fbq('track', 'Lead', { content_name: 'Account Signup' }); } catch (e) {}
+            }
         } else {
             await userRef.update({ 
                 lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(), 
