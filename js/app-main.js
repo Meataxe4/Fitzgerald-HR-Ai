@@ -7335,11 +7335,23 @@ function handlePaymentReturn() {
  */
 async function processPaymentSuccess() {
     const pendingPurchase = localStorage.getItem('pendingPurchase');
-    
+
     if (pendingPurchase) {
         try {
             const purchase = JSON.parse(pendingPurchase);
-            
+
+            if (typeof fbq === 'function') {
+                try {
+                    fbq('track', 'CompleteRegistration', {
+                        content_name: purchase.tier || purchase.type || 'Stripe Checkout',
+                        content_category: purchase.type || 'subscription',
+                        value: typeof purchase.price === 'number' ? purchase.price : (typeof purchase.amount === 'number' ? purchase.amount : undefined),
+                        currency: purchase.currency || 'AUD',
+                        status: true
+                    });
+                } catch (e) {}
+            }
+
             // Update status
             updatePaymentStatus('Adding credits to your account...');
             
