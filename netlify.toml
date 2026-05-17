@@ -5,6 +5,19 @@
   publish = "."
   functions = "netlify/functions"
 
+# Canonicalize www -> apex in a single hop (avoids redirect chain)
+[[redirects]]
+  from = "https://www.fitzhr.com/*"
+  to = "https://fitzhr.com/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.fitzhr.com/*"
+  to = "https://fitzhr.com/:splat"
+  status = 301
+  force = true
+
 # Redirect rules for OAuth callbacks
 [[redirects]]
   from = "/auth/deputy/callback"
