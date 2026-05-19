@@ -73,15 +73,24 @@
             font-family: inherit;
         }
         .btn:hover, .btn:focus { background: var(--amb2); }
-        .meta {
+        .urgent {
             margin-top: 1.75rem;
-            padding-top: 1.5rem;
-            border-top: 1px solid var(--rule);
-            font-size: 0.85rem;
+            padding: 1rem;
+            background: rgba(245,158,11,0.08);
+            border: 1px solid var(--rule);
+            font-size: 0.9rem;
+            color: #fff;
+        }
+        .urgent strong { color: var(--amber); display: block; margin-bottom: 0.35rem; font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; }
+        .urgent a { color: var(--amber); text-decoration: none; font-weight: 700; }
+        .urgent a:hover { text-decoration: underline; }
+        .meta {
+            margin-top: 1.25rem;
+            font-size: 0.8rem;
             color: var(--w30);
         }
-        .meta a { color: var(--amber); text-decoration: none; }
-        .meta a:hover { text-decoration: underline; }
+        .meta a { color: var(--w60); text-decoration: none; }
+        .meta a:hover { color: var(--amber); }
         .countdown { color: var(--w60); font-size: 0.8rem; margin-top: 0.75rem; }
     </style>
 </head>
@@ -92,9 +101,12 @@
         <p>Our hosting provider is having a brief hiccup. This usually clears within a couple of minutes.</p>
         <button class="btn" onclick="location.reload()">Try again</button>
         <p class="countdown" id="cd">Retrying automatically in 30s…</p>
+        <div class="urgent">
+            <strong>Need urgent help?</strong>
+            Email our team at <a href="mailto:support@fitzhr.com?subject=Urgent%20support%20request">support@fitzhr.com</a> for immediate assistance.
+        </div>
         <div class="meta">
-            Check live status: <a href="https://www.netlifystatus.com" target="_blank" rel="noopener">netlifystatus.com</a><br>
-            Need help? <a href="mailto:support@fitzhr.com">support@fitzhr.com</a>
+            Live status: <a href="https://www.netlifystatus.com" target="_blank" rel="noopener">netlifystatus.com</a>
         </div>
     </main>
     <script>
