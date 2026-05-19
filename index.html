@@ -661,6 +661,34 @@
 <div class="grain"></div>
 <div id="spb"></div>
 
+<!-- Netlify status banner: shows only when status.indicator !== "none" -->
+<div id="netlify-status-banner" role="status" aria-live="polite" style="display:none;position:fixed;top:0;left:0;right:0;z-index:10000;background:#f59e0b;color:#0f172a;font-family:'Outfit',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-weight:600;font-size:0.85rem;padding:0.6rem 1rem;text-align:center;letter-spacing:0.01em;box-shadow:0 2px 8px rgba(0,0,0,0.15);">
+    <span id="netlify-status-message">Our hosting provider is reporting an incident. Some features may be slow or unavailable.</span>
+    <a href="https://www.netlifystatus.com" target="_blank" rel="noopener" style="color:#0f172a;text-decoration:underline;margin-left:0.5rem;font-weight:700;">Status</a>
+    <button type="button" onclick="this.parentElement.style.display='none'" aria-label="Dismiss" style="background:none;border:none;color:#0f172a;font-size:1rem;font-weight:700;cursor:pointer;margin-left:0.75rem;padding:0 0.25rem;">×</button>
+</div>
+<script>
+    (function () {
+        try {
+            fetch('https://www.netlifystatus.com/api/v2/status.json', { cache: 'no-store' })
+                .then(function (r) { return r.ok ? r.json() : null; })
+                .then(function (data) {
+                    if (!data || !data.status) return;
+                    var indicator = data.status.indicator;
+                    if (indicator && indicator !== 'none') {
+                        var banner = document.getElementById('netlify-status-banner');
+                        var msg = document.getElementById('netlify-status-message');
+                        if (data.status.description) {
+                            msg.textContent = 'Hosting provider status: ' + data.status.description + '. Some features may be slow or unavailable.';
+                        }
+                        banner.style.display = 'block';
+                    }
+                })
+                .catch(function () { /* silent: don't break the page if status API is unreachable */ });
+        } catch (e) { /* no-op */ }
+    })();
+</script>
+
 <nav id="nav">
     <a href="/" class="nav-logo">
         <span class="nav-fitz"></span>
