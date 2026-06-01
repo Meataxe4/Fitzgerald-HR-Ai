@@ -11,7 +11,7 @@
       gtag('config', 'G-NT7FEHKWHV');
     </script>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Fitz HR — Start Free or Log In</title>
     <meta name="description" content="Sign in or start free with Fitz HR — AI-powered HR for Australian hospitality. Ask any Fair Work question, generate compliant documents, stay compliant.">
 
@@ -837,7 +837,7 @@
                 placeholder="Ask about HR, contracts, compliance..." 
                 rows="1"
                 class="flex-1 bg-slate-900 text-slate-100 border border-slate-700 rounded-2xl px-4 py-3 text-base md:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 resize-none min-h-[44px] max-h-[200px]"
-                onkeypress="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); sendMessage(); }"
+                onkeypress="if(event.key === 'Enter' && !event.shiftKey && window.matchMedia('(min-width: 768px)').matches) { event.preventDefault(); sendMessage(); }"
                 oninput="autoResizeTextarea(this)"></textarea>
             
             <!-- Microphone Button (Right) -->
@@ -7485,7 +7485,7 @@ Be as specific as possible!"></textarea>
                 </div>
             </div>
 
-            <div class="data-preview" style="overflow: hidden; border-radius: 16px; border: 1px solid rgba(0, 240, 255, 0.2);">
+            <div class="data-preview" style="overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; border-radius: 16px; border: 1px solid rgba(0, 240, 255, 0.2);">
                 <table id="aiPreviewTable" style="width: 100%; border-collapse: collapse;">
                     <thead id="aiTableHead" style="background: rgba(0, 240, 255, 0.1);">
                         <!-- Dynamically populated -->
