@@ -1676,9 +1676,9 @@ input, textarea, select {
     
     /* Assistant screen - full height, proper flex */
     #assistantScreen {
-        height: 100vh !important;
-        height: 100dvh !important;
-        height: -webkit-fill-available !important;
+        height: 100vh !important;                  /* fallback for very old browsers */
+        height: -webkit-fill-available !important; /* fallback for iOS < 15.4 (no dvh) */
+        height: 100dvh !important;                 /* modern: tracks the dynamic visible viewport — must win */
         display: flex !important;
         flex-direction: column !important;
         overflow: hidden !important;
@@ -1777,14 +1777,57 @@ input, textarea, select {
         scroll-behavior: smooth !important;
     }
     
-    /* Message bubbles */
+    /* Message ROW (flex container: #messagesContainer > .space-y-6 > div) */
     #messagesContainer > div > div {
-        padding: 12px !important;
         margin-bottom: 12px !important;
         font-size: 15px !important;
         line-height: 1.5 !important;
-        word-wrap: break-word !important;
-        overflow-wrap: break-word !important;
+        min-width: 0 !important;            /* allow the row's bubble child to shrink */
+    }
+
+    /* The actual chat BUBBLE (the flex item). Default flex items have
+       min-width:auto, so they refuse to shrink below their widest
+       unbreakable token (long URL / award code / word). On a narrow
+       portrait viewport that makes the bubble wider than the screen, and
+       because the chat column is position:fixed + overflow:hidden the
+       right-hand side of the text is clipped (landscape is wide enough to
+       fit, which is why it looked fine). The combination below fixes it:
+         - min-width:0 lets the bubble shrink to the available width
+         - max-width:100% stops it ever exceeding the row
+         - overflow-wrap:anywhere / word-break break long tokens AND reduce
+           the intrinsic min-size that was forcing the overflow */
+    #messagesContainer .space-y-6 > div > div {
+        min-width: 0 !important;
+        max-width: 100% !important;
+        padding: 12px 14px !important;
+        overflow-wrap: anywhere !important;
+        word-break: break-word !important;
+    }
+
+    /* Flex children inside a bubble must also be shrinkable */
+    #messagesContainer .space-y-6 > div > div .flex-1 {
+        min-width: 0 !important;
+    }
+
+    /* Wide embeds inside a bubble: fit the width or scroll, never clip */
+    #messagesContainer .space-y-6 > div > div img,
+    #messagesContainer .space-y-6 > div > div table,
+    #messagesContainer .space-y-6 > div > div pre {
+        max-width: 100% !important;
+    }
+    #messagesContainer .space-y-6 > div > div table,
+    #messagesContainer .space-y-6 > div > div pre {
+        display: block !important;
+        overflow-x: auto !important;
+    }
+    #messagesContainer .space-y-6 > div > div pre {
+        white-space: pre-wrap !important;
+    }
+
+    /* High-risk warning action buttons (whitespace-nowrap) wrap on mobile
+       instead of overflowing the bubble */
+    #messagesContainer .bg-red-500\/10 .flex {
+        flex-wrap: wrap !important;
     }
     
     /* ===================
