@@ -3859,6 +3859,16 @@ input, textarea, select {
     #employmentContractBuilder .btn {
         width: 100%;
     }
+
+    /* FIX: The Employment Contract Builder lives at z-index:999999 and is NOT
+       an [id$="Modal"], so the generic mobile rule above ([id$="Modal"] ->
+       z-index:500) does not lower the builder but DOES lower this Terms-of-Use
+       modal. That buried the modal behind the builder on mobile, so tapping
+       "Next" on Step 0 (which opens this modal) appeared to do nothing.
+       Restore it above the builder on mobile. */
+    #contractBuilderTermsModal {
+        z-index: 9999999 !important;
+    }
 }
 
 /* ========================================
