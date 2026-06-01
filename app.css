@@ -1829,6 +1829,15 @@ input, textarea, select {
     #messagesContainer .bg-red-500\/10 .flex {
         flex-wrap: wrap !important;
     }
+
+    /* Bulletproof safety net: nothing inside a chat bubble may exceed its
+       width or force horizontal overflow on a narrow portrait viewport.
+       Covers any content type (long words/URLs, inline code, nested flex). */
+    #messagesContainer .space-y-6 > div > div * {
+        max-width: 100% !important;
+        overflow-wrap: anywhere !important;
+        word-break: break-word !important;
+    }
     
     /* ===================
        INPUT AREA
