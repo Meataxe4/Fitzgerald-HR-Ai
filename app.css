@@ -1676,9 +1676,9 @@ input, textarea, select {
     
     /* Assistant screen - full height, proper flex */
     #assistantScreen {
-        height: 100vh !important;
-        height: 100dvh !important;
-        height: -webkit-fill-available !important;
+        height: 100vh !important;                  /* fallback for very old browsers */
+        height: -webkit-fill-available !important; /* fallback for iOS < 15.4 (no dvh) */
+        height: 100dvh !important;                 /* modern: tracks the dynamic visible viewport — must win */
         display: flex !important;
         flex-direction: column !important;
         overflow: hidden !important;
