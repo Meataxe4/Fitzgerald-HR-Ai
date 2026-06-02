@@ -9,12 +9,17 @@ W = "#ffffff"
 A = "#f59e0b"
 N = "#0f172a"
 
-# Shared grid constants — identical on every card
+# Instagram Reel safe zone: 1010 x 1440 centered inside the 1080 x 1920 frame.
+# => keep all text/important content within x:[35,1045], y:[240,1680].
+# We add extra internal padding (x:96, y:[300,1600]) so nothing crowds the UI.
+SAFE_L, SAFE_R, SAFE_T, SAFE_B = 35, 1045, 240, 1680
+
+# Shared grid constants — identical on every card, all inside the safe zone
 HEAD_SIZE = 92
 HEAD_X = 96
-HEAD_BASELINES = [960, 1084, 1208]   # 3 lines, vertically balanced
-WORDMARK_Y = 150
-BADGE = dict(x=96, y=336, s=160, rx=32, num_size=96, num_baseline=452, num_cx=176)
+HEAD_BASELINES = [940, 1064, 1188]   # 3 lines, centered within the safe zone
+WORDMARK_Y = 300                      # top bar sits below the 240px safe-top
+BADGE = dict(x=96, y=430, s=160, rx=32, num_size=96, num_baseline=546, num_cx=176)
 
 FONTS = ("""@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&amp;"""
          """family=Outfit:wght@600;700;800&amp;display=swap');""")
@@ -97,8 +102,8 @@ def build(card):
 
     if card["kind"] == "cta":
         body = (f'<rect width="1080" height="1920" fill="{A}"/>\n  '
-                f'<rect x="96" y="112" width="232" height="78" rx="16" fill="{N}"/>'
-                f'<text x="212" y="166" class="of" font-size="40" font-weight="800" text-anchor="middle">'
+                f'<rect x="96" y="246" width="232" height="78" rx="16" fill="{N}"/>'
+                f'<text x="212" y="300" class="of" font-size="40" font-weight="800" text-anchor="middle">'
                 f'<tspan fill="{A}">F</tspan><tspan fill="{W}">ITZ</tspan><tspan fill="{A}">HR</tspan></text>\n  '
                 + heading(card["lines"], cmap) + "\n  "
                 + '<g opacity="1"><animate attributeName="opacity" from="0" to="1" dur="0.6s" begin="0.75s" fill="freeze"/>'

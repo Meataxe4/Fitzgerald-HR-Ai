@@ -13,7 +13,8 @@ first full pay period on or after **1 July 2026**). Source of figures:
 
 ## Format
 
-- **Aspect ratio:** 9:16 (1080 × 1920)
+- **Aspect ratio:** 9:16 (1080 × 1920 px) — full-bleed backgrounds, no black bars
+- **Safe zone:** all text/logos kept inside the **1010 × 1440** centred safe area (x: 35–1045, y: 240–1680) so Instagram's top bar, caption and right-hand action rail never cover them. Verify with the "Safe zone" toggle in `reel-cards/reel-animated.html` or `reel-cards/preview/_safezone-check.png`.
 - **Duration:** 30–40 seconds (≈6s per tip + intro + CTA)
 - **Pacing:** One tip per card, hard cut or quick slide on the beat
 - **Sound:** Trending upbeat/business audio under a voiceover (VO optional — captions carry it)

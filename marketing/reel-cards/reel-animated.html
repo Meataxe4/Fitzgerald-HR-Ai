@@ -21,20 +21,23 @@
   .slide.hook::after{content:'';position:absolute;inset:0;background:radial-gradient(72% 60% at 50% 100%,rgba(245,158,11,.22),transparent);}
   .slide.cta{background:var(--amber);}
 
-  .topbar{position:absolute;top:5.2%;left:8.4%;right:8.4%;display:flex;align-items:center;justify-content:space-between;z-index:3;}
+  /* Instagram safe zone: 1010x1440 centered => 3.24% L/R, 12.5% T/B. All text stays inside. */
+  .safezone{position:absolute;left:3.24%;right:3.24%;top:12.5%;bottom:12.5%;border:2px dashed rgba(34,197,94,.9);border-radius:1vh;z-index:9;pointer-events:none;display:none;}
+  .safezone.on{display:block;}
+  .topbar{position:absolute;top:13%;left:8.4%;right:8.4%;display:flex;align-items:center;justify-content:space-between;z-index:3;}
   .wm{font-size:2.3vh;font-weight:800;letter-spacing:-.5px;}
   .wm .a{color:var(--amber);} .wm .w{color:#fff;}
   .slide.cta .wm{background:var(--navy);padding:1vh 1.6vh;border-radius:1.1vh;}
   .counter{font-size:2.1vh;font-weight:800;color:var(--amber);letter-spacing:2px;}
 
-  .badge{position:absolute;top:16.5%;left:8.4%;width:8.4vh;height:8.4vh;border-radius:1.7vh;background:var(--amber);color:var(--navy);font-family:'Playfair Display',serif;font-weight:900;font-size:5.6vh;display:flex;align-items:center;justify-content:center;z-index:3;}
+  .badge{position:absolute;top:18.5%;left:8.4%;width:8.4vh;height:8.4vh;border-radius:1.7vh;background:var(--amber);color:var(--navy);font-family:'Playfair Display',serif;font-weight:900;font-size:5.6vh;display:flex;align-items:center;justify-content:center;z-index:3;}
 
   .head{position:absolute;top:41%;left:8.4%;right:8.4%;z-index:3;}
   .head .l{display:block;font-family:'Playfair Display',serif;font-weight:900;line-height:1.04;letter-spacing:-.01em;font-size:6.4vh;color:#fff;opacity:0;transform:translateY(4.5vh);}
   .head .l.am{color:var(--amber);}
   .slide.cta .head .l{color:var(--navy);}
 
-  .foot{position:absolute;bottom:11%;left:8.4%;right:8.4%;z-index:3;}
+  .foot{position:absolute;bottom:14%;left:8.4%;right:8.4%;z-index:3;}
   .tag{font-weight:800;letter-spacing:.5vh;font-size:2.3vh;color:rgba(255,255,255,.85);opacity:0;transform:translateY(2.5vh);}
   .chip{display:block;background:var(--navy);color:var(--amber);font-weight:800;font-size:2.7vh;text-align:center;padding:2.3vh;border-radius:8vh;opacity:0;transform:scale(.86);}
 
@@ -63,13 +66,14 @@
 </style>
 </head>
 <body>
-  <div class="hint">Auto-plays &amp; loops · screen-record the stage at 1080×1920 for your MP4 · ←/→ step · space pause</div>
-  <div class="stage" id="stage"><div class="prog" id="prog"></div></div>
+  <div class="hint">1080×1920 (9:16) · text kept inside the 1010×1440 safe zone · screen-record the stage for your MP4 · ←/→ step · space pause</div>
+  <div class="stage" id="stage"><div class="prog" id="prog"></div><div class="safezone" id="safezone"></div></div>
 
   <div class="ctl">
     <button id="prev">‹ Prev</button>
     <button id="playpause">Pause</button>
     <button id="next">Next ›</button>
+    <button id="safe">Safe zone</button>
   </div>
 
 <script>
@@ -125,6 +129,7 @@
   document.getElementById('next').onclick=()=>show(idx+1);
   document.getElementById('prev').onclick=()=>show(idx-1);
   document.getElementById('playpause').onclick=()=>setPlay(!playing);
+  document.getElementById('safe').onclick=()=>document.getElementById('safezone').classList.toggle('on');
   addEventListener('keydown',e=>{ if(e.key==='ArrowRight')show(idx+1); if(e.key==='ArrowLeft')show(idx-1); if(e.key===' '){e.preventDefault();setPlay(!playing);} });
   show(0);
 </script>
