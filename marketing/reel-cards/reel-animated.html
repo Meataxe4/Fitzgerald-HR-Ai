@@ -10,127 +10,61 @@
   :root{--navy:#0f172a;--navy2:#141f35;--amber:#f59e0b;}
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100%;background:#05080f;display:flex;align-items:center;justify-content:center;font-family:'Outfit',sans-serif;}
-  /* 9:16 stage scaled to viewport height */
-  .stage{position:relative;width:calc(100vh * 9 / 16);height:100vh;max-width:100vw;max-height:calc(100vw * 16 / 9);background:var(--navy);overflow:hidden;border-radius:14px;box-shadow:0 30px 90px rgba(0,0,0,0.6);}
-  .slide{position:absolute;inset:0;opacity:0;visibility:hidden;padding:6.5% 8% 8%;display:flex;flex-direction:column;}
-  .slide.active{opacity:1;visibility:visible;}
-  .wm{font-size:2.4vh;font-weight:800;letter-spacing:-0.5px;}
-  .wm .a{color:var(--amber);} .wm .w{color:#fff;}
-  .badge{width:9vh;height:9vh;border-radius:1.8vh;background:var(--amber);color:var(--navy);font-family:'Playfair Display',serif;font-weight:900;font-size:6vh;display:flex;align-items:center;justify-content:center;margin:4vh 0 2vh;}
-  .head{font-family:'Playfair Display',serif;font-weight:900;line-height:1.02;letter-spacing:-0.01em;margin-top:auto;margin-bottom:auto;}
-  .head .l{display:block;color:#fff;font-size:6.6vh;opacity:0;transform:translateY(5vh);}
-  .head .l.am{color:var(--amber);}
-  .tag{margin-top:auto;font-weight:800;letter-spacing:0.4vh;font-size:2.4vh;color:rgba(255,255,255,0.85);opacity:0;transform:translateY(3vh);}
-  /* CTA slide */
+  .stage{position:relative;width:calc(100vh * 9 / 16);height:100vh;max-width:100vw;max-height:calc(100vw * 16 / 9);background:var(--navy);overflow:hidden;border-radius:14px;box-shadow:0 30px 90px rgba(0,0,0,.6);}
+
+  /* every slide shares the exact same regions */
+  .slide{position:absolute;inset:0;opacity:0;transition:opacity .6s ease;will-change:opacity;}
+  .slide.active{opacity:1;z-index:2;}
+  .panel{position:absolute;inset:2.5% 2.2%;border-radius:5vh;background:var(--navy2);border:1px solid rgba(245,158,11,.18);}
+  .slide.hook .panel,.slide.cta .panel{display:none;}
+  .slide.hook{background:linear-gradient(180deg,#0f172a 62%,#1a1205 100%);}
+  .slide.hook::after{content:'';position:absolute;inset:0;background:radial-gradient(72% 60% at 50% 100%,rgba(245,158,11,.22),transparent);}
   .slide.cta{background:var(--amber);}
-  .slide.cta .wmchip{background:var(--navy);display:inline-block;padding:1.2vh 2vh;border-radius:1.2vh;align-self:flex-start;}
-  .slide.cta .head .l{color:var(--navy);font-size:7.4vh;}
-  .chip{align-self:stretch;background:var(--navy);color:var(--amber);font-weight:800;font-size:3vh;text-align:center;padding:2.4vh;border-radius:8vh;margin-bottom:auto;opacity:0;transform:scale(0.85);}
-  /* hook slide */
-  .slide.hook{background:linear-gradient(180deg,#0f172a 60%,#1a1205 100%);}
-  .slide.hook::after{content:'';position:absolute;inset:0;background:radial-gradient(70% 60% at 50% 100%, rgba(245,158,11,0.22), transparent);pointer-events:none;}
-  /* trigger animations when active */
-  .slide.active .badge{animation:pop .5s cubic-bezier(.2,1.4,.4,1) both;}
-  .slide.active .head .l{animation:rise .7s cubic-bezier(.2,.7,.2,1) both;}
-  .slide.active .head .l:nth-child(1){animation-delay:.15s;}
-  .slide.active .head .l:nth-child(2){animation-delay:.27s;}
-  .slide.active .head .l:nth-child(3){animation-delay:.39s;}
-  .slide.active .head .l:nth-child(4){animation-delay:.51s;}
-  .slide.active .tag{animation:rise .7s cubic-bezier(.2,.7,.2,1) both;animation-delay:.6s;}
-  .slide.active .chip{animation:popchip .6s cubic-bezier(.2,1.3,.4,1) both;animation-delay:.55s;}
+
+  .topbar{position:absolute;top:5.2%;left:8.4%;right:8.4%;display:flex;align-items:center;justify-content:space-between;z-index:3;}
+  .wm{font-size:2.3vh;font-weight:800;letter-spacing:-.5px;}
+  .wm .a{color:var(--amber);} .wm .w{color:#fff;}
+  .slide.cta .wm{background:var(--navy);padding:1vh 1.6vh;border-radius:1.1vh;}
+  .counter{font-size:2.1vh;font-weight:800;color:var(--amber);letter-spacing:2px;}
+
+  .badge{position:absolute;top:16.5%;left:8.4%;width:8.4vh;height:8.4vh;border-radius:1.7vh;background:var(--amber);color:var(--navy);font-family:'Playfair Display',serif;font-weight:900;font-size:5.6vh;display:flex;align-items:center;justify-content:center;z-index:3;}
+
+  .head{position:absolute;top:41%;left:8.4%;right:8.4%;z-index:3;}
+  .head .l{display:block;font-family:'Playfair Display',serif;font-weight:900;line-height:1.04;letter-spacing:-.01em;font-size:6.4vh;color:#fff;opacity:0;transform:translateY(4.5vh);}
+  .head .l.am{color:var(--amber);}
+  .slide.cta .head .l{color:var(--navy);}
+
+  .foot{position:absolute;bottom:11%;left:8.4%;right:8.4%;z-index:3;}
+  .tag{font-weight:800;letter-spacing:.5vh;font-size:2.3vh;color:rgba(255,255,255,.85);opacity:0;transform:translateY(2.5vh);}
+  .chip{display:block;background:var(--navy);color:var(--amber);font-weight:800;font-size:2.7vh;text-align:center;padding:2.3vh;border-radius:8vh;opacity:0;transform:scale(.86);}
+
+  /* choreography — same on every slide, so it feels uniform & flowing */
+  .slide.active .badge{animation:pop .55s cubic-bezier(.2,1.5,.4,1) both;}
+  .slide.active .head{animation:drift 5.2s ease-out both;}      /* slow life */
+  .slide.active .head .l{animation:rise .8s cubic-bezier(.16,.7,.2,1) both;}
+  .slide.active .head .l:nth-child(1){animation-delay:.22s;}
+  .slide.active .head .l:nth-child(2){animation-delay:.34s;}
+  .slide.active .head .l:nth-child(3){animation-delay:.46s;}
+  .slide.active .tag{animation:rise .8s cubic-bezier(.16,.7,.2,1) both;animation-delay:.62s;}
+  .slide.active .chip{animation:popchip .6s cubic-bezier(.2,1.3,.4,1) both;animation-delay:.7s;}
   @keyframes rise{to{opacity:1;transform:translateY(0);}}
-  @keyframes pop{from{opacity:0;transform:scale(.6);}to{opacity:1;transform:scale(1);}}
+  @keyframes pop{from{opacity:0;transform:scale(.5);}to{opacity:1;transform:scale(1);}}
   @keyframes popchip{to{opacity:1;transform:scale(1);}}
-  /* progress bar */
-  .prog{position:absolute;top:2.2vh;left:8%;right:8%;display:flex;gap:0.8vh;z-index:5;}
-  .prog i{flex:1;height:0.5vh;border-radius:1vh;background:rgba(255,255,255,0.25);overflow:hidden;}
-  .prog i.cta-seg{background:rgba(15,23,42,0.25);}
+  @keyframes drift{from{transform:scale(1);}to{transform:scale(1.035);}}
+
+  .prog{position:absolute;top:2.4%;left:8.4%;right:8.4%;display:flex;gap:.7vh;z-index:6;}
+  .prog i{flex:1;height:.45vh;border-radius:1vh;background:rgba(255,255,255,.22);overflow:hidden;}
   .prog i span{display:block;height:100%;width:0;background:#fff;}
-  .prog i.cta-seg span{background:var(--navy);}
-  /* controls */
+
   .ctl{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:10px;z-index:20;}
-  .ctl button{background:rgba(255,255,255,0.1);color:#fff;border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:8px 14px;font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;}
-  .ctl button:hover{background:rgba(245,158,11,0.25);}
-  .hint{position:fixed;top:10px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.4);font-size:12px;z-index:20;}
+  .ctl button{background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:8px;padding:8px 14px;font-family:'Outfit',sans-serif;font-size:13px;cursor:pointer;}
+  .ctl button:hover{background:rgba(245,158,11,.25);}
+  .hint{position:fixed;top:10px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.4);font-size:12px;z-index:20;}
 </style>
 </head>
 <body>
-  <div class="hint">Auto-plays &amp; loops · screen-record this stage at 1080×1920 for your MP4</div>
-  <div class="stage" id="stage">
-    <div class="prog" id="prog"></div>
-
-    <div class="slide hook">
-      <div class="wm"><span class="a">F</span><span class="w">ITZ</span><span class="a">HR</span></div>
-      <div class="head">
-        <span class="l">Wages went</span>
-        <span class="l">up 4.75%.</span>
-        <span class="l am">Don't slip</span>
-        <span class="l am">on 1 July.</span>
-      </div>
-      <div class="tag">5 MUST-KNOW TIPS&nbsp;&nbsp;→</div>
-    </div>
-
-    <div class="slide">
-      <div class="wm"><span class="a">F</span><span class="w">ITZ</span><span class="a">HR</span></div>
-      <div class="badge">1</div>
-      <div class="head">
-        <span class="l">Starts on your</span>
-        <span class="l">first full pay</span>
-        <span class="l">period — not</span>
-        <span class="l am">1 July.</span>
-      </div>
-    </div>
-
-    <div class="slide">
-      <div class="wm"><span class="a">F</span><span class="w">ITZ</span><span class="a">HR</span></div>
-      <div class="badge">2</div>
-      <div class="head">
-        <span class="l am">+4.75% on</span>
-        <span class="l">every level —</span>
-        <span class="l">both awards.</span>
-      </div>
-    </div>
-
-    <div class="slide">
-      <div class="wm"><span class="a">F</span><span class="w">ITZ</span><span class="a">HR</span></div>
-      <div class="badge">3</div>
-      <div class="head">
-        <span class="l">Penalty rates</span>
-        <span class="l">rise with</span>
-        <span class="l am">the base too.</span>
-      </div>
-    </div>
-
-    <div class="slide">
-      <div class="wm"><span class="a">F</span><span class="w">ITZ</span><span class="a">HR</span></div>
-      <div class="badge">4</div>
-      <div class="head">
-        <span class="l">Re-test your</span>
-        <span class="l">flat &amp; annualised</span>
-        <span class="l am">rates.</span>
-      </div>
-    </div>
-
-    <div class="slide">
-      <div class="wm"><span class="a">F</span><span class="w">ITZ</span><span class="a">HR</span></div>
-      <div class="badge">5</div>
-      <div class="head">
-        <span class="l">Super rises —</span>
-        <span class="l">underpayment</span>
-        <span class="l am">bites.</span>
-      </div>
-    </div>
-
-    <div class="slide cta">
-      <div class="wmchip"><span class="wm"><span class="a">F</span><span class="w">ITZ</span><span class="a">HR</span></span></div>
-      <div class="head">
-        <span class="l">Be ready for</span>
-        <span class="l">the 1 July</span>
-        <span class="l">pay run.</span>
-      </div>
-      <div class="chip">Check a rate free&nbsp;&nbsp;→&nbsp;&nbsp;fitzhr.com</div>
-    </div>
-  </div>
+  <div class="hint">Auto-plays &amp; loops · screen-record the stage at 1080×1920 for your MP4 · ←/→ step · space pause</div>
+  <div class="stage" id="stage"><div class="prog" id="prog"></div></div>
 
   <div class="ctl">
     <button id="prev">‹ Prev</button>
@@ -139,45 +73,59 @@
   </div>
 
 <script>
-  const DUR = 4500; // ms per slide
-  const slides = [...document.querySelectorAll('.slide')];
+  const WM = '<span class="wm"><span class="a">F</span><span class="w">ITZ</span><span class="a">HR</span></span>';
+  // one data shape for every slide → identical formatting
+  const DATA = [
+    {kind:'hook', lines:[['Award wages',0],['just rose',0],['+4.75%.',1]], foot:{tag:'5 THINGS TO GET RIGHT  →'}},
+    {kind:'tip', n:'01', badge:'1', lines:[['Starts your first',0],['full pay period —',0],['not 1 July.',1]]},
+    {kind:'tip', n:'02', badge:'2', lines:[['Every level rises',0],['in both awards:',0],['+4.75%.',1]]},
+    {kind:'tip', n:'03', badge:'3', lines:[['Penalty rates',0],['rise off the',0],['new base too.',1]]},
+    {kind:'tip', n:'04', badge:'4', lines:[['Re-test every',0],['flat & salaried',0],['rate now.',1]]},
+    {kind:'tip', n:'05', badge:'5', lines:[['Super rises with',0],['it — underpaying',0],['bites hard.',1]]},
+    {kind:'cta', lines:[['Be ready for',0],['the 1 July',0],['pay run.',0]], foot:{chip:'Check a rate free  →  fitzhr.com'}},
+  ];
+  const DUR = 4800;
+  const stage = document.getElementById('stage');
   const prog = document.getElementById('prog');
-  slides.forEach((s,i)=>{
-    const seg = document.createElement('i');
-    if(s.classList.contains('cta')) seg.className='cta-seg';
-    seg.innerHTML='<span></span>';
-    prog.appendChild(seg);
+
+  const slides = DATA.map(d=>{
+    const s = document.createElement('div');
+    s.className = 'slide ' + d.kind;
+    const head = d.lines.map(([t,am])=>`<span class="l${am?' am':''}">${t.replace('&','&amp;')}</span>`).join('');
+    let foot = '';
+    if(d.foot && d.foot.tag) foot = `<div class="tag">${d.foot.tag}</div>`;
+    if(d.foot && d.foot.chip) foot = `<div class="chip">${d.foot.chip}</div>`;
+    s.innerHTML =
+      (d.kind!=='hook'&&d.kind!=='cta' ? '<div class="panel"></div>' : (d.kind==='cta'?'<div class="panel"></div>':'')) +
+      `<div class="topbar">${WM}<span class="counter">${d.n||''}</span></div>` +
+      (d.badge ? `<div class="badge">${d.badge}</div>` : '') +
+      `<div class="head">${head}</div>` +
+      `<div class="foot">${foot}</div>`;
+    stage.appendChild(s);
+    const seg = document.createElement('i'); seg.innerHTML='<span></span>'; prog.appendChild(seg);
+    return s;
   });
   const bars = [...prog.querySelectorAll('span')];
-  let idx = 0, playing = true, timer = null, t0 = 0, raf = null;
 
-  function fillBars(active, pct){
-    bars.forEach((b,i)=>{ b.style.transition='none'; b.style.width = i<active?'100%': i===active? pct+'%':'0%'; });
-  }
-  function tick(){
-    if(!playing) return;
-    const el = (performance.now()-t0)/DUR;
-    fillBars(idx, Math.min(el,1)*100);
-    raf = requestAnimationFrame(tick);
-  }
+  let idx=0, playing=true, timer=null, t0=0, raf=null;
+  function fill(active,pct){ bars.forEach((b,i)=>{ b.style.width = i<active?'100%':i===active?pct+'%':'0%'; }); }
+  function tick(){ if(!playing) return; const e=(performance.now()-t0)/DUR; fill(idx,Math.min(e,1)*100); raf=requestAnimationFrame(tick); }
+  function schedule(){ clearTimeout(timer); if(playing) timer=setTimeout(()=>show(idx+1),DUR); }
   function show(n){
-    idx = (n+slides.length)%slides.length;
-    slides.forEach((s,i)=>s.classList.toggle('active', i===idx));
-    // restart prog
-    cancelAnimationFrame(raf);
-    t0 = performance.now();
-    fillBars(idx,0);
+    const prev=idx; idx=(n+slides.length)%slides.length;
+    slides[prev].classList.remove('active');
+    const s=slides[idx];
+    s.classList.remove('active'); void s.offsetWidth;       // restart inner animations
+    s.classList.add('active');
+    cancelAnimationFrame(raf); t0=performance.now(); fill(idx,0);
     if(playing){ tick(); schedule(); }
   }
-  function schedule(){ clearTimeout(timer); if(playing) timer=setTimeout(()=>show(idx+1), DUR); }
-  function setPlay(p){
-    playing=p; document.getElementById('playpause').textContent=p?'Pause':'Play';
-    if(p){ t0=performance.now(); tick(); schedule(); } else { clearTimeout(timer); cancelAnimationFrame(raf); }
-  }
+  function setPlay(p){ playing=p; document.getElementById('playpause').textContent=p?'Pause':'Play';
+    if(p){ t0=performance.now(); tick(); schedule(); } else { clearTimeout(timer); cancelAnimationFrame(raf); } }
   document.getElementById('next').onclick=()=>show(idx+1);
   document.getElementById('prev').onclick=()=>show(idx-1);
   document.getElementById('playpause').onclick=()=>setPlay(!playing);
-  document.addEventListener('keydown',e=>{ if(e.key==='ArrowRight')show(idx+1); if(e.key==='ArrowLeft')show(idx-1); if(e.key===' '){e.preventDefault();setPlay(!playing);} });
+  addEventListener('keydown',e=>{ if(e.key==='ArrowRight')show(idx+1); if(e.key==='ArrowLeft')show(idx-1); if(e.key===' '){e.preventDefault();setPlay(!playing);} });
   show(0);
 </script>
 </body>
