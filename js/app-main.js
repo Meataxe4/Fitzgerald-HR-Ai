@@ -7680,7 +7680,7 @@ document.addEventListener('DOMContentLoaded', handlePaymentReturn);
 function showNotification(message, type = 'info') {
     // Create notification element
     const notification = document.createElement('div');
-    notification.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-50 transform transition-all duration-300 translate-y-full opacity-0`;
+    notification.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg shadow-lg z-[100000] transform transition-all duration-300 translate-y-full opacity-0`;
     
     if (type === 'success') {
         notification.classList.add('bg-green-600', 'text-white');
