@@ -102,8 +102,8 @@ def build(card):
 
     if card["kind"] == "cta":
         body = (f'<rect width="1080" height="1920" fill="{A}"/>\n  '
-                f'<rect x="96" y="246" width="232" height="78" rx="16" fill="{N}"/>'
-                f'<text x="212" y="300" class="of" font-size="40" font-weight="800" text-anchor="middle">'
+                f'<rect x="96" y="246" width="190" height="78" rx="16" fill="{N}"/>'
+                f'<text x="120" y="300" class="of" font-size="40" font-weight="800">'
                 f'<tspan fill="{A}">F</tspan><tspan fill="{W}">ITZ</tspan><tspan fill="{A}">HR</tspan></text>\n  '
                 + heading(card["lines"], cmap) + "\n  "
                 + '<g opacity="1"><animate attributeName="opacity" from="0" to="1" dur="0.6s" begin="0.75s" fill="freeze"/>'
