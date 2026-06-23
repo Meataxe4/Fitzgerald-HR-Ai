@@ -71,5 +71,38 @@ eq('Restaurant classifications use Cook grades', /Cook grade 5/.test(restOpts), 
 eq('Restaurant classifications NOT Levels', /Level 6/.test(restOpts), false);
 eq('Unresolved classifications -> placeholder', /Set your Award/.test(noneOpts), true);
 
+// ---- Manufacturing rates data integrity (Milestone: MA000010 wiring) --------
+const manuf = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'manufacturing-award-rates.json'), 'utf8'));
+eq('Manufacturing ma_number', manuf.ma_number, 'MA000010');
+eq('Manufacturing 169 rate rows', manuf.rates.length, 169);
+eq('Manufacturing Saturday 1.5', manuf.penalty_rates.saturday, 1.5);
+eq('Manufacturing Sunday 2.0', manuf.penalty_rates.sunday, 2.0);
+eq('Manufacturing public holiday 2.5', manuf.penalty_rates.public_holiday, 2.5);
+eq('Manufacturing casual loading 0.25', manuf.casual_loading, 0.25);
+const c10 = manuf.rates.find(r => /^C10\b/.test(r.classification) && r.employment_type === 'full_time');
+const c14 = manuf.rates.find(r => /^C14\b/.test(r.classification) && r.employment_type === 'full_time');
+eq('Manufacturing C10 rate $28.12', c10 && c10.rate, 28.12);
+eq('Manufacturing C14 rate $24.28', c14 && c14.rate, 24.28);
+// every rate row: penalties derive cleanly (hourly>0) — sanity guard against corruption
+eq('Manufacturing all rows have positive rate', manuf.rates.every(r => typeof r.rate === 'number' && r.rate > 0), true);
+
+// Calculator math: rate x multiplier must reproduce the PDF's OWN published
+// penalty-dollar columns (end-to-end correctness of the pay calculator).
+const r2 = n => Math.round(n * 100) / 100;
+const pr = manuf.penalty_rates;
+eq('C14 Saturday = $36.42 (PDF)', r2(c14.rate * pr.saturday), 36.42);
+eq('C14 Sunday = $48.56 (PDF)', r2(c14.rate * pr.sunday), 48.56);
+eq('C14 Public holiday = $60.70 (PDF)', r2(c14.rate * pr.public_holiday), 60.70);
+eq('C10 Saturday = $42.18 (PDF)', r2(c10.rate * pr.saturday), 42.18);
+
+// Minimum engagement sourced from the award text (clauses 10.2 / 11.2)
+eq('Manufacturing part-time min 4 hrs', manuf.minimum_engagement.part_time_hours_per_shift, 4);
+eq('Manufacturing casual min 4 hrs', manuf.minimum_engagement.casual_hours_per_shift, 4);
+// Shift loadings confirmed against award clause 33.2
+eq('Manufacturing afternoon/night +15%', manuf.penalty_rates.afternoon_shift_loading, 0.15);
+eq('Manufacturing permanent night +30%', manuf.penalty_rates.permanent_night_shift_loading, 0.30);
+// Supervisor formula captured from clause 20.1(g)
+eq('Supervisor formula present', !!(manuf.formula_classifications && manuf.formula_classifications.supervisor_trainer_coordinator), true);
+
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

@@ -6,6 +6,7 @@
 // without any code change here.
 const restaurantRates = require('../../restaurant-award-rates.json');
 const hospitalityRates = require('../../hospitality-award-rates.json');
+const manufacturingRates = require('../../manufacturing-award-rates.json');
 
 // Builds the PENALTY RATES section of the system prompt from a rates JSON.
 function buildPenaltyRateFacts(rates, awardLabel) {
@@ -41,12 +42,27 @@ function buildPenaltyRateFacts(rates, awardLabel) {
   if (typeof p.overtime_first_2hrs === 'number' && typeof p.overtime_after_2hrs === 'number') {
     lines.push(`- Overtime: first 2 hours at ${Math.round(p.overtime_first_2hrs * 100)}%, thereafter ${Math.round(p.overtime_after_2hrs * 100)}%`);
   }
+  if (typeof p.overtime_first_3hrs === 'number' && typeof p.overtime_after_3hrs === 'number') {
+    lines.push(`- Overtime: first 3 hours at ${Math.round(p.overtime_first_3hrs * 100)}%, thereafter ${Math.round(p.overtime_after_3hrs * 100)}%`);
+  }
+  // Shift loadings (e.g. Manufacturing) — percentage loadings on top of base.
+  if (typeof p.afternoon_shift_loading === 'number') {
+    lines.push(`- Afternoon shift loading: +${Math.round(p.afternoon_shift_loading * 100)}% of base rate`);
+  }
+  if (typeof p.night_shift_loading === 'number') {
+    lines.push(`- Night shift loading: +${Math.round(p.night_shift_loading * 100)}% of base rate`);
+  }
+  if (typeof p.permanent_night_shift_loading === 'number') {
+    lines.push(`- Permanent night shift loading: +${Math.round(p.permanent_night_shift_loading * 100)}% of base rate`);
+  }
   if (typeof rates.casual_loading === 'number') {
     lines.push(`- Casual loading: ${Math.round(rates.casual_loading * 100)}% (applies to base rate before penalties)`);
   }
 
   if (rates.ma_number === 'MA000119') {
     lines.push(`NOTE: The Restaurant Award's late-night windows differ from the Hospitality Award — evening loading only applies AFTER 10pm (not from 7pm), and night loading runs to 6am (not 7am). Weekend and public holiday rates supersede the late-night loadings.`);
+  } else if (rates.ma_number === 'MA000010') {
+    lines.push(`NOTE: Manufacturing shift loadings (afternoon/night) apply to shiftworkers on their ordinary hours; weekend, public holiday and overtime rates apply as listed. The shift-loading figures are pending confirmation against the award text.`);
   } else {
     lines.push(`NOTE: Weekend and public holiday rates supersede the late-night loadings.`);
   }
@@ -58,12 +74,13 @@ function buildPenaltyRateFacts(rates, awardLabel) {
 function buildMinimumEngagementFacts(rates, awardLabel) {
   const m = rates.minimum_engagement || {};
   const lines = [`MINIMUM ENGAGEMENT — ${awardLabel} (use these exact figures):`];
-  const isMA119 = rates.ma_number === 'MA000119';
+  const ma = rates.ma_number;
+  const isMA119 = ma === 'MA000119';
   const ftClause = isMA119 ? ' (clause 11)' : '';
-  const ptClause = isMA119 ? ' (clause 12)' : ' (clause 12)';
+  const ptClause = ma === 'MA000010' ? ' (clause 10.2)' : ' (clause 12)';
   const casClause = isMA119
     ? ' (clause 13.5 — "An employer must not engage a casual employee for less than 2 consecutive hours of work")'
-    : ' (clause 11.4)';
+    : ma === 'MA000010' ? ' (clause 11.2)' : ' (clause 11.4)';
 
   if (typeof m.full_time_hours_per_shift === 'number') {
     lines.push(`- Full-time employees: minimum ${m.full_time_hours_per_shift} consecutive hours per engagement${ftClause}.`);
@@ -81,6 +98,9 @@ function buildMinimumEngagementFacts(rates, awardLabel) {
     lines.push(`- Public holiday full-time / part-time minimum: ${m.public_holiday_full_time_part_time} hours.`);
   }
   lines.push(`The casual minimum applies even if the employee is sent home early — they must still be paid for the minimum.`);
+  if (ma === 'MA000010') {
+    lines.push(`Under MA000010 both the part-time and casual minimum may be reduced to no less than 3 consecutive hours by written agreement at the employee's request.`);
+  }
   return lines.join('\n');
 }
 
@@ -185,6 +205,12 @@ exports.handler = async (event, context) => {
         sector: 'restaurants, cafes, bistros, and table-service food venues',
         rates: restaurantRates,
         aliases: ['restaurant']
+      },
+      MA000010: {
+        fullName: 'Manufacturing and Associated Industries and Occupations Award MA000010',
+        sector: 'general manufacturing and associated industries',
+        rates: manufacturingRates,
+        aliases: ['manufacturing']
       }
     };
     function resolveServerAward(stored) {
