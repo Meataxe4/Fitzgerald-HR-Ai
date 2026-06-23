@@ -86,5 +86,14 @@ eq('Manufacturing C14 rate $24.28', c14 && c14.rate, 24.28);
 // every rate row: penalties derive cleanly (hourly>0) — sanity guard against corruption
 eq('Manufacturing all rows have positive rate', manuf.rates.every(r => typeof r.rate === 'number' && r.rate > 0), true);
 
+// Calculator math: rate x multiplier must reproduce the PDF's OWN published
+// penalty-dollar columns (end-to-end correctness of the pay calculator).
+const r2 = n => Math.round(n * 100) / 100;
+const pr = manuf.penalty_rates;
+eq('C14 Saturday = $36.42 (PDF)', r2(c14.rate * pr.saturday), 36.42);
+eq('C14 Sunday = $48.56 (PDF)', r2(c14.rate * pr.sunday), 48.56);
+eq('C14 Public holiday = $60.70 (PDF)', r2(c14.rate * pr.public_holiday), 60.70);
+eq('C10 Saturday = $42.18 (PDF)', r2(c10.rate * pr.saturday), 42.18);
+
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

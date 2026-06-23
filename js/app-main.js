@@ -1846,14 +1846,14 @@ let awardRates = null; // Global variable to store rates
 // ============================================================================
 const AWARD_REGISTRY = {
     MA000009: {
-        code: 'MA000009', status: 'supported', wizardModel: true,
+        code: 'MA000009', status: 'supported', calculatorType: 'role',
         displayName: 'Hospitality Industry (General) Award',
         fullName: 'Hospitality Industry (General) Award MA000009',
         ratesUrl: CONFIG.API.HOSPITALITY_RATES_URL,
         aliases: ['hospitality']
     },
     MA000119: {
-        code: 'MA000119', status: 'supported', wizardModel: true,
+        code: 'MA000119', status: 'supported', calculatorType: 'role',
         displayName: 'Restaurant Industry Award',
         fullName: 'Restaurant Industry Award MA000119',
         ratesUrl: CONFIG.API.RESTAURANT_RATES_URL,
@@ -1863,7 +1863,7 @@ const AWARD_REGISTRY = {
     // yet built/verified. Until enabled it resolves to UNRESOLVED (fail closed).
     MA000010: {
         code: 'MA000010', status: 'preview', flag: 'manufacturing_preview',
-        wizardModel: false,   // chat is wired; the role-based wizard is not yet adapted to C-levels
+        calculatorType: 'classification',   // C-level picker, not the hospitality role wizard
         displayName: 'Manufacturing and Associated Industries Award',
         fullName: 'Manufacturing and Associated Industries and Occupations Award MA000010',
         ratesUrl: '/manufacturing-award-rates.json',
@@ -1902,7 +1902,7 @@ function getAwardContext() {
         code: resolved.code,
         fullName: resolved.fullName,
         status: resolved.status,
-        wizardModel: resolved.wizardModel === true
+        calculatorType: resolved.calculatorType || null
     };
 }
 
@@ -13158,6 +13158,115 @@ function openRosterStressTester() {
     if (modal) modal.classList.remove('hidden');
 }
 
+// ============================================================================
+// Manufacturing pay calculator (MA000010). Manufacturing classifications are
+// C-levels / apprentice / junior / trainee / cadet streams, not hospitality
+// roles, so it gets its own picker rather than the role-based Award Wizard.
+// Reads from the loaded manufacturing-award-rates.json (awardRates).
+// ============================================================================
+async function openManufacturingCalculator() {
+    if (!awardRates || awardRates.ma_number !== 'MA000010') {
+        await loadAwardRates();
+    }
+    if (!awardRates || awardRates.ma_number !== 'MA000010' || !Array.isArray(awardRates.rates)) {
+        showAlert('Manufacturing rates could not be loaded. Please try again in a moment.');
+        return;
+    }
+    trackToolUsage('manufacturingCalculator');
+
+    const catLabels = {
+        adult: 'Adult — wages, professional & technical',
+        apprentice: 'Apprentice', junior: 'Junior', trainee: 'Trainee', cadet: 'Cadet'
+    };
+    const cats = Object.keys(catLabels)
+        .filter(c => awardRates.rates.some(r => r.category === c))
+        .map(c => `<option value="${c}">${_fwEscapeHtml(catLabels[c])}</option>`).join('');
+
+    const existing = document.getElementById('manufCalcModal');
+    if (existing) existing.remove();
+    const modal = document.createElement('div');
+    modal.id = 'manufCalcModal';
+    modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50';
+    modal.innerHTML =
+        '<div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 max-h-[90vh] overflow-y-auto">' +
+            '<div class="flex items-center justify-between mb-4">' +
+                '<div><h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2"><span>🧙</span> Manufacturing Pay Calculator</h2>' +
+                '<p class="text-slate-400 text-sm">Manufacturing Award MA000010 — find the rate for a classification</p></div>' +
+                '<button onclick="document.getElementById(\'manufCalcModal\').remove()" class="text-slate-400 hover:text-white text-2xl">×</button>' +
+            '</div>' +
+            '<div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-5 text-xs text-amber-300">⚠️ Preview — rates effective 01/07/2025, general manufacturing only (excludes vehicle manufacturing). Verify against the award before relying on these figures.</div>' +
+            '<div class="space-y-4">' +
+                '<div><label class="block text-slate-300 text-sm mb-2">Classification group</label>' +
+                '<select id="manufCatSelect" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">' + cats + '</select></div>' +
+                '<div><label class="block text-slate-300 text-sm mb-2">Classification</label>' +
+                '<select id="manufClassSelect" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white"></select></div>' +
+                '<div><label class="block text-slate-300 text-sm mb-2">Employment type</label>' +
+                '<select id="manufEmpSelect" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white"></select></div>' +
+                '<button onclick="calculateManufacturingRate()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">Calculate rates</button>' +
+            '</div>' +
+            '<div id="manufCalcResult" class="mt-6"></div>' +
+        '</div>';
+    document.body.appendChild(modal);
+    modal.querySelector('#manufCatSelect').addEventListener('change', populateManufClassifications);
+    populateManufClassifications();
+}
+
+function populateManufClassifications() {
+    const cat = document.getElementById('manufCatSelect').value;
+    const inCat = awardRates.rates.filter(r => r.category === cat);
+    const labels = [...new Set(inCat.map(r => r.classification))];
+    document.getElementById('manufClassSelect').innerHTML =
+        labels.map(l => `<option value="${_fwEscapeHtml(l)}">${_fwEscapeHtml(l)}</option>`).join('');
+    const empLabels = { full_time: 'Full-time / Part-time', casual: 'Casual' };
+    const emps = [...new Set(inCat.map(r => r.employment_type))];
+    document.getElementById('manufEmpSelect').innerHTML =
+        emps.map(e => `<option value="${e}">${_fwEscapeHtml(empLabels[e] || e)}</option>`).join('');
+    document.getElementById('manufCalcResult').innerHTML = '';
+}
+
+function calculateManufacturingRate() {
+    const cat = document.getElementById('manufCatSelect').value;
+    const cls = document.getElementById('manufClassSelect').value;
+    const emp = document.getElementById('manufEmpSelect').value;
+    const resultEl = document.getElementById('manufCalcResult');
+    const entry = awardRates.rates.find(r => r.category === cat && r.classification === cls && r.employment_type === emp);
+    if (!entry) { resultEl.innerHTML = '<div class="text-red-400 text-sm">No rate found for that combination.</div>'; return; }
+
+    const rate = entry.rate;
+    const p = awardRates.penalty_rates || {};
+    const money = n => '$' + n.toFixed(2);
+    const rows = [];
+    const mult = (label, m) => { if (typeof m === 'number') rows.push(`<div>• ${label} (${Math.round(m * 100)}%): <strong>${money(rate * m)}/hr</strong></div>`); };
+    mult('Saturday', p.saturday);
+    mult('Sunday', p.sunday);
+    mult('Public holiday', p.public_holiday);
+    mult('Overtime — first 3 hrs', p.overtime_first_3hrs);
+    mult('Overtime — after 3 hrs', p.overtime_after_3hrs);
+    const load = (label, l) => { if (typeof l === 'number') rows.push(`<div>• ${label} (+${Math.round(l * 100)}%): <strong>${money(rate * (1 + l))}/hr</strong></div>`); };
+    load('Afternoon shift', p.afternoon_shift_loading);
+    load('Night shift', p.night_shift_loading);
+    load('Permanent night shift', p.permanent_night_shift_loading);
+
+    const casualNote = emp === 'casual'
+        ? '<div class="text-xs text-slate-400 mt-2">Casual rate already includes the 25% loading. Penalty interactions for casuals should be confirmed against the award.</div>' : '';
+    const weekly = entry.weekly_rate ? `<p class="text-sm text-slate-400 mt-1">Weekly (38 hrs): <strong class="text-slate-200">${money(entry.weekly_rate)}</strong></p>` : '';
+
+    resultEl.innerHTML =
+        '<div class="bg-green-500/10 border-2 border-green-500 rounded-lg p-6">' +
+            '<h3 class="text-green-400 font-bold text-lg mb-4">✅ ' + _fwEscapeHtml(awardRates.award_name) + '</h3>' +
+            '<div class="bg-slate-700/50 rounded-lg p-4 mb-4">' +
+                '<p class="text-sm text-slate-400 mb-1">Classification</p>' +
+                '<p class="font-bold">' + _fwEscapeHtml(cls) + '</p>' +
+                '<p class="text-sm text-slate-400 mt-3 mb-1">Base ordinary rate</p>' +
+                '<p class="font-bold text-2xl text-amber-400">' + money(rate) + '/hr</p>' + weekly +
+            '</div>' +
+            '<div class="bg-amber-500/10 border border-amber-500 rounded-lg p-4">' +
+                '<p class="font-semibold text-amber-400 mb-2">Penalty rates &amp; loadings:</p>' +
+                '<div class="text-sm space-y-1">' + rows.join('') + '</div>' + casualNote +
+            '</div>' +
+        '</div>';
+}
+
 async function openAwardWizard() {
     trackToolUsage('awardWizardModal');
 
@@ -13169,12 +13278,16 @@ async function openAwardWizard() {
         return;
     }
 
-    // Guardrail: the wizard's role->classification model only covers awards that
-    // have a wizard model built. For awards without one (e.g. Manufacturing, which
-    // uses C-level classifications rather than hospitality roles) it must NOT run —
-    // it would otherwise apply the wrong award's role mapping. Chat still answers
-    // these users' questions. See docs/guardrails-award-resolution.md.
-    if (!getAwardContext().wizardModel) {
+    // Route by the award's calculator type. The hospitality role->classification
+    // wizard only fits role-based awards; Manufacturing uses a C-level picker.
+    // Anything without a calculator is fenced (chat still answers these users).
+    // See docs/guardrails-award-resolution.md.
+    const calc = getAwardContext().calculatorType;
+    if (calc === 'classification') {
+        openManufacturingCalculator();
+        return;
+    }
+    if (calc !== 'role') {
         showAlert(`The Award Wizard pay calculator isn't available yet for the ${getAwardContext().name}. In the meantime, ask Fitz your pay, penalty or classification questions in chat — it has this award's rates.`);
         return;
     }
