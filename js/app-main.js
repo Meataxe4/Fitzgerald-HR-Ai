@@ -13175,10 +13175,78 @@ function updateSidebarVenueName() {
 }
 
 // Tool Opening Functions
+// Award Rate Calculator (the quick modal, distinct from the stepped wizard) is
+// driven by the rates loaded for the SELECTED award. Repopulate its
+// classification picker, penalty multipliers and overtime rate from awardRates
+// whenever it opens so figures reflect the user's award, not hard-coded
+// hospitality values. See docs/guardrails-award-resolution.md.
+function _awardCalcOvertimeMultiplier() {
+    const pr = (awardRates && awardRates.penalty_rates) || {};
+    return Number(pr.overtime_first_2hrs || pr.overtime_first_3hrs) || 1.5;
+}
+
+function _renderAwardCalculatorOptions() {
+    const ctx = getAwardContext();
+    const posSel = document.getElementById('calcPosition');
+    const daySel = document.getElementById('calcDay');
+    const subtitle = document.getElementById('calcAwardSubtitle');
+    if (!posSel) return;
+
+    if (subtitle) {
+        subtitle.textContent = ctx.name
+            ? ctx.name + ' — full-time rates'
+            : 'Set a valid Modern Award in your business profile to load rates';
+    }
+
+    // Classification picker: adult full-time, rated entries for the loaded award.
+    let opts = '';
+    if (awardRates && Array.isArray(awardRates.rates)) {
+        const seen = {};
+        awardRates.rates
+            .filter(function(r) { return r.category === 'adult' && r.employment_type === 'full_time' && Number(r.rate) > 0; })
+            .forEach(function(r) {
+                const label = r.title || r.classification || 'Classification';
+                if (seen[label]) return;
+                seen[label] = true;
+                opts += '<option value="' + Number(r.rate) + '">' + _fwEscapeHtml(label) + ' - $' + Number(r.rate).toFixed(2) + '</option>';
+            });
+    }
+    posSel.innerHTML = opts + '<option value="custom">Custom Rate</option>';
+
+    // Penalty multipliers from the award (full-time/part-time figures).
+    if (daySel) {
+        const pr = (awardRates && awardRates.penalty_rates) || {};
+        const sat = Number(pr.saturday_full_time_part_time || pr.saturday) || 1.25;
+        const sun = Number(pr.sunday_full_time_part_time || pr.sunday) || 1.5;
+        const ph  = Number(pr.public_holiday_full_time_part_time || pr.public_holiday) || 2.25;
+        daySel.innerHTML =
+            '<option value="1.0">Monday-Friday (×1.0)</option>' +
+            '<option value="' + sat + '">Saturday (×' + sat + ')</option>' +
+            '<option value="' + sun + '">Sunday (×' + sun + ')</option>' +
+            '<option value="' + ph + '">Public Holiday (×' + ph + ')</option>';
+    }
+
+    // Reset overtime label to the award's first-tier overtime multiplier.
+    const otLabel = document.getElementById('overtimeLabel');
+    if (otLabel) otLabel.textContent = 'Overtime Pay (' + _awardCalcOvertimeMultiplier() + 'x):';
+}
+
+function _populateAwardCalculatorModal() {
+    const ctx = getAwardContext();
+    const loadedMa = awardRates && awardRates.ma_number;
+    const stale = !awardRates || !Array.isArray(awardRates.rates) || (ctx.code && loadedMa && loadedMa !== ctx.code);
+    if (stale && ctx.code) {
+        Promise.resolve(loadAwardRates()).then(_renderAwardCalculatorOptions).catch(_renderAwardCalculatorOptions);
+    } else {
+        _renderAwardCalculatorOptions();
+    }
+}
+
 function openAwardCalculator() {
     trackToolUsage('awardCalculatorModal');
     var modal = document.getElementById('awardCalculatorModal');
     if (modal) modal.classList.remove('hidden');
+    _populateAwardCalculatorModal();
 }
 
 function openScenarioAnalysis() {
@@ -16468,6 +16536,7 @@ function openTool(toolName) {
     const modalId = modalMap[toolName];
     if (modalId) {
         document.getElementById(modalId).classList.remove('hidden');
+        if (modalId === 'awardCalculatorModal') _populateAwardCalculatorModal();
         trackEvent('tool_opened', { tool: toolName, user: currentUser });
     }
 }
@@ -18716,9 +18785,10 @@ function calculateAward() {
         return;
     }
 
+    const otMultiplier = _awardCalcOvertimeMultiplier();
     const penaltyRate = baseRate * dayMultiplier;
     const ordinaryPay = penaltyRate * hours;
-    const overtimePay = overtime > 0 ? (baseRate * 1.5 * overtime) : 0;
+    const overtimePay = overtime > 0 ? (baseRate * otMultiplier * overtime) : 0;
     const totalPay = ordinaryPay + overtimePay;
 
     document.getElementById('resultBaseRate').textContent = `$${baseRate.toFixed(2)}/hr`;
@@ -18727,6 +18797,8 @@ function calculateAward() {
     document.getElementById('resultOvertimePay').textContent = `$${overtimePay.toFixed(2)}`;
     document.getElementById('resultTotal').textContent = `$${totalPay.toFixed(2)}`;
 
+    const otLabel = document.getElementById('overtimeLabel');
+    if (otLabel) otLabel.textContent = `Overtime Pay (${otMultiplier}x):`;
     document.getElementById('overtimeRow').style.display = overtime > 0 ? 'flex' : 'none';
     document.getElementById('calcResults').classList.remove('hidden');
 
@@ -18745,7 +18817,7 @@ function downloadCalculation() {
     if (overtime > 0) {
         data.push({
             'Description': 'Overtime',
-            'Rate': `$${(parseFloat(document.getElementById('calcPosition').value) * 1.5).toFixed(2)}/hr`,
+            'Rate': `$${(parseFloat(document.getElementById('calcPosition').value) * _awardCalcOvertimeMultiplier()).toFixed(2)}/hr`,
             'Hours': overtime,
             'Amount': document.getElementById('resultOvertimePay').textContent
         });
