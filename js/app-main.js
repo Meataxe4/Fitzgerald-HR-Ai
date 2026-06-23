@@ -996,6 +996,26 @@ const AWARD_VENUE_MAP = {
     ]
 };
 
+// Business types for the Manufacturing Award (MA000010). Manufacturing is a
+// different industry to hospitality, so it has its own EXCLUSIVE list — the
+// hospitality venue types never appear for a Manufacturing user. General
+// manufacturing only (vehicle manufacturing / TCF are separate coverage).
+const MANUFACTURING_VENUE_OPTIONS = [
+    { value: 'general-manufacturing',   label: 'General Manufacturing',                short: 'general manufacturing business' },
+    { value: 'engineering-fabrication', label: 'Engineering / Metal Fabrication',      short: 'engineering/fabrication business' },
+    { value: 'foundry',                 label: 'Foundry / Metal Casting',              short: 'foundry' },
+    { value: 'food-beverage-mfg',       label: 'Food & Beverage Manufacturing',        short: 'food & beverage manufacturer' },
+    { value: 'plastics-rubber-chemical',label: 'Plastics, Rubber & Chemical',          short: 'plastics/rubber/chemical manufacturer' },
+    { value: 'joinery-timber-furniture',label: 'Joinery, Timber & Furniture',          short: 'joinery/timber/furniture business' },
+    { value: 'printing-paper',          label: 'Printing & Paper Products',            short: 'printing/paper products business' },
+    { value: 'electrical-electronics',  label: 'Electrical / Electronics Assembly',    short: 'electrical/electronics assembler' },
+    { value: 'glass-ceramics',          label: 'Glass, Ceramics & Building Products',  short: 'glass/ceramics/building products business' }
+];
+
+function isManufacturingAwardName(awardName) {
+    return !!awardName && String(awardName).toLowerCase().indexOf('manufacturing') !== -1;
+}
+
 // Render the venue-type dropdown filtered by Award. When awardName matches a
 // known Award, the primary matches appear at the top in alphabetical order
 // and the remaining venues appear under an "Other venue types" optgroup.
@@ -1004,6 +1024,18 @@ function populateVenueTypeDropdown(selectEl, awardName, currentValue) {
     if (!selectEl) return;
     const selected = currentValue || '';
     const sortByLabel = (a, b) => a.label.localeCompare(b.label);
+
+    // Manufacturing is a different industry — show ONLY manufacturing business
+    // types, never the hospitality venue list.
+    if (isManufacturingAwardName(awardName)) {
+        let mhtml = '<option value="">Select business type...</option>';
+        mhtml += MANUFACTURING_VENUE_OPTIONS.slice().sort(sortByLabel)
+            .map(v => `<option value="${v.value}"${v.value === selected ? ' selected' : ''}>${v.label}</option>`)
+            .join('');
+        selectEl.innerHTML = mhtml;
+        return;
+    }
+
     const primarySlugs = AWARD_VENUE_MAP[awardName];
 
     let html = '<option value="">Select venue type...</option>';
@@ -16510,7 +16542,10 @@ function updateOnboardingStep() {
         const hint = document.getElementById('onboardingVenueTypeHint');
         populateVenueTypeDropdown(select, venueProfile.primaryAward, venueProfile.venueType);
         if (hint) {
-            if (AWARD_VENUE_MAP[venueProfile.primaryAward]) {
+            if (isManufacturingAwardName(venueProfile.primaryAward)) {
+                hint.textContent = 'Select the type of manufacturing business you run.';
+                hint.classList.remove('hidden');
+            } else if (AWARD_VENUE_MAP[venueProfile.primaryAward]) {
                 hint.textContent = `Showing venues commonly covered by the ${venueProfile.primaryAward}. If yours isn't listed, choose from "Other venue types".`;
                 hint.classList.remove('hidden');
             } else {
@@ -16745,7 +16780,8 @@ function showRandomQuickPrompts() {
 }
 
 function getVenueTypeLabel(type) {
-    const match = VENUE_OPTIONS.find(v => v.value === type);
+    const match = VENUE_OPTIONS.find(v => v.value === type)
+        || MANUFACTURING_VENUE_OPTIONS.find(v => v.value === type);
     if (match) return match.short;
     // Legacy slugs from earlier onboarding versions
     const legacy = {
@@ -22101,7 +22137,18 @@ function loadFeatureFlags(userProfile) {
 }
 
 function hasFeature(flagName) {
-    return _featureFlagsCache !== null && _featureFlagsCache.has(flagName);
+    if (_featureFlagsCache !== null && _featureFlagsCache.has(flagName)) return true;
+    // Robust admin fallback: allowlisted emails get their preview flags even if
+    // the Firestore flag load hasn't populated the cache (timing/login path).
+    try {
+        const email = (typeof auth !== 'undefined' && auth && auth.currentUser && auth.currentUser.email)
+            || (currentUser && currentUser.email);
+        if (email && typeof ALLOWLISTED_EMAILS !== 'undefined' && ALLOWLISTED_EMAILS[email]
+            && ALLOWLISTED_EMAILS[email].indexOf(flagName) !== -1) {
+            return true;
+        }
+    } catch (e) {}
+    return false;
 }
 
 // ---- Step 3: Question response storage -------------------------------------
