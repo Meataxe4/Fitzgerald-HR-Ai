@@ -22993,25 +22993,25 @@ let _fwDocState = { templateId: null, gap: null };
 
 const _FW_DOC_TEMPLATES = {
     clause_20_annualised_wage_agreement: {
-        title: 'Clause 20 Annualised Wage Agreement',
-        subtitle: 'Generates a written agreement compliant with MA000119 cl 20.1(d) / MA000009 equivalent',
-        anchor: 'MA000119 Clause 20.1(d) · Fair Work Act 2009',
+        title: 'Annualised Wage Agreement',
+        subtitle: 'Generates a written annualised wage agreement with the clause references for your award',
+        anchor: 'Annualised wage arrangement clause for your award · Fair Work Act 2009',
         render: function() { return _fwDocRender_clause20Agreement(); },
         validate: function() { return _fwDocValidate_clause20Agreement(); },
         generate: function() { return _fwDocGenerate_clause20Agreement(); }
     },
     clause_20_weekly_time_record: {
-        title: 'Clause 20 Weekly Time Record',
-        subtitle: 'Generates a weekly signed time record template (Schedule G equivalent)',
-        anchor: 'MA000119 Clause 20.2(c) · FW Act s535',
+        title: 'Annualised Wage Time Record',
+        subtitle: 'Generates a signed time record template for annualised wage arrangements',
+        anchor: 'Annualised wage record-keeping clause for your award · FW Act s535',
         render: function() { return _fwDocRender_weeklyTimeRecord(); },
         validate: function() { return _fwDocValidate_weeklyTimeRecord(); },
         generate: function() { return _fwDocGenerate_weeklyTimeRecord(); }
     },
     schedule_g_h_cash_out_agreement: {
         title: 'Annual Leave Cash-Out Agreement',
-        subtitle: 'Generates a Schedule G/H cash-out agreement (single use, residual ≥ 4 weeks)',
-        anchor: 'FW Act s93 · MA000119 Schedule H / MA000009 Schedule G',
+        subtitle: 'Generates an annual leave cash-out agreement (single use, residual ≥ 4 weeks)',
+        anchor: 'FW Act s93 · your award\'s cash-out provisions',
         render: function() { return _fwDocRender_cashOut(); },
         validate: function() { return _fwDocValidate_cashOut(); },
         generate: function() { return _fwDocGenerate_cashOut(); }
@@ -23068,9 +23068,9 @@ const _FW_DOC_TEMPLATES = {
         generate: function() { return _fwDocGenerate_probationClause(); }
     },
     schedule_g_leave_in_advance_agreement: {
-        title: 'Leave-in-Advance Agreement (Schedule G)',
-        subtitle: 'Schedule G written agreement with FW Act s324 deduction authority',
-        anchor: 'FW Act s324 (authorised deductions) · MA000119 Schedule G',
+        title: 'Leave-in-Advance Agreement',
+        subtitle: 'Written leave-in-advance agreement with FW Act s324 deduction authority',
+        anchor: 'FW Act s324 (authorised deductions)',
         render: function() { return _fwDocRender_leaveInAdvance(); },
         validate: function() { return _fwDocValidate_leaveInAdvance(); },
         generate: function() { return _fwDocGenerate_leaveInAdvance(); }
@@ -23229,10 +23229,73 @@ function _fwApplyDocAwardGating() {
     });
 }
 
+// Award-specific annualised-wage clause references, sourced from each award.
+// Hospitality (MA000009) / Restaurant (MA000119): Clause 20. Manufacturing
+// (MA000010): Clause 28 — and cl 28.1 restricts the arrangement to a full-time
+// Supervisor/Trainer/Coordinator Level I or II. References verified against
+// docs/ma000010.pdf (cl 28.2-28.4).
+function _fwAnnualisedWageProfile(reconDate) {
+    const code = getAwardContext().code;
+    if (code === 'MA000010') {
+        return {
+            clauseHeading: 'Clause 28-Annualised wage arrangements',
+            outerLimitText: 'those hours are not covered by the annualised wage and must be paid separately in accordance with the applicable provisions of the award (cl 28.2(c)).',
+            reconText: 'Each 12 months from commencement of the arrangement (or earlier, on termination of employment or of the agreement), the employer will calculate the remuneration that would have been payable under the award over the relevant period and compare it to the annualised wage actually paid. Any shortfall will be paid within 14 days (cl 28.3(b)).',
+            recordSentence: 'A record of starting and finishing times of work, and any unpaid breaks taken, will be kept for each pay period or roster cycle and signed (or acknowledged in writing) by the employee (cl 28.3(c)).',
+            weeklyRecordRef: 'Clause 28.3(c)',
+            weeklyVarianceClause: 'cl 28.2(c)',
+            eligibilityNote: 'Eligibility: under MA000010 cl 28.1, an annualised wage arrangement applies only to a full-time employee who is a Supervisor/Trainer/Coordinator Level I or II. Do not use this agreement for other classifications.',
+            baseRateNote: 'For NES purposes, the base rate of pay is the portion of the annualised wage equivalent to the minimum rate in cl 20-Minimum rates, excluding incentive-based payments, bonuses, loadings, allowances, overtime and penalties (cl 28.4).'
+        };
+    }
+    // Hospitality (MA000009) / Restaurant (MA000119) - Clause 20.
+    return {
+        clauseHeading: 'Clause 20',
+        outerLimitText: 'the employee will be paid the additional amount under the absorbed Award provisions above, payable within 14 days of the relevant pay period (cl 20.2(b)).',
+        reconText: 'A reconciliation will be performed by ' + _fwEscapeHtml(reconDate) + ' comparing the employee\'s actual hours worked at Award rates against the annualised wage paid. Any shortfall will be paid within 14 days of the reconciliation date.',
+        recordSentence: 'A signed weekly time record of start times, finish times, and unpaid breaks will be kept for each pay period (cl 20.2(c); FW Act s535).',
+        weeklyRecordRef: 'Clause 20.2(c)',
+        weeklyVarianceClause: 'cl 20.2(b)',
+        eligibilityNote: null,
+        baseRateNote: null
+    };
+}
+
+// The award provisions an annualised wage may absorb - award-specific so the
+// checkbox list and the generated document stay in sync. Manufacturing entries
+// reference the cl 28.2(a) list; hospitality/restaurant keep their existing set.
+function _fwAbsorbedProvisions() {
+    if (getAwardContext().code === 'MA000010') {
+        return [
+            { key: 'abs_overtime',  label: 'Overtime (cl 32)', checked: true },
+            { key: 'abs_weekend',   label: 'Weekend penalty rates (cl 17.2(g))', checked: true },
+            { key: 'abs_shift',     label: 'Shift penalties (cl 33)', checked: true },
+            { key: 'abs_ph',        label: 'Public holiday penalty rates (cl 17.2(h))', checked: true },
+            { key: 'abs_meal',      label: 'Meal-break penalty (cl 18.5(b))', checked: false },
+            { key: 'abs_allow',     label: 'Allowances and special rates (cl 30)', checked: false },
+            { key: 'abs_leaveload', label: 'Annual leave loading (cl 34.4)', checked: false }
+        ];
+    }
+    return [
+        { key: 'abs_overtime', label: 'Overtime rates', checked: true },
+        { key: 'abs_weekend',  label: 'Weekend penalties', checked: true },
+        { key: 'abs_evening',  label: 'Evening/night penalties', checked: true },
+        { key: 'abs_ph',       label: 'Public holiday penalties', checked: true },
+        { key: 'abs_industry', label: 'Industry allowance', checked: false },
+        { key: 'abs_split',    label: 'Split shift allowance', checked: false },
+        { key: 'abs_meal',     label: 'Meal allowance', checked: false }
+    ];
+}
+
 function _fwDocRender_clause20Agreement() {
     const p = venueProfile || {};
     const today = new Date().toISOString().slice(0, 10);
+    const elig = _fwAnnualisedWageProfile().eligibilityNote;
+    const eligBanner = elig
+        ? '<div class="text-xs text-amber-300/90 p-3 bg-amber-900/20 border border-amber-700 rounded-lg">⚠️ ' + _fwEscapeHtml(elig) + '</div>'
+        : '';
     return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" class="space-y-3">' +
+        eligBanner +
         '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">' +
             'Pre-filled from your business profile: <strong class="text-slate-300">' + _fwEscapeHtml(p.venueName || '—') + '</strong> · ABN ' + _fwEscapeHtml(p.venue_abn || '—') + ' · ' + _fwEscapeHtml(p.primaryAward || '—') +
         '</div>' +
@@ -23257,13 +23320,9 @@ function _fwDocRender_clause20Agreement() {
         '<div class="text-xs text-slate-400 p-3 bg-slate-700/30 rounded-lg">' +
             '<strong>Award provisions absorbed by this annualised wage</strong> (review the absorbed provisions carefully against your award):' +
             '<div class="mt-2 space-y-1 text-slate-300">' +
-                '<label class="flex items-center gap-2"><input type="checkbox" name="abs_overtime" checked class="accent-amber-500"> Overtime rates</label>' +
-                '<label class="flex items-center gap-2"><input type="checkbox" name="abs_weekend" checked class="accent-amber-500"> Weekend penalties</label>' +
-                '<label class="flex items-center gap-2"><input type="checkbox" name="abs_evening" checked class="accent-amber-500"> Evening/night penalties</label>' +
-                '<label class="flex items-center gap-2"><input type="checkbox" name="abs_ph" checked class="accent-amber-500"> Public holiday penalties</label>' +
-                '<label class="flex items-center gap-2"><input type="checkbox" name="abs_industry" class="accent-amber-500"> Industry allowance</label>' +
-                '<label class="flex items-center gap-2"><input type="checkbox" name="abs_split" class="accent-amber-500"> Split shift allowance</label>' +
-                '<label class="flex items-center gap-2"><input type="checkbox" name="abs_meal" class="accent-amber-500"> Meal allowance</label>' +
+                _fwAbsorbedProvisions().map(function(o) {
+                    return '<label class="flex items-center gap-2"><input type="checkbox" name="' + o.key + '"' + (o.checked ? ' checked' : '') + ' class="accent-amber-500"> ' + _fwEscapeHtml(o.label) + '</label>';
+                }).join('') +
             '</div>' +
         '</div>' +
     '</form>';
@@ -23305,33 +23364,30 @@ function _fwDocGenerate_clause20Agreement() {
         base.setFullYear(base.getFullYear() + 1);
         return base.toISOString().slice(0, 10);
     })();
-    const absorbed = [
-        d.abs_overtime && 'Overtime rates',
-        d.abs_weekend && 'Weekend penalties (Saturday and Sunday)',
-        d.abs_evening && 'Evening and night penalties',
-        d.abs_ph && 'Public holiday penalties',
-        d.abs_industry && 'Industry allowance',
-        d.abs_split && 'Split shift allowance',
-        d.abs_meal && 'Meal allowance'
-    ].filter(Boolean);
+    const prof = _fwAnnualisedWageProfile(reconDate);
+    const absorbed = _fwAbsorbedProvisions().filter(function(o) { return d[o.key]; }).map(function(o) { return o.label; });
     const absorbedHtml = absorbed.map(function(c) { return '<li>' + _fwEscapeHtml(c) + '</li>'; }).join('');
+    const eligHtml = prof.eligibilityNote ? '<p><strong>' + _fwEscapeHtml(prof.eligibilityNote) + '</strong></p>' : '';
+    const baseRateHtml = prof.baseRateNote ? '<p>' + _fwEscapeHtml(prof.baseRateNote) + '</p>' : '';
     const html =
         '<h1>Annualised Wage Arrangement</h1>' +
-        '<h2>Under ' + _fwEscapeHtml(award) + ' Clause 20</h2>' +
+        '<h2>Under ' + _fwEscapeHtml(award) + ' ' + _fwEscapeHtml(prof.clauseHeading) + '</h2>' +
+        eligHtml +
         '<p>Between <strong>' + _fwEscapeHtml(p.venueName || '[Employer name]') + '</strong> (ABN ' + _fwEscapeHtml(p.venue_abn || '[ABN]') + ') of ' + _fwEscapeHtml(p.venue_address || '[Address]') + '</p>' +
         '<p>And <strong>' + _fwEscapeHtml(d.emp_name) + '</strong> (classification: ' + _fwEscapeHtml(d.emp_classification) + ', ' + _fwEscapeHtml(d.emp_status) + ', commenced ' + _fwEscapeHtml(d.emp_start) + ')</p>' +
         '<h3>1. Annualised wage amount</h3>' +
         '<p>The employee will be paid an annualised salary of AUD ' + _fwEscapeHtml(Number(d.base_salary).toLocaleString('en-AU', { minimumFractionDigits: 2 })) + ' per annum, paid ' + _fwEscapeHtml(d.pay_cycle) + ', for ' + _fwEscapeHtml(d.hours_covered) + ' ordinary hours per week.</p>' +
+        baseRateHtml +
         '<h3>2. Award provisions absorbed</h3>' +
         '<p>This annualised wage absorbs the following provisions of ' + _fwEscapeHtml(award) + ':</p>' +
         '<ul>' + absorbedHtml + '</ul>' +
         '<h3>3. Outer-limit hours</h3>' +
         '<p>Ordinary hours are not to exceed ' + _fwEscapeHtml(d.outer_ordinary) + ' per week. Overtime hours are not to exceed ' + _fwEscapeHtml(d.outer_overtime) + ' per week.</p>' +
-        '<p>If hours worked exceed these outer limits in any pay period, the employee will be paid the additional amount under the absorbed Award provisions above, payable within 14 days of the relevant pay period (cl 20.2(b)).</p>' +
-        '<h3>4. 12-month reconciliation</h3>' +
-        '<p>A reconciliation will be performed by ' + _fwEscapeHtml(reconDate) + ' comparing the employee\'s actual hours worked at Award rates against the annualised wage paid. Any shortfall will be paid within 14 days of the reconciliation date.</p>' +
-        '<h3>5. Weekly time records</h3>' +
-        '<p>A signed weekly time record of start times, finish times, and unpaid breaks will be kept for each pay period (cl 20.2(c); FW Act s535).</p>' +
+        '<p>If hours worked exceed these outer limits in any pay period, ' + _fwEscapeHtml(prof.outerLimitText) + '</p>' +
+        '<h3>4. Reconciliation</h3>' +
+        '<p>' + _fwEscapeHtml(prof.reconText) + '</p>' +
+        '<h3>5. Time records</h3>' +
+        '<p>' + _fwEscapeHtml(prof.recordSentence) + '</p>' +
         '<h3>6. Termination</h3>' +
         '<p>This arrangement ends on the earlier of: (a) termination of the employee\'s employment, or (b) written notice from either party.</p>' +
         '<h3>7. Signatures</h3>' +
@@ -23341,7 +23397,7 @@ function _fwDocGenerate_clause20Agreement() {
         '<p>Employee: _______________________________ Date: ___________</p>' +
         '<p>Name: ' + _fwEscapeHtml(d.emp_name) + '</p>' +
         '<p><em>This document is not a substitute for legal advice. Verify all clause references and absorbed provisions against the current ' + _fwEscapeHtml(award) + ' before signing.</em></p>';
-    const filename = 'Clause20_Annualised_Wage_' + (d.emp_name || 'Employee').replace(/[^A-Za-z0-9_-]/g, '_') + '.docx';
+    const filename = 'Annualised_Wage_Agreement_' + (d.emp_name || 'Employee').replace(/[^A-Za-z0-9_-]/g, '_') + '.docx';
     return { html: html, filename: filename };
 }
 
@@ -23379,6 +23435,7 @@ function _fwDocGenerate_weeklyTimeRecord() {
     const numWeeks = parseInt(d.num_weeks, 10) || 1;
     const contracted = d.contracted_hours ? parseInt(d.contracted_hours, 10) : null;
     const award = getAwardContext().name || '[Your Modern Award]';
+    const prof = _fwAnnualisedWageProfile();
 
     function addWeeks(dateStr, n) {
         const dt = new Date(dateStr);
@@ -23390,7 +23447,7 @@ function _fwDocGenerate_weeklyTimeRecord() {
         '<h1>Weekly Time Records</h1>' +
         '<p>Employer: <strong>' + _fwEscapeHtml(p.venueName || '[Employer]') + '</strong> (ABN ' + _fwEscapeHtml(p.venue_abn || '[ABN]') + ')</p>' +
         '<p>Employee: <strong>' + _fwEscapeHtml(d.emp_name) + '</strong> · Classification: ' + _fwEscapeHtml(d.emp_classification) + '</p>' +
-        '<p>Award reference: ' + _fwEscapeHtml(award) + ' Clause 20.2(c) · Fair Work Act 2009 s535</p>';
+        '<p>Award reference: ' + _fwEscapeHtml(award) + ' ' + _fwEscapeHtml(prof.weeklyRecordRef) + ' · Fair Work Act 2009 s535</p>';
 
     for (let w = 0; w < numWeeks; w++) {
         const weekEnding = addWeeks(d.week_ending, w);
@@ -23407,7 +23464,7 @@ function _fwDocGenerate_weeklyTimeRecord() {
             '<p><strong>Total hours for the week:</strong> ___________</p>';
         if (contracted) {
             html += '<p>Contracted hours per week: ' + contracted + ' · Variance: ___________</p>' +
-                    '<p><em>If variance exceeds the outer-limit hours under the underlying annualised wage agreement, additional payment is required within 14 days (cl 20.2(b)).</em></p>';
+                    '<p><em>If variance exceeds the outer-limit hours under the underlying annualised wage agreement, the excess must be paid in accordance with the applicable award provisions (' + _fwEscapeHtml(prof.weeklyVarianceClause) + ').</em></p>';
         }
         html += '<p>I confirm the hours recorded above are accurate.</p>' +
                 '<p>Employee signature: _______________________ Date: ___________</p>' +
