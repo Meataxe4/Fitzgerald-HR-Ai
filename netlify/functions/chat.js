@@ -168,26 +168,58 @@ exports.handler = async (event, context) => {
       };
     }
 
-    // Determine which award this user is on
-    const isRestaurantAward = primaryAward && primaryAward.toLowerCase().includes('restaurant');
-    const awardName = primaryAward || 'Hospitality Industry (General) Award';
-    const awardCode = isRestaurantAward ? 'MA000119' : 'MA000009';
-    const awardFullName = isRestaurantAward
-      ? 'Restaurant Industry Award MA000119'
-      : 'Hospitality Industry (General) Award MA000009';
-    const industrySector = isRestaurantAward
-      ? 'restaurants, cafes, bistros, and table-service food venues'
-      : 'hotels, restaurants, cafes, pubs, bars, and other hospitality venues';
+    // Determine which award this user is on — registry-based and FAIL CLOSED.
+    // Guardrail: an unrecognised/unsupported award must NEVER silently default
+    // to Hospitality. When the award cannot be resolved we answer only at the
+    // NES / Fair Work Act / National Minimum Wage floor (see the else branch of
+    // the system prompt below). See docs/guardrails-award-resolution.md.
+    const SERVER_AWARDS = {
+      MA000009: {
+        fullName: 'Hospitality Industry (General) Award MA000009',
+        sector: 'hotels, restaurants, cafes, pubs, bars, and other hospitality venues',
+        rates: hospitalityRates,
+        aliases: ['hospitality']
+      },
+      MA000119: {
+        fullName: 'Restaurant Industry Award MA000119',
+        sector: 'restaurants, cafes, bistros, and table-service food venues',
+        rates: restaurantRates,
+        aliases: ['restaurant']
+      }
+    };
+    function resolveServerAward(stored) {
+      if (!stored) return null;
+      const s = String(stored).toLowerCase();
+      for (const code in SERVER_AWARDS) {
+        const entry = SERVER_AWARDS[code];
+        const matched = s.indexOf(code.toLowerCase()) !== -1 ||
+          entry.aliases.some(function (a) { return s.indexOf(a) !== -1; });
+        if (matched) return Object.assign({ code: code }, entry);
+      }
+      return null;
+    }
+
+    const resolvedAward = resolveServerAward(primaryAward);
+    const awardName = resolvedAward ? primaryAward : null;
+    const awardFullName = resolvedAward ? resolvedAward.fullName : null;
+    const industrySector = resolvedAward
+      ? resolvedAward.sector
+      : 'Australian hospitality businesses';
 
     // Award-specific facts — sourced from the rates JSON files at module load,
     // so any future change to penalty rates / minimum engagement / loadings
-    // updates this prompt automatically with no code edit required.
-    const ratesData = isRestaurantAward ? restaurantRates : hospitalityRates;
-    const penaltyRateFacts = buildPenaltyRateFacts(ratesData, awardFullName);
-    const minimumEngagementFacts = buildMinimumEngagementFacts(ratesData, awardFullName);
+    // updates this prompt automatically with no code edit required. Only built
+    // when an award is resolved; the floor-only branch never quotes award rates.
+    const ratesData = resolvedAward ? resolvedAward.rates : null;
+    const penaltyRateFacts = resolvedAward ? buildPenaltyRateFacts(ratesData, awardFullName) : '';
+    const minimumEngagementFacts = resolvedAward ? buildMinimumEngagementFacts(ratesData, awardFullName) : '';
 
-    // System prompt for Fitz HR Assistant
-    const systemPrompt = `You are Fitz, an expert AI HR assistant specialising in Australian hospitality industry HR. You work for Fitz HR, a boutique consultancy focused on ${industrySector}. You are the friendly, knowledgeable avatar helping managers and owners with their HR challenges.
+    // System prompt for Fitz HR Assistant. When the award is resolved we use the
+    // full award-aware prompt; when it is not, we fall back to a floor-only prompt
+    // that never quotes award-specific figures (guardrail — fail closed).
+    let systemPrompt;
+    if (resolvedAward) {
+    systemPrompt = `You are Fitz, an expert AI HR assistant specialising in Australian hospitality industry HR. You work for Fitz HR, a boutique consultancy focused on ${industrySector}. You are the friendly, knowledgeable avatar helping managers and owners with their HR challenges.
 
 IMPORTANT — THIS USER'S AWARD: All advice, rates, classifications, and compliance guidance must reference the **${awardFullName}**. Do NOT reference a different award unless explicitly asked to compare. If the user asks about pay rates, classifications, or compliance, always frame your answer in terms of ${awardFullName}.
 
@@ -420,6 +452,25 @@ For questions about PAY RATES specifically, ALSO mention the Award Wizard tool i
 Remember: You're a support tool provided by Fitz HR, not a replacement for human expertise in complex or high-stakes situations. Always drive clients toward:
 1. Using the Award Wizard tool for pay rate questions
 2. Engaging with Fitz HR consultants for complex/legal matters`;
+    } else {
+    systemPrompt = `You are Fitz, an expert AI HR assistant for Australian hospitality businesses, working for Fitz HR, a boutique HR consultancy. You are friendly, knowledgeable and personable.
+
+IMPORTANT — NO AWARD IS SET FOR THIS USER:
+This user has not selected a supported modern award, so you do NOT know which award applies to them. You must therefore answer ONLY at the universal floor that applies regardless of award:
+- The National Employment Standards (NES)
+- The Fair Work Act 2009
+- The National Minimum Wage
+
+You must NOT quote or estimate any award-specific figures — base rates, penalty rates, casual loading, overtime rates, shift loadings, allowances, or classification structures. These differ by award and you cannot determine them without knowing the user's award.
+
+If the user asks for any award-specific figure or rule, briefly explain that it depends on their specific modern award, and ask them to set their Award in Settings so you can give exact figures. Do not guess, and NEVER assume the Hospitality or Restaurant Award by default.
+
+CRITICAL - ALWAYS USE BRITISH/AUSTRALIAN ENGLISH SPELLING (e.g. specialise, organise, behaviour, labour, centre).
+
+Your tone should be professional but approachable and friendly (Australian conversational style), practical and solutions-focused, empathetic, and clear about when issues require escalation to a qualified HR consultant or lawyer.
+
+Remember: You're a support tool provided by Fitz HR, not a replacement for human expertise. For pay rates and award-specific questions, direct the user to set their Award in Settings and to use the Award Wizard tool; for complex or legal matters, direct them to Fitz HR consultants.`;
+    }
 
     // Prepare messages for Claude API
     const messages = [];
