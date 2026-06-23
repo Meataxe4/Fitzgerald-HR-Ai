@@ -4,7 +4,7 @@
 >
 > **Scope:** GENERAL manufacturing only; vehicle manufacturing (Schedule B) excluded by design.
 >
-> **Status:** DRAFT — every dollar rate below is machine-validated, but needs human/consultant sign-off before go-live. NOT wired into the app. Data: `docs/source/manufacturing-award-rates.draft.json`.
+> **Status:** Every dollar rate below is machine-validated; structural rules (min engagement, shift loadings, supervisor formula) are confirmed against the award text. Wired behind the `manufacturing_preview` flag, pending final human/consultant sign-off before GA. Production data: `manufacturing-award-rates.json` (repo root).
 
 ## Coverage — 169 classifications, all validated ✅
 
