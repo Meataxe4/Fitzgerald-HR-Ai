@@ -1,54 +1,65 @@
-# Manufacturing Award (MA000010) — rate extraction for verification
+# Manufacturing Award (MA000010) — COMPLETE rate extraction for verification
 
-> **Source:** Fair Work Ombudsman *Pay Guide — MA000010*, published 16 Oct 2025, rates effective **01/07/2025**.
+> **Source:** Fair Work Ombudsman *Pay Guide — MA000010*, published 16 Oct 2025, effective **01/07/2025**.
 >
 > **Scope:** GENERAL manufacturing only; vehicle manufacturing (Schedule B) excluded by design.
 >
-> **Status:** DRAFT for review — NOT wired into the app. Draft data: `docs/source/manufacturing-award-rates.draft.json`. Rates superseded by the imminent annual increase — re-run `scripts/extract_manufacturing_rates.py` on the new PDF.
+> **Status:** DRAFT — every dollar rate below is machine-validated, but needs human/consultant sign-off before go-live. NOT wired into the app. Data: `docs/source/manufacturing-award-rates.draft.json`.
 
-## Base hourly rates — Adult, general manufacturing (✅ validated)
+## Coverage — 149 classifications, all validated ✅
 
-Full-time/part-time validated by hourly×38=weekly; casual validated as exactly +25%.
+Validation = hourly×38 equals weekly (where given) **and** Saturday/Sunday/public-holiday columns are exactly 150% / 200% / 250% of the hourly rate.
 
-| C-level | Full-time/PT hourly | Casual hourly (+25%) | Weekly (FT) |
-|---|---|---|---|
-| **C14** | $24.28 | $30.35 | $922.70 |
-| **C13** | $24.95 | $31.19 | $948.00 |
-| **C12** | $25.85 | $32.31 | $982.40 |
-| **C11** | $26.70 | $33.38 | $1014.70 |
-| **C10** | $28.12 | $35.15 | $1068.40 |
-| **C9** | $29.00 | $36.25 | $1102.00 |
-| **C8** | $29.88 | $37.35 | $1135.50 |
-| **C7** | $30.68 | $38.35 | $1165.70 |
-| **C6** | $32.23 | $40.29 | $1224.90 |
-| **C5** | $32.90 | $41.13 | $1250.10 |
-| **C4** | $33.78 | $42.23 | $1283.50 |
-| **C3** | $35.55 | $44.44 | $1350.80 |
-| **C2(a)** | $36.43 | $45.54 | $1384.40 |
-| **C2(b)** | $38.03 | $47.54 | $1445.10 |
+| Category | Rows | Notes |
+|---|---|---|
+| Adult wages + professional/technical — FT/PT | 36 | C14→C2(b) + Advanced Cert/Diploma/Technical-field streams |
+| Adult wages + professional/technical — Casual | 36 | uniform +25% |
+| Junior — FT/PT | 11 | age-based (under 16→20), foundry / non-foundry |
+| Junior — Casual | 11 |  |
+| Apprentice — FT/PT | 42 | before/after 1 Jan 2014 × Year 10/11/12 × adult; stages 1–4 + higher/advanced |
+| Trainee (tech field/engineer/scientist) — FT/PT | 10 | by age band |
+| Cadet (technical field) — FT/PT | 3 | 1st–3rd year of training |
+
+## Core base rates — Adult, general manufacturing (most-used)
+
+| C-level | FT/PT hourly | Weekly |
+|---|---|---|
+| **C14** | $24.28 | $922.70 |
+| **C13** | $24.95 | $948.00 |
+| **C12** | $25.85 | $982.40 |
+| **C11** | $26.70 | $1014.70 |
+| **C10** | $28.12 | $1068.40 |
+| **C9** | $29.00 | $1102.00 |
+| **C8** | $29.88 | $1135.50 |
+| **C7** | $30.68 | $1165.70 |
+| **C6** | $32.23 | $1224.90 |
+| **C5** | $32.90 | $1250.10 |
+| **C4** | $33.78 | $1283.50 |
+| **C3** | $35.55 | $1350.80 |
+| **C2(a)** | $36.43 | $1384.40 |
+| **C2(b)** | $38.03 | $1445.10 |
 
 ## Penalty & overtime model (day worker)
 
 | Item | Rate | Confidence |
 |---|---|---|
-| Saturday (ordinary hours) | 150% | ✅ HIGH — validated, uniform |
-| Sunday (ordinary hours) | 200% | ✅ HIGH — validated, uniform |
-| Public holiday | 250% | ✅ HIGH — validated, uniform |
-| Overtime — first 3 hours | 150% | ✅ HIGH |
-| Overtime — after 3 hours | 200% | ✅ HIGH |
+| Saturday (ordinary) | 150% | ✅ validated, uniform |
+| Sunday (ordinary) | 200% | ✅ validated, uniform |
+| Public holiday | 250% | ✅ validated, uniform |
+| Overtime first 3 hrs | 150% | ✅ HIGH |
+| Overtime after 3 hrs | 200% | ✅ HIGH |
 | Sunday overtime | 200% | ✅ HIGH |
-| Afternoon shift loading | +15% | ⚠️ MEDIUM — confirm column mapping |
-| Night shift loading | +15% | ⚠️ MEDIUM |
-| Permanent night shift | +30% | ⚠️ MEDIUM |
-| Casual loading | +25% | ✅ HIGH — validated |
+| Casual loading | +25% | ✅ validated |
+| Afternoon shift | +15% | ⚠️ confirm mapping |
+| Night shift | +15% | ⚠️ confirm mapping |
+| Permanent night shift | +30% | ⚠️ confirm mapping |
 
-## Not yet extracted (later passes, before go-live)
+## Not in the dollar dataset (handled separately)
 
-- **Juniors** (pp. 32+) and **apprentices** (pp. 47+)
-- **Professional/technical stream** — Advanced Certificate / Associate Diploma / Degree → C2(b)/C1 (different column layout; deliberately not auto-trusted)
-- **Minimum engagement** — not in the Pay Guide; must be read from the award text
-- **Special penalties** — meal-break, ship trials, wharf (niche; low priority)
+- **Supervisor/Trainer/Coordinator** & **Technology Cadet / Completed Cadetship** — defined as **percentages** of base rates (e.g. Supervisor L2 = 115% of the minimum hourly wage); modelled as formulas, not absolute rates.
+- **Minimum engagement** — not in the Pay Guide; read from award text.
+- **Niche penalties** — meal-break, ship trials, wharf.
 
 ## Please verify
 
-The base-rate table above is the core. The ⚠️ MEDIUM shift-loading rows are the only ones I'm not fully certain map to the right column — worth a glance at the award. Everything marked ✅ is machine-validated.
+Core: **C10 $28.12**, **C14 $24.28**. Apprentice: *Started after 1 Jan 2014, stage 1* = **$22.49/hr ($854.72/wk)**. Only the ⚠️ shift-loading rows need a manual glance; everything else is machine-validated.

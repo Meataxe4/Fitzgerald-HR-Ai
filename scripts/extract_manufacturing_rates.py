@@ -86,3 +86,92 @@ if __name__ == "__main__":
     print(f"Validation: {len(ftpt)-len(bad)}/{len(ftpt)} rows pass hourly*38==weekly")
     for r in bad:
         print("  NEEDS-REVIEW:", r["label"], r["weekly"], r["hourly"])
+
+
+# --- Unified extraction across ALL General Manufacturing sections -------------
+SECTION_RE = re.compile(r'^(Adult apprentice|Apprentice|Adult|Junior|Trainee|Cadet)\b.*General manufacturing', re.I)
+TABLE_RE = re.compile(r'Table (\d+) of \d+')
+LABEL_RE = re.compile(
+    r'^(C\d+\([ab]\)|C\d+|Apprentice|Higher engineering|Advanced engineering|'
+    r'Advanced Certificate|Associate Diploma|Technical field|Completed Diploma|'
+    r'Degree|Under \d+ years|\d+ years of age|Cadet|Trainee)', re.I)
+EMBEDDED_HOURLY = re.compile(r'\$[\d,]+\.\d{2}')
+
+def _merge_continuation(rows, i):
+    """Append following money-less, non-label lines to the label."""
+    label = rows[i][0]
+    j = i + 1
+    while j < len(rows):
+        nxt = rows[j]
+        if not nxt: break
+        has_money = any(MONEY.match(c) for c in nxt)
+        if has_money or LABEL_RE.match(nxt[0]) or SECTION_RE.search(nxt[0]) \
+           or TABLE_RE.search(nxt[0]) or 'Award Code' in nxt[0] or nxt[0] == 'Classification':
+            break
+        label = (label + ' ' + nxt[0]).strip()
+        j += 1
+    return label
+
+def extract_all_general_manufacturing(max_page=83):
+    """Walk pages 1..max_page, return validated base-rate rows grouped by section.
+    Only Table 1 (base hourly + Sat/Sun/PH) of each section is captured. Table
+    state is carried across pages and only reset on a new section header, so
+    continuation pages of Tables 2-5 are never mistaken for Table 1."""
+    sections = {}
+    current = None
+    table = None
+    for pno in range(0, max_page):
+        rows = page_rows(pno)
+        for i, r in enumerate(rows):
+            if not r: continue
+            head = r[0]
+            sec = SECTION_RE.search(head)
+            if sec and not TABLE_RE.search(head):
+                current = _merge_continuation(rows, i)
+                table = None
+                sections.setdefault(current, [])
+                continue
+            tm = TABLE_RE.search(head)
+            if tm:
+                table = int(tm.group(1)); continue
+            if current is None or table != 1:   # capture ONLY confirmed Table 1
+                continue
+            if not LABEL_RE.match(head):
+                continue
+            monies = [c for c in r if MONEY.match(c)]
+            # Some rows (trainees) have the hourly rate embedded in the label cell
+            # rather than a separate column; pull it out so columns line up.
+            embedded = EMBEDDED_HOURLY.search(head)
+            if embedded and len(monies) >= 3:
+                hourly = num(embedded.group(0))
+                v = [num(m) for m in monies]
+                weekly, sat, sun, ph = None, v[0], v[1], v[2]
+                head = head[:embedded.start()].strip()
+            elif len(monies) >= 4:
+                v = [num(m) for m in monies]
+                if len(v) >= 5 and 30 <= v[0] / v[1] <= 46:   # weekly-first
+                    weekly, hourly, sat, sun, ph = v[0], v[1], v[2], v[3], v[4]
+                else:                                          # hourly-first
+                    weekly, hourly, sat, sun, ph = None, v[0], v[1], v[2], v[3]
+            else:
+                continue
+            ok = abs(sat/hourly - 1.5) < 0.02 and abs(sun/hourly - 2.0) < 0.02 and abs(ph/hourly - 2.5) < 0.02
+            wk_ok = (weekly is None) or abs(hourly*38 - weekly) < 0.6
+            sections[current].append({
+                "label": _merge_continuation(rows, i), "hourly": hourly, "weekly": weekly,
+                "sat": round(sat/hourly,3), "sun": round(sun/hourly,3), "ph": round(ph/hourly,3),
+                "valid": ok and wk_ok})
+    return sections
+
+if __name__ == "__main__" and "--all" in sys.argv:
+    secs = extract_all_general_manufacturing()
+    total = good = 0
+    for name, rows in secs.items():
+        g = sum(1 for r in rows if r["valid"])
+        total += len(rows); good += g
+        print(f"\n## {name}  ({g}/{len(rows)} validated)")
+        for r in rows:
+            flag = "" if r["valid"] else "  <-- REVIEW"
+            wk = f"wk ${r['weekly']:.2f}" if r['weekly'] else "(no weekly)"
+            print(f"   {r['label'][:50]:50s} ${r['hourly']:6.2f}  {wk}{flag}")
+    print(f"\n=== TOTAL: {good}/{total} rows validated (Sat 1.5 / Sun 2.0 / PH 2.5) ===")

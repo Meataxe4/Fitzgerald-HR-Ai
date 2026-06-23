@@ -4,10 +4,10 @@
   "effective_date": "2025-07-01",
   "next_review_date": "2026-07-01",
   "version": "2025-2026 (INTERIM DRAFT \u2014 superseded by imminent annual increase)",
-  "status": "DRAFT \u2014 NOT VERIFIED, NOT WIRED INTO APP",
+  "status": "DRAFT \u2014 machine-validated, pending human sign-off, NOT wired into app",
   "source": "Fair Work Ombudsman Pay Guide MA000010, published 16 Oct 2025",
   "weekly_hours": 38,
-  "coverage_note": "GENERAL manufacturing only. Does NOT cover vehicle manufacturing (Schedule B of MA000010), which is out of product scope.",
+  "coverage_note": "GENERAL manufacturing only. Vehicle manufacturing (Schedule B) out of scope.",
   "casual_loading": 0.25,
   "superannuation_rate": 0.12,
   "minimum_engagement": null,
@@ -23,241 +23,1210 @@
     "permanent_night_shift_loading": 0.3
   },
   "penalty_rates_confidence": {
-    "saturday/sunday/public_holiday": "HIGH \u2014 validated, uniform across all classifications",
-    "overtime": "HIGH \u2014 first 3hrs 150%, after 200% (matches data)",
-    "shift_loadings": "MEDIUM \u2014 exact column-to-header mapping to confirm against award"
+    "saturday_sunday_public_holiday": "HIGH \u2014 validated uniform across all 149 classifications",
+    "overtime": "HIGH",
+    "shift_loadings": "MEDIUM \u2014 confirm column mapping vs award"
   },
-  "coverage_incomplete": [
-    "juniors",
-    "apprentices",
-    "professional/technical stream (Adv Cert/Diploma/Degree -> C2(b)/C1)",
-    "meal-break & special penalties (ship trials, wharf)",
-    "minimum engagement (verify from award text)"
+  "derived_classifications_note": "Supervisor/Trainer/Coordinator and Technology Cadet / Completed Technology Cadetship are defined as PERCENTAGES of base rates (e.g. Supervisor level II = 115% of the minimum hourly wage), not absolute-rated in the Pay Guide. To be modelled as formulas later.",
+  "not_yet_modelled": [
+    "Supervisor/Trainer/Coordinator (%-based)",
+    "Technology cadet / completed cadetship (%-based)",
+    "minimum engagement (from award text, not Pay Guide)",
+    "meal-break & special penalties (ship trials, wharf)"
   ],
+  "validation": "All 149 rate rows pass: hourly*38==weekly (where weekly given) and Saturday 150%, Sunday 200%, public holiday 250% of hourly.",
   "rates": [
     {
       "category": "adult",
       "employment_type": "full_time",
-      "level": "C14",
-      "title": "Engineering/manufacturing employee - level I",
-      "classification": "c14",
-      "rate": 24.28
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C14 - Engineering/manufacturing employee - level I",
+      "hourly_rate": 24.28,
+      "weekly_rate": 922.7
     },
     {
       "category": "adult",
       "employment_type": "full_time",
-      "level": "C13",
-      "title": "Engineering/manufacturing employee - level II",
-      "classification": "c13",
-      "rate": 24.95
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C13 - Engineering/manufacturing employee - level II",
+      "hourly_rate": 24.95,
+      "weekly_rate": 948.0
     },
     {
       "category": "adult",
       "employment_type": "full_time",
-      "level": "C12",
-      "title": "Engineering/manufacturing employee - level III",
-      "classification": "c12",
-      "rate": 25.85
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C12 - Engineering/manufacturing employee - level III",
+      "hourly_rate": 25.85,
+      "weekly_rate": 982.4
     },
     {
       "category": "adult",
       "employment_type": "full_time",
-      "level": "C11",
-      "title": "Engineering/manufacturing employee - level IV; Laboratory tester",
-      "classification": "c11",
-      "rate": 26.7
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C11 - Engineering/manufacturing employee - level IV",
+      "hourly_rate": 26.7,
+      "weekly_rate": 1014.7
     },
     {
       "category": "adult",
       "employment_type": "full_time",
-      "level": "C10",
-      "title": "Engineering/manufacturing tradesperson - level I; Engineering/manufacturing systems employee - level V",
-      "classification": "c10",
-      "rate": 28.12
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C11 - Laboratory tester",
+      "hourly_rate": 26.7,
+      "weekly_rate": 1014.7
     },
     {
       "category": "adult",
       "employment_type": "full_time",
-      "level": "C9",
-      "title": "Engineering/manufacturing tradesperson - level II; Engineering/laboratory technician - level I",
-      "classification": "c9",
-      "rate": 29.0
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C10 - Engineering/manufacturing tradesperson - level I",
+      "hourly_rate": 28.12,
+      "weekly_rate": 1068.4
     },
     {
       "category": "adult",
       "employment_type": "full_time",
-      "level": "C8",
-      "title": "Engineering/manufacturing tradesperson - special class level I; Engineering/laboratory technician - level II",
-      "classification": "c8",
-      "rate": 29.88
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C10 - Engineering/manufacturing systems employee - level V",
+      "hourly_rate": 28.12,
+      "weekly_rate": 1068.4
     },
     {
       "category": "adult",
       "employment_type": "full_time",
-      "level": "C7",
-      "title": "Engineering/manufacturing tradesperson - special class level II; Engineering/laboratory technician - level III",
-      "classification": "c7",
-      "rate": 30.68
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C9 - Engineering/manufacturing tradesperson - level II",
+      "hourly_rate": 29.0,
+      "weekly_rate": 1102.0
     },
     {
       "category": "adult",
       "employment_type": "full_time",
-      "level": "C6",
-      "title": "Engineering/laboratory technician - level IV; Advanced engineering tradesperson - level I",
-      "classification": "c6",
-      "rate": 32.23
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C9 - Engineering/laboratory technician - level I",
+      "hourly_rate": 29.0,
+      "weekly_rate": 1102.0
     },
     {
       "category": "adult",
       "employment_type": "full_time",
-      "level": "C5",
-      "title": "Engineering/laboratory technician - level V; Advanced engineering tradesperson - level II",
-      "classification": "c5",
-      "rate": 32.9
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C8 - Engineering/manufacturing tradesperson - special class level I",
+      "hourly_rate": 29.88,
+      "weekly_rate": 1135.5
     },
     {
       "category": "adult",
       "employment_type": "full_time",
-      "level": "C4",
-      "title": "Engineering associate/laboratory technical",
-      "classification": "c4",
-      "rate": 33.78
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C8 - Engineering/laboratory technician - level II",
+      "hourly_rate": 29.88,
+      "weekly_rate": 1135.5
     },
     {
       "category": "adult",
       "employment_type": "full_time",
-      "level": "C3",
-      "title": "Engineering associate/laboratory technical",
-      "classification": "c3",
-      "rate": 35.55
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C7 - Engineering/manufacturing tradesperson - special class level II",
+      "hourly_rate": 30.68,
+      "weekly_rate": 1165.7
     },
     {
       "category": "adult",
       "employment_type": "full_time",
-      "level": "C2(a)",
-      "title": "Principal engineering supervisor/trainer/coordinator; Leading technical officer",
-      "classification": "c2_a",
-      "rate": 36.43
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C7 - Engineering/laboratory technician - level III",
+      "hourly_rate": 30.68,
+      "weekly_rate": 1165.7
     },
     {
       "category": "adult",
       "employment_type": "full_time",
-      "level": "C2(b)",
-      "title": "Principal technical officer",
-      "classification": "c2_b",
-      "rate": 38.03
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C6 - Engineering/laboratory technician - level IV",
+      "hourly_rate": 32.23,
+      "weekly_rate": 1224.9
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C6 - Advanced engineering tradesperson - level I",
+      "hourly_rate": 32.23,
+      "weekly_rate": 1224.9
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C5 - Engineering/laboratory technician - level V",
+      "hourly_rate": 32.9,
+      "weekly_rate": 1250.1
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C5 - Advanced engineering tradesperson - level II",
+      "hourly_rate": 32.9,
+      "weekly_rate": 1250.1
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C4 - Engineering associate/laboratory technical officer - level I",
+      "hourly_rate": 33.78,
+      "weekly_rate": 1283.5
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C3 - Engineering associate/laboratory technical officer - level II",
+      "hourly_rate": 35.55,
+      "weekly_rate": 1350.8
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C2(a) - Principal engineering supervisor/trainer/coordinator",
+      "hourly_rate": 36.43,
+      "weekly_rate": 1384.4
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C2(a) - Leading technical officer",
+      "hourly_rate": 36.43,
+      "weekly_rate": 1384.4
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "C2(b) - Principal technical officer",
+      "hourly_rate": 38.03,
+      "weekly_rate": 1445.1
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "Advanced Certificate or National Diploma - 0 years of relevant work experience",
+      "hourly_rate": 25.33,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "Advanced Certificate or National Diploma - 1 year of relevant work experience",
+      "hourly_rate": 27.97,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "Advanced Certificate or National Diploma - 2 years of relevant work experience",
+      "hourly_rate": 31.58,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "Advanced Certificate or National Diploma - 3 years of relevant work experience",
+      "hourly_rate": 32.9,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "Associate Diploma or National Advanced Diploma - 0 years of relevant work experience",
+      "hourly_rate": 25.6,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "Associate Diploma or National Advanced Diploma - 1 year of relevant work experience",
+      "hourly_rate": 28.08,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "Associate Diploma or National Advanced Diploma - 2 years of relevant work experience",
+      "hourly_rate": 31.64,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "Associate Diploma or National Advanced Diploma - 3 years of relevant work experience",
+      "hourly_rate": 33.06,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "Associate Diploma or National Advanced Diploma - 4 years of relevant work experience",
+      "hourly_rate": 35.55,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "Technical field - No qualification - 0 years of relevant work experience",
+      "hourly_rate": 24.07,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "Technical field - No qualification - 1 year of relevant work experience",
+      "hourly_rate": 25.52,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "Technical field - No qualification - 2 years of relevant work experience",
+      "hourly_rate": 27.55,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "Technical field - No qualification - 3 years of relevant work experience",
+      "hourly_rate": 29.0,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "full_time",
+      "section": "Adult - General manufacturing - Full-time & part-time",
+      "classification": "Completed Diploma of Engineering - 1st year after completion of",
+      "hourly_rate": 31.26,
+      "weekly_rate": null
     },
     {
       "category": "adult",
       "employment_type": "casual",
-      "level": "C14",
-      "title": "Engineering/manufacturing employee - level I (casual)",
-      "classification": "c14",
-      "rate": 30.35
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C14 - Engineering/manufacturing employee - level I",
+      "hourly_rate": 30.35,
+      "weekly_rate": null
     },
     {
       "category": "adult",
       "employment_type": "casual",
-      "level": "C13",
-      "title": "Engineering/manufacturing employee - level II (casual)",
-      "classification": "c13",
-      "rate": 31.19
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C13 - Engineering/manufacturing employee - level II",
+      "hourly_rate": 31.19,
+      "weekly_rate": null
     },
     {
       "category": "adult",
       "employment_type": "casual",
-      "level": "C12",
-      "title": "Engineering/manufacturing employee - level III (casual)",
-      "classification": "c12",
-      "rate": 32.31
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C12 - Engineering/manufacturing employee - level III",
+      "hourly_rate": 32.31,
+      "weekly_rate": null
     },
     {
       "category": "adult",
       "employment_type": "casual",
-      "level": "C11",
-      "title": "Engineering/manufacturing employee - level IV; Laboratory tester (casual)",
-      "classification": "c11",
-      "rate": 33.38
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C11 - Engineering/manufacturing employee - level IV",
+      "hourly_rate": 33.38,
+      "weekly_rate": null
     },
     {
       "category": "adult",
       "employment_type": "casual",
-      "level": "C10",
-      "title": "Engineering/manufacturing tradesperson - level I; Engineering/manufacturing systems employee - level V (casual)",
-      "classification": "c10",
-      "rate": 35.15
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C11 - Laboratory tester",
+      "hourly_rate": 33.38,
+      "weekly_rate": null
     },
     {
       "category": "adult",
       "employment_type": "casual",
-      "level": "C9",
-      "title": "Engineering/manufacturing tradesperson - level II; Engineering/laboratory technician - level I (casual)",
-      "classification": "c9",
-      "rate": 36.25
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C10 - Engineering/manufacturing tradesperson - level I",
+      "hourly_rate": 35.15,
+      "weekly_rate": null
     },
     {
       "category": "adult",
       "employment_type": "casual",
-      "level": "C8",
-      "title": "Engineering/manufacturing tradesperson - special class level I; Engineering/laboratory technician - level II (casual)",
-      "classification": "c8",
-      "rate": 37.35
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C10 - Engineering/manufacturing systems employee - level V",
+      "hourly_rate": 35.15,
+      "weekly_rate": null
     },
     {
       "category": "adult",
       "employment_type": "casual",
-      "level": "C7",
-      "title": "Engineering/manufacturing tradesperson - special class level II; Engineering/laboratory technician - level III (casual)",
-      "classification": "c7",
-      "rate": 38.35
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C9 - Engineering/manufacturing tradesperson - level II",
+      "hourly_rate": 36.25,
+      "weekly_rate": null
     },
     {
       "category": "adult",
       "employment_type": "casual",
-      "level": "C6",
-      "title": "Engineering/laboratory technician - level IV; Advanced engineering tradesperson - level I (casual)",
-      "classification": "c6",
-      "rate": 40.29
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C9 - Engineering/laboratory technician - level I",
+      "hourly_rate": 36.25,
+      "weekly_rate": null
     },
     {
       "category": "adult",
       "employment_type": "casual",
-      "level": "C5",
-      "title": "Engineering/laboratory technician - level V; Advanced engineering tradesperson - level II (casual)",
-      "classification": "c5",
-      "rate": 41.13
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C8 - Engineering/manufacturing tradesperson - special class level I",
+      "hourly_rate": 37.35,
+      "weekly_rate": null
     },
     {
       "category": "adult",
       "employment_type": "casual",
-      "level": "C4",
-      "title": "Engineering associate/laboratory technical (casual)",
-      "classification": "c4",
-      "rate": 42.23
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C8 - Engineering/laboratory technician - level II",
+      "hourly_rate": 37.35,
+      "weekly_rate": null
     },
     {
       "category": "adult",
       "employment_type": "casual",
-      "level": "C3",
-      "title": "Engineering associate/laboratory technical (casual)",
-      "classification": "c3",
-      "rate": 44.44
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C7 - Engineering/manufacturing tradesperson - special class level II",
+      "hourly_rate": 38.35,
+      "weekly_rate": null
     },
     {
       "category": "adult",
       "employment_type": "casual",
-      "level": "C2(a)",
-      "title": "Principal engineering supervisor/trainer/coordinator; Leading technical officer (casual)",
-      "classification": "c2_a",
-      "rate": 45.54
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C7 - Engineering/laboratory technician - level III",
+      "hourly_rate": 38.35,
+      "weekly_rate": null
     },
     {
       "category": "adult",
       "employment_type": "casual",
-      "level": "C2(b)",
-      "title": "Principal technical officer (casual)",
-      "classification": "c2_b",
-      "rate": 47.54
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C6 - Engineering/laboratory technician - level IV",
+      "hourly_rate": 40.29,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C6 - Advanced engineering tradesperson - level I",
+      "hourly_rate": 40.29,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C5 - Engineering/laboratory technician - level V",
+      "hourly_rate": 41.13,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C5 - Advanced engineering tradesperson - level II",
+      "hourly_rate": 41.13,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C4 - Engineering associate/laboratory technical officer - level I",
+      "hourly_rate": 42.23,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C3 - Engineering associate/laboratory technical officer - level II",
+      "hourly_rate": 44.44,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C2(a) - Principal engineering supervisor/trainer/coordinator",
+      "hourly_rate": 45.54,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C2(a) - Leading technical officer",
+      "hourly_rate": 45.54,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "C2(b) - Principal technical officer",
+      "hourly_rate": 47.54,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "Advanced Certificate or National Diploma - 0 years of relevant work experience",
+      "hourly_rate": 31.66,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "Advanced Certificate or National Diploma - 1 year of relevant work experience",
+      "hourly_rate": 34.96,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "Advanced Certificate or National Diploma - 2 years of relevant work experience",
+      "hourly_rate": 39.48,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "Advanced Certificate or National Diploma - 3 years of relevant work experience",
+      "hourly_rate": 41.13,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "Associate Diploma or National Advanced Diploma - 0 years of relevant work experience",
+      "hourly_rate": 32.0,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "Associate Diploma or National Advanced Diploma - 1 year of relevant work experience",
+      "hourly_rate": 35.1,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "Associate Diploma or National Advanced Diploma - 2 years of relevant work experience",
+      "hourly_rate": 39.55,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "Associate Diploma or National Advanced Diploma - 3 years of relevant work experience",
+      "hourly_rate": 41.33,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "Associate Diploma or National Advanced Diploma - 4 years of relevant work experience",
+      "hourly_rate": 44.44,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "Technical field - No qualification - 0 years of relevant work experience",
+      "hourly_rate": 30.09,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "Technical field - No qualification - 1 year of relevant work experience",
+      "hourly_rate": 31.9,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "Technical field - No qualification - 2 years of relevant work experience",
+      "hourly_rate": 34.44,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "Technical field - No qualification - 3 years of relevant work experience",
+      "hourly_rate": 36.25,
+      "weekly_rate": null
+    },
+    {
+      "category": "adult",
+      "employment_type": "casual",
+      "section": "Adult - General manufacturing - Casual",
+      "classification": "Completed Diploma of Engineering - 1st year after completion of apprenticeship",
+      "hourly_rate": 39.08,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "full_time",
+      "section": "Junior - General manufacturing - Full-time & part-time",
+      "classification": "Under 16 years of age - not in a foundry  $9.18",
+      "hourly_rate": 9.18,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "full_time",
+      "section": "Junior - General manufacturing - Full-time & part-time",
+      "classification": "Under 16 years of age - in a foundry",
+      "hourly_rate": 9.18,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "full_time",
+      "section": "Junior - General manufacturing - Full-time & part-time",
+      "classification": "16 years of age - not in a foundry",
+      "hourly_rate": 11.8,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "full_time",
+      "section": "Junior - General manufacturing - Full-time & part-time",
+      "classification": "16 years of age - in a foundry",
+      "hourly_rate": 11.8,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "full_time",
+      "section": "Junior - General manufacturing - Full-time & part-time",
+      "classification": "17 years of age - not in a foundry",
+      "hourly_rate": 14.42,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "full_time",
+      "section": "Junior - General manufacturing - Full-time & part-time",
+      "classification": "17 years of age - in a foundry",
+      "hourly_rate": 17.04,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "full_time",
+      "section": "Junior - General manufacturing - Full-time & part-time",
+      "classification": "18 years of age - not in a foundry",
+      "hourly_rate": 17.04,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "full_time",
+      "section": "Junior - General manufacturing - Full-time & part-time",
+      "classification": "18 years of age - in a foundry",
+      "hourly_rate": 20.71,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "full_time",
+      "section": "Junior - General manufacturing - Full-time & part-time",
+      "classification": "19 years of age - not in a foundry",
+      "hourly_rate": 20.58,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "full_time",
+      "section": "Junior - General manufacturing - Full-time & part-time",
+      "classification": "19 years of age - in a foundry",
+      "hourly_rate": 24.65,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "full_time",
+      "section": "Junior - General manufacturing - Full-time & part-time",
+      "classification": "20 years of age - not in a foundry",
+      "hourly_rate": 24.38,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "casual",
+      "section": "Junior - General manufacturing - Casual",
+      "classification": "Under 16 years of age - not in a foundry",
+      "hourly_rate": 11.48,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "casual",
+      "section": "Junior - General manufacturing - Casual",
+      "classification": "Under 16 years of age - in a foundry",
+      "hourly_rate": 11.48,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "casual",
+      "section": "Junior - General manufacturing - Casual",
+      "classification": "16 years of age - not in a foundry",
+      "hourly_rate": 14.75,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "casual",
+      "section": "Junior - General manufacturing - Casual",
+      "classification": "16 years of age - in a foundry",
+      "hourly_rate": 14.75,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "casual",
+      "section": "Junior - General manufacturing - Casual",
+      "classification": "17 years of age - not in a foundry",
+      "hourly_rate": 18.03,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "casual",
+      "section": "Junior - General manufacturing - Casual",
+      "classification": "17 years of age - in a foundry",
+      "hourly_rate": 21.3,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "casual",
+      "section": "Junior - General manufacturing - Casual",
+      "classification": "18 years of age - not in a foundry",
+      "hourly_rate": 21.3,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "casual",
+      "section": "Junior - General manufacturing - Casual",
+      "classification": "18 years of age - in a foundry",
+      "hourly_rate": 25.89,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "casual",
+      "section": "Junior - General manufacturing - Casual",
+      "classification": "19 years of age - not in a foundry",
+      "hourly_rate": 25.73,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "casual",
+      "section": "Junior - General manufacturing - Casual",
+      "classification": "19 years of age - in a foundry",
+      "hourly_rate": 30.81,
+      "weekly_rate": null
+    },
+    {
+      "category": "junior",
+      "employment_type": "casual",
+      "section": "Junior - General manufacturing - Casual",
+      "classification": "20 years of age - not in a foundry",
+      "hourly_rate": 30.48,
+      "weekly_rate": null
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 10 or less",
+      "classification": "Apprentice - stage 1",
+      "hourly_rate": 11.81,
+      "weekly_rate": 448.73
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 10 or less",
+      "classification": "Apprentice - stage 2",
+      "hourly_rate": 15.46,
+      "weekly_rate": 587.62
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 10 or less",
+      "classification": "Apprentice - stage 3",
+      "hourly_rate": 21.09,
+      "weekly_rate": 801.3
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 10 or less",
+      "classification": "Apprentice - stage 4",
+      "hourly_rate": 24.74,
+      "weekly_rate": 940.19
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 10 or less",
+      "classification": "Higher engineering",
+      "hourly_rate": 27.0,
+      "weekly_rate": null
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 10 or less",
+      "classification": "Advanced engineering",
+      "hourly_rate": 28.95,
+      "weekly_rate": null
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 11",
+      "classification": "Apprentice - stage 1",
+      "hourly_rate": 13.63,
+      "weekly_rate": 517.99
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 11",
+      "classification": "Apprentice - stage 2",
+      "hourly_rate": 15.46,
+      "weekly_rate": 587.62
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 11",
+      "classification": "Apprentice - stage 3",
+      "hourly_rate": 21.09,
+      "weekly_rate": 801.3
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 11",
+      "classification": "Apprentice - stage 4",
+      "hourly_rate": 24.74,
+      "weekly_rate": 940.19
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 11",
+      "classification": "Higher engineering",
+      "hourly_rate": 27.0,
+      "weekly_rate": null
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 11",
+      "classification": "Advanced engineering",
+      "hourly_rate": 28.95,
+      "weekly_rate": null
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 12",
+      "classification": "Apprentice - stage 1",
+      "hourly_rate": 14.22,
+      "weekly_rate": 540.5
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 12",
+      "classification": "Apprentice - stage 2",
+      "hourly_rate": 16.55,
+      "weekly_rate": 629.0
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 12",
+      "classification": "Apprentice - stage 3",
+      "hourly_rate": 21.09,
+      "weekly_rate": 801.3
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 12",
+      "classification": "Apprentice - stage 4",
+      "hourly_rate": 25.85,
+      "weekly_rate": 982.4
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 12",
+      "classification": "Higher engineering",
+      "hourly_rate": 27.0,
+      "weekly_rate": null
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started before 1 Jan 2014 - Completed Year 12",
+      "classification": "Advanced engineering",
+      "hourly_rate": 28.95,
+      "weekly_rate": null
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Adult apprentice - General manufacturing - Started before 1 Jan 2014",
+      "classification": "Apprentice - stage 1",
+      "hourly_rate": 21.33,
+      "weekly_rate": 810.4
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Adult apprentice - General manufacturing - Started before 1 Jan 2014",
+      "classification": "Apprentice - stage 2",
+      "hourly_rate": 24.28,
+      "weekly_rate": 922.7
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Adult apprentice - General manufacturing - Started before 1 Jan 2014",
+      "classification": "Apprentice - stage 3",
+      "hourly_rate": 24.95,
+      "weekly_rate": 948.0
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Adult apprentice - General manufacturing - Started before 1 Jan 2014",
+      "classification": "Apprentice - stage 4",
+      "hourly_rate": 25.85,
+      "weekly_rate": 982.4
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Adult apprentice - General manufacturing - Started before 1 Jan 2014",
+      "classification": "Higher engineering",
+      "hourly_rate": 27.0,
+      "weekly_rate": null
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Adult apprentice - General manufacturing - Started before 1 Jan 2014",
+      "classification": "Advanced engineering",
+      "hourly_rate": 28.95,
+      "weekly_rate": null
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started after 1 Jan 2014 - Did not complete year 12",
+      "classification": "Apprentice - stage 1",
+      "hourly_rate": 14.06,
+      "weekly_rate": 534.2
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started after 1 Jan 2014 - Did not complete year 12",
+      "classification": "Apprentice - stage 2",
+      "hourly_rate": 16.87,
+      "weekly_rate": 641.04
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started after 1 Jan 2014 - Did not complete year 12",
+      "classification": "Apprentice - stage 3",
+      "hourly_rate": 21.09,
+      "weekly_rate": 801.3
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started after 1 Jan 2014 - Did not complete year 12",
+      "classification": "Apprentice - stage 4",
+      "hourly_rate": 24.74,
+      "weekly_rate": 940.19
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started after 1 Jan 2014 - Did not complete year 12",
+      "classification": "Higher engineering",
+      "hourly_rate": 27.0,
+      "weekly_rate": null
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started after 1 Jan 2014 - Did not complete year 12",
+      "classification": "Advanced engineering",
+      "hourly_rate": 28.95,
+      "weekly_rate": null
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started after 1 Jan 2014 - Completed year 12",
+      "classification": "Apprentice - stage 1",
+      "hourly_rate": 15.46,
+      "weekly_rate": 587.62
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started after 1 Jan 2014 - Completed year 12",
+      "classification": "Apprentice - stage 2",
+      "hourly_rate": 18.28,
+      "weekly_rate": 694.46
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started after 1 Jan 2014 - Completed year 12",
+      "classification": "Apprentice - stage 3",
+      "hourly_rate": 21.09,
+      "weekly_rate": 801.3
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started after 1 Jan 2014 - Completed year 12",
+      "classification": "Apprentice - stage 4",
+      "hourly_rate": 25.85,
+      "weekly_rate": 982.4
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started after 1 Jan 2014 - Completed year 12",
+      "classification": "Higher engineering",
+      "hourly_rate": 27.0,
+      "weekly_rate": null
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Apprentice - General manufacturing - Started after 1 Jan 2014 - Completed year 12",
+      "classification": "Advanced engineering",
+      "hourly_rate": 28.95,
+      "weekly_rate": null
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Adult apprentice - General manufacturing - Started after 1 Jan 2014",
+      "classification": "Apprentice - stage 1",
+      "hourly_rate": 22.49,
+      "weekly_rate": 854.72
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Adult apprentice - General manufacturing - Started after 1 Jan 2014",
+      "classification": "Apprentice - stage 2",
+      "hourly_rate": 24.28,
+      "weekly_rate": 922.7
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Adult apprentice - General manufacturing - Started after 1 Jan 2014",
+      "classification": "Apprentice - stage 3",
+      "hourly_rate": 24.95,
+      "weekly_rate": 948.0
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Adult apprentice - General manufacturing - Started after 1 Jan 2014",
+      "classification": "Apprentice - stage 4",
+      "hourly_rate": 25.85,
+      "weekly_rate": 982.4
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Adult apprentice - General manufacturing - Started after 1 Jan 2014",
+      "classification": "Higher engineering",
+      "hourly_rate": 27.0,
+      "weekly_rate": null
+    },
+    {
+      "category": "apprentice",
+      "employment_type": "full_time",
+      "section": "Adult apprentice - General manufacturing - Started after 1 Jan 2014",
+      "classification": "Advanced engineering",
+      "hourly_rate": 28.95,
+      "weekly_rate": null
+    },
+    {
+      "category": "trainee",
+      "employment_type": "full_time",
+      "section": "Trainee - General manufacturing - Technical field/engineer/scientist - Full-time & part-time - Under 18 years of age",
+      "classification": "Technical field trainee  $15.23",
+      "hourly_rate": 15.23,
+      "weekly_rate": null
+    },
+    {
+      "category": "trainee",
+      "employment_type": "full_time",
+      "section": "Trainee - General manufacturing - Technical field/engineer/scientist - Full-time & part-time - Under 18 years of age",
+      "classification": "Trainee engineer /",
+      "hourly_rate": 16.76,
+      "weekly_rate": null
+    },
+    {
+      "category": "trainee",
+      "employment_type": "full_time",
+      "section": "Trainee - General manufacturing - Technical field/engineer/scientist - Full-time & part-time - 18 years of age",
+      "classification": "Technical field trainee  $18.15",
+      "hourly_rate": 18.15,
+      "weekly_rate": null
+    },
+    {
+      "category": "trainee",
+      "employment_type": "full_time",
+      "section": "Trainee - General manufacturing - Technical field/engineer/scientist - Full-time & part-time - 18 years of age",
+      "classification": "Trainee engineer /",
+      "hourly_rate": 19.98,
+      "weekly_rate": null
+    },
+    {
+      "category": "trainee",
+      "employment_type": "full_time",
+      "section": "Trainee - General manufacturing - Technical field/engineer/scientist - Full-time & part-time - 19 years of age",
+      "classification": "Technical field trainee  $21.95",
+      "hourly_rate": 21.95,
+      "weekly_rate": null
+    },
+    {
+      "category": "trainee",
+      "employment_type": "full_time",
+      "section": "Trainee - General manufacturing - Technical field/engineer/scientist - Full-time & part-time - 19 years of age",
+      "classification": "Trainee engineer /",
+      "hourly_rate": 24.17,
+      "weekly_rate": null
+    },
+    {
+      "category": "trainee",
+      "employment_type": "full_time",
+      "section": "Trainee - General manufacturing - Technical field/engineer/scientist - Full-time & part-time - 20 years of age",
+      "classification": "Technical field trainee  $25.75",
+      "hourly_rate": 25.75,
+      "weekly_rate": null
+    },
+    {
+      "category": "trainee",
+      "employment_type": "full_time",
+      "section": "Trainee - General manufacturing - Technical field/engineer/scientist - Full-time & part-time - 20 years of age",
+      "classification": "Trainee engineer /",
+      "hourly_rate": 28.36,
+      "weekly_rate": null
+    },
+    {
+      "category": "trainee",
+      "employment_type": "full_time",
+      "section": "Trainee - General manufacturing - Engineer/scientist - Full-time & part-time - 21 years of age",
+      "classification": "Trainee engineer /",
+      "hourly_rate": 29.49,
+      "weekly_rate": null
+    },
+    {
+      "category": "trainee",
+      "employment_type": "full_time",
+      "section": "Trainee - General manufacturing - Engineer/scientist - Full-time & part-time - 22 years of age and over",
+      "classification": "Trainee engineer /",
+      "hourly_rate": 31.26,
+      "weekly_rate": null
+    },
+    {
+      "category": "cadet",
+      "employment_type": "full_time",
+      "section": "Cadet - General manufacturing - Cadet in the technical field - Full-time & part-time",
+      "classification": "Cadet in the technical field - 1st year of contract of training",
+      "hourly_rate": 14.22,
+      "weekly_rate": null
+    },
+    {
+      "category": "cadet",
+      "employment_type": "full_time",
+      "section": "Cadet - General manufacturing - Cadet in the technical field - Full-time & part-time",
+      "classification": "Cadet in the technical field - 2nd year of contract of training",
+      "hourly_rate": 19.55,
+      "weekly_rate": null
+    },
+    {
+      "category": "cadet",
+      "employment_type": "full_time",
+      "section": "Cadet - General manufacturing - Cadet in the technical field - Full-time & part-time",
+      "classification": "Cadet in the technical field - 3rd year of contract of training",
+      "hourly_rate": 24.89,
+      "weekly_rate": null
     }
   ]
 }
