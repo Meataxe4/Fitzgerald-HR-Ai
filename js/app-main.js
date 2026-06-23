@@ -1038,7 +1038,7 @@ function populateVenueTypeDropdown(selectEl, awardName, currentValue) {
 
     const primarySlugs = AWARD_VENUE_MAP[awardName];
 
-    let html = '<option value="">Select venue type...</option>';
+    let html = '<option value="">Select business type...</option>';
 
     if (primarySlugs && primarySlugs.length) {
         const primary = VENUE_OPTIONS
@@ -1050,7 +1050,7 @@ function populateVenueTypeDropdown(selectEl, awardName, currentValue) {
         const optionTag = (v) =>
             `<option value="${v.value}"${v.value === selected ? ' selected' : ''}>${v.label}</option>`;
         html += `<optgroup label="Common for this Award">${primary.map(optionTag).join('')}</optgroup>`;
-        html += `<optgroup label="Other venue types">${other.map(optionTag).join('')}</optgroup>`;
+        html += `<optgroup label="Other business types">${other.map(optionTag).join('')}</optgroup>`;
     } else {
         html += VENUE_OPTIONS
             .slice()
@@ -16484,7 +16484,7 @@ function saveOnboardingNameAndVenue() {
     }
     
     if (!venueName) {
-        showAlert('Please enter your venue name');
+        showAlert('Please enter your business name');
         return;
     }
     
@@ -16510,7 +16510,7 @@ function saveOnboardingLocation() {
 function saveOnboardingVenueType() {
     const venueType = document.getElementById('onboardingVenueType').value;
     if (!venueType) {
-        showAlert('Please select a venue type');
+        showAlert('Please select a business type');
         return;
     }
     venueProfile.venueType = venueType;
@@ -16546,7 +16546,7 @@ function updateOnboardingStep() {
                 hint.textContent = 'Select the type of manufacturing business you run.';
                 hint.classList.remove('hidden');
             } else if (AWARD_VENUE_MAP[venueProfile.primaryAward]) {
-                hint.textContent = `Showing venues commonly covered by the ${venueProfile.primaryAward}. If yours isn't listed, choose from "Other venue types".`;
+                hint.textContent = `Showing business types commonly covered by the ${venueProfile.primaryAward}. If yours isn't listed, choose from "Other business types".`;
                 hint.classList.remove('hidden');
             } else {
                 hint.textContent = '';
@@ -16615,7 +16615,7 @@ function completeOnboarding() {
 
 I now know you run a **${venueType}** in **${venueProfile.city || venueProfile.location}** with **${venueProfile.staffCount}** staff.
 
-All my advice will be tailored for your venue. Update these anytime in ⚙️ Settings.`);
+All my advice will be tailored for your business. Update these anytime in ⚙️ Settings.`);
     
     // Show quick action prompts after short delay
     setTimeout(function() {
@@ -16788,9 +16788,9 @@ function getVenueTypeLabel(type) {
         'hotel': 'hotel/pub',
         'fastfood': 'fast food venue',
         'club': 'club/bar',
-        'other': 'hospitality venue'
+        'other': 'business'
     };
-    return legacy[type] || type || 'hospitality venue';
+    return legacy[type] || type || 'business';
 }
 
 function showVenueSettings() {
@@ -16807,16 +16807,16 @@ function showVenueSettings() {
             </div>
             
             <div>
-                <label class="block text-slate-300 text-sm mb-2">Venue Name</label>
+                <label class="block text-slate-300 text-sm mb-2">Business Name</label>
                 <input type="text" id="settingsVenueName" value="${venueProfile.venueName || ''}" 
                        placeholder="e.g., The Golden Fork"
                        class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
             </div>
             
             <div>
-                <label class="block text-slate-300 text-sm mb-2">Venue Type</label>
+                <label class="block text-slate-300 text-sm mb-2">Business Type</label>
                 <select id="settingsVenueType" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
-                    <option value="">Select venue type...</option>
+                    <option value="">Select business type...</option>
                 </select>
             </div>
             
@@ -16912,7 +16912,7 @@ function saveVenueSettings() {
     }
 
     closeVenueSettings();
-    showAlert('✅ Venue settings saved!');
+    showAlert('✅ Business settings saved!');
 }
 
 function closeVenueSettings() {
@@ -17543,7 +17543,7 @@ async function loadUsers() {
         users.forEach(profile => {
             const venueInfo = profile.venueProfile 
                 ? `${profile.venueProfile.venueType || 'Unknown'} in ${profile.venueProfile.location || 'Unknown'}` 
-                : 'No venue info';
+                : 'No business info';
             
             const legalStatus = profile.legalTermsAccepted 
                 ? '<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">✓ Legal Accepted</span>'
@@ -19206,7 +19206,7 @@ function calculateAwardClassification(data) {
                 'It is typically covered by the Hospitality Industry (General) Award MA000009.'
             ],
             nextSteps: [
-                'Switch your venue award to "Hospitality Industry (General) Award" in Settings, or',
+                'Switch your business award to "Hospitality Industry (General) Award" in Settings, or',
                 'Contact Fitz HR for advice: support@fitzhr.com'
             ]
         };
@@ -19262,7 +19262,7 @@ function calculateAwardClassification(data) {
             level: 'Award rates mismatch',
             rate: 0,
             penalties: [
-                `Loaded rates are for ${awardRates.award_name || 'a different award'} but your venue is on the Restaurant Industry Award MA000119.`,
+                `Loaded rates are for ${awardRates.award_name || 'a different award'} but your business is on the Restaurant Industry Award MA000119.`,
                 'Refreshing rates now — please close this wizard and reopen it.'
             ],
             nextSteps: ['Close the wizard, wait 2 seconds, then reopen.']
@@ -20348,7 +20348,7 @@ I require urgent expert guidance on an employment termination process to ensure 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 VENUE DETAILS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Venue Name: ${venueName}
+Business Name: ${venueName}
 Location: ${venueLocation}
 Contact Name: ${userName}
 User Code: ${userCode}
@@ -22849,7 +22849,7 @@ function _fwRenderRisksTab(profile, result, applicable, answeredCount) {
         return '<div class="text-center py-10 bg-slate-700/30 rounded-xl border border-slate-700">' +
                 '<div class="text-4xl mb-3">📋</div>' +
                 '<h3 class="text-lg font-bold text-white mb-2">Compliance assessment</h3>' +
-                '<p class="text-slate-400 mb-2">Run the assessment to detect compliance gaps in your venue.</p>' +
+                '<p class="text-slate-400 mb-2">Run the assessment to detect compliance gaps in your business.</p>' +
                 '<p class="text-xs text-slate-500 mb-6">' + applicable.length + ' questions · about ' + Math.max(3, Math.round(applicable.length * 0.5)) + ' minutes</p>' +
                 '<button onclick="closeFitzWatchDashboard(); openFitzWatchQuestionnaire();" class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold rounded-lg transition-all">Run assessment →</button>' +
             '</div>';
@@ -22964,7 +22964,7 @@ function _fwRenderChangesTab(profile, reforms) {
     if (!reforms || reforms.length === 0) {
         return '<div class="text-center py-10 bg-slate-700/30 rounded-xl border border-slate-700">' +
                 '<div class="text-3xl mb-3">📅</div>' +
-                '<p class="text-slate-300">No upcoming regulatory changes affect your venue right now.</p>' +
+                '<p class="text-slate-300">No upcoming regulatory changes affect your business right now.</p>' +
                 '<p class="text-xs text-slate-500 mt-2">This list is updated quarterly. Major reforms are added when announced.</p>' +
             '</div>';
     }
@@ -23150,8 +23150,8 @@ function _fwRenderChangedPrompt() {
 
     const lastDateStr = setupAt ? _fwFormatDate(setupAt) : null;
     const subline = lastDateStr
-        ? 'You last reviewed your venue profile on ' + lastDateStr + '.'
-        : 'Make sure your venue profile is up to date before relying on the risk picture below.';
+        ? 'You last reviewed your business profile on ' + lastDateStr + '.'
+        : 'Make sure your business profile is up to date before relying on the risk picture below.';
 
     return '<div class="p-4 bg-amber-900/15 border border-amber-700/50 rounded-xl flex items-start justify-between gap-3 flex-wrap">' +
         '<div class="flex-1 min-w-[240px]">' +
@@ -23180,7 +23180,7 @@ function _fwRenderGapCard(gap) {
     const anchorStr = anchorParts.join('; ') || 'see Award';
     const affectedStr = gap.affected_count != null
         ? 'Affects ~' + gap.affected_count + ' employee' + (gap.affected_count === 1 ? '' : 's')
-        : 'Applies to your venue';
+        : 'Applies to your business';
     const ctaClass = gap.fix_action_visual_signal === 'needs_review'
         ? 'border border-amber-500 text-amber-400 hover:bg-amber-500/10'
         : gap.fix_action_visual_signal === 'external'
@@ -23451,7 +23451,7 @@ function _fwDocRender_clause20Agreement() {
     const today = new Date().toISOString().slice(0, 10);
     return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" class="space-y-3">' +
         '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">' +
-            'Pre-filled from your venue profile: <strong class="text-slate-300">' + _fwEscapeHtml(p.venueName || '—') + '</strong> · ABN ' + _fwEscapeHtml(p.venue_abn || '—') + ' · ' + _fwEscapeHtml(p.primaryAward || '—') +
+            'Pre-filled from your business profile: <strong class="text-slate-300">' + _fwEscapeHtml(p.venueName || '—') + '</strong> · ABN ' + _fwEscapeHtml(p.venue_abn || '—') + ' · ' + _fwEscapeHtml(p.primaryAward || '—') +
         '</div>' +
         '<div class="grid grid-cols-2 gap-3">' +
             _fwDocFieldRow('Employee full name', '<input type="text" name="emp_name" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
@@ -23887,7 +23887,7 @@ const _FW_PSYCHO_HAZARDS = [
 function _fwDocRender_psychoRegister() {
     const p = venueProfile || {};
     return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" class="space-y-3">' +
-        '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">Pre-filled from your venue profile: <strong class="text-slate-300">' + _fwEscapeHtml(p.venueName || '—') + '</strong> · ' + _fwEscapeHtml(p.state || '—') + '. The register lists hospitality-specific hazards by default; you fill in risk ratings and controls in Word.</div>' +
+        '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">Pre-filled from your business profile: <strong class="text-slate-300">' + _fwEscapeHtml(p.venueName || '—') + '</strong> · ' + _fwEscapeHtml(p.state || '—') + '. The register lists hospitality-specific hazards by default; you fill in risk ratings and controls in Word.</div>' +
         _fwDocFieldRow('Responsible person (for the register)', '<input type="text" name="responsible_person" value="' + _fwEscapeHtml(p.userName || '') + '" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
         '<div class="grid grid-cols-2 gap-3">' +
             _fwDocFieldRow('Register effective date', '<input type="date" name="effective_date" required value="' + _fwTodayIso() + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
@@ -24064,7 +24064,7 @@ function _fwDocGenerate_customerAggression() {
         '<ul><li>After every serious incident</li><li>Annually as part of psychosocial risk register review</li></ul>' +
         '<h2>9. Sign-off</h2>' +
         _fwSignatureBlock(null) +
-        '<p><em>This procedure is a framework. Tailor to your venue\'s specific operational risks. Not a substitute for legal advice or for jurisdiction-specific liquor licensing requirements.</em></p>';
+        '<p><em>This procedure is a framework. Tailor to your business\'s specific operational risks. Not a substitute for legal advice or for jurisdiction-specific liquor licensing requirements.</em></p>';
     return { html: html, filename: 'Customer_Aggression_Procedure_' + (p.venueName || 'Venue').replace(/[^A-Za-z0-9_-]/g, '_') + '.docx' };
 }
 
@@ -24120,7 +24120,7 @@ function _fwDocGenerate_psychInjuryProc() {
         '<ul><li>Annually</li><li>After every claim outcome</li><li>After significant legislative change</li></ul>' +
         '<h2>11. Sign-off</h2>' +
         _fwSignatureBlock(null) +
-        '<p><em>This procedure is a framework. Tailor to your venue\'s operational context. Not a substitute for legal advice. Verify against current state workers compensation law before signing.</em></p>';
+        '<p><em>This procedure is a framework. Tailor to your business\'s operational context. Not a substitute for legal advice. Verify against current state workers compensation law before signing.</em></p>';
     return { html: html, filename: 'Psych_Injury_Claim_Procedure_' + (p.venueName || 'Venue').replace(/[^A-Za-z0-9_-]/g, '_') + '.docx' };
 }
 
