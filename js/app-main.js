@@ -1846,14 +1846,14 @@ let awardRates = null; // Global variable to store rates
 // ============================================================================
 const AWARD_REGISTRY = {
     MA000009: {
-        code: 'MA000009', status: 'supported',
+        code: 'MA000009', status: 'supported', wizardModel: true,
         displayName: 'Hospitality Industry (General) Award',
         fullName: 'Hospitality Industry (General) Award MA000009',
         ratesUrl: CONFIG.API.HOSPITALITY_RATES_URL,
         aliases: ['hospitality']
     },
     MA000119: {
-        code: 'MA000119', status: 'supported',
+        code: 'MA000119', status: 'supported', wizardModel: true,
         displayName: 'Restaurant Industry Award',
         fullName: 'Restaurant Industry Award MA000119',
         ratesUrl: CONFIG.API.RESTAURANT_RATES_URL,
@@ -1863,6 +1863,7 @@ const AWARD_REGISTRY = {
     // yet built/verified. Until enabled it resolves to UNRESOLVED (fail closed).
     MA000010: {
         code: 'MA000010', status: 'preview', flag: 'manufacturing_preview',
+        wizardModel: false,   // chat is wired; the role-based wizard is not yet adapted to C-levels
         displayName: 'Manufacturing and Associated Industries Award',
         fullName: 'Manufacturing and Associated Industries and Occupations Award MA000010',
         ratesUrl: '/manufacturing-award-rates.json',
@@ -1900,7 +1901,8 @@ function getAwardContext() {
         name: resolved.displayName,
         code: resolved.code,
         fullName: resolved.fullName,
-        status: resolved.status
+        status: resolved.status,
+        wizardModel: resolved.wizardModel === true
     };
 }
 
@@ -13164,6 +13166,16 @@ async function openAwardWizard() {
     // compute against a default award. See docs/guardrails-award-resolution.md.
     if (!getAwardContext().code) {
         showAlert('Please set your Modern Award in Settings before using the Award Wizard — it needs your award to calculate accurate rates and classifications.');
+        return;
+    }
+
+    // Guardrail: the wizard's role->classification model only covers awards that
+    // have a wizard model built. For awards without one (e.g. Manufacturing, which
+    // uses C-level classifications rather than hospitality roles) it must NOT run —
+    // it would otherwise apply the wrong award's role mapping. Chat still answers
+    // these users' questions. See docs/guardrails-award-resolution.md.
+    if (!getAwardContext().wizardModel) {
+        showAlert(`The Award Wizard pay calculator isn't available yet for the ${getAwardContext().name}. In the meantime, ask Fitz your pay, penalty or classification questions in chat — it has this award's rates.`);
         return;
     }
 
