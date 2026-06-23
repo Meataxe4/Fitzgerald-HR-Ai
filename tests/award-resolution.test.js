@@ -95,5 +95,14 @@ eq('C14 Sunday = $48.56 (PDF)', r2(c14.rate * pr.sunday), 48.56);
 eq('C14 Public holiday = $60.70 (PDF)', r2(c14.rate * pr.public_holiday), 60.70);
 eq('C10 Saturday = $42.18 (PDF)', r2(c10.rate * pr.saturday), 42.18);
 
+// Minimum engagement sourced from the award text (clauses 10.2 / 11.2)
+eq('Manufacturing part-time min 4 hrs', manuf.minimum_engagement.part_time_hours_per_shift, 4);
+eq('Manufacturing casual min 4 hrs', manuf.minimum_engagement.casual_hours_per_shift, 4);
+// Shift loadings confirmed against award clause 33.2
+eq('Manufacturing afternoon/night +15%', manuf.penalty_rates.afternoon_shift_loading, 0.15);
+eq('Manufacturing permanent night +30%', manuf.penalty_rates.permanent_night_shift_loading, 0.30);
+// Supervisor formula captured from clause 20.1(g)
+eq('Supervisor formula present', !!(manuf.formula_classifications && manuf.formula_classifications.supervisor_trainer_coordinator), true);
+
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

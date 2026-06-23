@@ -10,8 +10,11 @@
   "coverage_note": "General manufacturing only. Does NOT cover vehicle manufacturing (Schedule B of MA000010).",
   "casual_loading": 0.25,
   "superannuation_rate": 0.12,
-  "minimum_engagement": {},
-  "minimum_engagement_note": "To be sourced from the MA000010 award text; not in the Pay Guide.",
+  "minimum_engagement": {
+    "part_time_hours_per_shift": 4,
+    "casual_hours_per_shift": 4
+  },
+  "minimum_engagement_note": "Part-time: minimum 4 consecutive hours per shift (clause 10.2); casual: minimum 4 consecutive hours per attendance (clause 11.2). Both may be reduced to no less than 3 consecutive hours by written agreement at the employee's request. Full-time has no per-shift statutory minimum (ordinary hours average 38/week). Source: MA000010 award text.",
   "penalty_rates": {
     "saturday": 1.5,
     "sunday": 2.0,
@@ -23,10 +26,20 @@
     "night_shift_loading": 0.15,
     "permanent_night_shift_loading": 0.3
   },
+  "penalty_rates_source": "Saturday/Sunday/public holiday and overtime per the rates schedule; shift loadings confirmed against award clause 33.2 — afternoon/night shift = 115% (clause 33.2(d)), permanent night shift = 130% (clause 33.2(f)).",
+  "formula_classifications": {
+    "supervisor_trainer_coordinator": {
+      "clause": "20.1(g)",
+      "level_I": "max(122% of the minimum hourly rate of the highest technically qualified employee supervised/trained, 104.3% of the standard rate)",
+      "level_II": "max(115% of the minimum hourly rate of the highest paid employee supervised/trained, 113.1% of the standard rate)",
+      "technical": "paid an allowance under clause 30.2(f) instead of the clause 20.1(g) rates",
+      "note": "Relational rates — computed from the supervised employee's rate or the standard rate (the C10 rate), whichever is higher. Not absolute-rated."
+    }
+  },
   "notes": [
     "General manufacturing classifications C14-C2(b) plus professional/technical, junior, apprentice, trainee and cadet streams.",
-    "Supervisor/Trainer/Coordinator is a relational (percentage) classification, modelled separately.",
-    "Shift-loading column mapping to be confirmed against the award text."
+    "Supervisor/Trainer/Coordinator is a relational (percentage) classification — see formula_classifications.",
+    "Shift loadings confirmed against MA000010 clause 33.2."
   ],
   "rates": [
     {

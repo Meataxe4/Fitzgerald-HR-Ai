@@ -74,12 +74,13 @@ function buildPenaltyRateFacts(rates, awardLabel) {
 function buildMinimumEngagementFacts(rates, awardLabel) {
   const m = rates.minimum_engagement || {};
   const lines = [`MINIMUM ENGAGEMENT — ${awardLabel} (use these exact figures):`];
-  const isMA119 = rates.ma_number === 'MA000119';
+  const ma = rates.ma_number;
+  const isMA119 = ma === 'MA000119';
   const ftClause = isMA119 ? ' (clause 11)' : '';
-  const ptClause = isMA119 ? ' (clause 12)' : ' (clause 12)';
+  const ptClause = ma === 'MA000010' ? ' (clause 10.2)' : ' (clause 12)';
   const casClause = isMA119
     ? ' (clause 13.5 — "An employer must not engage a casual employee for less than 2 consecutive hours of work")'
-    : ' (clause 11.4)';
+    : ma === 'MA000010' ? ' (clause 11.2)' : ' (clause 11.4)';
 
   if (typeof m.full_time_hours_per_shift === 'number') {
     lines.push(`- Full-time employees: minimum ${m.full_time_hours_per_shift} consecutive hours per engagement${ftClause}.`);
@@ -97,6 +98,9 @@ function buildMinimumEngagementFacts(rates, awardLabel) {
     lines.push(`- Public holiday full-time / part-time minimum: ${m.public_holiday_full_time_part_time} hours.`);
   }
   lines.push(`The casual minimum applies even if the employee is sent home early — they must still be paid for the minimum.`);
+  if (ma === 'MA000010') {
+    lines.push(`Under MA000010 both the part-time and casual minimum may be reduced to no less than 3 consecutive hours by written agreement at the employee's request.`);
+  }
   return lines.join('\n');
 }
 

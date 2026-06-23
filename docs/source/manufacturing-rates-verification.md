@@ -50,16 +50,18 @@ Validation = hourly×38 equals weekly (where given) **and** Saturday/Sunday/publ
 | Overtime after 3 hrs | 200% | ✅ HIGH |
 | Sunday overtime | 200% | ✅ HIGH |
 | Casual loading | +25% | ✅ validated |
-| Afternoon shift | +15% | ⚠️ confirm mapping |
-| Night shift | +15% | ⚠️ confirm mapping |
-| Permanent night shift | +30% | ⚠️ confirm mapping |
+| Afternoon shift | +15% | ✅ confirmed — award cl 33.2(d) (115%) |
+| Night shift | +15% | ✅ confirmed — award cl 33.2(d) (115%) |
+| Permanent night shift | +30% | ✅ confirmed — award cl 33.2(f) (130%) |
 
-## Not in the dollar dataset (handled separately)
+## Resolved from the award text (`docs/ma000010.pdf`)
 
-- **Supervisor/Trainer/Coordinator** — the only genuinely formula-based class: a percentage of the highest-paid-supervised employee's rate (Level II = 115%, with a dollar floor), so it's modelled as a formula, not a fixed rate. Level I / technical percentages need the award clause.
-- **Minimum engagement** — not in the Pay Guide; must be read from the MA000010 award text before go-live.
-- **Niche penalties** — meal-break, ship trials, wharf.
+- **Minimum engagement** — part-time **4 consecutive hrs** (cl 10.2), casual **4 consecutive hrs** (cl 11.2); both reducible to **3 hrs by written agreement** at the employee's request. Full-time has no per-shift statutory minimum.
+- **Supervisor/Trainer/Coordinator** (cl 20.1(g)) — **Level I** = max(122% of the highest technically-qualified supervised employee's rate, **104.3% of the standard rate**); **Level II** = max(115% of the highest-paid supervised employee's rate, **113.1% of the standard rate**); **Technical** = an allowance under cl 30.2(f). The 104.3% floor reconciles with the $29.33 Level I floor seen in the Pay Guide. Modelled as a formula (`formula_classifications` in the rates JSON).
+- **Shift loadings** — confirmed exactly (see table above).
+
+## Still excluded (by design)
+- **Niche penalties** — meal-break, ship trials, wharf (low frequency).
 
 ## Please verify
-
-Core: **C10 $28.12**, **C14 $24.28**. Apprentice: *Started after 1 Jan 2014, stage 1* = **$22.49/hr ($854.72/wk)**. Only the ⚠️ shift-loading rows need a manual glance; everything else is machine-validated.
+Core: **C10 $28.12**, **C14 $24.28**. Apprentice: *Started after 1 Jan 2014, stage 1* = **$22.49/hr ($854.72/wk)**. Everything is now either machine-validated or confirmed against the award text.
