@@ -110,12 +110,12 @@ async function generateSmartChecklist() {
 
 // Get AI Insights using Claude API
 async function getAIInsights(position, employmentType) {
-    const prompt = `As an Australian HR expert, provide 3 key insights for onboarding a new ${employmentType} ${position} in the hospitality industry. Focus on:
+    const prompt = `As an Australian HR expert, provide 3 key insights for onboarding a new ${employmentType} ${position} in the ${_industryWord() ? _industryWord() + ' industry' : 'workplace'}. Focus on:
 1. Critical first-week priorities
 2. Common compliance issues to avoid
 3. Role-specific considerations
 
-Keep it concise, actionable, and specific to Australian hospitality.`;
+Keep it concise, actionable, and specific to the Australian ${_industryWord() ? _industryWord() + ' industry' : 'workplace'}.`;
     
     try {
         const response = await callClaudeAPI(prompt);
@@ -357,6 +357,11 @@ function generateChecklistItems(employmentType, position) {
         });
     }
     
+    // RSA (Responsible Service of Alcohol) only applies to licensed hospitality
+    // venues — drop it from the onboarding checklist for other awards.
+    if (_industryWord() !== 'hospitality') {
+        return baseItems.filter(function(it) { return it.title !== 'Responsible Service of Alcohol (RSA)'; });
+    }
     return baseItems;
 }
 
@@ -513,7 +518,7 @@ async function askAIAssistant() {
     
     try {
         const context = `Employee: ${onboardingState.employeeName}, Position: ${onboardingState.position}, Type: ${onboardingState.employmentType}`;
-        const prompt = `As an Australian HR expert, answer this onboarding question:\n\nContext: ${context}\n\nQuestion: ${question}\n\nProvide a clear, actionable answer focused on Australian hospitality compliance.`;
+        const prompt = `As an Australian HR expert, answer this onboarding question:\n\nContext: ${context}\n\nQuestion: ${question}\n\nProvide a clear, actionable answer focused on Australian ${_awardSector()}workplace compliance.`;
         
         const answer = await callClaudeAPI(prompt);
         responseContent.innerHTML = answer.replace(/\n/g, '<br>');
@@ -1469,7 +1474,7 @@ const probationWizardSteps = [
         fields: [
             { name: "keyRequirements", label: "What are the key requirements of this role? (List 3-5 core requirements)",
               type: "textarea", required: true, rows: 4,
-              placeholder: "e.g.,\n• Consistently arrive on time for all rostered shifts\n• Maintain RSA compliance and responsible service practices\n• Complete all opening and closing duties to standard\n• Work effectively as part of the team\n• Follow all food safety and WHS procedures" },
+              placeholder: "e.g.,\n• Consistently arrive on time for all rostered shifts\n• Maintain compliance with all relevant workplace policies and procedures\n• Complete all opening and closing duties to standard\n• Work effectively as part of the team\n• Follow all WHS and workplace safety procedures" },
             { name: "requirementsRating", label: "Overall, how is the employee tracking against these requirements?", type: "select",
               options: ["Exceeding expectations", "Meeting expectations", "Partially meeting expectations", "Not meeting expectations"],
               required: true },
@@ -1912,7 +1917,7 @@ function buildProbationCheckInPrompt() {
     
     const today = new Date().toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
     
-    return `You are generating a PROBATION CHECK-IN DOCUMENT for Australian hospitality HR.
+    return `You are generating a PROBATION CHECK-IN DOCUMENT for Australian ${_awardSector()}HR.
 
 This is a supportive probation review document — NOT a disciplinary document. The purpose is to support a new employee during their probation period by reviewing progress, identifying development needs, and agreeing on support.
 
@@ -3575,7 +3580,7 @@ function getStep1Template() {
                     <li>Lower notice period required (typically 1 week)</li>
                     <li>Easier to terminate if not suitable</li>
                     <li>Time to assess skills and cultural fit</li>
-                    <li>Standard practice in hospitality industry</li>
+                    <li>Standard practice across Australian workplaces</li>
                 </ul>
                 <p><strong>6 months is recommended</strong> as it gives enough time to see performance across different service periods and busy/quiet times.</p>
             </div>
