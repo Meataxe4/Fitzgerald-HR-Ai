@@ -1838,26 +1838,81 @@ function openDocumentBuilderFor(documentType) {
 
 let awardRates = null; // Global variable to store rates
 
-// Returns award name, MA code, and full name based on the user's venueProfile
+// ============================================================================
+// AWARD REGISTRY — single source of truth for award resolution.
+// Guardrail: anything that is not confidently a SUPPORTED award (or an ENABLED
+// preview award) resolves to UNRESOLVED — never a silent Hospitality default.
+// See docs/guardrails-award-resolution.md.
+// ============================================================================
+const AWARD_REGISTRY = {
+    MA000009: {
+        code: 'MA000009', status: 'supported',
+        displayName: 'Hospitality Industry (General) Award',
+        fullName: 'Hospitality Industry (General) Award MA000009',
+        ratesUrl: CONFIG.API.HOSPITALITY_RATES_URL,
+        aliases: ['hospitality']
+    },
+    MA000119: {
+        code: 'MA000119', status: 'supported',
+        displayName: 'Restaurant Industry Award',
+        fullName: 'Restaurant Industry Award MA000119',
+        ratesUrl: CONFIG.API.RESTAURANT_RATES_URL,
+        aliases: ['restaurant']
+    },
+    // Preview only — gated behind the manufacturing_preview feature flag and not
+    // yet built/verified. Until enabled it resolves to UNRESOLVED (fail closed).
+    MA000010: {
+        code: 'MA000010', status: 'preview', flag: 'manufacturing_preview',
+        displayName: 'Manufacturing and Associated Industries Award',
+        fullName: 'Manufacturing and Associated Industries and Occupations Award MA000010',
+        ratesUrl: null,
+        aliases: ['manufacturing']
+    }
+};
+
+const UNRESOLVED_AWARD = { code: null, status: 'unresolved', displayName: null, fullName: null, ratesUrl: null };
+
+// Resolve a stored award value (display string or MA code) to a registry entry,
+// honouring feature flags for preview awards. Returns UNRESOLVED_AWARD when the
+// award is unknown, unsupported, or a preview that is not enabled for this user.
+function resolveAward(stored) {
+    if (!stored) return UNRESOLVED_AWARD;
+    const s = String(stored).toLowerCase();
+    for (const code in AWARD_REGISTRY) {
+        const entry = AWARD_REGISTRY[code];
+        const matched = s.indexOf(code.toLowerCase()) !== -1 ||
+            entry.aliases.some(function (a) { return s.indexOf(a) !== -1; });
+        if (!matched) continue;
+        if (entry.status === 'preview') {
+            return (entry.flag && hasFeature(entry.flag)) ? entry : UNRESOLVED_AWARD;
+        }
+        return entry;
+    }
+    return UNRESOLVED_AWARD;
+}
+
+// Returns the resolved award context for the current venue. When the award is
+// unresolved, code/name/fullName are null — callers must gate on this and must
+// NEVER fall back to a default award. See docs/guardrails-award-resolution.md.
 function getAwardContext() {
-    const award = (venueProfile && venueProfile.primaryAward) || 'Hospitality Industry (General) Award';
-    const isRestaurant = award.toLowerCase().includes('restaurant');
+    const resolved = resolveAward(venueProfile && venueProfile.primaryAward);
     return {
-        name: award,
-        code: isRestaurant ? 'MA000119' : 'MA000009',
-        fullName: isRestaurant
-            ? 'Restaurant Industry Award MA000119'
-            : 'Hospitality Industry (General) Award MA000009'
+        name: resolved.displayName,
+        code: resolved.code,
+        fullName: resolved.fullName,
+        status: resolved.status
     };
 }
 
-// Fetch rates on page load
+// Fetch rates for the resolved award. Does NOT load any rates when the award is
+// unresolved or has no rates file — we never preload a default award's figures.
 async function loadAwardRates() {
     try {
-        const isRestaurant = venueProfile && venueProfile.primaryAward &&
-            venueProfile.primaryAward.toLowerCase().includes('restaurant');
-        const url = isRestaurant ? CONFIG.API.RESTAURANT_RATES_URL : CONFIG.API.HOSPITALITY_RATES_URL;
-        const response = await fetchWithRetry(url);
+        const resolved = resolveAward(venueProfile && venueProfile.primaryAward);
+        if (!resolved.code || !resolved.ratesUrl) {
+            return false;
+        }
+        const response = await fetchWithRetry(resolved.ratesUrl);
         if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to load rates`);
         awardRates = await response.json();
         return true;
@@ -11079,6 +11134,8 @@ function checkAccess() {
                 const hasCompletedOnboarding = checkOnboardingStatus();
                 if (!hasCompletedOnboarding) {
                     setTimeout(() => showOnboarding(), 500);
+                } else if (awardNeedsReselection()) {
+                    setTimeout(() => promptAwardReselection(), 500);
                 } else {
                     // LOAD CONVERSATIONS FIRST, THEN RESTORE (like Claude.ai)
                     loadConversations(); // Load from localStorage
@@ -11177,6 +11234,8 @@ function attemptAutoLogin() {
             const hasCompletedOnboarding = checkOnboardingStatus();
             if (!hasCompletedOnboarding) {
                 setTimeout(() => showOnboarding(), 500);
+            } else if (awardNeedsReselection()) {
+                setTimeout(() => promptAwardReselection(), 500);
             } else {
                 // RESTORE LAST CONVERSATION (like Claude.ai)
                 setTimeout(() => {
@@ -16212,14 +16271,42 @@ function showOnboarding() {
     updateOnboardingStep();
 }
 
+// Set when a previously-onboarded user is re-selecting only their award (because
+// their stored award is no longer supported). In that mode, picking an award
+// completes immediately rather than walking the rest of the onboarding steps.
+let onboardingAwardReselectOnly = false;
+
 function saveOnboardingAnswer(field, value, isLastStep = false) {
     venueProfile[field] = value;
+    if (onboardingAwardReselectOnly && field === 'primaryAward') {
+        onboardingAwardReselectOnly = false;
+        completeOnboarding();
+        return;
+    }
     if (isLastStep) {
         completeOnboarding();
     } else {
         onboardingCurrentStep++;
         updateOnboardingStep();
     }
+}
+
+// Guardrail: a previously-onboarded user whose stored award is no longer
+// supported (e.g. legacy "Not sure"/"Fast Food", or a disabled preview award)
+// must re-select a supported award before using award-specific features. We
+// never silently resolve them to a default award.
+// See docs/guardrails-award-resolution.md.
+function awardNeedsReselection() {
+    return !!(venueProfile && venueProfile.setupComplete === true &&
+        resolveAward(venueProfile.primaryAward).code === null);
+}
+
+function promptAwardReselection() {
+    onboardingAwardReselectOnly = true;
+    onboardingCurrentStep = 2;
+    showOnboarding();
+    const note = document.getElementById('onboardingAwardReselectNote');
+    if (note) note.classList.remove('hidden');
 }
 
 function saveOnboardingNameAndVenue() {
@@ -16592,8 +16679,6 @@ function showVenueSettings() {
                     <option value="">Select award...</option>
                     <option value="Hospitality Industry (General) Award" ${venueProfile.primaryAward === 'Hospitality Industry (General) Award' ? 'selected' : ''}>Hospitality Industry (General) Award (MA000009)</option>
                     <option value="Restaurant Industry Award" ${venueProfile.primaryAward === 'Restaurant Industry Award' ? 'selected' : ''}>Restaurant Industry Award (MA000119)</option>
-                    <option value="Fast Food Industry Award" ${venueProfile.primaryAward === 'Fast Food Industry Award' ? 'selected' : ''}>Fast Food Industry Award</option>
-                    <option value="Not sure" ${venueProfile.primaryAward === 'Not sure' ? 'selected' : ''}>Not sure</option>
                 </select>
                 <p class="text-xs text-slate-400 mt-1">Changing your award updates pay rate calculations and advice throughout the app.</p>
             </div>
@@ -20557,6 +20642,8 @@ async function acceptLegalTerms() {
     const hasCompletedOnboarding = checkOnboardingStatus();
     if (!hasCompletedOnboarding) {
         setTimeout(() => showOnboarding(), 500);
+    } else if (awardNeedsReselection()) {
+        setTimeout(() => promptAwardReselection(), 500);
     } else {
         // Onboarding already complete - restore last conversation
         setTimeout(() => {

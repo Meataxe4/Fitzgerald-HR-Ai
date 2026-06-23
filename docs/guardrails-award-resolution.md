@@ -135,3 +135,43 @@ resolved award must **never** receive a penalty/loading/classification figure.
 - `status` drives the outcome table in §4 directly.
 - The `manufacturing_preview` feature flag controls whether MA000010 appears in the
   picker and whether its server branch is honoured (admin-gated).
+
+---
+
+## 8. Implementation status
+
+### Milestone 1 — DONE (this branch)
+
+- **Client award registry + `resolveAward()`** (`js/app-main.js`): `AWARD_REGISTRY`
+  keyed by code with `status` (supported/preview), aliases, and rates URL.
+  `resolveAward()` returns a registry entry or `UNRESOLVED_AWARD` — no Hospitality
+  fallback. `getAwardContext()` and `loadAwardRates()` now route through it.
+- **Server resolver** (`netlify/functions/chat.js`): `resolveServerAward()` +
+  fail-closed system prompt. Supported awards use the existing award-aware prompt
+  (byte-identical); unresolved awards get a **floor-only** prompt (NES / Fair Work
+  Act / National Minimum Wage) that never quotes award-specific figures.
+- **"Not sure" and "Fast Food" removed** from onboarding (`app.html`) and the
+  settings dropdown. (Firestore check confirmed zero users had selected Fast Food.)
+- **Stale-award re-prompt:** `awardNeedsReselection()` + `promptAwardReselection()`
+  send a previously-onboarded user whose stored award is no longer supported back to
+  the award-selection step (with an explanatory note) before any award-specific
+  feature — never a silent default.
+- **`manufacturing_preview` flag** wired into `resolveAward()` via the existing
+  `hasFeature()` layer; MA000010 stays UNRESOLVED until the flag is enabled.
+- **Tests:** `tests/award-resolution.test.js` (run via `npm test`) exercises the
+  real shipped resolver — supported awards resolve exactly, everything else fails
+  closed, preview is flag-gated. 13/13 passing.
+
+### Deferred to later milestones
+
+- **Document layer** (`_fwDoc*` renderers, `app-main.js` ~23214/23293/23400 and
+  `_fwDocClassificationOptions`): still carry `|| 'MA000119'` defaults. These are
+  unreachable for real users now (the re-prompt guarantees a resolved award before
+  documents), so deferred to keep this milestone behaviour-preserving. **Finding:**
+  `_fwDocClassificationOptions` selects its list via `String(award).indexOf('009')`,
+  but stored award display strings never contain `009`, so it currently always
+  returns the MA000119 classification list — a pre-existing award-mismatch bug to
+  fix in the document-layer pass (Milestone 5).
+- **Per-calculator enforcement:** sites using `getAwardContext().code === 'MA000119'`
+  still fall through to the MA000009 branch if ever handed an unresolved award. The
+  re-prompt closes reachability; hard per-site refusal is Milestone 5.
