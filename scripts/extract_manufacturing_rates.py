@@ -94,7 +94,8 @@ TABLE_RE = re.compile(r'Table (\d+) of \d+')
 LABEL_RE = re.compile(
     r'^(C\d+\([ab]\)|C\d+|Apprentice|Higher engineering|Advanced engineering|'
     r'Advanced Certificate|Associate Diploma|Technical field|Completed Diploma|'
-    r'Degree|Under \d+ years|\d+ years of age|Cadet|Trainee)', re.I)
+    r'Degree|Under \d+ years|\d+ years of age|Cadet|Trainee|'
+    r'Technology cadet|Completed technology)', re.I)
 EMBEDDED_HOURLY = re.compile(r'\$[\d,]+\.\d{2}')
 
 def _merge_continuation(rows, i):

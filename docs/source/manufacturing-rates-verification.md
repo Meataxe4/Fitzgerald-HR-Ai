@@ -6,7 +6,7 @@
 >
 > **Status:** DRAFT — every dollar rate below is machine-validated, but needs human/consultant sign-off before go-live. NOT wired into the app. Data: `docs/source/manufacturing-award-rates.draft.json`.
 
-## Coverage — 149 classifications, all validated ✅
+## Coverage — 169 classifications, all validated ✅
 
 Validation = hourly×38 equals weekly (where given) **and** Saturday/Sunday/public-holiday columns are exactly 150% / 200% / 250% of the hourly rate.
 
@@ -18,7 +18,7 @@ Validation = hourly×38 equals weekly (where given) **and** Saturday/Sunday/publ
 | Junior — Casual | 11 |  |
 | Apprentice — FT/PT | 42 | before/after 1 Jan 2014 × Year 10/11/12 × adult; stages 1–4 + higher/advanced |
 | Trainee (tech field/engineer/scientist) — FT/PT | 10 | by age band |
-| Cadet (technical field) — FT/PT | 3 | 1st–3rd year of training |
+| Cadet (technical + technology) — FT/PT | 23 | technical-field 1st–3rd year; technology cadet stages; completed cadetship stages |
 
 ## Core base rates — Adult, general manufacturing (most-used)
 
@@ -56,8 +56,8 @@ Validation = hourly×38 equals weekly (where given) **and** Saturday/Sunday/publ
 
 ## Not in the dollar dataset (handled separately)
 
-- **Supervisor/Trainer/Coordinator** & **Technology Cadet / Completed Cadetship** — defined as **percentages** of base rates (e.g. Supervisor L2 = 115% of the minimum hourly wage); modelled as formulas, not absolute rates.
-- **Minimum engagement** — not in the Pay Guide; read from award text.
+- **Supervisor/Trainer/Coordinator** — the only genuinely formula-based class: a percentage of the highest-paid-supervised employee's rate (Level II = 115%, with a dollar floor), so it's modelled as a formula, not a fixed rate. Level I / technical percentages need the award clause.
+- **Minimum engagement** — not in the Pay Guide; must be read from the MA000010 award text before go-live.
 - **Niche penalties** — meal-break, ship trials, wharf.
 
 ## Please verify
