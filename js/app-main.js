@@ -13159,6 +13159,14 @@ function openRosterStressTester() {
 async function openAwardWizard() {
     trackToolUsage('awardWizardModal');
 
+    // Guardrail: the wizard computes award-specific pay rates and classifications,
+    // so it must not run without a resolved, supported award. Fail closed — never
+    // compute against a default award. See docs/guardrails-award-resolution.md.
+    if (!getAwardContext().code) {
+        showAlert('Please set your Modern Award in Settings before using the Award Wizard — it needs your award to calculate accurate rates and classifications.');
+        return;
+    }
+
     // Reset wizard state
     wizardData = {};
     currentWizardStep = 1;
@@ -18825,6 +18833,17 @@ function showJuniorRedirect() {
  * @returns {Object} Classification result with award, level, rate, penalties, and next steps
  */
 function calculateAwardClassification(data) {
+    // Guardrail: fail closed if no supported award is resolved — never compute
+    // against a default award. See docs/guardrails-award-resolution.md.
+    if (!getAwardContext().code) {
+        return {
+            award: '[Your Modern Award]',
+            level: 'Award not set',
+            rate: 0,
+            penalties: ['Set your Modern Award in Settings to calculate accurate rates.'],
+            nextSteps: ['Open Settings and select your award']
+        };
+    }
     if (!awardRates || !awardRates.rates) {
         return {
             award: getAwardContext().fullName,

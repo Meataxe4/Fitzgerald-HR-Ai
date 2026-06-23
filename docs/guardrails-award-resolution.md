@@ -189,8 +189,24 @@ resolved award must **never** receive a penalty/loading/classification figure.
 > convention (MA000119 → Schedule H, MA000009 → Schedule G). Confirm these schedule
 > letters against the current award text.
 
+### Milestone 3 — DONE (calculator hard refusal)
+
+- **`openAwardWizard()`** now refuses to open when `getAwardContext().code` is null,
+  directing the user to set their award in Settings — the wizard computes
+  award-specific pay/classifications and must not run against a default award.
+- **`calculateAwardClassification()`** gains an explicit "Award not set" branch
+  (defense-in-depth) so it never computes against a default award even if reached
+  some other way; the old "rates not loaded" branch is preserved for resolved users.
+- These only trigger when the award is unresolved (impossible for a properly
+  onboarded supported user, which the re-prompt gate enforces), so resolved
+  Hospitality/Restaurant behaviour is unchanged.
+
 ### Deferred to later milestones
 
-- **Per-calculator hard refusal:** sites using `getAwardContext().code === 'MA000119'`
-  still fall through to the MA000009 branch if ever handed an unresolved award. The
-  re-prompt closes reachability; hard per-site refusal is Milestone 5.
+- **Manufacturing (MA000010) data + grounding:** rates JSON, classification model,
+  penalty/loading facts, and document templates. The registry seam and
+  `manufacturing_preview` flag are in place; building and verifying the data is the
+  remaining product work before Manufacturing can be exposed in the picker
+  (Milestone 7).
+- **Expanded regression suite:** broaden `tests/` beyond resolution + classification
+  options as more award-specific surfaces are generalised.
