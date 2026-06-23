@@ -16496,6 +16496,15 @@ function updateOnboardingStep() {
     document.getElementById('onboardingProgress').textContent = `${progress}% Complete`;
     document.getElementById('onboardingProgressBar').style.width = `${progress}%`;
 
+    // Reveal the Manufacturing award option on the award step only for users with
+    // the manufacturing_preview flag (preview-gated; see guardrails spec).
+    if (onboardingCurrentStep === 2) {
+        const manufBtn = document.getElementById('onboardingManufacturingBtn');
+        if (manufBtn && typeof hasFeature === 'function' && hasFeature('manufacturing_preview')) {
+            manufBtn.classList.remove('hidden');
+        }
+    }
+
     if (onboardingCurrentStep === 3) {
         const select = document.getElementById('onboardingVenueType');
         const hint = document.getElementById('onboardingVenueTypeHint');
@@ -16812,6 +16821,7 @@ function showVenueSettings() {
                     <option value="">Select award...</option>
                     <option value="Hospitality Industry (General) Award" ${venueProfile.primaryAward === 'Hospitality Industry (General) Award' ? 'selected' : ''}>Hospitality Industry (General) Award (MA000009)</option>
                     <option value="Restaurant Industry Award" ${venueProfile.primaryAward === 'Restaurant Industry Award' ? 'selected' : ''}>Restaurant Industry Award (MA000119)</option>
+                    ${hasFeature('manufacturing_preview') ? `<option value="Manufacturing and Associated Industries Award" ${venueProfile.primaryAward === 'Manufacturing and Associated Industries Award' ? 'selected' : ''}>Manufacturing and Associated Industries Award (MA000010) — preview</option>` : ''}
                 </select>
                 <p class="text-xs text-slate-400 mt-1">Changing your award updates pay rate calculations and advice throughout the app.</p>
             </div>
@@ -22075,8 +22085,18 @@ let _featureFlagsCache = null;
 
 function loadFeatureFlags(userProfile) {
     const flags = (userProfile && Array.isArray(userProfile.featureFlags))
-        ? userProfile.featureFlags
+        ? userProfile.featureFlags.slice()
         : [];
+    // Session-only preview grant for allowlisted admin emails. Does NOT write to
+    // Firestore (rules block client writes to featureFlags) — it only affects
+    // hasFeature() for this session, so previews can be exercised without a
+    // Firestore console edit.
+    try {
+        const email = (userProfile && userProfile.email) || (currentUser && currentUser.email);
+        if (email && typeof ALLOWLISTED_EMAILS !== 'undefined' && ALLOWLISTED_EMAILS[email]) {
+            ALLOWLISTED_EMAILS[email].forEach(function (f) { if (flags.indexOf(f) === -1) flags.push(f); });
+        }
+    } catch (e) {}
     _featureFlagsCache = new Set(flags);
 }
 
