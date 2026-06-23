@@ -162,16 +162,35 @@ resolved award must **never** receive a penalty/loading/classification figure.
   real shipped resolver — supported awards resolve exactly, everything else fails
   closed, preview is flag-gated. 13/13 passing.
 
+### Milestone 2 — DONE (document/calculator layer)
+
+- **`_fwDocClassificationOptions`** now switches on the resolved award **code**
+  (not a display-string substring) and is fail-closed (placeholder for
+  unresolved). **Fixes a pre-existing bug:** it previously always returned the
+  Restaurant (MA000119) classification list, so Hospitality contract documents
+  showed the wrong classifications. Tested in `tests/award-resolution.test.js`.
+- **`_fwDocGenerate_cashOut`** schedule reference now resolves by code. **Fixes a
+  pre-existing bug:** the old `String(award).indexOf('119')` check never matched a
+  display string, so Restaurant cash-out docs cited MA000009 Schedule G instead of
+  MA000119 Schedule H.
+- **`_fwDocGenerate_leaveInAdvance`** previously hardcoded `MA000119 Schedule G`
+  for every user (and inconsistently with the cash-out doc). Now resolves by code.
+- **`|| 'MA000119'` defaults removed** from the `_fwDocGenerate_*` renderers
+  (clause-20 agreement, weekly time record, cash-out); unresolved awards render a
+  `[Your Modern Award]` placeholder rather than a silent default.
+- **Calculator sites** (`applyWizardAwardLabels`, the rate-classification builder)
+  already route through `getAwardContext()` — i.e. the registry — as of Milestone
+  1, so no change was needed; they are correct for resolved users and the
+  re-prompt gate prevents unresolved input.
+
+> ⚠️ **For legal review:** the annual-leave schedule citations (Schedule G vs H per
+> award) were internally inconsistent across the cash-out and leave-in-advance
+> documents. Milestone 2 made them consistent using the cash-out doc's existing
+> convention (MA000119 → Schedule H, MA000009 → Schedule G). Confirm these schedule
+> letters against the current award text.
+
 ### Deferred to later milestones
 
-- **Document layer** (`_fwDoc*` renderers, `app-main.js` ~23214/23293/23400 and
-  `_fwDocClassificationOptions`): still carry `|| 'MA000119'` defaults. These are
-  unreachable for real users now (the re-prompt guarantees a resolved award before
-  documents), so deferred to keep this milestone behaviour-preserving. **Finding:**
-  `_fwDocClassificationOptions` selects its list via `String(award).indexOf('009')`,
-  but stored award display strings never contain `009`, so it currently always
-  returns the MA000119 classification list — a pre-existing award-mismatch bug to
-  fix in the document-layer pass (Milestone 5).
-- **Per-calculator enforcement:** sites using `getAwardContext().code === 'MA000119'`
+- **Per-calculator hard refusal:** sites using `getAwardContext().code === 'MA000119'`
   still fall through to the MA000009 branch if ever handed an unresolved award. The
   re-prompt closes reachability; hard per-site refusal is Milestone 5.

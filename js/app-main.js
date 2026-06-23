@@ -23219,12 +23219,19 @@ function _fwDocFieldRow(label, html) {
     '</label>';
 }
 
-function _fwDocClassificationOptions(award) {
+// Classification options for the resolved award CODE (not a display string).
+// Guardrail: returns a placeholder for any unresolved award rather than
+// defaulting to a real award's classification list.
+// See docs/guardrails-award-resolution.md.
+function _fwDocClassificationOptions(awardCode) {
     const ma119 = ['Introductory level', 'Food & beverage attendant grade 1', 'Food & beverage attendant grade 2',
                    'Food & beverage attendant grade 3', 'Cook grade 1', 'Cook grade 2', 'Cook grade 3',
                    'Cook grade 4', 'Cook grade 5', 'Other'];
     const ma009 = ['Introductory', 'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Level 6', 'Other'];
-    const opts = (award && String(award).indexOf('009') !== -1) ? ma009 : ma119;
+    let opts;
+    if (awardCode === 'MA000009') opts = ma009;
+    else if (awardCode === 'MA000119') opts = ma119;
+    else return '<option value="">Set your Award in Settings first</option>';
     return opts.map(function(o) { return '<option value="' + _fwEscapeHtml(o) + '">' + _fwEscapeHtml(o) + '</option>'; }).join('');
 }
 
@@ -23240,7 +23247,7 @@ function _fwDocRender_clause20Agreement() {
             _fwDocFieldRow('Employment start date', '<input type="date" name="emp_start" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
         '</div>' +
         '<div class="grid grid-cols-2 gap-3">' +
-            _fwDocFieldRow('Classification', '<select name="emp_classification" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">' + _fwDocClassificationOptions(p.primaryAward) + '</select>') +
+            _fwDocFieldRow('Classification', '<select name="emp_classification" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">' + _fwDocClassificationOptions(getAwardContext().code) + '</select>') +
             _fwDocFieldRow('Employment status', '<select name="emp_status" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none"><option value="Full-time">Full-time</option><option value="Part-time">Part-time</option></select>') +
         '</div>' +
         '<div class="grid grid-cols-3 gap-3">' +
@@ -23298,7 +23305,7 @@ function _fwDocValidate_clause20Agreement() {
 function _fwDocGenerate_clause20Agreement() {
     const p = venueProfile || {};
     const d = _fwReadDocForm();
-    const award = p.primaryAward || 'MA000119';
+    const award = getAwardContext().name || '[Your Modern Award]';
     const reconDate = (function() {
         const base = new Date(d.effective_date);
         base.setFullYear(base.getFullYear() + 1);
@@ -23356,7 +23363,7 @@ function _fwDocRender_weeklyTimeRecord() {
         '</div>' +
         '<div class="grid grid-cols-2 gap-3">' +
             _fwDocFieldRow('Employee full name', '<input type="text" name="emp_name" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
-            _fwDocFieldRow('Classification', '<select name="emp_classification" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">' + _fwDocClassificationOptions(p.primaryAward) + '</select>') +
+            _fwDocFieldRow('Classification', '<select name="emp_classification" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">' + _fwDocClassificationOptions(getAwardContext().code) + '</select>') +
         '</div>' +
         '<div class="grid grid-cols-2 gap-3">' +
             _fwDocFieldRow('Week ending date (first week)', '<input type="date" name="week_ending" required value="' + todayIso + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
@@ -23377,7 +23384,7 @@ function _fwDocGenerate_weeklyTimeRecord() {
     const d = _fwReadDocForm();
     const numWeeks = parseInt(d.num_weeks, 10) || 1;
     const contracted = d.contracted_hours ? parseInt(d.contracted_hours, 10) : null;
-    const award = p.primaryAward || 'MA000119';
+    const award = getAwardContext().name || '[Your Modern Award]';
 
     function addWeeks(dateStr, n) {
         const dt = new Date(dateStr);
@@ -23428,7 +23435,7 @@ function _fwDocRender_cashOut() {
         '</div>' +
         '<div class="grid grid-cols-2 gap-3">' +
             _fwDocFieldRow('Employee full name', '<input type="text" name="emp_name" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
-            _fwDocFieldRow('Classification', '<select name="emp_classification" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">' + _fwDocClassificationOptions(p.primaryAward) + '</select>') +
+            _fwDocFieldRow('Classification', '<select name="emp_classification" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">' + _fwDocClassificationOptions(getAwardContext().code) + '</select>') +
         '</div>' +
         '<div class="grid grid-cols-2 gap-3">' +
             _fwDocFieldRow('Base hourly rate (AUD)', '<input type="number" name="base_rate" min="0" step="0.01" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
@@ -23484,9 +23491,10 @@ function _fwDocValidate_cashOut() {
 function _fwDocGenerate_cashOut() {
     const p = venueProfile || {};
     const d = _fwReadDocForm();
-    const award = p.primaryAward || 'MA000119';
-    const isMA119 = String(award).indexOf('119') !== -1;
-    const scheduleRef = isMA119 ? 'MA000119 Schedule H' : 'MA000009 Schedule G';
+    const awardCode = getAwardContext().code;
+    const isMA119 = awardCode === 'MA000119';
+    const scheduleRef = isMA119 ? 'MA000119 Schedule H'
+        : (awardCode === 'MA000009' ? 'MA000009 Schedule G' : '[your modern award] schedule');
     const balance = parseFloat(d.balance_hours);
     const cashout = parseFloat(d.cashout_hours);
     const rate = parseFloat(d.base_rate);
@@ -24038,10 +24046,13 @@ function _fwDocValidate_leaveInAdvance() {
 }
 function _fwDocGenerate_leaveInAdvance() {
     const p = venueProfile || {}; const d = _fwReadDocForm();
+    const awardCode = getAwardContext().code;
+    const scheduleRef = awardCode === 'MA000119' ? 'MA000119 Schedule H'
+        : (awardCode === 'MA000009' ? 'MA000009 Schedule G' : '[your modern award] schedule');
     const negativeBalance = Number(d.current_balance) - Number(d.advance_hours);
     const html =
         '<h1>Annual Leave in Advance Agreement</h1>' +
-        '<h2>Under FW Act s324 and MA000119 Schedule G</h2>' +
+        '<h2>Under FW Act s324 and ' + _fwEscapeHtml(scheduleRef) + '</h2>' +
         '<h3>1. Parties</h3>' +
         '<p>Employer: <strong>' + _fwVenueLine() + '</strong></p>' +
         '<p>Employee: <strong>' + _fwEscapeHtml(d.emp_name) + '</strong> (classification: ' + _fwEscapeHtml(d.emp_classification) + ')</p>' +
