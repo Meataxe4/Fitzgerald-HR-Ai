@@ -1038,7 +1038,7 @@ function populateVenueTypeDropdown(selectEl, awardName, currentValue) {
 
     const primarySlugs = AWARD_VENUE_MAP[awardName];
 
-    let html = '<option value="">Select venue type...</option>';
+    let html = '<option value="">Select business type...</option>';
 
     if (primarySlugs && primarySlugs.length) {
         const primary = VENUE_OPTIONS
@@ -1050,7 +1050,7 @@ function populateVenueTypeDropdown(selectEl, awardName, currentValue) {
         const optionTag = (v) =>
             `<option value="${v.value}"${v.value === selected ? ' selected' : ''}>${v.label}</option>`;
         html += `<optgroup label="Common for this Award">${primary.map(optionTag).join('')}</optgroup>`;
-        html += `<optgroup label="Other venue types">${other.map(optionTag).join('')}</optgroup>`;
+        html += `<optgroup label="Other business types">${other.map(optionTag).join('')}</optgroup>`;
     } else {
         html += VENUE_OPTIONS
             .slice()
@@ -13196,142 +13196,240 @@ function openRosterStressTester() {
 // roles, so it gets its own picker rather than the role-based Award Wizard.
 // Reads from the loaded manufacturing-award-rates.json (awardRates).
 // ============================================================================
-async function openManufacturingCalculator() {
-    if (!awardRates || awardRates.ma_number !== 'MA000010') {
-        await loadAwardRates();
-    }
-    if (!awardRates || awardRates.ma_number !== 'MA000010' || !Array.isArray(awardRates.rates)) {
-        showAlert('Manufacturing rates could not be loaded. Please try again in a moment.');
-        return;
-    }
-    trackToolUsage('manufacturingCalculator');
+// ============================================================================
+// AWARD CALCULATOR ENGINE — registry-driven stepped pay calculator.
+// Each award declares its own ordered steps + a resolver; one generic engine
+// renders the steps into #wizardSteps and shows a shared result card. Role
+// awards (Hospitality/Restaurant) share calculateAwardClassification; Restaurant
+// drops the roles it doesn't cover. Manufacturing uses resolveManufacturingRate.
+// See docs/guardrails-award-resolution.md.
+// ============================================================================
+let currentCalculatorSteps = [];
+let _calcConfig = null;
 
-    const catLabels = {
-        adult: 'Adult — wages, professional & technical',
-        apprentice: 'Apprentice', junior: 'Junior', trainee: 'Trainee', cadet: 'Cadet'
-    };
-    const cats = Object.keys(catLabels)
-        .filter(c => awardRates.rates.some(r => r.category === c))
-        .map(c => `<option value="${c}">${_fwEscapeHtml(catLabels[c])}</option>`).join('');
+const _CALC_ROLES = [
+    { value: 'waiter',       label: 'Waiter / Food & Beverage Attendant', sublabel: 'Takes orders, serves food & drinks', icon: '👔' },
+    { value: 'bartender',    label: 'Bartender',                          sublabel: 'Makes and serves drinks at bar',    icon: '🍸' },
+    { value: 'barista',      label: 'Barista',                            sublabel: 'Makes coffee & beverages',          icon: '☕' },
+    { value: 'cook',         label: 'Cook / Chef',                        sublabel: 'Prepares food in kitchen',          icon: '👨‍🍳' },
+    { value: 'kitchen-hand', label: 'Kitchen Hand / Dishwasher',          sublabel: 'Cleaning, prep work',               icon: '🧹' },
+    { value: 'supervisor',   label: 'Supervisor / Shift Manager',         sublabel: 'Manages team & operations',         icon: '👔' },
+    { value: 'receptionist', label: 'Receptionist / Front Desk',          sublabel: 'Check-in, guest services',          icon: '📞' },
+    { value: 'housekeeper',  label: 'Housekeeper / Room Attendant',       sublabel: 'Cleans rooms, maintains facilities',icon: '🛏️' },
+    { value: 'security',     label: 'Security / Door Person',             sublabel: 'Site security, crowd control',      icon: '🛡️' }
+];
+// Restaurant Award MA000119 does not cover receptionist/housekeeper/security.
+const _RESTAURANT_EXCLUDED_ROLES = ['receptionist', 'housekeeper', 'security'];
 
-    const existing = document.getElementById('manufCalcModal');
-    if (existing) existing.remove();
-    const modal = document.createElement('div');
-    modal.id = 'manufCalcModal';
-    modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50';
-    modal.innerHTML =
-        '<div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border border-amber-500 max-h-[90vh] overflow-y-auto">' +
-            '<div class="flex items-center justify-between mb-4">' +
-                '<div><h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2"><span>🧙</span> Manufacturing Pay Calculator</h2>' +
-                '<p class="text-slate-400 text-sm">Manufacturing Award MA000010 — find the rate for a classification</p></div>' +
-                '<button onclick="document.getElementById(\'manufCalcModal\').remove()" class="text-slate-400 hover:text-white text-2xl">×</button>' +
-            '</div>' +
-            '<div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-5 text-xs text-amber-300">⚠️ Preview — rates effective 01/07/2025, general manufacturing only (excludes vehicle manufacturing). Verify against the award before relying on these figures.</div>' +
-            '<div class="space-y-4">' +
-                '<div><label class="block text-slate-300 text-sm mb-2">Classification group</label>' +
-                '<select id="manufCatSelect" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">' + cats + '</select></div>' +
-                '<div><label class="block text-slate-300 text-sm mb-2">Classification</label>' +
-                '<select id="manufClassSelect" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white"></select></div>' +
-                '<div><label class="block text-slate-300 text-sm mb-2">Employment type</label>' +
-                '<select id="manufEmpSelect" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white"></select></div>' +
-                '<button onclick="calculateManufacturingRate()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">Calculate rates</button>' +
-            '</div>' +
-            '<div id="manufCalcResult" class="mt-6"></div>' +
-        '</div>';
-    document.body.appendChild(modal);
-    modal.querySelector('#manufCatSelect').addEventListener('change', populateManufClassifications);
-    populateManufClassifications();
+const _CALC_EXPERIENCE_STEP = { key: 'experience', title: "What's their experience level?", options: [
+    { value: 'intro',  label: 'Introductory / No experience', sublabel: 'Just starting out, learning basics' },
+    { value: 'level1', label: 'Level 1 - Basic skills',       sublabel: 'Can perform routine tasks' },
+    { value: 'level2', label: 'Level 2 - Competent',          sublabel: 'Works independently, some variety' },
+    { value: 'level3', label: 'Level 3 - Advanced',           sublabel: 'Skilled, handles complex tasks' },
+    { value: 'level4', label: 'Level 4 - Supervisor/Trade',   sublabel: 'Manages others or trade qualified' }
+]};
+const _CALC_AGE_STEP = { key: 'age', title: 'How old is the employee?', options: [
+    { value: 'adult',  label: '20 years or older',  sublabel: 'Adult rates apply' },
+    { value: 'junior', label: '19 years or younger', sublabel: 'Junior rates apply (percentage of adult rate)' }
+]};
+const _CALC_EMPLOYMENT_STEP = { key: 'employment', title: 'What type of employment?', options: [
+    { value: 'casual',    label: 'Casual',    sublabel: '25% loading, no leave entitlements' },
+    { value: 'part-time', label: 'Part-Time', sublabel: 'Regular hours, pro-rata leave' },
+    { value: 'full-time', label: 'Full-Time', sublabel: '38 hours/week, full entitlements' }
+]};
+function _calcRoleStep(code) {
+    const roles = code === 'MA000119'
+        ? _CALC_ROLES.filter(r => _RESTAURANT_EXCLUDED_ROLES.indexOf(r.value) === -1)
+        : _CALC_ROLES;
+    return { key: 'role', title: "What's their role?", options: roles };
 }
-
-function populateManufClassifications() {
-    const cat = document.getElementById('manufCatSelect').value;
-    const inCat = awardRates.rates.filter(r => r.category === cat);
-    const labels = [...new Set(inCat.map(r => r.classification))];
-    document.getElementById('manufClassSelect').innerHTML =
-        labels.map(l => `<option value="${_fwEscapeHtml(l)}">${_fwEscapeHtml(l)}</option>`).join('');
+function _calcHoursStep(code) {
+    const isRest = code === 'MA000119';
+    return { key: 'hours', title: 'What hours do they typically work?', options: [
+        { value: 'weekday-day',     label: 'Weekdays (Mon-Fri) - Daytime', sublabel: 'Regular business hours' },
+        { value: 'weekday-evening', label: 'Weekdays (Mon-Fri) - Evening', sublabel: isRest ? '10pm to midnight' : '7pm to midnight' },
+        { value: 'weekday-night',   label: 'Weekdays (Mon-Fri) - Night',   sublabel: isRest ? 'Midnight to 6am' : 'Midnight to 7am' },
+        { value: 'saturday',        label: 'Saturdays',                    sublabel: 'Weekend penalty rates apply' },
+        { value: 'sunday',          label: 'Sundays',                      sublabel: 'Higher penalty rates' },
+        { value: 'public-holiday',  label: 'Public Holidays',              sublabel: 'Highest penalty rates' }
+    ]};
+}
+function _calcManufacturingSteps() {
+    const catLabels = { adult: 'Adult — wages, professional & technical', apprentice: 'Apprentice', junior: 'Junior', trainee: 'Trainee', cadet: 'Cadet' };
     const empLabels = { full_time: 'Full-time / Part-time', casual: 'Casual' };
-    const emps = [...new Set(inCat.map(r => r.employment_type))];
-    document.getElementById('manufEmpSelect').innerHTML =
-        emps.map(e => `<option value="${e}">${_fwEscapeHtml(empLabels[e] || e)}</option>`).join('');
-    document.getElementById('manufCalcResult').innerHTML = '';
+    return [
+        { key: 'category', title: 'Which classification group?', options: function () {
+            return Object.keys(catLabels)
+                .filter(c => awardRates.rates.some(r => r.category === c))
+                .map(c => ({ value: c, label: catLabels[c] }));
+        }},
+        { key: 'manufClass', title: 'Which classification?', options: function (data) {
+            const inCat = awardRates.rates.filter(r => r.category === data.category);
+            return [...new Set(inCat.map(r => r.classification))].map(l => ({ value: l, label: l }));
+        }},
+        { key: 'employment', title: 'What type of employment?', options: function (data) {
+            const emps = [...new Set(awardRates.rates.filter(r => r.category === data.category).map(r => r.employment_type))];
+            return emps.map(e => ({ value: e, label: empLabels[e] || e }));
+        }}
+    ];
 }
 
-function calculateManufacturingRate() {
-    const cat = document.getElementById('manufCatSelect').value;
-    const cls = document.getElementById('manufClassSelect').value;
-    const emp = document.getElementById('manufEmpSelect').value;
-    const resultEl = document.getElementById('manufCalcResult');
-    const entry = awardRates.rates.find(r => r.category === cat && r.classification === cls && r.employment_type === emp);
-    if (!entry) { resultEl.innerHTML = '<div class="text-red-400 text-sm">No rate found for that combination.</div>'; return; }
+function getAwardCalculatorConfig(code) {
+    if (getAwardContext().calculatorType === 'classification') {
+        return {
+            disclaimer: '⚠️ Preview — rates effective 01/07/2025, general manufacturing only (excludes vehicle manufacturing). Verify against the award before relying on these figures.',
+            steps: _calcManufacturingSteps(),
+            resolve: resolveManufacturingRate,
+            juniorRedirect: false
+        };
+    }
+    return {
+        steps: [_calcRoleStep(code), _CALC_EXPERIENCE_STEP, _calcHoursStep(code), _CALC_AGE_STEP, _CALC_EMPLOYMENT_STEP],
+        resolve: calculateAwardClassification,
+        juniorRedirect: true
+    };
+}
 
+function startAwardCalculator() {
+    _calcConfig = getAwardCalculatorConfig(getAwardContext().code);
+    currentCalculatorSteps = _calcConfig.steps;
+    wizardData = {};
+    currentWizardStep = 1;
+    renderCalculatorStep();
+}
+
+function renderCalculatorStep() {
+    const step = currentCalculatorSteps[currentWizardStep - 1];
+    if (!step) return;
+    const opts = (typeof step.options === 'function') ? step.options(wizardData) : step.options;
+    const total = currentCalculatorSteps.length;
+    const disc = _calcConfig && _calcConfig.disclaimer
+        ? `<div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4 text-xs text-amber-300">${_calcConfig.disclaimer}</div>` : '';
+    let body;
+    if (opts.length > 12) {
+        // Long option sets (e.g. Manufacturing classifications) render as a dropdown;
+        // shorter sets (roles, experience, hours) stay as tap-friendly buttons.
+        body = disc + `<h3 class="text-lg font-bold text-white mb-4">${_fwEscapeHtml(step.title)}</h3>` +
+            `<select id="calcStepSelect" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white mb-4">` +
+            opts.map(o => `<option value="${_fwEscapeHtml(o.value)}">${_fwEscapeHtml(o.label)}</option>`).join('') +
+            `</select>` +
+            `<button onclick="wizardSelectAnswer('${step.key}')" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">Continue</button>`;
+    } else {
+        body = disc + `<h3 class="text-lg font-bold text-white mb-4">${_fwEscapeHtml(step.title)}</h3><div class="space-y-2">` +
+            opts.map(o => `<button onclick="wizardAnswer('${step.key}', '${_fwEscapeHtml(o.value)}')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">` +
+                (o.icon ? `<span class="text-2xl">${o.icon}</span>` : '') +
+                `<div><div class="font-semibold">${_fwEscapeHtml(o.label)}</div>` +
+                (o.sublabel ? `<div class="text-xs opacity-70">${_fwEscapeHtml(o.sublabel)}</div>` : '') +
+                `</div></button>`).join('') +
+            `</div>`;
+    }
+    const stepsDiv = document.getElementById('wizardSteps');
+    if (stepsDiv) stepsDiv.innerHTML = `<div class="wizard-step" data-step="${currentWizardStep}">${body}</div>`;
+
+    const stepNumEl = document.getElementById('wizardCurrentStep');
+    if (stepNumEl) stepNumEl.textContent = currentWizardStep;
+    const pct = Math.round((currentWizardStep / total) * 100);
+    const progEl = document.getElementById('wizardProgress');
+    if (progEl) progEl.textContent = `${pct}% Complete`;
+    const barEl = document.getElementById('wizardProgressBar');
+    if (barEl) barEl.style.width = `${pct}%`;
+    const backBtn = document.getElementById('wizardBackBtn');
+    if (backBtn) backBtn.classList.toggle('hidden', currentWizardStep <= 1);
+    const progressContainer = document.querySelector('#awardWizardModal .mb-6');
+    if (progressContainer) progressContainer.classList.remove('hidden');
+}
+
+function wizardSelectAnswer(key) {
+    const sel = document.getElementById('calcStepSelect');
+    if (sel) wizardAnswer(key, sel.value);
+}
+
+// Manufacturing resolver — returns the shared result-card shape.
+function resolveManufacturingRate(data) {
+    const entry = awardRates.rates.find(r => r.category === data.category && r.classification === data.manufClass && r.employment_type === data.employment);
+    if (!entry) {
+        return { award: awardRates.award_name, level: 'Rate not found', rate: 0,
+            penalties: ['No rate found for that combination.'], nextSteps: ['Contact Fitz HR support'] };
+    }
     const rate = entry.rate;
     const p = awardRates.penalty_rates || {};
     const money = n => '$' + n.toFixed(2);
-    const rows = [];
-    const mult = (label, m) => { if (typeof m === 'number') rows.push(`<div>• ${label} (${Math.round(m * 100)}%): <strong>${money(rate * m)}/hr</strong></div>`); };
+    const penalties = [];
+    const mult = (label, m) => { if (typeof m === 'number') penalties.push(`${label} (${Math.round(m * 100)}%): ${money(rate * m)}/hr`); };
     mult('Saturday', p.saturday);
     mult('Sunday', p.sunday);
     mult('Public holiday', p.public_holiday);
     mult('Overtime — first 3 hrs', p.overtime_first_3hrs);
     mult('Overtime — after 3 hrs', p.overtime_after_3hrs);
-    const load = (label, l) => { if (typeof l === 'number') rows.push(`<div>• ${label} (+${Math.round(l * 100)}%): <strong>${money(rate * (1 + l))}/hr</strong></div>`); };
+    const load = (label, l) => { if (typeof l === 'number') penalties.push(`${label} (+${Math.round(l * 100)}%): ${money(rate * (1 + l))}/hr`); };
     load('Afternoon shift', p.afternoon_shift_loading);
     load('Night shift', p.night_shift_loading);
     load('Permanent night shift', p.permanent_night_shift_loading);
+    if (data.employment === 'casual') {
+        penalties.push('Casual rate already includes the 25% loading; confirm casual penalty interactions against the award.');
+    }
+    return { award: awardRates.award_name, level: data.manufClass, rate: rate, weeklyRate: entry.weekly_rate || null,
+        penalties: penalties, nextSteps: [
+            'Confirm the classification against Schedule A of MA000010',
+            'Set up payroll with these exact rates',
+            'Keep employment records for 7 years'
+        ]};
+}
 
-    const casualNote = emp === 'casual'
-        ? '<div class="text-xs text-slate-400 mt-2">Casual rate already includes the 25% loading. Penalty interactions for casuals should be confirmed against the award.</div>' : '';
-    const weekly = entry.weekly_rate ? `<p class="text-sm text-slate-400 mt-1">Weekly (38 hrs): <strong class="text-slate-200">${money(entry.weekly_rate)}</strong></p>` : '';
-
-    resultEl.innerHTML =
-        '<div class="bg-green-500/10 border-2 border-green-500 rounded-lg p-6">' +
-            '<h3 class="text-green-400 font-bold text-lg mb-4">✅ ' + _fwEscapeHtml(awardRates.award_name) + '</h3>' +
-            '<div class="bg-slate-700/50 rounded-lg p-4 mb-4">' +
-                '<p class="text-sm text-slate-400 mb-1">Classification</p>' +
-                '<p class="font-bold">' + _fwEscapeHtml(cls) + '</p>' +
-                '<p class="text-sm text-slate-400 mt-3 mb-1">Base ordinary rate</p>' +
-                '<p class="font-bold text-2xl text-amber-400">' + money(rate) + '/hr</p>' + weekly +
-            '</div>' +
-            '<div class="bg-amber-500/10 border border-amber-500 rounded-lg p-4">' +
-                '<p class="font-semibold text-amber-400 mb-2">Penalty rates &amp; loadings:</p>' +
-                '<div class="text-sm space-y-1">' + rows.join('') + '</div>' + casualNote +
-            '</div>' +
-        '</div>';
+// Shared result card for every award.
+function renderWizardResultCard(result) {
+    const isRole = getAwardContext().calculatorType === 'role';
+    const penaltiesHTML = (result.penalties && result.penalties.length)
+        ? result.penalties.map(p => `<div>• ${p}</div>`).join('') : '<div>Standard rates apply</div>';
+    const stepsHTML = (result.nextSteps && result.nextSteps.length)
+        ? result.nextSteps.map(s => `<li>${s}</li>`).join('') : '<li>Verify rate with Fair Work</li>';
+    const weeklyHTML = (typeof result.weeklyRate === 'number')
+        ? `<p class="text-sm text-slate-400 mt-1">Weekly (38 hrs): <strong class="text-slate-200">$${result.weeklyRate.toFixed(2)}</strong></p>` : '';
+    const contractBtn = isRole
+        ? `<button onclick="openEmploymentContract()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">📝 Create Employment Contract</button>` : '';
+    const html =
+        `<div class="bg-green-500/10 border-2 border-green-500 rounded-lg p-6">` +
+            `<h3 class="text-green-400 font-bold text-xl mb-4 flex items-center gap-2"><span>✅</span><span>Award Classification Complete!</span></h3>` +
+            `<div class="space-y-4 text-slate-200">` +
+                `<div class="bg-slate-700/50 rounded-lg p-4"><p class="text-sm text-slate-400 mb-1">Applicable Award</p><p class="font-bold text-lg">${_fwEscapeHtml(result.award || getAwardContext().fullName || '')}</p></div>` +
+                `<div class="grid grid-cols-2 gap-4">` +
+                    `<div class="bg-slate-700/50 rounded-lg p-4"><p class="text-sm text-slate-400 mb-1">Classification</p><p class="font-bold">${_fwEscapeHtml(result.level || 'Classification')}</p></div>` +
+                    `<div class="bg-slate-700/50 rounded-lg p-4"><p class="text-sm text-slate-400 mb-1">Base Rate (per hour)</p><p class="font-bold text-2xl text-amber-400">$${(typeof result.rate === 'number' ? result.rate : 0).toFixed(2)}</p>${weeklyHTML}</div>` +
+                `</div>` +
+                `<div class="bg-amber-500/10 border border-amber-500 rounded-lg p-4"><p class="font-semibold text-amber-400 mb-2">Penalty Rates & Loadings:</p><div class="text-sm space-y-1">${penaltiesHTML}</div></div>` +
+                `<div class="bg-blue-500/10 border border-blue-500 rounded-lg p-4"><p class="font-semibold text-blue-400 mb-2">📝 Next Steps:</p><ul class="text-sm space-y-1">${stepsHTML}</ul></div>` +
+            `</div>` +
+            `<div class="flex gap-3 mt-6">${contractBtn}` +
+                `<button onclick="resetWizard()" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">Start Over</button>` +
+                `<button onclick="closeToolModal('awardWizardModal')" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">✕ Close</button>` +
+            `</div>` +
+        `</div>`;
+    const stepsDiv = document.getElementById('wizardSteps');
+    if (stepsDiv) stepsDiv.innerHTML = html;
+    const backBtn = document.getElementById('wizardBackBtn');
+    if (backBtn) backBtn.classList.add('hidden');
+    const progressContainer = document.querySelector('#awardWizardModal .mb-6');
+    if (progressContainer) progressContainer.classList.add('hidden');
 }
 
 async function openAwardWizard() {
     trackToolUsage('awardWizardModal');
 
-    // Guardrail: the wizard computes award-specific pay rates and classifications,
-    // so it must not run without a resolved, supported award. Fail closed — never
-    // compute against a default award. See docs/guardrails-award-resolution.md.
+    // Guardrail: the calculator computes award-specific pay rates, so it must not
+    // run without a resolved, supported award. Fail closed — never compute against
+    // a default award. See docs/guardrails-award-resolution.md.
     if (!getAwardContext().code) {
         showAlert('Please set your Modern Award in Settings before using the Award Wizard — it needs your award to calculate accurate rates and classifications.');
         return;
     }
-
-    // Route by the award's calculator type. The hospitality role->classification
-    // wizard only fits role-based awards; Manufacturing uses a C-level picker.
-    // Anything without a calculator is fenced (chat still answers these users).
-    // See docs/guardrails-award-resolution.md.
-    const calc = getAwardContext().calculatorType;
-    if (calc === 'classification') {
-        openManufacturingCalculator();
-        return;
-    }
-    if (calc !== 'role') {
+    // Awards without a calculator model are fenced (chat still answers them).
+    if (!getAwardContext().calculatorType) {
         showAlert(`The Award Wizard pay calculator isn't available yet for the ${getAwardContext().name}. In the meantime, ask Fitz your pay, penalty or classification questions in chat — it has this award's rates.`);
         return;
     }
 
-    // Reset wizard state
-    wizardData = {};
-    currentWizardStep = 1;
-
     // Make sure the rates JSON loaded matches the user's award before the
-    // wizard runs. If primaryAward says Restaurant but we have Hospitality
-    // rates (or vice versa), re-fetch and wait for it so the user can never
-    // see mixed evening/night windows.
+    // calculator runs, so a user can never see another award's figures.
     try {
         const expectedCode = getAwardContext().code;
         const loadedMa = awardRates && (awardRates.ma_number
@@ -13340,54 +13438,23 @@ async function openAwardWizard() {
             await loadAwardRates();
         }
     } catch (e) {
-        // Non-fatal — wizard will still show its mismatch guard if needed
+        // Non-fatal — the resolver still guards against missing rates.
+    }
+    if (!awardRates || !Array.isArray(awardRates.rates)) {
+        showAlert('Award rates could not be loaded. Please try again in a moment.');
+        return;
     }
 
-    // Reset UI to step 1
     const wizardModal = document.getElementById('awardWizardModal');
     if (wizardModal) {
-        // Show modal
         wizardModal.classList.remove('hidden');
-
-        // Reset all steps visibility
-        wizardModal.querySelectorAll('.wizard-step').forEach(step => {
-            step.classList.add('hidden');
-        });
-
-        // Show step 1
-        const step1 = wizardModal.querySelector('[data-step="1"]');
-        if (step1) step1.classList.remove('hidden');
-
-        // Hide back button
-        const backBtn = document.getElementById('wizardBackBtn');
-        if (backBtn) backBtn.classList.add('hidden');
-
-        // Reset progress bar
-        document.getElementById('wizardCurrentStep').textContent = '1';
-        document.getElementById('wizardProgress').textContent = '20% Complete';
-        document.getElementById('wizardProgressBar').style.width = '20%';
-
-        // Tailor late-night labels to the user's award
-        applyWizardAwardLabels(wizardModal);
+        startAwardCalculator();   // registry-driven steps for the resolved award
     }
 }
 
 // Adjusts wizard step-3 evening/night labels based on the user's award.
 // Restaurant Award MA000119: evening = after 10pm, night = midnight-6am.
 // Hospitality Award MA000009: evening = 7pm-midnight, night = midnight-7am.
-function applyWizardAwardLabels(scope) {
-    const root = scope || document;
-    const isRestaurantAward = (getAwardContext().code === 'MA000119');
-    const eveningLabel = isRestaurantAward ? '10pm to midnight' : '7pm to midnight';
-    const nightLabel = isRestaurantAward ? 'Midnight to 6am' : 'Midnight to 7am';
-
-    const eveningBtn = root.querySelector('button[onclick="wizardAnswer(\'hours\', \'weekday-evening\')"] .text-xs');
-    if (eveningBtn) eveningBtn.textContent = eveningLabel;
-
-    const nightBtn = root.querySelector('button[onclick="wizardAnswer(\'hours\', \'weekday-night\')"] .text-xs');
-    if (nightBtn) nightBtn.textContent = nightLabel;
-}
-
 function openRosterOptimizer() {
     trackToolUsage('rosterOptimizerModal');
     var modal = document.getElementById('rosterOptimizerModal');
@@ -16484,7 +16551,7 @@ function saveOnboardingNameAndVenue() {
     }
     
     if (!venueName) {
-        showAlert('Please enter your venue name');
+        showAlert('Please enter your business name');
         return;
     }
     
@@ -16510,7 +16577,7 @@ function saveOnboardingLocation() {
 function saveOnboardingVenueType() {
     const venueType = document.getElementById('onboardingVenueType').value;
     if (!venueType) {
-        showAlert('Please select a venue type');
+        showAlert('Please select a business type');
         return;
     }
     venueProfile.venueType = venueType;
@@ -16546,7 +16613,7 @@ function updateOnboardingStep() {
                 hint.textContent = 'Select the type of manufacturing business you run.';
                 hint.classList.remove('hidden');
             } else if (AWARD_VENUE_MAP[venueProfile.primaryAward]) {
-                hint.textContent = `Showing venues commonly covered by the ${venueProfile.primaryAward}. If yours isn't listed, choose from "Other venue types".`;
+                hint.textContent = `Showing business types commonly covered by the ${venueProfile.primaryAward}. If yours isn't listed, choose from "Other business types".`;
                 hint.classList.remove('hidden');
             } else {
                 hint.textContent = '';
@@ -16615,7 +16682,7 @@ function completeOnboarding() {
 
 I now know you run a **${venueType}** in **${venueProfile.city || venueProfile.location}** with **${venueProfile.staffCount}** staff.
 
-All my advice will be tailored for your venue. Update these anytime in ⚙️ Settings.`);
+All my advice will be tailored for your business. Update these anytime in ⚙️ Settings.`);
     
     // Show quick action prompts after short delay
     setTimeout(function() {
@@ -16788,9 +16855,9 @@ function getVenueTypeLabel(type) {
         'hotel': 'hotel/pub',
         'fastfood': 'fast food venue',
         'club': 'club/bar',
-        'other': 'hospitality venue'
+        'other': 'business'
     };
-    return legacy[type] || type || 'hospitality venue';
+    return legacy[type] || type || 'business';
 }
 
 function showVenueSettings() {
@@ -16807,16 +16874,16 @@ function showVenueSettings() {
             </div>
             
             <div>
-                <label class="block text-slate-300 text-sm mb-2">Venue Name</label>
+                <label class="block text-slate-300 text-sm mb-2">Business Name</label>
                 <input type="text" id="settingsVenueName" value="${venueProfile.venueName || ''}" 
                        placeholder="e.g., The Golden Fork"
                        class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
             </div>
             
             <div>
-                <label class="block text-slate-300 text-sm mb-2">Venue Type</label>
+                <label class="block text-slate-300 text-sm mb-2">Business Type</label>
                 <select id="settingsVenueType" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-2 text-white">
-                    <option value="">Select venue type...</option>
+                    <option value="">Select business type...</option>
                 </select>
             </div>
             
@@ -16912,7 +16979,7 @@ function saveVenueSettings() {
     }
 
     closeVenueSettings();
-    showAlert('✅ Venue settings saved!');
+    showAlert('✅ Business settings saved!');
 }
 
 function closeVenueSettings() {
@@ -17543,7 +17610,7 @@ async function loadUsers() {
         users.forEach(profile => {
             const venueInfo = profile.venueProfile 
                 ? `${profile.venueProfile.venueType || 'Unknown'} in ${profile.venueProfile.location || 'Unknown'}` 
-                : 'No venue info';
+                : 'No business info';
             
             const legalStatus = profile.legalTermsAccepted 
                 ? '<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">✓ Legal Accepted</span>'
@@ -18727,164 +18794,49 @@ function getNestedRate(obj, path) {
  */
 function wizardAnswer(question, answer) {
     wizardData[question] = answer;
-    
-    if (currentWizardStep < CONFIG.WIZARD_STEPS) {
+
+    if (currentWizardStep < currentCalculatorSteps.length) {
         currentWizardStep++;
-        updateWizardStep();
+        renderCalculatorStep();
     } else {
         showWizardResults();
     }
 }
 
-// Update wizard step display
+// Back-compat alias — the engine renders steps dynamically.
 function updateWizardStep() {
-    // Get the Award Wizard container specifically
-    const wizardModal = document.getElementById('awardWizardModal');
-    if (!wizardModal) return;
-    
-    // Hide all steps ONLY within the Award Wizard
-    wizardModal.querySelectorAll('.wizard-step').forEach(step => {
-        step.classList.add('hidden');
-    });
-    
-    // Show current step ONLY within the Award Wizard
-    const currentStep = wizardModal.querySelector(`[data-step="${currentWizardStep}"]`);
-    if (currentStep) {
-        currentStep.classList.remove('hidden');
-    }
-    
-    // Update progress
-    document.getElementById('wizardCurrentStep').textContent = currentWizardStep;
-    const progress = Math.round((currentWizardStep / 5) * 100);
-    document.getElementById('wizardProgress').textContent = `${progress}% Complete`;
-    document.getElementById('wizardProgressBar').style.width = `${progress}%`;
-    
-    // Show/hide back button
-    const backBtn = document.getElementById('wizardBackBtn');
-    if (backBtn) {
-        if (currentWizardStep > 1) {
-            backBtn.classList.remove('hidden');
-        } else {
-            backBtn.classList.add('hidden');
-        }
-    }
+    renderCalculatorStep();
 }
-    
-// Go back in wizard
+
+// Go back in the calculator
 function wizardGoBack() {
     if (currentWizardStep > 1) {
         currentWizardStep--;
-        updateWizardStep();
+        renderCalculatorStep();
     }
 }
 
 // Show wizard results
 function showWizardResults() {
-    // Check if employee is a junior (19 or younger)
-    if (wizardData.age === 'junior') {
+    const cfg = _calcConfig || getAwardCalculatorConfig(getAwardContext().code);
+    // Role awards: the rates JSON carries adult rates only, so juniors redirect.
+    if (cfg.juniorRedirect && wizardData.age === 'junior') {
         showJuniorRedirect();
         return;
     }
-    
-    // Build a simple result for now to ensure display works
-    let resultRate = 0;
-    let resultTitle = 'Classification';
-    let resultAward = getAwardContext().fullName;
-    let penaltiesHTML = '<div>Standard rates apply</div>';
-    let stepsHTML = '<li>Verify rate with Fair Work</li>';
-    
-    // Try to calculate from award rates if available
+    let result;
     try {
-        if (awardRates && awardRates.rates && awardRates.rates.length > 0) {
-            const result = calculateAwardClassification(wizardData);
-            if (result && typeof result.rate === 'number') {
-                resultRate = result.rate;
-                resultTitle = result.level || 'Classification';
-                resultAward = result.award || resultAward;
-                
-                if (result.penalties && result.penalties.length > 0) {
-                    penaltiesHTML = result.penalties.map(p => `<div>• ${p}</div>`).join('');
-                }
-                if (result.nextSteps && result.nextSteps.length > 0) {
-                    stepsHTML = result.nextSteps.map(s => `<li>${s}</li>`).join('');
-                }
-            }
+        if (!awardRates || !awardRates.rates || !awardRates.rates.length) {
+            result = { level: 'Rate lookup unavailable', rate: 0,
+                penalties: ['Connect to the internet to load current rates'],
+                nextSteps: ['Refresh the page when online to get accurate rates'] };
         } else {
-            // Use fallback display - rates not loaded
-            resultTitle = 'Rate lookup unavailable';
-            penaltiesHTML = '<div>• Connect to internet to load current rates</div>';
-            stepsHTML = '<li>Refresh page when online to get accurate rates</li>';
+            result = cfg.resolve(wizardData) || {};
         }
     } catch (calcError) {
-        resultTitle = 'Calculation Error';
+        result = { level: 'Calculation Error', rate: 0, penalties: [], nextSteps: [] };
     }
-    
-    // Build the results HTML
-    const resultsHTML = `
-        <div class="bg-green-500/10 border-2 border-green-500 rounded-lg p-6">
-            <h3 class="text-green-400 font-bold text-xl mb-4 flex items-center gap-2">
-                <span>✅</span>
-                <span>Award Classification Complete!</span>
-            </h3>
-            
-            <div class="space-y-4 text-slate-200">
-                <div class="bg-slate-700/50 rounded-lg p-4">
-                    <p class="text-sm text-slate-400 mb-1">Applicable Award</p>
-                    <p class="font-bold text-lg">${resultAward}</p>
-                </div>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-slate-700/50 rounded-lg p-4">
-                        <p class="text-sm text-slate-400 mb-1">Classification Level</p>
-                        <p class="font-bold">${resultTitle}</p>
-                    </div>
-                    <div class="bg-slate-700/50 rounded-lg p-4">
-                        <p class="text-sm text-slate-400 mb-1">Base Rate (per hour)</p>
-                        <p class="font-bold text-2xl text-amber-400">$${resultRate.toFixed(2)}</p>
-                    </div>
-                </div>
-
-                <div class="bg-amber-500/10 border border-amber-500 rounded-lg p-4">
-                    <p class="font-semibold text-amber-400 mb-2">Penalty Rates & Loadings:</p>
-                    <div class="text-sm space-y-1">${penaltiesHTML}</div>
-                </div>
-
-                <div class="bg-blue-500/10 border border-blue-500 rounded-lg p-4">
-                    <p class="font-semibold text-blue-400 mb-2">📝 Next Steps:</p>
-                    <ul class="text-sm space-y-1">${stepsHTML}</ul>
-                </div>
-            </div>
-
-            <div class="flex gap-3 mt-6">
-                <button onclick="openEmploymentContract()" class="flex-1 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all">
-                    📝 Create Employment Contract
-                </button>
-                <button onclick="resetWizard()" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
-                    Start Over
-                </button>
-                <button onclick="closeToolModal('awardWizardModal')" class="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-all">
-                    ✕ Close
-                </button>
-            </div>
-        </div>
-    `;
-    
-    // Display the results
-    const wizardStepsDiv = document.getElementById('wizardSteps');
-    if (wizardStepsDiv) {
-        wizardStepsDiv.innerHTML = resultsHTML;
-    } else {
-        showAlert('Error: Could not display results. Please try again.');
-        return;
-    }
-    
-    // Hide back button and progress bar
-    const backBtn = document.getElementById('wizardBackBtn');
-    if (backBtn) backBtn.classList.add('hidden');
-    
-    const progressContainer = document.querySelector('#awardWizardModal .mb-6');
-    if (progressContainer) progressContainer.classList.add('hidden');
-    
+    renderWizardResultCard(result);
 }
 function showJuniorRedirect() {
     try {
@@ -19206,7 +19158,7 @@ function calculateAwardClassification(data) {
                 'It is typically covered by the Hospitality Industry (General) Award MA000009.'
             ],
             nextSteps: [
-                'Switch your venue award to "Hospitality Industry (General) Award" in Settings, or',
+                'Switch your business award to "Hospitality Industry (General) Award" in Settings, or',
                 'Contact Fitz HR for advice: support@fitzhr.com'
             ]
         };
@@ -19262,7 +19214,7 @@ function calculateAwardClassification(data) {
             level: 'Award rates mismatch',
             rate: 0,
             penalties: [
-                `Loaded rates are for ${awardRates.award_name || 'a different award'} but your venue is on the Restaurant Industry Award MA000119.`,
+                `Loaded rates are for ${awardRates.award_name || 'a different award'} but your business is on the Restaurant Industry Award MA000119.`,
                 'Refreshing rates now — please close this wizard and reopen it.'
             ],
             nextSteps: ['Close the wizard, wait 2 seconds, then reopen.']
@@ -19374,213 +19326,12 @@ function calculateAwardClassification(data) {
 
 // Reset wizard
 function resetWizard() {
-    // Reset wizard data and step
-    wizardData = {};
-    currentWizardStep = 1;
-    
-    // Close modal
-    closeToolModal('awardWizardModal');
-    
-    // Wait for modal to close, then reset and reopen
-    setTimeout(() => {
-        // Force rebuild the wizard by reloading the page's wizard HTML
-        const wizardStepsDiv = document.getElementById('wizardSteps');
-        const progressContainer = document.querySelector('#awardWizardModal .mb-6');
-        const backBtn = document.getElementById('wizardBackBtn');
-        
-        if (!wizardStepsDiv) {
-            return;
-        }
-        
-        // Restore original wizard HTML (all 5 steps)
-        wizardStepsDiv.innerHTML = `
-            <!-- Step 1: Role -->
-            <div class="wizard-step" data-step="1">
-                <h3 class="text-lg font-bold text-white mb-4">What's their role?</h3>
-                <div class="space-y-2">
-                    <button onclick="wizardAnswer('role', 'waiter')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
-                        <span class="text-2xl">👔</span>
-                        <div>
-                            <div class="font-semibold">Waiter / Food & Beverage Attendant</div>
-                            <div class="text-xs opacity-70">Takes orders, serves food & drinks</div>
-                        </div>
-                    </button>
-                    <button onclick="wizardAnswer('role', 'bartender')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
-                        <span class="text-2xl">🍸</span>
-                        <div>
-                            <div class="font-semibold">Bartender</div>
-                            <div class="text-xs opacity-70">Makes and serves drinks at bar</div>
-                        </div>
-                    </button>
-                    <button onclick="wizardAnswer('role', 'barista')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
-                        <span class="text-2xl">☕</span>
-                        <div>
-                            <div class="font-semibold">Barista</div>
-                            <div class="text-xs opacity-70">Makes coffee & beverages</div>
-                        </div>
-                    </button>
-                    <button onclick="wizardAnswer('role', 'cook')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
-                        <span class="text-2xl">👨‍🍳</span>
-                        <div>
-                            <div class="font-semibold">Cook / Chef</div>
-                            <div class="text-xs opacity-70">Prepares food in kitchen</div>
-                        </div>
-                    </button>
-                    <button onclick="wizardAnswer('role', 'kitchen-hand')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
-                        <span class="text-2xl">🧹</span>
-                        <div>
-                            <div class="font-semibold">Kitchen Hand / Dishwasher</div>
-                            <div class="text-xs opacity-70">Cleaning, prep work</div>
-                        </div>
-                    </button>
-                    <button onclick="wizardAnswer('role', 'supervisor')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
-                        <span class="text-2xl">👔</span>
-                        <div>
-                            <div class="font-semibold">Supervisor / Shift Manager</div>
-                            <div class="text-xs opacity-70">Manages team & operations</div>
-                        </div>
-                    </button>
-                    <button onclick="wizardAnswer('role', 'receptionist')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
-                        <span class="text-2xl">📞</span>
-                        <div>
-                            <div class="font-semibold">Receptionist / Front Desk</div>
-                            <div class="text-xs opacity-70">Check-in, guest services</div>
-                        </div>
-                    </button>
-                    <button onclick="wizardAnswer('role', 'housekeeper')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
-                        <span class="text-2xl">🛏️</span>
-                        <div>
-                            <div class="font-semibold">Housekeeper / Room Attendant</div>
-                            <div class="text-xs opacity-70">Cleans rooms, maintains facilities</div>
-                        </div>
-                    </button>
-                    <button onclick="wizardAnswer('role', 'security')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left flex items-center gap-3">
-                        <span class="text-2xl">🛡️</span>
-                        <div>
-                            <div class="font-semibold">Security / Door Person</div>
-                            <div class="text-xs opacity-70">Venue security, crowd control</div>
-                        </div>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Step 2: Experience -->
-            <div class="wizard-step hidden" data-step="2">
-                <h3 class="text-lg font-bold text-white mb-4">What's their experience level?</h3>
-                <div class="space-y-2">
-                    <button onclick="wizardAnswer('experience', 'intro')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Introductory / No experience</div>
-                        <div class="text-xs opacity-70">Just starting out, learning basics</div>
-                    </button>
-                    <button onclick="wizardAnswer('experience', 'level1')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Level 1 - Basic skills</div>
-                        <div class="text-xs opacity-70">Can perform routine tasks</div>
-                    </button>
-                    <button onclick="wizardAnswer('experience', 'level2')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Level 2 - Competent</div>
-                        <div class="text-xs opacity-70">Works independently, some variety</div>
-                    </button>
-                    <button onclick="wizardAnswer('experience', 'level3')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Level 3 - Advanced</div>
-                        <div class="text-xs opacity-70">Skilled, handles complex tasks</div>
-                    </button>
-                    <button onclick="wizardAnswer('experience', 'level4')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Level 4 - Supervisor/Trade</div>
-                        <div class="text-xs opacity-70">Manages others or trade qualified</div>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Step 3: Hours -->
-            <div class="wizard-step hidden" data-step="3">
-                <h3 class="text-lg font-bold text-white mb-4">What hours do they typically work?</h3>
-                <div class="space-y-2">
-                    <button onclick="wizardAnswer('hours', 'weekday-day')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Weekdays (Mon-Fri) - Daytime</div>
-                        <div class="text-xs opacity-70">Regular business hours</div>
-                    </button>
-                    <button onclick="wizardAnswer('hours', 'weekday-evening')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Weekdays (Mon-Fri) - Evening</div>
-                        <div class="text-xs opacity-70">7pm to midnight</div>
-                    </button>
-                    <button onclick="wizardAnswer('hours', 'weekday-night')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Weekdays (Mon-Fri) - Night</div>
-                        <div class="text-xs opacity-70">Midnight to 7am</div>
-                    </button>
-                    <button onclick="wizardAnswer('hours', 'saturday')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Saturdays</div>
-                        <div class="text-xs opacity-70">Weekend penalty rates apply</div>
-                    </button>
-                    <button onclick="wizardAnswer('hours', 'sunday')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Sundays</div>
-                        <div class="text-xs opacity-70">Higher penalty rates</div>
-                    </button>
-                    <button onclick="wizardAnswer('hours', 'public-holiday')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Public Holidays</div>
-                        <div class="text-xs opacity-70">Highest penalty rates</div>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Step 4: Age -->
-            <div class="wizard-step hidden" data-step="4">
-                <h3 class="text-lg font-bold text-white mb-4">How old is the employee?</h3>
-                <div class="space-y-2">
-                    <button onclick="wizardAnswer('age', 'adult')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">20 years or older</div>
-                        <div class="text-xs opacity-70">Adult rates apply</div>
-                    </button>
-                    <button onclick="wizardAnswer('age', 'junior')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">19 years or younger</div>
-                        <div class="text-xs opacity-70">Junior rates apply (percentage of adult rate)</div>
-                    </button>
-                </div>
-            </div>
-
-            <!-- Step 5: Employment Type -->
-            <div class="wizard-step hidden" data-step="5">
-                <h3 class="text-lg font-bold text-white mb-4">What type of employment?</h3>
-                <div class="space-y-2">
-                    <button onclick="wizardAnswer('employment', 'casual')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Casual</div>
-                        <div class="text-xs opacity-70">25% loading, no leave entitlements</div>
-                    </button>
-                    <button onclick="wizardAnswer('employment', 'part-time')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Part-Time</div>
-                        <div class="text-xs opacity-70">Regular hours, pro-rata leave</div>
-                    </button>
-                    <button onclick="wizardAnswer('employment', 'full-time')" class="wizard-option w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Full-Time</div>
-                        <div class="text-xs opacity-70">38 hours/week, full entitlements</div>
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        // Show progress bar
-        if (progressContainer) {
-            progressContainer.classList.remove('hidden');
-        }
-        
-        // Hide back button
-        if (backBtn) {
-            backBtn.classList.add('hidden');
-        }
-        
-        // Make sure steps are visible
-        wizardStepsDiv.classList.remove('hidden');
-        
-        // Update to step 1
-        updateWizardStep();
-        
-        // Reopen modal
-        const reopenedModal = document.getElementById('awardWizardModal');
-        reopenedModal.classList.remove('hidden');
-
-        // Re-apply award-specific labels (resetWizard rebuilds the step HTML)
-        applyWizardAwardLabels(reopenedModal);
-
-    }, 150);
+    // Re-run the registry-driven calculator from step 1 in the open modal.
+    const progressContainer = document.querySelector('#awardWizardModal .mb-6');
+    if (progressContainer) progressContainer.classList.remove('hidden');
+    const wizardModal = document.getElementById('awardWizardModal');
+    if (wizardModal) wizardModal.classList.remove('hidden');
+    startAwardCalculator();
 }
 // ========================================
 // ROSTER STRESS TESTER - COMPLETE IMPLEMENTATION
@@ -20348,7 +20099,7 @@ I require urgent expert guidance on an employment termination process to ensure 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 VENUE DETAILS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Venue Name: ${venueName}
+Business Name: ${venueName}
 Location: ${venueLocation}
 Contact Name: ${userName}
 User Code: ${userCode}
@@ -22849,7 +22600,7 @@ function _fwRenderRisksTab(profile, result, applicable, answeredCount) {
         return '<div class="text-center py-10 bg-slate-700/30 rounded-xl border border-slate-700">' +
                 '<div class="text-4xl mb-3">📋</div>' +
                 '<h3 class="text-lg font-bold text-white mb-2">Compliance assessment</h3>' +
-                '<p class="text-slate-400 mb-2">Run the assessment to detect compliance gaps in your venue.</p>' +
+                '<p class="text-slate-400 mb-2">Run the assessment to detect compliance gaps in your business.</p>' +
                 '<p class="text-xs text-slate-500 mb-6">' + applicable.length + ' questions · about ' + Math.max(3, Math.round(applicable.length * 0.5)) + ' minutes</p>' +
                 '<button onclick="closeFitzWatchDashboard(); openFitzWatchQuestionnaire();" class="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-900 font-semibold rounded-lg transition-all">Run assessment →</button>' +
             '</div>';
@@ -22964,7 +22715,7 @@ function _fwRenderChangesTab(profile, reforms) {
     if (!reforms || reforms.length === 0) {
         return '<div class="text-center py-10 bg-slate-700/30 rounded-xl border border-slate-700">' +
                 '<div class="text-3xl mb-3">📅</div>' +
-                '<p class="text-slate-300">No upcoming regulatory changes affect your venue right now.</p>' +
+                '<p class="text-slate-300">No upcoming regulatory changes affect your business right now.</p>' +
                 '<p class="text-xs text-slate-500 mt-2">This list is updated quarterly. Major reforms are added when announced.</p>' +
             '</div>';
     }
@@ -23150,8 +22901,8 @@ function _fwRenderChangedPrompt() {
 
     const lastDateStr = setupAt ? _fwFormatDate(setupAt) : null;
     const subline = lastDateStr
-        ? 'You last reviewed your venue profile on ' + lastDateStr + '.'
-        : 'Make sure your venue profile is up to date before relying on the risk picture below.';
+        ? 'You last reviewed your business profile on ' + lastDateStr + '.'
+        : 'Make sure your business profile is up to date before relying on the risk picture below.';
 
     return '<div class="p-4 bg-amber-900/15 border border-amber-700/50 rounded-xl flex items-start justify-between gap-3 flex-wrap">' +
         '<div class="flex-1 min-w-[240px]">' +
@@ -23180,7 +22931,7 @@ function _fwRenderGapCard(gap) {
     const anchorStr = anchorParts.join('; ') || 'see Award';
     const affectedStr = gap.affected_count != null
         ? 'Affects ~' + gap.affected_count + ' employee' + (gap.affected_count === 1 ? '' : 's')
-        : 'Applies to your venue';
+        : 'Applies to your business';
     const ctaClass = gap.fix_action_visual_signal === 'needs_review'
         ? 'border border-amber-500 text-amber-400 hover:bg-amber-500/10'
         : gap.fix_action_visual_signal === 'external'
@@ -23451,7 +23202,7 @@ function _fwDocRender_clause20Agreement() {
     const today = new Date().toISOString().slice(0, 10);
     return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" class="space-y-3">' +
         '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">' +
-            'Pre-filled from your venue profile: <strong class="text-slate-300">' + _fwEscapeHtml(p.venueName || '—') + '</strong> · ABN ' + _fwEscapeHtml(p.venue_abn || '—') + ' · ' + _fwEscapeHtml(p.primaryAward || '—') +
+            'Pre-filled from your business profile: <strong class="text-slate-300">' + _fwEscapeHtml(p.venueName || '—') + '</strong> · ABN ' + _fwEscapeHtml(p.venue_abn || '—') + ' · ' + _fwEscapeHtml(p.primaryAward || '—') +
         '</div>' +
         '<div class="grid grid-cols-2 gap-3">' +
             _fwDocFieldRow('Employee full name', '<input type="text" name="emp_name" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
@@ -23887,7 +23638,7 @@ const _FW_PSYCHO_HAZARDS = [
 function _fwDocRender_psychoRegister() {
     const p = venueProfile || {};
     return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" class="space-y-3">' +
-        '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">Pre-filled from your venue profile: <strong class="text-slate-300">' + _fwEscapeHtml(p.venueName || '—') + '</strong> · ' + _fwEscapeHtml(p.state || '—') + '. The register lists hospitality-specific hazards by default; you fill in risk ratings and controls in Word.</div>' +
+        '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">Pre-filled from your business profile: <strong class="text-slate-300">' + _fwEscapeHtml(p.venueName || '—') + '</strong> · ' + _fwEscapeHtml(p.state || '—') + '. The register lists hospitality-specific hazards by default; you fill in risk ratings and controls in Word.</div>' +
         _fwDocFieldRow('Responsible person (for the register)', '<input type="text" name="responsible_person" value="' + _fwEscapeHtml(p.userName || '') + '" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
         '<div class="grid grid-cols-2 gap-3">' +
             _fwDocFieldRow('Register effective date', '<input type="date" name="effective_date" required value="' + _fwTodayIso() + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
@@ -24064,7 +23815,7 @@ function _fwDocGenerate_customerAggression() {
         '<ul><li>After every serious incident</li><li>Annually as part of psychosocial risk register review</li></ul>' +
         '<h2>9. Sign-off</h2>' +
         _fwSignatureBlock(null) +
-        '<p><em>This procedure is a framework. Tailor to your venue\'s specific operational risks. Not a substitute for legal advice or for jurisdiction-specific liquor licensing requirements.</em></p>';
+        '<p><em>This procedure is a framework. Tailor to your business\'s specific operational risks. Not a substitute for legal advice or for jurisdiction-specific liquor licensing requirements.</em></p>';
     return { html: html, filename: 'Customer_Aggression_Procedure_' + (p.venueName || 'Venue').replace(/[^A-Za-z0-9_-]/g, '_') + '.docx' };
 }
 
@@ -24120,7 +23871,7 @@ function _fwDocGenerate_psychInjuryProc() {
         '<ul><li>Annually</li><li>After every claim outcome</li><li>After significant legislative change</li></ul>' +
         '<h2>11. Sign-off</h2>' +
         _fwSignatureBlock(null) +
-        '<p><em>This procedure is a framework. Tailor to your venue\'s operational context. Not a substitute for legal advice. Verify against current state workers compensation law before signing.</em></p>';
+        '<p><em>This procedure is a framework. Tailor to your business\'s operational context. Not a substitute for legal advice. Verify against current state workers compensation law before signing.</em></p>';
     return { html: html, filename: 'Psych_Injury_Claim_Procedure_' + (p.venueName || 'Venue').replace(/[^A-Za-z0-9_-]/g, '_') + '.docx' };
 }
 

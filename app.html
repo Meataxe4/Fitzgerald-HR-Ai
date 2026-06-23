@@ -1534,9 +1534,9 @@
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-slate-300 text-sm mb-2">Tell me about your venue:</label>
+                    <label class="block text-slate-300 text-sm mb-2">Tell me about your business:</label>
                     <div class="grid grid-cols-2 gap-4">
-                        <input type="text" id="scenarioVenueType" placeholder="e.g., Restaurant, Hotel, Café" 
+                        <input type="text" id="scenarioVenueType" placeholder="e.g., Restaurant, Manufacturer, Hotel"
                                class="bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm placeholder-slate-500">
                         <input type="text" id="scenarioLocation" placeholder="e.g., Sydney CBD" 
                                class="bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white text-sm placeholder-slate-500">
@@ -1630,7 +1630,7 @@
     <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border-2 border-amber-500 fade-in">
         <div class="text-center mb-6">
             <div class="text-6xl mb-4">🏨</div>
-            <h2 class="text-3xl font-bold text-amber-500 mb-2">Let's Get to Know Your Venue</h2>
+            <h2 class="text-3xl font-bold text-amber-500 mb-2">Let's Get to Know Your Business</h2>
             <p class="text-slate-300">This helps me give you tailored advice. Takes 2 minutes.</p>
         </div>
 
@@ -1655,7 +1655,7 @@
                                class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white">
                     </div>
                     <div>
-                        <label class="block text-slate-300 text-sm mb-2">Venue Name</label>
+                        <label class="block text-slate-300 text-sm mb-2">Business Name</label>
                         <input type="text" id="onboardingVenueName" 
                                placeholder="e.g., The Golden Fork"
                                class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white">
@@ -1695,10 +1695,10 @@
             </div>
 
             <div class="onboarding-step hidden" data-step="3">
-                <h3 class="text-xl font-bold text-white mb-4">What type of venue do you run?</h3>
+                <h3 class="text-xl font-bold text-white mb-4">What type of business do you run?</h3>
                 <p id="onboardingVenueTypeHint" class="text-xs text-slate-400 mb-2 hidden"></p>
                 <select id="onboardingVenueType" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white mb-4">
-                    <option value="">Select venue type...</option>
+                    <option value="">Select business type...</option>
                 </select>
                 <button onclick="saveOnboardingVenueType()"
                         class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg">
@@ -1707,7 +1707,7 @@
             </div>
 
             <div class="onboarding-step hidden" data-step="4">
-                <h3 class="text-xl font-bold text-white mb-4">Where is your venue located?</h3>
+                <h3 class="text-xl font-bold text-white mb-4">Where is your business located?</h3>
                 <select id="onboardingLocation" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white mb-4">
                     <option value="">Select state...</option>
                     <option value="NSW">New South Wales</option>
@@ -1780,9 +1780,9 @@
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
-                    <span>⚙️</span> Venue Settings
+                    <span>⚙️</span> Business Settings
                 </h2>
-                <p class="text-slate-400 text-sm">Update your venue information</p>
+                <p class="text-slate-400 text-sm">Update your business information</p>
             </div>
             <button onclick="closeVenueSettings()" class="text-slate-400 hover:text-white text-2xl">×</button>
         </div>
@@ -1944,7 +1944,7 @@
                         <!-- Reset My Profile -->
                         <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
                             <h3 class="text-white font-semibold mb-1">🔄 Reset My Profile</h3>
-                            <p class="text-slate-400 text-xs mb-3">Clears your venue profile from localStorage and Firebase, then reloads — onboarding will run again. Use to test different award selections.</p>
+                            <p class="text-slate-400 text-xs mb-3">Clears your business profile from localStorage and Firebase, then reloads — onboarding will run again. Use to test different award selections.</p>
                             <button onclick="adminResetMyProfile()"
                                     class="bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold px-4 py-2 rounded-lg text-sm transition-all">
                                 Reset My Profile & Restart Onboarding
@@ -2120,7 +2120,7 @@
                 <h2 class="text-2xl font-bold text-amber-500 flex items-center gap-2">
                     <span>🛡️</span> Fitz Watch — Setup
                 </h2>
-                <p class="text-slate-400 text-sm">Before we begin, we need a few details about your venue to detect risks accurately.</p>
+                <p class="text-slate-400 text-sm">Before we begin, we need a few details about your business to detect risks accurately.</p>
             </div>
             <button onclick="closeFitzWatchPreflight()" class="text-slate-400 hover:text-white text-2xl">×</button>
         </div>
@@ -2741,7 +2741,7 @@ Be as specific as possible!"></textarea>
                     <option value="ACT">Australian Capital Territory</option>
                 </select>
             </div>
-            <p class="text-xs text-slate-500 mt-2">💡 This is based on your venue location. Change if you operate in multiple states.</p>
+            <p class="text-xs text-slate-500 mt-2">💡 This is based on your business location. Change if you operate in multiple states.</p>
         </div>
 
         <!-- Public Holidays Section -->
@@ -3595,7 +3595,7 @@ Be as specific as possible!"></textarea>
             <!-- Starter -->
             <div id="planCard_starter" class="bg-slate-900 rounded-xl p-4 border border-slate-700 hover:border-amber-500 transition-all">
                 <h3 class="text-lg font-bold text-white mb-1">Starter</h3>
-                <p class="text-slate-400 text-xs mb-3">Small venues, occasional needs</p>
+                <p class="text-slate-400 text-xs mb-3">Small businesses, occasional needs</p>
                 
                 <div class="mb-2">
                     <span id="starterPrice" class="text-2xl font-bold text-white">$249</span>
@@ -3624,7 +3624,7 @@ Be as specific as possible!"></textarea>
                 </div>
                 
                 <h3 class="text-lg font-bold text-amber-400 mb-1 mt-1">Pro</h3>
-                <p class="text-slate-400 text-xs mb-3">Busy venues, regular needs</p>
+                <p class="text-slate-400 text-xs mb-3">Busy businesses, regular needs</p>
                 
                 <div class="mb-2">
                     <span id="proPrice" class="text-2xl font-bold text-white">$449</span>
@@ -3649,7 +3649,7 @@ Be as specific as possible!"></textarea>
             <!-- Business -->
             <div id="planCard_business" class="bg-slate-900 rounded-xl p-4 border border-slate-700 hover:border-amber-500 transition-all">
                 <h3 class="text-lg font-bold text-white mb-1">Business</h3>
-                <p class="text-slate-400 text-xs mb-3">Multi-venue, high-turnover</p>
+                <p class="text-slate-400 text-xs mb-3">Multi-site, high-turnover</p>
                 
                 <div class="mb-2">
                     <span id="businessPrice" class="text-2xl font-bold text-white">$899</span>
@@ -6093,7 +6093,7 @@ Be as specific as possible!"></textarea>
                 <span class="text-xl">⚙️</span>
                 <div>
                     <div class="font-semibold">Settings</div>
-                    <div class="text-xs text-slate-400">Update venue information</div>
+                    <div class="text-xs text-slate-400">Update business information</div>
                 </div>
             </button>
             
