@@ -1865,7 +1865,7 @@ const AWARD_REGISTRY = {
         code: 'MA000010', status: 'preview', flag: 'manufacturing_preview',
         displayName: 'Manufacturing and Associated Industries Award',
         fullName: 'Manufacturing and Associated Industries and Occupations Award MA000010',
-        ratesUrl: null,
+        ratesUrl: '/manufacturing-award-rates.json',
         aliases: ['manufacturing']
     }
 };

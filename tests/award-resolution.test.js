@@ -71,5 +71,20 @@ eq('Restaurant classifications use Cook grades', /Cook grade 5/.test(restOpts), 
 eq('Restaurant classifications NOT Levels', /Level 6/.test(restOpts), false);
 eq('Unresolved classifications -> placeholder', /Set your Award/.test(noneOpts), true);
 
+// ---- Manufacturing rates data integrity (Milestone: MA000010 wiring) --------
+const manuf = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'manufacturing-award-rates.json'), 'utf8'));
+eq('Manufacturing ma_number', manuf.ma_number, 'MA000010');
+eq('Manufacturing 169 rate rows', manuf.rates.length, 169);
+eq('Manufacturing Saturday 1.5', manuf.penalty_rates.saturday, 1.5);
+eq('Manufacturing Sunday 2.0', manuf.penalty_rates.sunday, 2.0);
+eq('Manufacturing public holiday 2.5', manuf.penalty_rates.public_holiday, 2.5);
+eq('Manufacturing casual loading 0.25', manuf.casual_loading, 0.25);
+const c10 = manuf.rates.find(r => /^C10\b/.test(r.classification) && r.employment_type === 'full_time');
+const c14 = manuf.rates.find(r => /^C14\b/.test(r.classification) && r.employment_type === 'full_time');
+eq('Manufacturing C10 rate $28.12', c10 && c10.rate, 28.12);
+eq('Manufacturing C14 rate $24.28', c14 && c14.rate, 24.28);
+// every rate row: penalties derive cleanly (hourly>0) — sanity guard against corruption
+eq('Manufacturing all rows have positive rate', manuf.rates.every(r => typeof r.rate === 'number' && r.rate > 0), true);
+
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);
