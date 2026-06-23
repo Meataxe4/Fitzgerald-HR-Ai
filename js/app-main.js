@@ -989,11 +989,8 @@ const AWARD_VENUE_MAP = {
         'restaurant', 'cafe', 'bistro', 'bakery-cafe', 'wine-bar', 'brewery',
         'tea-house', 'dessert-bar', 'ice-cream-bar', 'juice-bar',
         'function-centre', 'cinema-fnb'
-    ],
-    'Fast Food Industry Award': [
-        'food-court', 'bakery-cafe', 'dessert-bar', 'ice-cream-bar',
-        'juice-bar', 'cinema-fnb'
     ]
+    // (Fast Food Industry Award is not a supported award, so it has no entry.)
 };
 
 // Business types for the Manufacturing Award (MA000010). Manufacturing is a
@@ -1939,6 +1936,22 @@ function getAwardContext() {
         status: resolved.status,
         calculatorType: resolved.calculatorType || null
     };
+}
+
+// Industry descriptor for the resolved award, used to keep AI prompts and
+// user-facing copy award-aware instead of hard-coding "hospitality". Returns the
+// bare word ('hospitality' | 'manufacturing' | '') and a space-suffixed helper
+// for inline interpolation (e.g. `Australian ${_awardSector()}HR` ->
+// "Australian hospitality HR" / "Australian manufacturing HR" / "Australian HR").
+function _industryWord() {
+    const code = getAwardContext().code;
+    if (code === 'MA000010') return 'manufacturing';
+    if (code === 'MA000009' || code === 'MA000119') return 'hospitality';
+    return '';
+}
+function _awardSector() {
+    const w = _industryWord();
+    return w ? w + ' ' : '';
 }
 
 // Fetch rates for the resolved award. Does NOT load any rates when the award is
@@ -4900,7 +4913,7 @@ If you output anything other than a complete, formal document ready for immediat
     let prompt = '';
     
     if (type === 'formalWarning') {
-    prompt = `You are generating a FORMAL WARNING LETTER for Australian hospitality HR.
+    prompt = `You are generating a FORMAL WARNING LETTER for Australian ${_awardSector()}HR.
 
 **CRITICAL OUTPUT REQUIREMENT:**
 You MUST generate an ACTUAL FORMAL LETTER - a complete, ready-to-use business letter document.
@@ -5046,7 +5059,7 @@ Format as a complete business letter with proper structure and clear spacing bet
 DO NOT add fictional details. Expand and contextualize what was provided.`;
     
     } else if (type === 'recordOfDiscussion') {
-    prompt = `You are generating a RECORD OF DISCUSSION TEMPLATE & CONVERSATION SCRIPT for Australian hospitality managers.
+    prompt = `You are generating a RECORD OF DISCUSSION TEMPLATE & CONVERSATION SCRIPT for Australian ${_awardSector()}managers.
 
 THIS IS A TEMPLATE/SCRIPT - NOT A COMPLETED DOCUMENT.
 The manager will use this during the actual conversation with the employee.
@@ -5529,7 +5542,7 @@ Include:
 TONE: Professional, neutral, procedurally fair. This is NOT a punishment - it's the start of a fair process.`;
 	
     } else if (type === 'formalProbationReview') {
-        prompt = `You are generating a FORMAL PROBATION REVIEW DOCUMENT for Australian hospitality HR.
+        prompt = `You are generating a FORMAL PROBATION REVIEW DOCUMENT for Australian ${_awardSector()}HR.
 
 The purpose of this Formal Probation Review Document is to guide an open and honest discussion about performance and/or behaviours in probation, including support the employee may need.
 
@@ -5719,7 +5732,7 @@ TONE: Professional, supportive, and fair. This is a development conversation —
 DO NOT add fictional details. Expand and contextualise what was provided. DO NOT reference any other organisations by name.`;
 	
     } else if (type === 'performanceImprovementPlan') {
-        prompt = `You are generating a PERFORMANCE IMPROVEMENT PLAN (PIP) for Australian hospitality HR.
+        prompt = `You are generating a PERFORMANCE IMPROVEMENT PLAN (PIP) for Australian ${_awardSector()}HR.
 
 **CRITICAL OUTPUT REQUIREMENT:**
 You MUST generate an ACTUAL FORMAL DOCUMENT - a complete, ready-to-use Performance Improvement Plan.
@@ -12286,7 +12299,7 @@ function createNewConversation() {
     // Add FULL welcome message with HTML formatting (matching Image 1)
     const welcomeMessage = `
         <p class="text-slate-100 leading-relaxed">
-            👋 G'day! I'm Fitz, your hospitality HR assistant.
+            👋 G'day! I'm Fitz, your ${_awardSector()}HR assistant.
         </p>
         <p class="text-slate-100 leading-relaxed mt-3">
             Ask me anything about awards, compliance, or employment law.
@@ -12320,7 +12333,7 @@ function createNewConversation() {
     }
     
     // For storage - save plain text version
-    var plainWelcome = '👋 G\'day! I\'m Fitz, your hospitality HR assistant.\n\nAsk me anything about awards, compliance, or employment law.\n\n🚨 Urgent/Critical Situations:\nUse the red URGENT button above for immediate crisis response.\n\nWhat HR topic would you like to learn about today?';
+    var plainWelcome = '👋 G\'day! I\'m Fitz, your ' + _awardSector() + 'HR assistant.\n\nAsk me anything about awards, compliance, or employment law.\n\n🚨 Urgent/Critical Situations:\nUse the red URGENT button above for immediate crisis response.\n\nWhat HR topic would you like to learn about today?';
     conversationHistory.push({ role: 'assistant', content: plainWelcome });
     
     // Save and update UI - FIXED: Use saveCurrentConversation to update messages
@@ -13929,7 +13942,7 @@ async function generateResponsibilities() {
     help.classList.add('hidden');
     
     try {
-        const prompt = `Generate 5-7 key responsibilities for a ${jdData.experienceLevel} level ${jdData.jobTitle} position in the Australian hospitality industry. Format as a bulleted list. Be specific and professional.`;
+        const prompt = `Generate 5-7 key responsibilities for a ${jdData.experienceLevel} level ${jdData.jobTitle} position in the Australian ${_awardSector()}industry. Format as a bulleted list. Be specific and professional.`;
         
         const response = await fetch('/.netlify/functions/recruitment-ai', {
             method: 'POST',
@@ -13963,35 +13976,9 @@ async function generateResponsibilities() {
     }
 }
 
-function setupSalaryCalculation() {
-    const awardSelect = document.getElementById('jdAward');
-    const classSelect = document.getElementById('jdClassification');
-    const display = document.getElementById('jdSalaryDisplay');
-    const rangeEl = document.getElementById('jdSalaryRange');
-    
-    const calculate = () => {
-        if (awardSelect.value && classSelect.value) {
-            // Simple salary calculation (would integrate with Award Calculator)
-            const baseRates = {
-                'restaurant': [45000, 55000, 75000],
-                'hospitality': [43000, 53000, 72000],
-                'fast-food': [42000, 50000, 68000]
-            };
-            
-            const level = parseInt(classSelect.value) - 1;
-            const base = baseRates[awardSelect.value][level];
-            const min = base;
-            const max = Math.round(base * 1.15);
-            
-            jdData.salaryRange = `$${min.toLocaleString()} - $${max.toLocaleString()} per year`;
-            rangeEl.textContent = jdData.salaryRange;
-            display.classList.remove('hidden');
-        }
-    };
-    
-    awardSelect.addEventListener('change', calculate);
-    classSelect.addEventListener('change', calculate);
-}
+// (Removed dead setupSalaryCalculation(): never called and bound to #jdAward/
+// #jdClassification elements that don't exist; it also hard-coded hospitality/
+// restaurant/fast-food salary arrays. The Award Rate Calculator covers this.)
 
 async function generateJobDescription() {
     // Collect all data
@@ -14020,7 +14007,7 @@ IMPORTANT INSTRUCTIONS:
 - DO NOT include any salary, pay rate, or remuneration information
 - DO NOT include hourly rates or annual salary figures
 - Include sections for: About the Role, Key Responsibilities, What You'll Bring, Why Join Us
-- Make it specific to Australian hospitality industry
+- Make it specific to the Australian ${_awardSector()}industry
 - Keep it concise and compelling - suitable for job board posting
 - End with a call to action to apply`;
 
@@ -14808,7 +14795,7 @@ async function generateInterviewQuestions() {
     
     try {
         // Simplified prompt for faster generation
-        const prompt = `Generate ${iqData.questionCount} interview questions for a ${iqData.experienceLevel} level ${iqData.jobTitle} position in Australian hospitality.
+        const prompt = `Generate ${iqData.questionCount} interview questions for a ${iqData.experienceLevel} level ${iqData.jobTitle} position in the Australian ${_industryWord() ? _industryWord() + ' industry' : 'workplace'}.
 
 Categories: ${iqData.categories.join(', ')}
 
@@ -19821,7 +19808,7 @@ async function performLogout(loggedOutUser, type) {
                     <div class="max-w-3xl bg-slate-800 border border-slate-700 rounded-2xl px-6 py-4">
                         <p class="text-slate-100 leading-relaxed">
                             👋 G'day! I'm Fitz, your AI-powered HR knowledge companion from Fitz HR, 
-                            specialising in hospitality HR for Australian venues.
+                            specialising in ${_awardSector()}HR for Australian businesses.
                         </p>
 
                         <p class="text-slate-100 leading-relaxed mt-3">
@@ -23886,7 +23873,7 @@ function _fwDocRender_bullyingPolicy() {
     return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" class="space-y-3">' +
         '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">Pre-filled: <strong class="text-slate-300">' + _fwEscapeHtml(p.venueName || '—') + '</strong>. Provide the named reporting contact and an alternative pathway in case the named person is the issue.</div>' +
         _fwDocFieldRow('Approval authority (signed by)', '<input type="text" name="approver" value="' + _fwEscapeHtml(p.userName || '') + '" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
-        _fwDocFieldRow('Primary reporting contact (name + title)', '<input type="text" name="primary_contact" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none" placeholder="e.g. Jane Smith, Venue Manager">') +
+        _fwDocFieldRow('Primary reporting contact (name + title)', '<input type="text" name="primary_contact" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none" placeholder="e.g. Jane Smith, Operations Manager">') +
         _fwDocFieldRow('Alternative reporting path', '<input type="text" name="alternative_contact" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none" placeholder="e.g. External HR consultant, EAP, Fair Work Ombudsman">') +
         '<div class="grid grid-cols-2 gap-3">' +
             _fwDocFieldRow('Effective date', '<input type="date" name="effective_date" required value="' + _fwTodayIso() + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
