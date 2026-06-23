@@ -50,18 +50,16 @@ That is the exact failure this spec eliminates.
    award is not a currently-supported one, send them back to the award-selection
    step instead of resolving it to anything.
 
-### OPEN DECISION — Fast Food Industry Award (MA000003)
+### RESOLVED — Fast Food Industry Award (MA000003): REMOVE
 
-"Fast Food" is currently selectable but **not modelled** — it falls through to
-Hospitality today. This contradicts the principle above. One of the following must
-be chosen before launch (tracked, not yet decided):
+"Fast Food" was selectable but **not modelled** — it fell through to Hospitality
+(MA000009), which violates the principle above. **Decision: remove the Fast Food
+option** from onboarding (`app.html`) and the settings dropdown (`app-main.js`).
+We offer only awards we actually model.
 
-- **(a) Remove it** — offer only awards we model (recommended unless there are
-  Fast Food customers).
-- **(b) Fence it** — selectable but refuses award-specific answers until MA000003
-  is built (same pattern as Manufacturing-preview).
-- **(c) Leave as-is** — accept Fast Food → Hospitality answers. *Not recommended;
-  violates this spec.*
+**Supported awards going forward:** Hospitality (MA000009), Restaurant (MA000119),
+and Manufacturing (MA000010) — the latter behind the `manufacturing_preview` flag
+until built and verified. No other award is selectable.
 
 ---
 
