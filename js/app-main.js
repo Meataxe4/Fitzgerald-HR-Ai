@@ -1836,7 +1836,10 @@ function openDocumentBuilder() {
     var modal = document.getElementById('documentBuilderModal');
     if (modal) {
         modal.classList.remove('hidden');
-        
+
+        // Hide framework tiles that don't apply to the current award.
+        _fwApplyDocAwardGating();
+
         // Reset to step 1 (document type selection)
         resetDocumentBuilderSilent();
         
@@ -4871,9 +4874,9 @@ function buildDocumentPrompt() {
     const type = documentBuilderState.currentType;
     const data = documentBuilderState.data;
     
-    const venueContext = venueProfile.setupComplete ? 
-        `Venue: ${venueProfile.venueName} (${venueProfile.venueType}) in ${venueProfile.city}, ${venueProfile.location}` :
-        `Australian hospitality venue`;
+    const venueContext = venueProfile.setupComplete ?
+        `Business: ${venueProfile.venueName} (${getVenueTypeLabel(venueProfile.venueType)}) in ${venueProfile.city}, ${venueProfile.location}` :
+        `Australian business`;
     
     // Universal instruction for ALL document types
     const universalInstruction = `
@@ -5530,7 +5533,7 @@ TONE: Professional, neutral, procedurally fair. This is NOT a punishment - it's 
 
 The purpose of this Formal Probation Review Document is to guide an open and honest discussion about performance and/or behaviours in probation, including support the employee may need.
 
-The probation period is an opportunity for the venue and the employee to determine the employee's suitability for the role and culture fit.
+The probation period is an opportunity for the business and the employee to determine the employee's suitability for the role and culture fit.
 
 THIS IS A TEMPLATE & CONVERSATION GUIDE — the manager will use this during the actual meeting with the employee and complete sections together.
 
@@ -5591,7 +5594,7 @@ Generate a complete, professional Formal Probation Review Document with the foll
 
 *Start with a brief purpose statement: "The purpose of this Formal Probation Review Document is to guide an open and honest discussion about performance and/or behaviours in probation, including support the employee may need."*
 
-*Add: "The probation period is an opportunity for [venue name] and the employee to determine the employee's suitability for the role and culture fit."*
+*Add: "The probation period is an opportunity for [business name] and the employee to determine the employee's suitability for the role and culture fit."*
 
 *Add: "Generally, at least one Probation Check-In Conversation has occurred before a Formal Probation Review."*
 
@@ -5690,7 +5693,7 @@ data.overallOutcome.includes('ending employment') ?
 - The decision to end employment during the probation period has been made in accordance with procedural fairness` :
 `- Generate 4-5 appropriate key messages based on the outcome: ${data.overallOutcome}`}
 
-*Add: "Should the employee feel they need any support in dealing with this matter, confidential independent professional counsellors can be contacted for a range of issues." (Include an EAP reference if the venue has one)*
+*Add: "Should the employee feel they need any support in dealing with this matter, confidential independent professional counsellors can be contacted for a range of issues." (Include an EAP reference if the business has one)*
 
 ## SIGNATURES
 
@@ -23017,7 +23020,7 @@ const _FW_DOC_TEMPLATES = {
     // ====== Phase 2 documents ============================================
     psychosocial_risk_register: {
         title: 'Psychosocial Hazard Risk Register',
-        subtitle: 'Hospitality-specific psychosocial risk register framework (WHS-001)',
+        subtitle: 'Psychosocial hazard risk register framework, tailored to your industry (WHS-001)',
         anchor: 'Vic OHS (Psychological Health) Regs 2025 · Model WHS Act · NSW Workplace Protections Act 2025',
         render: function() { return _fwDocRender_psychoRegister(); },
         validate: function() { return _fwDocValidate_psychoRegister(); },
@@ -23033,6 +23036,7 @@ const _FW_DOC_TEMPLATES = {
     },
     customer_aggression_procedure: {
         title: 'Customer Aggression Incident Procedure',
+        hospitalityOnly: true,   // RSA / liquor-licensing / customer-facing context
         subtitle: 'For licensed/late-night venues — response + worker support framework',
         anchor: 'WHS Act s19 (primary duty) · psychosocial hazard regulations',
         render: function() { return _fwDocRender_customerAggression(); },
@@ -23190,11 +23194,39 @@ function _fwDocClassificationOptions(awardCode) {
                    'Food & beverage attendant grade 3', 'Cook grade 1', 'Cook grade 2', 'Cook grade 3',
                    'Cook grade 4', 'Cook grade 5', 'Other'];
     const ma009 = ['Introductory', 'Level 1', 'Level 2', 'Level 3', 'Level 4', 'Level 5', 'Level 6', 'Other'];
+    // Manufacturing & Associated Industries Award MA000010 — the C-level wage scale.
+    const ma010 = ['C14 - Level I', 'C13 - Level II', 'C12 - Level III', 'C11 - Level IV',
+                   'C10 - Tradesperson level I', 'C9 - Tradesperson level II',
+                   'C8 - Special class level I', 'C7 - Special class level II',
+                   'C6 - Advanced tradesperson level I', 'C5 - Advanced tradesperson level II',
+                   'C4 - Engineering associate level I', 'C3 - Engineering associate level II',
+                   'C2(a) - Principal supervisor', 'C2(b) - Principal technical officer', 'Other'];
     let opts;
     if (awardCode === 'MA000009') opts = ma009;
     else if (awardCode === 'MA000119') opts = ma119;
+    else if (awardCode === 'MA000010') opts = ma010;
     else return '<option value="">Set your Award in Settings first</option>';
     return opts.map(function(o) { return '<option value="' + _fwEscapeHtml(o) + '">' + _fwEscapeHtml(o) + '</option>'; }).join('');
+}
+
+// Whether a compliance document/framework applies to the resolved award. Most
+// documents are general-purpose (any workplace); a few are hospitality-only
+// (customer-facing, licensed-venue context) and are flagged hospitalityOnly.
+function _fwDocAppliesToAward(templateId, awardCode) {
+    const t = _FW_DOC_TEMPLATES[templateId];
+    if (!t) return false;
+    if (t.hospitalityOnly) return awardCode === 'MA000009' || awardCode === 'MA000119';
+    return true;
+}
+
+// Hide the framework tiles that don't apply to the current award (e.g. the
+// licensed-venue Customer Aggression procedure for a Manufacturing user).
+function _fwApplyDocAwardGating() {
+    const code = getAwardContext().code;
+    document.querySelectorAll('[data-doc-key]').forEach(function(el) {
+        const key = el.getAttribute('data-doc-key');
+        el.classList.toggle('hidden', !!code && !_fwDocAppliesToAward(key, code));
+    });
 }
 
 function _fwDocRender_clause20Agreement() {
@@ -23223,7 +23255,7 @@ function _fwDocRender_clause20Agreement() {
         '</div>' +
         _fwDocFieldRow('Effective date', '<input type="date" name="effective_date" required value="' + today + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
         '<div class="text-xs text-slate-400 p-3 bg-slate-700/30 rounded-lg">' +
-            '<strong>Award provisions absorbed by this annualised wage</strong> (defaults appropriate for hospitality; review carefully):' +
+            '<strong>Award provisions absorbed by this annualised wage</strong> (review the absorbed provisions carefully against your award):' +
             '<div class="mt-2 space-y-1 text-slate-300">' +
                 '<label class="flex items-center gap-2"><input type="checkbox" name="abs_overtime" checked class="accent-amber-500"> Overtime rates</label>' +
                 '<label class="flex items-center gap-2"><input type="checkbox" name="abs_weekend" checked class="accent-amber-500"> Weekend penalties</label>' +
@@ -23589,6 +23621,10 @@ function _fwShowSubscriptionGate(templateId) {
 // compliance-doc wizard. Closes the Document Builder modal on success so
 // the doc-builder modal opens cleanly on top.
 function openComplianceDocFromBuilder(templateId) {
+    if (!_fwDocAppliesToAward(templateId, getAwardContext().code)) {
+        showAlert('This framework is specific to licensed hospitality venues and doesn\'t apply to your award.');
+        return;
+    }
     if (!_fwHasComplianceAccess()) {
         _fwShowSubscriptionGate(templateId);
         return;
@@ -23635,19 +23671,38 @@ const _FW_PSYCHO_HAZARDS = [
     'Vicarious trauma (witnessing customer incidents)'
 ];
 
+// Manufacturing-relevant psychosocial hazards (plant/production context).
+const _FW_PSYCHO_HAZARDS_MANUFACTURING = [
+    'Machinery / plant operation — sustained vigilance demands',
+    'Exposure to traumatic incidents (serious injury, near-miss)',
+    'High job demands during production targets / deadlines',
+    'Low job control on production lines',
+    'Poor support during incidents',
+    'Fatigue from shift work / night shift / overtime',
+    'Isolation (lone work, remote plant, solo shifts)',
+    'Bullying within team or supervisory hierarchy',
+    'Exposure to hazardous noise / heat affecting wellbeing',
+    'Vicarious trauma (witnessing workplace incidents)'
+];
+
+// The hazard list defaults to the resolved award's industry context.
+function _fwPsychoHazards() {
+    return getAwardContext().code === 'MA000010' ? _FW_PSYCHO_HAZARDS_MANUFACTURING : _FW_PSYCHO_HAZARDS;
+}
+
 function _fwDocRender_psychoRegister() {
     const p = venueProfile || {};
     return '<form id="fwDocForm" onsubmit="event.preventDefault(); fitzWatchDocGenerate();" class="space-y-3">' +
-        '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">Pre-filled from your business profile: <strong class="text-slate-300">' + _fwEscapeHtml(p.venueName || '—') + '</strong> · ' + _fwEscapeHtml(p.state || '—') + '. The register lists hospitality-specific hazards by default; you fill in risk ratings and controls in Word.</div>' +
+        '<div class="text-xs text-slate-500 p-3 bg-slate-700/30 rounded-lg">Pre-filled from your business profile: <strong class="text-slate-300">' + _fwEscapeHtml(p.venueName || '—') + '</strong> · ' + _fwEscapeHtml(p.state || '—') + '. The register pre-loads typical hazards for your industry; you fill in risk ratings and controls in Word.</div>' +
         _fwDocFieldRow('Responsible person (for the register)', '<input type="text" name="responsible_person" value="' + _fwEscapeHtml(p.userName || '') + '" required class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
         '<div class="grid grid-cols-2 gap-3">' +
             _fwDocFieldRow('Register effective date', '<input type="date" name="effective_date" required value="' + _fwTodayIso() + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
             _fwDocFieldRow('Next review date', '<input type="date" name="review_date" required value="' + _fwAddMonths(null, 6) + '" class="w-full mt-1 p-2 bg-slate-700 text-white rounded border border-slate-600 focus:border-amber-500 outline-none">') +
         '</div>' +
         '<div class="text-xs text-slate-400 p-3 bg-slate-700/30 rounded-lg">' +
-            '<strong>Identified hazards</strong> (hospitality default — uncheck any not relevant):' +
+            '<strong>Identified hazards</strong> (typical for your industry — uncheck any not relevant):' +
             '<div class="mt-2 space-y-1 text-slate-300">' +
-                _FW_PSYCHO_HAZARDS.map(function(h, i) {
+                _fwPsychoHazards().map(function(h, i) {
                     return '<label class="flex items-center gap-2"><input type="checkbox" name="hazard_' + i + '" checked class="accent-amber-500"> ' + _fwEscapeHtml(h) + '</label>';
                 }).join('') +
             '</div>' +
@@ -23661,7 +23716,7 @@ function _fwDocValidate_psychoRegister() {
 }
 function _fwDocGenerate_psychoRegister() {
     const p = venueProfile || {}; const d = _fwReadDocForm();
-    const selectedHazards = _FW_PSYCHO_HAZARDS.filter(function(_, i) { return d['hazard_' + i] === true; });
+    const selectedHazards = _fwPsychoHazards().filter(function(_, i) { return d['hazard_' + i] === true; });
     let html =
         '<h1>Psychosocial Hazard Risk Register</h1>' +
         '<p>Employer: <strong>' + _fwVenueLine() + '</strong></p>' +
