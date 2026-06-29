@@ -4,6 +4,7 @@
 // ========================================
 
 function openNewEmployeeToolkit() {
+    _applyAwardExamplePlaceholders();
     const modal = document.getElementById('newEmployeeToolkitModal');
     if (modal) {
         modal.classList.remove('hidden');
@@ -707,6 +708,7 @@ let trainingPlanState = {
 
 // Main Functions
 function openTrainingPlan() {
+    _applyAwardExamplePlaceholders();
     const modal = document.getElementById('trainingPlanModal');
     if (modal) {
         modal.classList.remove('hidden');
@@ -1450,7 +1452,7 @@ const probationWizardSteps = [
         title: "Employee & Probation Details",
         fields: [
             { name: "employeeName", label: "Employee's full name", type: "text", required: false, placeholder: "e.g., Sarah Johnson" },
-            { name: "position", label: "Position/Role", type: "text", required: true, placeholder: "e.g., Bartender" },
+            { name: "position", label: "Position/Role", type: "text", required: true, placeholder: function() { return 'e.g., ' + _awardRoleExample(); } },
             { name: "employmentType", label: "Employment Type", type: "select",
               options: ["Full-Time", "Part-Time", "Casual"], required: true },
             { name: "startDate", label: "Employment start date", type: "date", required: true },
@@ -1669,16 +1671,17 @@ function showProbationStep(stepNumber) {
         }
         
         const savedValue = probationCheckInState.data[field.name] || '';
-        
+        const _ph = typeof field.placeholder === 'function' ? field.placeholder() : (field.placeholder || '');
+
         if (field.type === 'text') {
-            html += `<input type="text" id="prob_${field.name}" 
-                           placeholder="${field.placeholder || ''}"
+            html += `<input type="text" id="prob_${field.name}"
+                           placeholder="${_ph}"
                            value="${savedValue}"
                            class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:border-amber-500 focus:outline-none"
                            ${field.required ? 'required' : ''}>`;
         } else if (field.type === 'textarea') {
             html += `<textarea id="prob_${field.name}" rows="${field.rows || 3}"
-                              placeholder="${field.placeholder || ''}"
+                              placeholder="${_ph}"
                               class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:border-amber-500 focus:outline-none"
                               ${field.required ? 'required' : ''}>${savedValue}</textarea>`;
         } else if (field.type === 'select') {
@@ -1707,9 +1710,9 @@ function showProbationStep(stepNumber) {
                            class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:border-amber-500 focus:outline-none"
                            ${field.required ? 'required' : ''}>`;
         } else if (field.type === 'number') {
-            html += `<input type="number" id="prob_${field.name}" 
+            html += `<input type="number" id="prob_${field.name}"
                            min="${field.min || 0}" max="${field.max || 100}"
-                           placeholder="${field.placeholder || ''}"
+                           placeholder="${_ph}"
                            value="${savedValue}"
                            class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:border-amber-500 focus:outline-none"
                            ${field.required ? 'required' : ''}>`;
@@ -3406,7 +3409,7 @@ function getStep1Template() {
             <label class="form-label required">Position Title</label>
             <input type="text" class="form-input" id="positionTitle" name="positionTitle" 
                    value="${data.positionTitle}" 
-                   placeholder="e.g., Head Chef, Front of House Manager, Barista">
+                   placeholder="e.g., ${_awardRoleExamples().join(', ')}">
             <span class="form-hint">Enter the official job title for this position</span>
         </div>
         

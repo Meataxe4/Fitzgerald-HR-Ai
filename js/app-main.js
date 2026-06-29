@@ -1954,6 +1954,39 @@ function _awardSector() {
     return w ? w + ' ' : '';
 }
 
+// Award-appropriate example role(s) / departments for placeholder hints in
+// position/role inputs, so a Manufacturing user sees production roles rather
+// than hospitality ones. Falls back to neutral examples when unresolved.
+function _awardRoleExamples() {
+    const code = getAwardContext().code;
+    if (code === 'MA000010') return ['Production Employee', 'Machine Operator', 'Maintenance Fitter'];
+    if (code === 'MA000119') return ['Waiter', 'Cook', 'Restaurant Manager'];
+    if (code === 'MA000009') return ['Bartender', 'Waiter', 'Chef'];
+    return ['Team Member', 'Supervisor', 'Manager'];
+}
+function _awardRoleExample() { return _awardRoleExamples()[0]; }
+function _awardDeptExamples() {
+    const code = getAwardContext().code;
+    if (code === 'MA000010') return ['Production', 'Maintenance', 'Warehouse'];
+    if (code === 'MA000009' || code === 'MA000119') return ['Kitchen', 'Front of House', 'Management'];
+    return ['Operations', 'Administration', 'Management'];
+}
+
+// Applies award-appropriate example placeholders to the STATIC role/position and
+// department inputs (recruitment, JD, interview, training and position-description
+// modals). Called on load and whenever the award changes. The JS-rendered
+// Document Builder / toolkit forms handle this via function-valued placeholders.
+function _applyAwardExamplePlaceholders() {
+    const roleEg = 'e.g., ' + _awardRoleExamples().join(', ');
+    const deptEg = 'e.g., ' + _awardDeptExamples().join(', ');
+    ['rcPosition', 'iqJobTitle', 'jdJobTitle', 'pdPositionTitle', 'trainingPosition', 'onboardingPosition'].forEach(function (id) {
+        const el = document.getElementById(id);
+        if (el) el.placeholder = roleEg;
+    });
+    const dept = document.getElementById('pdDepartment');
+    if (dept) dept.placeholder = deptEg;
+}
+
 // Fetch rates for the resolved award. Does NOT load any rates when the award is
 // unresolved or has no rates file — we never preload a default award's figures.
 async function loadAwardRates() {
@@ -3601,7 +3634,7 @@ formalWarning: [
         title: "Employee Details",
         fields: [
             { name: "employeeName", label: "Employee's full name", type: "text", required: false, placeholder: "e.g., Blake Smith" },
-            { name: "position", label: "Position/Role", type: "text", required: true, placeholder: "e.g., Chef" },
+            { name: "position", label: "Position/Role", type: "text", required: true, placeholder: function() { return 'e.g., ' + _awardRoleExample(); } },
             { name: "employmentType", label: "Employment Type", type: "select", 
               options: ["Full-Time", "Part-Time", "Casual"], required: true }
         ]
@@ -3612,7 +3645,7 @@ formalWarning: [
         title: "What Happened?",
         fields: [
             { name: "issueDescription", label: "Briefly describe the issue", 
-              type: "textarea", placeholder: "e.g., Repeatedly late for shifts", required: true, rows: 3 },
+              type: "textarea", placeholder: "e.g., Repeatedly late to work", required: true, rows: 3 },
             { name: "issueDate", label: "When did this occur? (most recent)", type: "date", required: true },
             { name: "witnesses", label: "Any witnesses? (optional)", type: "text", required: false, placeholder: "Names of witnesses" }
         ]
@@ -3659,7 +3692,7 @@ formalWarning: [
         title: "Employee Details",
         fields: [
             { name: "employeeName", label: "Employee's full name", type: "text", required: false, placeholder: "e.g., Sarah Johnson" },
-            { name: "position", label: "Position/Role", type: "text", required: true, placeholder: "e.g., Waiter" }
+            { name: "position", label: "Position/Role", type: "text", required: true, placeholder: function() { return 'e.g., ' + _awardRoleExample(); } }
         ]
     },
     {
@@ -3758,7 +3791,7 @@ formalWarning: [
         title: "Employee & Probation Details",
         fields: [
             { name: "employeeName", label: "Employee's full name", type: "text", required: false, placeholder: "e.g., Sarah Johnson" },
-            { name: "position", label: "Position/Role", type: "text", required: true, placeholder: "e.g., Bartender" },
+            { name: "position", label: "Position/Role", type: "text", required: true, placeholder: function() { return 'e.g., ' + _awardRoleExample(); } },
             { name: "peopleLeader", label: "People Leader / Manager conducting the review", type: "text", required: true, placeholder: "Your name" },
             { name: "meetingDate", label: "Meeting date", type: "date", required: true },
             { name: "employmentType", label: "Employment Type", type: "select",
@@ -3880,7 +3913,7 @@ formalWarning: [
             title: "Employee Details",
             fields: [
                 { name: "employeeName", label: "Employee's full name", type: "text", required: false, placeholder: "e.g., Sarah Johnson" },
-                { name: "position", label: "Position/Role", type: "text", required: true, placeholder: "e.g., Waiter" },
+                { name: "position", label: "Position/Role", type: "text", required: true, placeholder: function() { return 'e.g., ' + _awardRoleExample(); } },
                 { name: "employmentType", label: "Employment Type", type: "select", 
                   options: ["Full-Time", "Part-Time", "Casual"], required: true },
                 { name: "managerName", label: "Manager/Supervisor Name", type: "text", required: true, placeholder: "Your name" }
@@ -4149,6 +4182,7 @@ function showDocumentStep(stepNumber) {
         
         html += `<div>`;
         const isEmployeeName = field.name === 'employeeName';
+        const _ph = typeof field.placeholder === 'function' ? field.placeholder() : (field.placeholder || '');
         const infoIcon = isEmployeeName ? ' <span class="fitz-info-icon" onclick="fitzInfoToggle(this)">ⓘ</span>' : '';
         html += `<label class="block text-slate-300 text-sm mb-2">
                     ${field.label}${field.required ? ' <span class="text-red-400">*</span>' : ''}${infoIcon}
@@ -4159,13 +4193,13 @@ function showDocumentStep(stepNumber) {
         
         if (field.type === 'text') {
             html += `<input type="text" id="field_${field.name}" 
-                           placeholder="${field.placeholder || ''}"
+                           placeholder="${_ph}"
                            value="${documentBuilderState.data[field.name] || ''}"
                            class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white"
                            ${field.required ? 'required' : ''}>`;
         } else if (field.type === 'textarea') {
             html += `<textarea id="field_${field.name}" rows="${field.rows || 3}"
-                              placeholder="${field.placeholder || ''}"
+                              placeholder="${_ph}"
                               class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white"
                               ${field.required ? 'required' : ''}>${documentBuilderState.data[field.name] || ''}</textarea>`;
         } else if (field.type === 'select') {
@@ -4201,7 +4235,7 @@ function showDocumentStep(stepNumber) {
         } else if (field.type === 'number') {
             html += `<input type="number" id="field_${field.name}" 
                            min="${field.min || 0}" max="${field.max || 100}"
-                           placeholder="${field.placeholder || ''}"
+                           placeholder="${_ph}"
                            value="${documentBuilderState.data[field.name] || ''}"
                            class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white"
                            ${field.required ? 'required' : ''}>`;
@@ -13824,6 +13858,7 @@ function openTerminationRisk() {
 
 // Main Recruitment Toolkit
 function openRecruitmentToolkit() {
+    _applyAwardExamplePlaceholders();
     trackToolUsage('recruitmentToolkitModal');
     var modal = document.getElementById('recruitmentToolkitModal');
     if (modal) modal.classList.remove('hidden');
@@ -13847,6 +13882,7 @@ let jdData = {
 };
 
 function openJobDescriptionBuilder() {
+    _applyAwardExamplePlaceholders();
     trackToolUsage('jobDescriptionBuilder');
     jdCurrentStep = 1;
     jdData = { jobTitle: '', experienceLevel: '', responsibilities: '', qualifications: '', award: '', classification: '', salaryRange: '' };
@@ -14220,6 +14256,7 @@ let pdData = {
 };
 
 function openPositionDescriptionBuilder() {
+    _applyAwardExamplePlaceholders();
     trackToolUsage('positionDescriptionBuilder');
     pdCurrentStep = 1;
     pdData = { 
@@ -14684,6 +14721,7 @@ let iqData = {
 };
 
 function openInterviewQuestionsGenerator() {
+    _applyAwardExamplePlaceholders();
     trackToolUsage('interviewQuestionsGenerator');
     iqCurrentStep = 1;
     iqData = { jobTitle: '', experienceLevel: '', categories: [], questionCount: 15 };
@@ -15027,6 +15065,7 @@ function resetInterviewQuestions() {
 
 // Reference Check Form
 function openReferenceCheckForm() {
+    _applyAwardExamplePlaceholders();
     trackToolUsage('referenceCheckForm');
     var modal = document.getElementById('referenceCheckModal');
     if (modal) modal.classList.remove('hidden');
@@ -20172,7 +20211,7 @@ Preferred Contact Time: [e.g., 9am-5pm AEDT]
 EMPLOYEE DETAILS
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Employee Name: [Full Name]
-Position: [e.g., Chef, Waiter]
+Position: [e.g., ${_awardRoleExamples().slice(0,2).join(', ')}]
 Employment Type: [Full-Time / Part-Time / Casual]
 Length of Service: [e.g., 2 years 3 months]
 Current Status: [Active / Suspended / On leave]
