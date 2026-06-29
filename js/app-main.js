@@ -1985,6 +1985,43 @@ function _applyAwardExamplePlaceholders() {
     });
     const dept = document.getElementById('pdDepartment');
     if (dept) dept.placeholder = deptEg;
+    const qual = document.getElementById('pdQualifications');
+    if (qual) qual.placeholder = _awEx('qualifications');
+}
+
+
+// Award-appropriate example text for long placeholder hints (PIP, probation,
+// onboarding, qualifications). Hospitality/Restaurant keep their original
+// examples; Manufacturing gets production equivalents; unresolved -> neutral.
+const _AWARD_EXAMPLES = {
+    historyOfDiscussions: { hospitality: "e.g.,\n• 15 Jan 2026 — Informal catch-up: Discussed settling in, answered questions about rosters and POS system\n• 29 Jan 2026 — Probation Check-In #1: Reviewed key requirements, identified speed of service as area for development, agreed to buddy shifts with senior staff\n• 12 Feb 2026 — Ad hoc coaching: Discussed customer complaint regarding wait times, provided real-time feedback on section management", manufacturing: "e.g.,\n• 15 Jan 2026 — Informal catch-up: Discussed settling in, answered questions about rosters and the work-order system\n• 29 Jan 2026 — Probation Check-In #1: Reviewed key requirements, identified production throughput as area for development, agreed to buddy shifts with a leading hand\n• 12 Feb 2026 — Ad hoc coaching: Discussed a quality issue, provided real-time feedback on line and station management", default: "e.g.,\n• 15 Jan 2026 — Informal catch-up: Discussed settling in, answered questions about rosters and systems\n• 29 Jan 2026 — Probation Check-In #1: Reviewed key requirements, identified a development area, agreed to buddy shifts with senior staff\n• 12 Feb 2026 — Ad hoc coaching: Discussed a workplace concern, provided real-time feedback" },
+    positiveObservations: { hospitality: "e.g.,\n• Punctuality and attendance have been excellent — no unexplained absences\n• Positive attitude with guests — received two written compliments\n• Follows WHS procedures consistently\n• Works well with the team and communicates during service", manufacturing: "e.g.,\n• Punctuality and attendance have been excellent — no unexplained absences\n• Positive attitude on the floor — received two written compliments\n• Follows WHS and safety procedures consistently\n• Works well with the team and communicates during the shift", default: "e.g.,\n• Punctuality and attendance have been excellent — no unexplained absences\n• Positive, professional attitude — received two written compliments\n• Follows WHS procedures consistently\n• Works well with the team and communicates clearly" },
+    strengthsDetail: { hospitality: "e.g., Sarah has shown strong initiative in learning the wine list and regularly asks questions to improve her product knowledge.", manufacturing: "e.g., Sarah has shown strong initiative in learning machine operation and regularly asks questions to improve her technical knowledge.", default: "e.g., Sarah has shown strong initiative in learning the role and regularly asks questions to improve her knowledge." },
+    concernsList: { hospitality: "e.g.,\n• Speed of service during peak periods — average table turn time is 15 mins above target\n• Accuracy of orders — 3 incorrect orders in the past 2 weeks\n• Needs to be more proactive seeking tasks during quiet periods rather than waiting to be directed", manufacturing: "e.g.,\n• Output during peak periods — average cycle time is 15% above target\n• Quality — 3 defective units in the past 2 weeks\n• Needs to be more proactive seeking tasks during downtime rather than waiting to be directed", default: "e.g.,\n• Productivity during busy periods — output is below target\n• Accuracy — 3 errors in the past 2 weeks\n• Needs to be more proactive seeking tasks during quiet periods rather than waiting to be directed" },
+    incidentExample: { hospitality: "e.g., On Friday 7 Feb, section turnaround during the 7pm rush took 25 minutes compared to the 10-minute target. Two tables received incorrect mains.", manufacturing: "e.g., On Friday 7 Feb, changeover during the afternoon shift took 25 minutes compared to the 10-minute target. Two units failed quality check.", default: "e.g., On Friday 7 Feb, a task during the busy period took 25 minutes compared to the 10-minute target, and two items had errors." },
+    actionPlan: { hospitality: "e.g.,\nEmployee:\n• Focus on speed of service during Friday/Saturday peaks — aim for 10-min table turns\n• Double-check all orders before sending to kitchen\n• Proactively ask supervisor for tasks during quiet periods\n\nLeader:\n• Arrange buddy shifts with Senior Waiter (James) for next 2 weeks\n• Provide real-time coaching during Friday/Saturday peak services\n• Continue fortnightly check-ins to review progress", manufacturing: "e.g.,\nEmployee:\n• Focus on output during peak production runs — aim to meet target cycle time\n• Double-check all work against the spec before sign-off\n• Proactively ask supervisor for tasks during downtime\n\nLeader:\n• Arrange buddy shifts with a Leading Hand (James) for next 2 weeks\n• Provide real-time coaching during peak production\n• Continue fortnightly check-ins to review progress", default: "e.g.,\nEmployee:\n• Focus on productivity during busy periods — aim to meet targets\n• Double-check all work before completing it\n• Proactively ask your supervisor for tasks during quiet periods\n\nLeader:\n• Arrange buddy shifts with a senior team member (James) for next 2 weeks\n• Provide real-time coaching during busy periods\n• Continue fortnightly check-ins to review progress" },
+    supportTraining: { hospitality: "e.g.,\n• Advanced POS refresher training (split bills, modifications) — scheduled Week of 17 Feb\n• Shadow senior staff during 2 weekend peak shifts\n• Menu knowledge quiz to build confidence", manufacturing: "e.g.,\n• Refresher training on the work-order/MES system — scheduled Week of 17 Feb\n• Shadow senior staff during 2 peak production shifts\n• Quality-procedure refresher to build confidence", default: "e.g.,\n• Refresher training on key systems — scheduled Week of 17 Feb\n• Shadow senior staff during 2 busy shifts\n• Knowledge refresher to build confidence" },
+    performanceIssueShort: { hospitality: "e.g., Slow service - average drink prep time is 4 minutes vs team average of 2.5 minutes", manufacturing: "e.g., Low output - average task cycle time is 4 minutes vs team average of 2.5 minutes", default: "e.g., Below-target productivity - average task time is 4 minutes vs team average of 2.5 minutes" },
+    evidenceData: { hospitality: "e.g., POS system shows 18 incorrect orders in last 2 weeks", manufacturing: "e.g., Quality log shows 18 defective units in last 2 weeks", default: "e.g., Records show 18 errors in last 2 weeks" },
+    trainingPlanList: { hospitality: "e.g., \n• 2-hour cocktail making refresher course (Week 1)\n• Shadow experienced bartender for 3 shifts (Week 2)\n• Daily 15-min coaching sessions with supervisor (Weeks 1-4)\n• Access to online mixology tutorials", manufacturing: "e.g., \n• 2-hour machine-operation refresher course (Week 1)\n• Shadow an experienced operator for 3 shifts (Week 2)\n• Daily 15-min coaching sessions with supervisor (Weeks 1-4)\n• Access to online technical tutorials", default: "e.g., \n• 2-hour skills refresher course (Week 1)\n• Shadow an experienced team member for 3 shifts (Week 2)\n• Daily 15-min coaching sessions with supervisor (Weeks 1-4)\n• Access to online training tutorials" },
+    progressSummary: { hospitality: "e.g., Sarah has been punctual for all shifts except two occasions in week 3. She has completed RSA training and follows service standards well.", manufacturing: "e.g., Sarah has been punctual for all shifts except two occasions in week 3. She has completed her site safety induction and follows standard work procedures well.", default: "e.g., Sarah has been punctual for all shifts except two occasions in week 3. She has completed her required training and follows procedures well." },
+    roleExpectations: { hospitality: "e.g.,\n• Independently manage a section of 6 tables\n• Accurately process orders through POS system\n• Upsell menu items to achieve average spend targets", manufacturing: "e.g.,\n• Independently operate an assigned station or line\n• Accurately complete and log work orders\n• Meet output and quality targets for the shift", default: "e.g.,\n• Independently manage their assigned area of work\n• Accurately complete and record tasks\n• Meet productivity and quality targets" },
+    behaviours: { hospitality: "e.g.,\n• Positive and professional attitude with guests and team\n• Takes initiative and asks questions when unsure\n• Communicates effectively during service\n• Accepts feedback constructively", manufacturing: "e.g.,\n• Positive and professional attitude with the team\n• Takes initiative and asks questions when unsure\n• Communicates effectively during the shift\n• Accepts feedback constructively", default: "e.g.,\n• Positive and professional attitude with customers and team\n• Takes initiative and asks questions when unsure\n• Communicates effectively\n• Accepts feedback constructively" },
+    behaviourDetail: { hospitality: "e.g., Sarah's guest interactions are excellent — she's received two positive customer comments. She could improve on communication with kitchen during busy service.", manufacturing: "e.g., Sarah's teamwork is excellent — she's received two positive comments. She could improve on communication with the next station during busy production.", default: "e.g., Sarah's customer interactions are excellent — she's received two positive comments. She could improve on communication with the team during busy periods." },
+    inductionItems: { hospitality: "e.g.,\n• 3-day induction program completed\n• Buddy assigned (James - Senior Bartender)\n• RSA training completed\n• POS system training completed\n• Menu knowledge sessions x2", manufacturing: "e.g.,\n• 3-day induction program completed\n• Buddy assigned (James - Leading Hand)\n• Site safety induction completed\n• Work-order system training completed\n• Machine-operation sessions x2", default: "e.g.,\n• 3-day induction program completed\n• Buddy assigned (James - Senior team member)\n• WHS induction completed\n• Systems training completed\n• Role knowledge sessions x2" },
+    developmentTraining: { hospitality: "e.g.,\n• Cocktail masterclass for premium drinks\n• Advanced POS functions (split bills, modifications)\n• Cellar and wine knowledge training", manufacturing: "e.g.,\n• Advanced machine-operation masterclass\n• Advanced work-order/MES functions\n• Quality and inspection training", default: "e.g.,\n• Advanced skills masterclass\n• Advanced systems functions\n• Specialist knowledge training" },
+    employeeFeedback: { hospitality: "e.g., Sarah mentioned she'd like more exposure to cocktail making. No concerns raised about the role or team.", manufacturing: "e.g., Sarah mentioned she'd like more exposure to machine setup. No concerns raised about the role or team.", default: "e.g., Sarah mentioned she'd like more exposure to other areas of the role. No concerns raised about the role or team." },
+    improvementShort: { hospitality: "e.g., Needs to improve speed of service during peak periods, could be more proactive in asking for tasks during quiet periods", manufacturing: "e.g., Needs to improve output during peak periods, could be more proactive in asking for tasks during downtime", default: "e.g., Needs to improve productivity during busy periods, could be more proactive in asking for tasks during quiet periods" },
+    actionPlanProbation: { hospitality: "e.g.,\nEmployee:\n• Focus on speed of service during Friday/Saturday peaks\n• Complete cocktail training by end of month\n\nLeader:\n• Arrange cocktail masterclass with Head Bartender\n• Continue weekly check-ins\n• Provide real-time feedback during busy shifts", manufacturing: "e.g.,\nEmployee:\n• Focus on output during peak production runs\n• Complete machine-operation training by end of month\n\nLeader:\n• Arrange a skills masterclass with a Leading Hand\n• Continue weekly check-ins\n• Provide real-time feedback during busy shifts", default: "e.g.,\nEmployee:\n• Focus on productivity during busy periods\n• Complete required training by end of month\n\nLeader:\n• Arrange a skills session with a senior team member\n• Continue weekly check-ins\n• Provide real-time feedback during busy periods" },
+    qualifications: { hospitality: "e.g.,\nEssential:\n- Certificate III in Hospitality (or equivalent)\n- Minimum 5 years experience in a similar role\n- Current Food Safety Supervisor certificate\n\nDesirable:\n- Responsible Service of Alcohol (RSA)\n- Experience with menu costing and development", manufacturing: "e.g.,\nEssential:\n- Certificate III in Engineering or relevant trade qualification\n- Minimum 5 years experience in a similar role\n- Current White Card (construction induction)\n\nDesirable:\n- Forklift / high-risk work licence\n- Experience with lean / continuous-improvement practices", default: "e.g.,\nEssential:\n- Relevant trade certificate or qualification\n- Minimum 5 years experience in a similar role\n- Current licences/tickets for the role\n\nDesirable:\n- Additional certifications relevant to the role\n- First aid / WHS certification" },
+};
+function _awEx(key) {
+    const v = _AWARD_EXAMPLES[key];
+    if (!v) return '';
+    const code = getAwardContext().code;
+    if (code === 'MA000010') return v.manufacturing;
+    if (code === 'MA000009' || code === 'MA000119') return v.hospitality;
+    return v.default;
 }
 
 // Fetch rates for the resolved award. Does NOT load any rates when the award is
@@ -3813,7 +3850,7 @@ formalWarning: [
         fields: [
             { name: "checkInHistory", label: "List previous check-in/coaching conversations (date and brief overview of each)",
               type: "textarea", required: true, rows: 5,
-              placeholder: "e.g.,\n• 15 Jan 2026 — Informal catch-up: Discussed settling in, answered questions about rosters and POS system\n• 29 Jan 2026 — Probation Check-In #1: Reviewed key requirements, identified speed of service as area for development, agreed to buddy shifts with senior staff\n• 12 Feb 2026 — Ad hoc coaching: Discussed customer complaint regarding wait times, provided real-time feedback on section management" }
+              placeholder: function() { return _awEx('historyOfDiscussions'); } }
         ]
     },
     // STEP 5: Review of Performance — Strengths
@@ -3829,10 +3866,10 @@ formalWarning: [
         fields: [
             { name: "strengths", label: "What areas of performance and/or behaviour ARE currently meeting the required standards?",
               type: "textarea", required: true, rows: 4,
-              placeholder: "e.g.,\n• Punctuality and attendance have been excellent — no unexplained absences\n• Positive attitude with guests — received two written compliments\n• Follows WHS procedures consistently\n• Works well with the team and communicates during service" },
+              placeholder: function() { return _awEx('positiveObservations'); } },
             { name: "strengthsComments", label: "Additional comments on strengths (specific examples)",
               type: "textarea", required: false, rows: 3,
-              placeholder: "e.g., Sarah has shown strong initiative in learning the wine list and regularly asks questions to improve her product knowledge." }
+              placeholder: function() { return _awEx('strengthsDetail'); } }
         ]
     },
     // STEP 6: Opportunities for Development
@@ -3848,10 +3885,10 @@ formalWarning: [
         fields: [
             { name: "developmentAreas", label: "What areas of performance and/or behaviour are NOT currently meeting the required standards?",
               type: "textarea", required: true, rows: 4,
-              placeholder: "e.g.,\n• Speed of service during peak periods — average table turn time is 15 mins above target\n• Accuracy of orders — 3 incorrect orders in the past 2 weeks\n• Needs to be more proactive seeking tasks during quiet periods rather than waiting to be directed" },
+              placeholder: function() { return _awEx('concernsList'); } },
             { name: "developmentComments", label: "Additional comments on development areas (specific examples and context)",
               type: "textarea", required: false, rows: 3,
-              placeholder: "e.g., On Friday 7 Feb, section turnaround during the 7pm rush took 25 minutes compared to the 10-minute target. Two tables received incorrect mains." },
+              placeholder: function() { return _awEx('incidentExample'); } },
             { name: "conductConcerns", label: "Are there any conduct or compliance concerns? (If yes, describe)",
               type: "textarea", required: false, rows: 2,
               placeholder: "e.g., No conduct or compliance concerns at this time. OR: One instance of incorrect uniform on 3 Feb — addressed verbally at the time." }
@@ -3870,10 +3907,10 @@ formalWarning: [
         fields: [
             { name: "agreedActions", label: "Agreed actions to improve performance — what specifically will be done, by whom, and by when?",
               type: "textarea", required: true, rows: 5,
-              placeholder: "e.g.,\nEmployee:\n• Focus on speed of service during Friday/Saturday peaks — aim for 10-min table turns\n• Double-check all orders before sending to kitchen\n• Proactively ask supervisor for tasks during quiet periods\n\nLeader:\n• Arrange buddy shifts with Senior Waiter (James) for next 2 weeks\n• Provide real-time coaching during Friday/Saturday peak services\n• Continue fortnightly check-ins to review progress" },
+              placeholder: function() { return _awEx('actionPlan'); } },
             { name: "trainingAndSupport", label: "What additional training or support will be provided?",
               type: "textarea", required: true, rows: 3,
-              placeholder: "e.g.,\n• Advanced POS refresher training (split bills, modifications) — scheduled Week of 17 Feb\n• Shadow senior staff during 2 weekend peak shifts\n• Menu knowledge quiz to build confidence" },
+              placeholder: function() { return _awEx('supportTraining'); } },
             { name: "nextReviewDate", label: "When will the next review take place to assess progress?", type: "date", required: true }
         ]
     },
@@ -3927,7 +3964,7 @@ formalWarning: [
             fields: [
                 { name: "performanceIssue1", label: "Issue #1 - What specific performance problem?", 
                   type: "textarea", required: true, rows: 3,
-                  placeholder: "e.g., Slow service - average drink prep time is 4 minutes vs team average of 2.5 minutes" },
+                  placeholder: function() { return _awEx('performanceIssueShort'); } },
                 { name: "performanceData1", label: "What data/evidence supports this?", 
                   type: "textarea", required: true, rows: 2,
                   placeholder: "e.g., Till data shows 12 customer complaints in last month about wait times. Guest review average 2.8/5 stars." },
@@ -3936,7 +3973,7 @@ formalWarning: [
                   placeholder: "e.g., Order accuracy errors - 15% error rate vs team average of 3%" },
                 { name: "performanceData2", label: "Data/evidence for Issue #2", 
                   type: "textarea", required: false, rows: 2,
-                  placeholder: "e.g., POS system shows 18 incorrect orders in last 2 weeks" }
+                  placeholder: function() { return _awEx('evidenceData'); } }
             ]
         },
         
@@ -3964,7 +4001,7 @@ formalWarning: [
             fields: [
                 { name: "trainingProvided", label: "What training/coaching will be provided?", 
                   type: "textarea", required: true, rows: 4,
-                  placeholder: "e.g., \n• 2-hour cocktail making refresher course (Week 1)\n• Shadow experienced bartender for 3 shifts (Week 2)\n• Daily 15-min coaching sessions with supervisor (Weeks 1-4)\n• Access to online mixology tutorials" },
+                  placeholder: function() { return _awEx('trainingPlanList'); } },
                 { name: "resourcesProvided", label: "What resources/tools will be provided?", 
                   type: "textarea", required: true, rows: 3,
                   placeholder: "e.g., Recipe cards, speed pouring practice kit, timer for self-monitoring" },
