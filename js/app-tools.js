@@ -4,6 +4,7 @@
 // ========================================
 
 function openNewEmployeeToolkit() {
+    _applyAwardExamplePlaceholders();
     const modal = document.getElementById('newEmployeeToolkitModal');
     if (modal) {
         modal.classList.remove('hidden');
@@ -707,6 +708,7 @@ let trainingPlanState = {
 
 // Main Functions
 function openTrainingPlan() {
+    _applyAwardExamplePlaceholders();
     const modal = document.getElementById('trainingPlanModal');
     if (modal) {
         modal.classList.remove('hidden');
@@ -1450,7 +1452,7 @@ const probationWizardSteps = [
         title: "Employee & Probation Details",
         fields: [
             { name: "employeeName", label: "Employee's full name", type: "text", required: false, placeholder: "e.g., Sarah Johnson" },
-            { name: "position", label: "Position/Role", type: "text", required: true, placeholder: "e.g., Bartender" },
+            { name: "position", label: "Position/Role", type: "text", required: true, placeholder: function() { return 'e.g., ' + _awardRoleExample(); } },
             { name: "employmentType", label: "Employment Type", type: "select",
               options: ["Full-Time", "Part-Time", "Casual"], required: true },
             { name: "startDate", label: "Employment start date", type: "date", required: true },
@@ -1480,7 +1482,7 @@ const probationWizardSteps = [
               required: true },
             { name: "requirementsComments", label: "Specific comments on requirements (provide examples where possible)",
               type: "textarea", required: true, rows: 3,
-              placeholder: "e.g., Sarah has been punctual for all shifts except two occasions in week 3. She has completed RSA training and follows service standards well." }
+              placeholder: function() { return _awEx('progressSummary'); } }
         ]
     },
     // Step 4: Deliverables & Behaviours
@@ -1496,19 +1498,19 @@ const probationWizardSteps = [
         fields: [
             { name: "deliverables", label: "Key deliverables — what the employee should be producing/achieving at this stage",
               type: "textarea", required: true, rows: 3,
-              placeholder: "e.g.,\n• Independently manage a section of 6 tables\n• Accurately process orders through POS system\n• Upsell menu items to achieve average spend targets" },
+              placeholder: function() { return _awEx('roleExpectations'); } },
             { name: "deliverablesRating", label: "How is the employee tracking on deliverables?", type: "select",
               options: ["Exceeding expectations", "Meeting expectations", "Partially meeting expectations", "Not meeting expectations"],
               required: true },
             { name: "behaviours", label: "Behavioural expectations — how the employee is expected to conduct themselves",
               type: "textarea", required: true, rows: 3,
-              placeholder: "e.g.,\n• Positive and professional attitude with guests and team\n• Takes initiative and asks questions when unsure\n• Communicates effectively during service\n• Accepts feedback constructively" },
+              placeholder: function() { return _awEx('behaviours'); } },
             { name: "behavioursRating", label: "How is the employee tracking on behaviours?", type: "select",
               options: ["Exceeding expectations", "Meeting expectations", "Partially meeting expectations", "Not meeting expectations"],
               required: true },
             { name: "deliverablesAndBehavioursComments", label: "Specific examples and comments on deliverables and behaviours",
               type: "textarea", required: true, rows: 3,
-              placeholder: "e.g., Sarah's guest interactions are excellent — she's received two positive customer comments. She could improve on communication with kitchen during busy service." }
+              placeholder: function() { return _awEx('behaviourDetail'); } }
         ]
     },
     // Step 5: Support & Development
@@ -1524,10 +1526,10 @@ const probationWizardSteps = [
         fields: [
             { name: "trainingProvided", label: "What training and support has been provided so far?",
               type: "textarea", required: true, rows: 3,
-              placeholder: "e.g.,\n• 3-day induction program completed\n• Buddy assigned (James - Senior Bartender)\n• RSA training completed\n• POS system training completed\n• Menu knowledge sessions x2" },
+              placeholder: function() { return _awEx('inductionItems'); } },
             { name: "additionalTrainingNeeded", label: "What additional training or support does the employee need?",
               type: "textarea", required: true, rows: 3,
-              placeholder: "e.g.,\n• Cocktail masterclass for premium drinks\n• Advanced POS functions (split bills, modifications)\n• Cellar and wine knowledge training" },
+              placeholder: function() { return _awEx('developmentTraining'); } },
             { name: "oneOnOneFrequency", label: "How often are you having one-on-one check-ins?", type: "select",
               options: ["Weekly", "Fortnightly", "Monthly", "Ad hoc / as needed", "Not currently scheduled"],
               required: true },
@@ -1536,7 +1538,7 @@ const probationWizardSteps = [
               placeholder: "e.g., Weekly 15-min catch-ups on Mondays before shift. Employee is receptive to feedback." },
             { name: "employeeFeedback", label: "Has the employee raised any concerns, questions, or feedback?",
               type: "textarea", required: false, rows: 2,
-              placeholder: "e.g., Sarah mentioned she'd like more exposure to cocktail making. No concerns raised about the role or team." }
+              placeholder: function() { return _awEx('employeeFeedback'); } }
         ]
     },
     // Step 6: Overall Assessment & Next Steps
@@ -1560,10 +1562,10 @@ const probationWizardSteps = [
               placeholder: "e.g., Excellent customer interactions, strong work ethic, reliable attendance" },
             { name: "areasForImprovement", label: "Areas for improvement (if any) — be specific",
               type: "textarea", required: false, rows: 2,
-              placeholder: "e.g., Needs to improve speed of service during peak periods, could be more proactive in asking for tasks during quiet periods" },
+              placeholder: function() { return _awEx('improvementShort'); } },
             { name: "agreedActions", label: "Agreed actions for the next period (for both employee AND leader)",
               type: "textarea", required: true, rows: 3,
-              placeholder: "e.g.,\nEmployee:\n• Focus on speed of service during Friday/Saturday peaks\n• Complete cocktail training by end of month\n\nLeader:\n• Arrange cocktail masterclass with Head Bartender\n• Continue weekly check-ins\n• Provide real-time feedback during busy shifts" },
+              placeholder: function() { return _awEx('actionPlanProbation'); } },
             { name: "nextCheckInDate", label: "Next probation check-in date", type: "date", required: true },
             { name: "additionalNotes", label: "Any additional notes or comments",
               type: "textarea", required: false, rows: 2 }
@@ -1669,16 +1671,17 @@ function showProbationStep(stepNumber) {
         }
         
         const savedValue = probationCheckInState.data[field.name] || '';
-        
+        const _ph = typeof field.placeholder === 'function' ? field.placeholder() : (field.placeholder || '');
+
         if (field.type === 'text') {
-            html += `<input type="text" id="prob_${field.name}" 
-                           placeholder="${field.placeholder || ''}"
+            html += `<input type="text" id="prob_${field.name}"
+                           placeholder="${_ph}"
                            value="${savedValue}"
                            class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:border-amber-500 focus:outline-none"
                            ${field.required ? 'required' : ''}>`;
         } else if (field.type === 'textarea') {
             html += `<textarea id="prob_${field.name}" rows="${field.rows || 3}"
-                              placeholder="${field.placeholder || ''}"
+                              placeholder="${_ph}"
                               class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:border-amber-500 focus:outline-none"
                               ${field.required ? 'required' : ''}>${savedValue}</textarea>`;
         } else if (field.type === 'select') {
@@ -1707,9 +1710,9 @@ function showProbationStep(stepNumber) {
                            class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:border-amber-500 focus:outline-none"
                            ${field.required ? 'required' : ''}>`;
         } else if (field.type === 'number') {
-            html += `<input type="number" id="prob_${field.name}" 
+            html += `<input type="number" id="prob_${field.name}"
                            min="${field.min || 0}" max="${field.max || 100}"
-                           placeholder="${field.placeholder || ''}"
+                           placeholder="${_ph}"
                            value="${savedValue}"
                            class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-2 text-white focus:border-amber-500 focus:outline-none"
                            ${field.required ? 'required' : ''}>`;
@@ -3406,7 +3409,7 @@ function getStep1Template() {
             <label class="form-label required">Position Title</label>
             <input type="text" class="form-input" id="positionTitle" name="positionTitle" 
                    value="${data.positionTitle}" 
-                   placeholder="e.g., Head Chef, Front of House Manager, Barista">
+                   placeholder="e.g., ${_awardRoleExamples().join(', ')}">
             <span class="form-hint">Enter the official job title for this position</span>
         </div>
         

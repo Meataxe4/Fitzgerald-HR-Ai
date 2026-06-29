@@ -62,7 +62,7 @@ function buildPenaltyRateFacts(rates, awardLabel) {
   if (rates.ma_number === 'MA000119') {
     lines.push(`NOTE: The Restaurant Award's late-night windows differ from the Hospitality Award — evening loading only applies AFTER 10pm (not from 7pm), and night loading runs to 6am (not 7am). Weekend and public holiday rates supersede the late-night loadings.`);
   } else if (rates.ma_number === 'MA000010') {
-    lines.push(`NOTE: Manufacturing shift loadings (afternoon/night) apply to shiftworkers on their ordinary hours; weekend, public holiday and overtime rates apply as listed. The shift-loading figures are pending confirmation against the award text.`);
+    lines.push(`NOTE: Manufacturing shift loadings (afternoon/night) apply to shiftworkers on their ordinary hours; weekend, public holiday and overtime rates apply as listed. Afternoon and night shift loadings are +15% (clause 33.2(d)) and permanent night shift +30% (clause 33.2(f)).`);
   } else {
     lines.push(`NOTE: Weekend and public holiday rates supersede the late-night loadings.`);
   }
@@ -197,18 +197,21 @@ exports.handler = async (event, context) => {
       MA000009: {
         fullName: 'Hospitality Industry (General) Award MA000009',
         sector: 'hotels, restaurants, cafes, pubs, bars, and other hospitality venues',
+        industryAdj: 'hospitality',
         rates: hospitalityRates,
         aliases: ['hospitality']
       },
       MA000119: {
         fullName: 'Restaurant Industry Award MA000119',
         sector: 'restaurants, cafes, bistros, and table-service food venues',
+        industryAdj: 'hospitality',
         rates: restaurantRates,
         aliases: ['restaurant']
       },
       MA000010: {
         fullName: 'Manufacturing and Associated Industries and Occupations Award MA000010',
         sector: 'general manufacturing and associated industries',
+        industryAdj: 'manufacturing',
         rates: manufacturingRates,
         aliases: ['manufacturing']
       }
@@ -230,7 +233,11 @@ exports.handler = async (event, context) => {
     const awardFullName = resolvedAward ? resolvedAward.fullName : null;
     const industrySector = resolvedAward
       ? resolvedAward.sector
-      : 'Australian hospitality businesses';
+      : 'Australian businesses';
+    // Short industry adjective for persona/framing prose ('hospitality' |
+    // 'manufacturing'). Switches with the award so a Restaurant or Manufacturing
+    // user is not framed as a hospitality operator.
+    const industryAdj = resolvedAward ? resolvedAward.industryAdj : 'workplace';
 
     // Award-specific facts — sourced from the rates JSON files at module load,
     // so any future change to penalty rates / minimum engagement / loadings
@@ -245,7 +252,7 @@ exports.handler = async (event, context) => {
     // that never quotes award-specific figures (guardrail — fail closed).
     let systemPrompt;
     if (resolvedAward) {
-    systemPrompt = `You are Fitz, an expert AI HR assistant specialising in Australian hospitality industry HR. You work for Fitz HR, a boutique consultancy focused on ${industrySector}. You are the friendly, knowledgeable avatar helping managers and owners with their HR challenges.
+    systemPrompt = `You are Fitz, an expert AI HR assistant specialising in Australian ${industryAdj} industry HR. You work for Fitz HR, a boutique consultancy focused on ${industrySector}. You are the friendly, knowledgeable avatar helping managers and owners with their HR challenges.
 
 IMPORTANT — THIS USER'S AWARD: All advice, rates, classifications, and compliance guidance must reference the **${awardFullName}**. Do NOT reference a different award unless explicitly asked to compare. If the user asks about pay rates, classifications, or compliance, always frame your answer in terms of ${awardFullName}.
 
@@ -259,18 +266,18 @@ When a user asks about minimum shift length, minimum engagement, "shortest shift
 Your expertise includes:
 - Fair Work Act and Modern Awards (especially ${awardFullName})
 - Casual conversion obligations and compliance
-- Recruitment and onboarding for hospitality roles
+- Recruitment and onboarding for ${industryAdj} roles
 - Performance management in high-turnover environments
 - Workplace investigations and employee relations
 - Award interpretation and penalty rates
 - Rostering and scheduling compliance
 - Probation periods and dismissal procedures
-- Workplace health and safety in hospitality settings
+- Workplace health and safety in ${industryAdj} settings
 
 Your tone should be:
 - Professional but approachable and friendly (Australian conversational style)
 - Practical and solutions-focused
-- Empathetic to the challenges hospitality operators face
+- Empathetic to the challenges ${industryAdj} operators face
 - Clear about when issues require escalation to a qualified HR consultant or lawyer
 - Personable - you're Fitz, a helpful AI companion, not a faceless system
 
@@ -341,13 +348,13 @@ The exact rate for a casual waiter depends on several factors including their ex
 
 I strongly recommend using the **Award Wizard tool** (click 🛠️ Tools in the menu above) to get the precise rate. It will ask you the right questions to determine the exact classification and rate that applies.
 
-Generally, hospitality rates range from around $24-35/hour for front-of-house roles depending on experience, plus casual loading and penalty rates.
+Generally, award rates range from around $24-35/hour for entry-level classifications depending on experience, plus casual loading and penalty rates.
 
 💡 For complex matters: support@fitzhr.com"
 
 IMPORTANT GUIDELINES:
 - Always reference relevant Modern Awards or Fair Work provisions when discussing compliance
-- Be specific about hospitality contexts (front of house vs back of house, casual vs permanent, etc.)
+- Be specific about the user's operational context (the roles involved, casual vs permanent, day work vs shift work, etc.)
 - When discussing complex legal matters or high-risk situations (dismissals, investigations, discrimination claims), recommend they speak with their Fitz HR consultant
 - Provide actionable next steps, not just theoretical advice
 - Use Australian terminology (e.g., "roster" not "schedule", "redundancy" not "layoff")
@@ -479,7 +486,7 @@ Remember: You're a support tool provided by Fitz HR, not a replacement for human
 1. Using the Award Wizard tool for pay rate questions
 2. Engaging with Fitz HR consultants for complex/legal matters`;
     } else {
-    systemPrompt = `You are Fitz, an expert AI HR assistant for Australian hospitality businesses, working for Fitz HR, a boutique HR consultancy. You are friendly, knowledgeable and personable.
+    systemPrompt = `You are Fitz, an expert AI HR assistant for Australian businesses, working for Fitz HR, a boutique HR consultancy. You are friendly, knowledgeable and personable.
 
 IMPORTANT — NO AWARD IS SET FOR THIS USER:
 This user has not selected a supported modern award, so you do NOT know which award applies to them. You must therefore answer ONLY at the universal floor that applies regardless of award:
