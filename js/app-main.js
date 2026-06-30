@@ -13524,6 +13524,7 @@ function resolveManufacturingRate(data) {
         penalties.push('Casual rate already includes the 25% loading; confirm casual penalty interactions against the award.');
     }
     return { award: awardRates.award_name, level: data.manufClass, rate: rate, weeklyRate: entry.weekly_rate || null,
+        rateLabel: data.employment === 'casual' ? 'Casual Rate (per hour)' : 'Base Rate (per hour)',
         penalties: penalties, nextSteps: [
             'Confirm the classification against Schedule A of MA000010',
             'Set up payroll with these exact rates',
@@ -13549,7 +13550,7 @@ function renderWizardResultCard(result) {
                 `<div class="bg-slate-700/50 rounded-lg p-4"><p class="text-sm text-slate-400 mb-1">Applicable Award</p><p class="font-bold text-lg">${_fwEscapeHtml(result.award || getAwardContext().fullName || '')}</p></div>` +
                 `<div class="grid grid-cols-2 gap-4">` +
                     `<div class="bg-slate-700/50 rounded-lg p-4"><p class="text-sm text-slate-400 mb-1">Classification</p><p class="font-bold">${_fwEscapeHtml(result.level || 'Classification')}</p></div>` +
-                    `<div class="bg-slate-700/50 rounded-lg p-4"><p class="text-sm text-slate-400 mb-1">Base Rate (per hour)</p><p class="font-bold text-2xl text-amber-400">$${(typeof result.rate === 'number' ? result.rate : 0).toFixed(2)}</p>${weeklyHTML}</div>` +
+                    `<div class="bg-slate-700/50 rounded-lg p-4"><p class="text-sm text-slate-400 mb-1">${_fwEscapeHtml(result.rateLabel || 'Base Rate (per hour)')}</p><p class="font-bold text-2xl text-amber-400">$${(typeof result.rate === 'number' ? result.rate : 0).toFixed(2)}</p>${weeklyHTML}</div>` +
                 `</div>` +
                 `<div class="bg-amber-500/10 border border-amber-500 rounded-lg p-4"><p class="font-semibold text-amber-400 mb-2">Penalty Rates & Loadings:</p><div class="text-sm space-y-1">${penaltiesHTML}</div></div>` +
                 `<div class="bg-blue-500/10 border border-blue-500 rounded-lg p-4"><p class="font-semibold text-blue-400 mb-2">📝 Next Steps:</p><ul class="text-sm space-y-1">${stepsHTML}</ul></div>` +
@@ -19117,7 +19118,9 @@ function calculateAwardClassification(data) {
     
     // Determine employment type for filtering
     const isCasual = data.employment === 'casual';
-    const employmentType = (isCasual || data.employment === 'part-time') ? 'casual' : 'full_time';
+    // Part-time is paid the same base rate as full-time; only casual attracts the
+    // 25% casual loading. (Previously part-time wrongly resolved to the casual rate.)
+    const employmentType = isCasual ? 'casual' : 'full_time';
     
     // Build classification path based on role and experience
     const levelMap = {
@@ -19409,7 +19412,9 @@ function calculateAwardClassification(data) {
     }
 
     if (isCasual) {
-        penalties.push(`Casual Loading: 25% (already included in base rate of $${baseRate.toFixed(2)}/hr)`);
+        const loadingPct = awardRates.casual_loading || 0.25;
+        const baseBeforeLoading = baseRate / (1 + loadingPct);
+        penalties.push(`Casual Loading: ${Math.round(loadingPct * 100)}% — the $${baseRate.toFixed(2)}/hr casual rate shown is the $${baseBeforeLoading.toFixed(2)}/hr base rate plus the casual loading.`);
     }
 
     penalties.push(`Overtime: First 2 hours at 150%, thereafter 200%`);
@@ -19448,6 +19453,7 @@ function calculateAwardClassification(data) {
     award: getAwardContext().fullName,
     level: title,
     rate: baseRate,
+    rateLabel: isCasual ? 'Casual Rate (per hour)' : 'Base Rate (per hour)',
         penalties: penalties,
         nextSteps: [
             'Create written employment contract',
