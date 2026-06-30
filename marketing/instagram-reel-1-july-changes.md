@@ -13,12 +13,13 @@ and restaurant venues from 1 July 2026.
 ## Slides
 
 0. **Intro** (amber) — It's 1 July. What you need to know.
-1. **Pay rates** — Award pay rates rise 4.75%
-2. **Payday super** — Super is paid on payday now (in fund within 7 business days; 20 for new starters)
-3. **Penalty rates** — Locked in (FWC can no longer cut penalty/overtime rates)
-4. **Compliance** — Scrutiny stays high (FWO audits; guessing rates = underpayment risk)
-5. **Leave & casuals** — PPL rises to 26 weeks (govt-funded); casual "employee choice" conversion
+1. **Pay rates** — Award rates rise 4.75% · base, penalties & overtime all up
+2. **Payday super** — Super is paid on payday now · in the fund within 7 days
+3. **Penalty rates** — Are locked in · Fair Work can't cut them
+4. **Compliance** — Don't guess your rates · Fair Work is auditing hospo
+5. **Leave & casuals** — Casuals can go permanent · + parental leave now 26 weeks
 6. **Outro** (navy) — Stay compliant from 1 July → fitzhr.com
+
 
 ## Caption (post body)
 

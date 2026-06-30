@@ -80,53 +80,43 @@ def reveal(begin, dy=30):
 CARDS = [
     dict(kind="intro",
          title=[("It's 1 July.", N), ("What you", N), ("need to know.", N)],
-         sub="The 2026 changes hitting hospitality & restaurant venues."),
+         sub="5 changes hitting hospitality."),
     dict(kind="tip", n="01", num="1", eyebrow="PAY RATES",
-         title=[("Award pay rates", W), ("rise 4.75%", A)],
-         body="From the first full pay period on or after 1 July 2026, every base rate in the "
-              "Hospitality and Restaurant Awards lifts 4.75% — and penalty rates, loadings and "
-              "overtime rise with it."),
+         title=[("Award rates", W), ("rise 4.75%", A)],
+         punch="Base, penalties & overtime all up."),
     dict(kind="tip", n="02", num="2", eyebrow="PAYDAY SUPER",
          title=[("Super is paid", W), ("on payday now", A)],
-         body="You must now pay super at the same time as wages. Contributions have to reach the "
-              "employee's fund within 7 business days — and within 20 business days for new starters."),
+         punch="In the fund within 7 days."),
     dict(kind="tip", n="03", num="3", eyebrow="PENALTY RATES",
          title=[("Penalty rates", W), ("are locked in", A)],
-         body="The Fair Work Commission can no longer cut penalty rates or overtime under any modern "
-              "award. The weekend and public-holiday loadings you budget for are protected."),
+         punch="Fair Work can't cut them."),
     dict(kind="tip", n="04", num="4", eyebrow="COMPLIANCE",
-         title=[("Compliance", W), ("scrutiny stays high", A)],
-         body="Hospitality is a regular focus of Fair Work Ombudsman audits. Guessing rates — or "
-              "copying what the cafe next door pays — is how venues land six-figure underpayment bills."),
+         title=[("Don't guess", W), ("your rates", A)],
+         punch="Fair Work is auditing hospo."),
     dict(kind="tip", n="05", num="5", eyebrow="LEAVE & CASUALS",
-         title=[("Leave & casual", W), ("rules change", A)],
-         body="Government-funded Paid Parental Leave rises to 26 weeks (paid by the government, not "
-              "you). And casuals with a regular pattern can give written notice to convert to "
-              "permanent under the new 'employee choice' rules."),
+         title=[("Casuals can", W), ("go permanent", A)],
+         punch="+ parental leave now 26 weeks."),
     dict(kind="outro"),
 ]
 
 def build_tip(c):
     # left amber spine + huge faint watermark number
     spine = f'<rect x="64" y="300" width="10" height="1300" rx="5" fill="{A}" opacity="0.9"/>'
-    wm = (f'<text x="1030" y="1230" class="ti" font-size="760" font-weight="800" fill="{A}" '
-          f'opacity="0.06" text-anchor="end">{c["num"]}</text>')
+    wm = (f'<text x="1030" y="1240" class="ti" font-size="820" font-weight="800" fill="{A}" '
+          f'opacity="0.07" text-anchor="end">{c["num"]}</text>')
     top = wordmark() + f'<text x="{MR}" y="300" class="ti" font-size="40" font-weight="800" fill="{A}" text-anchor="end" letter-spacing="2">{c["n"]} / 05</text>'
-    eyebrow = (f'<text x="{MX}" y="510" class="ti" font-size="36" font-weight="800" fill="{A}" letter-spacing="6">{esc(c["eyebrow"])}</text>')
-    # title (hand-set lines)
+    eyebrow = (f'<text x="{MX}" y="700" class="ti" font-size="38" font-weight="800" fill="{A}" letter-spacing="6">{esc(c["eyebrow"])}</text>')
+    # big punchy title (carries 90% of the message)
     tlines = "".join(
-        f'<text x="{MX}" y="{620 + i*98}" class="ti" font-size="84" font-weight="800" fill="{col}">{esc(t)}</text>'
+        f'<text x="{MX}" y="{820 + i*116}" class="ti" font-size="108" font-weight="800" fill="{col}">{esc(t)}</text>'
         for i, (t, col) in enumerate(c["title"]))
-    rule_y = 620 + len(c["title"]) * 98 + 6
-    rule = f'<rect x="{MX}" y="{rule_y}" width="210" height="8" rx="4" fill="{A}"/>'
-    # body (auto-wrapped)
-    by0 = rule_y + 96
-    blines = "".join(
-        f'<text x="{MX}" y="{by0 + i*58}" class="bd" font-size="42" fill="{W72}">{esc(line)}</text>'
-        for i, line in enumerate(wrap(c["body"])))
+    rule_y = 820 + len(c["title"]) * 116 + 4
+    rule = f'<rect x="{MX}" y="{rule_y}" width="180" height="8" rx="4" fill="{A}"/>'
+    # one short kicker line (the extra 10%)
+    punch = (f'<text x="{MX}" y="{rule_y + 92}" class="bd" font-size="48" fill="rgba(255,255,255,0.62)">{esc(c["punch"])}</text>')
     body = (f'<rect width="1080" height="1920" fill="{N}"/>{wm}{spine}\n  {top}\n  '
             f'<g opacity="1">{reveal(0.15)}{eyebrow}{tlines}{rule}</g>\n  '
-            f'<g opacity="1">{reveal(0.35)}{blines}</g>\n  {dots(int(c["num"])-1)}')
+            f'<g opacity="1">{reveal(0.4)}{punch}</g>\n  {dots(int(c["num"])-1)}')
     return shell(body)
 
 def build_intro(c):
