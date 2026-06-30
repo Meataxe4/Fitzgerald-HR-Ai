@@ -17590,11 +17590,19 @@ async function adminResetMyProfile() {
             if (!convSnap.empty) await batch.commit();
         } catch (e) {}
 
-        // 2. Reset user document fields
+        // 2. Reset user document fields. The venue profile is persisted in TWO
+        // places in Firestore — a top-level `venueProfile` field AND the full
+        // app-state snapshot at `appState.venueProfile` (see loadAllDataFromCloud
+        // and the auth-handler merge, which both read appState.venueProfile
+        // first). Both must be deleted or the cloud copy restores setupComplete
+        // on reload and onboarding is skipped.
         try {
             await db.collection('users').doc(uid).update({
                 venueProfile: firebase.firestore.FieldValue.delete(),
+                'appState.venueProfile': firebase.firestore.FieldValue.delete(),
                 lastConversationId: firebase.firestore.FieldValue.delete(),
+                'appState.currentConversationId': firebase.firestore.FieldValue.delete(),
+                'appState.conversations': firebase.firestore.FieldValue.delete(),
                 'credits.monthlyPromptsUsed': 0,
                 'credits.monthlyPromptsReset': new Date().toISOString()
             });
@@ -17618,8 +17626,12 @@ async function adminResetUserProfile() {
 
     status.textContent = '⏳ Resetting...';
     try {
+        // Delete BOTH copies — the top-level field and the app-state snapshot
+        // (appState.venueProfile), which is the one the login/restore path reads
+        // first. Deleting only the top-level field leaves onboarding skipped.
         await db.collection('users').doc(uid).update({
-            venueProfile: firebase.firestore.FieldValue.delete()
+            venueProfile: firebase.firestore.FieldValue.delete(),
+            'appState.venueProfile': firebase.firestore.FieldValue.delete()
         });
         status.textContent = `✅ venueProfile cleared for ${uid}. They will see onboarding on next login.`;
         status.className = 'text-xs mt-2 text-green-400';
