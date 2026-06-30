@@ -7,8 +7,8 @@ and restaurant venues from 1 July 2026.
 
 - **Build:** `python3 scripts/setup_fonts.py && python3 scripts/build_reel2_cards.py`
 - **Cards:** `marketing/reel-cards-2/` (SVG + `preview/` PNGs)
-- **Video:** `marketing/exports/fitz-hr-1-july-changes-reel.mp4` (1080×1920, ~41s, locked/static, safe-zone compliant)
-- **Re-export MP4:** `python3 scripts/build_reel_mp4.py marketing/reel-cards-2/preview marketing/exports/fitz-hr-1-july-changes-reel.mp4 5.5`
+- **Video:** `marketing/exports/fitz-hr-1-july-changes-reel.mp4` (1080×1920, ~31s, locked/static, safe-zone compliant)
+- **Re-export MP4:** `python3 scripts/build_reel_mp4.py marketing/reel-cards-2/preview marketing/exports/fitz-hr-1-july-changes-reel.mp4 4.0`
 
 ## Slides
 
