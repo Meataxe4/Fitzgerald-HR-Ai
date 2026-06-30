@@ -1013,6 +1013,28 @@ function isManufacturingAwardName(awardName) {
     return !!awardName && String(awardName).toLowerCase().indexOf('manufacturing') !== -1;
 }
 
+// Business types for the SCHADS Award (MA000100). Community services is a
+// distinct industry to hospitality, so it has its own EXCLUSIVE list — the
+// hospitality venue types never appear for a SCHADS user. Covers the four
+// base-rate streams: social/community services, home & disability care,
+// crisis accommodation and family day care.
+const SCHADS_VENUE_OPTIONS = [
+    { value: 'disability-services',     label: 'Disability Services / NDIS Provider',   short: 'disability services provider' },
+    { value: 'home-care',               label: 'Home Care / In-home Aged Care',         short: 'home care provider' },
+    { value: 'community-services',      label: 'Social & Community Services',           short: 'community services organisation' },
+    { value: 'crisis-accommodation',    label: 'Crisis Accommodation / Homelessness',   short: 'crisis accommodation service' },
+    { value: 'family-day-care',         label: 'Family Day Care',                       short: 'family day care service' },
+    { value: 'community-health',        label: 'Community Health & Wellbeing',          short: 'community health service' },
+    { value: 'youth-family-services',   label: 'Youth & Family Services',               short: 'youth & family services organisation' }
+];
+
+function isSchadsAwardName(awardName) {
+    if (!awardName) return false;
+    const s = String(awardName).toLowerCase();
+    return s.indexOf('ma000100') !== -1 || s.indexOf('schads') !== -1 ||
+        s.indexOf('social, community') !== -1 || s.indexOf('home care and disability') !== -1;
+}
+
 // Render the venue-type dropdown filtered by Award. When awardName matches a
 // known Award, the primary matches appear at the top in alphabetical order
 // and the remaining venues appear under an "Other venue types" optgroup.
@@ -1030,6 +1052,17 @@ function populateVenueTypeDropdown(selectEl, awardName, currentValue) {
             .map(v => `<option value="${v.value}"${v.value === selected ? ' selected' : ''}>${v.label}</option>`)
             .join('');
         selectEl.innerHTML = mhtml;
+        return;
+    }
+
+    // SCHADS is a different industry — show ONLY community-services business
+    // types, never the hospitality venue list.
+    if (isSchadsAwardName(awardName)) {
+        let shtml = '<option value="">Select business type...</option>';
+        shtml += SCHADS_VENUE_OPTIONS.slice().sort(sortByLabel)
+            .map(v => `<option value="${v.value}"${v.value === selected ? ' selected' : ''}>${v.label}</option>`)
+            .join('');
+        selectEl.innerHTML = shtml;
         return;
     }
 
@@ -1900,6 +1933,16 @@ const AWARD_REGISTRY = {
         fullName: 'Manufacturing and Associated Industries and Occupations Award MA000010',
         ratesUrl: '/manufacturing-award-rates.json',
         aliases: ['manufacturing']
+    },
+    // Preview only — gated behind the schads_preview feature flag and not yet
+    // human-signed-off. Until enabled it resolves to UNRESOLVED (fail closed).
+    MA000100: {
+        code: 'MA000100', status: 'preview', flag: 'schads_preview',
+        calculatorType: 'classification',   // Level/pay-point picker, not the hospitality role wizard
+        displayName: 'Social, Community, Home Care and Disability Services Award',
+        fullName: 'Social, Community, Home Care and Disability Services Industry Award MA000100',
+        ratesUrl: '/schads-award-rates.json',
+        aliases: ['schads', 'social community', 'home care', 'disability services']
     }
 };
 
@@ -1946,6 +1989,7 @@ function getAwardContext() {
 function _industryWord() {
     const code = getAwardContext().code;
     if (code === 'MA000010') return 'manufacturing';
+    if (code === 'MA000100') return 'community services';
     if (code === 'MA000009' || code === 'MA000119') return 'hospitality';
     return '';
 }
@@ -1960,6 +2004,7 @@ function _awardSector() {
 function _awardRoleExamples() {
     const code = getAwardContext().code;
     if (code === 'MA000010') return ['Production Employee', 'Machine Operator', 'Maintenance Fitter'];
+    if (code === 'MA000100') return ['Support Worker', 'Community Care Worker', 'Case Manager'];
     if (code === 'MA000119') return ['Waiter', 'Cook', 'Restaurant Manager'];
     if (code === 'MA000009') return ['Bartender', 'Waiter', 'Chef'];
     return ['Team Member', 'Supervisor', 'Manager'];
@@ -1968,6 +2013,7 @@ function _awardRoleExample() { return _awardRoleExamples()[0]; }
 function _awardDeptExamples() {
     const code = getAwardContext().code;
     if (code === 'MA000010') return ['Production', 'Maintenance', 'Warehouse'];
+    if (code === 'MA000100') return ['Disability Services', 'Home Care', 'Community Programs'];
     if (code === 'MA000009' || code === 'MA000119') return ['Kitchen', 'Front of House', 'Management'];
     return ['Operations', 'Administration', 'Management'];
 }
@@ -1994,32 +2040,33 @@ function _applyAwardExamplePlaceholders() {
 // onboarding, qualifications). Hospitality/Restaurant keep their original
 // examples; Manufacturing gets production equivalents; unresolved -> neutral.
 const _AWARD_EXAMPLES = {
-    historyOfDiscussions: { hospitality: "e.g.,\n• 15 Jan 2026 — Informal catch-up: Discussed settling in, answered questions about rosters and POS system\n• 29 Jan 2026 — Probation Check-In #1: Reviewed key requirements, identified speed of service as area for development, agreed to buddy shifts with senior staff\n• 12 Feb 2026 — Ad hoc coaching: Discussed customer complaint regarding wait times, provided real-time feedback on section management", manufacturing: "e.g.,\n• 15 Jan 2026 — Informal catch-up: Discussed settling in, answered questions about rosters and the work-order system\n• 29 Jan 2026 — Probation Check-In #1: Reviewed key requirements, identified production throughput as area for development, agreed to buddy shifts with a leading hand\n• 12 Feb 2026 — Ad hoc coaching: Discussed a quality issue, provided real-time feedback on line and station management", default: "e.g.,\n• 15 Jan 2026 — Informal catch-up: Discussed settling in, answered questions about rosters and systems\n• 29 Jan 2026 — Probation Check-In #1: Reviewed key requirements, identified a development area, agreed to buddy shifts with senior staff\n• 12 Feb 2026 — Ad hoc coaching: Discussed a workplace concern, provided real-time feedback" },
-    positiveObservations: { hospitality: "e.g.,\n• Punctuality and attendance have been excellent — no unexplained absences\n• Positive attitude with guests — received two written compliments\n• Follows WHS procedures consistently\n• Works well with the team and communicates during service", manufacturing: "e.g.,\n• Punctuality and attendance have been excellent — no unexplained absences\n• Positive attitude on the floor — received two written compliments\n• Follows WHS and safety procedures consistently\n• Works well with the team and communicates during the shift", default: "e.g.,\n• Punctuality and attendance have been excellent — no unexplained absences\n• Positive, professional attitude — received two written compliments\n• Follows WHS procedures consistently\n• Works well with the team and communicates clearly" },
-    strengthsDetail: { hospitality: "e.g., Sarah has shown strong initiative in learning the wine list and regularly asks questions to improve her product knowledge.", manufacturing: "e.g., Sarah has shown strong initiative in learning machine operation and regularly asks questions to improve her technical knowledge.", default: "e.g., Sarah has shown strong initiative in learning the role and regularly asks questions to improve her knowledge." },
-    concernsList: { hospitality: "e.g.,\n• Speed of service during peak periods — average table turn time is 15 mins above target\n• Accuracy of orders — 3 incorrect orders in the past 2 weeks\n• Needs to be more proactive seeking tasks during quiet periods rather than waiting to be directed", manufacturing: "e.g.,\n• Output during peak periods — average cycle time is 15% above target\n• Quality — 3 defective units in the past 2 weeks\n• Needs to be more proactive seeking tasks during downtime rather than waiting to be directed", default: "e.g.,\n• Productivity during busy periods — output is below target\n• Accuracy — 3 errors in the past 2 weeks\n• Needs to be more proactive seeking tasks during quiet periods rather than waiting to be directed" },
-    incidentExample: { hospitality: "e.g., On Friday 7 Feb, section turnaround during the 7pm rush took 25 minutes compared to the 10-minute target. Two tables received incorrect mains.", manufacturing: "e.g., On Friday 7 Feb, changeover during the afternoon shift took 25 minutes compared to the 10-minute target. Two units failed quality check.", default: "e.g., On Friday 7 Feb, a task during the busy period took 25 minutes compared to the 10-minute target, and two items had errors." },
-    actionPlan: { hospitality: "e.g.,\nEmployee:\n• Focus on speed of service during Friday/Saturday peaks — aim for 10-min table turns\n• Double-check all orders before sending to kitchen\n• Proactively ask supervisor for tasks during quiet periods\n\nLeader:\n• Arrange buddy shifts with Senior Waiter (James) for next 2 weeks\n• Provide real-time coaching during Friday/Saturday peak services\n• Continue fortnightly check-ins to review progress", manufacturing: "e.g.,\nEmployee:\n• Focus on output during peak production runs — aim to meet target cycle time\n• Double-check all work against the spec before sign-off\n• Proactively ask supervisor for tasks during downtime\n\nLeader:\n• Arrange buddy shifts with a Leading Hand (James) for next 2 weeks\n• Provide real-time coaching during peak production\n• Continue fortnightly check-ins to review progress", default: "e.g.,\nEmployee:\n• Focus on productivity during busy periods — aim to meet targets\n• Double-check all work before completing it\n• Proactively ask your supervisor for tasks during quiet periods\n\nLeader:\n• Arrange buddy shifts with a senior team member (James) for next 2 weeks\n• Provide real-time coaching during busy periods\n• Continue fortnightly check-ins to review progress" },
-    supportTraining: { hospitality: "e.g.,\n• Advanced POS refresher training (split bills, modifications) — scheduled Week of 17 Feb\n• Shadow senior staff during 2 weekend peak shifts\n• Menu knowledge quiz to build confidence", manufacturing: "e.g.,\n• Refresher training on the work-order/MES system — scheduled Week of 17 Feb\n• Shadow senior staff during 2 peak production shifts\n• Quality-procedure refresher to build confidence", default: "e.g.,\n• Refresher training on key systems — scheduled Week of 17 Feb\n• Shadow senior staff during 2 busy shifts\n• Knowledge refresher to build confidence" },
-    performanceIssueShort: { hospitality: "e.g., Slow service - average drink prep time is 4 minutes vs team average of 2.5 minutes", manufacturing: "e.g., Low output - average task cycle time is 4 minutes vs team average of 2.5 minutes", default: "e.g., Below-target productivity - average task time is 4 minutes vs team average of 2.5 minutes" },
-    evidenceData: { hospitality: "e.g., POS system shows 18 incorrect orders in last 2 weeks", manufacturing: "e.g., Quality log shows 18 defective units in last 2 weeks", default: "e.g., Records show 18 errors in last 2 weeks" },
-    trainingPlanList: { hospitality: "e.g., \n• 2-hour cocktail making refresher course (Week 1)\n• Shadow experienced bartender for 3 shifts (Week 2)\n• Daily 15-min coaching sessions with supervisor (Weeks 1-4)\n• Access to online mixology tutorials", manufacturing: "e.g., \n• 2-hour machine-operation refresher course (Week 1)\n• Shadow an experienced operator for 3 shifts (Week 2)\n• Daily 15-min coaching sessions with supervisor (Weeks 1-4)\n• Access to online technical tutorials", default: "e.g., \n• 2-hour skills refresher course (Week 1)\n• Shadow an experienced team member for 3 shifts (Week 2)\n• Daily 15-min coaching sessions with supervisor (Weeks 1-4)\n• Access to online training tutorials" },
-    progressSummary: { hospitality: "e.g., Sarah has been punctual for all shifts except two occasions in week 3. She has completed RSA training and follows service standards well.", manufacturing: "e.g., Sarah has been punctual for all shifts except two occasions in week 3. She has completed her site safety induction and follows standard work procedures well.", default: "e.g., Sarah has been punctual for all shifts except two occasions in week 3. She has completed her required training and follows procedures well." },
-    roleExpectations: { hospitality: "e.g.,\n• Independently manage a section of 6 tables\n• Accurately process orders through POS system\n• Upsell menu items to achieve average spend targets", manufacturing: "e.g.,\n• Independently operate an assigned station or line\n• Accurately complete and log work orders\n• Meet output and quality targets for the shift", default: "e.g.,\n• Independently manage their assigned area of work\n• Accurately complete and record tasks\n• Meet productivity and quality targets" },
-    behaviours: { hospitality: "e.g.,\n• Positive and professional attitude with guests and team\n• Takes initiative and asks questions when unsure\n• Communicates effectively during service\n• Accepts feedback constructively", manufacturing: "e.g.,\n• Positive and professional attitude with the team\n• Takes initiative and asks questions when unsure\n• Communicates effectively during the shift\n• Accepts feedback constructively", default: "e.g.,\n• Positive and professional attitude with customers and team\n• Takes initiative and asks questions when unsure\n• Communicates effectively\n• Accepts feedback constructively" },
-    behaviourDetail: { hospitality: "e.g., Sarah's guest interactions are excellent — she's received two positive customer comments. She could improve on communication with kitchen during busy service.", manufacturing: "e.g., Sarah's teamwork is excellent — she's received two positive comments. She could improve on communication with the next station during busy production.", default: "e.g., Sarah's customer interactions are excellent — she's received two positive comments. She could improve on communication with the team during busy periods." },
-    inductionItems: { hospitality: "e.g.,\n• 3-day induction program completed\n• Buddy assigned (James - Senior Bartender)\n• RSA training completed\n• POS system training completed\n• Menu knowledge sessions x2", manufacturing: "e.g.,\n• 3-day induction program completed\n• Buddy assigned (James - Leading Hand)\n• Site safety induction completed\n• Work-order system training completed\n• Machine-operation sessions x2", default: "e.g.,\n• 3-day induction program completed\n• Buddy assigned (James - Senior team member)\n• WHS induction completed\n• Systems training completed\n• Role knowledge sessions x2" },
-    developmentTraining: { hospitality: "e.g.,\n• Cocktail masterclass for premium drinks\n• Advanced POS functions (split bills, modifications)\n• Cellar and wine knowledge training", manufacturing: "e.g.,\n• Advanced machine-operation masterclass\n• Advanced work-order/MES functions\n• Quality and inspection training", default: "e.g.,\n• Advanced skills masterclass\n• Advanced systems functions\n• Specialist knowledge training" },
-    employeeFeedback: { hospitality: "e.g., Sarah mentioned she'd like more exposure to cocktail making. No concerns raised about the role or team.", manufacturing: "e.g., Sarah mentioned she'd like more exposure to machine setup. No concerns raised about the role or team.", default: "e.g., Sarah mentioned she'd like more exposure to other areas of the role. No concerns raised about the role or team." },
-    improvementShort: { hospitality: "e.g., Needs to improve speed of service during peak periods, could be more proactive in asking for tasks during quiet periods", manufacturing: "e.g., Needs to improve output during peak periods, could be more proactive in asking for tasks during downtime", default: "e.g., Needs to improve productivity during busy periods, could be more proactive in asking for tasks during quiet periods" },
-    actionPlanProbation: { hospitality: "e.g.,\nEmployee:\n• Focus on speed of service during Friday/Saturday peaks\n• Complete cocktail training by end of month\n\nLeader:\n• Arrange cocktail masterclass with Head Bartender\n• Continue weekly check-ins\n• Provide real-time feedback during busy shifts", manufacturing: "e.g.,\nEmployee:\n• Focus on output during peak production runs\n• Complete machine-operation training by end of month\n\nLeader:\n• Arrange a skills masterclass with a Leading Hand\n• Continue weekly check-ins\n• Provide real-time feedback during busy shifts", default: "e.g.,\nEmployee:\n• Focus on productivity during busy periods\n• Complete required training by end of month\n\nLeader:\n• Arrange a skills session with a senior team member\n• Continue weekly check-ins\n• Provide real-time feedback during busy periods" },
-    qualifications: { hospitality: "e.g.,\nEssential:\n- Certificate III in Hospitality (or equivalent)\n- Minimum 5 years experience in a similar role\n- Current Food Safety Supervisor certificate\n\nDesirable:\n- Responsible Service of Alcohol (RSA)\n- Experience with menu costing and development", manufacturing: "e.g.,\nEssential:\n- Certificate III in Engineering or relevant trade qualification\n- Minimum 5 years experience in a similar role\n- Current White Card (construction induction)\n\nDesirable:\n- Forklift / high-risk work licence\n- Experience with lean / continuous-improvement practices", default: "e.g.,\nEssential:\n- Relevant trade certificate or qualification\n- Minimum 5 years experience in a similar role\n- Current licences/tickets for the role\n\nDesirable:\n- Additional certifications relevant to the role\n- First aid / WHS certification" },
+    historyOfDiscussions: { hospitality: "e.g.,\n• 15 Jan 2026 — Informal catch-up: Discussed settling in, answered questions about rosters and POS system\n• 29 Jan 2026 — Probation Check-In #1: Reviewed key requirements, identified speed of service as area for development, agreed to buddy shifts with senior staff\n• 12 Feb 2026 — Ad hoc coaching: Discussed customer complaint regarding wait times, provided real-time feedback on section management", manufacturing: "e.g.,\n• 15 Jan 2026 — Informal catch-up: Discussed settling in, answered questions about rosters and the work-order system\n• 29 Jan 2026 — Probation Check-In #1: Reviewed key requirements, identified production throughput as area for development, agreed to buddy shifts with a leading hand\n• 12 Feb 2026 — Ad hoc coaching: Discussed a quality issue, provided real-time feedback on line and station management", community_services: "e.g.,\n• 15 Jan 2026 — Informal catch-up: Discussed settling in, answered questions about rosters and the client management system\n• 29 Jan 2026 — Probation Check-In #1: Reviewed key requirements, identified documentation of support notes as area for development, agreed to buddy shifts with a senior support worker\n• 12 Feb 2026 — Ad hoc coaching: Discussed a client incident report, provided real-time feedback on following the support plan", default: "e.g.,\n• 15 Jan 2026 — Informal catch-up: Discussed settling in, answered questions about rosters and systems\n• 29 Jan 2026 — Probation Check-In #1: Reviewed key requirements, identified a development area, agreed to buddy shifts with senior staff\n• 12 Feb 2026 — Ad hoc coaching: Discussed a workplace concern, provided real-time feedback" },
+    positiveObservations: { hospitality: "e.g.,\n• Punctuality and attendance have been excellent — no unexplained absences\n• Positive attitude with guests — received two written compliments\n• Follows WHS procedures consistently\n• Works well with the team and communicates during service", manufacturing: "e.g.,\n• Punctuality and attendance have been excellent — no unexplained absences\n• Positive attitude on the floor — received two written compliments\n• Follows WHS and safety procedures consistently\n• Works well with the team and communicates during the shift", community_services: "e.g.,\n• Punctuality and attendance have been excellent — no unexplained absences\n• Warm, respectful rapport with clients — received two written compliments from families\n• Follows WHS and safe manual-handling procedures consistently\n• Works well with the team and communicates during handover", default: "e.g.,\n• Punctuality and attendance have been excellent — no unexplained absences\n• Positive, professional attitude — received two written compliments\n• Follows WHS procedures consistently\n• Works well with the team and communicates clearly" },
+    strengthsDetail: { hospitality: "e.g., Sarah has shown strong initiative in learning the wine list and regularly asks questions to improve her product knowledge.", manufacturing: "e.g., Sarah has shown strong initiative in learning machine operation and regularly asks questions to improve her technical knowledge.", community_services: "e.g., Sarah has shown strong initiative in learning clients' support plans and regularly asks questions to improve her person-centred practice.", default: "e.g., Sarah has shown strong initiative in learning the role and regularly asks questions to improve her knowledge." },
+    concernsList: { hospitality: "e.g.,\n• Speed of service during peak periods — average table turn time is 15 mins above target\n• Accuracy of orders — 3 incorrect orders in the past 2 weeks\n• Needs to be more proactive seeking tasks during quiet periods rather than waiting to be directed", manufacturing: "e.g.,\n• Output during peak periods — average cycle time is 15% above target\n• Quality — 3 defective units in the past 2 weeks\n• Needs to be more proactive seeking tasks during downtime rather than waiting to be directed", community_services: "e.g.,\n• Timeliness completing support notes — several entries logged a day late over the past fortnight\n• Accuracy of documentation — 3 incomplete progress notes in the past 2 weeks\n• Needs to be more proactive seeking tasks during quieter periods of a shift rather than waiting to be directed", default: "e.g.,\n• Productivity during busy periods — output is below target\n• Accuracy — 3 errors in the past 2 weeks\n• Needs to be more proactive seeking tasks during quiet periods rather than waiting to be directed" },
+    incidentExample: { hospitality: "e.g., On Friday 7 Feb, section turnaround during the 7pm rush took 25 minutes compared to the 10-minute target. Two tables received incorrect mains.", manufacturing: "e.g., On Friday 7 Feb, changeover during the afternoon shift took 25 minutes compared to the 10-minute target. Two units failed quality check.", community_services: "e.g., On Friday 7 Feb, a medication administration record was left unsigned and two progress notes for the morning shift were not completed before handover.", default: "e.g., On Friday 7 Feb, a task during the busy period took 25 minutes compared to the 10-minute target, and two items had errors." },
+    actionPlan: { hospitality: "e.g.,\nEmployee:\n• Focus on speed of service during Friday/Saturday peaks — aim for 10-min table turns\n• Double-check all orders before sending to kitchen\n• Proactively ask supervisor for tasks during quiet periods\n\nLeader:\n• Arrange buddy shifts with Senior Waiter (James) for next 2 weeks\n• Provide real-time coaching during Friday/Saturday peak services\n• Continue fortnightly check-ins to review progress", manufacturing: "e.g.,\nEmployee:\n• Focus on output during peak production runs — aim to meet target cycle time\n• Double-check all work against the spec before sign-off\n• Proactively ask supervisor for tasks during downtime\n\nLeader:\n• Arrange buddy shifts with a Leading Hand (James) for next 2 weeks\n• Provide real-time coaching during peak production\n• Continue fortnightly check-ins to review progress", community_services: "e.g.,\nEmployee:\n• Focus on completing support/progress notes before the end of each shift\n• Double-check medication and care records against the support plan\n• Proactively ask the coordinator for tasks during quieter periods\n\nLeader:\n• Arrange buddy shifts with a Senior Support Worker (James) for next 2 weeks\n• Provide real-time coaching during community-access shifts\n• Continue fortnightly check-ins to review progress", default: "e.g.,\nEmployee:\n• Focus on productivity during busy periods — aim to meet targets\n• Double-check all work before completing it\n• Proactively ask your supervisor for tasks during quiet periods\n\nLeader:\n• Arrange buddy shifts with a senior team member (James) for next 2 weeks\n• Provide real-time coaching during busy periods\n• Continue fortnightly check-ins to review progress" },
+    supportTraining: { hospitality: "e.g.,\n• Advanced POS refresher training (split bills, modifications) — scheduled Week of 17 Feb\n• Shadow senior staff during 2 weekend peak shifts\n• Menu knowledge quiz to build confidence", manufacturing: "e.g.,\n• Refresher training on the work-order/MES system — scheduled Week of 17 Feb\n• Shadow senior staff during 2 peak production shifts\n• Quality-procedure refresher to build confidence", community_services: "e.g.,\n• Refresher training on the client management / progress-notes system — scheduled Week of 17 Feb\n• Shadow a senior support worker for 2 community-access shifts\n• Manual-handling and person-centred-practice refresher to build confidence", default: "e.g.,\n• Refresher training on key systems — scheduled Week of 17 Feb\n• Shadow senior staff during 2 busy shifts\n• Knowledge refresher to build confidence" },
+    performanceIssueShort: { hospitality: "e.g., Slow service - average drink prep time is 4 minutes vs team average of 2.5 minutes", manufacturing: "e.g., Low output - average task cycle time is 4 minutes vs team average of 2.5 minutes", community_services: "e.g., Incomplete documentation - average of 4 progress notes per week submitted late or unfinished vs team standard of same-shift completion", default: "e.g., Below-target productivity - average task time is 4 minutes vs team average of 2.5 minutes" },
+    evidenceData: { hospitality: "e.g., POS system shows 18 incorrect orders in last 2 weeks", manufacturing: "e.g., Quality log shows 18 defective units in last 2 weeks", community_services: "e.g., Client management system shows 18 incomplete or late progress notes in last 2 weeks", default: "e.g., Records show 18 errors in last 2 weeks" },
+    trainingPlanList: { hospitality: "e.g., \n• 2-hour cocktail making refresher course (Week 1)\n• Shadow experienced bartender for 3 shifts (Week 2)\n• Daily 15-min coaching sessions with supervisor (Weeks 1-4)\n• Access to online mixology tutorials", manufacturing: "e.g., \n• 2-hour machine-operation refresher course (Week 1)\n• Shadow an experienced operator for 3 shifts (Week 2)\n• Daily 15-min coaching sessions with supervisor (Weeks 1-4)\n• Access to online technical tutorials", community_services: "e.g., \n• 2-hour person-centred-practice refresher (Week 1)\n• Shadow an experienced support worker for 3 shifts (Week 2)\n• Daily 15-min coaching sessions with the coordinator (Weeks 1-4)\n• Access to online NDIS and manual-handling tutorials", default: "e.g., \n• 2-hour skills refresher course (Week 1)\n• Shadow an experienced team member for 3 shifts (Week 2)\n• Daily 15-min coaching sessions with supervisor (Weeks 1-4)\n• Access to online training tutorials" },
+    progressSummary: { hospitality: "e.g., Sarah has been punctual for all shifts except two occasions in week 3. She has completed RSA training and follows service standards well.", manufacturing: "e.g., Sarah has been punctual for all shifts except two occasions in week 3. She has completed her site safety induction and follows standard work procedures well.", community_services: "e.g., Sarah has been punctual for all shifts except two occasions in week 3. She has completed her manual-handling training and follows clients' support plans well.", default: "e.g., Sarah has been punctual for all shifts except two occasions in week 3. She has completed her required training and follows procedures well." },
+    roleExpectations: { hospitality: "e.g.,\n• Independently manage a section of 6 tables\n• Accurately process orders through POS system\n• Upsell menu items to achieve average spend targets", manufacturing: "e.g.,\n• Independently operate an assigned station or line\n• Accurately complete and log work orders\n• Meet output and quality targets for the shift", community_services: "e.g.,\n• Independently support an assigned client caseload in line with their support plans\n• Accurately complete and log progress and medication notes\n• Meet documentation and care-quality standards for the shift", default: "e.g.,\n• Independently manage their assigned area of work\n• Accurately complete and record tasks\n• Meet productivity and quality targets" },
+    behaviours: { hospitality: "e.g.,\n• Positive and professional attitude with guests and team\n• Takes initiative and asks questions when unsure\n• Communicates effectively during service\n• Accepts feedback constructively", manufacturing: "e.g.,\n• Positive and professional attitude with the team\n• Takes initiative and asks questions when unsure\n• Communicates effectively during the shift\n• Accepts feedback constructively", community_services: "e.g.,\n• Positive, respectful attitude with clients, families and team\n• Takes initiative and asks questions when unsure\n• Communicates effectively at handover\n• Accepts feedback constructively", default: "e.g.,\n• Positive and professional attitude with customers and team\n• Takes initiative and asks questions when unsure\n• Communicates effectively\n• Accepts feedback constructively" },
+    behaviourDetail: { hospitality: "e.g., Sarah's guest interactions are excellent — she's received two positive customer comments. She could improve on communication with kitchen during busy service.", manufacturing: "e.g., Sarah's teamwork is excellent — she's received two positive comments. She could improve on communication with the next station during busy production.", community_services: "e.g., Sarah's rapport with clients is excellent — she's received two positive comments from families. She could improve on communication with the team at handover during busy shifts.", default: "e.g., Sarah's customer interactions are excellent — she's received two positive comments. She could improve on communication with the team during busy periods." },
+    inductionItems: { hospitality: "e.g.,\n• 3-day induction program completed\n• Buddy assigned (James - Senior Bartender)\n• RSA training completed\n• POS system training completed\n• Menu knowledge sessions x2", manufacturing: "e.g.,\n• 3-day induction program completed\n• Buddy assigned (James - Leading Hand)\n• Site safety induction completed\n• Work-order system training completed\n• Machine-operation sessions x2", community_services: "e.g.,\n• 3-day induction program completed\n• Buddy assigned (James - Senior Support Worker)\n• WHS and manual-handling induction completed\n• Client management system training completed\n• Support-plan familiarisation sessions x2", default: "e.g.,\n• 3-day induction program completed\n• Buddy assigned (James - Senior team member)\n• WHS induction completed\n• Systems training completed\n• Role knowledge sessions x2" },
+    developmentTraining: { hospitality: "e.g.,\n• Cocktail masterclass for premium drinks\n• Advanced POS functions (split bills, modifications)\n• Cellar and wine knowledge training", manufacturing: "e.g.,\n• Advanced machine-operation masterclass\n• Advanced work-order/MES functions\n• Quality and inspection training", community_services: "e.g.,\n• Advanced person-centred-practice masterclass\n• Advanced client management system functions\n• Complex-needs and positive-behaviour-support training", default: "e.g.,\n• Advanced skills masterclass\n• Advanced systems functions\n• Specialist knowledge training" },
+    employeeFeedback: { hospitality: "e.g., Sarah mentioned she'd like more exposure to cocktail making. No concerns raised about the role or team.", manufacturing: "e.g., Sarah mentioned she'd like more exposure to machine setup. No concerns raised about the role or team.", community_services: "e.g., Sarah mentioned she'd like more exposure to complex-needs support. No concerns raised about the role or team.", default: "e.g., Sarah mentioned she'd like more exposure to other areas of the role. No concerns raised about the role or team." },
+    improvementShort: { hospitality: "e.g., Needs to improve speed of service during peak periods, could be more proactive in asking for tasks during quiet periods", manufacturing: "e.g., Needs to improve output during peak periods, could be more proactive in asking for tasks during downtime", community_services: "e.g., Needs to improve timeliness of support-note documentation, could be more proactive in asking for tasks during quieter periods", default: "e.g., Needs to improve productivity during busy periods, could be more proactive in asking for tasks during quiet periods" },
+    actionPlanProbation: { hospitality: "e.g.,\nEmployee:\n• Focus on speed of service during Friday/Saturday peaks\n• Complete cocktail training by end of month\n\nLeader:\n• Arrange cocktail masterclass with Head Bartender\n• Continue weekly check-ins\n• Provide real-time feedback during busy shifts", manufacturing: "e.g.,\nEmployee:\n• Focus on output during peak production runs\n• Complete machine-operation training by end of month\n\nLeader:\n• Arrange a skills masterclass with a Leading Hand\n• Continue weekly check-ins\n• Provide real-time feedback during busy shifts", community_services: "e.g.,\nEmployee:\n• Focus on completing support notes before end of shift\n• Complete manual-handling refresher by end of month\n\nLeader:\n• Arrange a person-centred-practice session with a Senior Support Worker\n• Continue weekly check-ins\n• Provide real-time feedback during busy shifts", default: "e.g.,\nEmployee:\n• Focus on productivity during busy periods\n• Complete required training by end of month\n\nLeader:\n• Arrange a skills session with a senior team member\n• Continue weekly check-ins\n• Provide real-time feedback during busy periods" },
+    qualifications: { hospitality: "e.g.,\nEssential:\n- Certificate III in Hospitality (or equivalent)\n- Minimum 5 years experience in a similar role\n- Current Food Safety Supervisor certificate\n\nDesirable:\n- Responsible Service of Alcohol (RSA)\n- Experience with menu costing and development", manufacturing: "e.g.,\nEssential:\n- Certificate III in Engineering or relevant trade qualification\n- Minimum 5 years experience in a similar role\n- Current White Card (construction induction)\n\nDesirable:\n- Forklift / high-risk work licence\n- Experience with lean / continuous-improvement practices", community_services: "e.g.,\nEssential:\n- Certificate III in Individual Support / Disability (or equivalent)\n- Minimum 5 years experience in a similar role\n- Current First Aid & CPR certificate\n\nDesirable:\n- NDIS Worker Screening Check and Working with Children Check\n- Manual-handling and medication-assistance training", default: "e.g.,\nEssential:\n- Relevant trade certificate or qualification\n- Minimum 5 years experience in a similar role\n- Current licences/tickets for the role\n\nDesirable:\n- Additional certifications relevant to the role\n- First aid / WHS certification" },
 };
 function _awEx(key) {
     const v = _AWARD_EXAMPLES[key];
     if (!v) return '';
     const code = getAwardContext().code;
     if (code === 'MA000010') return v.manufacturing;
+    if (code === 'MA000100') return v.community_services || v.default;
     if (code === 'MA000009' || code === 'MA000119') return v.hospitality;
     return v.default;
 }
@@ -13429,8 +13476,95 @@ function _calcManufacturingSteps() {
     ];
 }
 
+// SCHADS (MA000100) classification picker — community services is graded by
+// STREAM (social/community services, crisis accommodation, family day care,
+// home care) then level/pay point, not by hospitality role. Reads from the
+// loaded schads-award-rates.json (awardRates).
+function _schadsShortLabel(classification) {
+    // "Home care (disability care) - Level 1 - pay point 1" -> "Disability Care — Level 1 - pay point 1"
+    const m = classification.match(/\(([^)]+)\)\s*-\s*(.+)$/);
+    if (m) return m[1].replace(/\b\w/g, c => c.toUpperCase()) + ' — ' + m[2];
+    const i = classification.indexOf(' - ');
+    return i === -1 ? classification : classification.slice(i + 3);
+}
+function _calcSchadsSteps() {
+    const streamLabels = {
+        social_community_services: 'Social & community services (SACS)',
+        crisis_accommodation: 'Crisis accommodation',
+        family_day_care: 'Family day care',
+        home_care: 'Home care (disability & aged care)'
+    };
+    const empLabels = { full_time: 'Full-time / Part-time', casual: 'Casual' };
+    return [
+        { key: 'schadsStream', title: 'Which SCHADS stream?', options: function () {
+            return [...new Set(awardRates.rates.map(r => r.stream))]
+                .map(s => ({ value: s, label: streamLabels[s] || s }));
+        }},
+        { key: 'schadsClass', title: 'Which classification / pay point?', options: function (data) {
+            const inStream = awardRates.rates.filter(r => r.stream === data.schadsStream);
+            return [...new Set(inStream.map(r => r.classification))]
+                .map(c => ({ value: c, label: _schadsShortLabel(c) }));
+        }},
+        { key: 'employment', title: 'What type of employment?', options: function (data) {
+            const emps = [...new Set(awardRates.rates.filter(r => r.stream === data.schadsStream).map(r => r.employment_type))];
+            return emps.map(e => ({ value: e, label: empLabels[e] || e }));
+        }}
+    ];
+}
+
+// SCHADS resolver — returns the shared result-card shape. Casual rates already
+// include the 25% loading, so penalties are computed on the base rate (loaded /
+// 1.25) and the casual penalty/overtime multipliers add the 25% back.
+function resolveSchadsRate(data) {
+    const entry = awardRates.rates.find(r => r.stream === data.schadsStream && r.classification === data.schadsClass && r.employment_type === data.employment);
+    if (!entry) {
+        return { award: awardRates.award_name, level: 'Rate not found', rate: 0,
+            penalties: ['No rate found for that combination.'], nextSteps: ['Contact Fitz HR support'] };
+    }
+    const rate = entry.rate;
+    const p = awardRates.penalty_rates || {};
+    const cl = awardRates.casual_loading || 0.25;
+    const isCasual = data.employment === 'casual';
+    // Casual penalties are calculated on the (unloaded) base rate. Use the
+    // full-time sibling row for an exact base rather than dividing the rounded
+    // casual rate, so penalty dollars reproduce the Pay Guide exactly.
+    const ftSibling = isCasual
+        ? awardRates.rates.find(r => r.stream === data.schadsStream && r.classification === data.schadsClass && r.employment_type === 'full_time')
+        : null;
+    const base = isCasual ? (ftSibling ? ftSibling.rate : rate / (1 + cl)) : rate;
+    const money = n => '$' + n.toFixed(2);
+    const penalties = [];
+    const pen = (label, mult) => { if (typeof mult === 'number') penalties.push(`${label} (${Math.round(mult * 100)}%): ${money(base * mult)}/hr`); };
+    pen('Saturday', isCasual ? p.saturday_casual : p.saturday_full_time_part_time);
+    pen('Sunday', isCasual ? p.sunday_casual : p.sunday_full_time_part_time);
+    pen('Public holiday', isCasual ? p.public_holiday_casual : p.public_holiday_full_time_part_time);
+    const load = (label, l) => { if (typeof l === 'number') { const mult = 1 + l + (isCasual ? cl : 0); penalties.push(`${label} (${Math.round(mult * 100)}%): ${money(base * mult)}/hr`); } };
+    load('Afternoon shift (+12.5%)', p.afternoon_shift_loading);
+    load('Night shift (+15%)', p.night_shift_loading);
+    pen('Overtime — first 2 hrs (full-time first 3 hrs)', (p.overtime_first_2hrs || 1.5) + (isCasual ? cl : 0));
+    pen('Overtime — after 2 hrs', (p.overtime_after_2hrs || 2.0) + (isCasual ? cl : 0));
+    if (isCasual) {
+        penalties.push('Casual rates include the 25% loading; penalties above are computed on the base rate and already include the loading.');
+    }
+    return { award: awardRates.award_name, level: _schadsShortLabel(entry.classification), rate: rate, weeklyRate: entry.weekly_rate || null,
+        rateLabel: isCasual ? 'Casual Rate (per hour)' : 'Base Rate (per hour)',
+        penalties: penalties, nextSteps: [
+            'Confirm the stream, level and pay point against Schedule B/C of MA000100',
+            'Set up payroll with these exact rates',
+            'Keep employment records for 7 years'
+        ]};
+}
+
 function getAwardCalculatorConfig(code) {
     if (getAwardContext().calculatorType === 'classification') {
+        if (code === 'MA000100') {
+            return {
+                disclaimer: '⚠️ Preview — SCHADS rates effective 01/07/2026. Pick the stream that matches the work performed. Verify against the award before relying on these figures.',
+                steps: _calcSchadsSteps(),
+                resolve: resolveSchadsRate,
+                juniorRedirect: false
+            };
+        }
         return {
             disclaimer: '⚠️ Preview — rates effective 01/07/2025, general manufacturing only (excludes vehicle manufacturing). Verify against the award before relying on these figures.',
             steps: _calcManufacturingSteps(),
@@ -16731,12 +16865,16 @@ function updateOnboardingStep() {
     document.getElementById('onboardingProgress').textContent = `${progress}% Complete`;
     document.getElementById('onboardingProgressBar').style.width = `${progress}%`;
 
-    // Reveal the Manufacturing award option on the award step only for users with
-    // the manufacturing_preview flag (preview-gated; see guardrails spec).
+    // Reveal preview-gated award options on the award step only for users with
+    // the matching feature flag (preview-gated; see guardrails spec).
     if (onboardingCurrentStep === 2) {
         const manufBtn = document.getElementById('onboardingManufacturingBtn');
         if (manufBtn && typeof hasFeature === 'function' && hasFeature('manufacturing_preview')) {
             manufBtn.classList.remove('hidden');
+        }
+        const schadsBtn = document.getElementById('onboardingSchadsBtn');
+        if (schadsBtn && typeof hasFeature === 'function' && hasFeature('schads_preview')) {
+            schadsBtn.classList.remove('hidden');
         }
     }
 
@@ -16747,6 +16885,9 @@ function updateOnboardingStep() {
         if (hint) {
             if (isManufacturingAwardName(venueProfile.primaryAward)) {
                 hint.textContent = 'Select the type of manufacturing business you run.';
+                hint.classList.remove('hidden');
+            } else if (isSchadsAwardName(venueProfile.primaryAward)) {
+                hint.textContent = 'Select the type of community services, care or disability organisation you run.';
                 hint.classList.remove('hidden');
             } else if (AWARD_VENUE_MAP[venueProfile.primaryAward]) {
                 hint.textContent = `Showing business types commonly covered by the ${venueProfile.primaryAward}. If yours isn't listed, choose from "Other business types".`;
@@ -16984,7 +17125,8 @@ function showRandomQuickPrompts() {
 
 function getVenueTypeLabel(type) {
     const match = VENUE_OPTIONS.find(v => v.value === type)
-        || MANUFACTURING_VENUE_OPTIONS.find(v => v.value === type);
+        || MANUFACTURING_VENUE_OPTIONS.find(v => v.value === type)
+        || SCHADS_VENUE_OPTIONS.find(v => v.value === type);
     if (match) return match.short;
     // Legacy slugs from earlier onboarding versions
     const legacy = {
@@ -17061,6 +17203,7 @@ function showVenueSettings() {
                     <option value="Hospitality Industry (General) Award" ${venueProfile.primaryAward === 'Hospitality Industry (General) Award' ? 'selected' : ''}>Hospitality Industry (General) Award (MA000009)</option>
                     <option value="Restaurant Industry Award" ${venueProfile.primaryAward === 'Restaurant Industry Award' ? 'selected' : ''}>Restaurant Industry Award (MA000119)</option>
                     ${hasFeature('manufacturing_preview') ? `<option value="Manufacturing and Associated Industries Award" ${venueProfile.primaryAward === 'Manufacturing and Associated Industries Award' ? 'selected' : ''}>Manufacturing and Associated Industries Award (MA000010) — preview</option>` : ''}
+                    ${hasFeature('schads_preview') ? `<option value="Social, Community, Home Care and Disability Services Industry Award MA000100" ${venueProfile.primaryAward === 'Social, Community, Home Care and Disability Services Industry Award MA000100' ? 'selected' : ''}>Social, Community, Home Care &amp; Disability Services Award (MA000100) — preview</option>` : ''}
                 </select>
                 <p class="text-xs text-slate-400 mt-1">Changing your award updates pay rate calculations and advice throughout the app.</p>
             </div>
@@ -23137,6 +23280,7 @@ const _FW_DOC_TEMPLATES = {
         title: 'Annualised Wage Agreement',
         subtitle: 'Generates a written annualised wage agreement with the clause references for your award',
         anchor: 'Annualised wage arrangement clause for your award · Fair Work Act 2009',
+        excludeAwards: ['MA000100'],   // SCHADS has no annualised wage arrangement clause
         render: function() { return _fwDocRender_clause20Agreement(); },
         validate: function() { return _fwDocValidate_clause20Agreement(); },
         generate: function() { return _fwDocGenerate_clause20Agreement(); }
@@ -23145,6 +23289,7 @@ const _FW_DOC_TEMPLATES = {
         title: 'Annualised Wage Time Record',
         subtitle: 'Generates a signed time record template for annualised wage arrangements',
         anchor: 'Annualised wage record-keeping clause for your award · FW Act s535',
+        excludeAwards: ['MA000100'],   // SCHADS has no annualised wage arrangement clause
         render: function() { return _fwDocRender_weeklyTimeRecord(); },
         validate: function() { return _fwDocValidate_weeklyTimeRecord(); },
         generate: function() { return _fwDocGenerate_weeklyTimeRecord(); }
@@ -23342,10 +23487,22 @@ function _fwDocClassificationOptions(awardCode) {
                    'C6 - Advanced tradesperson level I', 'C5 - Advanced tradesperson level II',
                    'C4 - Engineering associate level I', 'C3 - Engineering associate level II',
                    'C2(a) - Principal supervisor', 'C2(b) - Principal technical officer', 'Other'];
+    // SCHADS MA000100 — graded by stream then level (Schedules B/C of the award).
+    const ma100 = ['Social & community services - Level 1', 'Social & community services - Level 2',
+                   'Social & community services - Level 3', 'Social & community services - Level 4',
+                   'Social & community services - Level 5', 'Social & community services - Level 6',
+                   'Social & community services - Level 7', 'Social & community services - Level 8',
+                   'Crisis accommodation - Level 1', 'Crisis accommodation - Level 2',
+                   'Crisis accommodation - Level 3', 'Crisis accommodation - Level 4',
+                   'Home care - Level 1', 'Home care - Level 2', 'Home care - Level 3',
+                   'Home care - Level 4', 'Home care - Level 5', 'Home care - Level 6 (Team leader)',
+                   'Family day care - Level 1', 'Family day care - Level 2', 'Family day care - Level 3',
+                   'Family day care - Level 4', 'Family day care - Level 5', 'Other'];
     let opts;
     if (awardCode === 'MA000009') opts = ma009;
     else if (awardCode === 'MA000119') opts = ma119;
     else if (awardCode === 'MA000010') opts = ma010;
+    else if (awardCode === 'MA000100') opts = ma100;
     else return '<option value="">Set your Award in Settings first</option>';
     return opts.map(function(o) { return '<option value="' + _fwEscapeHtml(o) + '">' + _fwEscapeHtml(o) + '</option>'; }).join('');
 }
@@ -23357,6 +23514,9 @@ function _fwDocAppliesToAward(templateId, awardCode) {
     const t = _FW_DOC_TEMPLATES[templateId];
     if (!t) return false;
     if (t.hospitalityOnly) return awardCode === 'MA000009' || awardCode === 'MA000119';
+    // Fail closed for awards a template can't lawfully produce (e.g. SCHADS has
+    // no annualised wage arrangement clause, so those templates don't apply).
+    if (Array.isArray(t.excludeAwards) && t.excludeAwards.indexOf(awardCode) !== -1) return false;
     return true;
 }
 
@@ -23686,7 +23846,8 @@ function _fwDocGenerate_cashOut() {
     const awardCode = getAwardContext().code;
     const isMA119 = awardCode === 'MA000119';
     const scheduleRef = isMA119 ? 'MA000119 Schedule H'
-        : (awardCode === 'MA000009' ? 'MA000009 Schedule G' : '[your modern award] schedule');
+        : (awardCode === 'MA000009' ? 'MA000009 Schedule G'
+        : (awardCode === 'MA000100' ? 'MA000100 Schedule K' : '[your modern award] schedule'));
     const balance = parseFloat(d.balance_hours);
     const cashout = parseFloat(d.cashout_hours);
     const rate = parseFloat(d.base_rate);
@@ -23820,7 +23981,10 @@ function _fwShowSubscriptionGate(templateId) {
 // the doc-builder modal opens cleanly on top.
 function openComplianceDocFromBuilder(templateId) {
     if (!_fwDocAppliesToAward(templateId, getAwardContext().code)) {
-        showAlert('This framework is specific to licensed hospitality venues and doesn\'t apply to your award.');
+        const t = _FW_DOC_TEMPLATES[templateId];
+        showAlert(t && t.hospitalityOnly
+            ? 'This framework is specific to licensed hospitality venues and doesn\'t apply to your award.'
+            : 'This document isn\'t available for your award — the relevant provision doesn\'t exist in it.');
         return;
     }
     if (!_fwHasComplianceAccess()) {
@@ -23883,9 +24047,27 @@ const _FW_PSYCHO_HAZARDS_MANUFACTURING = [
     'Vicarious trauma (witnessing workplace incidents)'
 ];
 
+// SCHADS-relevant psychosocial hazards (community/disability/home care context).
+const _FW_PSYCHO_HAZARDS_SCHADS = [
+    'Client / participant aggression or challenging behaviours',
+    'Exposure to traumatic events (client crises, self-harm, abuse disclosures)',
+    'Vicarious trauma and compassion fatigue / burnout',
+    'Occupational violence in clients\' homes or in the community',
+    'Lone / remote work (single-worker home visits, sleepovers, on-call)',
+    'High emotional labour and sustained client demands',
+    'Low job control over rosters, broken shifts and travel',
+    'Fatigue from broken shifts, sleepovers, 24-hour care and on-call',
+    'Poor support after a critical incident',
+    'Manual handling and physical strain affecting wellbeing',
+    'Bullying or poor support within the team or supervisory hierarchy'
+];
+
 // The hazard list defaults to the resolved award's industry context.
 function _fwPsychoHazards() {
-    return getAwardContext().code === 'MA000010' ? _FW_PSYCHO_HAZARDS_MANUFACTURING : _FW_PSYCHO_HAZARDS;
+    const code = getAwardContext().code;
+    if (code === 'MA000010') return _FW_PSYCHO_HAZARDS_MANUFACTURING;
+    if (code === 'MA000100') return _FW_PSYCHO_HAZARDS_SCHADS;
+    return _FW_PSYCHO_HAZARDS;
 }
 
 function _fwDocRender_psychoRegister() {
@@ -24263,7 +24445,8 @@ function _fwDocGenerate_leaveInAdvance() {
     const p = venueProfile || {}; const d = _fwReadDocForm();
     const awardCode = getAwardContext().code;
     const scheduleRef = awardCode === 'MA000119' ? 'MA000119 Schedule H'
-        : (awardCode === 'MA000009' ? 'MA000009 Schedule G' : '[your modern award] schedule');
+        : (awardCode === 'MA000009' ? 'MA000009 Schedule G'
+        : (awardCode === 'MA000100' ? 'MA000100 Schedule J' : '[your modern award] schedule'));
     const negativeBalance = Number(d.current_balance) - Number(d.advance_hours);
     const html =
         '<h1>Annual Leave in Advance Agreement</h1>' +

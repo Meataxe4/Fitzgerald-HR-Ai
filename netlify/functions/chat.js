@@ -7,6 +7,7 @@
 const restaurantRates = require('../../restaurant-award-rates.json');
 const hospitalityRates = require('../../hospitality-award-rates.json');
 const manufacturingRates = require('../../manufacturing-award-rates.json');
+const schadsRates = require('../../schads-award-rates.json');
 
 // Builds the PENALTY RATES section of the system prompt from a rates JSON.
 function buildPenaltyRateFacts(rates, awardLabel) {
@@ -24,6 +25,21 @@ function buildPenaltyRateFacts(rates, awardLabel) {
     lines.push(`- Public holiday (casual): ${Math.round(p.public_holiday_casual * 100)}% of base rate`);
   } else if (typeof p.public_holiday === 'number') {
     lines.push(`- Public holiday: ${Math.round(p.public_holiday * 100)}% of base rate`);
+  }
+
+  // SCHADS (MA000100) expresses weekend/PH as full-time/part-time vs casual
+  // multipliers (like Hospitality/Restaurant) rather than the single bare keys.
+  // Emitted only for MA000100 so Hospitality/Restaurant output stays unchanged.
+  if (rates.ma_number === 'MA000100') {
+    if (typeof p.saturday_full_time_part_time === 'number' && typeof p.saturday_casual === 'number') {
+      lines.push(`- Saturday: ${Math.round(p.saturday_full_time_part_time * 100)}% of base rate (full-time/part-time); ${Math.round(p.saturday_casual * 100)}% for casuals (incl. 25% loading)`);
+    }
+    if (typeof p.sunday_full_time_part_time === 'number' && typeof p.sunday_casual === 'number') {
+      lines.push(`- Sunday: ${Math.round(p.sunday_full_time_part_time * 100)}% of base rate (full-time/part-time); ${Math.round(p.sunday_casual * 100)}% for casuals (incl. 25% loading)`);
+    }
+    if (typeof p.public_holiday_full_time_part_time === 'number' && typeof p.public_holiday_casual === 'number') {
+      lines.push(`- Public holiday: ${Math.round(p.public_holiday_full_time_part_time * 100)}% of base rate (full-time/part-time); ${Math.round(p.public_holiday_casual * 100)}% for casuals (incl. 25% loading)`);
+    }
   }
 
   // Late-night windows — derived from which keys exist in the JSON, so the
@@ -45,15 +61,18 @@ function buildPenaltyRateFacts(rates, awardLabel) {
   if (typeof p.overtime_first_3hrs === 'number' && typeof p.overtime_after_3hrs === 'number') {
     lines.push(`- Overtime: first 3 hours at ${Math.round(p.overtime_first_3hrs * 100)}%, thereafter ${Math.round(p.overtime_after_3hrs * 100)}%`);
   }
-  // Shift loadings (e.g. Manufacturing) — percentage loadings on top of base.
+  // Shift loadings (e.g. Manufacturing, SCHADS) — percentage loadings on top of
+  // base. Use a precise formatter so fractional loadings (SCHADS afternoon
+  // +12.5%) aren't rounded; integer loadings render identically to before.
+  const pct = (x) => (x * 100).toFixed(1).replace(/\.0$/, '');
   if (typeof p.afternoon_shift_loading === 'number') {
-    lines.push(`- Afternoon shift loading: +${Math.round(p.afternoon_shift_loading * 100)}% of base rate`);
+    lines.push(`- Afternoon shift loading: +${pct(p.afternoon_shift_loading)}% of base rate`);
   }
   if (typeof p.night_shift_loading === 'number') {
-    lines.push(`- Night shift loading: +${Math.round(p.night_shift_loading * 100)}% of base rate`);
+    lines.push(`- Night shift loading: +${pct(p.night_shift_loading)}% of base rate`);
   }
   if (typeof p.permanent_night_shift_loading === 'number') {
-    lines.push(`- Permanent night shift loading: +${Math.round(p.permanent_night_shift_loading * 100)}% of base rate`);
+    lines.push(`- Permanent night shift loading: +${pct(p.permanent_night_shift_loading)}% of base rate`);
   }
   if (typeof rates.casual_loading === 'number') {
     lines.push(`- Casual loading: ${Math.round(rates.casual_loading * 100)}% (applies to base rate before penalties)`);
@@ -63,6 +82,8 @@ function buildPenaltyRateFacts(rates, awardLabel) {
     lines.push(`NOTE: The Restaurant Award's late-night windows differ from the Hospitality Award — evening loading only applies AFTER 10pm (not from 7pm), and night loading runs to 6am (not 7am). Weekend and public holiday rates supersede the late-night loadings.`);
   } else if (rates.ma_number === 'MA000010') {
     lines.push(`NOTE: Manufacturing shift loadings (afternoon/night) apply to shiftworkers on their ordinary hours; weekend, public holiday and overtime rates apply as listed. Afternoon and night shift loadings are +15% (clause 33.2(d)) and permanent night shift +30% (clause 33.2(f)).`);
+  } else if (rates.ma_number === 'MA000100') {
+    lines.push(`NOTE: SCHADS weekend/public-holiday penalties are Saturday 150%, Sunday 200%, public holiday 250% of the minimum hourly rate for full-time/part-time employees (clause 29); casual employees add the 25% casual loading (Saturday 175%, Sunday 225%, public holiday 275%). Shift loadings are afternoon +12.5% and night +15% (clause 29.4) — afternoon shift finishes after 8pm and at or before midnight; night shift finishes after midnight and at or before 8am. The higher of a penalty rate or shift loading applies for the same hours, not both. Sleepover, on-call, broken-shift and 24-hour-care payments are additional — direct the user to the award/Pay Guide for those.`);
   } else {
     lines.push(`NOTE: Weekend and public holiday rates supersede the late-night loadings.`);
   }
@@ -77,10 +98,10 @@ function buildMinimumEngagementFacts(rates, awardLabel) {
   const ma = rates.ma_number;
   const isMA119 = ma === 'MA000119';
   const ftClause = isMA119 ? ' (clause 11)' : '';
-  const ptClause = ma === 'MA000010' ? ' (clause 10.2)' : ' (clause 12)';
+  const ptClause = ma === 'MA000010' ? ' (clause 10.2)' : ma === 'MA000100' ? ' (clause 10.5)' : ' (clause 12)';
   const casClause = isMA119
     ? ' (clause 13.5 — "An employer must not engage a casual employee for less than 2 consecutive hours of work")'
-    : ma === 'MA000010' ? ' (clause 11.2)' : ' (clause 11.4)';
+    : ma === 'MA000010' ? ' (clause 11.2)' : ma === 'MA000100' ? ' (clause 10.5)' : ' (clause 11.4)';
 
   if (typeof m.full_time_hours_per_shift === 'number') {
     lines.push(`- Full-time employees: minimum ${m.full_time_hours_per_shift} consecutive hours per engagement${ftClause}.`);
@@ -100,6 +121,9 @@ function buildMinimumEngagementFacts(rates, awardLabel) {
   lines.push(`The casual minimum applies even if the employee is sent home early — they must still be paid for the minimum.`);
   if (ma === 'MA000010') {
     lines.push(`Under MA000010 both the part-time and casual minimum may be reduced to no less than 3 consecutive hours by written agreement at the employee's request.`);
+  }
+  if (ma === 'MA000100') {
+    lines.push(`Under MA000100 (clause 10.5) the minimum payment applies per shift or per period of work in a broken shift, and depends on the stream: social and community services employees (except when undertaking disability services work) — minimum 3 hours; all other employees (home care, crisis accommodation, family day care, and SACS employees doing disability services work) — minimum 2 hours. The 2-hour figures above are the floor for those other streams; use 3 hours for social and community services employees.`);
   }
   return lines.join('\n');
 }
@@ -214,6 +238,13 @@ exports.handler = async (event, context) => {
         industryAdj: 'manufacturing',
         rates: manufacturingRates,
         aliases: ['manufacturing']
+      },
+      MA000100: {
+        fullName: 'Social, Community, Home Care and Disability Services Industry Award MA000100',
+        sector: 'social, community, home care and disability services (incl. NDIS, aged and home care)',
+        industryAdj: 'community services',
+        rates: schadsRates,
+        aliases: ['schads', 'social community', 'home care', 'disability services']
       }
     };
     function resolveServerAward(stored) {

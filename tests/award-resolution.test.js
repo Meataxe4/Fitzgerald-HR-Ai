@@ -48,6 +48,19 @@ _flags = new Set(['manufacturing_preview']);
 ({ resolveAward } = factory(CONFIG, hasFeature));
 eq('Manufacturing (flag ON)  -> MA000010', resolveAward('Manufacturing and Associated Industries Award').code, 'MA000010');
 
+// SCHADS preview: gated by its OWN flag (manufacturing_preview must NOT unlock it)
+eq('SCHADS (manufacturing flag only) -> null', resolveAward('Social, Community, Home Care and Disability Services Industry Award MA000100').code, null);
+_flags = new Set(['schads_preview']);
+({ resolveAward } = factory(CONFIG, hasFeature));
+eq('SCHADS (flag ON) -> MA000100', resolveAward('Social, Community, Home Care and Disability Services Industry Award MA000100').code, 'MA000100');
+eq('SCHADS alias schads -> MA000100', resolveAward('schads').code, 'MA000100');
+eq('SCHADS code MA000100 -> MA000100', resolveAward('MA000100').code, 'MA000100');
+eq('SCHADS calculatorType classification', resolveAward('MA000100').calculatorType, 'classification');
+// Hospitality/Restaurant remain byte-identical regardless of preview flags
+eq('Hospitality still -> MA000009 (SCHADS flag on)', resolveAward('Hospitality Industry (General) Award').code, 'MA000009');
+eq('Restaurant still -> MA000119 (SCHADS flag on)', resolveAward('Restaurant Industry Award').code, 'MA000119');
+eq('Manufacturing gated again when only SCHADS flag on -> null', resolveAward('Manufacturing and Associated Industries Award').code, null);
+
 // Code-based resolution (future award_code field)
 eq('Code MA000119 -> MA000119', resolveAward('MA000119').code, 'MA000119');
 
@@ -70,6 +83,10 @@ eq('Hospitality classifications NOT Cook grades', /Cook grade/.test(hospOpts), f
 eq('Restaurant classifications use Cook grades', /Cook grade 5/.test(restOpts), true);
 eq('Restaurant classifications NOT Levels', /Level 6/.test(restOpts), false);
 eq('Unresolved classifications -> placeholder', /Set your Award/.test(noneOpts), true);
+const schadsOpts = _fwDocClassificationOptions('MA000100');
+eq('SCHADS classifications include SACS Level 8', /Social & community services - Level 8/.test(schadsOpts), true);
+eq('SCHADS classifications include Home care Team leader', /Home care - Level 6 \(Team leader\)/.test(schadsOpts), true);
+eq('SCHADS classifications NOT Cook grades', /Cook grade/.test(schadsOpts), false);
 
 // ---- Manufacturing rates data integrity (Milestone: MA000010 wiring) --------
 const manuf = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'manufacturing-award-rates.json'), 'utf8'));
@@ -103,6 +120,41 @@ eq('Manufacturing afternoon/night +15%', manuf.penalty_rates.afternoon_shift_loa
 eq('Manufacturing permanent night +30%', manuf.penalty_rates.permanent_night_shift_loading, 0.30);
 // Supervisor formula captured from clause 20.1(g)
 eq('Supervisor formula present', !!(manuf.formula_classifications && manuf.formula_classifications.supervisor_trainer_coordinator), true);
+
+// ---- SCHADS rates data integrity (Milestone: MA000100 wiring) ----------------
+const schads = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'schads-award-rates.json'), 'utf8'));
+eq('SCHADS ma_number', schads.ma_number, 'MA000100');
+eq('SCHADS 152 rate rows', schads.rates.length, 152);
+eq('SCHADS Saturday FT/PT 1.5', schads.penalty_rates.saturday_full_time_part_time, 1.5);
+eq('SCHADS Saturday casual 1.75', schads.penalty_rates.saturday_casual, 1.75);
+eq('SCHADS Sunday FT/PT 2.0', schads.penalty_rates.sunday_full_time_part_time, 2.0);
+eq('SCHADS public holiday FT/PT 2.5', schads.penalty_rates.public_holiday_full_time_part_time, 2.5);
+eq('SCHADS casual loading 0.25', schads.casual_loading, 0.25);
+eq('SCHADS afternoon +12.5%', schads.penalty_rates.afternoon_shift_loading, 0.125);
+eq('SCHADS night +15%', schads.penalty_rates.night_shift_loading, 0.15);
+eq('SCHADS all rows have positive rate', schads.rates.every(r => typeof r.rate === 'number' && r.rate > 0), true);
+eq('SCHADS streams present', [...new Set(schads.rates.map(r => r.stream))].sort().join(','),
+   'crisis_accommodation,family_day_care,home_care,social_community_services');
+
+// Known PDF figures: SACS Level 1 pay point 1, full-time = $27.55 (weekly $1,046.90).
+const sacs1 = schads.rates.find(r => r.stream === 'social_community_services' && r.employment_type === 'full_time' && /Level 1 - pay point 1$/.test(r.classification));
+eq('SCHADS SACS L1pp1 rate $27.55', sacs1 && sacs1.rate, 27.55);
+eq('SCHADS SACS L1pp1 weekly $1046.90', sacs1 && sacs1.weekly_rate, 1046.90);
+// rate x multiplier must reproduce the PDF's own published penalty-dollar columns
+eq('SACS L1pp1 Saturday = $41.33 (PDF)', r2(sacs1.rate * schads.penalty_rates.saturday_full_time_part_time), 41.33);
+eq('SACS L1pp1 Sunday = $55.10 (PDF)', r2(sacs1.rate * schads.penalty_rates.sunday_full_time_part_time), 55.10);
+eq('SACS L1pp1 Public holiday = $68.88 (PDF)', r2(sacs1.rate * schads.penalty_rates.public_holiday_full_time_part_time), 68.88);
+// Casual rate already includes the 25% loading; base x casual multiplier reproduces the PDF.
+const sacs1c = schads.rates.find(r => r.stream === 'social_community_services' && r.employment_type === 'casual' && /Level 1 - pay point 1$/.test(r.classification));
+eq('SCHADS SACS L1pp1 casual rate $34.44', sacs1c && sacs1c.rate, 34.44);
+// Casual penalties derive from the FT base rate (per the Pay Guide), not the
+// rounded casual rate: 27.55 x 1.75 = 48.21.
+eq('SACS casual Saturday = base x1.75 = $48.21 (PDF)', r2(sacs1.rate * schads.penalty_rates.saturday_casual), 48.21);
+// Minimum engagement sourced from award text (clause 10.5)
+eq('SCHADS SACS min 3 hrs', schads.minimum_engagement.social_community_services_hours_per_shift, 3);
+eq('SCHADS other streams min 2 hrs', schads.minimum_engagement.other_streams_hours_per_shift, 2);
+// SCHADS has NO annualised wage clause — those doc templates must be excluded
+eq('SCHADS annualised wage templates excluded (source)', (src.match(/excludeAwards: \['MA000100'\]/g) || []).length >= 2, true);
 
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);
