@@ -889,14 +889,13 @@
 
 </div>
      
-<!-- Hidden Netlify Form for Beta Feedback Collection -->
+<!-- Hidden Netlify Form for Feedback Collection -->
     <form name="beta-feedback" netlify netlify-honeypot="bot-field" hidden>
         <input type="hidden" name="bot-field" />
         <input type="text" name="user">
         <input type="text" name="rating">
         <textarea name="likes"></textarea>
         <textarea name="improve"></textarea>
-        <input type="text" name="willPay">
     </form>
 
     <!-- Payment Processing Modal -->
@@ -1091,7 +1090,7 @@
     <!-- Feedback Modal -->
     <div id="feedbackModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6 z-50">
         <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border border-slate-700 fade-in">
-            <h2 class="text-2xl font-bold text-white mb-4">Beta Feedback</h2>
+            <h2 class="text-2xl font-bold text-white mb-4">Feedback</h2>
             <p class="text-slate-400 mb-6">Your feedback helps us build the best AI assistant for HR. Thank you!</p>
             
             <div class="space-y-4">
@@ -1114,24 +1113,6 @@
                 <div>
                     <label class="block text-slate-300 font-medium mb-2">What could be improved?</label>
                     <textarea id="feedbackImprove" class="w-full bg-slate-900 border border-slate-600 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:border-amber-500" rows="3" placeholder="What would make this better?"></textarea>
-                </div>
-
-                <div>
-                    <label class="block text-slate-300 font-medium mb-2">Would you pay $49/month for this service?</label>
-                    <div class="flex gap-4">
-                        <label class="flex items-center gap-2 text-slate-300">
-                            <input type="radio" name="willPay" value="yes" class="text-amber-500">
-                            <span>Yes, definitely</span>
-                        </label>
-                        <label class="flex items-center gap-2 text-slate-300">
-                            <input type="radio" name="willPay" value="maybe" class="text-amber-500">
-                            <span>Maybe</span>
-                        </label>
-                        <label class="flex items-center gap-2 text-slate-300">
-                            <input type="radio" name="willPay" value="no" class="text-amber-500">
-                            <span>No</span>
-                        </label>
-                    </div>
                 </div>
             </div>
 

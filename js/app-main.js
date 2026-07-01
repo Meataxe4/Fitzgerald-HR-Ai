@@ -20188,8 +20188,7 @@ async function performLogout(loggedOutUser, type) {
 function submitFeedback() {
     const likes = document.getElementById('feedbackLikes').value;
     const improve = document.getElementById('feedbackImprove').value;
-    const willPay = document.querySelector('input[name="willPay"]:checked')?.value;
-    
+
     // Submit to Netlify Forms
     fetch('/', {
         method: 'POST',
@@ -20199,24 +20198,22 @@ function submitFeedback() {
             'user': currentUser,
             'rating': feedbackRating,
             'likes': likes,
-            'improve': improve,
-            'willPay': willPay
+            'improve': improve
         }).toString()
     })
     .then(() => {
         trackEvent('beta_feedback', {
             user: currentUser,
             rating: feedbackRating,
-            likes, improve, willPay
+            likes, improve
         });
-        
+
         showAlert('✓ Thank you! Your feedback has been submitted.\n\nWe really appreciate your help improving this tool!');
         closeFeedback();
-        
+
         // Reset form
         document.getElementById('feedbackLikes').value = '';
         document.getElementById('feedbackImprove').value = '';
-        document.querySelectorAll('input[name="willPay"]').forEach(r => r.checked = false);
         feedbackRating = 0;
         document.querySelectorAll('.rating-btn').forEach(btn => {
             btn.classList.remove('bg-amber-500');

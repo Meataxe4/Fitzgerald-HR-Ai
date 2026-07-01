@@ -1054,7 +1054,7 @@ const FitzTour = {
             id: 'welcome',
             type: 'modal',
             title: "G'day! Welcome to Fitz 👋",
-            content: "I'm your AI-powered HR assistant, built specifically for Australian hospitality venues. Let me show you how I can help you manage your team with confidence.",
+            content: "I'm your AI-powered HR assistant, built specifically for Australian businesses. Let me show you how I can help you manage your team with confidence.",
             icon: '🦘'
         },
         {
@@ -1062,7 +1062,7 @@ const FitzTour = {
             target: '#messageInput',
             targetAction: null,
             title: "Ask Me Anything",
-            content: "Type your HR questions here — from award rates to managing difficult conversations. I'll give you practical, legally-sound advice tailored to Australian hospitality.",
+            content: "Type your HR questions here — from award rates to managing difficult conversations. I'll give you practical, legally-sound advice tailored to your award.",
             position: 'top',
             icon: '💬'
         },
