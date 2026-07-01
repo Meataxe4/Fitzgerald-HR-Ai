@@ -11137,35 +11137,71 @@ async function logDocumentDownload(metadata) {
 	// DAILY TIPS SYSTEM
 	// ========================================
 
-const dailyTips = [
-    { icon: "💡", tip: "Did you know? You must give 30-min breaks for shifts over 5 hours" },
-    { icon: "⚠️", tip: "Award rates increase on 1 July each year - mark your calendar!" },
-    { icon: "📝", tip: "Always document performance conversations in writing" },
-    { icon: "🕒", tip: "Casuals must be paid within 7 days of completing their shift" },
-    { icon: "📋", tip: "Keep employment records for 7 years minimum - it's the law" },
-    { icon: "⚖️", tip: "Unfair dismissal claims must be lodged within 21 days" },
-    { icon: "💰", tip: "Casual loading is 25% on top of permanent rates" },
-    { icon: "🔄", tip: "Regular casuals may request conversion to permanent after 12 months" },
-    { icon: "📅", tip: "Public holidays require 2.5x pay or time off in lieu" },
-    { icon: "✍️", tip: "Use written employment contracts for all staff - avoid disputes" },
-    { icon: "🚨", tip: "Document workplace incidents immediately while details are fresh" },
-    { icon: "📞", tip: "Return employee calls within 24 hours during disputes" },
-    { icon: "⏰", tip: "Minimum shift length is usually 3 hours for casual employees" },
-    { icon: "🎓", tip: "Provide a Fair Work Information Statement to all new employees" },
-    { icon: "💼", tip: "Probation periods are typically 3-6 months - put it in writing" },
-    { icon: "🔐", tip: "Store employee personal information securely - privacy laws apply" },
-    { icon: "📊", tip: "Review your payroll monthly - catch errors before they compound" },
-    { icon: "🤝", tip: "Consider offering unpaid trial shifts (max 1-2 hours for assessment)" },
-    { icon: "🌟", tip: "Recognise good performance regularly - it reduces turnover" },
-    { icon: "📱", tip: "Use the tools menu (🛠️) to access specialised calculators" }
-];
+// Two tips are AWARD-SPECIFIC — the public-holiday multiplier and the casual
+// minimum shift both differ between awards (e.g. public holiday is 2.25x FT/PT
+// under Hospitality/Restaurant but 2.5x under Manufacturing/SCHADS; the casual
+// minimum is 2h under Hospitality/Restaurant/SCHADS but 4h under Manufacturing).
+// They are computed from the loaded award rates so the figure always matches the
+// selected award, and fall back to award-neutral wording when no award is
+// resolved (fail closed — never quote a wrong award-specific number).
+function _dailyPublicHolidayTip() {
+    const pr = (awardRates && awardRates.penalty_rates) || {};
+    const ph = pr.public_holiday_full_time_part_time || pr.public_holiday;
+    const phCasual = pr.public_holiday_casual;
+    if (typeof ph === 'number' && typeof phCasual === 'number' && phCasual !== ph) {
+        return `Public holidays: ${ph}x pay for full-time/part-time and ${phCasual}x for casuals (or time off in lieu where your award allows)`;
+    }
+    if (typeof ph === 'number') {
+        return `Public holidays: ${ph}x pay (or time off in lieu where your award allows)`;
+    }
+    return `Public holidays attract penalty rates or time off in lieu - check your award for the exact multiplier`;
+}
+function _dailyMinShiftTip() {
+    const me = (awardRates && awardRates.minimum_engagement) || {};
+    if (getAwardContext().code === 'MA000100') {
+        return `Minimum engagement: 2 hours for casuals, and 3 hours for social & community services employees (SCHADS clause 10.5)`;
+    }
+    const cas = me.casual_hours_per_shift;
+    if (typeof cas === 'number') {
+        return `Minimum shift length for casual employees is ${cas} hours under your award`;
+    }
+    return `Minimum shift lengths are set by your award - check before rostering short shifts`;
+}
+
+// Built fresh on each read so the two award-specific tips reflect the current
+// award. Order/count is stable so day-of-month indexing stays consistent.
+function getDailyTips() {
+    return [
+        { icon: "💡", tip: "Did you know? You must give 30-min breaks for shifts over 5 hours" },
+        { icon: "⚠️", tip: "Award rates increase on 1 July each year - mark your calendar!" },
+        { icon: "📝", tip: "Always document performance conversations in writing" },
+        { icon: "🕒", tip: "Casuals must be paid within 7 days of completing their shift" },
+        { icon: "📋", tip: "Keep employment records for 7 years minimum - it's the law" },
+        { icon: "⚖️", tip: "Unfair dismissal claims must be lodged within 21 days" },
+        { icon: "💰", tip: "Casual loading is 25% on top of permanent rates" },
+        { icon: "🔄", tip: "Regular casuals may request conversion to permanent after 12 months" },
+        { icon: "📅", tip: _dailyPublicHolidayTip() },
+        { icon: "✍️", tip: "Use written employment contracts for all staff - avoid disputes" },
+        { icon: "🚨", tip: "Document workplace incidents immediately while details are fresh" },
+        { icon: "📞", tip: "Return employee calls within 24 hours during disputes" },
+        { icon: "⏰", tip: _dailyMinShiftTip() },
+        { icon: "🎓", tip: "Provide a Fair Work Information Statement to all new employees" },
+        { icon: "💼", tip: "Probation periods are typically 3-6 months - put it in writing" },
+        { icon: "🔐", tip: "Store employee personal information securely - privacy laws apply" },
+        { icon: "📊", tip: "Review your payroll monthly - catch errors before they compound" },
+        { icon: "🤝", tip: "Consider offering unpaid trial shifts (max 1-2 hours for assessment)" },
+        { icon: "🌟", tip: "Recognise good performance regularly - it reduces turnover" },
+        { icon: "📱", tip: "Use the tools menu (🛠️) to access specialised calculators" }
+    ];
+}
 
 let currentDailyTipIndex = -1; // Start at -1 so first call gets index 0
 
 function getDailyTip() {
     // Get tip based on day of month for consistency
     const today = new Date().getDate();
-    return dailyTips[today % dailyTips.length];
+    const tips = getDailyTips();
+    return tips[today % tips.length];
 }
 
 function updateDailyTipBanner() {
@@ -11196,15 +11232,16 @@ function updateDailyTipBanner() {
 
 function rotateTipManually() {
     // Cycle to next tip
-    currentDailyTipIndex = (currentDailyTipIndex + 1) % dailyTips.length;
-    
+    const tips = getDailyTips();
+    currentDailyTipIndex = (currentDailyTipIndex + 1) % tips.length;
+
     const tipElement = document.getElementById('dailyTipContent');
     const iconElement = document.getElementById('dailyTipIcon');
     const banner = document.getElementById('dailyTipBanner');
-    
+
     if (!tipElement || !iconElement || !banner) return;
-    
-    const tipData = dailyTips[currentDailyTipIndex];
+
+    const tipData = tips[currentDailyTipIndex];
     
     // Fade out
     banner.style.transition = 'opacity 0.3s ease-out';
