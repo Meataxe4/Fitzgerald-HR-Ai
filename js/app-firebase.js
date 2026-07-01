@@ -20,7 +20,7 @@ let auth, db, storage, currentSubscription = null;
 // console: users/{uid}.featureFlags = ['fitz_watch_preview'].
 // Phase 1+ may introduce a Cloud Function to auto-merge from this list.
 const ALLOWLISTED_EMAILS = {
-    'blakefitzgerald4@gmail.com': ['fitz_watch_preview', 'manufacturing_preview', 'schads_preview']
+    'blakefitzgerald4@gmail.com': ['fitz_watch_preview', 'manufacturing_preview', 'schads_preview', 'retail_preview']
 };
 
 try {
