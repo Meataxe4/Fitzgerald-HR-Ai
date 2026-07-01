@@ -1035,6 +1035,29 @@ function isSchadsAwardName(awardName) {
         s.indexOf('social, community') !== -1 || s.indexOf('home care and disability') !== -1;
 }
 
+// Business types for the General Retail Industry Award (MA000004). Retail is a
+// distinct industry to hospitality, so it has its own EXCLUSIVE list — the
+// hospitality venue types never appear for a Retail user. General retail trade
+// only (hair & beauty, fast food, meat and pharmacy are separate coverage).
+const RETAIL_VENUE_OPTIONS = [
+    { value: 'supermarket-grocery',   label: 'Supermarket / Grocery Store',          short: 'supermarket / grocery store' },
+    { value: 'department-variety',    label: 'Department / Variety Store',           short: 'department / variety store' },
+    { value: 'clothing-footwear',     label: 'Clothing, Footwear & Fashion',         short: 'clothing & footwear retailer' },
+    { value: 'electronics-tech',      label: 'Electronics & Technology',             short: 'electronics & technology retailer' },
+    { value: 'hardware-homewares',    label: 'Hardware, Homewares & Garden',         short: 'hardware & homewares retailer' },
+    { value: 'furniture-bedding',     label: 'Furniture & Bedding',                  short: 'furniture & bedding retailer' },
+    { value: 'newsagent-books',       label: 'Newsagency, Books & Stationery',       short: 'newsagency / bookshop' },
+    { value: 'specialty-retail',      label: 'Specialty / General Retail Store',     short: 'specialty retail store' },
+    { value: 'online-retail',         label: 'Online Retail / Distribution',         short: 'online retailer' }
+];
+
+function isRetailAwardName(awardName) {
+    if (!awardName) return false;
+    const s = String(awardName).toLowerCase();
+    return s.indexOf('ma000004') !== -1 || s.indexOf('general retail') !== -1 ||
+        (s.indexOf('retail') !== -1 && s.indexOf('award') !== -1);
+}
+
 // Render the venue-type dropdown filtered by Award. When awardName matches a
 // known Award, the primary matches appear at the top in alphabetical order
 // and the remaining venues appear under an "Other venue types" optgroup.
@@ -1063,6 +1086,17 @@ function populateVenueTypeDropdown(selectEl, awardName, currentValue) {
             .map(v => `<option value="${v.value}"${v.value === selected ? ' selected' : ''}>${v.label}</option>`)
             .join('');
         selectEl.innerHTML = shtml;
+        return;
+    }
+
+    // Retail is a different industry — show ONLY retail business types, never
+    // the hospitality venue list.
+    if (isRetailAwardName(awardName)) {
+        let rhtml = '<option value="">Select business type...</option>';
+        rhtml += RETAIL_VENUE_OPTIONS.slice().sort(sortByLabel)
+            .map(v => `<option value="${v.value}"${v.value === selected ? ' selected' : ''}>${v.label}</option>`)
+            .join('');
+        selectEl.innerHTML = rhtml;
         return;
     }
 
@@ -1943,6 +1977,16 @@ const AWARD_REGISTRY = {
         fullName: 'Social, Community, Home Care and Disability Services Industry Award MA000100',
         ratesUrl: '/schads-award-rates.json',
         aliases: ['schads', 'social community', 'home care', 'disability services']
+    },
+    // Preview only — gated behind the retail_preview feature flag and not yet
+    // human-signed-off. Until enabled it resolves to UNRESOLVED (fail closed).
+    MA000004: {
+        code: 'MA000004', status: 'preview', flag: 'retail_preview',
+        calculatorType: 'classification',   // Retail Employee Level 1-8 picker, not the hospitality role wizard
+        displayName: 'General Retail Industry Award',
+        fullName: 'General Retail Industry Award MA000004',
+        ratesUrl: '/retail-award-rates.json',
+        aliases: ['general retail', 'retail']
     }
 };
 
@@ -1990,6 +2034,7 @@ function _industryWord() {
     const code = getAwardContext().code;
     if (code === 'MA000010') return 'manufacturing';
     if (code === 'MA000100') return 'community services';
+    if (code === 'MA000004') return 'retail';
     if (code === 'MA000009' || code === 'MA000119') return 'hospitality';
     return '';
 }
@@ -2005,6 +2050,7 @@ function _awardRoleExamples() {
     const code = getAwardContext().code;
     if (code === 'MA000010') return ['Production Employee', 'Machine Operator', 'Maintenance Fitter'];
     if (code === 'MA000100') return ['Support Worker', 'Community Care Worker', 'Case Manager'];
+    if (code === 'MA000004') return ['Retail Assistant', 'Sales Assistant', 'Store Manager'];
     if (code === 'MA000119') return ['Waiter', 'Cook', 'Restaurant Manager'];
     if (code === 'MA000009') return ['Bartender', 'Waiter', 'Chef'];
     return ['Team Member', 'Supervisor', 'Manager'];
@@ -2014,6 +2060,7 @@ function _awardDeptExamples() {
     const code = getAwardContext().code;
     if (code === 'MA000010') return ['Production', 'Maintenance', 'Warehouse'];
     if (code === 'MA000100') return ['Disability Services', 'Home Care', 'Community Programs'];
+    if (code === 'MA000004') return ['Sales Floor', 'Stockroom / Warehouse', 'Store Management'];
     if (code === 'MA000009' || code === 'MA000119') return ['Kitchen', 'Front of House', 'Management'];
     return ['Operations', 'Administration', 'Management'];
 }
@@ -2067,6 +2114,10 @@ function _awEx(key) {
     const code = getAwardContext().code;
     if (code === 'MA000010') return v.manufacturing;
     if (code === 'MA000100') return v.community_services || v.default;
+    // Retail is customer-facing with the same "customers / busy periods /
+    // productivity" framing as the neutral default, so retail reuses the
+    // default copy (v.retail is honoured first if a variant is ever added).
+    if (code === 'MA000004') return v.retail || v.default;
     if (code === 'MA000009' || code === 'MA000119') return v.hospitality;
     return v.default;
 }
@@ -13591,6 +13642,70 @@ function resolveSchadsRate(data) {
         ]};
 }
 
+// General Retail (MA000004) classification picker — retail is graded on a single
+// linear scale (Retail Employee Level 1-8), not by hospitality role or stream.
+// Reads from the loaded retail-award-rates.json (awardRates).
+function _calcRetailSteps() {
+    const empLabels = { full_time: 'Full-time / Part-time', casual: 'Casual' };
+    return [
+        { key: 'retailClass', title: 'Which classification level?', options: function () {
+            return [...new Set(awardRates.rates.map(r => r.classification))]
+                .map(c => ({ value: c, label: c }));
+        }},
+        { key: 'employment', title: 'What type of employment?', options: function (data) {
+            const emps = [...new Set(awardRates.rates
+                .filter(r => r.classification === data.retailClass)
+                .map(r => r.employment_type))];
+            return emps.map(e => ({ value: e, label: empLabels[e] || e }));
+        }}
+    ];
+}
+
+// Retail resolver — returns the shared result-card shape. Casual rates already
+// include the 25% loading, so penalties are computed on the (unloaded) base
+// rate: the full-time sibling row supplies an exact base and the casual
+// multipliers add the 25% back, reproducing the Pay Guide's casual columns.
+function resolveRetailRate(data) {
+    const entry = awardRates.rates.find(r => r.classification === data.retailClass && r.employment_type === data.employment);
+    if (!entry) {
+        return { award: awardRates.award_name, level: 'Rate not found', rate: 0,
+            penalties: ['No rate found for that combination.'], nextSteps: ['Contact Fitz HR support'] };
+    }
+    const rate = entry.rate;
+    const p = awardRates.penalty_rates || {};
+    const cl = awardRates.casual_loading || 0.25;
+    const isCasual = data.employment === 'casual';
+    const ftSibling = isCasual
+        ? awardRates.rates.find(r => r.classification === data.retailClass && r.employment_type === 'full_time')
+        : null;
+    const base = isCasual ? (ftSibling ? ftSibling.rate : rate / (1 + cl)) : rate;
+    // Round half-up to cents (the FWO Pay Guide convention). A plain toFixed(2)
+    // truncates half-cent boundaries the wrong way in double precision
+    // (e.g. 27.81 × 1.5 = 41.71499… would show $41.71, not the award's $41.72),
+    // so nudge by 1e-9 (<< half a cent) before rounding.
+    const money = n => '$' + (Math.round((n + 1e-9) * 100) / 100).toFixed(2);
+    const penalties = [];
+    const pen = (label, mult) => { if (typeof mult === 'number') penalties.push(`${label} (${Math.round(mult * 100)}%): ${money(base * mult)}/hr`); };
+    // Evening loading (Mon-Fri after 6pm) is +25% on ordinary hours; casual adds the 25% loading.
+    const eveMult = (p.evening_mon_fri_loading || 0.25) + 1 + (isCasual ? cl : 0);
+    penalties.push(`Evening after 6pm Mon-Fri (${Math.round(eveMult * 100)}%): ${money(base * eveMult)}/hr`);
+    pen('Saturday', isCasual ? p.saturday_casual : p.saturday_full_time_part_time);
+    pen('Sunday', isCasual ? p.sunday_casual : p.sunday_full_time_part_time);
+    pen('Public holiday', isCasual ? p.public_holiday_casual : p.public_holiday_full_time_part_time);
+    pen('Overtime — first 3 hrs', (p.overtime_first_3hrs || 1.5) + (isCasual ? cl : 0));
+    pen('Overtime — after 3 hrs', (p.overtime_after_3hrs || 2.0) + (isCasual ? cl : 0));
+    if (isCasual) {
+        penalties.push('Casual rates include the 25% loading; penalties above are computed on the base rate and already include the loading.');
+    }
+    return { award: awardRates.award_name, level: entry.classification, rate: rate, weeklyRate: entry.weekly_rate || null,
+        rateLabel: isCasual ? 'Casual Rate (per hour)' : 'Base Rate (per hour)',
+        penalties: penalties, nextSteps: [
+            'Confirm the classification against Schedule A of MA000004',
+            'Set up payroll with these exact rates',
+            'Keep employment records for 7 years'
+        ]};
+}
+
 function getAwardCalculatorConfig(code) {
     if (getAwardContext().calculatorType === 'classification') {
         if (code === 'MA000100') {
@@ -13598,6 +13713,14 @@ function getAwardCalculatorConfig(code) {
                 disclaimer: '⚠️ Preview — SCHADS rates effective 01/07/2026. Pick the stream that matches the work performed. Verify against the award before relying on these figures.',
                 steps: _calcSchadsSteps(),
                 resolve: resolveSchadsRate,
+                juniorRedirect: false
+            };
+        }
+        if (code === 'MA000004') {
+            return {
+                disclaimer: '⚠️ Preview — General Retail rates effective 01/07/2026, adult classifications only (junior/apprentice rates not modelled). Verify against the award before relying on these figures.',
+                steps: _calcRetailSteps(),
+                resolve: resolveRetailRate,
                 juniorRedirect: false
             };
         }
@@ -16912,6 +17035,10 @@ function updateOnboardingStep() {
         if (schadsBtn && typeof hasFeature === 'function' && hasFeature('schads_preview')) {
             schadsBtn.classList.remove('hidden');
         }
+        const retailBtn = document.getElementById('onboardingRetailBtn');
+        if (retailBtn && typeof hasFeature === 'function' && hasFeature('retail_preview')) {
+            retailBtn.classList.remove('hidden');
+        }
     }
 
     if (onboardingCurrentStep === 3) {
@@ -16924,6 +17051,9 @@ function updateOnboardingStep() {
                 hint.classList.remove('hidden');
             } else if (isSchadsAwardName(venueProfile.primaryAward)) {
                 hint.textContent = 'Select the type of community services, care or disability organisation you run.';
+                hint.classList.remove('hidden');
+            } else if (isRetailAwardName(venueProfile.primaryAward)) {
+                hint.textContent = 'Select the type of retail business you run.';
                 hint.classList.remove('hidden');
             } else if (AWARD_VENUE_MAP[venueProfile.primaryAward]) {
                 hint.textContent = `Showing business types commonly covered by the ${venueProfile.primaryAward}. If yours isn't listed, choose from "Other business types".`;
@@ -17162,7 +17292,8 @@ function showRandomQuickPrompts() {
 function getVenueTypeLabel(type) {
     const match = VENUE_OPTIONS.find(v => v.value === type)
         || MANUFACTURING_VENUE_OPTIONS.find(v => v.value === type)
-        || SCHADS_VENUE_OPTIONS.find(v => v.value === type);
+        || SCHADS_VENUE_OPTIONS.find(v => v.value === type)
+        || RETAIL_VENUE_OPTIONS.find(v => v.value === type);
     if (match) return match.short;
     // Legacy slugs from earlier onboarding versions
     const legacy = {
@@ -17240,6 +17371,7 @@ function showVenueSettings() {
                     <option value="Restaurant Industry Award" ${venueProfile.primaryAward === 'Restaurant Industry Award' ? 'selected' : ''}>Restaurant Industry Award (MA000119)</option>
                     ${hasFeature('manufacturing_preview') ? `<option value="Manufacturing and Associated Industries Award" ${venueProfile.primaryAward === 'Manufacturing and Associated Industries Award' ? 'selected' : ''}>Manufacturing and Associated Industries Award (MA000010) — preview</option>` : ''}
                     ${hasFeature('schads_preview') ? `<option value="Social, Community, Home Care and Disability Services Industry Award MA000100" ${venueProfile.primaryAward === 'Social, Community, Home Care and Disability Services Industry Award MA000100' ? 'selected' : ''}>Social, Community, Home Care &amp; Disability Services Award (MA000100) — preview</option>` : ''}
+                    ${hasFeature('retail_preview') ? `<option value="General Retail Industry Award MA000004" ${venueProfile.primaryAward === 'General Retail Industry Award MA000004' ? 'selected' : ''}>General Retail Industry Award (MA000004) — preview</option>` : ''}
                 </select>
                 <p class="text-xs text-slate-400 mt-1">Changing your award updates pay rate calculations and advice throughout the app.</p>
             </div>
@@ -23325,7 +23457,7 @@ const _FW_DOC_TEMPLATES = {
         title: 'Annualised Wage Agreement',
         subtitle: 'Generates a written annualised wage agreement with the clause references for your award',
         anchor: 'Annualised wage arrangement clause for your award · Fair Work Act 2009',
-        excludeAwards: ['MA000100'],   // SCHADS has no annualised wage arrangement clause
+        excludeAwards: ['MA000100', 'MA000004'],   // SCHADS and General Retail have no annualised wage arrangement clause
         render: function() { return _fwDocRender_clause20Agreement(); },
         validate: function() { return _fwDocValidate_clause20Agreement(); },
         generate: function() { return _fwDocGenerate_clause20Agreement(); }
@@ -23334,7 +23466,7 @@ const _FW_DOC_TEMPLATES = {
         title: 'Annualised Wage Time Record',
         subtitle: 'Generates a signed time record template for annualised wage arrangements',
         anchor: 'Annualised wage record-keeping clause for your award · FW Act s535',
-        excludeAwards: ['MA000100'],   // SCHADS has no annualised wage arrangement clause
+        excludeAwards: ['MA000100', 'MA000004'],   // SCHADS and General Retail have no annualised wage arrangement clause
         render: function() { return _fwDocRender_weeklyTimeRecord(); },
         validate: function() { return _fwDocValidate_weeklyTimeRecord(); },
         generate: function() { return _fwDocGenerate_weeklyTimeRecord(); }
@@ -23543,11 +23675,16 @@ function _fwDocClassificationOptions(awardCode) {
                    'Home care - Level 4', 'Home care - Level 5', 'Home care - Level 6 (Team leader)',
                    'Family day care - Level 1', 'Family day care - Level 2', 'Family day care - Level 3',
                    'Family day care - Level 4', 'Family day care - Level 5', 'Other'];
+    // General Retail Industry Award MA000004 — the linear Retail Employee scale.
+    const ma004 = ['Retail Employee Level 1', 'Retail Employee Level 2', 'Retail Employee Level 3',
+                   'Retail Employee Level 4', 'Retail Employee Level 5', 'Retail Employee Level 6',
+                   'Retail Employee Level 7', 'Retail Employee Level 8', 'Other'];
     let opts;
     if (awardCode === 'MA000009') opts = ma009;
     else if (awardCode === 'MA000119') opts = ma119;
     else if (awardCode === 'MA000010') opts = ma010;
     else if (awardCode === 'MA000100') opts = ma100;
+    else if (awardCode === 'MA000004') opts = ma004;
     else return '<option value="">Set your Award in Settings first</option>';
     return opts.map(function(o) { return '<option value="' + _fwEscapeHtml(o) + '">' + _fwEscapeHtml(o) + '</option>'; }).join('');
 }
@@ -23892,7 +24029,8 @@ function _fwDocGenerate_cashOut() {
     const isMA119 = awardCode === 'MA000119';
     const scheduleRef = isMA119 ? 'MA000119 Schedule H'
         : (awardCode === 'MA000009' ? 'MA000009 Schedule G'
-        : (awardCode === 'MA000100' ? 'MA000100 Schedule K' : '[your modern award] schedule'));
+        : (awardCode === 'MA000100' ? 'MA000100 Schedule K'
+        : (awardCode === 'MA000004' ? 'MA000004 Schedule G' : '[your modern award] schedule')));
     const balance = parseFloat(d.balance_hours);
     const cashout = parseFloat(d.cashout_hours);
     const rate = parseFloat(d.base_rate);
@@ -24107,11 +24245,27 @@ const _FW_PSYCHO_HAZARDS_SCHADS = [
     'Bullying or poor support within the team or supervisory hierarchy'
 ];
 
+// General Retail-relevant psychosocial hazards (shop-floor / customer-facing context).
+const _FW_PSYCHO_HAZARDS_RETAIL = [
+    'Customer aggression, abuse or threats (including at point of sale and returns)',
+    'Armed robbery, theft and shoplifter confrontation',
+    'Sexual harassment (by customers or colleagues)',
+    'Exposure to traumatic incidents (robbery, medical emergencies)',
+    'High job demands during peak trade (sales, stocktake, holiday periods)',
+    'Low job control for junior and casual staff over rosters and tasks',
+    'Lone / isolated work (solo open or close, back-of-house, single-staff stores)',
+    'Fatigue from late-night trading, early starts and consecutive shifts',
+    'Poor support during and after customer incidents',
+    'Bullying within the store hierarchy',
+    'Sustained standing, manual handling and repetitive work affecting wellbeing'
+];
+
 // The hazard list defaults to the resolved award's industry context.
 function _fwPsychoHazards() {
     const code = getAwardContext().code;
     if (code === 'MA000010') return _FW_PSYCHO_HAZARDS_MANUFACTURING;
     if (code === 'MA000100') return _FW_PSYCHO_HAZARDS_SCHADS;
+    if (code === 'MA000004') return _FW_PSYCHO_HAZARDS_RETAIL;
     return _FW_PSYCHO_HAZARDS;
 }
 
@@ -24491,7 +24645,8 @@ function _fwDocGenerate_leaveInAdvance() {
     const awardCode = getAwardContext().code;
     const scheduleRef = awardCode === 'MA000119' ? 'MA000119 Schedule H'
         : (awardCode === 'MA000009' ? 'MA000009 Schedule G'
-        : (awardCode === 'MA000100' ? 'MA000100 Schedule J' : '[your modern award] schedule'));
+        : (awardCode === 'MA000100' ? 'MA000100 Schedule J'
+        : (awardCode === 'MA000004' ? 'MA000004 Schedule F' : '[your modern award] schedule')));
     const negativeBalance = Number(d.current_balance) - Number(d.advance_hours);
     const html =
         '<h1>Annual Leave in Advance Agreement</h1>' +

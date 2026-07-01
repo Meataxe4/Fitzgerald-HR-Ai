@@ -61,6 +61,22 @@ eq('Hospitality still -> MA000009 (SCHADS flag on)', resolveAward('Hospitality I
 eq('Restaurant still -> MA000119 (SCHADS flag on)', resolveAward('Restaurant Industry Award').code, 'MA000119');
 eq('Manufacturing gated again when only SCHADS flag on -> null', resolveAward('Manufacturing and Associated Industries Award').code, null);
 
+// General Retail preview: gated by its OWN flag (schads_preview must NOT unlock it)
+eq('Retail (schads flag only) -> null', resolveAward('General Retail Industry Award MA000004').code, null);
+_flags = new Set(['retail_preview']);
+({ resolveAward } = factory(CONFIG, hasFeature));
+eq('Retail (flag ON) -> MA000004', resolveAward('General Retail Industry Award MA000004').code, 'MA000004');
+eq('Retail alias general retail -> MA000004', resolveAward('general retail').code, 'MA000004');
+eq('Retail code MA000004 -> MA000004', resolveAward('MA000004').code, 'MA000004');
+eq('Retail calculatorType classification', resolveAward('MA000004').calculatorType, 'classification');
+eq('Retail fullName', resolveAward('MA000004').fullName, 'General Retail Industry Award MA000004');
+// Retail must NOT shadow Restaurant (both contain related words) — Restaurant still resolves first
+eq('Restaurant still -> MA000119 (retail flag on)', resolveAward('Restaurant Industry Award').code, 'MA000119');
+eq('Hospitality still -> MA000009 (retail flag on)', resolveAward('Hospitality Industry (General) Award').code, 'MA000009');
+eq('Manufacturing gated again when only retail flag on -> null', resolveAward('Manufacturing and Associated Industries Award').code, null);
+_flags = new Set();
+({ resolveAward } = factory(CONFIG, hasFeature));
+
 // Code-based resolution (future award_code field)
 eq('Code MA000119 -> MA000119', resolveAward('MA000119').code, 'MA000119');
 
@@ -87,6 +103,10 @@ const schadsOpts = _fwDocClassificationOptions('MA000100');
 eq('SCHADS classifications include SACS Level 8', /Social & community services - Level 8/.test(schadsOpts), true);
 eq('SCHADS classifications include Home care Team leader', /Home care - Level 6 \(Team leader\)/.test(schadsOpts), true);
 eq('SCHADS classifications NOT Cook grades', /Cook grade/.test(schadsOpts), false);
+const retailOpts = _fwDocClassificationOptions('MA000004');
+eq('Retail classifications include Retail Employee Level 8', /Retail Employee Level 8/.test(retailOpts), true);
+eq('Retail classifications NOT Cook grades', /Cook grade/.test(retailOpts), false);
+eq('Retail classifications NOT C-levels', /C10/.test(retailOpts), false);
 
 // ---- Manufacturing rates data integrity (Milestone: MA000010 wiring) --------
 const manuf = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'manufacturing-award-rates.json'), 'utf8'));
@@ -153,8 +173,43 @@ eq('SACS casual Saturday = base x1.75 = $48.21 (PDF)', r2(sacs1.rate * schads.pe
 // Minimum engagement sourced from award text (clause 10.5)
 eq('SCHADS SACS min 3 hrs', schads.minimum_engagement.social_community_services_hours_per_shift, 3);
 eq('SCHADS other streams min 2 hrs', schads.minimum_engagement.other_streams_hours_per_shift, 2);
-// SCHADS has NO annualised wage clause — those doc templates must be excluded
-eq('SCHADS annualised wage templates excluded (source)', (src.match(/excludeAwards: \['MA000100'\]/g) || []).length >= 2, true);
+// SCHADS and General Retail have NO annualised wage clause — those doc
+// templates must exclude both codes (2 templates: agreement + time record).
+eq('SCHADS + Retail annualised wage templates excluded (source)',
+   (src.match(/excludeAwards: \['MA000100', 'MA000004'\]/g) || []).length >= 2, true);
+
+// ---- General Retail rates data integrity (Milestone: MA000004 wiring) --------
+const retail = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'retail-award-rates.json'), 'utf8'));
+eq('Retail ma_number', retail.ma_number, 'MA000004');
+eq('Retail 16 rate rows (8 FT + 8 casual, adult)', retail.rates.length, 16);
+eq('Retail Saturday FT/PT 1.25', retail.penalty_rates.saturday_full_time_part_time, 1.25);
+eq('Retail Saturday casual 1.5', retail.penalty_rates.saturday_casual, 1.5);
+eq('Retail Sunday FT/PT 1.5', retail.penalty_rates.sunday_full_time_part_time, 1.5);
+eq('Retail public holiday FT/PT 2.25', retail.penalty_rates.public_holiday_full_time_part_time, 2.25);
+eq('Retail public holiday casual 2.5', retail.penalty_rates.public_holiday_casual, 2.5);
+eq('Retail evening loading +25%', retail.penalty_rates.evening_mon_fri_loading, 0.25);
+eq('Retail overtime first 3h 1.5', retail.penalty_rates.overtime_first_3hrs, 1.5);
+eq('Retail overtime after 3h 2.0', retail.penalty_rates.overtime_after_3hrs, 2.0);
+eq('Retail casual loading 0.25', retail.casual_loading, 0.25);
+eq('Retail all rows have positive rate', retail.rates.every(r => typeof r.rate === 'number' && r.rate > 0), true);
+// Known PDF figures: Retail Employee Level 1 full-time = $27.81 (weekly $1,056.80).
+const rl1 = retail.rates.find(r => r.employment_type === 'full_time' && r.classification === 'Retail Employee Level 1');
+const rl8 = retail.rates.find(r => r.employment_type === 'full_time' && r.classification === 'Retail Employee Level 8');
+eq('Retail L1 rate $27.81', rl1 && rl1.rate, 27.81);
+eq('Retail L1 weekly $1056.80', rl1 && rl1.weekly_rate, 1056.80);
+eq('Retail L8 rate $33.99', rl8 && rl8.rate, 33.99);
+// L1 Saturday/evening = 125% of $27.81 = $34.76 — the one FT penalty column that
+// lands on an exact cent in double precision (others sit on half-mil boundaries
+// and are validated rigorously with Decimal in scripts/extract_retail_rates.py).
+eq('Retail L1 Saturday = $34.76 (PDF)', r2(rl1.rate * retail.penalty_rates.saturday_full_time_part_time), 34.76);
+// Casual rate already includes the 25% loading; the stored casual column equals
+// base x1.25 rounded, reproducing the Pay Guide's casual hourly figure exactly.
+const rl1c = retail.rates.find(r => r.employment_type === 'casual' && r.classification === 'Retail Employee Level 1');
+eq('Retail L1 casual rate $34.76', rl1c && rl1c.rate, 34.76);
+eq('Retail L8 casual rate $42.49', (retail.rates.find(r => r.employment_type === 'casual' && r.classification === 'Retail Employee Level 8') || {}).rate, 42.49);
+// Minimum engagement sourced from award text (clauses 10.9 / 11.2)
+eq('Retail part-time min 3 hrs', retail.minimum_engagement.part_time_hours_per_shift, 3);
+eq('Retail casual min 3 hrs', retail.minimum_engagement.casual_hours_per_shift, 3);
 
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);
