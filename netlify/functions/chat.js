@@ -134,6 +134,28 @@ function buildMinimumEngagementFacts(rates, awardLabel) {
   return lines.join('\n');
 }
 
+// Builds the ALLOWANCES section of the system prompt from a rates JSON. Emits
+// nothing when the award has no allowances block (so awards without allowance
+// data stay byte-identical and the model falls back to the fail-closed rule of
+// not quoting figures it cannot source). Each allowance carries either an exact
+// amount + unit, or a text description (reimbursements). Source: the FWO Pay
+// Guide allowances table for the award.
+function buildAllowanceFacts(rates, awardLabel) {
+  const a = rates.allowances;
+  if (!Array.isArray(a) || !a.length) return '';
+  const lines = [`ALLOWANCES — ${awardLabel} (use these EXACT figures when asked about an allowance; if an allowance is not listed here, say you don't have that figure and tell the user to check the award / FWO Pay Guide rather than estimating):`];
+  for (const it of a) {
+    if (!it || !it.name) continue;
+    if (typeof it.amount === 'number') {
+      lines.push(`- ${it.name}: $${it.amount.toFixed(2)} ${it.unit || ''}`.trimEnd() + (it.condition ? ` (${it.condition})` : ''));
+    } else if (it.text) {
+      lines.push(`- ${it.name}: ${it.text}`);
+    }
+  }
+  if (rates.allowances_note) lines.push(rates.allowances_note);
+  return lines.join('\n');
+}
+
 // ============================================================================
 // FITZ WATCH context block — builds a focused system addendum when a chat
 // request comes from a gap card. Tells Claude to (a) treat the user's
@@ -290,6 +312,7 @@ exports.handler = async (event, context) => {
     const ratesData = resolvedAward ? resolvedAward.rates : null;
     const penaltyRateFacts = resolvedAward ? buildPenaltyRateFacts(ratesData, awardFullName) : '';
     const minimumEngagementFacts = resolvedAward ? buildMinimumEngagementFacts(ratesData, awardFullName) : '';
+    const allowanceFacts = resolvedAward ? buildAllowanceFacts(ratesData, awardFullName) : '';
 
     // System prompt for Fitz HR Assistant. When the award is resolved we use the
     // full award-aware prompt; when it is not, we fall back to a floor-only prompt
@@ -303,7 +326,7 @@ IMPORTANT — THIS USER'S AWARD: All advice, rates, classifications, and complia
 ${penaltyRateFacts}
 
 ${minimumEngagementFacts}
-
+${allowanceFacts ? '\n' + allowanceFacts + '\n' : ''}
 CRITICAL — MINIMUM ENGAGEMENT QUESTIONS:
 When a user asks about minimum shift length, minimum engagement, "shortest shift", "send someone home early", or "minimum hours per shift", you MUST quote the figures from the MINIMUM ENGAGEMENT section above for ${awardFullName}. Do NOT say "no minimum is specified" or "this depends on the contract" — the modern award sets explicit minimums and they always apply.
 
