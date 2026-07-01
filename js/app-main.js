@@ -11175,7 +11175,7 @@ function getDailyTips() {
         { icon: "💡", tip: "Did you know? You must give 30-min breaks for shifts over 5 hours" },
         { icon: "⚠️", tip: "Award rates increase on 1 July each year - mark your calendar!" },
         { icon: "📝", tip: "Always document performance conversations in writing" },
-        { icon: "🕒", tip: "Casuals must be paid within 7 days of completing their shift" },
+        { icon: "🏦", tip: "Payday super: from 1 July 2026 you must pay employees' super at the same time as their wages (received by the fund within 7 days of payday), not quarterly" },
         { icon: "📋", tip: "Keep employment records for 7 years minimum - it's the law" },
         { icon: "⚖️", tip: "Unfair dismissal claims must be lodged within 21 days" },
         { icon: "💰", tip: "Casual loading is 25% on top of permanent rates" },
