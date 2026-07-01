@@ -11189,7 +11189,6 @@ function getDailyTips() {
         { icon: "💼", tip: "Probation periods are typically 3-6 months - put it in writing" },
         { icon: "🔐", tip: "Store employee personal information securely - privacy laws apply" },
         { icon: "📊", tip: "Review your payroll monthly - catch errors before they compound" },
-        { icon: "🤝", tip: "Consider offering unpaid trial shifts (max 1-2 hours for assessment)" },
         { icon: "🌟", tip: "Recognise good performance regularly - it reduces turnover" },
         { icon: "📱", tip: "Use the tools menu (🛠️) to access specialised calculators" }
     ];
