@@ -47,17 +47,21 @@
     "Sleepover, on-call, 24-hour-care, broken-shift and remote-work penalty tables are not modelled in this dataset \u2014 see the award and Pay Guide for those.",
     "MA000100 contains NO annualised wage arrangement clause (unlike Hospitality/Restaurant cl 20 or Manufacturing cl 28). The Annualised Wage document templates are therefore not offered for this award."
   ],
-  "allowances": {
-    "broken_shift_one_break": 21.81,
-    "broken_shift_two_breaks": 28.87,
-    "first_aid_full_time_per_week": 21.43,
-    "sleepover_per_sleepover": 62.87,
-    "on_call_mon_fri_per_24h": 25.66,
-    "on_call_other_or_public_holiday_per_24h": 50.81,
-    "vehicle_per_km": 1.01,
-    "meal_overtime": 17.3,
-    "uniform_per_shift": 1.26
-  },
+  "allowances": [
+    { "name": "Broken shift allowance (1 unpaid break)", "amount": 21.81, "unit": "per broken shift" },
+    { "name": "Broken shift allowance (2 unpaid breaks)", "amount": 28.87, "unit": "per broken shift" },
+    { "name": "First aid allowance (full-time)", "amount": 21.43, "unit": "per week" },
+    { "name": "First aid allowance (part-time or casual)", "amount": 0.56, "unit": "per hour", "condition": "up to a maximum of $21.43 per week" },
+    { "name": "Laundry allowance", "amount": 0.33, "unit": "per shift", "condition": "up to a maximum of $1.53 per week" },
+    { "name": "Meal allowance - overtime", "amount": 17.30, "unit": "per occasion", "condition": "plus a further $17.30 when more than 4 hours of overtime is worked" },
+    { "name": "On call allowance (Mon-Fri, any 24-hour period)", "amount": 25.66, "unit": "per period" },
+    { "name": "On call allowance (any other 24-hour period or public holiday)", "amount": 50.81, "unit": "per period" },
+    { "name": "Sleepover allowance", "amount": 62.87, "unit": "per sleepover" },
+    { "name": "Uniform allowance", "amount": 1.26, "unit": "per shift", "condition": "up to a maximum of $6.41 per week" },
+    { "name": "Vehicle allowance", "amount": 1.01, "unit": "per km" },
+    { "name": "Special or protective clothing", "text": "reimbursement for any rubber gloves, special clothing or safety equipment the employee is required to provide" }
+  ],
+  "allowances_note": "Common allowances from the FWO Pay Guide MA000100 (effective 1 Jul 2026). Not every allowance is listed - consult the award and Pay Guide for others (e.g. telephone/travel reimbursements, legacy hot-work allowances).",
   "rates": [
     {
       "category": "adult",

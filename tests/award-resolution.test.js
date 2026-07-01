@@ -211,5 +211,48 @@ eq('Retail L8 casual rate $42.49', (retail.rates.find(r => r.employment_type ===
 eq('Retail part-time min 3 hrs', retail.minimum_engagement.part_time_hours_per_shift, 3);
 eq('Retail casual min 3 hrs', retail.minimum_engagement.casual_hours_per_shift, 3);
 
+// ---- Allowance grounding: every award ships an allowances block ------------
+// (fed to the chat prompt so the AI answers allowance questions with exact
+// figures instead of guessing / declining). Figures sourced from the FWO Pay
+// Guide allowances tables.
+const AWARD_FILES = {
+  MA000009: 'hospitality-award-rates.json',
+  MA000119: 'restaurant-award-rates.json',
+  MA000010: 'manufacturing-award-rates.json',
+  MA000100: 'schads-award-rates.json',
+  MA000004: 'retail-award-rates.json',
+};
+function loadAward(code) { return JSON.parse(fs.readFileSync(path.join(__dirname, '..', AWARD_FILES[code]), 'utf8')); }
+function allowanceAmount(rates, nameFragment) {
+  const a = (rates.allowances || []).find(x => x.name && x.name.indexOf(nameFragment) !== -1);
+  return a ? a.amount : undefined;
+}
+Object.keys(AWARD_FILES).forEach(code => {
+  const r = loadAward(code);
+  eq(code + ' has a non-empty allowances array', Array.isArray(r.allowances) && r.allowances.length > 0, true);
+  eq(code + ' every allowance entry has a name', (r.allowances || []).every(a => typeof a.name === 'string' && a.name), true);
+  eq(code + ' every allowance is a dollar amount OR a text description',
+     (r.allowances || []).every(a => typeof a.amount === 'number' || typeof a.text === 'string'), true);
+});
+// Spot-check known published figures from each Pay Guide.
+eq('Retail cold work 0°C and above = $0.38/hr', allowanceAmount(retail, 'Cold work allowance (0°C and above)'), 0.38);
+eq('Retail first aid = $14.55/wk', allowanceAmount(retail, 'First aid allowance'), 14.55);
+eq('Hospitality first aid (FT) = $13.43/wk', allowanceAmount(loadAward('MA000009'), 'First aid allowance (full-time employees)'), 13.43);
+eq('Restaurant meal-overtime = $17.42', allowanceAmount(loadAward('MA000119'), 'Meal allowance - overtime'), 17.42);
+eq('Manufacturing meal = $19.14/meal', allowanceAmount(loadAward('MA000010'), 'Meal allowance'), 19.14);
+eq('SCHADS sleepover = $62.87', allowanceAmount(loadAward('MA000100'), 'Sleepover allowance'), 62.87);
+
+// ---- buildAllowanceFacts (chat.js) renders exact figures / fails closed ----
+const chatSrc = fs.readFileSync(path.join(__dirname, '..', 'netlify', 'functions', 'chat.js'), 'utf8');
+const bafStart = chatSrc.indexOf('function buildAllowanceFacts(');
+let d = 0, bi = chatSrc.indexOf('{', bafStart), bafEnd = bafStart;
+for (; bi < chatSrc.length; bi++) { if (chatSrc[bi] === '{') d++; else if (chatSrc[bi] === '}') { d--; if (d === 0) { bafEnd = bi + 1; break; } } }
+const buildAllowanceFacts = new Function(chatSrc.slice(bafStart, bafEnd) + '\nreturn buildAllowanceFacts;')();
+const retailFacts = buildAllowanceFacts(retail, retail.award_name);
+eq('Chat grounds retail cold-work allowance as $0.38 per hour',
+   /Cold work allowance \(0°C and above\): \$0\.38 per hour \(while so employed\)/.test(retailFacts), true);
+eq('Chat allowance facts include a header for the award', /ALLOWANCES — General Retail Industry Award MA000004/.test(retailFacts), true);
+eq('buildAllowanceFacts fails closed with no allowances block', buildAllowanceFacts({ award_name: 'X' }, 'X'), '');
+
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);
