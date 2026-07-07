@@ -184,6 +184,7 @@
         .slot-wrap { display: inline-block; overflow: hidden; height: 1.25em; vertical-align: text-bottom; position: relative; transition: width 0.18s ease; }
         .slot-drum { display: block; will-change: transform; }
         .slot-word { display: block; height: 1.25em; line-height: 1.25; white-space: nowrap; color: var(--amber); font-style: italic; }
+        .hero-situation { transition: opacity 0.25s ease; }
 
         .hero-ctas { opacity: 0; transform: translateY(14px); transition: opacity 0.7s 1.0s, transform 0.7s 1.0s cubic-bezier(0.16,1,0.3,1); }
         .hero-ctas.in { opacity: 1; transform: translateY(0); }
@@ -721,7 +722,7 @@
             <span class="h1-line"><span class="h1-inner">every business</span></span>
             <span class="h1-line"><span class="h1-inner"><em>deserves.</em></span></span>
         </h1>
-        <p class="hero-hook" id="heroHook">Your <span class="slot-wrap" id="slotWrap"><span class="slot-drum" id="slotDrum"><span class="slot-word">chef</span></span></span> is a no-show. Fitz tells you exactly what to do.</p>
+        <p class="hero-hook" id="heroHook">Your <span class="slot-wrap" id="slotWrap"><span class="slot-drum" id="slotDrum"><span class="slot-word">chef</span></span></span> <span class="hero-situation" id="heroSituation">is a no-show</span>. Fitz tells you exactly what to do.</p>
         <div class="hero-ctas" id="heroCtas">
             <a href="/app" class="btn-primary"><span>Start Free — No Card Required</span><span class="arr">→</span></a>
             <a href="#pricing" class="btn-ghost">View Pricing ↓</a>
@@ -1459,7 +1460,40 @@ function toggleBilling(type) {
 
 /* SLOT MACHINE */
 (function() {
-    const titles = ['chef','support worker','sales assistant','machine operator','dental assistant','educator','store manager','carer','tradesperson','barista'];
+    // Industry-specific hero scenarios — the amber role drums, the situation swaps
+    // to match whichever award the drum lands on. Hospitality/Restaurant land on
+    // a no-show; every other award gets its own crisis.
+    const scenarios = [
+        // Hospitality (MA000009)
+        { role: 'chef', situation: 'is a no-show' },
+        { role: 'bartender', situation: 'quits by text an hour before open' },
+        { role: 'cook', situation: 'wants their weekend penalty rates explained' },
+        // Restaurant (MA000119)
+        { role: 'waiter', situation: 'is a no-show' },
+        { role: 'barista', situation: 'walks out mid-service' },
+        { role: 'sous chef', situation: 'asks about their split-shift allowance' },
+        // General Retail (MA000004)
+        { role: 'sales assistant', situation: 'walks off after a customer blow-up' },
+        { role: 'store manager', situation: 'asks how to convert a casual to permanent' },
+        { role: 'checkout operator', situation: 'is accused of theft' },
+        // Manufacturing (MA000010)
+        { role: 'machine operator', situation: 'hands you their resignation with no notice' },
+        { role: 'tradesperson', situation: 'clocks up unexpected overtime' },
+        { role: 'storeperson', situation: 'refuses a reasonable afternoon shift' },
+        // SCHADS (MA000100)
+        { role: 'support worker', situation: 'needs a sleepover shift covered tonight' },
+        { role: 'home carer', situation: 'reports a client incident mid-shift' },
+        { role: 'care worker', situation: 'disputes their broken-shift pay' },
+        // Health Professionals (MA000027)
+        { role: 'dental assistant', situation: 'disputes their weekend penalty rate' },
+        { role: 'pathology collector', situation: 'wants to cash out annual leave' },
+        { role: 'receptionist', situation: 'asks about their annualised salary' },
+        // Children’s Services (MA000120)
+        { role: 'educator', situation: 'calls in sick and your ratios are blown' },
+        { role: 'room leader', situation: 'asks about the educational leader allowance' },
+        { role: 'trainee', situation: 'is on probation and struggling' },
+    ];
+    const roles = scenarios.map(s => s.role);
     const wrap = document.getElementById('slotWrap');
     const drum = document.getElementById('slotDrum');
     if (!wrap || !drum) return;
@@ -1492,22 +1526,27 @@ function toggleBilling(type) {
     async function spin() {
         if (spinning) return; spinning = true;
         let target = current;
-        while (target === current) target = Math.floor(Math.random() * titles.length);
+        while (target === current) target = Math.floor(Math.random() * scenarios.length);
         const fastCount = 5 + Math.floor(Math.random() * 3);
         const sequence = [];
-        for (let i = 0; i < fastCount; i++) sequence.push(titles[Math.floor(Math.random()*titles.length)]);
-        sequence.push(titles[Math.floor(Math.random()*titles.length)]);
-        sequence.push(titles[Math.floor(Math.random()*titles.length)]);
-        sequence.push(titles[target]);
+        for (let i = 0; i < fastCount; i++) sequence.push(roles[Math.floor(Math.random()*roles.length)]);
+        sequence.push(roles[Math.floor(Math.random()*roles.length)]);
+        sequence.push(roles[Math.floor(Math.random()*roles.length)]);
+        sequence.push(scenarios[target].role);
         const durations = sequence.map((_,i) => {
             const fe = sequence.length-1-i;
             if(fe===0) return 480; if(fe===1) return 280; if(fe===2) return 170; return 95;
         });
-        for (let i=0; i<sequence.length; i++) await rollOne(sequence[i], durations[i]);
+        const sit = document.getElementById('heroSituation');
+        for (let i=0; i<sequence.length; i++) {
+            if (sit && i === sequence.length-1) sit.style.opacity = '0';   // fade out during the final slow roll
+            await rollOne(sequence[i], durations[i]);
+        }
+        if (sit) { sit.textContent = scenarios[target].situation; sit.style.opacity = '1'; }
         current = target; spinning = false;
     }
     setTimeout(() => {
-        wrap.style.width = measureWord(titles[current]) + 'px';
+        wrap.style.width = measureWord(roles[current]) + 'px';
         spin(); setInterval(spin, 15000);
     }, 1700);
 })();
