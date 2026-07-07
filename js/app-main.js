@@ -1082,6 +1082,26 @@ function isHealthAwardName(awardName) {
         (s.indexOf('health') !== -1 && s.indexOf('support services') !== -1);
 }
 
+// Business types for the Children's Services Award (MA000120). Early childhood
+// education and care is a distinct industry to hospitality, so it has its own
+// EXCLUSIVE list — the hospitality venue types never appear for a children's
+// services user. Excludes schools, higher education, local government and SCHADS.
+const CHILDRENS_VENUE_OPTIONS = [
+    { value: 'long-day-care',       label: 'Long Day Care Centre',                 short: 'long day care centre' },
+    { value: 'preschool-kinder',    label: 'Preschool / Kindergarten',             short: 'preschool / kindergarten' },
+    { value: 'oshc',                label: 'Outside School Hours Care (OSHC)',      short: 'outside school hours care service' },
+    { value: 'family-day-care',     label: 'Family Day Care Service',              short: 'family day care service' },
+    { value: 'occasional-care',     label: 'Occasional Care',                      short: 'occasional care service' },
+    { value: 'mobile-early-child',  label: 'Mobile / Other Early Childhood Service', short: 'early childhood service' }
+];
+
+function isChildrensAwardName(awardName) {
+    if (!awardName) return false;
+    const s = String(awardName).toLowerCase();
+    return s.indexOf('ma000120') !== -1 || s.indexOf("children's services") !== -1 ||
+        s.indexOf('childrens services') !== -1;
+}
+
 // Render the venue-type dropdown filtered by Award. When awardName matches a
 // known Award, the primary matches appear at the top in alphabetical order
 // and the remaining venues appear under an "Other venue types" optgroup.
@@ -1132,6 +1152,17 @@ function populateVenueTypeDropdown(selectEl, awardName, currentValue) {
             .map(v => `<option value="${v.value}"${v.value === selected ? ' selected' : ''}>${v.label}</option>`)
             .join('');
         selectEl.innerHTML = hhtml;
+        return;
+    }
+
+    // Children's services is a different industry — show ONLY early-childhood
+    // business types, never the hospitality venue list.
+    if (isChildrensAwardName(awardName)) {
+        let chtml = '<option value="">Select business type...</option>';
+        chtml += CHILDRENS_VENUE_OPTIONS.slice().sort(sortByLabel)
+            .map(v => `<option value="${v.value}"${v.value === selected ? ' selected' : ''}>${v.label}</option>`)
+            .join('');
+        selectEl.innerHTML = chtml;
         return;
     }
 
@@ -2032,6 +2063,16 @@ const AWARD_REGISTRY = {
         fullName: 'Health Professionals and Support Services Award MA000027',
         ratesUrl: '/health-award-rates.json',
         aliases: ['health professionals', 'health support', 'support services']
+    },
+    // Preview only — gated behind the childrens_preview feature flag and not yet
+    // human-signed-off. Until enabled it resolves to UNRESOLVED (fail closed).
+    MA000120: {
+        code: 'MA000120', status: 'preview', flag: 'childrens_preview',
+        calculatorType: 'classification',   // Stream + level picker, not the hospitality role wizard
+        displayName: "Children's Services Award",
+        fullName: "Children's Services Award MA000120",
+        ratesUrl: '/childrens-award-rates.json',
+        aliases: ["children's services", 'childrens services', 'early childhood', 'child care', 'childcare']
     }
 };
 
@@ -2081,6 +2122,7 @@ function _industryWord() {
     if (code === 'MA000100') return 'community services';
     if (code === 'MA000004') return 'retail';
     if (code === 'MA000027') return 'health services';
+    if (code === 'MA000120') return "children's services";
     if (code === 'MA000009' || code === 'MA000119') return 'hospitality';
     return '';
 }
@@ -2098,6 +2140,7 @@ function _awardRoleExamples() {
     if (code === 'MA000100') return ['Support Worker', 'Community Care Worker', 'Case Manager'];
     if (code === 'MA000004') return ['Retail Assistant', 'Sales Assistant', 'Store Manager'];
     if (code === 'MA000027') return ['Physiotherapist', 'Medical Receptionist', 'Allied Health Assistant'];
+    if (code === 'MA000120') return ['Educator', 'Room Leader', 'Centre Director'];
     if (code === 'MA000119') return ['Waiter', 'Cook', 'Restaurant Manager'];
     if (code === 'MA000009') return ['Bartender', 'Waiter', 'Chef'];
     return ['Team Member', 'Supervisor', 'Manager'];
@@ -2109,6 +2152,7 @@ function _awardDeptExamples() {
     if (code === 'MA000100') return ['Disability Services', 'Home Care', 'Community Programs'];
     if (code === 'MA000004') return ['Sales Floor', 'Stockroom / Warehouse', 'Store Management'];
     if (code === 'MA000027') return ['Allied Health', 'Clinical Support', 'Administration'];
+    if (code === 'MA000120') return ['Early Education', 'Room / Floor', 'Centre Management'];
     if (code === 'MA000009' || code === 'MA000119') return ['Kitchen', 'Front of House', 'Management'];
     return ['Operations', 'Administration', 'Management'];
 }
@@ -2170,6 +2214,10 @@ function _awEx(key) {
     // handover, manual handling) closest to the community-services copy, so it
     // reuses that variant (v.health is honoured first if one is ever added).
     if (code === 'MA000027') return v.health || v.community_services || v.default;
+    // Children's services is a care setting (children/families, documentation,
+    // handover, ratios) closest to the community-services copy, so it reuses that
+    // variant (v.childrens is honoured first if one is ever added).
+    if (code === 'MA000120') return v.childrens || v.community_services || v.default;
     if (code === 'MA000009' || code === 'MA000119') return v.hospitality;
     return v.default;
 }
@@ -13843,6 +13891,80 @@ function resolveHealthRate(data) {
         ]};
 }
 
+// Children's Services (MA000120) classification picker — graded by STREAM
+// (Support worker, Children's services employee / educator) then level. Reads
+// from the loaded childrens-award-rates.json (awardRates).
+function _calcChildrensSteps() {
+    const streamLabels = {
+        support_worker: 'Support worker (support roles, no ECEC qualification)',
+        childrens_services_employee: "Children's services employee / educator"
+    };
+    const empLabels = { full_time: 'Full-time / Part-time', casual: 'Casual' };
+    return [
+        { key: 'csStream', title: 'Which classification stream?', options: function () {
+            return [...new Set(awardRates.rates.map(r => r.stream))]
+                .map(s => ({ value: s, label: streamLabels[s] || s }));
+        }},
+        { key: 'csClass', title: 'Which level?', options: function (data) {
+            return [...new Set(awardRates.rates.filter(r => r.stream === data.csStream).map(r => r.classification))]
+                .map(c => ({ value: c, label: c }));
+        }},
+        { key: 'employment', title: 'What type of employment?', options: function (data) {
+            const emps = [...new Set(awardRates.rates.filter(r => r.stream === data.csStream).map(r => r.employment_type))];
+            return emps.map(e => ({ value: e, label: empLabels[e] || e }));
+        }}
+    ];
+}
+
+// Children's Services resolver — returns the shared result-card shape. Casual
+// rates already include the 25% loading, and every casual penalty/shift/overtime
+// rate adds the loading to the corresponding full-time multiplier (additive), so
+// penalties are computed on the (unloaded) base rate from the full-time sibling.
+function resolveChildrensRate(data) {
+    const entry = awardRates.rates.find(r => r.stream === data.csStream && r.classification === data.csClass && r.employment_type === data.employment);
+    if (!entry) {
+        return { award: awardRates.award_name, level: 'Rate not found', rate: 0,
+            penalties: ['No rate found for that combination.'], nextSteps: ['Contact Fitz HR support'] };
+    }
+    const rate = entry.rate;
+    const p = awardRates.penalty_rates || {};
+    const cl = awardRates.casual_loading || 0.25;
+    const isCasual = data.employment === 'casual';
+    const ftSibling = isCasual
+        ? awardRates.rates.find(r => r.stream === data.csStream && r.classification === data.csClass && r.employment_type === 'full_time')
+        : null;
+    const base = isCasual ? (ftSibling ? ftSibling.rate : rate / (1 + cl)) : rate;
+    // Round half-up to cents (the FWO Pay Guide convention).
+    const money = n => '$' + (Math.round((n + 1e-9) * 100) / 100).toFixed(2);
+    const add = isCasual ? cl : 0;
+    const penalties = [];
+    // Percent label that tolerates float noise (1.175 -> "117.5", 1.10 -> "110").
+    const pct = m => { const v = Math.round(m * 1000) / 10; return Number.isInteger(v) ? String(v) : v.toFixed(1); };
+    // Penalty rates (Sat/Sun/PH) — casual adds the 25% loading (additive).
+    const pen = (label, mult) => { if (typeof mult === 'number') penalties.push(`${label} (${pct(mult + add)}%): ${money(base * (mult + add))}/hr`); };
+    // Shift loadings — casual adds the 25% loading on top of the shift loading (additive).
+    const load = (label, l) => { if (typeof l === 'number') { const m = 1 + l + add; penalties.push(`${label} (${pct(m)}%): ${money(base * m)}/hr`); } };
+    load('Early morning shift', p.early_morning_shift_loading);
+    load('Afternoon shift', p.afternoon_shift_loading);
+    load('Rotating night shift', p.rotating_night_shift_loading);
+    load('Permanent night shift', p.permanent_night_shift_loading);
+    pen('Saturday (shiftworkers; day workers paid overtime)', p.saturday_full_time_part_time);
+    pen('Sunday', p.sunday_full_time_part_time);
+    pen('Public holiday', p.public_holiday_full_time_part_time);
+    pen('Overtime — first 2 hrs', p.overtime_first_2hrs);
+    pen('Overtime — after 2 hrs', p.overtime_after_2hrs);
+    if (isCasual) {
+        penalties.push('Casual rates include the 25% loading; every penalty, shift and overtime rate above adds the 25% loading to the full-time figure.');
+    }
+    return { award: awardRates.award_name, level: entry.classification, rate: rate, weeklyRate: entry.weekly_rate || null,
+        rateLabel: isCasual ? 'Casual Rate (per hour)' : 'Base Rate (per hour)',
+        penalties: penalties, nextSteps: [
+            'Confirm the stream and level against Schedule B of MA000120',
+            'Set up payroll with these exact rates',
+            'Keep employment records for 7 years'
+        ]};
+}
+
 function getAwardCalculatorConfig(code) {
     if (getAwardContext().calculatorType === 'classification') {
         if (code === 'MA000100') {
@@ -13866,6 +13988,14 @@ function getAwardCalculatorConfig(code) {
                 disclaimer: '⚠️ Preview — Health Professionals & Support Services rates effective 01/07/2026, adult classifications only (junior/apprentice rates not modelled). Pick the stream that matches the work performed. Verify against the award before relying on these figures.',
                 steps: _calcHealthSteps(),
                 resolve: resolveHealthRate,
+                juniorRedirect: false
+            };
+        }
+        if (code === 'MA000120') {
+            return {
+                disclaimer: "⚠️ Preview — Children's Services rates effective 01/07/2026, adult classifications only (junior/apprentice rates not modelled). Pick the stream that matches the role. Verify against the award before relying on these figures.",
+                steps: _calcChildrensSteps(),
+                resolve: resolveChildrensRate,
                 juniorRedirect: false
             };
         }
@@ -17188,6 +17318,10 @@ function updateOnboardingStep() {
         if (healthBtn && typeof hasFeature === 'function' && hasFeature('health_preview')) {
             healthBtn.classList.remove('hidden');
         }
+        const childrensBtn = document.getElementById('onboardingChildrensBtn');
+        if (childrensBtn && typeof hasFeature === 'function' && hasFeature('childrens_preview')) {
+            childrensBtn.classList.remove('hidden');
+        }
     }
 
     if (onboardingCurrentStep === 3) {
@@ -17206,6 +17340,9 @@ function updateOnboardingStep() {
                 hint.classList.remove('hidden');
             } else if (isHealthAwardName(venueProfile.primaryAward)) {
                 hint.textContent = 'Select the type of health service, practice or clinic you run.';
+                hint.classList.remove('hidden');
+            } else if (isChildrensAwardName(venueProfile.primaryAward)) {
+                hint.textContent = 'Select the type of early childhood education & care service you run.';
                 hint.classList.remove('hidden');
             } else if (AWARD_VENUE_MAP[venueProfile.primaryAward]) {
                 hint.textContent = `Showing business types commonly covered by the ${venueProfile.primaryAward}. If yours isn't listed, choose from "Other business types".`;
@@ -17446,7 +17583,8 @@ function getVenueTypeLabel(type) {
         || MANUFACTURING_VENUE_OPTIONS.find(v => v.value === type)
         || SCHADS_VENUE_OPTIONS.find(v => v.value === type)
         || RETAIL_VENUE_OPTIONS.find(v => v.value === type)
-        || HEALTH_VENUE_OPTIONS.find(v => v.value === type);
+        || HEALTH_VENUE_OPTIONS.find(v => v.value === type)
+        || CHILDRENS_VENUE_OPTIONS.find(v => v.value === type);
     if (match) return match.short;
     // Legacy slugs from earlier onboarding versions
     const legacy = {
@@ -17526,6 +17664,7 @@ function showVenueSettings() {
                     ${hasFeature('schads_preview') ? `<option value="Social, Community, Home Care and Disability Services Industry Award MA000100" ${venueProfile.primaryAward === 'Social, Community, Home Care and Disability Services Industry Award MA000100' ? 'selected' : ''}>Social, Community, Home Care &amp; Disability Services Award (MA000100) — preview</option>` : ''}
                     ${hasFeature('retail_preview') ? `<option value="General Retail Industry Award MA000004" ${venueProfile.primaryAward === 'General Retail Industry Award MA000004' ? 'selected' : ''}>General Retail Industry Award (MA000004) — preview</option>` : ''}
                     ${hasFeature('health_preview') ? `<option value="Health Professionals and Support Services Award MA000027" ${venueProfile.primaryAward === 'Health Professionals and Support Services Award MA000027' ? 'selected' : ''}>Health Professionals &amp; Support Services Award (MA000027) — preview</option>` : ''}
+                    ${hasFeature('childrens_preview') ? `<option value="Children's Services Award MA000120" ${venueProfile.primaryAward === "Children's Services Award MA000120" ? 'selected' : ''}>Children's Services Award (MA000120) — preview</option>` : ''}
                 </select>
                 <p class="text-xs text-slate-400 mt-1">Changing your award updates pay rate calculations and advice throughout the app.</p>
             </div>
@@ -23611,7 +23750,7 @@ const _FW_DOC_TEMPLATES = {
         title: 'Annualised Wage Agreement',
         subtitle: 'Generates a written annualised wage agreement with the clause references for your award',
         anchor: 'Annualised wage arrangement clause for your award · Fair Work Act 2009',
-        excludeAwards: ['MA000100', 'MA000004'],   // SCHADS and General Retail have no annualised wage arrangement clause
+        excludeAwards: ['MA000100', 'MA000004', 'MA000120'],   // SCHADS, General Retail and Children's Services have no annualised wage arrangement clause
         render: function() { return _fwDocRender_clause20Agreement(); },
         validate: function() { return _fwDocValidate_clause20Agreement(); },
         generate: function() { return _fwDocGenerate_clause20Agreement(); }
@@ -23620,7 +23759,7 @@ const _FW_DOC_TEMPLATES = {
         title: 'Annualised Wage Time Record',
         subtitle: 'Generates a signed time record template for annualised wage arrangements',
         anchor: 'Annualised wage record-keeping clause for your award · FW Act s535',
-        excludeAwards: ['MA000100', 'MA000004'],   // SCHADS and General Retail have no annualised wage arrangement clause
+        excludeAwards: ['MA000100', 'MA000004', 'MA000120'],   // SCHADS, General Retail and Children's Services have no annualised wage arrangement clause
         render: function() { return _fwDocRender_weeklyTimeRecord(); },
         validate: function() { return _fwDocValidate_weeklyTimeRecord(); },
         generate: function() { return _fwDocGenerate_weeklyTimeRecord(); }
@@ -23841,6 +23980,11 @@ function _fwDocClassificationOptions(awardCode) {
                    'Dental assistant - Level 7', 'Pathology collector - Level 5', 'Pathology collector - Level 6',
                    'Pathology collector - Level 7', 'Health Professional - Level 1', 'Health Professional - Level 2',
                    'Health Professional - Level 3', 'Health Professional - Level 4', 'Other'];
+    // Children's Services Award MA000120 — two streams: Support worker + educator levels.
+    const ma120 = ['Support worker level 1.1', 'Support worker level 2.1', 'Support worker level 2.2',
+                   'Support worker level 3.1', 'Level 1 - Introductory educator', 'Level 2 - Educator',
+                   'Level 3 - Qualified educator', 'Level 4 - Experienced educator', 'Level 5 - Advanced educator',
+                   'Level 6 - Room leader', 'Level 7 - Assistant director', 'Level 8 - Director', 'Other'];
     let opts;
     if (awardCode === 'MA000009') opts = ma009;
     else if (awardCode === 'MA000119') opts = ma119;
@@ -23848,6 +23992,7 @@ function _fwDocClassificationOptions(awardCode) {
     else if (awardCode === 'MA000100') opts = ma100;
     else if (awardCode === 'MA000004') opts = ma004;
     else if (awardCode === 'MA000027') opts = ma027;
+    else if (awardCode === 'MA000120') opts = ma120;
     else return '<option value="">Set your Award in Settings first</option>';
     return opts.map(function(o) { return '<option value="' + _fwEscapeHtml(o) + '">' + _fwEscapeHtml(o) + '</option>'; }).join('');
 }
@@ -24215,7 +24360,8 @@ function _fwDocGenerate_cashOut() {
         : (awardCode === 'MA000009' ? 'MA000009 Schedule G'
         : (awardCode === 'MA000100' ? 'MA000100 Schedule K'
         : (awardCode === 'MA000004' ? 'MA000004 Schedule G'
-        : (awardCode === 'MA000027' ? 'MA000027 Schedule I' : '[your modern award] schedule'))));
+        : (awardCode === 'MA000027' ? 'MA000027 Schedule I'
+        : (awardCode === 'MA000120' ? 'MA000120 Schedule G' : '[your modern award] schedule')))));
     const balance = parseFloat(d.balance_hours);
     const cashout = parseFloat(d.cashout_hours);
     const rate = parseFloat(d.base_rate);
@@ -24462,6 +24608,23 @@ const _FW_PSYCHO_HAZARDS_HEALTH = [
     'Vicarious trauma (witnessing patient trauma or distress)'
 ];
 
+// Children's Services-relevant psychosocial hazards (early childhood education
+// and care context).
+const _FW_PSYCHO_HAZARDS_CHILDRENS = [
+    'Exposure to child protection concerns and abuse/neglect disclosures',
+    'Aggression or abuse from parents, carers or family members',
+    'Managing children with challenging behaviours or complex needs',
+    'High emotional labour and sustained responsibility for children\'s safety',
+    'Understaffing and educator-to-child ratio pressure',
+    'Lone / isolated work (early open, late close, single-educator rooms)',
+    'Manual handling and physical strain (lifting children, low furniture)',
+    'Fatigue from long-day-care shifts, split shifts and early starts',
+    'Exposure to infectious illness affecting wellbeing',
+    'Poor support after a serious incident involving a child',
+    'Bullying or poor support within the centre hierarchy',
+    'Vicarious trauma (witnessing or responding to child trauma)'
+];
+
 // The hazard list defaults to the resolved award's industry context.
 function _fwPsychoHazards() {
     const code = getAwardContext().code;
@@ -24469,6 +24632,7 @@ function _fwPsychoHazards() {
     if (code === 'MA000100') return _FW_PSYCHO_HAZARDS_SCHADS;
     if (code === 'MA000004') return _FW_PSYCHO_HAZARDS_RETAIL;
     if (code === 'MA000027') return _FW_PSYCHO_HAZARDS_HEALTH;
+    if (code === 'MA000120') return _FW_PSYCHO_HAZARDS_CHILDRENS;
     return _FW_PSYCHO_HAZARDS;
 }
 
@@ -24850,7 +25014,8 @@ function _fwDocGenerate_leaveInAdvance() {
         : (awardCode === 'MA000009' ? 'MA000009 Schedule G'
         : (awardCode === 'MA000100' ? 'MA000100 Schedule J'
         : (awardCode === 'MA000004' ? 'MA000004 Schedule F'
-        : (awardCode === 'MA000027' ? 'MA000027 Schedule H' : '[your modern award] schedule'))));
+        : (awardCode === 'MA000027' ? 'MA000027 Schedule H'
+        : (awardCode === 'MA000120' ? 'MA000120 Schedule F' : '[your modern award] schedule')))));
     const negativeBalance = Number(d.current_balance) - Number(d.advance_hours);
     const html =
         '<h1>Annual Leave in Advance Agreement</h1>' +
