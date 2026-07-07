@@ -1234,3 +1234,95 @@ ${h.penaltyTable(h.data)}` },
     },
   ],
 };
+
+// ===========================================================================
+// MINIMUM WAGE INCREASE 2026 — one post per new award. Shares the strong-
+// performing hospitality "minimum-wage-increase-2026" angle: the FWC Annual
+// Wage Review lifted award minimums 4.75% from the first full pay period on or
+// after 1 July 2026, with a targeted floor of $26.44/hr.
+// ===========================================================================
+const MWR_HISTORY = `    <table class="rate-table">
+        <thead><tr><th>Effective date</th><th>Award minimum wage increase</th></tr></thead>
+        <tbody>
+            <tr><td>1 July 2024</td><td>3.75%</td></tr>
+            <tr><td>1 July 2025</td><td>3.5%</td></tr>
+            <tr><td>1 July 2026</td><td><span class="rate-highlight">4.75%</span></td></tr>
+        </tbody>
+    </table>
+    <p class="caption">Modern award minimum wage increases from successive Fair Work Commission Annual Wage Review decisions.</p>`;
+
+function mwPost(c) {
+  return {
+    slug: c.slug,
+    tag: 'Wage Review · Award Rates · 2026', cardTag: 'Wage Review · 2026',
+    h1: `${c.short} Minimum Wage Increase 2026 — <em>4.75% Rise</em>`,
+    cardTitle: `${c.short} Minimum Wage Increase 2026 — 4.75% Rise`,
+    title: `${c.short} Minimum Wage Increase 2026: 4.75% Rise (${c.code})`,
+    metaDesc: `Fair Work's 2026 Annual Wage Review lifts ${c.code} minimum rates by 4.75% from 1 July 2026. What it means for ${c.industry} employers — new base rates, the first-pay-period rule, and a pre-1-July checklist.`,
+    keywords: `${c.industry} minimum wage increase 2026, ${c.short} pay rise 2026, ${c.code} wage increase July 2026, award rates increase 2026, 4.75% pay rise 2026, annual wage review 2026 ${c.industry}`,
+    ogDesc: `What Fair Work's 4.75% award increase from 1 July 2026 means for ${c.industry} employers under the ${c.short} — new rates and a pre-1-July action checklist.`,
+    blurb: `What the Fair Work 4.75% Annual Wage Review increase from 1 July 2026 means for ${c.industry} employers — new ${c.code} base rates and a pre-1-July checklist.`,
+    datePublished: '2026-06-02', dateModified: '2026-07-01', datePublishedLabel: '2 Jun 2026', dateModifiedLabel: '1 Jul 2026', readMin: 6,
+    intro: `The Fair Work Commission's <strong>Annual Wage Review 2026</strong> lifted modern award minimum rates by <strong>4.75%</strong> from the first full pay period on or after 1 July 2026. For ${c.industry} employers under the <strong>${c.full}</strong>, every base rate, penalty rate, casual loading and overtime figure shifts — and payroll needs updating for the first July pay run.`,
+    summary: `The Fair Work Commission increased modern award minimum wages by 4.75%, with a targeted floor ensuring the lowest ongoing award rate is at least $26.44/hr ($1,004.90/week). Under the ${c.short} ${c.code}, ${c.baseLine}. The increase applies from the first full pay period starting on or after 1 July 2026. Because penalties, casual loading and overtime are multiples of the base rate, those dollar amounts rise too.`,
+    quickRefLabel: `Quick Reference — ${c.short} Wage Rise 2026`,
+    quickRef: [
+      '<strong>Headline increase:</strong> 4.75% to all modern award minimum rates',
+      '<strong>Lowest ongoing rate floor:</strong> $26.44/hr ($1,004.90/week)',
+      `<strong>${c.short} base:</strong> ${c.baseShort}`,
+      '<strong>Starts:</strong> first full pay period on or after 1 July 2026',
+      '<strong>Penalties, casual loading &amp; overtime:</strong> rise with the new base',
+    ],
+    sections: () => [
+      { h2: 'The 2026 Fair Work Pay Rise <em>Explained</em>', html:
+`    <p>The <strong>Fair Work Commission (FWC)</strong> sets minimum wages through its <strong>Annual Wage Review</strong> each year. The 2026 decision increased modern award minimum rates by <strong>4.75%</strong>, with a targeted floor so the lowest ongoing award rate is at least <strong>$26.44/hr ($1,004.90/week)</strong>. The Fair Work Ombudsman published the updated per-award pay guides on 24 June 2026, so the ${c.code} dollar figures are confirmed and effective from the first full pay period on or after 1 July 2026.</p>` },
+      { h2: 'When the Increase <em>Actually</em> Starts', html:
+`    <p>The new rates apply from the <strong>first full pay period that starts on or after 1 July 2026</strong> — not necessarily 1 July itself. If your pay week starts on a Monday, the new rates apply from the first Monday on or after 1 July, and the days before that are still paid at the old rate. Getting this cut-over date wrong is the most common wage-review payroll error.</p>` },
+      { h2: `Confirmed ${c.short} Rates <em>from July 2026</em>`, html:
+`    <p>Under the ${c.short} ${c.code}, ${c.baseLine} from the first full pay period on or after 1 July 2026. Every classification rises by 4.75% off its previous base. Because penalty rates, casual loading and overtime are calculated as multiples of the base rate, those dollar amounts increase automatically — see the full <a href="/blog/${c.ratesSlug}">${c.short} rates guide</a>, updated for 1 July 2026.</p>` },
+      { h2: 'Junior, Apprentice &amp; <em>Casual</em> Flow-On', html:
+`    <p>Junior and apprentice rates are set as percentages of the adult classification rate, so they rise automatically with the base. The 25% casual loading is unchanged as a percentage, but the dollar value of every casual hour rises because it is calculated on the higher base. Update the base first, then let the percentages flow through — do not freeze junior or casual rates at the old dollar figures.</p>` },
+      { h2: 'Annual Wage Review Increases <em>Since 2024</em>', html: MWR_HISTORY },
+      { h2: `What ${c.industryTitle} Employers Must Do <em>Before 1 July</em>`, html:
+`    <ul>
+        <li>Identify your <strong>first full pay period</strong> on or after 1 July 2026 — that is your cut-over date.</li>
+        <li>Update <strong>base rates</strong> in payroll by classification level under ${c.code}.</li>
+        <li>Recalculate <strong>penalty rates, casual loading and overtime</strong> off the new base.</li>
+        <li>Check <strong>junior and apprentice</strong> flow-on percentages update automatically.</li>
+        <li>Confirm any <strong>enterprise agreement</strong> still meets the new award floor for every classification.</li>
+        <li>Keep a record of the old and new rates and the date you applied them.</li>
+    </ul>` },
+    ],
+    mistakes: [
+      '<strong>Applying the rise from 1 July regardless of your pay cycle.</strong> It starts from the first full pay period on or after 1 July — apply it too early or too late and you have an underpayment or an overpayment to unwind.',
+      '<strong>Updating the base but not the penalties.</strong> Penalty rates, casual loading and overtime are multiples of the base — they must be recalculated off the new figure.',
+      '<strong>Freezing junior or casual dollar rates.</strong> These are percentages of the adult base and must rise with it.',
+      '<strong>Assuming an enterprise agreement is safe.</strong> An agreement base rate cannot be below the new award rate for any classification.',
+    ],
+    faqs: [
+      { q: `How much is the ${c.industry} minimum wage increase in 2026?`, a: `<strong>Modern award minimum rates rose 4.75%, with the lowest ongoing award rate set at no less than $26.44/hr ($1,004.90/week).</strong> Under the ${c.short} ${c.code}, ${c.baseLine}. The change applies from the first full pay period on or after 1 July 2026.` },
+      { q: 'When does the 2026 award wage increase take effect?', a: '<strong>From the first full pay period that starts on or after 1 July 2026</strong> — not necessarily 1 July itself. Days before that first full period are still paid at the old rate.' },
+      { q: `Does the 2026 increase apply to the ${c.short}?`, a: `<strong>Yes — 4.75% applies to all modern awards, including ${c.code}.</strong> Because penalty rates, casual loading and overtime are multiples of the base rate, those dollar amounts increase too.` },
+      { q: `What do ${c.industry} employers need to do before 1 July 2026?`, a: '<strong>Identify your first full pay period on or after 1 July, update base rates by classification, recalculate penalties, casual loading and overtime off the new base, check junior/apprentice flow-on, and confirm any enterprise agreement still meets the new award floor.</strong>' },
+      { q: 'Do enterprise agreement rates increase with the 2026 wage review?', a: '<strong>Not automatically — but an enterprise agreement base rate cannot be less than the relevant award rate.</strong> If the 4.75% increase pushes the award rate above your agreement rate for any classification, you must pay at least the new award rate.' },
+    ],
+    related: [
+      { href: `/blog/${c.ratesSlug}`, label: `${c.short} rates 2026 — full breakdown` },
+      { href: '/blog/minimum-wage-increase-2026', label: 'Minimum wage increase 2026 — hospitality & restaurant' },
+      { href: c.guide, label: `${c.short} guide (${c.code})` },
+      { href: c.payRates, label: `${c.short} pay rates — full table` },
+    ],
+    ctaH3: `Update Your ${c.short} Rates — Instantly`,
+    ctaP: `The 4.75% rise touches every base rate, penalty and loading. Fitz HR has the current ${c.code} figures built in — ask any rate and get the post-1-July answer in seconds.`,
+  };
+}
+
+const MW = [
+  { key: 'retail', slug: 'retail-award-minimum-wage-increase-2026', short: 'Retail Award', full: 'General Retail Industry Award MA000004', code: 'MA000004', industry: 'retail', industryTitle: 'Retail', ratesSlug: 'retail-award-rates-2026', guide: '/retail-award-guide', payRates: '/retail-award-pay-rates', baseLine: 'a Retail Employee Level 1 is $27.81/hr', baseShort: 'Retail Employee Level 1 at $27.81/hr' },
+  { key: 'manufacturing', slug: 'manufacturing-award-minimum-wage-increase-2026', short: 'Manufacturing Award', full: 'Manufacturing and Associated Industries and Occupations Award MA000010', code: 'MA000010', industry: 'manufacturing', industryTitle: 'Manufacturing', ratesSlug: 'manufacturing-award-rates-2026', guide: '/manufacturing-award-guide', payRates: '/manufacturing-award-pay-rates', baseLine: 'a C14 employee is $25.74/hr and every C-level rises 4.75%', baseShort: 'C14 at $25.74/hr' },
+  { key: 'schads', slug: 'schads-award-minimum-wage-increase-2026', short: 'SCHADS Award', full: 'Social, Community, Home Care and Disability Services Industry Award MA000100', code: 'MA000100', industry: 'community services', industryTitle: 'Community Services', ratesSlug: 'schads-award-rates-2026', guide: '/schads-award-guide', payRates: '/schads-award-pay-rates', baseLine: 'a Social & Community Services Level 1 pay point 1 employee is $27.55/hr', baseShort: 'SACS Level 1 (pp1) at $27.55/hr' },
+  { key: 'health', slug: 'health-professionals-award-minimum-wage-increase-2026', short: 'Health Professionals Award', full: 'Health Professionals and Support Services Award MA000027', code: 'MA000027', industry: 'health practice', industryTitle: 'Health Practice', ratesSlug: 'health-professionals-award-rates-2026', guide: '/health-award-guide', payRates: '/health-award-pay-rates', baseLine: 'a Support Services Level 1 employee is $26.97/hr', baseShort: 'Support Services Level 1 at $26.97/hr' },
+  { key: 'childrens', slug: 'childrens-services-award-minimum-wage-increase-2026', short: "Children's Services Award", full: "Children's Services Award MA000120", code: 'MA000120', industry: "children's services", industryTitle: "Children's Services", ratesSlug: 'childrens-services-award-rates-2026', guide: '/childrens-award-guide', payRates: '/childrens-award-pay-rates', baseLine: 'a Support Worker Level 1.1 is $26.44/hr — exactly the new lowest-ongoing floor', baseShort: 'Support Worker Level 1.1 at $26.44/hr' },
+];
+for (const c of MW) POSTS[c.key].push(mwPost(c));
+
