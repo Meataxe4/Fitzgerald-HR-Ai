@@ -1,0 +1,45 @@
+name: Regression suite & accuracy gate
+
+# Milestone 6 — runs the new-vertical regression suite on every push/PR, reports
+# the pass rate, and ENFORCES the launch gate: a vertical that is LIVE (GA) in the
+# AWARD_REGISTRY must clear ACCURACY_THRESHOLD or the build fails. This is what
+# keeps a below-bar vertical's feature flag OFF until its accuracy is proven.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+  workflow_dispatch:
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    env:
+      # The bar every LIVE (GA) award must clear. Raise over time as coverage grows.
+      ACCURACY_THRESHOLD: '0.95'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      # Guardrail unit tests (award resolution + grounding facts).
+      - name: Award-resolution guardrail tests
+        run: node tests/award-resolution.test.js
+
+      # Proves the gate is enforced, not advisory (fail-closed on a GA miss).
+      - name: Accuracy-gate enforcement test
+        run: node tests/regression-gate.test.js
+
+      # The regression suite itself. Writes a machine-readable report and, on a
+      # LIVE (GA) award falling below ACCURACY_THRESHOLD, exits non-zero and fails
+      # the build — blocking launch.
+      - name: Regression suite + accuracy gate
+        run: node scripts/run-regression.mjs --json regression-report.json
+
+      - name: Upload regression report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: regression-report
+          path: regression-report.json

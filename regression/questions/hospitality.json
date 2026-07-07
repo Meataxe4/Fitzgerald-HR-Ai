@@ -1,0 +1,613 @@
+[
+  {
+    "id": "MA000009-resolution-001",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "resolution",
+    "question": "Which modern award and code covers the Hospitality Industry (General) Award?",
+    "expected_answer": "Hospitality Industry (General) Award (MA000009)",
+    "assert": {
+      "kind": "resolves",
+      "input": "Hospitality Industry (General) Award MA000009",
+      "flag": null,
+      "code": "MA000009"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-resolution-002",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "resolution",
+    "question": "If a user says their award is the \"Fast Food Industry Award\", should the Hospitality Industry (General) Award answer their pay questions?",
+    "expected_answer": "No — that is a different award; the assistant must not answer from this award’s data.",
+    "assert": {
+      "kind": "resolves_unresolved",
+      "input": "Fast Food Industry Award MA000003"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-casual_loading-003",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "casual_loading",
+    "question": "What is the casual loading under the Hospitality Industry (General) Award?",
+    "expected_answer": "25% (a casual is paid 25% on top of the minimum hourly rate).",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000009",
+      "path": "casual_loading",
+      "equals": 0.25
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-superannuation-004",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "superannuation",
+    "question": "What superannuation guarantee rate applies under the Hospitality Industry (General) Award for this period?",
+    "expected_answer": "12%.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000009",
+      "path": "superannuation_rate",
+      "equals": 0.12
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-minimum_engagement-005",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "minimum_engagement",
+    "question": "Under the Hospitality Industry (General) Award, what is the minimum shift length (minimum engagement) for a full-time employee?",
+    "expected_answer": "4 hours.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000009",
+      "path": "minimum_engagement.full_time_hours_per_shift",
+      "equals": 4
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-minimum_engagement-006",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "minimum_engagement",
+    "question": "Under the Hospitality Industry (General) Award, what is the minimum shift length (minimum engagement) for a part-time employee?",
+    "expected_answer": "3 hours.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000009",
+      "path": "minimum_engagement.part_time_hours_per_shift",
+      "equals": 3
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-minimum_engagement-007",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "minimum_engagement",
+    "question": "Under the Hospitality Industry (General) Award, what is the minimum shift length (minimum engagement) for a casual employee?",
+    "expected_answer": "2 hours.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000009",
+      "path": "minimum_engagement.casual_hours_per_shift",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-minimum_engagement-008",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "minimum_engagement",
+    "question": "Under the Hospitality Industry (General) Award, what is the minimum shift length (minimum engagement) for a full-time / part-time employee on a public holiday?",
+    "expected_answer": "4 hours.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000009",
+      "path": "minimum_engagement.public_holiday_full_time_part_time",
+      "equals": 4
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-minimum_engagement-009",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "minimum_engagement",
+    "question": "Under the Hospitality Industry (General) Award, what is the minimum shift length (minimum engagement) for a casual employee on a public holiday?",
+    "expected_answer": "2 hours.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000009",
+      "path": "minimum_engagement.public_holiday_casual",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-penalty_rate-010",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "penalty_rate",
+    "question": "Under the Hospitality Industry (General) Award, what penalty/loading applies for Saturday (full-time / part-time)?",
+    "expected_answer": "125% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000009",
+      "key": "saturday_full_time_part_time",
+      "equals": 1.25
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-penalty_rate-011",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "penalty_rate",
+    "question": "Under the Hospitality Industry (General) Award, what penalty/loading applies for Saturday (casual)?",
+    "expected_answer": "150% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000009",
+      "key": "saturday_casual",
+      "equals": 1.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-penalty_rate-012",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "penalty_rate",
+    "question": "Under the Hospitality Industry (General) Award, what penalty/loading applies for Sunday (full-time / part-time)?",
+    "expected_answer": "150% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000009",
+      "key": "sunday_full_time_part_time",
+      "equals": 1.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-penalty_rate-013",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "penalty_rate",
+    "question": "Under the Hospitality Industry (General) Award, what penalty/loading applies for Sunday (casual)?",
+    "expected_answer": "175% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000009",
+      "key": "sunday_casual",
+      "equals": 1.75
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-penalty_rate-014",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "penalty_rate",
+    "question": "Under the Hospitality Industry (General) Award, what penalty/loading applies for a public holiday (full-time / part-time)?",
+    "expected_answer": "225% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000009",
+      "key": "public_holiday_full_time_part_time",
+      "equals": 2.25
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-penalty_rate-015",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "penalty_rate",
+    "question": "Under the Hospitality Industry (General) Award, what penalty/loading applies for a public holiday (casual)?",
+    "expected_answer": "250% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000009",
+      "key": "public_holiday_casual",
+      "equals": 2.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-penalty_rate-016",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "penalty_rate",
+    "question": "Under the Hospitality Industry (General) Award, what penalty/loading applies for ordinary hours after 7pm (evening loading)?",
+    "expected_answer": "295% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000009",
+      "key": "evening_after_7pm_loading",
+      "equals": 2.95
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-penalty_rate-017",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "penalty_rate",
+    "question": "Under the Hospitality Industry (General) Award, what penalty/loading applies for a night shift between midnight and 7am (loading)?",
+    "expected_answer": "442% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000009",
+      "key": "night_midnight_to_7am_loading",
+      "equals": 4.42
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-penalty_rate-018",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "penalty_rate",
+    "question": "Under the Hospitality Industry (General) Award, what penalty/loading applies for the first 2 hours of overtime?",
+    "expected_answer": "150% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000009",
+      "key": "overtime_first_2hrs",
+      "equals": 1.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-penalty_rate-019",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "penalty_rate",
+    "question": "Under the Hospitality Industry (General) Award, what penalty/loading applies for overtime after the first 2 hours?",
+    "expected_answer": "200% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000009",
+      "key": "overtime_after_2hrs",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-pay_rate-020",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "pay_rate",
+    "question": "Under the Hospitality Industry (General) Award, what is the minimum full-time hourly rate for \"introductory\"?",
+    "expected_answer": "$25.74 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000009",
+      "where": {
+        "employment_type": "full_time",
+        "level": "Introductory",
+        "classification": "introductory",
+        "title": "Introductory"
+      },
+      "field": "rate",
+      "equals": 25.74
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-pay_rate-021",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "pay_rate",
+    "question": "Under the Hospitality Industry (General) Award, what is the minimum full-time hourly rate for \"level_2.front_office_grade1\"?",
+    "expected_answer": "$27.08 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000009",
+      "where": {
+        "employment_type": "full_time",
+        "level": "Level 2",
+        "classification": "level_2.front_office_grade1",
+        "title": "Front Office, Grade 1"
+      },
+      "field": "rate",
+      "equals": 27.08
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-pay_rate-022",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "pay_rate",
+    "question": "Under the Hospitality Industry (General) Award, what is the minimum full-time hourly rate for \"level_3.food_beverage_grade3\"?",
+    "expected_answer": "$27.97 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000009",
+      "where": {
+        "employment_type": "full_time",
+        "level": "Level 3",
+        "classification": "level_3.food_beverage_grade3",
+        "title": "Food and Beverage Attendant, Grade 3"
+      },
+      "field": "rate",
+      "equals": 27.97
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-pay_rate-023",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "pay_rate",
+    "question": "Under the Hospitality Industry (General) Award, what is the minimum full-time hourly rate for \"level_3.timekeeper_security_grade2\"?",
+    "expected_answer": "$27.97 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000009",
+      "where": {
+        "employment_type": "full_time",
+        "level": "Level 3",
+        "classification": "level_3.timekeeper_security_grade2",
+        "title": "Timekeeper/Security Officer, Grade 2"
+      },
+      "field": "rate",
+      "equals": 27.97
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-pay_rate-024",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "pay_rate",
+    "question": "Under the Hospitality Industry (General) Award, what is the minimum full-time hourly rate for \"level_4.storeperson_grade3\"?",
+    "expected_answer": "$29.45 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000009",
+      "where": {
+        "employment_type": "full_time",
+        "level": "Level 4",
+        "classification": "level_4.storeperson_grade3",
+        "title": "Storeperson, Grade 3"
+      },
+      "field": "rate",
+      "equals": 29.45
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-pay_rate-025",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "pay_rate",
+    "question": "Under the Hospitality Industry (General) Award, what is the minimum full-time hourly rate for \"managerial_hotel\"?",
+    "expected_answer": "$32.19 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000009",
+      "where": {
+        "employment_type": "full_time",
+        "level": "Managerial",
+        "classification": "managerial_hotel",
+        "title": "Managerial Staff - Hotel"
+      },
+      "field": "rate",
+      "equals": 32.19
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-pay_rate-026",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "pay_rate",
+    "question": "Under the Hospitality Industry (General) Award, what is the minimum casual hourly rate (including casual loading) for \"introductory\"?",
+    "expected_answer": "$32.18 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000009",
+      "where": {
+        "employment_type": "casual",
+        "level": "Introductory",
+        "classification": "introductory",
+        "title": "Introductory"
+      },
+      "field": "rate",
+      "equals": 32.18
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-pay_rate-027",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "pay_rate",
+    "question": "Under the Hospitality Industry (General) Award, what is the minimum casual hourly rate (including casual loading) for \"managerial_hotel\"?",
+    "expected_answer": "$40.24 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000009",
+      "where": {
+        "employment_type": "casual",
+        "level": "Managerial",
+        "classification": "managerial_hotel",
+        "title": "Managerial Staff - Hotel"
+      },
+      "field": "rate",
+      "equals": 40.24
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-allowance-028",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "allowance",
+    "question": "Under the Hospitality Industry (General) Award, what is the \"Split/broken shift allowance (not casuals or loaded-rate; break 2 to 3 hours)\"?",
+    "expected_answer": "$3.69 per day.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000009",
+      "name_includes": "Split/broken shift allowance (not casuals or loaded-rate; break 2 to 3 hours)",
+      "field": "amount",
+      "equals": 3.69
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-allowance-029",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "allowance",
+    "question": "Under the Hospitality Industry (General) Award, what is the \"First aid allowance (part-time or casual employees)\"?",
+    "expected_answer": "$2.69 per day.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000009",
+      "name_includes": "First aid allowance (part-time or casual employees)",
+      "field": "amount",
+      "equals": 2.69
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-allowance-030",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "allowance",
+    "question": "Under the Hospitality Industry (General) Award, what is the \"Meal allowance - overtime (not casual employees)\"?",
+    "expected_answer": "$17.42 per occasion.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000009",
+      "name_includes": "Meal allowance - overtime (not casual employees)",
+      "field": "amount",
+      "equals": 17.42
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-allowance-031",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "allowance",
+    "question": "Under the Hospitality Industry (General) Award, what is the \"Vehicle allowance (managerial staff - hotels)\"?",
+    "expected_answer": "$1.01 per km.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000009",
+      "name_includes": "Vehicle allowance (managerial staff - hotels)",
+      "field": "amount",
+      "equals": 1.01
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-currency-032",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "currency",
+    "question": "What effective date is the Hospitality Industry (General) Award rate data current as at?",
+    "expected_answer": "2026-07-01.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000009",
+      "path": "effective_date",
+      "equals": "2026-07-01"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000009-currency-033",
+    "vertical": "hospitality",
+    "award": "MA000009",
+    "category": "currency",
+    "question": "When is the Hospitality Industry (General) Award rate data next due for review?",
+    "expected_answer": "2027-07-01.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000009",
+      "path": "next_review_date",
+      "equals": "2027-07-01"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000009, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  }
+]

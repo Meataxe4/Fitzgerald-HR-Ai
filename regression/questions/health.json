@@ -1,0 +1,545 @@
+[
+  {
+    "id": "MA000027-resolution-001",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "resolution",
+    "question": "Which modern award and code covers the Health Professionals and Support Services Award?",
+    "expected_answer": "Health Professionals and Support Services Award (MA000027)",
+    "assert": {
+      "kind": "resolves",
+      "input": "Health Professionals and Support Services Award MA000027",
+      "flag": "health_preview",
+      "code": "MA000027"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-resolution-002",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "resolution",
+    "question": "If a user says their award is the \"Fast Food Industry Award\", should the Health Professionals and Support Services Award answer their pay questions?",
+    "expected_answer": "No — that is a different award; the assistant must not answer from this award’s data.",
+    "assert": {
+      "kind": "resolves_unresolved",
+      "input": "Fast Food Industry Award MA000003"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-casual_loading-003",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "casual_loading",
+    "question": "What is the casual loading under the Health Professionals and Support Services Award?",
+    "expected_answer": "25% (a casual is paid 25% on top of the minimum hourly rate).",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000027",
+      "path": "casual_loading",
+      "equals": 0.25
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-superannuation-004",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "superannuation",
+    "question": "What superannuation guarantee rate applies under the Health Professionals and Support Services Award for this period?",
+    "expected_answer": "12%.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000027",
+      "path": "superannuation_rate",
+      "equals": 0.12
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-minimum_engagement-005",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "minimum_engagement",
+    "question": "Under the Health Professionals and Support Services Award, what is the minimum shift length (minimum engagement) for a casual employee?",
+    "expected_answer": "3 hours.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000027",
+      "path": "minimum_engagement.casual_hours_per_shift",
+      "equals": 3
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-penalty_rate-006",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "penalty_rate",
+    "question": "Under the Health Professionals and Support Services Award, what penalty/loading applies for Saturday (full-time / part-time)?",
+    "expected_answer": "150% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000027",
+      "key": "saturday_full_time_part_time",
+      "equals": 1.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-penalty_rate-007",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "penalty_rate",
+    "question": "Under the Health Professionals and Support Services Award, what penalty/loading applies for Saturday (casual)?",
+    "expected_answer": "175% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000027",
+      "key": "saturday_casual",
+      "equals": 1.75
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-penalty_rate-008",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "penalty_rate",
+    "question": "Under the Health Professionals and Support Services Award, what penalty/loading applies for Sunday (full-time / part-time)?",
+    "expected_answer": "150% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000027",
+      "key": "sunday_full_time_part_time",
+      "equals": 1.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-penalty_rate-009",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "penalty_rate",
+    "question": "Under the Health Professionals and Support Services Award, what penalty/loading applies for Sunday (casual)?",
+    "expected_answer": "175% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000027",
+      "key": "sunday_casual",
+      "equals": 1.75
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-penalty_rate-010",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "penalty_rate",
+    "question": "Under the Health Professionals and Support Services Award, what penalty/loading applies for a public holiday (full-time / part-time)?",
+    "expected_answer": "250% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000027",
+      "key": "public_holiday_full_time_part_time",
+      "equals": 2.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-penalty_rate-011",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "penalty_rate",
+    "question": "Under the Health Professionals and Support Services Award, what penalty/loading applies for a public holiday (casual)?",
+    "expected_answer": "275% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000027",
+      "key": "public_holiday_casual",
+      "equals": 2.75
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-penalty_rate-012",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "penalty_rate",
+    "question": "Under the Health Professionals and Support Services Award, what penalty/loading applies for a shift attracting the Monday–Friday shift loading?",
+    "expected_answer": "A loading of 15% on the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000027",
+      "key": "shift_loading_mon_fri",
+      "equals": 0.15
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-penalty_rate-013",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "penalty_rate",
+    "question": "Under the Health Professionals and Support Services Award, what penalty/loading applies for the first 2 hours of overtime?",
+    "expected_answer": "150% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000027",
+      "key": "overtime_first_2hrs",
+      "equals": 1.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-penalty_rate-014",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "penalty_rate",
+    "question": "Under the Health Professionals and Support Services Award, what penalty/loading applies for overtime after the first 2 hours?",
+    "expected_answer": "200% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000027",
+      "key": "overtime_after_2hrs",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-penalty_rate-015",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "penalty_rate",
+    "question": "Under the Health Professionals and Support Services Award, what penalty/loading applies for overtime worked on a Sunday?",
+    "expected_answer": "200% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000027",
+      "key": "sunday_overtime",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-pay_rate-016",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "pay_rate",
+    "question": "Under the Health Professionals and Support Services Award, what is the minimum full-time hourly rate for \"Level 1\" (support services stream)?",
+    "expected_answer": "$26.97 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000027",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "support_services",
+        "section": "Support services employees (other than dental assistants and pathology collectors) - Full-time & part-time",
+        "classification": "Level 1"
+      },
+      "field": "rate",
+      "equals": 26.97
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-pay_rate-017",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "pay_rate",
+    "question": "Under the Health Professionals and Support Services Award, what is the minimum full-time hourly rate for \"Level 8 - pay point 2\" (support services stream)?",
+    "expected_answer": "$34.66 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000027",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "support_services",
+        "section": "Support services employees (other than dental assistants and pathology collectors) - Full-time & part-time",
+        "classification": "Level 8 - pay point 2"
+      },
+      "field": "rate",
+      "equals": 34.66
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-pay_rate-018",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "pay_rate",
+    "question": "Under the Health Professionals and Support Services Award, what is the minimum full-time hourly rate for \"Level 7 - dental assistant\" (dental assistants stream)?",
+    "expected_answer": "$31.67 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000027",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "dental_assistants",
+        "section": "Support services employees - Dental assistants - Full-time & part-time",
+        "classification": "Level 7 - dental assistant"
+      },
+      "field": "rate",
+      "equals": 31.67
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-pay_rate-019",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "pay_rate",
+    "question": "Under the Health Professionals and Support Services Award, what is the minimum full-time hourly rate for \"Level 1 - pay point 3\" (health professionals stream)?",
+    "expected_answer": "$33.51 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000027",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "health_professionals",
+        "section": "Health professional employees - Full-time & part-time",
+        "classification": "Level 1 - pay point 3"
+      },
+      "field": "rate",
+      "equals": 33.51
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-pay_rate-020",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "pay_rate",
+    "question": "Under the Health Professionals and Support Services Award, what is the minimum full-time hourly rate for \"Level 3 - pay point 1\" (health professionals stream)?",
+    "expected_answer": "$45.89 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000027",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "health_professionals",
+        "section": "Health professional employees - Full-time & part-time",
+        "classification": "Level 3 - pay point 1"
+      },
+      "field": "rate",
+      "equals": 45.89
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-pay_rate-021",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "pay_rate",
+    "question": "Under the Health Professionals and Support Services Award, what is the minimum full-time hourly rate for \"Level 4 - pay point 4\" (health professionals stream)?",
+    "expected_answer": "$71.19 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000027",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "health_professionals",
+        "section": "Health professional employees - Full-time & part-time",
+        "classification": "Level 4 - pay point 4"
+      },
+      "field": "rate",
+      "equals": 71.19
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-pay_rate-022",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "pay_rate",
+    "question": "Under the Health Professionals and Support Services Award, what is the minimum casual hourly rate (including casual loading) for \"Level 1\" (support services stream)?",
+    "expected_answer": "$33.71 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000027",
+      "where": {
+        "employment_type": "casual",
+        "stream": "support_services",
+        "section": "Support services employees (other than dental assistants and pathology collectors) - Casual",
+        "classification": "Level 1"
+      },
+      "field": "rate",
+      "equals": 33.71
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-pay_rate-023",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "pay_rate",
+    "question": "Under the Health Professionals and Support Services Award, what is the minimum casual hourly rate (including casual loading) for \"Level 4 - pay point 4\" (health professionals stream)?",
+    "expected_answer": "$88.99 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000027",
+      "where": {
+        "employment_type": "casual",
+        "stream": "health_professionals",
+        "section": "Health professional employees - Casual",
+        "classification": "Level 4 - pay point 4"
+      },
+      "field": "rate",
+      "equals": 88.99
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-allowance-024",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "allowance",
+    "question": "Under the Health Professionals and Support Services Award, what is the \"Heat allowance (temperature 40°C-46°C, employed at current workplace before 8 Aug 1991)\"?",
+    "expected_answer": "$0.61 per hour.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000027",
+      "name_includes": "Heat allowance (temperature 40°C-46°C, employed at current workplace before 8 Aug 1991)",
+      "field": "amount",
+      "equals": 0.61
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-allowance-025",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "allowance",
+    "question": "Under the Health Professionals and Support Services Award, what is the \"Meal allowance\"?",
+    "expected_answer": "$17.30 per meal.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000027",
+      "name_includes": "Meal allowance",
+      "field": "amount",
+      "equals": 17.3
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-allowance-026",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "allowance",
+    "question": "Under the Health Professionals and Support Services Award, what is the \"On call allowance (Sunday & public holiday)\"?",
+    "expected_answer": "$52.56 per 24-hour period.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000027",
+      "name_includes": "On call allowance (Sunday & public holiday)",
+      "field": "amount",
+      "equals": 52.56
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-allowance-027",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "allowance",
+    "question": "Under the Health Professionals and Support Services Award, what is the \"Vehicle allowance\"?",
+    "expected_answer": "$1.01 per km.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000027",
+      "name_includes": "Vehicle allowance",
+      "field": "amount",
+      "equals": 1.01
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-currency-028",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "currency",
+    "question": "What effective date is the Health Professionals and Support Services Award rate data current as at?",
+    "expected_answer": "2026-07-01.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000027",
+      "path": "effective_date",
+      "equals": "2026-07-01"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000027-currency-029",
+    "vertical": "health",
+    "award": "MA000027",
+    "category": "currency",
+    "question": "When is the Health Professionals and Support Services Award rate data next due for review?",
+    "expected_answer": "2027-07-01.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000027",
+      "path": "next_review_date",
+      "equals": "2027-07-01"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  }
+]

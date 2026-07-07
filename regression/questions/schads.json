@@ -1,0 +1,638 @@
+[
+  {
+    "id": "MA000100-resolution-001",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "resolution",
+    "question": "Which modern award and code covers the Social, Community, Home Care and Disability Services Industry Award?",
+    "expected_answer": "Social, Community, Home Care and Disability Services Industry Award (MA000100)",
+    "assert": {
+      "kind": "resolves",
+      "input": "Social, Community, Home Care and Disability Services Industry Award MA000100",
+      "flag": "schads_preview",
+      "code": "MA000100"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-resolution-002",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "resolution",
+    "question": "If a user says their award is the \"Fast Food Industry Award\", should the Social, Community, Home Care and Disability Services Industry Award answer their pay questions?",
+    "expected_answer": "No — that is a different award; the assistant must not answer from this award’s data.",
+    "assert": {
+      "kind": "resolves_unresolved",
+      "input": "Fast Food Industry Award MA000003"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-casual_loading-003",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "casual_loading",
+    "question": "What is the casual loading under the Social, Community, Home Care and Disability Services Industry Award?",
+    "expected_answer": "25% (a casual is paid 25% on top of the minimum hourly rate).",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000100",
+      "path": "casual_loading",
+      "equals": 0.25
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-superannuation-004",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "superannuation",
+    "question": "What superannuation guarantee rate applies under the Social, Community, Home Care and Disability Services Industry Award for this period?",
+    "expected_answer": "12%.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000100",
+      "path": "superannuation_rate",
+      "equals": 0.12
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-minimum_engagement-005",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "minimum_engagement",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what is the minimum shift length (minimum engagement) for a social & community services employee?",
+    "expected_answer": "3 hours.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000100",
+      "path": "minimum_engagement.social_community_services_hours_per_shift",
+      "equals": 3
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-minimum_engagement-006",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "minimum_engagement",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what is the minimum shift length (minimum engagement) for an employee in the other streams?",
+    "expected_answer": "2 hours.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000100",
+      "path": "minimum_engagement.other_streams_hours_per_shift",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-minimum_engagement-007",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "minimum_engagement",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what is the minimum shift length (minimum engagement) for a part-time employee?",
+    "expected_answer": "2 hours.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000100",
+      "path": "minimum_engagement.part_time_hours_per_shift",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-minimum_engagement-008",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "minimum_engagement",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what is the minimum shift length (minimum engagement) for a casual employee?",
+    "expected_answer": "2 hours.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000100",
+      "path": "minimum_engagement.casual_hours_per_shift",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-penalty_rate-009",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "penalty_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what penalty/loading applies for Saturday (full-time / part-time)?",
+    "expected_answer": "150% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000100",
+      "key": "saturday_full_time_part_time",
+      "equals": 1.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-penalty_rate-010",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "penalty_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what penalty/loading applies for Saturday (casual)?",
+    "expected_answer": "175% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000100",
+      "key": "saturday_casual",
+      "equals": 1.75
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-penalty_rate-011",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "penalty_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what penalty/loading applies for Sunday (full-time / part-time)?",
+    "expected_answer": "200% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000100",
+      "key": "sunday_full_time_part_time",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-penalty_rate-012",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "penalty_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what penalty/loading applies for Sunday (casual)?",
+    "expected_answer": "225% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000100",
+      "key": "sunday_casual",
+      "equals": 2.25
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-penalty_rate-013",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "penalty_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what penalty/loading applies for a public holiday (full-time / part-time)?",
+    "expected_answer": "250% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000100",
+      "key": "public_holiday_full_time_part_time",
+      "equals": 2.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-penalty_rate-014",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "penalty_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what penalty/loading applies for a public holiday (casual)?",
+    "expected_answer": "275% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000100",
+      "key": "public_holiday_casual",
+      "equals": 2.75
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-penalty_rate-015",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "penalty_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what penalty/loading applies for an afternoon shift (shift loading)?",
+    "expected_answer": "A loading of 13% on the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000100",
+      "key": "afternoon_shift_loading",
+      "equals": 0.125
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-penalty_rate-016",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "penalty_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what penalty/loading applies for a night shift (shift loading)?",
+    "expected_answer": "A loading of 15% on the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000100",
+      "key": "night_shift_loading",
+      "equals": 0.15
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-penalty_rate-017",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "penalty_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what penalty/loading applies for the first 2 hours of overtime?",
+    "expected_answer": "150% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000100",
+      "key": "overtime_first_2hrs",
+      "equals": 1.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-penalty_rate-018",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "penalty_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what penalty/loading applies for overtime after the first 2 hours?",
+    "expected_answer": "200% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000100",
+      "key": "overtime_after_2hrs",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-penalty_rate-019",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "penalty_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what penalty/loading applies for overtime worked on a Sunday?",
+    "expected_answer": "200% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000100",
+      "key": "sunday_overtime",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-penalty_rate-020",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "penalty_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what penalty/loading applies for overtime worked on a public holiday?",
+    "expected_answer": "250% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000100",
+      "key": "public_holiday_overtime",
+      "equals": 2.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-pay_rate-021",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "pay_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what is the minimum full-time hourly rate for \"Social and community services - Level 1 - pay point 1\" (social community services stream)?",
+    "expected_answer": "$27.55 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000100",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "social_community_services",
+        "section": "Social and community services - Full-time & part-time",
+        "classification": "Social and community services - Level 1 - pay point 1",
+        "title": "Social and community services Level 1 - pay point 1"
+      },
+      "field": "rate",
+      "equals": 27.55
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-pay_rate-022",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "pay_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what is the minimum full-time hourly rate for \"Social and community services - Level 5 - pay point 1\" (social community services stream)?",
+    "expected_answer": "$53.43 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000100",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "social_community_services",
+        "section": "Social and community services - Full-time & part-time",
+        "classification": "Social and community services - Level 5 - pay point 1",
+        "title": "Social and community services Level 5 - pay point 1"
+      },
+      "field": "rate",
+      "equals": 53.43
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-pay_rate-023",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "pay_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what is the minimum full-time hourly rate for \"Crisis accommodation - Level 1 - pay point 4\" (crisis accommodation stream)?",
+    "expected_answer": "$43.42 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000100",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "crisis_accommodation",
+        "section": "Crisis accommodation - Full-time & part-time",
+        "classification": "Crisis accommodation - Level 1 - pay point 4",
+        "title": "Crisis accommodation Level 1 - pay point 4"
+      },
+      "field": "rate",
+      "equals": 43.42
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-pay_rate-024",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "pay_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what is the minimum full-time hourly rate for \"Family day care - Level 2 - pay point 1\" (family day care stream)?",
+    "expected_answer": "$31.36 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000100",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "family_day_care",
+        "section": "Family day care - Full-time & part-time",
+        "classification": "Family day care - Level 2 - pay point 1",
+        "title": "Family day care Level 2 - pay point 1"
+      },
+      "field": "rate",
+      "equals": 31.36
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-pay_rate-025",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "pay_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what is the minimum full-time hourly rate for \"Family day care - Level 5 - pay point 4\" (family day care stream)?",
+    "expected_answer": "$48.09 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000100",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "family_day_care",
+        "section": "Family day care - Full-time & part-time",
+        "classification": "Family day care - Level 5 - pay point 4",
+        "title": "Family day care Level 5 - pay point 4"
+      },
+      "field": "rate",
+      "equals": 48.09
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-pay_rate-026",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "pay_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what is the minimum full-time hourly rate for \"Home care (aged care) - Level 6 - Team leader\" (home care stream)?",
+    "expected_answer": "$40.58 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000100",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "home_care",
+        "section": "Home care - Full-time & part-time",
+        "classification": "Home care (aged care) - Level 6 - Team leader",
+        "title": "Home care (aged care) Level 6 - Team leader"
+      },
+      "field": "rate",
+      "equals": 40.58
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-pay_rate-027",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "pay_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what is the minimum casual hourly rate (including casual loading) for \"Social and community services - Level 1 - pay point 1\" (social community services stream)?",
+    "expected_answer": "$34.44 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000100",
+      "where": {
+        "employment_type": "casual",
+        "stream": "social_community_services",
+        "section": "Social and community services - Casual",
+        "classification": "Social and community services - Level 1 - pay point 1",
+        "title": "Social and community services Level 1 - pay point 1"
+      },
+      "field": "rate",
+      "equals": 34.44
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-pay_rate-028",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "pay_rate",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what is the minimum casual hourly rate (including casual loading) for \"Home care (aged care) - Level 6 - Team leader\" (home care stream)?",
+    "expected_answer": "$50.73 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000100",
+      "where": {
+        "employment_type": "casual",
+        "stream": "home_care",
+        "section": "Home care - Casual",
+        "classification": "Home care (aged care) - Level 6 - Team leader",
+        "title": "Home care (aged care) Level 6 - Team leader"
+      },
+      "field": "rate",
+      "equals": 50.73
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-allowance-029",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "allowance",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what is the \"Broken shift allowance (1 unpaid break)\"?",
+    "expected_answer": "$21.81 per broken shift.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000100",
+      "name_includes": "Broken shift allowance (1 unpaid break)",
+      "field": "amount",
+      "equals": 21.81
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-allowance-030",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "allowance",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what is the \"First aid allowance (part-time or casual)\"?",
+    "expected_answer": "$0.56 per hour.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000100",
+      "name_includes": "First aid allowance (part-time or casual)",
+      "field": "amount",
+      "equals": 0.56
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-allowance-031",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "allowance",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what is the \"On call allowance (any other 24-hour period or public holiday)\"?",
+    "expected_answer": "$50.81 per period.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000100",
+      "name_includes": "On call allowance (any other 24-hour period or public holiday)",
+      "field": "amount",
+      "equals": 50.81
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-allowance-032",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "allowance",
+    "question": "Under the Social, Community, Home Care and Disability Services Industry Award, what is the \"Vehicle allowance\"?",
+    "expected_answer": "$1.01 per km.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000100",
+      "name_includes": "Vehicle allowance",
+      "field": "amount",
+      "equals": 1.01
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-currency-033",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "currency",
+    "question": "What effective date is the Social, Community, Home Care and Disability Services Industry Award rate data current as at?",
+    "expected_answer": "2026-07-01.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000100",
+      "path": "effective_date",
+      "equals": "2026-07-01"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000100-currency-034",
+    "vertical": "schads",
+    "award": "MA000100",
+    "category": "currency",
+    "question": "When is the Social, Community, Home Care and Disability Services Industry Award rate data next due for review?",
+    "expected_answer": "2027-07-01.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000100",
+      "path": "next_review_date",
+      "equals": "2027-07-01"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000100, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  }
+]
