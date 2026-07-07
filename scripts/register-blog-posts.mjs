@@ -85,8 +85,10 @@ ${cards}
     </div>`;
   }).join('\n\n');
 
-  const startMarker = '    <!-- MORE AWARDS — new verticals (now live) -->';
-  const start = html.indexOf(startMarker);
+  // Stable marker survives re-runs; fall back to the original one-time marker.
+  const STABLE = '    <!-- AWARD BLOG SECTIONS (generated — build-award-blog-posts + register-blog-posts) -->';
+  const ONCE = '    <!-- MORE AWARDS — new verticals (now live) -->';
+  const start = html.indexOf(STABLE) !== -1 ? html.indexOf(STABLE) : html.indexOf(ONCE);
   const footIdx = html.indexOf('<footer>', start);
   if (start === -1 || footIdx === -1) throw new Error('blog index markers not found');
   const before = html.slice(0, start);
