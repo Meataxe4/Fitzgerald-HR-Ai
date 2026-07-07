@@ -1058,6 +1058,30 @@ function isRetailAwardName(awardName) {
         (s.indexOf('retail') !== -1 && s.indexOf('award') !== -1);
 }
 
+// Business types for the Health Professionals and Support Services Award
+// (MA000027). Health services is a distinct industry to hospitality, so it has
+// its own EXCLUSIVE list — the hospitality venue types never appear for a
+// health-services user. Private-sector health only (public hospitals and
+// nurses/medical practitioners are separate coverage).
+const HEALTH_VENUE_OPTIONS = [
+    { value: 'private-hospital',        label: 'Private Hospital / Day Surgery',        short: 'private hospital' },
+    { value: 'medical-practice',        label: 'Medical / GP Practice',                 short: 'medical practice' },
+    { value: 'dental-practice',         label: 'Dental Practice',                       short: 'dental practice' },
+    { value: 'allied-health-clinic',    label: 'Allied Health Clinic (physio, OT, podiatry)', short: 'allied health clinic' },
+    { value: 'diagnostic-pathology',    label: 'Diagnostic Imaging / Pathology',        short: 'diagnostic & pathology service' },
+    { value: 'community-health',        label: 'Community & Public Health Service',      short: 'community health service' },
+    { value: 'aged-care-health',        label: 'Aged Care Health Services',             short: 'aged care health service' },
+    { value: 'optical-audiology',       label: 'Optical / Audiology',                   short: 'optical / audiology practice' },
+    { value: 'other-health',            label: 'Other Health Service',                  short: 'health service' }
+];
+
+function isHealthAwardName(awardName) {
+    if (!awardName) return false;
+    const s = String(awardName).toLowerCase();
+    return s.indexOf('ma000027') !== -1 || s.indexOf('health professionals') !== -1 ||
+        (s.indexOf('health') !== -1 && s.indexOf('support services') !== -1);
+}
+
 // Render the venue-type dropdown filtered by Award. When awardName matches a
 // known Award, the primary matches appear at the top in alphabetical order
 // and the remaining venues appear under an "Other venue types" optgroup.
@@ -1097,6 +1121,17 @@ function populateVenueTypeDropdown(selectEl, awardName, currentValue) {
             .map(v => `<option value="${v.value}"${v.value === selected ? ' selected' : ''}>${v.label}</option>`)
             .join('');
         selectEl.innerHTML = rhtml;
+        return;
+    }
+
+    // Health services is a different industry — show ONLY health business types,
+    // never the hospitality venue list.
+    if (isHealthAwardName(awardName)) {
+        let hhtml = '<option value="">Select business type...</option>';
+        hhtml += HEALTH_VENUE_OPTIONS.slice().sort(sortByLabel)
+            .map(v => `<option value="${v.value}"${v.value === selected ? ' selected' : ''}>${v.label}</option>`)
+            .join('');
+        selectEl.innerHTML = hhtml;
         return;
     }
 
@@ -1987,6 +2022,16 @@ const AWARD_REGISTRY = {
         fullName: 'General Retail Industry Award MA000004',
         ratesUrl: '/retail-award-rates.json',
         aliases: ['general retail', 'retail']
+    },
+    // Preview only — gated behind the health_preview feature flag and not yet
+    // human-signed-off. Until enabled it resolves to UNRESOLVED (fail closed).
+    MA000027: {
+        code: 'MA000027', status: 'preview', flag: 'health_preview',
+        calculatorType: 'classification',   // Stream + level/pay-point picker, not the hospitality role wizard
+        displayName: 'Health Professionals and Support Services Award',
+        fullName: 'Health Professionals and Support Services Award MA000027',
+        ratesUrl: '/health-award-rates.json',
+        aliases: ['health professionals', 'health support', 'support services']
     }
 };
 
@@ -2035,6 +2080,7 @@ function _industryWord() {
     if (code === 'MA000010') return 'manufacturing';
     if (code === 'MA000100') return 'community services';
     if (code === 'MA000004') return 'retail';
+    if (code === 'MA000027') return 'health services';
     if (code === 'MA000009' || code === 'MA000119') return 'hospitality';
     return '';
 }
@@ -2051,6 +2097,7 @@ function _awardRoleExamples() {
     if (code === 'MA000010') return ['Production Employee', 'Machine Operator', 'Maintenance Fitter'];
     if (code === 'MA000100') return ['Support Worker', 'Community Care Worker', 'Case Manager'];
     if (code === 'MA000004') return ['Retail Assistant', 'Sales Assistant', 'Store Manager'];
+    if (code === 'MA000027') return ['Physiotherapist', 'Medical Receptionist', 'Allied Health Assistant'];
     if (code === 'MA000119') return ['Waiter', 'Cook', 'Restaurant Manager'];
     if (code === 'MA000009') return ['Bartender', 'Waiter', 'Chef'];
     return ['Team Member', 'Supervisor', 'Manager'];
@@ -2061,6 +2108,7 @@ function _awardDeptExamples() {
     if (code === 'MA000010') return ['Production', 'Maintenance', 'Warehouse'];
     if (code === 'MA000100') return ['Disability Services', 'Home Care', 'Community Programs'];
     if (code === 'MA000004') return ['Sales Floor', 'Stockroom / Warehouse', 'Store Management'];
+    if (code === 'MA000027') return ['Allied Health', 'Clinical Support', 'Administration'];
     if (code === 'MA000009' || code === 'MA000119') return ['Kitchen', 'Front of House', 'Management'];
     return ['Operations', 'Administration', 'Management'];
 }
@@ -2118,6 +2166,10 @@ function _awEx(key) {
     // productivity" framing as the neutral default, so retail reuses the
     // default copy (v.retail is honoured first if a variant is ever added).
     if (code === 'MA000004') return v.retail || v.default;
+    // Health services is a care setting (patients/clients, documentation,
+    // handover, manual handling) closest to the community-services copy, so it
+    // reuses that variant (v.health is honoured first if one is ever added).
+    if (code === 'MA000027') return v.health || v.community_services || v.default;
     if (code === 'MA000009' || code === 'MA000119') return v.hospitality;
     return v.default;
 }
@@ -13706,6 +13758,91 @@ function resolveRetailRate(data) {
         ]};
 }
 
+// Health Professionals and Support Services (MA000027) classification picker —
+// graded by STREAM (Support services, Dental assistants, Pathology collectors,
+// Health professionals) then level/pay point. Reads from the loaded
+// health-award-rates.json (awardRates).
+function _calcHealthSteps() {
+    const streamLabels = {
+        support_services: 'Support services (clerical, admin, catering, cleaning, technical)',
+        dental_assistants: 'Support services — Dental assistant',
+        pathology_collectors: 'Support services — Pathology collector',
+        health_professionals: 'Health professional (allied health, Levels 1-4)'
+    };
+    const empLabels = { full_time: 'Full-time / Part-time', casual: 'Casual' };
+    return [
+        { key: 'healthStream', title: 'Which classification stream?', options: function () {
+            return [...new Set(awardRates.rates.map(r => r.stream))]
+                .map(s => ({ value: s, label: streamLabels[s] || s }));
+        }},
+        { key: 'healthClass', title: 'Which level / pay point?', options: function (data) {
+            return [...new Set(awardRates.rates.filter(r => r.stream === data.healthStream).map(r => r.classification))]
+                .map(c => ({ value: c, label: c }));
+        }},
+        { key: 'employment', title: 'What type of employment?', options: function (data) {
+            const emps = [...new Set(awardRates.rates.filter(r => r.stream === data.healthStream).map(r => r.employment_type))];
+            return emps.map(e => ({ value: e, label: empLabels[e] || e }));
+        }}
+    ];
+}
+
+// Health resolver — returns the shared result-card shape. Casual rates already
+// include the 25% loading, so penalties are computed on the (unloaded) base
+// rate: penalties add the 25% loading (additive) while overtime applies the
+// overtime % to the loaded casual rate (multiplicative), reproducing the Pay
+// Guide's casual columns. See docs/guardrails-award-resolution.md.
+function resolveHealthRate(data) {
+    const entry = awardRates.rates.find(r => r.stream === data.healthStream && r.classification === data.healthClass && r.employment_type === data.employment);
+    if (!entry) {
+        return { award: awardRates.award_name, level: 'Rate not found', rate: 0,
+            penalties: ['No rate found for that combination.'], nextSteps: ['Contact Fitz HR support'] };
+    }
+    const rate = entry.rate;
+    const p = awardRates.penalty_rates || {};
+    const cl = awardRates.casual_loading || 0.25;
+    const isCasual = data.employment === 'casual';
+    const ftSibling = isCasual
+        ? awardRates.rates.find(r => r.stream === data.healthStream && r.classification === data.healthClass && r.employment_type === 'full_time')
+        : null;
+    const base = isCasual ? (ftSibling ? ftSibling.rate : rate / (1 + cl)) : rate;
+    // Round half-up to cents (the FWO Pay Guide convention).
+    const money = n => '$' + (Math.round((n + 1e-9) * 100) / 100).toFixed(2);
+    const penalties = [];
+    // Penalty rates: casual adds the 25% loading to the penalty (additive).
+    const pen = (label, mult) => {
+        if (typeof mult !== 'number') return;
+        const m = isCasual ? mult + cl : mult;
+        penalties.push(`${label} (${Math.round(m * 100)}%): ${money(base * m)}/hr`);
+    };
+    const shift = (p.shift_loading_mon_fri != null) ? p.shift_loading_mon_fri : 0.15;
+    const shiftMult = 1 + shift + (isCasual ? cl : 0);
+    penalties.push(`Shiftwork Mon-Fri (${Math.round(shiftMult * 100)}%): ${money(base * shiftMult)}/hr`);
+    pen('Saturday', isCasual ? undefined : p.saturday_full_time_part_time);
+    if (isCasual) penalties.push(`Saturday (${Math.round((p.saturday_casual || 1.75) * 100)}%): ${money(base * (p.saturday_casual || 1.75))}/hr`);
+    if (isCasual) penalties.push(`Sunday (${Math.round((p.sunday_casual || 1.75) * 100)}%): ${money(base * (p.sunday_casual || 1.75))}/hr`);
+    else penalties.push(`Sunday (${Math.round((p.sunday_full_time_part_time || 1.5) * 100)}%): ${money(base * (p.sunday_full_time_part_time || 1.5))}/hr`);
+    if (isCasual) penalties.push(`Public holiday (${Math.round((p.public_holiday_casual || 2.75) * 100)}%): ${money(base * (p.public_holiday_casual || 2.75))}/hr`);
+    else penalties.push(`Public holiday (${Math.round((p.public_holiday_full_time_part_time || 2.5) * 100)}%): ${money(base * (p.public_holiday_full_time_part_time || 2.5))}/hr`);
+    // Overtime: casual applies the overtime % to the loaded casual rate (multiplicative).
+    const otf = (label, mult) => {
+        if (typeof mult !== 'number') return;
+        const m = isCasual ? mult * (1 + cl) : mult;
+        penalties.push(`${label} (${(m * 100).toFixed(m * 100 % 1 ? 1 : 0)}%): ${money(base * m)}/hr`);
+    };
+    otf('Overtime — first 2 hrs', p.overtime_first_2hrs || 1.5);
+    otf('Overtime — after 2 hrs', p.overtime_after_2hrs || 2.0);
+    if (isCasual) {
+        penalties.push('Casual rates include the 25% loading; penalty rates above add the loading, and overtime applies the overtime % to the loaded casual rate.');
+    }
+    return { award: awardRates.award_name, level: entry.classification, rate: rate, weeklyRate: entry.weekly_rate || null,
+        rateLabel: isCasual ? 'Casual Rate (per hour)' : 'Base Rate (per hour)',
+        penalties: penalties, nextSteps: [
+            'Confirm the stream and level against Schedule A/B of MA000027',
+            'Set up payroll with these exact rates',
+            'Keep employment records for 7 years'
+        ]};
+}
+
 function getAwardCalculatorConfig(code) {
     if (getAwardContext().calculatorType === 'classification') {
         if (code === 'MA000100') {
@@ -13721,6 +13858,14 @@ function getAwardCalculatorConfig(code) {
                 disclaimer: '⚠️ Preview — General Retail rates effective 01/07/2026, adult classifications only (junior/apprentice rates not modelled). Verify against the award before relying on these figures.',
                 steps: _calcRetailSteps(),
                 resolve: resolveRetailRate,
+                juniorRedirect: false
+            };
+        }
+        if (code === 'MA000027') {
+            return {
+                disclaimer: '⚠️ Preview — Health Professionals & Support Services rates effective 01/07/2026, adult classifications only (junior/apprentice rates not modelled). Pick the stream that matches the work performed. Verify against the award before relying on these figures.',
+                steps: _calcHealthSteps(),
+                resolve: resolveHealthRate,
                 juniorRedirect: false
             };
         }
@@ -17039,6 +17184,10 @@ function updateOnboardingStep() {
         if (retailBtn && typeof hasFeature === 'function' && hasFeature('retail_preview')) {
             retailBtn.classList.remove('hidden');
         }
+        const healthBtn = document.getElementById('onboardingHealthBtn');
+        if (healthBtn && typeof hasFeature === 'function' && hasFeature('health_preview')) {
+            healthBtn.classList.remove('hidden');
+        }
     }
 
     if (onboardingCurrentStep === 3) {
@@ -17054,6 +17203,9 @@ function updateOnboardingStep() {
                 hint.classList.remove('hidden');
             } else if (isRetailAwardName(venueProfile.primaryAward)) {
                 hint.textContent = 'Select the type of retail business you run.';
+                hint.classList.remove('hidden');
+            } else if (isHealthAwardName(venueProfile.primaryAward)) {
+                hint.textContent = 'Select the type of health service, practice or clinic you run.';
                 hint.classList.remove('hidden');
             } else if (AWARD_VENUE_MAP[venueProfile.primaryAward]) {
                 hint.textContent = `Showing business types commonly covered by the ${venueProfile.primaryAward}. If yours isn't listed, choose from "Other business types".`;
@@ -17293,7 +17445,8 @@ function getVenueTypeLabel(type) {
     const match = VENUE_OPTIONS.find(v => v.value === type)
         || MANUFACTURING_VENUE_OPTIONS.find(v => v.value === type)
         || SCHADS_VENUE_OPTIONS.find(v => v.value === type)
-        || RETAIL_VENUE_OPTIONS.find(v => v.value === type);
+        || RETAIL_VENUE_OPTIONS.find(v => v.value === type)
+        || HEALTH_VENUE_OPTIONS.find(v => v.value === type);
     if (match) return match.short;
     // Legacy slugs from earlier onboarding versions
     const legacy = {
@@ -17372,6 +17525,7 @@ function showVenueSettings() {
                     ${hasFeature('manufacturing_preview') ? `<option value="Manufacturing and Associated Industries Award" ${venueProfile.primaryAward === 'Manufacturing and Associated Industries Award' ? 'selected' : ''}>Manufacturing and Associated Industries Award (MA000010) — preview</option>` : ''}
                     ${hasFeature('schads_preview') ? `<option value="Social, Community, Home Care and Disability Services Industry Award MA000100" ${venueProfile.primaryAward === 'Social, Community, Home Care and Disability Services Industry Award MA000100' ? 'selected' : ''}>Social, Community, Home Care &amp; Disability Services Award (MA000100) — preview</option>` : ''}
                     ${hasFeature('retail_preview') ? `<option value="General Retail Industry Award MA000004" ${venueProfile.primaryAward === 'General Retail Industry Award MA000004' ? 'selected' : ''}>General Retail Industry Award (MA000004) — preview</option>` : ''}
+                    ${hasFeature('health_preview') ? `<option value="Health Professionals and Support Services Award MA000027" ${venueProfile.primaryAward === 'Health Professionals and Support Services Award MA000027' ? 'selected' : ''}>Health Professionals &amp; Support Services Award (MA000027) — preview</option>` : ''}
                 </select>
                 <p class="text-xs text-slate-400 mt-1">Changing your award updates pay rate calculations and advice throughout the app.</p>
             </div>
@@ -23679,12 +23833,21 @@ function _fwDocClassificationOptions(awardCode) {
     const ma004 = ['Retail Employee Level 1', 'Retail Employee Level 2', 'Retail Employee Level 3',
                    'Retail Employee Level 4', 'Retail Employee Level 5', 'Retail Employee Level 6',
                    'Retail Employee Level 7', 'Retail Employee Level 8', 'Other'];
+    // Health Professionals and Support Services Award MA000027 — streams then levels/pay points.
+    const ma027 = ['Support Services - Level 1', 'Support Services - Level 2', 'Support Services - Level 3',
+                   'Support Services - Level 4', 'Support Services - Level 5', 'Support Services - Level 6',
+                   'Support Services - Level 7', 'Support Services - Level 8', 'Support Services - Level 9',
+                   'Dental assistant - Level 3', 'Dental assistant - Level 5', 'Dental assistant - Level 6',
+                   'Dental assistant - Level 7', 'Pathology collector - Level 5', 'Pathology collector - Level 6',
+                   'Pathology collector - Level 7', 'Health Professional - Level 1', 'Health Professional - Level 2',
+                   'Health Professional - Level 3', 'Health Professional - Level 4', 'Other'];
     let opts;
     if (awardCode === 'MA000009') opts = ma009;
     else if (awardCode === 'MA000119') opts = ma119;
     else if (awardCode === 'MA000010') opts = ma010;
     else if (awardCode === 'MA000100') opts = ma100;
     else if (awardCode === 'MA000004') opts = ma004;
+    else if (awardCode === 'MA000027') opts = ma027;
     else return '<option value="">Set your Award in Settings first</option>';
     return opts.map(function(o) { return '<option value="' + _fwEscapeHtml(o) + '">' + _fwEscapeHtml(o) + '</option>'; }).join('');
 }
@@ -23731,6 +23894,18 @@ function _fwAnnualisedWageProfile(reconDate) {
             baseRateNote: 'For NES purposes, the base rate of pay is the portion of the annualised wage equivalent to the minimum rate in cl 20-Minimum rates, excluding incentive-based payments, bonuses, loadings, allowances, overtime and penalties (cl 28.4).'
         };
     }
+    if (code === 'MA000027') {
+        return {
+            clauseHeading: 'Clause 22-Annualised wage arrangements',
+            outerLimitText: 'those hours are not covered by the annualised wage and must be paid separately in accordance with the applicable provisions of the award (cl 22.1(c)).',
+            reconText: 'Within each 12 month period (or on termination of employment or of the agreement), the employer will calculate the amount of remuneration that would have been payable to the employee under the award and compare it to the annualised wage actually paid. Any shortfall will be paid within 14 days (cl 22.2(b)).',
+            recordSentence: 'A record of the starting and finishing times of work, and any unpaid breaks taken, will be kept for each pay period or roster cycle and signed (or acknowledged in writing) by the employee (cl 22.2(c)).',
+            weeklyRecordRef: 'Clause 22.2(c)',
+            weeklyVarianceClause: 'cl 22.1(c)',
+            eligibilityNote: 'Eligibility: under MA000027 cl 22.1(a), an annualised wage arrangement applies only to a full-time employee in Support Services employee Level 8 or Level 9, or Health Professional employee Level 2, Level 3 or Level 4. Do not use this agreement for other classifications.',
+            baseRateNote: 'For NES purposes, the base rate of pay is the portion of the annualised wage equivalent to the relevant minimum hourly rate (cl 16 / cl 17), excluding incentive-based payments, bonuses, loadings, monetary allowances, overtime and penalties (cl 22.3).'
+        };
+    }
     // Hospitality (MA000009) / Restaurant (MA000119) - Clause 20.
     return {
         clauseHeading: 'Clause 20',
@@ -23757,6 +23932,15 @@ function _fwAbsorbedProvisions() {
             { key: 'abs_meal',      label: 'Meal-break penalty (cl 18.5(b))', checked: false },
             { key: 'abs_allow',     label: 'Allowances and special rates (cl 30)', checked: false },
             { key: 'abs_leaveload', label: 'Annual leave loading (cl 34.4)', checked: false }
+        ];
+    }
+    if (getAwardContext().code === 'MA000027') {
+        return [
+            { key: 'abs_overtime',  label: 'Overtime (cl 25)', checked: true },
+            { key: 'abs_penalty',   label: 'Penalty rates and shiftwork (cl 26)', checked: true },
+            { key: 'abs_minrates',  label: 'Minimum rates (cl 16 / cl 17)', checked: true },
+            { key: 'abs_allow',     label: 'Allowances (cl 23)', checked: false },
+            { key: 'abs_leaveload', label: 'Annual leave loading (cl 27.3)', checked: false }
         ];
     }
     return [
@@ -24030,7 +24214,8 @@ function _fwDocGenerate_cashOut() {
     const scheduleRef = isMA119 ? 'MA000119 Schedule H'
         : (awardCode === 'MA000009' ? 'MA000009 Schedule G'
         : (awardCode === 'MA000100' ? 'MA000100 Schedule K'
-        : (awardCode === 'MA000004' ? 'MA000004 Schedule G' : '[your modern award] schedule')));
+        : (awardCode === 'MA000004' ? 'MA000004 Schedule G'
+        : (awardCode === 'MA000027' ? 'MA000027 Schedule I' : '[your modern award] schedule'))));
     const balance = parseFloat(d.balance_hours);
     const cashout = parseFloat(d.cashout_hours);
     const rate = parseFloat(d.base_rate);
@@ -24260,12 +24445,30 @@ const _FW_PSYCHO_HAZARDS_RETAIL = [
     'Sustained standing, manual handling and repetitive work affecting wellbeing'
 ];
 
+// Health Professionals & Support Services-relevant psychosocial hazards
+// (clinical / patient-facing / community context).
+const _FW_PSYCHO_HAZARDS_HEALTH = [
+    'Occupational violence and aggression from patients, clients or families',
+    'Exposure to trauma, distress, serious illness and death',
+    'High emotional labour and compassion fatigue / burnout',
+    'Exposure to infectious disease and biohazards affecting wellbeing',
+    'Lone / community work (home visits, single-clinician sites, on-call)',
+    'High job demands and understaffing during peak clinical loads',
+    'Low job control over rosters, on-call and shift patterns',
+    'Fatigue from shift work, on-call and consecutive shifts',
+    'Poor support after a critical incident or patient death',
+    'Manual handling and patient-transfer strain affecting wellbeing',
+    'Bullying, harassment or poor support within the clinical hierarchy',
+    'Vicarious trauma (witnessing patient trauma or distress)'
+];
+
 // The hazard list defaults to the resolved award's industry context.
 function _fwPsychoHazards() {
     const code = getAwardContext().code;
     if (code === 'MA000010') return _FW_PSYCHO_HAZARDS_MANUFACTURING;
     if (code === 'MA000100') return _FW_PSYCHO_HAZARDS_SCHADS;
     if (code === 'MA000004') return _FW_PSYCHO_HAZARDS_RETAIL;
+    if (code === 'MA000027') return _FW_PSYCHO_HAZARDS_HEALTH;
     return _FW_PSYCHO_HAZARDS;
 }
 
@@ -24646,7 +24849,8 @@ function _fwDocGenerate_leaveInAdvance() {
     const scheduleRef = awardCode === 'MA000119' ? 'MA000119 Schedule H'
         : (awardCode === 'MA000009' ? 'MA000009 Schedule G'
         : (awardCode === 'MA000100' ? 'MA000100 Schedule J'
-        : (awardCode === 'MA000004' ? 'MA000004 Schedule F' : '[your modern award] schedule')));
+        : (awardCode === 'MA000004' ? 'MA000004 Schedule F'
+        : (awardCode === 'MA000027' ? 'MA000027 Schedule H' : '[your modern award] schedule'))));
     const negativeBalance = Number(d.current_balance) - Number(d.advance_hours);
     const html =
         '<h1>Annual Leave in Advance Agreement</h1>' +
