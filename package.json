@@ -12,9 +12,12 @@
     "test": "node tests/award-resolution.test.js",
     "test:gate": "node tests/regression-gate.test.js",
     "test:regression": "node scripts/run-regression.mjs",
-    "test:ci": "npm test && npm run test:gate && npm run test:regression",
+    "test:ci": "npm test && npm run test:gate && npm run validate:rates && npm run test:regression",
     "build:regression": "node scripts/build-regression-questions.mjs",
-    "build:vertical-pages": "node scripts/build-vertical-pages.mjs"
+    "build:vertical-pages": "node scripts/build-vertical-pages.mjs",
+    "validate:rates": "node scripts/validate-rates.mjs",
+    "check:staleness": "node scripts/check-staleness.mjs",
+    "flag:to-regression": "node scripts/flag-to-regression.mjs"
   },
   "repository": {
     "type": "git",
