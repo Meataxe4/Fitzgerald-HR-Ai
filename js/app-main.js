@@ -2024,50 +2024,45 @@ const AWARD_REGISTRY = {
         ratesUrl: CONFIG.API.RESTAURANT_RATES_URL,
         aliases: ['restaurant']
     },
-    // Preview only — gated behind the manufacturing_preview feature flag and not
-    // yet built/verified. Until enabled it resolves to UNRESOLVED (fail closed).
+    // GA — launched. Resolves unconditionally (regression-gated; see docs/regression-suite.md).
     MA000010: {
-        code: 'MA000010', status: 'preview', flag: 'manufacturing_preview',
+        code: 'MA000010', status: 'supported',
         calculatorType: 'classification',   // C-level picker, not the hospitality role wizard
         displayName: 'Manufacturing and Associated Industries Award',
         fullName: 'Manufacturing and Associated Industries and Occupations Award MA000010',
         ratesUrl: '/manufacturing-award-rates.json',
         aliases: ['manufacturing']
     },
-    // Preview only — gated behind the schads_preview feature flag and not yet
-    // human-signed-off. Until enabled it resolves to UNRESOLVED (fail closed).
+    // GA — launched. Resolves unconditionally (regression-gated; see docs/regression-suite.md).
     MA000100: {
-        code: 'MA000100', status: 'preview', flag: 'schads_preview',
+        code: 'MA000100', status: 'supported',
         calculatorType: 'classification',   // Level/pay-point picker, not the hospitality role wizard
         displayName: 'Social, Community, Home Care and Disability Services Award',
         fullName: 'Social, Community, Home Care and Disability Services Industry Award MA000100',
         ratesUrl: '/schads-award-rates.json',
         aliases: ['schads', 'social community', 'home care', 'disability services']
     },
-    // Preview only — gated behind the retail_preview feature flag and not yet
-    // human-signed-off. Until enabled it resolves to UNRESOLVED (fail closed).
+    // GA — launched. Resolves unconditionally (regression-gated; see docs/regression-suite.md).
     MA000004: {
-        code: 'MA000004', status: 'preview', flag: 'retail_preview',
+        code: 'MA000004', status: 'supported',
         calculatorType: 'classification',   // Retail Employee Level 1-8 picker, not the hospitality role wizard
         displayName: 'General Retail Industry Award',
         fullName: 'General Retail Industry Award MA000004',
         ratesUrl: '/retail-award-rates.json',
         aliases: ['general retail', 'retail']
     },
-    // Preview only — gated behind the health_preview feature flag and not yet
-    // human-signed-off. Until enabled it resolves to UNRESOLVED (fail closed).
+    // GA — launched. Resolves unconditionally (regression-gated; see docs/regression-suite.md).
     MA000027: {
-        code: 'MA000027', status: 'preview', flag: 'health_preview',
+        code: 'MA000027', status: 'supported',
         calculatorType: 'classification',   // Stream + level/pay-point picker, not the hospitality role wizard
         displayName: 'Health Professionals and Support Services Award',
         fullName: 'Health Professionals and Support Services Award MA000027',
         ratesUrl: '/health-award-rates.json',
         aliases: ['health professionals', 'health support', 'support services']
     },
-    // Preview only — gated behind the childrens_preview feature flag and not yet
-    // human-signed-off. Until enabled it resolves to UNRESOLVED (fail closed).
+    // GA — launched. Resolves unconditionally (regression-gated; see docs/regression-suite.md).
     MA000120: {
-        code: 'MA000120', status: 'preview', flag: 'childrens_preview',
+        code: 'MA000120', status: 'supported',
         calculatorType: 'classification',   // Stream + level picker, not the hospitality role wizard
         displayName: "Children's Services Award",
         fullName: "Children's Services Award MA000120",
@@ -17299,29 +17294,11 @@ function updateOnboardingStep() {
     document.getElementById('onboardingProgress').textContent = `${progress}% Complete`;
     document.getElementById('onboardingProgressBar').style.width = `${progress}%`;
 
-    // Reveal preview-gated award options on the award step only for users with
-    // the matching feature flag (preview-gated; see guardrails spec).
+    // All awards are GA — show every award option on the award step. (Defensive:
+    // the buttons are no longer hidden in markup; this also un-hides any that are.)
     if (onboardingCurrentStep === 2) {
-        const manufBtn = document.getElementById('onboardingManufacturingBtn');
-        if (manufBtn && typeof hasFeature === 'function' && hasFeature('manufacturing_preview')) {
-            manufBtn.classList.remove('hidden');
-        }
-        const schadsBtn = document.getElementById('onboardingSchadsBtn');
-        if (schadsBtn && typeof hasFeature === 'function' && hasFeature('schads_preview')) {
-            schadsBtn.classList.remove('hidden');
-        }
-        const retailBtn = document.getElementById('onboardingRetailBtn');
-        if (retailBtn && typeof hasFeature === 'function' && hasFeature('retail_preview')) {
-            retailBtn.classList.remove('hidden');
-        }
-        const healthBtn = document.getElementById('onboardingHealthBtn');
-        if (healthBtn && typeof hasFeature === 'function' && hasFeature('health_preview')) {
-            healthBtn.classList.remove('hidden');
-        }
-        const childrensBtn = document.getElementById('onboardingChildrensBtn');
-        if (childrensBtn && typeof hasFeature === 'function' && hasFeature('childrens_preview')) {
-            childrensBtn.classList.remove('hidden');
-        }
+        ['onboardingManufacturingBtn', 'onboardingSchadsBtn', 'onboardingRetailBtn', 'onboardingHealthBtn', 'onboardingChildrensBtn']
+            .forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('hidden'); });
     }
 
     if (onboardingCurrentStep === 3) {
@@ -17660,11 +17637,11 @@ function showVenueSettings() {
                     <option value="">Select award...</option>
                     <option value="Hospitality Industry (General) Award" ${venueProfile.primaryAward === 'Hospitality Industry (General) Award' ? 'selected' : ''}>Hospitality Industry (General) Award (MA000009)</option>
                     <option value="Restaurant Industry Award" ${venueProfile.primaryAward === 'Restaurant Industry Award' ? 'selected' : ''}>Restaurant Industry Award (MA000119)</option>
-                    ${hasFeature('manufacturing_preview') ? `<option value="Manufacturing and Associated Industries Award" ${venueProfile.primaryAward === 'Manufacturing and Associated Industries Award' ? 'selected' : ''}>Manufacturing and Associated Industries Award (MA000010) — preview</option>` : ''}
-                    ${hasFeature('schads_preview') ? `<option value="Social, Community, Home Care and Disability Services Industry Award MA000100" ${venueProfile.primaryAward === 'Social, Community, Home Care and Disability Services Industry Award MA000100' ? 'selected' : ''}>Social, Community, Home Care &amp; Disability Services Award (MA000100) — preview</option>` : ''}
-                    ${hasFeature('retail_preview') ? `<option value="General Retail Industry Award MA000004" ${venueProfile.primaryAward === 'General Retail Industry Award MA000004' ? 'selected' : ''}>General Retail Industry Award (MA000004) — preview</option>` : ''}
-                    ${hasFeature('health_preview') ? `<option value="Health Professionals and Support Services Award MA000027" ${venueProfile.primaryAward === 'Health Professionals and Support Services Award MA000027' ? 'selected' : ''}>Health Professionals &amp; Support Services Award (MA000027) — preview</option>` : ''}
-                    ${hasFeature('childrens_preview') ? `<option value="Children's Services Award MA000120" ${venueProfile.primaryAward === "Children's Services Award MA000120" ? 'selected' : ''}>Children's Services Award (MA000120) — preview</option>` : ''}
+                    <option value="Manufacturing and Associated Industries Award" ${venueProfile.primaryAward === 'Manufacturing and Associated Industries Award' ? 'selected' : ''}>Manufacturing and Associated Industries Award (MA000010)</option>
+                    <option value="General Retail Industry Award MA000004" ${venueProfile.primaryAward === 'General Retail Industry Award MA000004' ? 'selected' : ''}>General Retail Industry Award (MA000004)</option>
+                    <option value="Social, Community, Home Care and Disability Services Industry Award MA000100" ${venueProfile.primaryAward === 'Social, Community, Home Care and Disability Services Industry Award MA000100' ? 'selected' : ''}>Social, Community, Home Care &amp; Disability Services Award (MA000100)</option>
+                    <option value="Health Professionals and Support Services Award MA000027" ${venueProfile.primaryAward === 'Health Professionals and Support Services Award MA000027' ? 'selected' : ''}>Health Professionals &amp; Support Services Award (MA000027)</option>
+                    <option value="Children's Services Award MA000120" ${venueProfile.primaryAward === "Children's Services Award MA000120" ? 'selected' : ''}>Children's Services Award (MA000120)</option>
                 </select>
                 <p class="text-xs text-slate-400 mt-1">Changing your award updates pay rate calculations and advice throughout the app.</p>
             </div>

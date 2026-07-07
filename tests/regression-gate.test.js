@@ -42,10 +42,13 @@ const badGA = {
   question: 'q', expected_answer: 'a',
   assert: { kind: 'penalty', award: 'MA000009', key: 'saturday_casual', equals: 9.99 },
 };
-const badPreview = {
-  id: 'MA000010-bad', vertical: 'manufacturing', award: 'MA000010', category: 'penalty_rate',
+// A vertical that is NOT launched (status !== 'supported'). All real awards are now
+// GA, so this uses a synthetic unregistered award code to represent a future/
+// not-yet-launched vertical — the runner treats an unknown code as non-fatal.
+const badNotLaunched = {
+  id: 'MA999001-bad', vertical: 'future', award: 'MA999001', category: 'pay_rate',
   question: 'q', expected_answer: 'a',
-  assert: { kind: 'penalty', award: 'MA000010', key: 'saturday', equals: 9.99 },
+  assert: { kind: 'scalar', award: 'MA999001', path: 'casual_loading', equals: 9.99 },
 };
 
 // 1) GA award below threshold => gate FAILS (non-zero exit).
@@ -59,13 +62,13 @@ const badPreview = {
   ok('GA failure message names the launch gate', /LAUNCH GATE FAILED/.test(res.stdout + res.stderr));
 }
 
-// 2) PREVIEW award below threshold => gate PASSES (kept off, not fatal).
+// 2) NOT-LAUNCHED award below threshold => gate PASSES (kept off, not fatal).
 {
   const qs = [goodGA];
-  for (let i = 0; i < 10; i++) qs.push({ ...badPreview, id: 'bp' + i });
+  for (let i = 0; i < 10; i++) qs.push({ ...badNotLaunched, id: 'bp' + i });
   const res = runGate(qs);
-  ok('PREVIEW award below threshold -> zero exit (correctly kept off)', res.status === 0);
-  ok('PREVIEW failure does NOT trip the launch gate', !/LAUNCH GATE FAILED/.test(res.stdout + res.stderr));
+  ok('not-launched award below threshold -> zero exit (correctly kept off)', res.status === 0);
+  ok('not-launched failure does NOT trip the launch gate', !/LAUNCH GATE FAILED/.test(res.stdout + res.stderr));
 }
 
 // 3) All passing => gate PASSES.

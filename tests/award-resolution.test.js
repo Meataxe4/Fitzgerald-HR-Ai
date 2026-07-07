@@ -42,72 +42,41 @@ eq('empty      -> null', resolveAward('').code, null);
 eq('null       -> null', resolveAward(null).code, null);
 eq('garbage    -> null', resolveAward('Some Random Award').code, null);
 
-// Manufacturing preview: gated by flag
-eq('Manufacturing (flag OFF) -> null', resolveAward('Manufacturing and Associated Industries Award').code, null);
-_flags = new Set(['manufacturing_preview']);
-({ resolveAward } = factory(CONFIG, hasFeature));
-eq('Manufacturing (flag ON)  -> MA000010', resolveAward('Manufacturing and Associated Industries Award').code, 'MA000010');
+// ---- Newly-launched awards (GA): resolve WITHOUT any feature flag ----------
+// These five were preview-gated; on GA the flag requirement is removed and they
+// must resolve unconditionally, exactly like Hospitality/Restaurant. No flags set.
+eq('Manufacturing -> MA000010', resolveAward('Manufacturing and Associated Industries Award').code, 'MA000010');
+eq('Manufacturing calculatorType classification', resolveAward('MA000010').calculatorType, 'classification');
 
-// SCHADS preview: gated by its OWN flag (manufacturing_preview must NOT unlock it)
-eq('SCHADS (manufacturing flag only) -> null', resolveAward('Social, Community, Home Care and Disability Services Industry Award MA000100').code, null);
-_flags = new Set(['schads_preview']);
-({ resolveAward } = factory(CONFIG, hasFeature));
-eq('SCHADS (flag ON) -> MA000100', resolveAward('Social, Community, Home Care and Disability Services Industry Award MA000100').code, 'MA000100');
+eq('SCHADS -> MA000100', resolveAward('Social, Community, Home Care and Disability Services Industry Award MA000100').code, 'MA000100');
 eq('SCHADS alias schads -> MA000100', resolveAward('schads').code, 'MA000100');
 eq('SCHADS code MA000100 -> MA000100', resolveAward('MA000100').code, 'MA000100');
 eq('SCHADS calculatorType classification', resolveAward('MA000100').calculatorType, 'classification');
-// Hospitality/Restaurant remain byte-identical regardless of preview flags
-eq('Hospitality still -> MA000009 (SCHADS flag on)', resolveAward('Hospitality Industry (General) Award').code, 'MA000009');
-eq('Restaurant still -> MA000119 (SCHADS flag on)', resolveAward('Restaurant Industry Award').code, 'MA000119');
-eq('Manufacturing gated again when only SCHADS flag on -> null', resolveAward('Manufacturing and Associated Industries Award').code, null);
 
-// General Retail preview: gated by its OWN flag (schads_preview must NOT unlock it)
-eq('Retail (schads flag only) -> null', resolveAward('General Retail Industry Award MA000004').code, null);
-_flags = new Set(['retail_preview']);
-({ resolveAward } = factory(CONFIG, hasFeature));
-eq('Retail (flag ON) -> MA000004', resolveAward('General Retail Industry Award MA000004').code, 'MA000004');
+eq('Retail -> MA000004', resolveAward('General Retail Industry Award MA000004').code, 'MA000004');
 eq('Retail alias general retail -> MA000004', resolveAward('general retail').code, 'MA000004');
 eq('Retail code MA000004 -> MA000004', resolveAward('MA000004').code, 'MA000004');
 eq('Retail calculatorType classification', resolveAward('MA000004').calculatorType, 'classification');
 eq('Retail fullName', resolveAward('MA000004').fullName, 'General Retail Industry Award MA000004');
-// Retail must NOT shadow Restaurant (both contain related words) — Restaurant still resolves first
-eq('Restaurant still -> MA000119 (retail flag on)', resolveAward('Restaurant Industry Award').code, 'MA000119');
-eq('Hospitality still -> MA000009 (retail flag on)', resolveAward('Hospitality Industry (General) Award').code, 'MA000009');
-eq('Manufacturing gated again when only retail flag on -> null', resolveAward('Manufacturing and Associated Industries Award').code, null);
-_flags = new Set();
-({ resolveAward } = factory(CONFIG, hasFeature));
 
-// Health Professionals & Support Services preview: gated by its OWN flag
-eq('Health (retail flag only) -> null', resolveAward('Health Professionals and Support Services Award MA000027').code, null);
-_flags = new Set(['health_preview']);
-({ resolveAward } = factory(CONFIG, hasFeature));
-eq('Health (flag ON) -> MA000027', resolveAward('Health Professionals and Support Services Award MA000027').code, 'MA000027');
+eq('Health -> MA000027', resolveAward('Health Professionals and Support Services Award MA000027').code, 'MA000027');
 eq('Health alias health professionals -> MA000027', resolveAward('health professionals award').code, 'MA000027');
 eq('Health code MA000027 -> MA000027', resolveAward('MA000027').code, 'MA000027');
 eq('Health calculatorType classification', resolveAward('MA000027').calculatorType, 'classification');
 eq('Health fullName', resolveAward('MA000027').fullName, 'Health Professionals and Support Services Award MA000027');
-// Health must not shadow the live awards
-eq('Hospitality still -> MA000009 (health flag on)', resolveAward('Hospitality Industry (General) Award').code, 'MA000009');
-eq('Restaurant still -> MA000119 (health flag on)', resolveAward('Restaurant Industry Award').code, 'MA000119');
-eq('SCHADS gated when only health flag on -> null', resolveAward('Social, Community, Home Care and Disability Services Industry Award MA000100').code, null);
-_flags = new Set();
-({ resolveAward } = factory(CONFIG, hasFeature));
 
-// Children's Services preview: gated by its OWN flag
-eq('Childrens (health flag only) -> null', resolveAward("Children's Services Award MA000120").code, null);
-_flags = new Set(['childrens_preview']);
-({ resolveAward } = factory(CONFIG, hasFeature));
-eq('Childrens (flag ON) -> MA000120', resolveAward("Children's Services Award MA000120").code, 'MA000120');
+eq('Childrens -> MA000120', resolveAward("Children's Services Award MA000120").code, 'MA000120');
 eq('Childrens alias early childhood -> MA000120', resolveAward('early childhood service').code, 'MA000120');
 eq('Childrens code MA000120 -> MA000120', resolveAward('MA000120').code, 'MA000120');
 eq('Childrens calculatorType classification', resolveAward('MA000120').calculatorType, 'classification');
 eq('Childrens fullName', resolveAward('MA000120').fullName, "Children's Services Award MA000120");
-// Children's must not shadow the live awards
-eq('Hospitality still -> MA000009 (childrens flag on)', resolveAward('Hospitality Industry (General) Award').code, 'MA000009');
-eq('Restaurant still -> MA000119 (childrens flag on)', resolveAward('Restaurant Industry Award').code, 'MA000119');
-eq('Health gated when only childrens flag on -> null', resolveAward('Health Professionals and Support Services Award MA000027').code, null);
-_flags = new Set();
-({ resolveAward } = factory(CONFIG, hasFeature));
+
+// Cross-award guardrails still hold: newly-live awards must NOT shadow the
+// role-based awards, and genuinely unknown awards still fail closed.
+eq('Restaurant still -> MA000119 (not shadowed by Retail)', resolveAward('Restaurant Industry Award').code, 'MA000119');
+eq('Hospitality still -> MA000009', resolveAward('Hospitality Industry (General) Award').code, 'MA000009');
+eq('Fast Food still -> null', resolveAward('Fast Food Industry Award').code, null);
+eq('garbage still -> null', resolveAward('Some Random Award').code, null);
 
 // Code-based resolution (future award_code field)
 eq('Code MA000119 -> MA000119', resolveAward('MA000119').code, 'MA000119');
