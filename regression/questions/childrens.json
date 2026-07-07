@@ -1,0 +1,596 @@
+[
+  {
+    "id": "MA000120-resolution-001",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "resolution",
+    "question": "Which modern award and code covers the Children's Services Award?",
+    "expected_answer": "Children's Services Award (MA000120)",
+    "assert": {
+      "kind": "resolves",
+      "input": "Children's Services Award MA000120",
+      "flag": "childrens_preview",
+      "code": "MA000120"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-resolution-002",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "resolution",
+    "question": "If a user says their award is the \"Fast Food Industry Award\", should the Children's Services Award answer their pay questions?",
+    "expected_answer": "No — that is a different award; the assistant must not answer from this award’s data.",
+    "assert": {
+      "kind": "resolves_unresolved",
+      "input": "Fast Food Industry Award MA000003"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-casual_loading-003",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "casual_loading",
+    "question": "What is the casual loading under the Children's Services Award?",
+    "expected_answer": "25% (a casual is paid 25% on top of the minimum hourly rate).",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000120",
+      "path": "casual_loading",
+      "equals": 0.25
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-superannuation-004",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "superannuation",
+    "question": "What superannuation guarantee rate applies under the Children's Services Award for this period?",
+    "expected_answer": "12%.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000120",
+      "path": "superannuation_rate",
+      "equals": 0.12
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-minimum_engagement-005",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "minimum_engagement",
+    "question": "Under the Children's Services Award, what is the minimum shift length (minimum engagement) for a part-time employee?",
+    "expected_answer": "2 hours.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000120",
+      "path": "minimum_engagement.part_time_hours_per_shift",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-minimum_engagement-006",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "minimum_engagement",
+    "question": "Under the Children's Services Award, what is the minimum shift length (minimum engagement) for a casual employee?",
+    "expected_answer": "2 hours.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000120",
+      "path": "minimum_engagement.casual_hours_per_shift",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-penalty_rate-007",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "penalty_rate",
+    "question": "Under the Children's Services Award, what penalty/loading applies for Saturday (full-time / part-time)?",
+    "expected_answer": "150% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000120",
+      "key": "saturday_full_time_part_time",
+      "equals": 1.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-penalty_rate-008",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "penalty_rate",
+    "question": "Under the Children's Services Award, what penalty/loading applies for Saturday (casual)?",
+    "expected_answer": "175% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000120",
+      "key": "saturday_casual",
+      "equals": 1.75
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-penalty_rate-009",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "penalty_rate",
+    "question": "Under the Children's Services Award, what penalty/loading applies for Sunday (full-time / part-time)?",
+    "expected_answer": "200% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000120",
+      "key": "sunday_full_time_part_time",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-penalty_rate-010",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "penalty_rate",
+    "question": "Under the Children's Services Award, what penalty/loading applies for Sunday (casual)?",
+    "expected_answer": "225% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000120",
+      "key": "sunday_casual",
+      "equals": 2.25
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-penalty_rate-011",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "penalty_rate",
+    "question": "Under the Children's Services Award, what penalty/loading applies for a public holiday (full-time / part-time)?",
+    "expected_answer": "250% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000120",
+      "key": "public_holiday_full_time_part_time",
+      "equals": 2.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-penalty_rate-012",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "penalty_rate",
+    "question": "Under the Children's Services Award, what penalty/loading applies for a public holiday (casual)?",
+    "expected_answer": "275% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000120",
+      "key": "public_holiday_casual",
+      "equals": 2.75
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-penalty_rate-013",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "penalty_rate",
+    "question": "Under the Children's Services Award, what penalty/loading applies for an early-morning shift (shift loading)?",
+    "expected_answer": "A loading of 10% on the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000120",
+      "key": "early_morning_shift_loading",
+      "equals": 0.1
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-penalty_rate-014",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "penalty_rate",
+    "question": "Under the Children's Services Award, what penalty/loading applies for an afternoon shift (shift loading)?",
+    "expected_answer": "A loading of 15% on the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000120",
+      "key": "afternoon_shift_loading",
+      "equals": 0.15
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-penalty_rate-015",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "penalty_rate",
+    "question": "Under the Children's Services Award, what penalty/loading applies for a rotating night shift (shift loading)?",
+    "expected_answer": "A loading of 18% on the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000120",
+      "key": "rotating_night_shift_loading",
+      "equals": 0.175
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-penalty_rate-016",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "penalty_rate",
+    "question": "Under the Children's Services Award, what penalty/loading applies for a permanent night shift (shift loading)?",
+    "expected_answer": "A loading of 30% on the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000120",
+      "key": "permanent_night_shift_loading",
+      "equals": 0.3
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-penalty_rate-017",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "penalty_rate",
+    "question": "Under the Children's Services Award, what penalty/loading applies for the first 2 hours of overtime?",
+    "expected_answer": "150% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000120",
+      "key": "overtime_first_2hrs",
+      "equals": 1.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-penalty_rate-018",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "penalty_rate",
+    "question": "Under the Children's Services Award, what penalty/loading applies for overtime after the first 2 hours?",
+    "expected_answer": "200% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000120",
+      "key": "overtime_after_2hrs",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-pay_rate-019",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "pay_rate",
+    "question": "Under the Children's Services Award, what is the minimum full-time hourly rate for \"Support worker level 1.1 on commencement\" (support worker stream)?",
+    "expected_answer": "$26.44 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000120",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "support_worker",
+        "section": "Support worker - Full-time & part-time",
+        "classification": "Support worker level 1.1 on commencement"
+      },
+      "field": "rate",
+      "equals": 26.44
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-pay_rate-020",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "pay_rate",
+    "question": "Under the Children's Services Award, what is the minimum full-time hourly rate for \"Support worker level 2.2 after 1 year\" (support worker stream)?",
+    "expected_answer": "$27.82 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000120",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "support_worker",
+        "section": "Support worker - Full-time & part-time",
+        "classification": "Support worker level 2.2 after 1 year"
+      },
+      "field": "rate",
+      "equals": 27.82
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-pay_rate-021",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "pay_rate",
+    "question": "Under the Children's Services Award, what is the minimum full-time hourly rate for \"Level 1 - Introductory educator\" (childrens services employee stream)?",
+    "expected_answer": "$28.81 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000120",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "childrens_services_employee",
+        "section": "Children's services employee - Full-time & part-time",
+        "classification": "Level 1 - Introductory educator"
+      },
+      "field": "rate",
+      "equals": 28.81
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-pay_rate-022",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "pay_rate",
+    "question": "Under the Children's Services Award, what is the minimum full-time hourly rate for \"Level 4 - Experienced educator\" (childrens services employee stream)?",
+    "expected_answer": "$34.65 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000120",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "childrens_services_employee",
+        "section": "Children's services employee - Full-time & part-time",
+        "classification": "Level 4 - Experienced educator"
+      },
+      "field": "rate",
+      "equals": 34.65
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-pay_rate-023",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "pay_rate",
+    "question": "Under the Children's Services Award, what is the minimum full-time hourly rate for \"Level 6 - Room leader\" (childrens services employee stream)?",
+    "expected_answer": "$38.25 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000120",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "childrens_services_employee",
+        "section": "Children's services employee - Full-time & part-time",
+        "classification": "Level 6 - Room leader"
+      },
+      "field": "rate",
+      "equals": 38.25
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-pay_rate-024",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "pay_rate",
+    "question": "Under the Children's Services Award, what is the minimum full-time hourly rate for \"Level 8 - Director\" (childrens services employee stream)?",
+    "expected_answer": "$46.12 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000120",
+      "where": {
+        "employment_type": "full_time",
+        "stream": "childrens_services_employee",
+        "section": "Children's services employee - Full-time & part-time",
+        "classification": "Level 8 - Director"
+      },
+      "field": "rate",
+      "equals": 46.12
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-pay_rate-025",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "pay_rate",
+    "question": "Under the Children's Services Award, what is the minimum casual hourly rate (including casual loading) for \"Support worker level 1.1 on commencement\" (support worker stream)?",
+    "expected_answer": "$33.05 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000120",
+      "where": {
+        "employment_type": "casual",
+        "stream": "support_worker",
+        "section": "Support worker - Casual",
+        "classification": "Support worker level 1.1 on commencement"
+      },
+      "field": "rate",
+      "equals": 33.05
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-pay_rate-026",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "pay_rate",
+    "question": "Under the Children's Services Award, what is the minimum casual hourly rate (including casual loading) for \"Level 8 - Director\" (childrens services employee stream)?",
+    "expected_answer": "$57.65 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000120",
+      "where": {
+        "employment_type": "casual",
+        "stream": "childrens_services_employee",
+        "section": "Children's services employee - Casual",
+        "classification": "Level 8 - Director"
+      },
+      "field": "rate",
+      "equals": 57.65
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-allowance-027",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "allowance",
+    "question": "Under the Children's Services Award, what is the \"Broken shift allowance\"?",
+    "expected_answer": "$21.38 per day.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000120",
+      "name_includes": "Broken shift allowance",
+      "field": "amount",
+      "equals": 21.38
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-allowance-028",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "allowance",
+    "question": "Under the Children's Services Award, what is the \"Meal allowance (overtime)\"?",
+    "expected_answer": "$16.12 per occasion.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000120",
+      "name_includes": "Meal allowance (overtime)",
+      "field": "amount",
+      "equals": 16.12
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-allowance-029",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "allowance",
+    "question": "Under the Children's Services Award, what is the \"Laundry allowance, no ironing (full-time employees)\"?",
+    "expected_answer": "$6.14 per week.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000120",
+      "name_includes": "Laundry allowance, no ironing (full-time employees)",
+      "field": "amount",
+      "equals": 6.14
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-allowance-030",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "allowance",
+    "question": "Under the Children's Services Award, what is the \"Vehicle allowance (motorcycle)\"?",
+    "expected_answer": "$0.34 per km.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000120",
+      "name_includes": "Vehicle allowance (motorcycle)",
+      "field": "amount",
+      "equals": 0.34
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-currency-031",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "currency",
+    "question": "What effective date is the Children's Services Award rate data current as at?",
+    "expected_answer": "2026-07-01.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000120",
+      "path": "effective_date",
+      "equals": "2026-07-01"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000120-currency-032",
+    "vertical": "childrens",
+    "award": "MA000120",
+    "category": "currency",
+    "question": "When is the Children's Services Award rate data next due for review?",
+    "expected_answer": "2027-07-01.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000120",
+      "path": "next_review_date",
+      "equals": "2027-07-01"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000120, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  }
+]

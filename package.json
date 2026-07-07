@@ -9,7 +9,11 @@
     "build:css": "tailwindcss -i ./src/tailwind-input.css -o ./tailwind.css --minify",
     "stamp": "node scripts/stamp-assets.mjs",
     "build": "npm run build:css && npm run stamp",
-    "test": "node tests/award-resolution.test.js"
+    "test": "node tests/award-resolution.test.js",
+    "test:gate": "node tests/regression-gate.test.js",
+    "test:regression": "node scripts/run-regression.mjs",
+    "test:ci": "npm test && npm run test:gate && npm run test:regression",
+    "build:regression": "node scripts/build-regression-questions.mjs"
   },
   "repository": {
     "type": "git",

@@ -1,0 +1,537 @@
+[
+  {
+    "id": "MA000010-resolution-001",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "resolution",
+    "question": "Which modern award and code covers the Manufacturing and Associated Industries and Occupations Award?",
+    "expected_answer": "Manufacturing and Associated Industries and Occupations Award (MA000010)",
+    "assert": {
+      "kind": "resolves",
+      "input": "Manufacturing and Associated Industries and Occupations Award MA000010",
+      "flag": "manufacturing_preview",
+      "code": "MA000010"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-resolution-002",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "resolution",
+    "question": "If a user says their award is the \"Fast Food Industry Award\", should the Manufacturing and Associated Industries and Occupations Award answer their pay questions?",
+    "expected_answer": "No — that is a different award; the assistant must not answer from this award’s data.",
+    "assert": {
+      "kind": "resolves_unresolved",
+      "input": "Fast Food Industry Award MA000003"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-casual_loading-003",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "casual_loading",
+    "question": "What is the casual loading under the Manufacturing and Associated Industries and Occupations Award?",
+    "expected_answer": "25% (a casual is paid 25% on top of the minimum hourly rate).",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000010",
+      "path": "casual_loading",
+      "equals": 0.25
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-superannuation-004",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "superannuation",
+    "question": "What superannuation guarantee rate applies under the Manufacturing and Associated Industries and Occupations Award for this period?",
+    "expected_answer": "12%.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000010",
+      "path": "superannuation_rate",
+      "equals": 0.12
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-minimum_engagement-005",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "minimum_engagement",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what is the minimum shift length (minimum engagement) for a part-time employee?",
+    "expected_answer": "4 hours.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000010",
+      "path": "minimum_engagement.part_time_hours_per_shift",
+      "equals": 4
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-minimum_engagement-006",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "minimum_engagement",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what is the minimum shift length (minimum engagement) for a casual employee?",
+    "expected_answer": "4 hours.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000010",
+      "path": "minimum_engagement.casual_hours_per_shift",
+      "equals": 4
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-penalty_rate-007",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "penalty_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what penalty/loading applies for saturday?",
+    "expected_answer": "150% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000010",
+      "key": "saturday",
+      "equals": 1.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-penalty_rate-008",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "penalty_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what penalty/loading applies for sunday?",
+    "expected_answer": "200% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000010",
+      "key": "sunday",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-penalty_rate-009",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "penalty_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what penalty/loading applies for public holiday?",
+    "expected_answer": "250% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000010",
+      "key": "public_holiday",
+      "equals": 2.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-penalty_rate-010",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "penalty_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what penalty/loading applies for the first 3 hours of overtime?",
+    "expected_answer": "150% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000010",
+      "key": "overtime_first_3hrs",
+      "equals": 1.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-penalty_rate-011",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "penalty_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what penalty/loading applies for overtime after the first 3 hours?",
+    "expected_answer": "200% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000010",
+      "key": "overtime_after_3hrs",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-penalty_rate-012",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "penalty_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what penalty/loading applies for overtime worked on a Sunday?",
+    "expected_answer": "200% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000010",
+      "key": "sunday_overtime",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-penalty_rate-013",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "penalty_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what penalty/loading applies for an afternoon shift (shift loading)?",
+    "expected_answer": "A loading of 15% on the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000010",
+      "key": "afternoon_shift_loading",
+      "equals": 0.15
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-penalty_rate-014",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "penalty_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what penalty/loading applies for a night shift (shift loading)?",
+    "expected_answer": "A loading of 15% on the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000010",
+      "key": "night_shift_loading",
+      "equals": 0.15
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-penalty_rate-015",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "penalty_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what penalty/loading applies for a permanent night shift (shift loading)?",
+    "expected_answer": "A loading of 30% on the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000010",
+      "key": "permanent_night_shift_loading",
+      "equals": 0.3
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-pay_rate-016",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "pay_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what is the minimum full-time hourly rate for \"C14 - Engineering/manufacturing employee - level I\"?",
+    "expected_answer": "$25.74 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000010",
+      "where": {
+        "employment_type": "full_time",
+        "section": "Adult - General manufacturing - Full-time & part-time",
+        "classification": "C14 - Engineering/manufacturing employee - level I"
+      },
+      "field": "rate",
+      "equals": 25.74
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-pay_rate-017",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "pay_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what is the minimum full-time hourly rate for \"C2(a) - Principal engineering supervisor/trainer/coordinator\"?",
+    "expected_answer": "$38.16 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000010",
+      "where": {
+        "employment_type": "full_time",
+        "section": "Adult - General manufacturing - Full-time & part-time",
+        "classification": "C2(a) - Principal engineering supervisor/trainer/coordinator"
+      },
+      "field": "rate",
+      "equals": 38.16
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-pay_rate-018",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "pay_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what is the minimum full-time hourly rate for \"16 years of age - in a foundry\"?",
+    "expected_answer": "$12.51 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000010",
+      "where": {
+        "employment_type": "full_time",
+        "section": "Junior - General manufacturing - Full-time & part-time",
+        "classification": "16 years of age - in a foundry"
+      },
+      "field": "rate",
+      "equals": 12.51
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-pay_rate-019",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "pay_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what is the minimum full-time hourly rate for \"Advanced engineering\"?",
+    "expected_answer": "$30.32 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000010",
+      "where": {
+        "employment_type": "full_time",
+        "section": "Apprentice - General manufacturing - Started after 1 Jan 2014 - Completed year 12",
+        "classification": "Advanced engineering"
+      },
+      "field": "rate",
+      "equals": 30.32
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-pay_rate-020",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "pay_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what is the minimum full-time hourly rate for \"Technology cadet - undertaking stage 1 - completed year 12 three or more years ago or completed year 10 or 11 four or more years ago\"?",
+    "expected_answer": "$21.27 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000010",
+      "where": {
+        "employment_type": "full_time",
+        "section": "Cadet - General manufacturing - Technology cadet - Full-time & part-time",
+        "classification": "Technology cadet - undertaking stage 1 - completed year 12 three or more years ago or completed year 10 or 11 four or more years ago"
+      },
+      "field": "rate",
+      "equals": 21.27
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-pay_rate-021",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "pay_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what is the minimum full-time hourly rate for \"Completed technology cadetship - Completed stage 4 - Two years after successful completion of stage 4\"?",
+    "expected_answer": "$37.24 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000010",
+      "where": {
+        "employment_type": "full_time",
+        "section": "Cadet - General manufacturing - Completed technology cadetship - Full-time & part-time",
+        "classification": "Completed technology cadetship - Completed stage 4 - Two years after successful completion of stage 4"
+      },
+      "field": "rate",
+      "equals": 37.24
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-pay_rate-022",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "pay_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what is the minimum casual hourly rate (including casual loading) for \"C14 - Engineering/manufacturing employee - level I\"?",
+    "expected_answer": "$32.18 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000010",
+      "where": {
+        "employment_type": "casual",
+        "section": "Adult - General manufacturing - Casual",
+        "classification": "C14 - Engineering/manufacturing employee - level I"
+      },
+      "field": "rate",
+      "equals": 32.18
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-pay_rate-023",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "pay_rate",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what is the minimum casual hourly rate (including casual loading) for \"20 years of age - not in a foundry\"?",
+    "expected_answer": "$32.29 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000010",
+      "where": {
+        "employment_type": "casual",
+        "section": "Junior - General manufacturing - Casual",
+        "classification": "20 years of age - not in a foundry"
+      },
+      "field": "rate",
+      "equals": 32.29
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-allowance-024",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "allowance",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what is the \"First aid allowance\"?",
+    "expected_answer": "$22.26 per week.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000010",
+      "name_includes": "First aid allowance",
+      "field": "amount",
+      "equals": 22.26
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-allowance-025",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "allowance",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what is the \"Tool allowance (tradespersons other than carpenter/joiner/shipwright, not vehicle manufacturing, all-purpose)\"?",
+    "expected_answer": "$0.47 per hour.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000010",
+      "name_includes": "Tool allowance (tradespersons other than carpenter/joiner/shipwright, not vehicle manufacturing, all-purpose)",
+      "field": "amount",
+      "equals": 0.47
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-allowance-026",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "allowance",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what is the \"Dirty work allowance (not ship repair work)\"?",
+    "expected_answer": "$0.85 per hour.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000010",
+      "name_includes": "Dirty work allowance (not ship repair work)",
+      "field": "amount",
+      "equals": 0.85
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-allowance-027",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "allowance",
+    "question": "Under the Manufacturing and Associated Industries and Occupations Award, what is the \"Vehicle allowance\"?",
+    "expected_answer": "$1.00 per km.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000010",
+      "name_includes": "Vehicle allowance",
+      "field": "amount",
+      "equals": 1
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-currency-028",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "currency",
+    "question": "What effective date is the Manufacturing and Associated Industries and Occupations Award rate data current as at?",
+    "expected_answer": "2026-07-01.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000010",
+      "path": "effective_date",
+      "equals": "2026-07-01"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000010-currency-029",
+    "vertical": "manufacturing",
+    "award": "MA000010",
+    "category": "currency",
+    "question": "When is the Manufacturing and Associated Industries and Occupations Award rate data next due for review?",
+    "expected_answer": "2027-07-01.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000010",
+      "path": "next_review_date",
+      "equals": "2027-07-01"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000010, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  }
+]

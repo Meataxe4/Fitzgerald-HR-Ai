@@ -1,0 +1,571 @@
+[
+  {
+    "id": "MA000004-resolution-001",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "resolution",
+    "question": "Which modern award and code covers the General Retail Industry Award?",
+    "expected_answer": "General Retail Industry Award (MA000004)",
+    "assert": {
+      "kind": "resolves",
+      "input": "General Retail Industry Award MA000004",
+      "flag": "retail_preview",
+      "code": "MA000004"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-resolution-002",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "resolution",
+    "question": "If a user says their award is the \"Fast Food Industry Award\", should the General Retail Industry Award answer their pay questions?",
+    "expected_answer": "No — that is a different award; the assistant must not answer from this award’s data.",
+    "assert": {
+      "kind": "resolves_unresolved",
+      "input": "Fast Food Industry Award MA000003"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-casual_loading-003",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "casual_loading",
+    "question": "What is the casual loading under the General Retail Industry Award?",
+    "expected_answer": "25% (a casual is paid 25% on top of the minimum hourly rate).",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000004",
+      "path": "casual_loading",
+      "equals": 0.25
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-superannuation-004",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "superannuation",
+    "question": "What superannuation guarantee rate applies under the General Retail Industry Award for this period?",
+    "expected_answer": "12%.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000004",
+      "path": "superannuation_rate",
+      "equals": 0.12
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-minimum_engagement-005",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "minimum_engagement",
+    "question": "Under the General Retail Industry Award, what is the minimum shift length (minimum engagement) for a part-time employee?",
+    "expected_answer": "3 hours.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000004",
+      "path": "minimum_engagement.part_time_hours_per_shift",
+      "equals": 3
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-minimum_engagement-006",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "minimum_engagement",
+    "question": "Under the General Retail Industry Award, what is the minimum shift length (minimum engagement) for a casual employee?",
+    "expected_answer": "3 hours.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000004",
+      "path": "minimum_engagement.casual_hours_per_shift",
+      "equals": 3
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-penalty_rate-007",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "penalty_rate",
+    "question": "Under the General Retail Industry Award, what penalty/loading applies for Saturday (full-time / part-time)?",
+    "expected_answer": "125% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000004",
+      "key": "saturday_full_time_part_time",
+      "equals": 1.25
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-penalty_rate-008",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "penalty_rate",
+    "question": "Under the General Retail Industry Award, what penalty/loading applies for Saturday (casual)?",
+    "expected_answer": "150% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000004",
+      "key": "saturday_casual",
+      "equals": 1.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-penalty_rate-009",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "penalty_rate",
+    "question": "Under the General Retail Industry Award, what penalty/loading applies for Sunday (full-time / part-time)?",
+    "expected_answer": "150% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000004",
+      "key": "sunday_full_time_part_time",
+      "equals": 1.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-penalty_rate-010",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "penalty_rate",
+    "question": "Under the General Retail Industry Award, what penalty/loading applies for Sunday (casual)?",
+    "expected_answer": "175% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000004",
+      "key": "sunday_casual",
+      "equals": 1.75
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-penalty_rate-011",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "penalty_rate",
+    "question": "Under the General Retail Industry Award, what penalty/loading applies for a public holiday (full-time / part-time)?",
+    "expected_answer": "225% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000004",
+      "key": "public_holiday_full_time_part_time",
+      "equals": 2.25
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-penalty_rate-012",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "penalty_rate",
+    "question": "Under the General Retail Industry Award, what penalty/loading applies for a public holiday (casual)?",
+    "expected_answer": "250% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000004",
+      "key": "public_holiday_casual",
+      "equals": 2.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-penalty_rate-013",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "penalty_rate",
+    "question": "Under the General Retail Industry Award, what penalty/loading applies for ordinary evening hours Monday–Friday (evening loading)?",
+    "expected_answer": "A loading of 25% on the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000004",
+      "key": "evening_mon_fri_loading",
+      "equals": 0.25
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-penalty_rate-014",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "penalty_rate",
+    "question": "Under the General Retail Industry Award, what penalty/loading applies for the first 3 hours of overtime?",
+    "expected_answer": "150% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000004",
+      "key": "overtime_first_3hrs",
+      "equals": 1.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-penalty_rate-015",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "penalty_rate",
+    "question": "Under the General Retail Industry Award, what penalty/loading applies for overtime after the first 3 hours?",
+    "expected_answer": "200% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000004",
+      "key": "overtime_after_3hrs",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-penalty_rate-016",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "penalty_rate",
+    "question": "Under the General Retail Industry Award, what penalty/loading applies for overtime worked on a Sunday?",
+    "expected_answer": "200% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000004",
+      "key": "sunday_overtime",
+      "equals": 2
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-penalty_rate-017",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "penalty_rate",
+    "question": "Under the General Retail Industry Award, what penalty/loading applies for overtime worked on a public holiday?",
+    "expected_answer": "250% of the ordinary hourly rate.",
+    "assert": {
+      "kind": "penalty",
+      "award": "MA000004",
+      "key": "public_holiday_overtime",
+      "equals": 2.5
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-pay_rate-018",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "pay_rate",
+    "question": "Under the General Retail Industry Award, what is the minimum full-time hourly rate for \"Retail Employee Level 1\"?",
+    "expected_answer": "$27.81 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000004",
+      "where": {
+        "employment_type": "full_time",
+        "section": "Adult - Full-time & part-time",
+        "classification": "Retail Employee Level 1"
+      },
+      "field": "rate",
+      "equals": 27.81
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-pay_rate-019",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "pay_rate",
+    "question": "Under the General Retail Industry Award, what is the minimum full-time hourly rate for \"Retail Employee Level 2\"?",
+    "expected_answer": "$28.45 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000004",
+      "where": {
+        "employment_type": "full_time",
+        "section": "Adult - Full-time & part-time",
+        "classification": "Retail Employee Level 2"
+      },
+      "field": "rate",
+      "equals": 28.45
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-pay_rate-020",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "pay_rate",
+    "question": "Under the General Retail Industry Award, what is the minimum full-time hourly rate for \"Retail Employee Level 4\"?",
+    "expected_answer": "$29.45 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000004",
+      "where": {
+        "employment_type": "full_time",
+        "section": "Adult - Full-time & part-time",
+        "classification": "Retail Employee Level 4"
+      },
+      "field": "rate",
+      "equals": 29.45
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-pay_rate-021",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "pay_rate",
+    "question": "Under the General Retail Industry Award, what is the minimum full-time hourly rate for \"Retail Employee Level 5\"?",
+    "expected_answer": "$30.66 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000004",
+      "where": {
+        "employment_type": "full_time",
+        "section": "Adult - Full-time & part-time",
+        "classification": "Retail Employee Level 5"
+      },
+      "field": "rate",
+      "equals": 30.66
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-pay_rate-022",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "pay_rate",
+    "question": "Under the General Retail Industry Award, what is the minimum full-time hourly rate for \"Retail Employee Level 7\"?",
+    "expected_answer": "$32.67 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000004",
+      "where": {
+        "employment_type": "full_time",
+        "section": "Adult - Full-time & part-time",
+        "classification": "Retail Employee Level 7"
+      },
+      "field": "rate",
+      "equals": 32.67
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-pay_rate-023",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "pay_rate",
+    "question": "Under the General Retail Industry Award, what is the minimum full-time hourly rate for \"Retail Employee Level 8\"?",
+    "expected_answer": "$33.99 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000004",
+      "where": {
+        "employment_type": "full_time",
+        "section": "Adult - Full-time & part-time",
+        "classification": "Retail Employee Level 8"
+      },
+      "field": "rate",
+      "equals": 33.99
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-pay_rate-024",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "pay_rate",
+    "question": "Under the General Retail Industry Award, what is the minimum casual hourly rate (including casual loading) for \"Retail Employee Level 1\"?",
+    "expected_answer": "$34.76 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000004",
+      "where": {
+        "employment_type": "casual",
+        "section": "Adult - Casual",
+        "classification": "Retail Employee Level 1"
+      },
+      "field": "rate",
+      "equals": 34.76
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-pay_rate-025",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "pay_rate",
+    "question": "Under the General Retail Industry Award, what is the minimum casual hourly rate (including casual loading) for \"Retail Employee Level 8\"?",
+    "expected_answer": "$42.49 per hour.",
+    "assert": {
+      "kind": "pay_rate",
+      "award": "MA000004",
+      "where": {
+        "employment_type": "casual",
+        "section": "Adult - Casual",
+        "classification": "Retail Employee Level 8"
+      },
+      "field": "rate",
+      "equals": 42.49
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-allowance-026",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "allowance",
+    "question": "Under the General Retail Industry Award, what is the \"Cold work allowance (0°C and above)\"?",
+    "expected_answer": "$0.38 per hour.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000004",
+      "name_includes": "Cold work allowance (0°C and above)",
+      "field": "amount",
+      "equals": 0.38
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-allowance-027",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "allowance",
+    "question": "Under the General Retail Industry Award, what is the \"First aid allowance\"?",
+    "expected_answer": "$14.55 per week.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000004",
+      "name_includes": "First aid allowance",
+      "field": "amount",
+      "equals": 14.55
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-allowance-028",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "allowance",
+    "question": "Under the General Retail Industry Award, what is the \"Laundry allowance (part-time or casual employees)\"?",
+    "expected_answer": "$1.28 per shift.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000004",
+      "name_includes": "Laundry allowance (part-time or casual employees)",
+      "field": "amount",
+      "equals": 1.28
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-allowance-029",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "allowance",
+    "question": "Under the General Retail Industry Award, what is the \"Vehicle allowance\"?",
+    "expected_answer": "$1.00 per km.",
+    "assert": {
+      "kind": "allowance",
+      "award": "MA000004",
+      "name_includes": "Vehicle allowance",
+      "field": "amount",
+      "equals": 1
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-currency-030",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "currency",
+    "question": "What effective date is the General Retail Industry Award rate data current as at?",
+    "expected_answer": "2026-07-01.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000004",
+      "path": "effective_date",
+      "equals": "2026-07-01"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  },
+  {
+    "id": "MA000004-currency-031",
+    "vertical": "retail",
+    "award": "MA000004",
+    "category": "currency",
+    "question": "When is the General Retail Industry Award rate data next due for review?",
+    "expected_answer": "2027-07-01.",
+    "assert": {
+      "kind": "scalar",
+      "award": "MA000004",
+      "path": "next_review_date",
+      "equals": "2027-07-01"
+    },
+    "source": "Fair Work Ombudsman Pay Guide MA000004, published 24 June 2026",
+    "verified_by": "FWO Pay Guide (SME-verified extract)",
+    "verified_date": "2026-07-01"
+  }
+]
