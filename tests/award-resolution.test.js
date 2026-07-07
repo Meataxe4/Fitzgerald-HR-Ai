@@ -77,6 +77,22 @@ eq('Manufacturing gated again when only retail flag on -> null', resolveAward('M
 _flags = new Set();
 ({ resolveAward } = factory(CONFIG, hasFeature));
 
+// Health Professionals & Support Services preview: gated by its OWN flag
+eq('Health (retail flag only) -> null', resolveAward('Health Professionals and Support Services Award MA000027').code, null);
+_flags = new Set(['health_preview']);
+({ resolveAward } = factory(CONFIG, hasFeature));
+eq('Health (flag ON) -> MA000027', resolveAward('Health Professionals and Support Services Award MA000027').code, 'MA000027');
+eq('Health alias health professionals -> MA000027', resolveAward('health professionals award').code, 'MA000027');
+eq('Health code MA000027 -> MA000027', resolveAward('MA000027').code, 'MA000027');
+eq('Health calculatorType classification', resolveAward('MA000027').calculatorType, 'classification');
+eq('Health fullName', resolveAward('MA000027').fullName, 'Health Professionals and Support Services Award MA000027');
+// Health must not shadow the live awards
+eq('Hospitality still -> MA000009 (health flag on)', resolveAward('Hospitality Industry (General) Award').code, 'MA000009');
+eq('Restaurant still -> MA000119 (health flag on)', resolveAward('Restaurant Industry Award').code, 'MA000119');
+eq('SCHADS gated when only health flag on -> null', resolveAward('Social, Community, Home Care and Disability Services Industry Award MA000100').code, null);
+_flags = new Set();
+({ resolveAward } = factory(CONFIG, hasFeature));
+
 // Code-based resolution (future award_code field)
 eq('Code MA000119 -> MA000119', resolveAward('MA000119').code, 'MA000119');
 
@@ -107,6 +123,11 @@ const retailOpts = _fwDocClassificationOptions('MA000004');
 eq('Retail classifications include Retail Employee Level 8', /Retail Employee Level 8/.test(retailOpts), true);
 eq('Retail classifications NOT Cook grades', /Cook grade/.test(retailOpts), false);
 eq('Retail classifications NOT C-levels', /C10/.test(retailOpts), false);
+const healthOpts = _fwDocClassificationOptions('MA000027');
+eq('Health classifications include Support Services - Level 9', /Support Services - Level 9/.test(healthOpts), true);
+eq('Health classifications include Health Professional - Level 4', /Health Professional - Level 4/.test(healthOpts), true);
+eq('Health classifications include Pathology collector', /Pathology collector - Level 5/.test(healthOpts), true);
+eq('Health classifications NOT Cook grades', /Cook grade/.test(healthOpts), false);
 
 // ---- Manufacturing rates data integrity (Milestone: MA000010 wiring) --------
 const manuf = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'manufacturing-award-rates.json'), 'utf8'));
@@ -211,6 +232,47 @@ eq('Retail L8 casual rate $42.49', (retail.rates.find(r => r.employment_type ===
 eq('Retail part-time min 3 hrs', retail.minimum_engagement.part_time_hours_per_shift, 3);
 eq('Retail casual min 3 hrs', retail.minimum_engagement.casual_hours_per_shift, 3);
 
+// ---- Health Professionals & Support Services data integrity (MA000027) ------
+const health = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'health-award-rates.json'), 'utf8'));
+eq('Health ma_number', health.ma_number, 'MA000027');
+eq('Health 80 rate rows (40 adult classifications x2)', health.rates.length, 80);
+eq('Health four streams present', [...new Set(health.rates.map(r => r.stream))].sort().join(','),
+   'dental_assistants,health_professionals,pathology_collectors,support_services');
+eq('Health Saturday FT/PT 1.5', health.penalty_rates.saturday_full_time_part_time, 1.5);
+eq('Health Saturday casual 1.75', health.penalty_rates.saturday_casual, 1.75);
+eq('Health Sunday FT/PT 1.5', health.penalty_rates.sunday_full_time_part_time, 1.5);
+eq('Health public holiday FT/PT 2.5', health.penalty_rates.public_holiday_full_time_part_time, 2.5);
+eq('Health public holiday casual 2.75', health.penalty_rates.public_holiday_casual, 2.75);
+eq('Health Mon-Fri shift loading +15%', health.penalty_rates.shift_loading_mon_fri, 0.15);
+eq('Health overtime first 2h 1.5', health.penalty_rates.overtime_first_2hrs, 1.5);
+eq('Health overtime after 2h 2.0', health.penalty_rates.overtime_after_2hrs, 2.0);
+eq('Health casual loading 0.25', health.casual_loading, 0.25);
+eq('Health all rows have positive rate', health.rates.every(r => typeof r.rate === 'number' && r.rate > 0), true);
+// Known PDF figures: Support Services Level 1 full-time = $26.97 (weekly $1,024.70).
+const hss1 = health.rates.find(r => r.stream === 'support_services' && r.employment_type === 'full_time' && r.classification === 'Level 1');
+eq('Health Support L1 rate $26.97', hss1 && hss1.rate, 26.97);
+eq('Health Support L1 weekly $1024.70', hss1 && hss1.weekly_rate, 1024.70);
+// rate x multiplier reproduces the published penalty-dollar columns (Sat 150%, PH 250%).
+eq('Health Support L1 Saturday = $40.46 (PDF)', r2(hss1.rate * health.penalty_rates.saturday_full_time_part_time), 40.46);
+eq('Health Support L1 Public holiday = $67.43 (PDF)', r2(hss1.rate * health.penalty_rates.public_holiday_full_time_part_time), 67.43);
+// Health Professional top rate = $71.19 (weekly $2,705.10).
+const hp44 = health.rates.find(r => r.stream === 'health_professionals' && r.employment_type === 'full_time' && r.classification === 'Level 4 - pay point 4');
+eq('Health Professional L4pp4 rate $71.19', hp44 && hp44.rate, 71.19);
+eq('Health Professional L4pp4 casual rate $88.99',
+   (health.rates.find(r => r.stream === 'health_professionals' && r.employment_type === 'casual' && r.classification === 'Level 4 - pay point 4') || {}).rate, 88.99);
+// Minimum engagement + annualised wage sourced from award text.
+eq('Health casual min 3 hrs (clause 11.2)', health.minimum_engagement.casual_hours_per_shift, 3);
+eq('Health has NO fixed part-time per-shift minimum', health.minimum_engagement.part_time_hours_per_shift, undefined);
+eq('Health annualised wage clause 22', health.annualised_wage.clause, '22');
+// MA000027 HAS an annualised wage clause, so it must NOT be in the excluded set.
+eq('Health NOT excluded from annualised wage templates',
+   /excludeAwards: \[[^\]]*MA000027/.test(src), false);
+// The annualised-wage profile + absorbed-provisions must switch for MA000027.
+eq('app-main has MA000027 annualised wage profile (clause 22)', /clauseHeading: 'Clause 22-Annualised wage arrangements'/.test(src), true);
+eq('app-main has MA000027 absorbed provisions (cl 26)', /Penalty rates and shiftwork \(cl 26\)/.test(src), true);
+eq('app-main cash-out uses MA000027 Schedule I', /MA000027 Schedule I/.test(src), true);
+eq('app-main leave-in-advance uses MA000027 Schedule H', /MA000027 Schedule H/.test(src), true);
+
 // ---- Allowance grounding: every award ships an allowances block ------------
 // (fed to the chat prompt so the AI answers allowance questions with exact
 // figures instead of guessing / declining). Figures sourced from the FWO Pay
@@ -221,6 +283,7 @@ const AWARD_FILES = {
   MA000010: 'manufacturing-award-rates.json',
   MA000100: 'schads-award-rates.json',
   MA000004: 'retail-award-rates.json',
+  MA000027: 'health-award-rates.json',
 };
 function loadAward(code) { return JSON.parse(fs.readFileSync(path.join(__dirname, '..', AWARD_FILES[code]), 'utf8')); }
 function allowanceAmount(rates, nameFragment) {
@@ -241,6 +304,8 @@ eq('Hospitality first aid (FT) = $13.43/wk', allowanceAmount(loadAward('MA000009
 eq('Restaurant meal-overtime = $17.42', allowanceAmount(loadAward('MA000119'), 'Meal allowance - overtime'), 17.42);
 eq('Manufacturing meal = $19.14/meal', allowanceAmount(loadAward('MA000010'), 'Meal allowance'), 19.14);
 eq('SCHADS sleepover = $62.87', allowanceAmount(loadAward('MA000100'), 'Sleepover allowance'), 62.87);
+eq('Health tool allowance (chefs/cooks) = $13.41/wk', allowanceAmount(health, 'Tool allowance (chefs and cooks)'), 13.41);
+eq('Health uniform allowance = $1.26/shift', allowanceAmount(health, 'Uniform allowance'), 1.26);
 
 // ---- buildAllowanceFacts (chat.js) renders exact figures / fails closed ----
 const chatSrc = fs.readFileSync(path.join(__dirname, '..', 'netlify', 'functions', 'chat.js'), 'utf8');
