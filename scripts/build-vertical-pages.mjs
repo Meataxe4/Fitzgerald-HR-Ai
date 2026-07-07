@@ -31,6 +31,7 @@ const VERTICALS = {
     awardFull: 'Manufacturing and Associated Industries and Occupations Award MA000010',
     audience: 'Australian manufacturers, workshops and production facilities',
     industry: 'manufacturing business',
+    titleIndustry: 'Manufacturers',
     heroWord: 'grinder operator',
     heroHook: 'A {word} walks off mid-shift. Fitz tells you exactly what the Manufacturing Award requires.',
     coverage: 'general manufacturing, engineering, food and beverage processing, and associated production and maintenance work. It does not cover vehicle manufacturing (a separate award).',
@@ -51,6 +52,7 @@ const VERTICALS = {
     awardFull: 'Social, Community, Home Care and Disability Services Industry Award MA000100',
     audience: 'NDIS providers, community services, home care and disability support organisations',
     industry: 'community services provider',
+    titleIndustry: 'Community Services & NDIS Providers',
     heroWord: 'support worker',
     heroHook: 'A {word} calls in for a sleepover shift. Fitz tells you exactly what SCHADS requires.',
     coverage: 'social and community services, home care, disability services (including NDIS), family day care and crisis accommodation.',
@@ -71,6 +73,7 @@ const VERTICALS = {
     awardFull: 'General Retail Industry Award MA000004',
     audience: 'Australian retail stores, shops and retail chains',
     industry: 'retail business',
+    titleIndustry: 'Retailers',
     heroWord: 'sales assistant',
     heroHook: 'A {word} no-shows on a Sunday trade day. Fitz tells you exactly what the Retail Award requires.',
     coverage: 'general retail trade. It does not cover hair and beauty, pharmacy, fast food, or businesses covered by a more specific award.',
@@ -91,6 +94,7 @@ const VERTICALS = {
     awardFull: 'Health Professionals and Support Services Award MA000027',
     audience: 'private practices, allied health, dental, pathology and medical support employers',
     industry: 'health practice',
+    titleIndustry: 'Health Practices',
     heroWord: 'dental assistant',
     heroHook: 'A {word} asks about weekend rates. Fitz tells you exactly what the Health Professionals Award requires.',
     coverage: 'private-sector health professionals and health support services — including allied health, dental assistants, pathology collectors and medical administration.',
@@ -111,6 +115,7 @@ const VERTICALS = {
     awardFull: "Children's Services Award MA000120",
     audience: 'long day care, preschools, kindergartens and outside-school-hours care providers',
     industry: 'childcare service',
+    titleIndustry: 'Childcare & OSHC',
     heroWord: 'educator',
     heroHook: "An {word} calls in sick and ratios are tight. Fitz tells you exactly what the Children's Services Award requires.",
     coverage: 'long day care, preschools and kindergartens, outside-school-hours care, and other children’s services.',
@@ -147,6 +152,8 @@ function pen(data) {
   };
 }
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+// 'manufacturing business' -> 'manufacturing businesses'; 'health practice' -> 'health practices'.
+const pluralIndustry = (x) => x.endsWith('business') ? x.slice(0, -8) + 'businesses' : x + 's';
 
 // --------------------------------------------------------------------------
 // Shared shell: design tokens copied verbatim from the existing guide pages,
@@ -257,7 +264,7 @@ const FONTS = `    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">`;
 
-function head({ title, description, canonical, jsonld }) {
+function head({ title, description, canonical, jsonld, keywords }) {
   const ld = jsonld.map(o => `    <script type="application/ld+json">\n    ${JSON.stringify(o)}\n    </script>`).join('\n');
   return `<!DOCTYPE html>
 <html lang="en-AU">
@@ -266,7 +273,7 @@ ${GTAG}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${esc(title)}</title>
-    <meta name="description" content="${esc(description)}">
+    <meta name="description" content="${esc(description)}">${keywords ? `\n    <meta name="keywords" content="${esc(keywords)}">` : ''}
     <meta name="author" content="Fitz HR">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="${canonical}">
@@ -322,7 +329,8 @@ function clusterLinks(v, current) {
     { key: 'landing', href: `/${v}`, label: 'Overview', title: `${VERTICALS[v].awardShort} for your business`, blurb: 'The live scenarios, wizard, document builder and Crisis Mode, built for your vertical.' },
     { key: 'pay', href: `/${v}-award-pay-rates`, label: 'Pay Rates', title: `${VERTICALS[v].awardShort} Pay Rates 2026`, blurb: 'Current classification rates, penalties and allowances from the FWO Pay Guide.' },
     { key: 'guide', href: `/${v}-award-guide`, label: 'Guide', title: `${VERTICALS[v].awardShort} Guide (${VERTICALS[v].code})`, blurb: 'The complete reference — coverage, classifications, penalties, allowances and compliance.' },
-    { key: 'vs', href: `/compare/fitz-hr-vs-employment-hero-${v}`, label: 'Compare', title: `Fitz HR vs Employment Hero`, blurb: `How Fitz compares for ${VERTICALS[v].industry}s on the ${VERTICALS[v].awardShort}.` },
+    { key: 'vs', href: `/compare/fitz-hr-vs-employment-hero-${v}`, label: 'Compare', title: `Fitz HR vs Employment Hero`, blurb: `How Fitz compares for ${pluralIndustry(VERTICALS[v].industry)} on the ${VERTICALS[v].awardShort}.` },
+    { key: 'best', href: `/compare/best-hr-software-${v}-australia`, label: 'Best software', title: `Best HR Software for ${VERTICALS[v].titleIndustry}`, blurb: `What to look for in HR & compliance software for ${pluralIndustry(VERTICALS[v].industry)} — and how Fitz compares.` },
   ].filter(l => l.key !== current);
   return `    <div class="hub-grid">
 ${links.map(l => `        <a href="${l.href}" class="hub-card"><div class="hub-label">${l.label}</div><h3>${esc(l.title)}</h3><p>${esc(l.blurb)}</p></a>`).join('\n')}
@@ -379,8 +387,9 @@ function landingPage(v) {
   const c = VERTICALS[v]; const data = load(c.file);
   const url = `${SITE}/${v}`;
   const heroWordHtml = c.heroHook.replace('{word}', `<em>${esc(c.heroWord)}</em>`);
-  const title = `${c.awardShort} HR & Compliance (${c.code}) | Fitz HR`;
-  const description = `HR and ${c.awardShort} compliance for ${c.audience}. Instant, award-grounded answers on pay rates, penalties, allowances and awards — plus document builder and Crisis Mode.`;
+  const title = `HR & Compliance Software for ${c.titleIndustry} — ${c.awardShort} | Fitz HR`;
+  const description = `Award-aware HR & compliance software for ${c.audience}. Instant answers grounded in the ${c.awardShort} (${c.code}) — pay rates, penalties, allowances — plus a document builder and Crisis Mode. Free to start.`;
+  const keywords = `HR software for ${c.industry}, HR compliance software ${c.titleIndustry.toLowerCase()}, ${c.awardShort} software, ${c.awardShort} compliance, ${c.code} pay rates, HR software Australia ${c.industry}`;
   const faqs = [
     { q: `What does Fitz HR do for a ${c.industry}?`, a: `Fitz answers ${c.awardShort} (${c.code}) questions instantly — pay rates, penalties, allowances, minimum engagement, classifications and compliance — grounded in the current Fair Work Ombudsman Pay Guide. It also builds documents and runs a Crisis Mode for urgent situations.` },
     { q: `Are the ${c.awardShort} rates current?`, a: `Yes. Rates are sourced from the FWO Pay Guide ${c.code} and are current as at ${data.effective_date}, with the next review due ${data.next_review_date}.` },
@@ -392,7 +401,7 @@ function landingPage(v) {
     { '@context': 'https://schema.org', '@type': 'WebPage', name: title, description, url, inLanguage: 'en-AU', isPartOf: { '@type': 'WebSite', name: 'Fitz HR', url: `${SITE}/` } },
     faqLd(faqs),
   ];
-  return `${head({ title, description, canonical: url, jsonld })}
+  return `${head({ title, description, canonical: url, jsonld, keywords })}
 ${nav()}
 <header class="hero">
     <div class="post-tag">${c.awardFull.split(' ').slice(-1)[0]} &middot; ${esc(c.awardShort)}</div>
@@ -638,6 +647,78 @@ ${faqBlock(faqs)}
 ${footer()}`;
 }
 
+function bestHrSoftwarePage(v) {
+  const c = VERTICALS[v]; const data = load(c.file);
+  const url = `${SITE}/compare/best-hr-software-${v}-australia`;
+  const title = `Best HR & Compliance Software for ${c.titleIndustry} in Australia (2026) | Fitz HR`;
+  const description = `Choosing HR & compliance software for ${c.audience}? What to look for, why award-aware matters under the ${c.awardShort} (${c.code}), and how Fitz HR compares to generic HR platforms.`;
+  const keywords = `best HR software for ${c.industry}, HR compliance software ${c.titleIndustry.toLowerCase()}, HR software Australia ${c.industry}, ${c.awardShort} software, ${c.awardShort} compliance software, payroll compliance ${c.industry}`;
+  const rows = [
+    ['Grounded in the ' + c.awardShort, `Yes — every answer cites ${c.code} from the current FWO Pay Guide`, 'Generic HR content; award detail is shallow or absent'],
+    ['Correct pay, penalties & allowances', `Exact ${c.awardShort} figures, updated at the annual wage review`, 'Often generic or manual; easy to misapply'],
+    ['Accuracy checked before launch', 'Regression-tested against the Pay Guide', 'Not published'],
+    ['Award-correct documents', `${c.industry} contracts, warnings & letters reflecting ${c.awardShort} rules`, 'Template library, not award-reasoned'],
+    ['Crisis Mode', 'Immediate, award-grounded steps for urgent situations', 'No equivalent'],
+    ['Setup & price', 'Ask a question — no implementation project; free to start', 'Implementation typical; per-seat pricing'],
+  ];
+  const faqs = [
+    { q: `What is the best HR software for ${pluralIndustry(c.industry)} in Australia?`, a: `For award compliance, the best HR software is one that grounds every answer in your specific award. Fitz HR is award-aware for the ${c.awardShort} (${c.code}) — it returns exact pay rates, penalties and allowances and builds ${c.industry} documents that reflect the award, rather than a generic template.` },
+    { q: `Why does award-aware HR software matter for ${pluralIndustry(c.industry)}?`, a: `Because ${pluralIndustry(c.industry)} are covered by the ${c.awardFull}, and getting classifications, penalties or allowances wrong is the fastest route to a Fair Work underpayment claim. Generic HR platforms rarely reason about a specific award; Fitz answers from ${c.code} directly.` },
+    { q: `Does Fitz HR replace payroll for a ${c.industry}?`, a: `Fitz focuses on award interpretation, compliance answers, document building and crisis response. Many operators run it alongside their payroll system for fast, ${c.awardShort}-accurate answers. Compare the current <a href="/pricing">Fitz HR pricing</a> to a per-seat HR platform quote.` },
+    { q: `How much does HR compliance software cost for a ${c.industry}?`, a: `Fitz HR is free to start, with paid plans published transparently at <a href="/pricing">fitzhr.com/pricing</a> — no sales call, no lock-in. That is typically a fraction of the cost of a single unfair dismissal claim.` },
+  ];
+  const jsonld = [
+    breadcrumb([{ name: 'Home', url: `${SITE}/` }, { name: 'Compare', url: `${SITE}/compare/best-hr-software-hospitality-australia` }, { name: `Best HR Software for ${c.titleIndustry}`, url }]),
+    { '@context': 'https://schema.org', '@type': 'WebPage', name: title, description, url, inLanguage: 'en-AU' },
+    faqLd(faqs),
+  ];
+  return `${head({ title, description, canonical: url, jsonld, keywords })}
+${nav()}
+<header class="hero">
+    <div class="post-tag">Buyer's Guide &middot; ${esc(c.awardShort)}</div>
+    <h1>Best HR &amp; Compliance Software for <em>${esc(c.titleIndustry)}</em> in Australia</h1>
+    <p class="intro">Choosing HR and compliance software for ${esc(c.audience)}? The single most important factor is whether it actually understands your award — the <strong style="color:#fff">${esc(c.awardShort)} (${esc(c.code)})</strong>. Here is what to look for, and how Fitz HR compares.</p>
+    <div class="hero-ctas"><a href="/app" class="btn-primary">Try Fitz Free &rarr;</a><a href="/${v}-award-pay-rates" class="btn-ghost">See ${esc(c.awardShort)} rates</a></div>
+</header>
+<div class="body">
+    <div class="section-label">What to look for</div>
+    <p>For a ${esc(c.industry)}, generic HR software is the wrong tool for the most expensive risk you carry: getting the award wrong. When you compare options, weigh these first:</p>
+    <ul>
+        <li><strong>Award-grounded answers</strong> — does it cite the ${esc(c.awardShort)} (${esc(c.code)}), or give generic guidance?</li>
+        <li><strong>Correct rates</strong> — exact pay, penalties and allowances, kept current at the annual wage review.</li>
+        <li><strong>Award-correct documents</strong> — contracts and warnings that reflect ${esc(c.awardShort)} rules, not a generic template.</li>
+        <li><strong>Speed in a crisis</strong> — immediate, grounded steps when something goes wrong on shift.</li>
+        <li><strong>Transparent price</strong> — no implementation project or per-seat surprises.</li>
+    </ul>
+
+    <div class="section-label">How Fitz HR compares</div>
+    <table class="compare-table">
+        <thead><tr><th>What matters</th><th>Fitz HR</th><th>Generic HR platforms</th></tr></thead>
+        <tbody>
+${rows.map(r => `            <tr><td>${esc(r[0])}</td><td class="highlight">${esc(r[1])}</td><td>${esc(r[2])}</td></tr>`).join('\n')}
+        </tbody>
+    </table>
+
+    <div class="verdict">
+        <div class="verdict-label">The verdict</div>
+        <p>If your priority is staying compliant under the ${esc(c.awardShort)}, the best HR software for a ${esc(c.industry)} is one built to answer from that award. Fitz HR is award-aware, accuracy-gated and free to start — purpose-built for exactly this, not adapted from a generic platform.</p>
+    </div>
+
+    <div class="section-label">Explore</div>
+${clusterLinks(v, 'best')}
+
+${faqBlock(faqs)}
+
+    <div class="post-cta">
+        <h3>Try it on your own ${esc(c.awardShort)} question</h3>
+        <p>Ask Fitz anything about ${esc(c.code)} — pay, penalties, allowances or compliance — and judge the software yourself.</p>
+        <a href="/app">Ask Fitz Free &rarr;</a>
+    </div>
+</div>
+<a href="/app" class="sticky-pill">Best HR software for ${esc(c.titleIndustry)}? &rarr;</a>
+${footer()}`;
+}
+
 // --------------------------------------------------------------------------
 // Emit
 // --------------------------------------------------------------------------
@@ -650,6 +731,7 @@ for (const v of Object.keys(VERTICALS)) {
   write(`${v}-award-pay-rates.html`, payRatesPage(v));
   write(`${v}-award-guide.html`, guidePage(v));
   write(`compare/fitz-hr-vs-employment-hero-${v}.html`, vsEmploymentHeroPage(v));
+  write(`compare/best-hr-software-${v}-australia.html`, bestHrSoftwarePage(v));
 }
 console.log(`Generated ${written.length} vertical pages:`);
 for (const w of written) console.log('  ' + w);
