@@ -93,6 +93,22 @@ eq('SCHADS gated when only health flag on -> null', resolveAward('Social, Commun
 _flags = new Set();
 ({ resolveAward } = factory(CONFIG, hasFeature));
 
+// Children's Services preview: gated by its OWN flag
+eq('Childrens (health flag only) -> null', resolveAward("Children's Services Award MA000120").code, null);
+_flags = new Set(['childrens_preview']);
+({ resolveAward } = factory(CONFIG, hasFeature));
+eq('Childrens (flag ON) -> MA000120', resolveAward("Children's Services Award MA000120").code, 'MA000120');
+eq('Childrens alias early childhood -> MA000120', resolveAward('early childhood service').code, 'MA000120');
+eq('Childrens code MA000120 -> MA000120', resolveAward('MA000120').code, 'MA000120');
+eq('Childrens calculatorType classification', resolveAward('MA000120').calculatorType, 'classification');
+eq('Childrens fullName', resolveAward('MA000120').fullName, "Children's Services Award MA000120");
+// Children's must not shadow the live awards
+eq('Hospitality still -> MA000009 (childrens flag on)', resolveAward('Hospitality Industry (General) Award').code, 'MA000009');
+eq('Restaurant still -> MA000119 (childrens flag on)', resolveAward('Restaurant Industry Award').code, 'MA000119');
+eq('Health gated when only childrens flag on -> null', resolveAward('Health Professionals and Support Services Award MA000027').code, null);
+_flags = new Set();
+({ resolveAward } = factory(CONFIG, hasFeature));
+
 // Code-based resolution (future award_code field)
 eq('Code MA000119 -> MA000119', resolveAward('MA000119').code, 'MA000119');
 
@@ -128,6 +144,10 @@ eq('Health classifications include Support Services - Level 9', /Support Service
 eq('Health classifications include Health Professional - Level 4', /Health Professional - Level 4/.test(healthOpts), true);
 eq('Health classifications include Pathology collector', /Pathology collector - Level 5/.test(healthOpts), true);
 eq('Health classifications NOT Cook grades', /Cook grade/.test(healthOpts), false);
+const childrensOpts = _fwDocClassificationOptions('MA000120');
+eq('Childrens classifications include Level 8 - Director', /Level 8 - Director/.test(childrensOpts), true);
+eq('Childrens classifications include Support worker level 3.1', /Support worker level 3\.1/.test(childrensOpts), true);
+eq('Childrens classifications NOT Cook grades', /Cook grade/.test(childrensOpts), false);
 
 // ---- Manufacturing rates data integrity (Milestone: MA000010 wiring) --------
 const manuf = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'manufacturing-award-rates.json'), 'utf8'));
@@ -194,10 +214,10 @@ eq('SACS casual Saturday = base x1.75 = $48.21 (PDF)', r2(sacs1.rate * schads.pe
 // Minimum engagement sourced from award text (clause 10.5)
 eq('SCHADS SACS min 3 hrs', schads.minimum_engagement.social_community_services_hours_per_shift, 3);
 eq('SCHADS other streams min 2 hrs', schads.minimum_engagement.other_streams_hours_per_shift, 2);
-// SCHADS and General Retail have NO annualised wage clause — those doc
-// templates must exclude both codes (2 templates: agreement + time record).
-eq('SCHADS + Retail annualised wage templates excluded (source)',
-   (src.match(/excludeAwards: \['MA000100', 'MA000004'\]/g) || []).length >= 2, true);
+// SCHADS, General Retail and Children's Services have NO annualised wage clause —
+// those doc templates must exclude all three codes (2 templates: agreement + time record).
+eq('SCHADS + Retail + Childrens annualised wage templates excluded (source)',
+   (src.match(/excludeAwards: \['MA000100', 'MA000004', 'MA000120'\]/g) || []).length >= 2, true);
 
 // ---- General Retail rates data integrity (Milestone: MA000004 wiring) --------
 const retail = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'retail-award-rates.json'), 'utf8'));
@@ -273,6 +293,41 @@ eq('app-main has MA000027 absorbed provisions (cl 26)', /Penalty rates and shift
 eq('app-main cash-out uses MA000027 Schedule I', /MA000027 Schedule I/.test(src), true);
 eq('app-main leave-in-advance uses MA000027 Schedule H', /MA000027 Schedule H/.test(src), true);
 
+// ---- Children's Services data integrity (MA000120) --------------------------
+const childrens = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'childrens-award-rates.json'), 'utf8'));
+eq('Childrens ma_number', childrens.ma_number, 'MA000120');
+eq('Childrens 24 rate rows (12 adult classifications x2)', childrens.rates.length, 24);
+eq('Childrens two streams present', [...new Set(childrens.rates.map(r => r.stream))].sort().join(','),
+   'childrens_services_employee,support_worker');
+eq('Childrens Sunday FT/PT 2.0', childrens.penalty_rates.sunday_full_time_part_time, 2.0);
+eq('Childrens Sunday casual 2.25', childrens.penalty_rates.sunday_casual, 2.25);
+eq('Childrens public holiday FT/PT 2.5', childrens.penalty_rates.public_holiday_full_time_part_time, 2.5);
+eq('Childrens public holiday casual 2.75', childrens.penalty_rates.public_holiday_casual, 2.75);
+eq('Childrens permanent night shift +30%', childrens.penalty_rates.permanent_night_shift_loading, 0.30);
+eq('Childrens rotating night shift +17.5%', childrens.penalty_rates.rotating_night_shift_loading, 0.175);
+eq('Childrens overtime first 2h 1.5', childrens.penalty_rates.overtime_first_2hrs, 1.5);
+eq('Childrens casual loading 0.25', childrens.casual_loading, 0.25);
+eq('Childrens all rows have positive rate', childrens.rates.every(r => typeof r.rate === 'number' && r.rate > 0), true);
+// Known PDF figures: Support worker level 1.1 = $26.44 (weekly $1,004.90).
+const csw1 = childrens.rates.find(r => r.stream === 'support_worker' && r.employment_type === 'full_time' && r.classification === 'Support worker level 1.1 on commencement');
+eq('Childrens Support worker L1.1 rate $26.44', csw1 && csw1.rate, 26.44);
+eq('Childrens Support worker L1.1 weekly $1004.90', csw1 && csw1.weekly_rate, 1004.90);
+eq('Childrens Support L1.1 Sunday = $52.88 (PDF)', r2(csw1.rate * childrens.penalty_rates.sunday_full_time_part_time), 52.88);
+eq('Childrens Support L1.1 Public holiday = $66.10 (PDF)', r2(csw1.rate * childrens.penalty_rates.public_holiday_full_time_part_time), 66.10);
+// Director top rate = $46.12 (weekly $1,752.70), casual $57.65.
+const cdir = childrens.rates.find(r => r.stream === 'childrens_services_employee' && r.employment_type === 'full_time' && r.classification === 'Level 8 - Director');
+eq('Childrens Director rate $46.12', cdir && cdir.rate, 46.12);
+eq('Childrens Director casual rate $57.65',
+   (childrens.rates.find(r => r.stream === 'childrens_services_employee' && r.employment_type === 'casual' && r.classification === 'Level 8 - Director') || {}).rate, 57.65);
+// Minimum engagement sourced from award text (clauses 10.4(e) / 10.5(c)).
+eq('Childrens part-time min 2 hrs', childrens.minimum_engagement.part_time_hours_per_shift, 2);
+eq('Childrens casual min 2 hrs', childrens.minimum_engagement.casual_hours_per_shift, 2);
+// MA000120 has NO annualised wage clause, so it must be in the excluded set.
+eq('Childrens excluded from annualised wage templates',
+   (src.match(/excludeAwards: \[[^\]]*MA000120/g) || []).length >= 2, true);
+eq('app-main cash-out uses MA000120 Schedule G', /MA000120 Schedule G/.test(src), true);
+eq('app-main leave-in-advance uses MA000120 Schedule F', /MA000120 Schedule F/.test(src), true);
+
 // ---- Allowance grounding: every award ships an allowances block ------------
 // (fed to the chat prompt so the AI answers allowance questions with exact
 // figures instead of guessing / declining). Figures sourced from the FWO Pay
@@ -284,6 +339,7 @@ const AWARD_FILES = {
   MA000100: 'schads-award-rates.json',
   MA000004: 'retail-award-rates.json',
   MA000027: 'health-award-rates.json',
+  MA000120: 'childrens-award-rates.json',
 };
 function loadAward(code) { return JSON.parse(fs.readFileSync(path.join(__dirname, '..', AWARD_FILES[code]), 'utf8')); }
 function allowanceAmount(rates, nameFragment) {
@@ -306,6 +362,8 @@ eq('Manufacturing meal = $19.14/meal', allowanceAmount(loadAward('MA000010'), 'M
 eq('SCHADS sleepover = $62.87', allowanceAmount(loadAward('MA000100'), 'Sleepover allowance'), 62.87);
 eq('Health tool allowance (chefs/cooks) = $13.41/wk', allowanceAmount(health, 'Tool allowance (chefs and cooks)'), 13.41);
 eq('Health uniform allowance = $1.26/shift', allowanceAmount(health, 'Uniform allowance'), 1.26);
+eq('Childrens broken shift allowance = $21.38/day', allowanceAmount(childrens, 'Broken shift allowance'), 21.38);
+eq('Childrens educational leader (5 days) = $4784.28/yr', allowanceAmount(childrens, 'Educational leader allowance (5 days or more per week)'), 4784.28);
 
 // ---- buildAllowanceFacts (chat.js) renders exact figures / fails closed ----
 const chatSrc = fs.readFileSync(path.join(__dirname, '..', 'netlify', 'functions', 'chat.js'), 'utf8');

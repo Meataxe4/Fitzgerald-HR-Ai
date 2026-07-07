@@ -10,6 +10,7 @@ const manufacturingRates = require('../../manufacturing-award-rates.json');
 const schadsRates = require('../../schads-award-rates.json');
 const retailRates = require('../../retail-award-rates.json');
 const healthRates = require('../../health-award-rates.json');
+const childrensRates = require('../../childrens-award-rates.json');
 
 // Builds the PENALTY RATES section of the system prompt from a rates JSON.
 function buildPenaltyRateFacts(rates, awardLabel) {
@@ -33,7 +34,7 @@ function buildPenaltyRateFacts(rates, awardLabel) {
   // weekend/PH as full-time/part-time vs casual multipliers rather than the
   // single bare keys. Emitted only for those awards so Hospitality/Restaurant
   // output stays unchanged.
-  if (rates.ma_number === 'MA000100' || rates.ma_number === 'MA000004' || rates.ma_number === 'MA000027') {
+  if (rates.ma_number === 'MA000100' || rates.ma_number === 'MA000004' || rates.ma_number === 'MA000027' || rates.ma_number === 'MA000120') {
     if (typeof p.saturday_full_time_part_time === 'number' && typeof p.saturday_casual === 'number') {
       lines.push(`- Saturday: ${Math.round(p.saturday_full_time_part_time * 100)}% of base rate (full-time/part-time); ${Math.round(p.saturday_casual * 100)}% for casuals (incl. 25% loading)`);
     }
@@ -91,6 +92,8 @@ function buildPenaltyRateFacts(rates, awardLabel) {
     lines.push(`NOTE: General Retail penalties (clause 22) are, for full-time/part-time employees, Saturday 125%, Sunday 150% and public holiday 225% of the ordinary hourly rate; casual employees add the 25% casual loading (Saturday 150%, Sunday 175%, public holiday 250%). A separate evening loading of 25% applies to ordinary hours worked after 6:00pm Monday to Friday (150% for casuals, i.e. 125% + the 25% loading). Weekend and public holiday penalty rates apply instead of the evening loading on those days, not on top. Overtime (clause 21) is 150% for the first 3 hours and 200% thereafter, with all Sunday overtime at 200% and public holiday overtime at 250%. These figures are the adult classification rates; junior (age-scaled) and apprentice rates are a percentage of the adult rate — direct the user to the Pay Guide for those.`);
   } else if (rates.ma_number === 'MA000027') {
     lines.push(`NOTE: Health Professionals & Support Services penalties (clause 26) are, for full-time/part-time employees, Saturday and Sunday 150% and public holiday 250% of the minimum hourly rate; casual employees add the 25% loading (Saturday/Sunday 175%, public holiday 275%). A Monday-to-Friday shiftwork loading of 15% applies to shiftworkers' ordinary hours (115% full-time/part-time, 140% casual). Overtime (clause 25) is 150% for the first 2 hours and 200% thereafter, with Sunday overtime 200%. For CASUALS, the overtime percentage is applied to the loaded casual rate (multiplicative), giving 187.5% for the first 2 hours, 250% thereafter, 250% Sunday overtime and 312.5% public holiday overtime — do not simply add the 25% loading to the overtime figure. A 'less than 10 hour break after overtime' rate of 200% also applies (clause 25). These figures are the adult classification rates across the four streams (Support Services, Dental assistants, Pathology collectors, Health Professionals); junior and apprentice rates are not listed here — direct the user to the Pay Guide.`);
+  } else if (rates.ma_number === 'MA000120') {
+    lines.push(`NOTE: Children's Services penalties (clause 23) are, for full-time/part-time employees, Sunday 200% and public holiday 250% of the ordinary hourly rate. Saturday is different: shiftworkers receive a 150% ordinary penalty, while day workers (non-shiftworkers) are paid OVERTIME for Saturday work (150% first 2 hours, 200% thereafter) — there is no ordinary weekday-equivalent Saturday penalty for day workers. Shiftwork loadings are early morning +10% (110%), afternoon +15% (115%), rotating night +17.5% (117.5%) and permanent night +30% (130%). Overtime is 150% for the first 2 hours and 200% thereafter (Monday-Saturday). Casual employees add the 25% casual loading to EVERY penalty, shift and overtime rate (additive): e.g. early morning 135%, permanent night 155%, Sunday 225%, public holiday 275%, overtime 175%/225%. These figures are the adult classification rates for the Support worker and Children's services employee (educator) streams; junior and apprentice rates are not listed here — direct the user to the Pay Guide.`);
   } else {
     lines.push(`NOTE: Weekend and public holiday rates supersede the late-night loadings.`);
   }
@@ -105,10 +108,10 @@ function buildMinimumEngagementFacts(rates, awardLabel) {
   const ma = rates.ma_number;
   const isMA119 = ma === 'MA000119';
   const ftClause = isMA119 ? ' (clause 11)' : '';
-  const ptClause = ma === 'MA000010' ? ' (clause 10.2)' : ma === 'MA000100' ? ' (clause 10.5)' : ma === 'MA000004' ? ' (clause 10.9)' : ' (clause 12)';
+  const ptClause = ma === 'MA000010' ? ' (clause 10.2)' : ma === 'MA000100' ? ' (clause 10.5)' : ma === 'MA000004' ? ' (clause 10.9)' : ma === 'MA000120' ? ' (clause 10.4(e))' : ' (clause 12)';
   const casClause = isMA119
     ? ' (clause 13.5 — "An employer must not engage a casual employee for less than 2 consecutive hours of work")'
-    : ma === 'MA000010' ? ' (clause 11.2)' : ma === 'MA000100' ? ' (clause 10.5)' : ma === 'MA000004' ? ' (clause 11.2)' : ma === 'MA000027' ? ' (clause 11.2)' : ' (clause 11.4)';
+    : ma === 'MA000010' ? ' (clause 11.2)' : ma === 'MA000100' ? ' (clause 10.5)' : ma === 'MA000004' ? ' (clause 11.2)' : ma === 'MA000027' ? ' (clause 11.2)' : ma === 'MA000120' ? ' (clause 10.5(c))' : ' (clause 11.4)';
 
   if (typeof m.full_time_hours_per_shift === 'number') {
     lines.push(`- Full-time employees: minimum ${m.full_time_hours_per_shift} consecutive hours per engagement${ftClause}.`);
@@ -137,6 +140,9 @@ function buildMinimumEngagementFacts(rates, awardLabel) {
   }
   if (ma === 'MA000027') {
     lines.push(`Under MA000027 the casual minimum period of engagement is 3 hours (clause 11.2); cleaners employed in private medical practices have a 2-hour minimum (clause 11.3). Part-time employees are not subject to a fixed per-shift minimum — instead a regular pattern of work (weekly hours, days, and start/finish times) must be agreed in writing before commencement and can only be varied by agreement (clause 10.2). Full-time employees work an average of 38 ordinary hours per week (clause 9).`);
+  }
+  if (ma === 'MA000120') {
+    lines.push(`Under MA000120 a part-time employee must be rostered for a minimum of 2 consecutive hours on any shift (clause 10.4(e)), and a casual employee is paid a minimum of 2 hours pay for each engagement (clause 10.5(c)). A part-time employee also has an agreed regular pattern of hours; a part-time employee may agree to work up to 8 additional ordinary-time hours during the service's ordinary hours of operation, but hours beyond 8 in a day attract overtime (clause 10.4(f)).`);
   }
   return lines.join('\n');
 }
@@ -294,6 +300,13 @@ exports.handler = async (event, context) => {
         industryAdj: 'health services',
         rates: healthRates,
         aliases: ['health professionals', 'health support', 'support services']
+      },
+      MA000120: {
+        fullName: "Children's Services Award MA000120",
+        sector: 'early childhood education and care (long day care, preschools/kindergartens, outside-school-hours care and other children\'s services)',
+        industryAdj: "children's services",
+        rates: childrensRates,
+        aliases: ["children's services", 'childrens services', 'early childhood', 'child care', 'childcare']
       }
     };
     function resolveServerAward(stored) {
