@@ -205,9 +205,6 @@ const SHARED_CSS = `<style>
     .step .n{font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--amber);letter-spacing:0.14em;}
     .step h4{font-size:0.95rem;color:#fff;margin:0.4rem 0;}
     .step p{font-size:0.85rem;color:var(--w60);margin:0;}
-    .tcard{background:var(--navy2);border:1px dashed var(--w30);border-radius:10px;padding:1.5rem;}
-    .tcard .slot{font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--w30);margin-bottom:0.5rem;}
-    .tcard p{font-size:0.9rem;color:var(--w60);font-style:italic;margin:0;}
     .rate-table,.compare-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.86rem;}
     .rate-table th,.compare-table th{background:var(--navy2);color:var(--amber);padding:0.75rem 1rem;text-align:left;font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;border-bottom:1px solid var(--rule);}
     .rate-table td,.compare-table td{padding:0.8rem 1rem;border-bottom:1px solid var(--rw);color:var(--w60);vertical-align:middle;}
@@ -437,12 +434,6 @@ ${c.scenarios.map(s => `        <div class="scn-card"><div class="scn-q">${esc(s
     <div class="feature">
         <h3>When something goes wrong right now</h3>
         <p>${esc(c.crisis)}</p>
-    </div>
-
-    <div class="section-label">What operators say</div>
-    <div class="scn-grid">
-        <div class="tcard"><div class="slot">Testimonial slot</div><p>Add a verified ${esc(c.industry)} testimonial here once collected.</p></div>
-        <div class="tcard"><div class="slot">Testimonial slot</div><p>Add a second ${esc(c.industry)} testimonial here once collected.</p></div>
     </div>
 
     <div class="section-label">Explore</div>
