@@ -27,6 +27,16 @@ jobs:
       - name: Award-resolution guardrail tests
         run: node tests/award-resolution.test.js
 
+      # Structural validation of the rate data (Milestone 8) — makes a wage-review
+      # update a safe, data-only change.
+      - name: Validate award rate data
+        run: node scripts/validate-rates.mjs
+
+      # Staleness warning (Milestone 8) — non-blocking here; surfaces upcoming/overdue
+      # review dates as annotations. The scheduled staleness workflow enforces it.
+      - name: Staleness check (warn)
+        run: node scripts/check-staleness.mjs
+
       # Proves the gate is enforced, not advisory (fail-closed on a GA miss).
       - name: Accuracy-gate enforcement test
         run: node tests/regression-gate.test.js

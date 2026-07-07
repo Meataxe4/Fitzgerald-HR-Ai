@@ -1,0 +1,55 @@
+name: Award rate-data staleness alert
+
+# Milestone 8 — the maintenance alert. Runs weekly (and on demand), fails when any
+# award's rate data is past its review date, and opens/updates a GitHub issue so a
+# stale award can't silently slip past the 1 July annual wage review.
+on:
+  schedule:
+    - cron: '0 0 * * 1'   # every Monday 00:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  staleness:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Check rate-data staleness (strict)
+        id: check
+        run: |
+          set +e
+          node scripts/check-staleness.mjs --strict --warn-days 45 | tee staleness.txt
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+          cat staleness.txt >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Open / update staleness issue
+        if: steps.check.outputs.code != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = '```\n' + fs.readFileSync('staleness.txt', 'utf8') + '\n```\n\n' +
+              'One or more awards are past their review date. Apply the wage-review update — see `docs/maintenance-pipeline.md`. This issue was opened automatically by the staleness workflow.';
+            const marker = '<!-- staleness-alert -->';
+            const title = '⚠️ Award rate data is overdue for review';
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner, repo: context.repo.repo, state: 'open', labels: 'staleness', per_page: 20,
+            });
+            const existing = issues.find(i => i.body && i.body.includes(marker));
+            const fullBody = marker + '\n' + body;
+            if (existing) {
+              await github.rest.issues.createComment({ owner: context.repo.owner, repo: context.repo.repo, issue_number: existing.number, body });
+            } else {
+              await github.rest.issues.create({ owner: context.repo.owner, repo: context.repo.repo, title, body: fullBody, labels: ['staleness'] });
+            }
+
+      - name: Fail if overdue
+        if: steps.check.outputs.code != '0'
+        run: exit 1
