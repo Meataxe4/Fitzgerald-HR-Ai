@@ -13511,14 +13511,26 @@ function _renderAwardCalculatorOptions() {
             : 'Set a valid Modern Award in your business profile to load rates';
     }
 
-    // Classification picker: adult full-time, rated entries for the loaded award.
+    // Classification picker: all full-time rated entries for the loaded award.
+    // Only Manufacturing carries non-adult rows (apprentice/junior/trainee/cadet);
+    // apprentice and trainee share classification labels across sections (Year-12
+    // status, trainee age band), so each label is qualified to stay distinct and
+    // no rate is silently hidden. Every other award is adult-only, so unchanged.
     let opts = '';
     if (awardRates && Array.isArray(awardRates.rates)) {
+        const catTag = { apprentice: 'Apprentice', junior: 'Junior', trainee: 'Trainee', cadet: 'Cadet' };
         const seen = {};
         awardRates.rates
-            .filter(function(r) { return r.category === 'adult' && r.employment_type === 'full_time' && Number(r.rate) > 0; })
+            .filter(function(r) { return r.employment_type === 'full_time' && Number(r.rate) > 0; })
             .forEach(function(r) {
-                const label = r.title || r.classification || 'Classification';
+                const base = r.title || r.classification || 'Classification';
+                let label = base;
+                if (r.category && r.category !== 'adult') {
+                    const tag = catTag[r.category] || (r.category.charAt(0).toUpperCase() + r.category.slice(1));
+                    const lead = base.toLowerCase().indexOf(r.category) === 0 ? '' : (tag + ' — ');
+                    const qual = (r.category === 'apprentice' || r.category === 'trainee') ? _manufSectionLabel(r.category, r.section) : '';
+                    label = lead + base + (qual ? ' (' + qual + ')' : '');
+                }
                 if (seen[label]) return;
                 seen[label] = true;
                 opts += '<option value="' + Number(r.rate) + '">' + _fwEscapeHtml(label) + ' - $' + Number(r.rate).toFixed(2) + '</option>';
@@ -13638,47 +13650,81 @@ function _calcHoursStep(code) {
         { value: 'public-holiday',  label: 'Public Holidays',              sublabel: 'Highest penalty rates' }
     ]};
 }
-// Manufacturing apprentice pay depends on whether the apprentice has completed
-// Year 12 (and whether they are an adult apprentice). Those variants live in the
-// rates JSON as separate `section`s with identical classification labels, so the
-// wizard asks a Year-12 question for apprentices to pick the correct row.
-function _apprenticeSectionOrder(section) {
-    if (/did not complete year 12/i.test(section)) return 0;
-    if (/completed year 12/i.test(section)) return 1;
-    return 2; // adult apprentice / anything else last
+// Some Manufacturing categories carry the same classification label across
+// several `section`s that differ on an extra stipulation the wizard must ask
+// about: apprentices split by Year-12 completion (and adult apprentices), and
+// trainees split by age band. A category needs a "section" step whenever a
+// (classification, employment) pair appears in more than one section.
+function _manufCategoryNeedsSection(category) {
+    const rows = awardRates.rates.filter(r => r.category === category);
+    const seen = Object.create(null);
+    for (const r of rows) {
+        const k = r.classification + '||' + r.employment_type;
+        if (seen[k] && seen[k] !== r.section) return true;
+        seen[k] = r.section;
+    }
+    return false;
 }
-function _apprenticeSectionLabel(section) {
-    if (/adult apprentice/i.test(section)) return 'Adult apprentice';
-    if (/completed year 12/i.test(section)) return 'Completed Year 12';
-    if (/did not complete year 12/i.test(section)) return 'Did not complete Year 12';
+// Sort/label the section choices per category (Year-12 status for apprentices,
+// age band for trainees).
+function _manufSectionAge(section) {
+    if (/under 18/i.test(section)) return 17;
+    const m = section.match(/(\d+)\s+years of age/i);
+    return m ? parseInt(m[1], 10) : 99;
+}
+function _manufSectionOrder(category, section) {
+    if (category === 'apprentice') {
+        if (/did not complete year 12/i.test(section)) return 0;
+        if (/completed year 12/i.test(section)) return 1;
+        return 2; // adult apprentice last
+    }
+    if (category === 'trainee') return _manufSectionAge(section);
+    return 0;
+}
+function _manufSectionLabel(category, section) {
+    if (category === 'apprentice') {
+        if (/adult apprentice/i.test(section)) return 'Adult apprentice';
+        if (/completed year 12/i.test(section)) return 'Completed Year 12';
+        if (/did not complete year 12/i.test(section)) return 'Did not complete Year 12';
+    }
+    if (category === 'trainee') {
+        if (/under 18/i.test(section)) return 'Under 18 years';
+        const m = section.match(/(\d+)\s+years of age(\s+and over)?/i);
+        if (m) return m[1] + (m[2] ? ' years or over' : ' years');
+    }
     return section;
 }
-function _apprenticeSectionSublabel(section) {
-    if (/adult apprentice/i.test(section)) return '21 or older when the apprenticeship started';
-    if (/completed year 12/i.test(section)) return 'Year 12 (or equivalent) completed — higher minimum';
-    if (/did not complete year 12/i.test(section)) return 'Year 12 not completed';
+function _manufSectionSublabel(category, section) {
+    if (category === 'apprentice') {
+        if (/adult apprentice/i.test(section)) return '21 or older when the apprenticeship started';
+        if (/completed year 12/i.test(section)) return 'Year 12 (or equivalent) completed — higher minimum';
+        if (/did not complete year 12/i.test(section)) return 'Year 12 not completed';
+    }
+    if (category === 'trainee') {
+        return /technical field/i.test(section) ? 'Technical field / engineer / scientist stream' : 'Engineer / scientist stream';
+    }
     return '';
 }
 function _calcManufacturingSteps() {
     const catLabels = { adult: 'Adult — wages, professional & technical', apprentice: 'Apprentice', junior: 'Junior', trainee: 'Trainee', cadet: 'Cadet' };
     const empLabels = { full_time: 'Full-time / Part-time', casual: 'Casual' };
-    // Rows for the chosen category, narrowed to the chosen apprentice section
-    // (Year-12 status) when the category is apprentice.
+    // The chosen section only narrows rows for categories that need it.
+    const chosenSection = (data) => _manufCategoryNeedsSection(data.category) ? data.manufSection : null;
     const rowsFor = (data) => awardRates.rates.filter(r =>
-        r.category === data.category &&
-        (data.category !== 'apprentice' || !data.apprenticeSection || r.section === data.apprenticeSection));
+        r.category === data.category && (!chosenSection(data) || r.section === chosenSection(data)));
     return [
         { key: 'category', title: 'Which classification group?', options: function () {
             return Object.keys(catLabels)
                 .filter(c => awardRates.rates.some(r => r.category === c))
                 .map(c => ({ value: c, label: catLabels[c] }));
         }},
-        { key: 'apprenticeSection', title: 'Has the apprentice completed Year 12?',
-          visibleWhen: (data) => data.category === 'apprentice',
-          options: function () {
-            return [...new Set(awardRates.rates.filter(r => r.category === 'apprentice').map(r => r.section))]
-                .sort((a, b) => _apprenticeSectionOrder(a) - _apprenticeSectionOrder(b))
-                .map(s => ({ value: s, label: _apprenticeSectionLabel(s), sublabel: _apprenticeSectionSublabel(s) }));
+        { key: 'manufSection',
+          title: (data) => data.category === 'trainee' ? 'What is the trainee’s age?' : 'Has the apprentice completed Year 12?',
+          visibleWhen: (data) => _manufCategoryNeedsSection(data.category),
+          options: function (data) {
+            return [...new Set(awardRates.rates.filter(r => r.category === data.category).map(r => r.section))]
+                .sort((a, b) => _manufSectionOrder(data.category, a) - _manufSectionOrder(data.category, b))
+                .map(s => ({ value: s, label: _manufSectionLabel(data.category, s), sublabel: _manufSectionSublabel(data.category, s) }));
         }},
         { key: 'manufClass', title: 'Which classification?', options: function (data) {
             return [...new Set(rowsFor(data).map(r => r.classification))].map(l => ({ value: l, label: l }));
@@ -14067,6 +14113,7 @@ function renderCalculatorStep() {
     const step = currentCalculatorSteps[currentWizardStep - 1];
     if (!step) return;
     const opts = (typeof step.options === 'function') ? step.options(wizardData) : step.options;
+    const stepTitle = (typeof step.title === 'function') ? step.title(wizardData) : step.title;
     const _visibleIdx = currentCalculatorSteps.map((s, i) => i).filter(i => _calcStepVisible(i));
     const total = _visibleIdx.length || currentCalculatorSteps.length;
     const _ordinal = Math.max(1, _visibleIdx.indexOf(currentWizardStep - 1) + 1);
@@ -14076,7 +14123,7 @@ function renderCalculatorStep() {
     if (opts.length > 12) {
         // Long option sets (e.g. Manufacturing classifications) render as a dropdown;
         // shorter sets (roles, experience, hours) stay as tap-friendly buttons.
-        body = disc + `<h3 class="text-lg font-bold text-white mb-4">${_fwEscapeHtml(step.title)}</h3>` +
+        body = disc + `<h3 class="text-lg font-bold text-white mb-4">${_fwEscapeHtml(stepTitle)}</h3>` +
             `<select id="calcStepSelect" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white mb-4">` +
             opts.map(o => `<option value="${_fwEscapeHtml(o.value)}">${_fwEscapeHtml(o.label)}</option>`).join('') +
             `</select>` +
@@ -14113,10 +14160,11 @@ function wizardSelectAnswer(key) {
 
 // Manufacturing resolver — returns the shared result-card shape.
 function resolveManufacturingRate(data) {
-    // Apprentice classifications repeat across sections (Year-12 status), so the
-    // section chosen in the wizard is part of the key for apprentices.
+    // Apprentice (Year-12 status) and trainee (age band) classifications repeat
+    // across sections, so the chosen section is part of the key for them.
+    const chosen = _manufCategoryNeedsSection(data.category) ? data.manufSection : null;
     const entry = awardRates.rates.find(r => r.category === data.category && r.classification === data.manufClass && r.employment_type === data.employment
-        && (data.category !== 'apprentice' || !data.apprenticeSection || r.section === data.apprenticeSection));
+        && (!chosen || r.section === chosen));
     if (!entry) {
         return { award: awardRates.award_name, level: 'Rate not found', rate: 0,
             penalties: ['No rate found for that combination.'], nextSteps: ['Contact Fitz HR support'] };
@@ -14138,8 +14186,8 @@ function resolveManufacturingRate(data) {
     if (data.employment === 'casual') {
         penalties.push('Casual rate already includes the 25% loading; confirm casual penalty interactions against the award.');
     }
-    const levelLabel = (data.category === 'apprentice' && data.apprenticeSection)
-        ? `${data.manufClass} — ${_apprenticeSectionLabel(data.apprenticeSection)}`
+    const levelLabel = chosen
+        ? `${data.manufClass} — ${_manufSectionLabel(data.category, chosen)}`
         : data.manufClass;
     return { award: awardRates.award_name, level: levelLabel, rate: rate, weeklyRate: entry.weekly_rate || null,
         rateLabel: data.employment === 'casual' ? 'Casual Rate (per hour)' : 'Base Rate (per hour)',
