@@ -32,6 +32,7 @@ const VERTICALS = {
     audience: 'Australian manufacturers, workshops and production facilities',
     industry: 'manufacturing business',
     titleIndustry: 'Manufacturers',
+    shortIndustry: 'Manufacturers', descWho: 'manufacturers',
     heroWord: 'grinder operator',
     heroHook: 'A {word} walks off mid-shift. Fitz tells you exactly what the Manufacturing Award requires.',
     coverage: 'general manufacturing, engineering, food and beverage processing, and associated production and maintenance work. It does not cover vehicle manufacturing (a separate award).',
@@ -53,6 +54,7 @@ const VERTICALS = {
     audience: 'NDIS providers, community services, home care and disability support organisations',
     industry: 'community services provider',
     titleIndustry: 'Community Services & NDIS Providers',
+    shortIndustry: 'Community Services', descWho: 'community services',
     heroWord: 'support worker',
     heroHook: 'A {word} calls in for a sleepover shift. Fitz tells you exactly what SCHADS requires.',
     coverage: 'social and community services, home care, disability services (including NDIS), family day care and crisis accommodation.',
@@ -74,6 +76,7 @@ const VERTICALS = {
     audience: 'Australian retail stores, shops and retail chains',
     industry: 'retail business',
     titleIndustry: 'Retailers',
+    shortIndustry: 'Retailers', descWho: 'retailers',
     heroWord: 'sales assistant',
     heroHook: 'A {word} no-shows on a Sunday trade day. Fitz tells you exactly what the Retail Award requires.',
     coverage: 'general retail trade. It does not cover hair and beauty, pharmacy, fast food, or businesses covered by a more specific award.',
@@ -95,6 +98,7 @@ const VERTICALS = {
     audience: 'private practices, allied health, dental, pathology and medical support employers',
     industry: 'health practice',
     titleIndustry: 'Health Practices',
+    shortIndustry: 'Health Practices', descWho: 'health practices',
     heroWord: 'dental assistant',
     heroHook: 'A {word} asks about weekend rates. Fitz tells you exactly what the Health Professionals Award requires.',
     coverage: 'private-sector health professionals and health support services — including allied health, dental assistants, pathology collectors and medical administration.',
@@ -116,6 +120,7 @@ const VERTICALS = {
     audience: 'long day care, preschools, kindergartens and outside-school-hours care providers',
     industry: 'childcare service',
     titleIndustry: 'Childcare & OSHC',
+    shortIndustry: 'Childcare & OSHC', descWho: 'childcare',
     heroWord: 'educator',
     heroHook: "An {word} calls in sick and ratios are tight. Fitz tells you exactly what the Children's Services Award requires.",
     coverage: 'long day care, preschools and kindergartens, outside-school-hours care, and other children’s services.',
@@ -387,8 +392,8 @@ function landingPage(v) {
   const c = VERTICALS[v]; const data = load(c.file);
   const url = `${SITE}/${v}`;
   const heroWordHtml = c.heroHook.replace('{word}', `<em>${esc(c.heroWord)}</em>`);
-  const title = `HR & Compliance Software for ${c.titleIndustry} — ${c.awardShort} | Fitz HR`;
-  const description = `Award-aware HR & compliance software for ${c.audience}. Instant answers grounded in the ${c.awardShort} (${c.code}) — pay rates, penalties, allowances — plus a document builder and Crisis Mode. Free to start.`;
+  const title = `${c.awardShort} HR Compliance Software | Fitz HR`;
+  const description = `Award-aware HR software for ${c.descWho}. Instant ${c.awardShort} answers on pay, penalties, allowances & documents — grounded in ${c.code}.`;
   const keywords = `HR software for ${c.industry}, HR compliance software ${c.titleIndustry.toLowerCase()}, ${c.awardShort} software, ${c.awardShort} compliance, ${c.code} pay rates, HR software Australia ${c.industry}`;
   const faqs = [
     { q: `What does Fitz HR do for a ${c.industry}?`, a: `Fitz answers ${c.awardShort} (${c.code}) questions instantly — pay rates, penalties, allowances, minimum engagement, classifications and compliance — grounded in the current Fair Work Ombudsman Pay Guide. It also builds documents and runs a Crisis Mode for urgent situations.` },
@@ -463,8 +468,8 @@ ${footer()}`;
 function payRatesPage(v) {
   const c = VERTICALS[v]; const data = load(c.file);
   const url = `${SITE}/${v}-award-pay-rates`;
-  const title = `${c.awardShort} Pay Rates 2026 — ${c.code} Hourly & Penalty Rates | Fitz HR`;
-  const description = `${c.awardShort} (${c.code}) pay rates current as at ${data.effective_date} — classification hourly and weekly rates, Saturday/Sunday/public holiday penalties, casual loading and allowances from the FWO Pay Guide.`;
+  const title = `${c.awardShort} Pay Rates 2026 | Fitz HR`;
+  const description = `${c.awardShort} (${c.code}) pay rates — hourly and weekly rates, weekend and public holiday penalties, casual loading and allowances.`;
   const faqs = [
     { q: `What are the ${c.awardShort} pay rates in 2026?`, a: `The ${c.awardFull} minimum rates are current as at ${data.effective_date} (next review ${data.next_review_date}). Full-time classification rates, penalty rates and allowances are listed above; casual employees receive a ${pct(data.casual_loading)} loading.` },
     { q: `What penalty rates apply under ${c.code}?`, a: `Weekend and public holiday penalties are shown in the penalties table above, expressed as a percentage of the ordinary hourly rate. Casual penalty percentages are all-inclusive of the ${pct(data.casual_loading)} casual loading.` },
@@ -520,8 +525,8 @@ ${footer()}`;
 function guidePage(v) {
   const c = VERTICALS[v]; const data = load(c.file);
   const url = `${SITE}/${v}-award-guide`;
-  const title = `${c.awardShort} Guide — ${c.code} Complete Reference (2026) | Fitz HR`;
-  const description = `${c.code} ${c.awardShort} guide — coverage, classifications, penalty rates, allowances, minimum engagement and Fair Work compliance for ${c.audience}.`;
+  const title = `${c.awardShort} Guide 2026 (${c.code}) | Fitz HR`;
+  const description = `${c.awardShort} (${c.code}) guide — coverage, classifications, penalty rates, allowances, minimum engagement and Fair Work compliance.`;
   const me = Object.entries(data.minimum_engagement || {}).filter(([, x]) => typeof x === 'number')
     .map(([k, x]) => `<li><strong>${esc(k.replace(/_/g, ' '))}:</strong> ${x} hours minimum per shift</li>`).join('');
   const faqs = [
@@ -591,8 +596,8 @@ ${footer()}`;
 function vsEmploymentHeroPage(v) {
   const c = VERTICALS[v]; const data = load(c.file);
   const url = `${SITE}/compare/fitz-hr-vs-employment-hero-${v}`;
-  const title = `Fitz HR vs Employment Hero for ${c.awardShort} (2026) | Fitz HR`;
-  const description = `Fitz HR vs Employment Hero for ${c.audience}. How the two compare on ${c.awardShort} (${c.code}) accuracy, award-grounded answers, document building and price.`;
+  const title = `Fitz HR vs Employment Hero for ${c.awardShort}`;
+  const description = `Fitz HR vs Employment Hero for the ${c.awardShort} (${c.code}): compare award accuracy, grounded answers, documents and price.`;
   const rows = [
     ['Built for the ' + c.awardShort, `Purpose-built cluster + ${c.code}-grounded answers`, 'General HR platform; award content is generic'],
     ['Instant award answers', 'Yes — grounded in the current FWO Pay Guide', 'Limited; often points to external resources'],
@@ -650,8 +655,8 @@ ${footer()}`;
 function bestHrSoftwarePage(v) {
   const c = VERTICALS[v]; const data = load(c.file);
   const url = `${SITE}/compare/best-hr-software-${v}-australia`;
-  const title = `Best HR & Compliance Software for ${c.titleIndustry} in Australia (2026) | Fitz HR`;
-  const description = `Choosing HR & compliance software for ${c.audience}? What to look for, why award-aware matters under the ${c.awardShort} (${c.code}), and how Fitz HR compares to generic HR platforms.`;
+  const title = `Best HR Software for ${c.shortIndustry} Australia | Fitz HR`;
+  const description = `Choosing HR software for ${c.descWho}? Why award-aware matters under the ${c.awardShort} (${c.code}), and how Fitz HR compares.`;
   const keywords = `best HR software for ${c.industry}, HR compliance software ${c.titleIndustry.toLowerCase()}, HR software Australia ${c.industry}, ${c.awardShort} software, ${c.awardShort} compliance software, payroll compliance ${c.industry}`;
   const rows = [
     ['Grounded in the ' + c.awardShort, `Yes — every answer cites ${c.code} from the current FWO Pay Guide`, 'Generic HR content; award detail is shallow or absent'],
