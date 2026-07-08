@@ -13638,22 +13638,53 @@ function _calcHoursStep(code) {
         { value: 'public-holiday',  label: 'Public Holidays',              sublabel: 'Highest penalty rates' }
     ]};
 }
+// Manufacturing apprentice pay depends on whether the apprentice has completed
+// Year 12 (and whether they are an adult apprentice). Those variants live in the
+// rates JSON as separate `section`s with identical classification labels, so the
+// wizard asks a Year-12 question for apprentices to pick the correct row.
+function _apprenticeSectionOrder(section) {
+    if (/did not complete year 12/i.test(section)) return 0;
+    if (/completed year 12/i.test(section)) return 1;
+    return 2; // adult apprentice / anything else last
+}
+function _apprenticeSectionLabel(section) {
+    if (/adult apprentice/i.test(section)) return 'Adult apprentice';
+    if (/completed year 12/i.test(section)) return 'Completed Year 12';
+    if (/did not complete year 12/i.test(section)) return 'Did not complete Year 12';
+    return section;
+}
+function _apprenticeSectionSublabel(section) {
+    if (/adult apprentice/i.test(section)) return '21 or older when the apprenticeship started';
+    if (/completed year 12/i.test(section)) return 'Year 12 (or equivalent) completed — higher minimum';
+    if (/did not complete year 12/i.test(section)) return 'Year 12 not completed';
+    return '';
+}
 function _calcManufacturingSteps() {
     const catLabels = { adult: 'Adult — wages, professional & technical', apprentice: 'Apprentice', junior: 'Junior', trainee: 'Trainee', cadet: 'Cadet' };
     const empLabels = { full_time: 'Full-time / Part-time', casual: 'Casual' };
+    // Rows for the chosen category, narrowed to the chosen apprentice section
+    // (Year-12 status) when the category is apprentice.
+    const rowsFor = (data) => awardRates.rates.filter(r =>
+        r.category === data.category &&
+        (data.category !== 'apprentice' || !data.apprenticeSection || r.section === data.apprenticeSection));
     return [
         { key: 'category', title: 'Which classification group?', options: function () {
             return Object.keys(catLabels)
                 .filter(c => awardRates.rates.some(r => r.category === c))
                 .map(c => ({ value: c, label: catLabels[c] }));
         }},
+        { key: 'apprenticeSection', title: 'Has the apprentice completed Year 12?',
+          visibleWhen: (data) => data.category === 'apprentice',
+          options: function () {
+            return [...new Set(awardRates.rates.filter(r => r.category === 'apprentice').map(r => r.section))]
+                .sort((a, b) => _apprenticeSectionOrder(a) - _apprenticeSectionOrder(b))
+                .map(s => ({ value: s, label: _apprenticeSectionLabel(s), sublabel: _apprenticeSectionSublabel(s) }));
+        }},
         { key: 'manufClass', title: 'Which classification?', options: function (data) {
-            const inCat = awardRates.rates.filter(r => r.category === data.category);
-            return [...new Set(inCat.map(r => r.classification))].map(l => ({ value: l, label: l }));
+            return [...new Set(rowsFor(data).map(r => r.classification))].map(l => ({ value: l, label: l }));
         }},
         { key: 'employment', title: 'What type of employment?', options: function (data) {
-            const emps = [...new Set(awardRates.rates.filter(r => r.category === data.category).map(r => r.employment_type))];
-            return emps.map(e => ({ value: e, label: empLabels[e] || e }));
+            return [...new Set(rowsFor(data).map(r => r.employment_type))].map(e => ({ value: e, label: empLabels[e] || e }));
         }}
     ];
 }
@@ -14016,11 +14047,29 @@ function startAwardCalculator() {
     renderCalculatorStep();
 }
 
+// A step may declare visibleWhen(data) so it only appears for certain earlier
+// answers — e.g. the Manufacturing apprentice "completed Year 12?" question is
+// only relevant when the apprentice classification group is chosen. Steps
+// without visibleWhen are always shown (unchanged behaviour for every award).
+function _calcStepVisible(i) {
+    const s = currentCalculatorSteps[i];
+    return !!s && (typeof s.visibleWhen !== 'function' || s.visibleWhen(wizardData));
+}
+// Nearest visible step index (0-based) walking `dir` (+1 forward / -1 back)
+// from the current step; returns an out-of-range index when none remain.
+function _calcNextVisibleStep(dir) {
+    let i = (currentWizardStep - 1) + dir;
+    while (i >= 0 && i < currentCalculatorSteps.length && !_calcStepVisible(i)) i += dir;
+    return i;
+}
+
 function renderCalculatorStep() {
     const step = currentCalculatorSteps[currentWizardStep - 1];
     if (!step) return;
     const opts = (typeof step.options === 'function') ? step.options(wizardData) : step.options;
-    const total = currentCalculatorSteps.length;
+    const _visibleIdx = currentCalculatorSteps.map((s, i) => i).filter(i => _calcStepVisible(i));
+    const total = _visibleIdx.length || currentCalculatorSteps.length;
+    const _ordinal = Math.max(1, _visibleIdx.indexOf(currentWizardStep - 1) + 1);
     const disc = _calcConfig && _calcConfig.disclaimer
         ? `<div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4 text-xs text-amber-300">${_calcConfig.disclaimer}</div>` : '';
     let body;
@@ -14045,8 +14094,8 @@ function renderCalculatorStep() {
     if (stepsDiv) stepsDiv.innerHTML = `<div class="wizard-step" data-step="${currentWizardStep}">${body}</div>`;
 
     const stepNumEl = document.getElementById('wizardCurrentStep');
-    if (stepNumEl) stepNumEl.textContent = currentWizardStep;
-    const pct = Math.round((currentWizardStep / total) * 100);
+    if (stepNumEl) stepNumEl.textContent = _ordinal;
+    const pct = Math.round((_ordinal / total) * 100);
     const progEl = document.getElementById('wizardProgress');
     if (progEl) progEl.textContent = `${pct}% Complete`;
     const barEl = document.getElementById('wizardProgressBar');
@@ -14064,7 +14113,10 @@ function wizardSelectAnswer(key) {
 
 // Manufacturing resolver — returns the shared result-card shape.
 function resolveManufacturingRate(data) {
-    const entry = awardRates.rates.find(r => r.category === data.category && r.classification === data.manufClass && r.employment_type === data.employment);
+    // Apprentice classifications repeat across sections (Year-12 status), so the
+    // section chosen in the wizard is part of the key for apprentices.
+    const entry = awardRates.rates.find(r => r.category === data.category && r.classification === data.manufClass && r.employment_type === data.employment
+        && (data.category !== 'apprentice' || !data.apprenticeSection || r.section === data.apprenticeSection));
     if (!entry) {
         return { award: awardRates.award_name, level: 'Rate not found', rate: 0,
             penalties: ['No rate found for that combination.'], nextSteps: ['Contact Fitz HR support'] };
@@ -14086,7 +14138,10 @@ function resolveManufacturingRate(data) {
     if (data.employment === 'casual') {
         penalties.push('Casual rate already includes the 25% loading; confirm casual penalty interactions against the award.');
     }
-    return { award: awardRates.award_name, level: data.manufClass, rate: rate, weeklyRate: entry.weekly_rate || null,
+    const levelLabel = (data.category === 'apprentice' && data.apprenticeSection)
+        ? `${data.manufClass} — ${_apprenticeSectionLabel(data.apprenticeSection)}`
+        : data.manufClass;
+    return { award: awardRates.award_name, level: levelLabel, rate: rate, weeklyRate: entry.weekly_rate || null,
         rateLabel: data.employment === 'casual' ? 'Casual Rate (per hour)' : 'Base Rate (per hour)',
         penalties: penalties, nextSteps: [
             'Confirm the classification against Schedule A of MA000010',
@@ -19527,8 +19582,12 @@ function getNestedRate(obj, path) {
 function wizardAnswer(question, answer) {
     wizardData[question] = answer;
 
-    if (currentWizardStep < currentCalculatorSteps.length) {
-        currentWizardStep++;
+    // Advance to the next *visible* step (some steps only apply to certain
+    // earlier answers, e.g. the apprentice Year-12 question). If none remain,
+    // the wizard is complete.
+    const nextIdx = _calcNextVisibleStep(1);
+    if (nextIdx < currentCalculatorSteps.length) {
+        currentWizardStep = nextIdx + 1;
         renderCalculatorStep();
     } else {
         showWizardResults();
@@ -19542,8 +19601,9 @@ function updateWizardStep() {
 
 // Go back in the calculator
 function wizardGoBack() {
-    if (currentWizardStep > 1) {
-        currentWizardStep--;
+    const prevIdx = _calcNextVisibleStep(-1);
+    if (prevIdx >= 0) {
+        currentWizardStep = prevIdx + 1;
         renderCalculatorStep();
     }
 }
