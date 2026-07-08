@@ -297,6 +297,39 @@ body.light-mode {
     font-weight: 700 !important;
 }
 
+/* Pale amber/yellow text (amber-200/300, yellow-300/400 and their opacity
+   variants) had NO light-mode override, so it rendered as faint yellow on
+   light backgrounds — e.g. the Award Wizard "Preview" banner. Force a dark,
+   high-contrast amber. */
+.light-mode .text-amber-100,
+.light-mode .text-amber-200,
+.light-mode .text-amber-300,
+.light-mode .text-amber-300\/70,
+.light-mode .text-amber-300\/80,
+.light-mode .text-amber-300\/90,
+.light-mode .text-amber-400\/80,
+.light-mode .text-orange-300,
+.light-mode .text-yellow-300,
+.light-mode .text-yellow-400 {
+    color: #b45309 !important;   /* amber-700 */
+    font-weight: 700 !important;
+}
+/* Hover states must not lighten the text in light mode. */
+.light-mode .hover\:text-amber-300:hover,
+.light-mode .hover\:text-yellow-300:hover {
+    color: #92400e !important;   /* amber-800 */
+}
+/* Amber/yellow info boxes turn light-blue in light mode with dark-navy child
+   text. Their OWN direct text (a text node on the box element itself, not a
+   child) — like the Award Wizard preview disclaimer — was missed by the
+   `.bg-amber-500/10 *` descendant rule. Colour it to match. `body.light-mode`
+   outranks the amber text rules above so the navy wins on the box element. */
+body.light-mode .bg-amber-500\/10,
+body.light-mode .bg-yellow-500\/10,
+body.light-mode .bg-amber-100 {
+    color: #1e3a8a !important;
+}
+
 /* FITZ LOGO - Keep consistent font-weight in both modes */
 .light-mode #headerTitle h1,
 .light-mode #headerTitle h1 span,
