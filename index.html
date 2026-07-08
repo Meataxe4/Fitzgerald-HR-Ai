@@ -181,10 +181,7 @@
         /* Slot machine hook — now the ONLY subtext under the h1 */
         .hero-hook { font-family: 'Playfair Display', serif; font-weight: 700; font-style: italic; font-size: 1.6rem; color: var(--w60); line-height: 1.3; margin-bottom: 2rem; opacity: 0; transform: translateY(14px); transition: opacity 0.7s 0.88s, transform 0.7s 0.88s cubic-bezier(0.16,1,0.3,1); }
         .hero-hook.in { opacity: 1; transform: translateY(0); }
-        .slot-wrap { display: inline-block; overflow: hidden; height: 1.25em; vertical-align: text-bottom; position: relative; transition: width 0.18s ease; }
-        .slot-drum { display: block; will-change: transform; }
-        .slot-word { display: block; height: 1.25em; line-height: 1.25; white-space: nowrap; color: var(--amber); font-style: italic; }
-        .hero-situation { transition: opacity 0.25s ease; }
+        .hero-role { color: var(--amber); font-style: italic; }
 
         .hero-ctas { opacity: 0; transform: translateY(14px); transition: opacity 0.7s 1.0s, transform 0.7s 1.0s cubic-bezier(0.16,1,0.3,1); }
         .hero-ctas.in { opacity: 1; transform: translateY(0); }
@@ -722,7 +719,7 @@
             <span class="h1-line"><span class="h1-inner">every business</span></span>
             <span class="h1-line"><span class="h1-inner"><em>deserves.</em></span></span>
         </h1>
-        <p class="hero-hook" id="heroHook">Your <span class="slot-wrap" id="slotWrap"><span class="slot-drum" id="slotDrum"><span class="slot-word">chef</span></span></span> <span class="hero-situation" id="heroSituation">is a no-show</span>. Fitz tells you exactly what to do.</p>
+        <p class="hero-hook" id="heroHook">Your <em class="hero-role" id="heroRole">chef</em> <span id="heroSituation">is a no-show</span>. Fitz tells you exactly what to do.</p>
         <div class="hero-ctas" id="heroCtas">
             <a href="/app" class="btn-primary"><span>Start Free — No Card Required</span><span class="arr">→</span></a>
             <a href="#pricing" class="btn-ghost">View Pricing ↓</a>
@@ -1458,11 +1455,9 @@ function toggleBilling(type) {
     });
 }
 
-/* SLOT MACHINE */
+/* HERO SCENARIO — pick one random example per page load; it fades in with the
+   rest of the hero (no slot-machine animation). */
 (function() {
-    // Industry-specific hero scenarios — the amber role drums, the situation swaps
-    // to match whichever award the drum lands on. Hospitality/Restaurant land on
-    // a no-show; every other award gets its own crisis.
     const scenarios = [
         // Hospitality (MA000009)
         { role: 'chef', situation: 'is a no-show' },
@@ -1488,67 +1483,17 @@ function toggleBilling(type) {
         { role: 'dental assistant', situation: 'disputes their weekend penalty rate' },
         { role: 'pathology collector', situation: 'wants to cash out annual leave' },
         { role: 'receptionist', situation: 'asks about their annualised salary' },
-        // Children’s Services (MA000120)
+        // Children\u2019s Services (MA000120)
         { role: 'educator', situation: 'calls in sick and your ratios are blown' },
         { role: 'room leader', situation: 'asks about the educational leader allowance' },
         { role: 'trainee', situation: 'is on probation and struggling' },
     ];
-    const roles = scenarios.map(s => s.role);
-    const wrap = document.getElementById('slotWrap');
-    const drum = document.getElementById('slotDrum');
-    if (!wrap || !drum) return;
-    let current = 0, spinning = false;
-    function measureWord(word) {
-        const hookEl = document.getElementById('heroHook');
-        const computed = hookEl ? window.getComputedStyle(hookEl).font : 'serif';
-        const t = document.createElement('span');
-        t.style.cssText = 'position:fixed;top:-9999px;left:-9999px;visibility:hidden;white-space:nowrap;font:'+computed+';font-style:italic;font-weight:700;';
-        t.textContent = word; document.body.appendChild(t);
-        const w = t.offsetWidth; document.body.removeChild(t); return w;
-    }
-    function rollOne(word, duration) {
-        return new Promise(resolve => {
-            const nextW = measureWord(word);
-            wrap.style.width = Math.max(wrap.offsetWidth, nextW) + 'px';
-            void wrap.offsetWidth;
-            const nextEl = document.createElement('span');
-            nextEl.className = 'slot-word'; nextEl.textContent = word;
-            drum.appendChild(nextEl);
-            drum.style.transition = `transform ${duration}ms cubic-bezier(0.4,0,0.15,1)`;
-            drum.style.transform = 'translateY(-1.25em)';
-            setTimeout(() => {
-                drum.style.transition = 'none'; drum.style.transform = 'translateY(0)';
-                if (drum.firstChild) drum.removeChild(drum.firstChild);
-                wrap.style.width = nextW + 'px'; resolve();
-            }, duration + 16);
-        });
-    }
-    async function spin() {
-        if (spinning) return; spinning = true;
-        let target = current;
-        while (target === current) target = Math.floor(Math.random() * scenarios.length);
-        const fastCount = 5 + Math.floor(Math.random() * 3);
-        const sequence = [];
-        for (let i = 0; i < fastCount; i++) sequence.push(roles[Math.floor(Math.random()*roles.length)]);
-        sequence.push(roles[Math.floor(Math.random()*roles.length)]);
-        sequence.push(roles[Math.floor(Math.random()*roles.length)]);
-        sequence.push(scenarios[target].role);
-        const durations = sequence.map((_,i) => {
-            const fe = sequence.length-1-i;
-            if(fe===0) return 480; if(fe===1) return 280; if(fe===2) return 170; return 95;
-        });
-        const sit = document.getElementById('heroSituation');
-        for (let i=0; i<sequence.length; i++) {
-            if (sit && i === sequence.length-1) sit.style.opacity = '0';   // fade out during the final slow roll
-            await rollOne(sequence[i], durations[i]);
-        }
-        if (sit) { sit.textContent = scenarios[target].situation; sit.style.opacity = '1'; }
-        current = target; spinning = false;
-    }
-    setTimeout(() => {
-        wrap.style.width = measureWord(roles[current]) + 'px';
-        spin(); setInterval(spin, 15000);
-    }, 1700);
+    const roleEl = document.getElementById('heroRole');
+    const sitEl = document.getElementById('heroSituation');
+    if (!roleEl || !sitEl) return;
+    const s = scenarios[Math.floor(Math.random() * scenarios.length)];
+    roleEl.textContent = s.role;
+    sitEl.textContent = s.situation;
 })();
 
 /* ============================================================
