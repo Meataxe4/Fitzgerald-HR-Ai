@@ -3,10 +3,11 @@
 Announces that Fitz HR has grown from 2 awards (Hospitality + Restaurant) to **7 modern
 awards**, broadening the audience well beyond hospitality. Checklist / reveal template.
 
-- **Build:** `python3 scripts/setup_fonts.py && python3 scripts/build_newawards_cards.py`
+- **Build cards:** `python3 scripts/setup_fonts.py && python3 scripts/build_newawards_cards.py`
 - **Cards:** `marketing/reel-cards-new-awards/` (SVG + `preview/` PNGs)
-- **Video:** `marketing/exports/fitz-hr-new-awards-reel.mp4` (1080×1920, ~24s, locked/static, safe-zone compliant)
-- **Re-export:** `python3 scripts/build_reel_mp4.py marketing/reel-cards-new-awards/preview marketing/exports/fitz-hr-new-awards-reel.mp4 4.5`
+- **Video (ANIMATED):** `marketing/exports/fitz-hr-new-awards-reel.mp4` (1080×1920, ~17s, safe-zone compliant). Elements fade + rise in with stagger and the 7 awards **tick in one-by-one**, then hold locked — no drift.
+- **Re-export animated:** `python3 scripts/setup_fonts.py && cd scripts && python3 build_newawards_anim.py`
+- **Static fallback export:** `python3 scripts/build_reel_mp4.py marketing/reel-cards-new-awards/preview marketing/exports/fitz-hr-new-awards-reel.mp4 4.5`
 
 ## Slides
 0. **Hook** — "We just got bigger." · Fitz HR now covers 7 modern awards, not just 2
