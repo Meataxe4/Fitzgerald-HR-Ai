@@ -3,6 +3,8 @@
 icon(name, cx, cy, scale, stroke, sw) -> SVG string, drawn centered at (cx,cy)."""
 import math
 
+AMBER, INK = "#f59e0b", "#0f172a"
+
 def _teeth():
     out = []
     for k in range(8):
@@ -45,6 +47,13 @@ ICON_FOR = {
 }
 
 def icon(name, cx, cy, scale=1.0, stroke="#f59e0b", sw=6):
+    if name == "children":  # playful bouncy "ABC"
+        letters = [("A", -34, 22, -13, AMBER), ("B", -1, 10, 7, INK), ("C", 30, 24, 14, AMBER)]
+        inner = "".join(
+            f'<text x="{x}" y="{y}" transform="rotate({r} {x} {y})" '
+            f'font-family="Outfit,\'Helvetica Neue\',sans-serif" font-size="48" font-weight="800" '
+            f'fill="{col}" text-anchor="middle">{ch}</text>' for ch, x, y, r, col in letters)
+        return f'<g transform="translate({cx},{cy}) scale({scale})">{inner}</g>'
     shape = _SHAPES[name]
     return (f'<g transform="translate({cx},{cy}) scale({scale})" fill="none" '
             f'stroke="{stroke}" stroke-width="{sw/scale:.2f}" stroke-linecap="round" '
