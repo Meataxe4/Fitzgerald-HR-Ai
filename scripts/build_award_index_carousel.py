@@ -79,7 +79,7 @@ def cover():
             + f'<text x="{M}" y="470" class="pf" font-size="128" font-weight="900" fill="{INK}">Seven awards.</text>'
             + f'<text x="{M}" y="600" class="pf" font-size="128" font-weight="900" fill="{AMBER}">One platform.</text>'
             + "".join(f'<text x="{M}" y="{700+i*52}" class="bd" font-size="42" fill="{INK60}">{esc(l)}</text>'
-                      for i, l in enumerate(wrap("Every rate, penalty and classification — kept current with Fair Work.", ot(42), 860)))
+                      for i, l in enumerate(wrap("Every rate, allowance and working condition — kept current with Fair Work.", ot(42), 860)))
             + f'<text x="{M}" y="900" class="ti" font-size="34" font-weight="800" fill="{INK}" letter-spacing="4">SWIPE THE INDEX  →</text>'
             + footer())
     return shell(body)

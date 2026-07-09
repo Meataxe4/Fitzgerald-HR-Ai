@@ -70,7 +70,7 @@ def cover():
              f'<text x="{MX}" y="660" class="pf" font-size="128" font-weight="900" fill="{INK}">Seven awards.</text>'
              f'<text x="{MX}" y="790" class="pf" font-size="128" font-weight="900" fill="{AMBER}">One platform.</text>')
     sub = "".join(f'<text x="{MX}" y="{900+i*56}" class="bd" font-size="44" fill="{INK60}">{esc(l)}</text>'
-                  for i, l in enumerate(wrap("Every rate, penalty and classification — kept current with Fair Work.", 860)))
+                  for i, l in enumerate(wrap("Every rate, allowance and working condition — kept current with Fair Work.", 860)))
     tag = f'<text x="{MX}" y="1480" class="ti" font-size="36" font-weight="800" fill="{INK}" letter-spacing="5">SWIPE THE INDEX  →</text>'
     return base, [(title, 0.15, 40), (sub, 0.5, 32), (tag, 0.8, 24)]
 
