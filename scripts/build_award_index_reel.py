@@ -66,12 +66,12 @@ def cover():
     base = _svg(f'<rect width="1080" height="1920" fill="{CREAM}"/>'
                 f'<text x="1010" y="1120" class="pf" font-size="820" font-weight="900" fill="{AMBER}" opacity="0.08" text-anchor="end">7</text>'
                 + wm() + f'<rect x="{MX}" y="340" width="{MR-MX}" height="2" fill="{RULE}"/>')
-    title = (f'<text x="{MX}" y="500" class="ti" font-size="36" font-weight="800" fill="{AMBER}" letter-spacing="8">THE AWARD INDEX</text>'
-             f'<text x="{MX}" y="660" class="pf" font-size="128" font-weight="900" fill="{INK}">Seven awards.</text>'
-             f'<text x="{MX}" y="790" class="pf" font-size="128" font-weight="900" fill="{AMBER}">One platform.</text>')
+    title = (f'<text x="{MX}" y="500" class="ti" font-size="36" font-weight="800" fill="{AMBER}" letter-spacing="8">BIG NEWS</text>'
+             f'<text x="{MX}" y="660" class="pf" font-size="128" font-weight="900" fill="{INK}">We just</text>'
+             f'<text x="{MX}" y="790" class="pf" font-size="128" font-weight="900" fill="{AMBER}">got bigger.</text>')
     sub = "".join(f'<text x="{MX}" y="{900+i*56}" class="bd" font-size="44" fill="{INK60}">{esc(l)}</text>'
-                  for i, l in enumerate(wrap("Every rate, allowance and working condition — kept current with Fair Work.", 860)))
-    tag = f'<text x="{MX}" y="1480" class="ti" font-size="36" font-weight="800" fill="{INK}" letter-spacing="5">SWIPE THE INDEX  →</text>'
+                  for i, l in enumerate(wrap("Fitz HR now covers 7 modern awards — not just 2.", 860)))
+    tag = f'<text x="{MX}" y="1480" class="ti" font-size="36" font-weight="800" fill="{INK}" letter-spacing="5">SEE THE FULL LIST  →</text>'
     return base, [(title, 0.15, 40), (sub, 0.5, 32), (tag, 0.8, 24)]
 
 def index_card():
