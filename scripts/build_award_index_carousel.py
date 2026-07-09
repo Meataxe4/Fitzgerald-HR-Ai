@@ -7,6 +7,7 @@ Run: python3 scripts/setup_fonts.py && python3 scripts/build_award_index_carouse
 """
 import os
 from PIL import ImageFont
+from reel_icons import icon, ICON_FOR
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "marketing", "carousel-award-index")
 FONTDIR = "/usr/share/fonts/truetype/reel"
@@ -96,10 +97,14 @@ def award_card(idx, name, code, sector, is_new):
     code_svg = f'<text x="{M}" y="{code_y:.0f}" class="ti" font-size="46" font-weight="800" fill="{AMBER}">{code}</text>'
     sect_svg = "".join(
         f'<text x="{M}" y="{code_y+80+i*50:.0f}" class="bd" font-size="42" fill="{INK60}">{esc(l)}</text>'
-        for i, l in enumerate(wrap(sector, ot(42), 820)))
-    pill = new_pill(1080 - M - 118, 300) if is_new else ""
+        for i, l in enumerate(wrap(sector, ot(42), 780)))
+    # sector icon in a thin ring, top-right
+    ring_cx, ring_cy = 1080 - M - 78, 336
+    badge = (f'<circle cx="{ring_cx}" cy="{ring_cy}" r="84" fill="none" stroke="{RULE}" stroke-width="2"/>'
+             + icon(ICON_FOR[code], ring_cx, ring_cy, scale=1.25, stroke=AMBER, sw=6))
+    pill = new_pill(1080 - M - 118, int(code_y)) if is_new else ""
     body = (f'<rect width="1080" height="1080" fill="{CREAM}"/>{numeral}'
-            + header(f"{idx:02d} / 07") + label + pill + name_svg + code_svg + sect_svg + footer())
+            + header(f"{idx:02d} / 07") + label + badge + pill + name_svg + code_svg + sect_svg + footer())
     return shell(body)
 
 def cta():

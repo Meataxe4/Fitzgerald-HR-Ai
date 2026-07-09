@@ -8,6 +8,10 @@ watermarks) — still on brand (navy ink + amber accent, Fitz voice).
 - **Build:** `python3 scripts/setup_fonts.py && python3 scripts/build_award_index_carousel.py`
 - **Slides:** `marketing/carousel-award-index/` (SVG + `preview/` PNGs) — upload the PNGs in order `card-00 … card-08`
 - **Format:** 1080×1080 (square feed carousel, not a reel)
+- **Sector icons:** each award card carries a line glyph in a thin ring (coffee cup, fork & knife, shopping bag, gear, heart, medical cross, balloon) — shared with the reel via `scripts/reel_icons.py`.
+
+## Matching reel (a set)
+`marketing/exports/fitz-hr-award-index-reel.mp4` — a **light-theme 9:16 animated reel** in the same editorial style (cream, serif, icons). Cover → the 7 awards tick in → navy CTA. Build: `python3 scripts/build_award_index_reel.py`. Post the carousel to the feed and the reel to Reels so they read as one campaign.
 
 ## Slides
 0. **Cover** — "The Award Index · Seven awards. One platform."
