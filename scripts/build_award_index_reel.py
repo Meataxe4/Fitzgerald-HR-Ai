@@ -90,7 +90,7 @@ def cta():
     title = (f'<text x="{MX}" y="780" class="pf" font-size="128" font-weight="900" fill="#ffffff">Find your</text>'
              f'<text x="{MX}" y="916" class="pf" font-size="128" font-weight="900" fill="{AMBER}">award.</text>')
     sub = "".join(f'<text x="{MX}" y="{1040+i*54}" class="bd" font-size="44" fill="rgba(255,255,255,0.72)">{esc(l)}</text>'
-                  for i, l in enumerate(wrap("Exact legal rates for every classification, shift and penalty — free.", 880)))
+                  for i, l in enumerate(wrap("The exact rates, allowances and conditions for every classification and shift — free.", 880)))
     btn = (f'<rect x="{MX}" y="1320" width="888" height="140" rx="70" fill="{AMBER}"/>'
            f'<text x="{MX+444}" y="1408" class="ti" font-size="46" font-weight="800" fill="{INK}" text-anchor="middle">Check a rate free  →  fitzhr.com</text>')
     return base, [(title, 0.12, 40), (sub, 0.42, 30), (btn, 0.66, 46)]

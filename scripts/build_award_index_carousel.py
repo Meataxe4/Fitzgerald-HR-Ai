@@ -115,7 +115,7 @@ def cta():
             + f'<text x="{M}" y="500" class="pf" font-size="132" font-weight="900" fill="#ffffff">Find your</text>'
             + f'<text x="{M}" y="636" class="pf" font-size="132" font-weight="900" fill="{AMBER}">award.</text>'
             + "".join(f'<text x="{M}" y="{740+i*52}" class="bd" font-size="42" fill="rgba(255,255,255,0.72)">{esc(l)}</text>'
-                      for i, l in enumerate(wrap("Exact legal rates for every classification, shift and penalty — free.", ot(42), 880)))
+                      for i, l in enumerate(wrap("The exact rates, allowances and conditions for every classification and shift — free.", ot(42), 880)))
             + f'<rect x="{M}" y="900" width="888" height="140" rx="70" fill="{AMBER}"/>'
             + f'<text x="{M+444}" y="988" class="ti" font-size="46" font-weight="800" fill="{INK}" text-anchor="middle">Check a rate free  →  fitzhr.com</text>')
     return shell(body)
