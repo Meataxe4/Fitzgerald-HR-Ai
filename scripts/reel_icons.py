@@ -31,9 +31,11 @@ _SHAPES = {
         '<path d="M 0 26 C -26 6 -20 -18 0 -6 C 20 -18 26 6 0 26 Z"/>'),
     "health": (  # medical cross
         '<path d="M -8 -26 H 8 V -8 H 26 V 8 H 8 V 26 H -8 V 8 H -26 V -8 H -8 Z"/>'),
-    "children": (  # balloon
-        '<circle cx="0" cy="-8" r="16"/><path d="M -4 6 L 4 6 L 0 12 Z"/>'
-        '<path d="M 0 12 q 10 8 -2 18"/>'),
+    "children": (  # stacked toy blocks (early learning)
+        '<rect x="-28" y="0" width="26" height="26" rx="4"/>'
+        '<rect x="2" y="-26" width="26" height="26" rx="4"/>'
+        '<line x1="-19" y1="9" x2="-11" y2="9"/><line x1="-15" y1="5" x2="-15" y2="13"/>'
+        '<line x1="9" y1="-13" x2="21" y2="-13"/>'),
 }
 
 ICON_FOR = {
