@@ -17396,9 +17396,41 @@ function checkOnboardingStatus() {
 }
 
 function showOnboarding() {
+    // Preferred path: the interactive React onboarding (js/onboarding-react.js).
+    // It renders its own full-screen overlay, so the legacy modal stays hidden.
+    if (typeof window.mountFitzOnboarding === 'function') {
+        const legacy = document.getElementById('venueOnboardingModal');
+        if (legacy) legacy.classList.add('hidden');
+        window.mountFitzOnboarding({ mode: 'full' });
+        return;
+    }
+    // Fallback: legacy 6-step vanilla modal (used if React failed to load).
     document.getElementById('venueOnboardingModal').classList.remove('hidden');
     updateOnboardingStep();
 }
+
+// ── Bridge from the React onboarding into the existing profile pipeline ──────
+// The React flow collects the same fields the legacy modal did, then calls one
+// of these. Both funnel through completeOnboarding() so localStorage/Firebase
+// sync, rate loading and the welcome message are identical to before.
+function fitzOnboardingComplete(data) {
+    if (data && typeof data === 'object') {
+        ['userName', 'venueName', 'primaryAward', 'venueType', 'location', 'city', 'staffCount']
+            .forEach(function (k) { if (data[k] != null) venueProfile[k] = data[k]; });
+    }
+    completeOnboarding();
+}
+
+function fitzOnboardingAwardReselect(primaryAward) {
+    venueProfile.primaryAward = primaryAward;
+    onboardingAwardReselectOnly = false;
+    completeOnboarding();
+}
+
+// Expose for the React module (loaded as a separate classic script).
+window.fitzOnboardingComplete = fitzOnboardingComplete;
+window.fitzOnboardingAwardReselect = fitzOnboardingAwardReselect;
+window._orderedVenueOptionsForAward = _orderedVenueOptionsForAward;
 
 // Set when a previously-onboarded user is re-selecting only their award (because
 // their stored award is no longer supported). In that mode, picking an award
@@ -17472,6 +17504,14 @@ function awardNeedsReselection() {
 
 function promptAwardReselection() {
     onboardingAwardReselectOnly = true;
+    // Preferred path: React onboarding in award-only re-selection mode.
+    if (typeof window.mountFitzOnboarding === 'function') {
+        const legacy = document.getElementById('venueOnboardingModal');
+        if (legacy) legacy.classList.add('hidden');
+        window.mountFitzOnboarding({ mode: 'reselect', reselect: true });
+        return;
+    }
+    // Fallback: legacy modal jumped straight to the award step.
     onboardingCurrentStep = 2;
     showOnboarding();
     const note = document.getElementById('onboardingAwardReselectNote');
@@ -17682,7 +17722,9 @@ function completeOnboarding() {
     }, 300);
     
     document.getElementById('venueOnboardingModal').classList.add('hidden');
-    
+    // Close the React onboarding overlay if it was the active path.
+    if (typeof window.__fitzOnboardingUnmount === 'function') window.__fitzOnboardingUnmount();
+
     const venueType = getVenueTypeLabel(venueProfile.venueType);
     const userName = venueProfile.userName || 'there';
     const venueName = venueProfile.venueName || 'your venue';
