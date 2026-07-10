@@ -313,14 +313,12 @@
 
     var stepS = useState(reselect ? 1 : 0);
     var step = stepS[0], setStep = stepS[1];
-    var nameS = useState(''); var name = nameS[0], setName = nameS[1];
     var venueS = useState(''); var venue = venueS[0], setVenue = venueS[1];
     var awardS = useState(null); var awardId = awardS[0], setAwardId = awardS[1];
     var settingS = useState(null); var setting = settingS[0], setSetting = settingS[1];
     var otherS = useState(''); var otherSetting = otherS[0], setOtherSetting = otherS[1];
     var teamS = useState(null); var team = teamS[0], setTeam = teamS[1];
     var stateS = useState(null); var stateVal = stateS[0], setStateVal = stateS[1];
-    var cityS = useState(''); var city = cityS[0], setCity = cityS[1];
     var helpS = useState(false); var showHelp = helpS[0], setShowHelp = helpS[1];
 
     var award = AWARDS.find(function (a) { return a.id === awardId; }) || null;
@@ -335,8 +333,8 @@
 
     function go(n) { setStep(n); }
     function restart() {
-      setStep(0); setName(''); setVenue(''); setAwardId(null); setSetting(null);
-      setOtherSetting(''); setTeam(null); setStateVal(null); setCity(''); setShowHelp(false);
+      setStep(0); setVenue(''); setAwardId(null); setSetting(null);
+      setOtherSetting(''); setTeam(null); setStateVal(null); setShowHelp(false);
     }
 
     // Human label for the chosen setting (for the Ready summary).
@@ -349,12 +347,10 @@
     function finish() {
       if (typeof window.fitzOnboardingComplete === 'function') {
         window.fitzOnboardingComplete({
-          userName: name.trim(),
           venueName: venue.trim(),
           primaryAward: award.award,
           venueType: effSetting,
           location: stateVal,
-          city: city.trim(),
           staffCount: team
         });
       }
@@ -388,7 +384,7 @@
     var content = null;
 
     if (step === 0) {
-      var canStart = name.trim() && venue.trim();
+      var canStart = venue.trim();
       content = h('div', { style: { textAlign: 'center', maxWidth: 440, width: '100%', animation: 'fitzRise .5s ease both' } },
         h(Mascot, { size: 96, mode: 'float' }),
         h('h1', { style: { fontFamily: "'Playfair Display',serif", fontWeight: 900, fontSize: '2.1rem', lineHeight: 1.08, margin: '18px 0 10px', color: '#fff' } },
@@ -396,11 +392,6 @@
         h('p', { style: { color: 'var(--white-60)', fontSize: '1rem', lineHeight: 1.55, margin: '0 auto 22px', maxWidth: 360 } },
           'Three quick questions. After that, every answer, rate and document is grounded in your specific modern award — never a generic template.'),
         h('div', { style: { display: 'flex', flexDirection: 'column', gap: 10, textAlign: 'left', marginBottom: 22 } },
-          h('input', {
-            type: 'text', value: name, placeholder: 'Your name — e.g. Sarah Johnson',
-            onChange: function (e) { setName(e.target.value); },
-            style: fieldStyle
-          }),
           h('input', {
             type: 'text', value: venue, placeholder: 'Business name — e.g. The Golden Fork',
             onChange: function (e) { setVenue(e.target.value); },
@@ -503,7 +494,7 @@
           })
         ),
         h('div', { style: { fontFamily: "'DM Mono',monospace", fontSize: '0.56rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--white-30)', margin: '0 0 8px' } }, 'Which state?'),
-        h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 18 } },
+        h('div', { style: { display: 'flex', flexWrap: 'wrap', gap: 8 } },
           STATES.map(function (st) {
             var sel = stateVal === st;
             return h('button', {
@@ -516,12 +507,6 @@
             }, st);
           })
         ),
-        h('div', { style: { fontFamily: "'DM Mono',monospace", fontSize: '0.56rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--white-30)', margin: '0 0 8px' } }, 'City / suburb (optional)'),
-        h('input', {
-          type: 'text', value: city, placeholder: 'e.g. Newcastle',
-          onChange: function (e) { setCity(e.target.value); },
-          style: fieldStyle
-        }),
         h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 24 } },
           h(BackBtn, { onClick: function () { go(2); } }),
           h(PrimaryBtn, { disabled: !canBuild, onClick: function () { go(4); } }, 'Build my profile')
