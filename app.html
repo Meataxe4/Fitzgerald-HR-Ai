@@ -1609,13 +1609,6 @@
 
 <style>
     /* Award selection grid — the make-or-break onboarding pick */
-    .award-mascot {
-        flex: none; width: 2.5rem; height: 2.5rem;
-        display: inline-flex; align-items: center; justify-content: center;
-        font-size: 1.4rem; border-radius: 0.65rem;
-        background: rgba(245, 158, 11, 0.15);
-        border: 1px solid rgba(245, 158, 11, 0.4);
-    }
     .award-tagline {
         font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
         color: #64748b; font-weight: 600;
@@ -1662,11 +1655,39 @@
     .light-mode .award-card.selected .award-name { color: #b45309; }
     .light-mode .award-card--muted { background: transparent; border-color: #cbd5e1; }
     .light-mode .award-card--muted .award-name { color: #475569; }
+
+    /* Step 3 — most-common business quick-picks */
+    .venue-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    .venue-card {
+        position: relative; text-align: left;
+        padding: 0.85rem 0.9rem; border-radius: 0.7rem;
+        background: #334155; border: 2px solid transparent;
+        transition: transform .12s ease, background .12s ease, border-color .12s ease;
+        cursor: pointer;
+    }
+    .venue-card:hover { background: #3b4a63; transform: translateY(-1px); }
+    .venue-card:focus-visible { outline: 2px solid #f59e0b; outline-offset: 2px; }
+    .venue-card-label { font-weight: 600; color: #fff; font-size: 0.9rem; line-height: 1.2; display: block; padding-right: 1.1rem; }
+    .venue-card.selected {
+        border-color: #f59e0b; background: rgba(245, 158, 11, 0.12);
+        box-shadow: 0 0 0 1px #f59e0b inset;
+    }
+    .venue-card.selected .venue-card-label { color: #fbbf24; }
+    .venue-check {
+        position: absolute; top: 0.6rem; right: 0.7rem;
+        color: #f59e0b; font-weight: 700; opacity: 0; transition: opacity .12s;
+    }
+    .venue-card.selected .venue-check { opacity: 1; }
+    .light-mode .venue-card { background: #f1f5f9; }
+    .light-mode .venue-card:hover { background: #e2e8f0; }
+    .light-mode .venue-card-label { color: #0f172a; }
+    .light-mode .venue-card.selected { background: rgba(245, 158, 11, 0.18); }
+    .light-mode .venue-card.selected .venue-card-label { color: #b45309; }
 </style>
 <div id="venueOnboardingModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
     <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border-2 border-amber-500 fade-in max-h-[92vh] overflow-y-auto">
         <div class="text-center mb-6">
-            <div class="text-6xl mb-4">🏨</div>
+            <img src="/assets/fitz-neon-transparent.png" alt="Fitz HR" class="w-24 h-24 mx-auto mb-3 object-contain">
             <h2 class="text-3xl font-bold text-amber-500 mb-2">Let's Get to Know Your Business</h2>
             <p class="text-slate-300">This helps me give you tailored advice. Takes 2 minutes.</p>
         </div>
@@ -1705,10 +1726,7 @@
             </div>
 
             <div class="onboarding-step hidden" data-step="2">
-                <div class="flex items-center gap-3 mb-1">
-                    <span class="award-mascot">🤖</span>
-                    <h3 class="text-xl font-bold text-white">Which award covers most of your staff?</h3>
-                </div>
+                <h3 class="text-xl font-bold text-white mb-1">Which award covers most of your staff?</h3>
                 <p class="award-tagline mb-4">Everything Fitz tells you is grounded in this choice</p>
                 <div id="onboardingAwardReselectNote" class="hidden bg-red-500/10 border border-red-500/30 rounded-lg p-3 mb-4 text-sm text-red-300">
                     Your previous award selection is no longer supported. Please choose your award below to continue — Fitz needs this to give you accurate, award-specific advice.
@@ -1782,13 +1800,23 @@
             </div>
 
             <div class="onboarding-step hidden" data-step="3">
-                <h3 class="text-xl font-bold text-white mb-4">What type of business do you run?</h3>
-                <p id="onboardingVenueTypeHint" class="text-xs text-slate-400 mb-2 hidden"></p>
-                <select id="onboardingVenueType" class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white mb-4">
-                    <option value="">Select business type...</option>
-                </select>
-                <button onclick="saveOnboardingVenueType()"
-                        class="w-full bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg">
+                <h3 class="text-xl font-bold text-white mb-1">What type of business do you run?</h3>
+                <p id="onboardingVenueTypeHint" class="text-xs text-slate-400 mb-3 hidden"></p>
+
+                <!-- 4 most common business types for the selected award -->
+                <div id="onboardingVenueCommon" class="venue-grid"></div>
+
+                <!-- Other: everything else, via dropdown -->
+                <div class="mt-4">
+                    <label class="block text-slate-400 text-xs font-semibold uppercase tracking-wide mb-2">Other business type</label>
+                    <select id="onboardingVenueType" onchange="onOnboardingVenueOtherChange()"
+                            class="w-full bg-slate-700 border border-slate-600 rounded-lg px-4 py-3 text-white">
+                        <option value="">Other business type…</option>
+                    </select>
+                </div>
+
+                <button id="onboardingVenueNext" onclick="saveOnboardingVenueType()" disabled
+                        class="w-full mt-5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed">
                     Next →
                 </button>
             </div>

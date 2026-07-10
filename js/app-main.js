@@ -1192,6 +1192,45 @@ function populateVenueTypeDropdown(selectEl, awardName, currentValue) {
     selectEl.innerHTML = html;
 }
 
+// The four most common business types to feature as quick-pick cards on the
+// onboarding business-type step, per hospitality/restaurant award. The
+// industry-specific awards use the first four entries of their own curated
+// arrays (already ordered most-common first).
+const AWARD_COMMON_VENUES = {
+    'Hospitality Industry (General) Award': ['pub', 'bar', 'hotel-accommodation', 'function-centre'],
+    'Restaurant Industry Award': ['restaurant', 'cafe', 'bistro', 'bakery-cafe']
+};
+
+// Ordered [{value,label}] business-type options for an award, most-common
+// first. The first four become quick-pick cards; the remainder fill the
+// "Other business type" dropdown. Mirrors the industry gating in
+// populateVenueTypeDropdown so a user only ever sees their industry's types.
+function _orderedVenueOptionsForAward(awardName) {
+    if (isManufacturingAwardName(awardName)) return MANUFACTURING_VENUE_OPTIONS.slice();
+    if (isSchadsAwardName(awardName)) return SCHADS_VENUE_OPTIONS.slice();
+    if (isRetailAwardName(awardName)) return RETAIL_VENUE_OPTIONS.slice();
+    if (isHealthAwardName(awardName)) return HEALTH_VENUE_OPTIONS.slice();
+    if (isChildrensAwardName(awardName)) return CHILDRENS_VENUE_OPTIONS.slice();
+
+    const sortByLabel = (a, b) => a.label.localeCompare(b.label);
+    const primarySlugs = AWARD_VENUE_MAP[awardName];
+    if (primarySlugs && primarySlugs.length) {
+        const common = AWARD_COMMON_VENUES[awardName] || [];
+        const commonOpts = common
+            .map(slug => VENUE_OPTIONS.find(o => o.value === slug))
+            .filter(Boolean);
+        const restPrimary = VENUE_OPTIONS
+            .filter(o => primarySlugs.includes(o.value) && !common.includes(o.value))
+            .sort(sortByLabel);
+        const other = VENUE_OPTIONS
+            .filter(o => !primarySlugs.includes(o.value))
+            .sort(sortByLabel);
+        return commonOpts.concat(restPrimary, other);
+    }
+    // Unknown / "Not sure" award: whole list alphabetical.
+    return VENUE_OPTIONS.slice().sort(sortByLabel);
+}
+
 // ========================================
 // ADMIN ANALYTICS TRACKING
 // ========================================
@@ -17416,8 +17455,70 @@ function saveOnboardingLocation() {
     updateOnboardingStep();
 }
 
+// Business-type step uses the same select-then-confirm pattern as the award
+// step: the four most common types show as quick-pick cards, everything else
+// lives under the "Other business type" dropdown. Either path sets the pending
+// value and arms the Next button.
+let onboardingPendingVenueType = '';
+
+function _syncOnboardingVenueNext() {
+    const btn = document.getElementById('onboardingVenueNext');
+    if (btn) btn.disabled = !onboardingPendingVenueType;
+}
+
+function renderOnboardingVenueStep() {
+    const container = document.getElementById('onboardingVenueCommon');
+    const select = document.getElementById('onboardingVenueType');
+    if (!container || !select) return;
+
+    const opts = _orderedVenueOptionsForAward(venueProfile.primaryAward);
+    const common = opts.slice(0, 4);
+    const commonValues = common.map(o => o.value);
+    const rest = opts.filter(o => !commonValues.includes(o.value));
+
+    onboardingPendingVenueType = venueProfile.venueType || '';
+
+    container.innerHTML = common.map(o =>
+        `<button type="button" class="venue-card${o.value === onboardingPendingVenueType ? ' selected' : ''}" ` +
+        `onclick="selectOnboardingVenueCard(this, '${o.value}')">` +
+        `<span class="venue-card-label">${o.label}</span>` +
+        `<span class="venue-check" aria-hidden="true">✓</span></button>`
+    ).join('');
+
+    // "Other" dropdown holds everything that isn't a featured card.
+    let html = '<option value="">Other business type…</option>';
+    html += rest.map(o =>
+        `<option value="${o.value}"${o.value === onboardingPendingVenueType ? ' selected' : ''}>${o.label}</option>`
+    ).join('');
+    select.innerHTML = html;
+    // If the stored type is a featured card, keep the dropdown on its placeholder.
+    if (onboardingPendingVenueType && commonValues.includes(onboardingPendingVenueType)) {
+        select.value = '';
+    }
+
+    _syncOnboardingVenueNext();
+}
+
+function selectOnboardingVenueCard(el, value) {
+    onboardingPendingVenueType = value;
+    document.querySelectorAll('#onboardingVenueCommon .venue-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    const select = document.getElementById('onboardingVenueType');
+    if (select) select.value = '';   // clear "Other" when a card is chosen
+    _syncOnboardingVenueNext();
+}
+
+function onOnboardingVenueOtherChange() {
+    const select = document.getElementById('onboardingVenueType');
+    onboardingPendingVenueType = select ? select.value : '';
+    // A dropdown pick clears any highlighted card.
+    document.querySelectorAll('#onboardingVenueCommon .venue-card').forEach(c => c.classList.remove('selected'));
+    _syncOnboardingVenueNext();
+}
+
 function saveOnboardingVenueType() {
-    const venueType = document.getElementById('onboardingVenueType').value;
+    const venueType = onboardingPendingVenueType ||
+        (document.getElementById('onboardingVenueType') || {}).value || '';
     if (!venueType) {
         showAlert('Please select a business type');
         return;
@@ -17446,9 +17547,8 @@ function updateOnboardingStep() {
     }
 
     if (onboardingCurrentStep === 3) {
-        const select = document.getElementById('onboardingVenueType');
         const hint = document.getElementById('onboardingVenueTypeHint');
-        populateVenueTypeDropdown(select, venueProfile.primaryAward, venueProfile.venueType);
+        renderOnboardingVenueStep();
         if (hint) {
             if (isManufacturingAwardName(venueProfile.primaryAward)) {
                 hint.textContent = 'Select the type of manufacturing business you run.';
