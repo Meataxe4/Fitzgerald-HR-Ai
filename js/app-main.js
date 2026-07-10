@@ -2106,65 +2106,6 @@ function getAwardContext() {
     };
 }
 
-// Per-award signature tint + industry glyph for the confident award header.
-// The RGB triple is applied only as a faint surface wash (~6%) behind the
-// header and a small glyph chip — amber stays the one interactive accent, so
-// the tint never competes with buttons, links or focus states.
-const AWARD_TINTS = {
-    MA000009: { rgb: '200, 150, 62',  glyph: '🍸', short: 'Hospitality (General)' },
-    MA000119: { rgb: '198, 95, 62',   glyph: '🍽️', short: 'Restaurant' },
-    MA000010: { rgb: '139, 109, 176', glyph: '🏭', short: 'Manufacturing' },
-    MA000100: { rgb: '62, 158, 200',  glyph: '🤝', short: 'SCHADS' },
-    MA000004: { rgb: '79, 107, 208',  glyph: '🛍️', short: 'General Retail' },
-    MA000027: { rgb: '62, 176, 138',  glyph: '🩺', short: 'Health Professionals' },
-    MA000120: { rgb: '163, 179, 74',  glyph: '🧸', short: "Children's Services" }
-};
-
-// Format an ISO 'YYYY-MM-DD' effective date as e.g. '1 JUL 2026'. Returns ''
-// for anything that isn't a clean ISO date (so the meta line degrades quietly).
-function _formatRatesDate(iso) {
-    const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso || '');
-    if (!m) return '';
-    const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-    return parseInt(m[3], 10) + ' ' + months[parseInt(m[2], 10) - 1] + ' ' + m[1];
-}
-
-// Render the active-award header badge from the resolved award context. Keeps
-// the award visible as a confident header on every screen; when the award is
-// unresolved it prompts to choose one rather than hiding (never a buried
-// setting). Safe to call before rates load — the rates date fills in once
-// loadAwardRates() resolves and calls this again.
-function updateAwardHeaderBadge() {
-    const badge = document.getElementById('awardHeaderBadge');
-    if (!badge) return;
-    const nameEl = document.getElementById('awardHeaderName');
-    const codeEl = document.getElementById('awardHeaderCode');
-    const glyphEl = document.getElementById('awardHeaderGlyph');
-    const metaEl = document.getElementById('awardHeaderMeta');
-    const ctx = getAwardContext();
-
-    badge.classList.remove('hidden');
-
-    if (!ctx.code) {
-        badge.style.setProperty('--award-tint', '245, 158, 11');
-        if (glyphEl) glyphEl.textContent = '⚖️';
-        if (nameEl) nameEl.textContent = 'Set your award';
-        if (codeEl) codeEl.textContent = '';
-        if (metaEl) metaEl.textContent = 'TAP TO CHOOSE';
-        return;
-    }
-
-    const tint = AWARD_TINTS[ctx.code] || { rgb: '245, 158, 11', glyph: '⚖️', short: ctx.name };
-    badge.style.setProperty('--award-tint', tint.rgb);
-    if (glyphEl) glyphEl.textContent = tint.glyph;
-    if (nameEl) nameEl.textContent = tint.short || ctx.name;
-    if (codeEl) codeEl.textContent = ctx.code;
-
-    let dateStr = '';
-    if (awardRates && awardRates.ma_number === ctx.code) dateStr = _formatRatesDate(awardRates.effective_date);
-    if (metaEl) metaEl.textContent = dateStr ? ('RATES · ' + dateStr) : 'ACTIVE AWARD';
-}
-
 // Industry descriptor for the resolved award, used to keep AI prompts and
 // user-facing copy award-aware instead of hard-coding "hospitality". Returns the
 // bare word ('hospitality' | 'manufacturing' | '') and a space-suffixed helper
@@ -2287,8 +2228,6 @@ async function loadAwardRates() {
         const response = await fetchWithRetry(resolved.ratesUrl);
         if (!response.ok) throw new Error(`HTTP ${response.status}: Failed to load rates`);
         awardRates = await response.json();
-        // Rates now loaded for this award — fill in the header badge's date line.
-        if (typeof updateAwardHeaderBadge === 'function') updateAwardHeaderBadge();
         return true;
     } catch (error) {
         awardRates = getFallbackRates();
@@ -13537,9 +13476,6 @@ function updateSidebarVenueName() {
     if (sidebarName) {
         sidebarName.textContent = venueName;
     }
-
-    // Keep the active-award header badge in sync with the current award.
-    updateAwardHeaderBadge();
     
     // Also store in localStorage for easy access
     if (venueProfile.venueName) {

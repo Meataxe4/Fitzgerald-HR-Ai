@@ -673,54 +673,6 @@
 
 <script src="/js/access-screen.js?v=20260501-1"></script>
 
-    <style>
-    /* Active-award header badge — the award is a confident header on every
-       screen, never a buried setting. Each award carries a whisper of tint
-       (a ~6% surface wash + an industry glyph); amber stays the one
-       interactive accent, so the tint never competes. */
-    .award-hdr {
-        --award-tint: 245, 158, 11; /* default amber; set per-award in JS */
-        display: inline-flex; align-items: center; gap: 0.55rem;
-        padding: 0.35rem 0.75rem 0.35rem 0.45rem;
-        border-radius: 0.7rem; text-align: left; max-width: 100%;
-        background:
-            linear-gradient(0deg, rgba(var(--award-tint), 0.06), rgba(var(--award-tint), 0.06)),
-            rgba(15, 23, 42, 0.55);
-        border: 1px solid rgba(245, 158, 11, 0.45);
-        transition: border-color .15s ease, transform .15s ease;
-        cursor: pointer;
-    }
-    .award-hdr:hover { border-color: #f59e0b; transform: translateY(-1px); }
-    .award-hdr:focus-visible { outline: 2px solid #f59e0b; outline-offset: 2px; }
-    .award-hdr-glyph {
-        flex: none; width: 1.85rem; height: 1.85rem;
-        display: inline-flex; align-items: center; justify-content: center;
-        font-size: 0.95rem; border-radius: 0.5rem; line-height: 1;
-        background: rgba(var(--award-tint), 0.16);
-    }
-    .award-hdr-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.15; }
-    .award-hdr-name-row { display: flex; align-items: baseline; gap: 0.35rem; min-width: 0; }
-    .award-hdr-name { font-weight: 700; color: #fff; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .award-hdr-code {
-        flex: none; font-size: 0.6rem; letter-spacing: 0.05em; font-weight: 600;
-        color: rgb(var(--award-tint)); font-variant-numeric: tabular-nums;
-        filter: brightness(1.35);
-    }
-    .award-hdr-meta {
-        font-size: 0.58rem; letter-spacing: 0.11em; text-transform: uppercase;
-        color: #94a3b8; margin-top: 0.05rem; white-space: nowrap;
-    }
-    /* Light mode: lift the wash slightly and darken text for contrast. */
-    .light-mode .award-hdr {
-        background:
-            linear-gradient(0deg, rgba(var(--award-tint), 0.12), rgba(var(--award-tint), 0.12)),
-            #ffffff;
-    }
-    .light-mode .award-hdr-name { color: #0f172a; }
-    .light-mode .award-hdr-code { color: rgb(var(--award-tint)); filter: brightness(0.7); }
-    .light-mode .award-hdr-meta { color: #475569; }
-    </style>
-
     <!-- Main Assistant Screen (Hidden Initially) -->
     <div id="assistantScreen" class="hidden flex flex-col">
         <!-- Header -->
@@ -745,19 +697,6 @@
                     </h2>
                     <p id="headerSubtitle" class="text-xs text-slate-400"><span id="userTierDisplay">Free</span> Plan</p>
                 </div>
-
-                <!-- Active award — confident header, always visible, click to change -->
-                <button id="awardHeaderBadge" type="button" onclick="showVenueSettings()"
-                        class="award-hdr hidden" title="Your active award — click to change in Business Settings">
-                    <span class="award-hdr-glyph" id="awardHeaderGlyph" aria-hidden="true">⚖️</span>
-                    <span class="award-hdr-text">
-                        <span class="award-hdr-name-row">
-                            <span class="award-hdr-name" id="awardHeaderName">Set your award</span>
-                            <span class="award-hdr-code" id="awardHeaderCode"></span>
-                        </span>
-                        <span class="award-hdr-meta" id="awardHeaderMeta">TAP TO CHOOSE</span>
-                    </span>
-                </button>
             </div>
 
             <!-- Right: Simplified Buttons -->
