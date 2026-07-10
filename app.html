@@ -1607,8 +1607,64 @@
 <!-- VENUE ONBOARDING MODAL -->
 <!-- ========================================== -->
 
+<style>
+    /* Award selection grid — the make-or-break onboarding pick */
+    .award-mascot {
+        flex: none; width: 2.5rem; height: 2.5rem;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 1.4rem; border-radius: 0.65rem;
+        background: rgba(245, 158, 11, 0.15);
+        border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+    .award-tagline {
+        font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase;
+        color: #64748b; font-weight: 600;
+    }
+    .award-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+    @media (min-width: 640px) { .award-grid { grid-template-columns: repeat(4, 1fr); } }
+    .award-card {
+        position: relative; text-align: left;
+        padding: 0.85rem 0.9rem; border-radius: 0.7rem;
+        background: #334155; border: 2px solid transparent;
+        transition: transform .12s ease, background .12s ease, border-color .12s ease;
+        cursor: pointer;
+    }
+    .award-card:hover { background: #3b4a63; transform: translateY(-1px); }
+    .award-card:focus-visible { outline: 2px solid #f59e0b; outline-offset: 2px; }
+    .award-card .award-name { font-weight: 700; color: #fff; font-size: 0.95rem; line-height: 1.15; }
+    .award-card .award-code {
+        margin-top: 0.3rem; font-size: 0.68rem; letter-spacing: 0.06em;
+        color: #94a3b8; font-variant-numeric: tabular-nums;
+    }
+    .award-card.selected {
+        border-color: #f59e0b; background: rgba(245, 158, 11, 0.12);
+        box-shadow: 0 0 0 1px #f59e0b inset;
+    }
+    .award-card.selected .award-name { color: #fbbf24; }
+    .award-check {
+        position: absolute; top: 0.55rem; right: 0.7rem;
+        color: #f59e0b; font-weight: 700; opacity: 0; transition: opacity .12s;
+    }
+    .award-card.selected .award-check { opacity: 1; }
+    .award-card--muted {
+        background: transparent; border: 2px dashed #475569;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .award-card--muted .award-name { color: #94a3b8; font-weight: 600; font-size: 0.85rem; }
+    .award-card--muted:hover { background: rgba(148, 163, 184, 0.08); border-color: #64748b; }
+    /* Light mode */
+    .light-mode .award-tagline { color: #64748b; }
+    .light-mode .award-card { background: #f1f5f9; }
+    .light-mode .award-card:hover { background: #e2e8f0; }
+    .light-mode .award-card .award-name { color: #0f172a; }
+    .light-mode .award-card .award-code { color: #475569; }
+    .light-mode .award-card.selected { background: rgba(245, 158, 11, 0.18); }
+    .light-mode .award-card.selected .award-name { color: #b45309; }
+    .light-mode .award-card--muted { background: transparent; border-color: #cbd5e1; }
+    .light-mode .award-card--muted .award-name { color: #475569; }
+</style>
 <div id="venueOnboardingModal" class="hidden fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-6 z-50">
-    <div class="bg-slate-800 rounded-2xl p-8 max-w-2xl w-full border-2 border-amber-500 fade-in">
+    <div class="bg-slate-800 rounded-2xl p-8 max-w-3xl w-full border-2 border-amber-500 fade-in max-h-[92vh] overflow-y-auto">
         <div class="text-center mb-6">
             <div class="text-6xl mb-4">🏨</div>
             <h2 class="text-3xl font-bold text-amber-500 mb-2">Let's Get to Know Your Business</h2>
@@ -1649,50 +1705,80 @@
             </div>
 
             <div class="onboarding-step hidden" data-step="2">
-                <h3 class="text-xl font-bold text-white mb-2">Which award covers most of your staff?</h3>
-                <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mb-4 text-sm text-amber-300">
-                    <strong>💡 Why this matters:</strong> Your Modern Award determines pay rates, penalty rates, and entitlements. Selecting the correct award ensures Fitz gives you accurate, compliant advice tailored to your specific obligations. This step is required.
+                <div class="flex items-center gap-3 mb-1">
+                    <span class="award-mascot">🤖</span>
+                    <h3 class="text-xl font-bold text-white">Which award covers most of your staff?</h3>
                 </div>
+                <p class="award-tagline mb-4">Everything Fitz tells you is grounded in this choice</p>
                 <div id="onboardingAwardReselectNote" class="hidden bg-red-500/10 border border-red-500/30 rounded-lg p-3 mb-4 text-sm text-red-300">
                     Your previous award selection is no longer supported. Please choose your award below to continue — Fitz needs this to give you accurate, award-specific advice.
                 </div>
-                <div class="space-y-3">
-                    <button onclick="saveOnboardingAnswer('primaryAward', 'Hospitality Industry (General) Award')"
-                            class="w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Hospitality Industry (General) Award</div>
-                        <div class="text-xs opacity-70">Hotels, pubs, bars, clubs, resorts</div>
+                <div class="award-grid">
+                    <button type="button" class="award-card"
+                            onclick="selectOnboardingAward(this, 'Hospitality Industry (General) Award', 'Hospitality')">
+                        <div class="award-name">Hospitality</div>
+                        <div class="award-code">MA000009</div>
+                        <span class="award-check" aria-hidden="true">✓</span>
                     </button>
-                    <button onclick="saveOnboardingAnswer('primaryAward', 'Restaurant Industry Award')"
-                            class="w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Restaurant Industry Award</div>
-                        <div class="text-xs opacity-70">MA000119 — restaurants, cafés, bistros</div>
+                    <button type="button" class="award-card"
+                            onclick="selectOnboardingAward(this, 'Restaurant Industry Award', 'Restaurant')">
+                        <div class="award-name">Restaurant</div>
+                        <div class="award-code">MA000119</div>
+                        <span class="award-check" aria-hidden="true">✓</span>
                     </button>
-                    <button id="onboardingManufacturingBtn" onclick="saveOnboardingAnswer('primaryAward', 'Manufacturing and Associated Industries Award')"
-                            class="w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Manufacturing and Associated Industries Award</div>
-                        <div class="text-xs opacity-70">MA000010 — general manufacturing</div>
+                    <button type="button" id="onboardingRetailBtn" class="award-card"
+                            onclick="selectOnboardingAward(this, 'General Retail Industry Award MA000004', 'Retail')">
+                        <div class="award-name">Retail</div>
+                        <div class="award-code">MA000004</div>
+                        <span class="award-check" aria-hidden="true">✓</span>
                     </button>
-                    <button id="onboardingRetailBtn" onclick="saveOnboardingAnswer('primaryAward', 'General Retail Industry Award MA000004')"
-                            class="w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">General Retail Industry Award</div>
-                        <div class="text-xs opacity-70">MA000004 — supermarkets, department &amp; specialty stores</div>
+                    <button type="button" id="onboardingManufacturingBtn" class="award-card"
+                            onclick="selectOnboardingAward(this, 'Manufacturing and Associated Industries Award', 'Manufacturing')">
+                        <div class="award-name">Manufacturing</div>
+                        <div class="award-code">MA000010</div>
+                        <span class="award-check" aria-hidden="true">✓</span>
                     </button>
-                    <button id="onboardingSchadsBtn" onclick="saveOnboardingAnswer('primaryAward', 'Social, Community, Home Care and Disability Services Industry Award MA000100')"
-                            class="w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Social, Community, Home Care &amp; Disability Services Award</div>
-                        <div class="text-xs opacity-70">MA000100 — SCHADS / NDIS, aged &amp; home care</div>
+                    <button type="button" id="onboardingSchadsBtn" class="award-card"
+                            onclick="selectOnboardingAward(this, 'Social, Community, Home Care and Disability Services Industry Award MA000100', 'SCHADS')">
+                        <div class="award-name">SCHADS</div>
+                        <div class="award-code">MA000100</div>
+                        <span class="award-check" aria-hidden="true">✓</span>
                     </button>
-                    <button id="onboardingHealthBtn" onclick="saveOnboardingAnswer('primaryAward', 'Health Professionals and Support Services Award MA000027')"
-                            class="w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Health Professionals &amp; Support Services Award</div>
-                        <div class="text-xs opacity-70">MA000027 — private hospitals, medical/dental &amp; allied health</div>
+                    <button type="button" id="onboardingHealthBtn" class="award-card"
+                            onclick="selectOnboardingAward(this, 'Health Professionals and Support Services Award MA000027', 'Health Prof.')">
+                        <div class="award-name">Health Prof.</div>
+                        <div class="award-code">MA000027</div>
+                        <span class="award-check" aria-hidden="true">✓</span>
                     </button>
-                    <button id="onboardingChildrensBtn" onclick="saveOnboardingAnswer('primaryAward', 'Children\'s Services Award MA000120')"
-                            class="w-full p-4 bg-slate-700 hover:bg-amber-500 hover:text-slate-900 rounded-lg transition-all text-left">
-                        <div class="font-semibold">Children's Services Award</div>
-                        <div class="text-xs opacity-70">MA000120 — long day care, preschools &amp; OSHC</div>
+                    <button type="button" id="onboardingChildrensBtn" class="award-card"
+                            onclick="selectOnboardingAward(this, 'Children\'s Services Award MA000120', 'Children\'s Svc.')">
+                        <div class="award-name">Children's Svc.</div>
+                        <div class="award-code">MA000120</div>
+                        <span class="award-check" aria-hidden="true">✓</span>
+                    </button>
+                    <button type="button" class="award-card award-card--muted"
+                            onclick="toggleOnboardingAwardHelp()">
+                        <div class="award-name">Not sure →</div>
                     </button>
                 </div>
+                <div id="onboardingAwardHelp" class="hidden mt-4 bg-slate-900/50 border border-slate-700 rounded-lg p-4 text-sm text-slate-300 space-y-2">
+                    <p class="text-amber-300 font-semibold">Match your business to an award:</p>
+                    <p><strong class="text-white">Hospitality</strong> — hotels, pubs, bars, clubs, resorts</p>
+                    <p><strong class="text-white">Restaurant</strong> — restaurants, cafés, bistros</p>
+                    <p><strong class="text-white">Retail</strong> — supermarkets, department &amp; specialty stores</p>
+                    <p><strong class="text-white">Manufacturing</strong> — general manufacturing &amp; associated industries</p>
+                    <p><strong class="text-white">SCHADS</strong> — community services, NDIS, aged &amp; home care, disability</p>
+                    <p><strong class="text-white">Health Prof.</strong> — private hospitals, medical/dental &amp; allied health</p>
+                    <p><strong class="text-white">Children's Svc.</strong> — long day care, preschools &amp; OSHC</p>
+                    <p class="text-slate-400 pt-1">Still unsure? Pick the closest match — you can change it anytime in Business Settings, and you can always ask Fitz.</p>
+                </div>
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3 mt-4 text-sm text-amber-300">
+                    <strong>💡 Why this matters:</strong> Your Modern Award determines pay rates, penalty rates and entitlements. Selecting the correct award ensures Fitz gives you accurate, compliant advice tailored to your obligations. This step is required.
+                </div>
+                <button id="onboardingAwardContinue" onclick="confirmOnboardingAward()" disabled
+                        class="w-full mt-5 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold py-3 rounded-lg transition-all disabled:opacity-40 disabled:cursor-not-allowed">
+                    Select an award to continue
+                </button>
             </div>
 
             <div class="onboarding-step hidden" data-step="3">

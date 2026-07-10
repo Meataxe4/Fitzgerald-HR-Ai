@@ -17310,6 +17310,46 @@ function showOnboarding() {
 // completes immediately rather than walking the rest of the onboarding steps.
 let onboardingAwardReselectOnly = false;
 
+// Award step uses a select-then-confirm flow: picking a card highlights it and
+// arms the Continue button, so the operator commits deliberately to the choice
+// that grounds every downstream answer.
+let onboardingPendingAward = null;
+
+function selectOnboardingAward(cardEl, value, shortName) {
+    onboardingPendingAward = value;
+    document.querySelectorAll('#onboardingStepContent .award-card').forEach(c => c.classList.remove('selected'));
+    cardEl.classList.add('selected');
+    const btn = document.getElementById('onboardingAwardContinue');
+    if (btn) {
+        btn.disabled = false;
+        btn.textContent = `Continue with ${shortName} →`;
+    }
+}
+
+function confirmOnboardingAward() {
+    if (!onboardingPendingAward) return;
+    const value = onboardingPendingAward;
+    onboardingPendingAward = null;
+    saveOnboardingAnswer('primaryAward', value);
+}
+
+function toggleOnboardingAwardHelp() {
+    const help = document.getElementById('onboardingAwardHelp');
+    if (help) help.classList.toggle('hidden');
+}
+
+function resetOnboardingAwardStep() {
+    onboardingPendingAward = null;
+    document.querySelectorAll('#onboardingStepContent .award-card').forEach(c => c.classList.remove('selected'));
+    const help = document.getElementById('onboardingAwardHelp');
+    if (help) help.classList.add('hidden');
+    const btn = document.getElementById('onboardingAwardContinue');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Select an award to continue';
+    }
+}
+
 function saveOnboardingAnswer(field, value, isLastStep = false) {
     venueProfile[field] = value;
     if (onboardingAwardReselectOnly && field === 'primaryAward') {
@@ -17402,6 +17442,7 @@ function updateOnboardingStep() {
     if (onboardingCurrentStep === 2) {
         ['onboardingManufacturingBtn', 'onboardingSchadsBtn', 'onboardingRetailBtn', 'onboardingHealthBtn', 'onboardingChildrensBtn']
             .forEach(id => { const el = document.getElementById(id); if (el) el.classList.remove('hidden'); });
+        resetOnboardingAwardStep();
     }
 
     if (onboardingCurrentStep === 3) {
