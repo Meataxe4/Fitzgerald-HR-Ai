@@ -2145,6 +2145,59 @@ function getAwardContext() {
     };
 }
 
+// Per-award signature tint + short name for the profile card. rgb is applied
+// only as a faint wash behind the avatar and chip — amber stays the one
+// interactive accent, so the tint never competes.
+const AWARD_PROFILE = {
+    MA000009: { rgb: '200, 150, 62',  short: 'Hospitality (General)' },
+    MA000119: { rgb: '198, 95, 62',   short: 'Restaurant' },
+    MA000010: { rgb: '139, 109, 176', short: 'Manufacturing' },
+    MA000100: { rgb: '62, 158, 200',  short: 'SCHADS' },
+    MA000004: { rgb: '79, 107, 208',  short: 'General Retail' },
+    MA000027: { rgb: '62, 176, 138',  short: 'Health Professionals' },
+    MA000120: { rgb: '163, 179, 74',  short: "Children's Services" }
+};
+
+// Minimalist line icon for an award's profile avatar. Stroked with currentColor
+// so it inherits the avatar's tint; single-weight, no fill — deliberately plain.
+function _awardAvatarIcon(code) {
+    const svg = inner => '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" ' +
+        'stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">' + inner + '</svg>';
+    switch (code) {
+        case 'MA000009': return svg('<path d="M5 6h14l-7 7z"/><path d="M12 13v5"/><path d="M8 18h8"/>');                       // martini glass
+        case 'MA000119': return svg('<path d="M8 3v18"/><path d="M6 3v4a2 2 0 0 0 4 0V3"/><path d="M16 13V3c-1.7 0-2.7 2.2-2.7 5.5S14.3 13 16 13z"/><path d="M16 13v8"/>'); // fork + knife
+        case 'MA000010': return svg('<path d="M3 21h18"/><path d="M4 21V10l5 3V10l5 3V7l5 3v11"/>');                          // factory
+        case 'MA000100': return svg('<path d="M12 20s-6.5-4.2-6.5-9A3.3 3.3 0 0 1 12 8.2 3.3 3.3 0 0 1 18.5 11c0 4.8-6.5 9-6.5 9z"/>'); // heart (care)
+        case 'MA000004': return svg('<path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>');                        // shopping bag
+        case 'MA000027': return svg('<rect x="4" y="4" width="16" height="16" rx="3.5"/><path d="M12 8.5v7M8.5 12h7"/>');     // medical cross
+        case 'MA000120': return svg('<circle cx="12" cy="13.5" r="5.5"/><circle cx="7" cy="7.5" r="2.2"/><circle cx="17" cy="7.5" r="2.2"/>'); // teddy (early childhood)
+        default:         return svg('<path d="M4 21V7l6-3 6 3v14"/><path d="M4 21h16"/><path d="M9 21v-4h2v4"/>');            // generic building
+    }
+}
+
+// Render the profile card's award avatar (tinted, minimalist icon) and the
+// signature-tint award chip. Neutral amber + generic icon when unresolved.
+function _renderProfileAward() {
+    const card = document.getElementById('profileAccountCard');
+    const avatar = document.getElementById('profileAwardAvatar');
+    const chip = document.getElementById('profileAwardBadge');
+    if (!card || !avatar) return;
+    const ctx = getAwardContext();
+    const info = ctx.code ? AWARD_PROFILE[ctx.code] : null;
+    card.style.setProperty('--award-tint', info ? info.rgb : '245, 158, 11');
+    avatar.innerHTML = _awardAvatarIcon(ctx.code);
+    if (chip) {
+        if (info) {
+            chip.innerHTML = '<span class="award-chip"><span class="award-chip-dot"></span>' +
+                info.short + ' · ' + ctx.code + '</span>';
+            chip.classList.remove('hidden');
+        } else {
+            chip.innerHTML = '';
+            chip.classList.add('hidden');
+        }
+    }
+}
+
 // Industry descriptor for the resolved award, used to keep AI prompts and
 // user-facing copy award-aware instead of hard-coding "hospitality". Returns the
 // bare word ('hospitality' | 'manufacturing' | '') and a space-suffixed helper
@@ -13430,7 +13483,10 @@ function openProfileMenu() {
         
         document.getElementById('profileVenueName').textContent = venueName;
         document.getElementById('profileUserCode').textContent = userDisplay;
-        
+
+        // Award avatar (minimalist, tinted) + signature-tint award chip
+        _renderProfileAward();
+
         // Update subscription info
         var tier = userCredits.subscriptionTier || userCredits.tier || 'free';
         var tierConfig = CONFIG.CREDITS.TIERS[tier] || CONFIG.CREDITS.TIERS.free;
