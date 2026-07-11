@@ -232,6 +232,11 @@
 # ============================================
 
 [[redirects]]
+  from = "/blog/minimum-wage-increase-2026"
+  to = "/blog/minimum-wage-increase-2026.html"
+  status = 200
+
+[[redirects]]
   from = "/blog/retail-award-minimum-wage-increase-2026"
   to = "/blog/retail-award-minimum-wage-increase-2026.html"
   status = 200
@@ -629,6 +634,11 @@
     X-XSS-Protection = "1; mode=block"
 
 # Cache static assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
 [[headers]]
   for = "/*.js"
   [headers.values]
