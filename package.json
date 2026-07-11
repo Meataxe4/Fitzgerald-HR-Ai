@@ -8,7 +8,7 @@
     "deploy": "netlify deploy --prod",
     "build:css": "tailwindcss -i ./src/tailwind-input.css -o ./tailwind.css --minify",
     "stamp": "node scripts/stamp-assets.mjs",
-    "build": "npm run build:css && npm run stamp",
+    "build": "npm run build:css && npm run stamp && node scripts/generate-rss.mjs",
     "test": "node tests/award-resolution.test.js",
     "test:gate": "node tests/regression-gate.test.js",
     "test:regression": "node scripts/run-regression.mjs",
