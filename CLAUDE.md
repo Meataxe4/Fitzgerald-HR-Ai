@@ -3,6 +3,7 @@
 ## Hard constraints (do not suggest otherwise)
 
 - **No LinkedIn.** Blake (founder) has a conflict of interest with his current employer and CANNOT create a LinkedIn personal profile or company page for Fitz HR. Do not recommend LinkedIn in any plan, playbook, or schema. Work around it with other entity signals (Instagram @fitz.hr, X @FitzHR, Crunchbase, Google Business Profile, Bing Places, software directories, the /about page).
+- **Founder name stays out of visible page text.** Blake's name must not appear in rendered/visible HTML content (it would surface when someone Googles his name). JSON-LD schema (`founder`/`creator`) is explicitly OK. llms.txt currently names him — flagged as a judgement call, Blake's to make. Press pitches naming him are his per-send decision.
 - **Never invent statistics, testimonials, or award rates.** All figures must come from the site's own published pages (sourced from FWO Pay Guides) or from Blake directly. The one testimonial is "Business Owner · Inner West Sydney" (kitchen-hand walkout story).
 - **One primary CTA** across the marketing site: "Start Free — No Card Required" → /app.
 
