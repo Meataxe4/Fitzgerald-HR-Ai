@@ -23,11 +23,17 @@ Everything else (profiles, chamber, bookkeepers, podcasts) is either one-time se
 ## 30-Day Plan
 
 ### Week 1 — One-time setup (half a day total)
-- [ ] Create **LinkedIn company page** for Fitz HR Pty Ltd (logo, ABN-consistent name, link to fitzhr.com)
-- [ ] Create **Crunchbase profile** (founder: Blake Fitzgerald; founded 2025; Sydney)
+
+> **Constraint: no LinkedIn** (conflict of interest with Blake's current employer — non-negotiable, do not revisit). The entity-signal gap is covered by stacking the alternatives below instead.
+
+- [ ] Create **Google Business Profile** + **Bing Places** for Fitz HR Pty Ltd (strongest free entity anchors after LinkedIn; verify with the ABN address)
+- [ ] Activate/claim **X (Twitter) @FitzHR** — the site's twitter:card meta already declares it; an active profile makes it a real entity signal
+- [ ] Create **Facebook business page** (low effort, another Meta-verified brand anchor alongside Instagram @fitz.hr)
+- [ ] Create **Crunchbase profile** (company-level; founder attribution optional — match whatever visibility Blake is comfortable with)
 - [ ] Free listings: **AlternativeTo** (list as alternative to Employment Hero and BrightHR), **SaaSHub**, **Capterra**, **G2**, **GetApp**
 - [ ] Sign up to **SourceBottle** (free tier) — set alerts for: Fair Work, wages, small business, hospitality, childcare, NDIS
-- [ ] Tell Claude the LinkedIn/Crunchbase URLs → they get added to the homepage `sameAs` schema and llms.txt
+- [ ] Strengthen the **/about page** as the canonical founder/company bio — without LinkedIn, this page IS the entity hub that journalists and Google check
+- [ ] Tell Claude the profile URLs → they get added to the homepage `sameAs` schema and llms.txt
 
 ### Week 2 — The July pitch (do not let this window close)
 - [ ] Send the **Wage-Review Pitch** (template B) to 6–8 outlets: SmartCompany, HRM Online, Hospitality Magazine, The Shout, The Sector (childcare), an NDIS/community-services outlet, Startup Daily (launch angle), Dynamic Business
