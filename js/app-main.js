@@ -11766,21 +11766,23 @@ async function sendMessage() {
     
     addMessage('user', message);
     input.value = '';
-    
-    // ✅ USE A PROMPT (for free tier tracking)
-    usePrompt();
-    
+
     // Show "Fitz is thinking..." indicator
     const thinkingDiv = showThinkingIndicator();
     const sendBtn = DOM.sendButton;
     sendBtn.disabled = true;
     sendBtn.innerHTML = '<span class="pulse">●●●</span>';
-    
+
     conversationHistory.push({ role: 'user', content: message });
-    
+
     try {
         const response = await callClaudeAPI(message);
-        
+
+        // ✅ USE A PROMPT (for free tier tracking) — only charge AFTER a
+        // successful response, so a failed call (API 404/500, network error)
+        // doesn't burn one of the user's free-tier prompts.
+        usePrompt();
+
         // Remove thinking indicator
         removeThinkingIndicator(thinkingDiv);
         
