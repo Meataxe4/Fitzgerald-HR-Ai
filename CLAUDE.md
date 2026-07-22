@@ -7,6 +7,10 @@
 - **Never invent statistics, testimonials, or award rates.** All figures must come from the site's own published pages (sourced from FWO Pay Guides) or from Blake directly. The one testimonial is "Business Owner · Inner West Sydney" (kitchen-hand walkout story).
 - **One primary CTA** across the marketing site: "Start Free — No Card Required" → /app.
 
+## Legal entity
+
+- The legal company is **Fitzgerald HR Pty Ltd** (ABN 87 693 882 709), **trading as Fitz HR**. "Fitz HR" is the brand/business name only — never write "Fitz HR Pty Ltd". Footer/legal format: "© Fitzgerald HR Pty Ltd (ABN 87 693 882 709), trading as Fitz HR". Schema: `name: "Fitz HR"`, `legalName: "Fitzgerald HR Pty Ltd"`. The Terms/Privacy pages (app.html, privacy.html, terms.html) are the reference — they've always used the correct entity.
+
 ## Positioning (agreed July 2026)
 
 - Core axis: **"Your Award, not generic HR."** Supporting: "We know your award cold."

@@ -26,7 +26,7 @@ Everything else (profiles, chamber, bookkeepers, podcasts) is either one-time se
 
 > **Constraint: no LinkedIn** (conflict of interest with Blake's current employer — non-negotiable, do not revisit). The entity-signal gap is covered by stacking the alternatives below instead.
 
-- [ ] Create **Google Business Profile** + **Bing Places** for Fitz HR Pty Ltd (strongest free entity anchors after LinkedIn; verify with the ABN address)
+- [ ] Create **Google Business Profile** + **Bing Places** — public name "Fitz HR", registered to Fitzgerald HR Pty Ltd (strongest free entity anchors after LinkedIn; verify with the ABN address)
 - [ ] Activate/claim **X (Twitter) @FitzHR** — the site's twitter:card meta already declares it; an active profile makes it a real entity signal
 - [ ] Create **Facebook business page** (low effort, another Meta-verified brand anchor alongside Instagram @fitz.hr)
 - [ ] Create **Crunchbase profile** (company-level; founder attribution optional — match whatever visibility Blake is comfortable with)
