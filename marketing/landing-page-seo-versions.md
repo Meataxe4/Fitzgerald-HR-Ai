@@ -145,7 +145,7 @@ Yes. The Document Builder walks you through a short set of questions — includi
 Yes — the free tier includes 20 AI chats per month, 1 free template download and unlimited HR tools. No credit card required. Paid plans start from $249/year.
 
 **Q: Is my data secure and is this an Australian company?**
-Fitz HR Pty Ltd is Australian owned (ABN 87 693 882 709), and answers are based 100% on Australian law. Data security is a core commitment across all plans.
+Fitzgerald HR Pty Ltd, trading as Fitz HR, is Australian owned (ABN 87 693 882 709), and answers are based 100% on Australian law. Data security is a core commitment across all plans.
 
 ### Internal link suggestions
 
