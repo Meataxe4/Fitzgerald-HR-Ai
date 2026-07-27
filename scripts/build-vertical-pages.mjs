@@ -135,6 +135,59 @@ const VERTICALS = {
       { q: "Which award covers long day care and OSHC?", a: "The Children's Services Award MA000120 covers long day care, preschools and kindergartens, and outside-school-hours care. Teachers in early childhood settings may instead be covered by the relevant education teachers award — Fitz confirms coverage first." },
     ],
   },
+  hospitality: {
+    code: 'MA000009', file: 'hospitality-award-rates.json',
+    awardShort: 'Hospitality Award',
+    awardFull: 'Hospitality Industry (General) Award MA000009',
+    audience: 'Australian pubs, hotels, motels, bars and licensed venues',
+    industry: 'hospitality venue',
+    titleIndustry: 'Hospitality',
+    shortIndustry: 'Hospitality', descWho: 'hospitality venues',
+    heroWord: 'chef',
+    heroHook: 'A {word} is a no-show at 5pm on Saturday. Fitz tells you exactly what the Hospitality Award requires.',
+    coverage: 'pubs, hotels, motels, bars, licensed clubs and their venues. Standalone restaurants, cafes and bistros are typically covered by the Restaurant Industry Award MA000119 instead — Fitz confirms coverage before it answers.',
+    // The hand-built hospitality-award-guide.html predates this generator and
+    // stays authoritative; the generic vs-Employment-Hero page covers this
+    // vertical. Only emit what does not already exist.
+    emit: ['landing', 'pay'],
+    vsHref: '/compare/fitz-hr-vs-employment-hero',
+    scenarios: [
+      { q: 'What is the Sunday rate for a casual bartender?', a: 'Fitz returns the exact all-inclusive casual Sunday percentage from the current Pay Guide — with the 25% casual loading already included, so it is never double-counted.' },
+      { q: 'What do the evening and night loadings add?', a: 'The Hospitality Award pays flat dollar-per-hour evening (7pm–midnight) and night (midnight–7am) loadings — not percentages. Fitz applies the exact current figures so the flat amounts are never mistaken for percentage penalties.' },
+      { q: 'Can I roster a split shift, and what does it cost?', a: 'Yes — the award allows split shifts with a per-day allowance depending on the break. Fitz returns the exact allowance and flags rosters that trigger it.' },
+    ],
+    docs: ['Hospitality employment contract', 'Casual engagement letter', 'Classification & pay-rate letter', 'Formal warning (venue)', 'Casual conversion letter'],
+    crisis: 'A chef walks out mid-service, an altercation on the floor, a no-show before open — Crisis Mode gives you the immediate, Hospitality-Award-grounded steps to take right now.',
+    faqExtra: [
+      { q: 'Does the Hospitality Award or the Restaurant Award cover my venue?', a: 'Pubs, hotels, motels, bars and licensed clubs generally sit under the Hospitality Industry (General) Award MA000009; standalone restaurants, cafes and bistros under the Restaurant Industry Award MA000119. Coverage follows the principal business activity — Fitz confirms which award applies before answering.' },
+    ],
+  },
+  restaurant: {
+    code: 'MA000119', file: 'restaurant-award-rates.json',
+    awardShort: 'Restaurant Award',
+    awardFull: 'Restaurant Industry Award MA000119',
+    audience: 'Australian restaurants, cafes and bistros',
+    industry: 'restaurant business',
+    titleIndustry: 'Restaurants & Cafes',
+    shortIndustry: 'Restaurants', descWho: 'restaurants and cafes',
+    heroWord: 'waiter',
+    heroHook: 'A {word} quits mid-service on Saturday night. Fitz tells you exactly what the Restaurant Award requires.',
+    coverage: 'standalone restaurants, cafes, bistros and catering within them. Venues attached to pubs, hotels and clubs are typically covered by the Hospitality Award MA000009 instead — Fitz confirms coverage before it answers.',
+    // Hand-built restaurant-award-guide.html stays authoritative; generic
+    // vs-Employment-Hero page covers this vertical.
+    emit: ['landing', 'pay', 'best'],
+    vsHref: '/compare/fitz-hr-vs-employment-hero',
+    scenarios: [
+      { q: 'What does the late-night loading pay after 10pm?', a: 'The Restaurant Award has its own late-night band that differs from Hospitality. Fitz returns the exact current loading and the hours it applies to.' },
+      { q: 'Can I put a chef on an annualised wage arrangement?', a: 'Yes — under strict conditions with outer limits and reconciliation requirements. Fitz explains what clause 20 requires before you rely on one.' },
+      { q: 'What is the minimum engagement for a casual shift?', a: 'Fitz returns the exact minimum engagement from the current award text and flags any roster below it before you publish.' },
+    ],
+    docs: ['Restaurant employment contract', 'Casual engagement letter', 'Annualised wage agreement', 'Classification & pay-rate letter', 'Formal warning'],
+    crisis: 'A kitchen hand walks out mid-Saturday service, a heated dispute on the pass — Crisis Mode gives you the immediate, Restaurant-Award-grounded steps to take right now.',
+    faqExtra: [
+      { q: 'Does the Restaurant Award cover cafes?', a: 'Yes — the Restaurant Industry Award MA000119 covers standalone restaurants, cafes and bistros. A cafe or restaurant operating inside a pub, hotel or club is generally covered by the Hospitality Award MA000009 instead. Fitz confirms coverage before answering.' },
+    ],
+  },
 };
 
 const load = (file) => JSON.parse(fs.readFileSync(path.join(ROOT, file), 'utf8'));
@@ -334,7 +387,7 @@ function clusterLinks(v, current) {
     { key: 'landing', href: `/${v}`, label: 'Overview', title: `${VERTICALS[v].awardShort} for your business`, blurb: 'The live scenarios, wizard, document builder and Crisis Mode, built for your vertical.' },
     { key: 'pay', href: `/${v}-award-pay-rates`, label: 'Pay Rates', title: `${VERTICALS[v].awardShort} Pay Rates 2026`, blurb: 'Current classification rates, penalties and allowances from the FWO Pay Guide.' },
     { key: 'guide', href: `/${v}-award-guide`, label: 'Guide', title: `${VERTICALS[v].awardShort} Guide (${VERTICALS[v].code})`, blurb: 'The complete reference — coverage, classifications, penalties, allowances and compliance.' },
-    { key: 'vs', href: `/compare/fitz-hr-vs-employment-hero-${v}`, label: 'Compare', title: `Fitz HR vs Employment Hero`, blurb: `How Fitz compares for ${pluralIndustry(VERTICALS[v].industry)} on the ${VERTICALS[v].awardShort}.` },
+    { key: 'vs', href: VERTICALS[v].vsHref || `/compare/fitz-hr-vs-employment-hero-${v}`, label: 'Compare', title: `Fitz HR vs Employment Hero`, blurb: `How Fitz compares for ${pluralIndustry(VERTICALS[v].industry)} on the ${VERTICALS[v].awardShort}.` },
     { key: 'best', href: `/compare/best-hr-software-${v}-australia`, label: 'Best software', title: `Best HR Software for ${VERTICALS[v].titleIndustry}`, blurb: `What to look for in HR & compliance software for ${pluralIndustry(VERTICALS[v].industry)} — and how Fitz compares.` },
   ].filter(l => l.key !== current);
   return `    <div class="hub-grid">
@@ -731,12 +784,19 @@ fs.mkdirSync(path.join(ROOT, 'compare'), { recursive: true });
 const written = [];
 function write(rel, html) { fs.writeFileSync(path.join(ROOT, rel), html); written.push(rel); }
 
+// Optional CLI filter: `node scripts/build-vertical-pages.mjs hospitality restaurant`
+// regenerates only the named verticals. NOTE: several generated pages have
+// hand-added "quick answer" boxes layered on top — a full regeneration wipes
+// them, so prefer the filter unless you intend to rebuild everything.
+const only = process.argv.slice(2);
 for (const v of Object.keys(VERTICALS)) {
-  write(`${v}.html`, landingPage(v));
-  write(`${v}-award-pay-rates.html`, payRatesPage(v));
-  write(`${v}-award-guide.html`, guidePage(v));
-  write(`compare/fitz-hr-vs-employment-hero-${v}.html`, vsEmploymentHeroPage(v));
-  write(`compare/best-hr-software-${v}-australia.html`, bestHrSoftwarePage(v));
+  if (only.length && !only.includes(v)) continue;
+  const emit = VERTICALS[v].emit || ['landing', 'pay', 'guide', 'vs', 'best'];
+  if (emit.includes('landing')) write(`${v}.html`, landingPage(v));
+  if (emit.includes('pay')) write(`${v}-award-pay-rates.html`, payRatesPage(v));
+  if (emit.includes('guide')) write(`${v}-award-guide.html`, guidePage(v));
+  if (emit.includes('vs')) write(`compare/fitz-hr-vs-employment-hero-${v}.html`, vsEmploymentHeroPage(v));
+  if (emit.includes('best')) write(`compare/best-hr-software-${v}-australia.html`, bestHrSoftwarePage(v));
 }
 console.log(`Generated ${written.length} vertical pages:`);
 for (const w of written) console.log('  ' + w);
