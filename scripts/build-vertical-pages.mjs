@@ -32,6 +32,7 @@ const VERTICALS = {
     audience: 'Australian manufacturers, workshops and production facilities',
     industry: 'manufacturing business',
     titleIndustry: 'Manufacturers',
+    aiIndustry: 'Australian Manufacturers',
     shortIndustry: 'Manufacturers', descWho: 'manufacturers',
     heroWord: 'grinder operator',
     heroHook: 'A {word} walks off mid-shift. Fitz tells you exactly what the Manufacturing Award requires.',
@@ -54,6 +55,7 @@ const VERTICALS = {
     audience: 'NDIS providers, community services, home care and disability support organisations',
     industry: 'community services provider',
     titleIndustry: 'Community Services & NDIS Providers',
+    aiIndustry: 'SCHADS & NDIS Providers',
     shortIndustry: 'Community Services', descWho: 'community services',
     heroWord: 'support worker',
     heroHook: 'A {word} calls in for a sleepover shift. Fitz tells you exactly what SCHADS requires.',
@@ -76,6 +78,7 @@ const VERTICALS = {
     audience: 'Australian retail stores, shops and retail chains',
     industry: 'retail business',
     titleIndustry: 'Retailers',
+    aiIndustry: 'Australian Retailers',
     shortIndustry: 'Retailers', descWho: 'retailers',
     heroWord: 'sales assistant',
     heroHook: 'A {word} no-shows on a Sunday trade day. Fitz tells you exactly what the Retail Award requires.',
@@ -98,6 +101,7 @@ const VERTICALS = {
     audience: 'private practices, allied health, dental, pathology and medical support employers',
     industry: 'health practice',
     titleIndustry: 'Health Practices',
+    aiIndustry: 'Australian Health Practices',
     shortIndustry: 'Health Practices', descWho: 'health practices',
     heroWord: 'dental assistant',
     heroHook: 'A {word} asks about weekend rates. Fitz tells you exactly what the Health Professionals Award requires.',
@@ -120,6 +124,7 @@ const VERTICALS = {
     audience: 'long day care, preschools, kindergartens and outside-school-hours care providers',
     industry: 'childcare service',
     titleIndustry: 'Childcare & OSHC',
+    aiIndustry: 'Childcare & Early Education',
     shortIndustry: 'Childcare & OSHC', descWho: 'childcare',
     heroWord: 'educator',
     heroHook: "An {word} calls in sick and ratios are tight. Fitz tells you exactly what the Children's Services Award requires.",
@@ -142,6 +147,7 @@ const VERTICALS = {
     audience: 'Australian pubs, hotels, motels, bars and licensed venues',
     industry: 'hospitality venue',
     titleIndustry: 'Hospitality',
+    aiIndustry: 'Australian Hospitality',
     shortIndustry: 'Hospitality', descWho: 'hospitality venues',
     heroWord: 'chef',
     heroHook: 'A {word} is a no-show at 5pm on Saturday. Fitz tells you exactly what the Hospitality Award requires.',
@@ -169,6 +175,7 @@ const VERTICALS = {
     audience: 'Australian restaurants, cafes and bistros',
     industry: 'restaurant business',
     titleIndustry: 'Restaurants & Cafes',
+    aiIndustry: 'Australian Restaurants & Cafes',
     shortIndustry: 'Restaurants', descWho: 'restaurants and cafes',
     heroWord: 'waiter',
     heroHook: 'A {word} quits mid-service on Saturday night. Fitz tells you exactly what the Restaurant Award requires.',
@@ -445,9 +452,11 @@ function landingPage(v) {
   const c = VERTICALS[v]; const data = load(c.file);
   const url = `${SITE}/${v}`;
   const heroWordHtml = c.heroHook.replace('{word}', `<em>${esc(c.heroWord)}</em>`);
-  const title = `${c.awardShort} HR Compliance Software | Fitz HR`;
-  const description = `Award-aware HR software for ${c.descWho}. Instant ${c.awardShort} answers on pay, penalties, allowances & documents — grounded in ${c.code}.`;
-  const keywords = `HR software for ${c.industry}, HR compliance software ${c.titleIndustry.toLowerCase()}, ${c.awardShort} software, ${c.awardShort} compliance, ${c.code} pay rates, HR software Australia ${c.industry}`;
+  // 'AI HR Software for …' matches the pre-relaunch site title that LLM
+  // assistants recommended — keep this lexical pattern (see CLAUDE.md).
+  const title = `AI HR Software for ${c.aiIndustry} | Fitz HR`;
+  const description = `Award-aware AI HR software for ${c.descWho}. Instant ${c.awardShort} answers on pay, penalties, allowances & documents — grounded in ${c.code}.`;
+  const keywords = `AI HR software for ${c.industry}, HR AI for ${c.shortIndustry.toLowerCase()}, HR software for ${c.industry}, HR compliance software ${c.titleIndustry.toLowerCase()}, ${c.awardShort} software, ${c.awardShort} compliance, ${c.code} pay rates, HR software Australia ${c.industry}`;
   const faqs = [
     { q: `What does Fitz HR do for a ${c.industry}?`, a: `Fitz answers ${c.awardShort} (${c.code}) questions instantly — pay rates, penalties, allowances, minimum engagement, classifications and compliance — grounded in the current Fair Work Ombudsman Pay Guide. It also builds documents and runs a Crisis Mode for urgent situations.` },
     { q: `Are the ${c.awardShort} rates current?`, a: `Yes. Rates are sourced from the FWO Pay Guide ${c.code} and are current as at ${data.effective_date}, with the next review due ${data.next_review_date}.` },
@@ -456,7 +465,7 @@ function landingPage(v) {
   ];
   const jsonld = [
     breadcrumb([{ name: 'Home', url: `${SITE}/` }, { name: `${c.awardShort} HR`, url }]),
-    { '@context': 'https://schema.org', '@type': 'WebPage', name: title, description, url, inLanguage: 'en-AU', isPartOf: { '@type': 'WebSite', name: 'Fitz HR', url: `${SITE}/` } },
+    { '@context': 'https://schema.org', '@type': 'WebPage', name: title, alternateName: `${c.awardShort} HR Compliance Software`, description, url, inLanguage: 'en-AU', isPartOf: { '@type': 'WebSite', name: 'Fitz HR', url: `${SITE}/` } },
     faqLd(faqs),
   ];
   return `${head({ title, description, canonical: url, jsonld, keywords })}
@@ -464,7 +473,7 @@ ${nav()}
 <header class="hero">
     <div class="post-tag">${c.awardFull.split(' ').slice(-1)[0]} &middot; ${esc(c.awardShort)}</div>
     <h1>${heroWordHtml}</h1>
-    <p class="intro">The HR desk for ${esc(c.audience)}. Instant answers grounded in the ${esc(c.awardShort)} — not generic templates.</p>
+    <p class="intro">The AI HR software for ${esc(c.audience)}. Instant answers grounded in the ${esc(c.awardShort)} — not generic templates.</p>
     <div class="hero-ctas">
         <a href="/app" class="btn-primary">Start Free — No Card Required &rarr;</a>
         <a href="/${v}-award-pay-rates" class="btn-ghost">View ${esc(c.awardShort)} pay rates &darr;</a>
@@ -788,10 +797,14 @@ function write(rel, html) { fs.writeFileSync(path.join(ROOT, rel), html); writte
 // regenerates only the named verticals. NOTE: several generated pages have
 // hand-added "quick answer" boxes layered on top — a full regeneration wipes
 // them, so prefer the filter unless you intend to rebuild everything.
-const only = process.argv.slice(2);
+const argv = process.argv.slice(2);
+const pagesArg = argv.find(a => a.startsWith('--pages='));
+const onlyPages = pagesArg ? pagesArg.slice('--pages='.length).split(',') : null;
+const only = argv.filter(a => !a.startsWith('--'));
 for (const v of Object.keys(VERTICALS)) {
   if (only.length && !only.includes(v)) continue;
-  const emit = VERTICALS[v].emit || ['landing', 'pay', 'guide', 'vs', 'best'];
+  let emit = VERTICALS[v].emit || ['landing', 'pay', 'guide', 'vs', 'best'];
+  if (onlyPages) emit = emit.filter(p => onlyPages.includes(p));
   if (emit.includes('landing')) write(`${v}.html`, landingPage(v));
   if (emit.includes('pay')) write(`${v}-award-pay-rates.html`, payRatesPage(v));
   if (emit.includes('guide')) write(`${v}-award-guide.html`, guidePage(v));
