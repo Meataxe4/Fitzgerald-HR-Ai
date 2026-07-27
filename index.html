@@ -51,6 +51,7 @@
         "@type": "SoftwareApplication",
         "@id": "https://fitzhr.com/#software",
         "name": "Fitz HR",
+        "alternateName": "AI HR Software for Australian Small Business",
         "url": "https://fitzhr.com",
         "image": "https://fitzhr.com/assets/og-image.png",
         "applicationCategory": "BusinessApplication",
@@ -86,7 +87,9 @@
         "@type": "Organization",
         "@id": "https://fitzhr.com/#organization",
         "name": "Fitz HR",
+        "alternateName": ["Fitzgerald HR", "Fitz HR AI"],
         "legalName": "Fitzgerald HR Pty Ltd",
+        "description": "AI HR software for Australian small business — hospitality, restaurants, retail, manufacturing, SCHADS & NDIS, health practices and childcare — grounded in the modern award that governs each team.",
         "url": "https://fitzhr.com",
         "logo": "https://fitzhr.com/assets/favicon.svg",
         "sameAs": ["https://www.instagram.com/fitz.hr/"],
@@ -259,6 +262,8 @@
   .agrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
   .acard{--mx:50%;--my:50%;background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:20px;position:relative;overflow:hidden;transition:transform .25s ease,border-color .25s ease}
   .acard:hover{transform:translateY(-5px);border-color:var(--amber-line)}
+  a.acard{display:block;text-decoration:none;color:inherit}
+  .acard .alink{display:inline-block;margin-top:12px;font-size:.8rem;font-weight:700;color:var(--amber)}
   .acard::before{content:"";position:absolute;inset:0;background:radial-gradient(280px circle at var(--mx) var(--my),rgba(245,158,11,.11),transparent 65%);opacity:0;transition:opacity .3s ease;pointer-events:none}
   .acard:hover::before{opacity:1}
   .acard .code{font-size:.66rem;font-weight:800;letter-spacing:.12em;color:var(--amber);text-transform:uppercase}
@@ -343,7 +348,7 @@
 
 
   footer{border-top:1px solid var(--border-soft);padding:56px 0 32px;color:var(--faint);font-size:.8rem}
-  .foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1.2fr 1fr;gap:36px;margin-bottom:40px}
+  .foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1.1fr 1fr;gap:32px;margin-bottom:40px}
   .foot-grid h4{font-size:.72rem;font-weight:800;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:0 0 14px}
   .foot-grid ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px}
   .foot-grid a{color:var(--faint);text-decoration:none;font-size:.82rem;transition:color .2s ease}
@@ -493,13 +498,13 @@
       <p class="sub">These aren't random. They're the award-dependent, penalty-heavy, shift-based frontline workforces with little in-house HR and high Fair Work exposure. Tell Fitz your award once, and every answer, rate and document is built on it.</p>
     </div>
     <div class="agrid stagger">
-      <div class="acard"><span class="code">MA000009</span><h3>Hospitality (General)</h3><p>Penalty rates, split shifts, casual conversion, evening and night loadings.</p></div>
-      <div class="acard"><span class="code">MA000119</span><h3>Restaurant</h3><p>Separate late-night band and different minimum engagements to Hospitality.</p></div>
-      <div class="acard"><span class="code">MA000004</span><h3>General Retail</h3><p>Sunday and public holiday penalties, junior rates, late-trading spans.</p></div>
-      <div class="acard"><span class="code">MA000010</span><h3>Manufacturing &amp; Associated</h3><p>C14–C1 classifications, shift loadings, overtime, allowances, RDOs.</p></div>
-      <div class="acard"><span class="code">MA000100</span><h3>SCHADS</h3><p>Broken shifts, sleepovers, on-call, client travel, cancellations — widely regarded as the most complex award in the country.</p></div>
-      <div class="acard"><span class="code">MA000027</span><h3>Health Professionals</h3><p>Classification streams, on-call, higher duties, allied-health specifics.</p></div>
-      <div class="acard"><span class="code">MA000120</span><h3>Children's Services</h3><p>Qualification-based classification, ratios-driven rostering, director and educator levels.</p></div>
+      <a class="acard" href="/hospitality"><span class="code">MA000009</span><h3>Hospitality (General)</h3><p>Penalty rates, split shifts, casual conversion, evening and night loadings.</p><span class="alink">AI HR for Hospitality &rarr;</span></a>
+      <a class="acard" href="/restaurant"><span class="code">MA000119</span><h3>Restaurant</h3><p>Separate late-night band and different minimum engagements to Hospitality.</p><span class="alink">AI HR for Restaurants &amp; Cafes &rarr;</span></a>
+      <a class="acard" href="/retail"><span class="code">MA000004</span><h3>General Retail</h3><p>Sunday and public holiday penalties, junior rates, late-trading spans.</p><span class="alink">AI HR for Retail &rarr;</span></a>
+      <a class="acard" href="/manufacturing"><span class="code">MA000010</span><h3>Manufacturing &amp; Associated</h3><p>C14–C1 classifications, shift loadings, overtime, allowances, RDOs.</p><span class="alink">AI HR for Manufacturing &rarr;</span></a>
+      <a class="acard" href="/schads"><span class="code">MA000100</span><h3>SCHADS</h3><p>Broken shifts, sleepovers, on-call, client travel, cancellations — widely regarded as the most complex award in the country.</p><span class="alink">AI HR for SCHADS &amp; NDIS &rarr;</span></a>
+      <a class="acard" href="/health"><span class="code">MA000027</span><h3>Health Professionals</h3><p>Classification streams, on-call, higher duties, allied-health specifics.</p><span class="alink">AI HR for Health Practices &rarr;</span></a>
+      <a class="acard" href="/childrens"><span class="code">MA000120</span><h3>Children's Services</h3><p>Qualification-based classification, ratios-driven rostering, director and educator levels.</p><span class="alink">AI HR for Childcare &amp; Education &rarr;</span></a>
     </div>
   </div>
 </section>
@@ -625,6 +630,18 @@
           <li><a href="/about">About</a></li>
           <li><a href="/partnerships">Partnerships</a></li>
           <li><a href="/app">Log In</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Industries</h4>
+        <ul>
+          <li><a href="/hospitality">AI HR for Hospitality</a></li>
+          <li><a href="/restaurant">AI HR for Restaurants</a></li>
+          <li><a href="/retail">AI HR for Retail</a></li>
+          <li><a href="/manufacturing">AI HR for Manufacturing</a></li>
+          <li><a href="/schads">AI HR for SCHADS &amp; NDIS</a></li>
+          <li><a href="/health">AI HR for Health Practices</a></li>
+          <li><a href="/childrens">AI HR for Childcare</a></li>
         </ul>
       </div>
       <div>
