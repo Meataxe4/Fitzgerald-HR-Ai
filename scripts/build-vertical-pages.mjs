@@ -527,6 +527,27 @@ ${faqBlock(faqs)}
 ${footer()}`;
 }
 
+
+// Email-capture block (Netlify Forms, form name rates-alerts). Submissions land
+// in the Netlify dashboard; /subscribed is the thank-you page the form posts to.
+function ratesAlertBlock(c) {
+  return `<div class="rates-alert" style="background:#141f35;border:1px solid rgba(245,158,11,0.35);border-left:4px solid #f59e0b;border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;">
+        <strong style="display:block;font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:#f59e0b;margin-bottom:8px;">Rates change alerts</strong>
+        <p style="margin:0 0 0.9rem;font-size:0.93rem;line-height:1.65;color:rgba(255,255,255,0.6);">Get one email when the ${esc(c.awardShort)} (${esc(c.code)}) rates change &mdash; usually once a year at the Annual Wage Review. No newsletter, no spam.</p>
+        <form name="rates-alerts" method="POST" action="/subscribed" data-netlify="true" netlify-honeypot="bot-field" style="display:flex;gap:10px;flex-wrap:wrap;">
+            <input type="hidden" name="form-name" value="rates-alerts">
+            <input type="hidden" name="award" value="${esc(c.awardShort)} ${esc(c.code)}">
+            <p style="display:none;"><label>Leave this field empty: <input name="bot-field"></label></p>
+            <label for="rates-alert-email" style="position:absolute;left:-9999px;">Email address</label>
+            <input id="rates-alert-email" type="email" name="email" required placeholder="you@yourbusiness.com.au" style="flex:1 1 220px;min-width:0;background:#0f172a;border:1px solid rgba(255,255,255,0.15);border-radius:8px;padding:0.75rem 1rem;color:#fff;font-family:inherit;font-size:0.9rem;">
+            <button type="submit" style="background:#f59e0b;color:#0f172a;font-weight:800;border:none;border-radius:8px;padding:0.75rem 1.4rem;font-size:0.85rem;font-family:inherit;cursor:pointer;">Notify me</button>
+        </form>
+        <p style="margin:0.8rem 0 0;font-size:0.72rem;color:rgba(255,255,255,0.3);">Sent by Fitzgerald HR Pty Ltd, trading as Fitz HR &middot; unsubscribe anytime &middot; <a href="/privacy" style="color:rgba(255,255,255,0.45);">Privacy Policy</a></p>
+    </div>
+
+`;
+}
+
 function payRatesPage(v) {
   const c = VERTICALS[v]; const data = load(c.file);
   const url = `${SITE}/${v}-award-pay-rates`;
@@ -572,7 +593,7 @@ ${allowanceTable(data)}
     <div class="section-label">Explore</div>
 ${clusterLinks(v, 'pay')}
 
-${faqBlock(faqs)}
+${ratesAlertBlock(c)}${faqBlock(faqs)}
 
     <div class="post-cta">
         <h3>Need a rate we didn’t list?</h3>
@@ -643,7 +664,7 @@ ${allowanceTable(data, 8)}
     </ul>
     <p>See the <a href="/fair-work-compliance-hospitality">Fair Work compliance pillar guide</a> and <a href="/compare/fitz-hr-vs-employment-hero-${v}">how Fitz HR compares for ${esc(c.industry)}s</a>.</p>
 
-${faqBlock(faqs)}
+${ratesAlertBlock(c)}${faqBlock(faqs)}
 
     <div class="post-cta">
         <h3>Any ${esc(c.awardShort)} question — answered in seconds</h3>
