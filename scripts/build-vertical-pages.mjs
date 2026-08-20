@@ -397,6 +397,7 @@ function clusterLinks(v, current) {
     { key: 'vs', href: VERTICALS[v].vsHref || `/compare/fitz-hr-vs-employment-hero-${v}`, label: 'Compare', title: `Fitz HR vs Employment Hero`, blurb: `How Fitz compares for ${pluralIndustry(VERTICALS[v].industry)} on the ${VERTICALS[v].awardShort}.` },
     { key: 'best', href: `/compare/best-hr-software-${v}-australia`, label: 'Best software', title: `Best HR Software for ${VERTICALS[v].titleIndustry}`, blurb: `What to look for in HR & compliance software for ${pluralIndustry(VERTICALS[v].industry)} — and how Fitz compares.` },
   ].filter(l => l.key !== current);
+  if (current === 'landing') links.push({ key: 'cheat', href: `/${v}-award-cheat-sheet`, label: 'Printable', title: `${VERTICALS[v].awardShort} Cheat Sheet`, blurb: 'Rates, penalties and allowances on one page — print or save as PDF.' });
   return `    <div class="hub-grid">
 ${links.map(l => `        <a href="${l.href}" class="hub-card"><div class="hub-label">${l.label}</div><h3>${esc(l.title)}</h3><p>${esc(l.blurb)}</p></a>`).join('\n')}
     </div>`;
@@ -548,6 +549,18 @@ function ratesAlertBlock(c) {
 `;
 }
 
+
+// Distinguishable cheat-sheet callout used on guide + pay-rates pages.
+function cheatSheetCallout(v, c) {
+  return `<div class="cheat-callout" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;background:rgba(245,158,11,0.08);border:1px dashed rgba(245,158,11,0.55);border-radius:12px;padding:1.1rem 1.4rem;margin:2rem 0;">
+        <div style="flex:1 1 320px;">
+            <strong style="display:block;color:#fff;font-size:0.98rem;margin-bottom:2px;">The ${esc(c.awardShort)} on one page</strong>
+            <span style="color:rgba(255,255,255,0.6);font-size:0.85rem;">Rates, penalties, allowances &amp; minimum shifts &mdash; print it or save as PDF.</span>
+        </div>
+        <a href="/${v}-award-cheat-sheet" style="background:#f59e0b;color:#0f172a;font-weight:800;font-size:0.85rem;padding:0.7rem 1.3rem;border-radius:8px;text-decoration:none;white-space:nowrap;">Get the cheat sheet &rarr;</a>
+    </div>`;
+}
+
 function payRatesPage(v) {
   const c = VERTICALS[v]; const data = load(c.file);
   const url = `${SITE}/${v}-award-pay-rates`;
@@ -593,7 +606,9 @@ ${allowanceTable(data)}
     <div class="section-label">Explore</div>
 ${clusterLinks(v, 'pay')}
 
-${ratesAlertBlock(c)}${faqBlock(faqs)}
+${cheatSheetCallout(v, c)}
+
+    ${ratesAlertBlock(c)}${faqBlock(faqs)}
 
     <div class="post-cta">
         <h3>Need a rate we didn’t list?</h3>
@@ -664,7 +679,7 @@ ${allowanceTable(data, 8)}
     </ul>
     <p>See the <a href="/fair-work-compliance-hospitality">Fair Work compliance pillar guide</a> and <a href="/compare/fitz-hr-vs-employment-hero-${v}">how Fitz HR compares for ${esc(c.industry)}s</a>.</p>
 
-<p>Prefer it on paper? <a href="/${v}-award-cheat-sheet">Print the one-page ${esc(c.awardShort)} cheat sheet</a> &mdash; rates, penalties, allowances and minimum shifts at a glance.</p>
+${cheatSheetCallout(v, c)}
 
     ${ratesAlertBlock(c)}${faqBlock(faqs)}
 
