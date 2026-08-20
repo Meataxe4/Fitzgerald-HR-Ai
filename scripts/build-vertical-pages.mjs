@@ -664,7 +664,9 @@ ${allowanceTable(data, 8)}
     </ul>
     <p>See the <a href="/fair-work-compliance-hospitality">Fair Work compliance pillar guide</a> and <a href="/compare/fitz-hr-vs-employment-hero-${v}">how Fitz HR compares for ${esc(c.industry)}s</a>.</p>
 
-${ratesAlertBlock(c)}${faqBlock(faqs)}
+<p>Prefer it on paper? <a href="/${v}-award-cheat-sheet">Print the one-page ${esc(c.awardShort)} cheat sheet</a> &mdash; rates, penalties, allowances and minimum shifts at a glance.</p>
+
+    ${ratesAlertBlock(c)}${faqBlock(faqs)}
 
     <div class="post-cta">
         <h3>Any ${esc(c.awardShort)} question — answered in seconds</h3>
