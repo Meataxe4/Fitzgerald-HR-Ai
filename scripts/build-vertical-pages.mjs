@@ -595,6 +595,8 @@ ${nav()}
     <p>Full-time minimum rates by classification. Casual employees receive these rates plus the ${pct(data.casual_loading)} casual loading (or the all-inclusive casual rate where the award specifies one).</p>
 ${payTable(data)}
 
+    <p>Not sure which level a role belongs at? See <a href="/${v}-award-classifications">every ${esc(c.awardShort)} classification explained</a> with full-time and casual rates.</p>
+
     <h2>Penalty <em>Rates</em></h2>
     <p>Weekend and public holiday penalties as a percentage of the ordinary hourly rate. Casual percentages are all-inclusive of the casual loading.</p>
 ${penaltyTable(data)}

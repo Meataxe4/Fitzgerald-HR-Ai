@@ -43,8 +43,8 @@ Founder, Fitz HR — fitzhr.com
 
 ## Email 2 — Club Management (RSLs, leagues & licensed clubs)
 
-**Find the editor:** intermedia.com.au → Our Brands → Club Management, or bylines on the
-Club Management site. Governance/compliance writers are the best fit.
+**Find the editor:** clubmanagement.com.au — the editor is Aimee Chanthadavong (confirm
+against recent bylines before sending; grab the contact email from the site's contact page).
 
 **Subject:** clubs have audit committees — and no HR paper trail on the floor
 
