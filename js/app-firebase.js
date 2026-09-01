@@ -166,6 +166,9 @@ async function createOrUpdateUserProfile(user) {
             if (typeof fbq === 'function') {
                 try { fbq('track', 'Lead', { content_name: 'Account Signup' }); } catch (e) {}
             }
+            if (typeof gtag === 'function') {
+                try { gtag('event', 'sign_up', { method: user.providerData && user.providerData[0] ? user.providerData[0].providerId : 'firebase' }); } catch (e) {}
+            }
         } else {
             await userRef.update({ 
                 lastLoginAt: firebase.firestore.FieldValue.serverTimestamp(), 

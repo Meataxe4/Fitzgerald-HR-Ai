@@ -7812,6 +7812,16 @@ async function processPaymentSuccess() {
                     });
                 } catch (e) {}
             }
+            if (typeof gtag === 'function') {
+                try {
+                    gtag('event', 'purchase', {
+                        transaction_id: 'stripe_' + Date.now(),
+                        value: typeof purchase.price === 'number' ? purchase.price : (typeof purchase.amount === 'number' ? purchase.amount : 0),
+                        currency: purchase.currency || 'AUD',
+                        items: [{ item_name: purchase.tier || purchase.type || 'Stripe Checkout', item_category: purchase.type || 'subscription' }]
+                    });
+                } catch (e) {}
+            }
 
             // Update status
             updatePaymentStatus('Adding credits to your account...');
