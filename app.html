@@ -2045,6 +2045,18 @@
 
                 <!-- Users Tab -->
                 <div id="adminUsersTab" class="admin-tab-content hidden">
+                    <div class="bg-slate-900 rounded-lg p-3 mb-3 flex flex-col sm:flex-row gap-2">
+                        <input type="text" id="adminUserSearch" placeholder="🔍 Search name, email or business..."
+                               oninput="renderAdminUsers()"
+                               class="flex-1 bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm">
+                        <select id="adminUserSort" onchange="renderAdminUsers()"
+                                class="bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm">
+                            <option value="lastActive">Sort: Last active</option>
+                            <option value="joined">Sort: Date joined</option>
+                            <option value="chats">Sort: Chats</option>
+                            <option value="tools">Sort: Tool uses</option>
+                        </select>
+                    </div>
                     <div id="usersList" class="space-y-2"></div>
                 </div>
 

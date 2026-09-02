@@ -13282,7 +13282,18 @@ function trackToolUsage(toolId) {
     
     saveRecentTools();
     updateSidebarRecentTools();
-    
+
+    // Lifetime per-tool counters on users/{uid}.toolUsage.<toolId> — the admin
+    // dashboard Users tab reads these for cross-device usage totals.
+    if (currentUser && db) {
+        try {
+            db.collection('users').doc(currentUser.uid).set({
+                toolUsage: { [toolId]: firebase.firestore.FieldValue.increment(1) },
+                toolUsageUpdatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true }).catch(function () {});
+        } catch (e) { }
+    }
+
     trackEvent('tool_used', {
         user: currentUser,
         tool: tool.name
@@ -18648,81 +18659,224 @@ async function loadThemes() {
     }
 }
 
+let adminUsersCache = [];
+
+// Firestore Timestamp | ISO string | Date → Date (or null)
+function adminTsToDate(value) {
+    if (!value) return null;
+    if (value.toDate) return value.toDate();
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? null : d;
+}
+
+function adminFormatDate(date) {
+    return date
+        ? date.toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' })
+        : '—';
+}
+
 async function loadUsers() {
     const list = document.getElementById('usersList');
-    
+
     list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">Loading users from Firebase...</div>';
-    
+
     if (!db) {
         list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Firebase not connected</div>';
         return;
     }
-    
+
     try {
         const usersSnapshot = await db.collection('users').get();
-        
+
         if (usersSnapshot.empty) {
             list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No users yet</div>';
             return;
         }
-        
-        const users = [];
-        
-        for (const userDoc of usersSnapshot.docs) {
+
+        adminUsersCache = await Promise.all(usersSnapshot.docs.map(async (userDoc) => {
             const userData = userDoc.data();
-            
-            // Count conversations for this user
-            const conversationsSnapshot = await db.collection('users').doc(userDoc.id).collection('conversations').get();
-            const messageCount = conversationsSnapshot.size;
-            
-            users.push({
+            const appState = userData.appState || {};
+            const venueProfile = (appState.venueProfile && Object.keys(appState.venueProfile).length ? appState.venueProfile : userData.venueProfile) || {};
+            const credits = userData.credits || {};
+
+            // Conversation count — the subcollection is the authoritative store
+            let messageCount = 0;
+            try {
+                const conversationsSnapshot = await db.collection('users').doc(userDoc.id).collection('conversations').get();
+                messageCount = conversationsSnapshot.size;
+            } catch (e) { }
+
+            const toolUsage = userData.toolUsage || {};
+            const toolTotal = Object.values(toolUsage).reduce((sum, n) => sum + (typeof n === 'number' ? n : 0), 0);
+
+            const lastLoginAt = adminTsToDate(userData.lastLoginAt);
+            const lastActiveAt = adminTsToDate(appState.lastSyncedAt) || lastLoginAt;
+
+            return {
                 id: userDoc.id,
                 displayName: userData.displayName || 'Unknown',
                 email: userData.email || 'N/A',
-                venueProfile: userData.venueProfile || null,
+                businessName: venueProfile.venueName || null,
+                venueType: venueProfile.venueType || null,
+                city: venueProfile.city || venueProfile.location || null,
+                staffCount: venueProfile.staffCount || null,
+                primaryAward: venueProfile.primaryAward || null,
+                tier: String(credits.subscriptionTier || userData.subscriptionTier || 'free').toLowerCase(),
+                billingCycle: credits.billingCycle || userData.billingCycle || null,
+                monthlyPromptsUsed: credits.monthlyPromptsUsed || 0,
+                reviewCreditsUsed: credits.reviewCreditsUsed || userData.reviewCreditsUsed || 0,
+                reviewCredits: credits.reviewCredits || userData.reviewCredits || 0,
+                stripeCustomerId: credits.stripeCustomerId || userData.stripeCustomerId || null,
+                createdAt: adminTsToDate(userData.createdAt),
+                lastLoginAt: lastLoginAt,
+                lastActiveAt: lastActiveAt,
+                documentCount: Array.isArray(appState.documentLogs) ? appState.documentLogs.length : 0,
+                toolUsage: toolUsage,
+                toolTotal: toolTotal,
+                recentTools: Array.isArray(appState.recentTools) ? appState.recentTools : [],
                 legalTermsAccepted: userData.legalTermsAccepted || false,
-                legalTermsAcceptedAt: userData.legalTermsAcceptedAt || null,
+                legalTermsAcceptedAt: adminTsToDate(userData.legalTermsAcceptedAt),
                 messageCount: messageCount
-            });
-        }
-        
-        // Sort by message count
-        users.sort((a, b) => b.messageCount - a.messageCount);
-        
-        let html = '';
-        users.forEach(profile => {
-            const venueInfo = profile.venueProfile 
-                ? `${profile.venueProfile.venueType || 'Unknown'} in ${profile.venueProfile.location || 'Unknown'}` 
-                : 'No business info';
-            
-            const legalStatus = profile.legalTermsAccepted 
-                ? '<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded">✓ Legal Accepted</span>'
-                : '<span class="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded">Pending</span>';
-            
-            html += `
-                <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
-                    <div class="flex items-start justify-between mb-3">
-                        <div>
-                            <p class="text-purple-400 font-semibold">${profile.displayName}</p>
-                            <p class="text-xs text-slate-500">${profile.email}</p>
-                            <p class="text-xs text-slate-400 mt-1">${venueInfo}</p>
-                        </div>
-                        <div class="flex flex-col items-end gap-1">
-                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${profile.messageCount} chats</span>
-                            ${legalStatus}
-                        </div>
-                    </div>
-                    <div class="text-xs text-slate-500">
-                        User ID: ${profile.id.substring(0, 12)}...
-                    </div>
-                </div>
-            `;
-        });
-        
-        list.innerHTML = html;
+            };
+        }));
+
+        renderAdminUsers();
     } catch (error) {
         list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
     }
+}
+
+function renderAdminUsers() {
+    const list = document.getElementById('usersList');
+    if (!list || !adminUsersCache.length) return;
+
+    const query = (document.getElementById('adminUserSearch')?.value || '').trim().toLowerCase();
+    const sortBy = document.getElementById('adminUserSort')?.value || 'lastActive';
+
+    let users = adminUsersCache.slice();
+    if (query) {
+        users = users.filter(u =>
+            (u.displayName || '').toLowerCase().includes(query) ||
+            (u.email || '').toLowerCase().includes(query) ||
+            (u.businessName || '').toLowerCase().includes(query)
+        );
+    }
+
+    const time = d => (d ? d.getTime() : 0);
+    const sorters = {
+        lastActive: (a, b) => time(b.lastActiveAt) - time(a.lastActiveAt),
+        joined: (a, b) => time(b.createdAt) - time(a.createdAt),
+        chats: (a, b) => b.messageCount - a.messageCount,
+        tools: (a, b) => b.toolTotal - a.toolTotal
+    };
+    users.sort(sorters[sortBy] || sorters.lastActive);
+
+    const paidCount = adminUsersCache.filter(u => u.tier !== 'free').length;
+    let html = `<div class="text-xs text-slate-500 mb-2">${users.length} of ${adminUsersCache.length} users shown · ${paidCount} paying</div>`;
+
+    if (!users.length) {
+        html += '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No users match this search</div>';
+    }
+
+    users.forEach(profile => { html += buildAdminUserCard(profile); });
+    list.innerHTML = html;
+}
+
+function buildAdminUserCard(profile) {
+    const tierBadges = {
+        free: 'bg-slate-600/40 text-slate-300',
+        starter: 'bg-amber-500/20 text-amber-400',
+        pro: 'bg-purple-500/20 text-purple-400',
+        business: 'bg-green-500/20 text-green-400'
+    };
+    const tierClass = tierBadges[profile.tier] || tierBadges.free;
+    const tierLabel = profile.tier.charAt(0).toUpperCase() + profile.tier.slice(1)
+        + (profile.billingCycle ? ' · ' + profile.billingCycle : '');
+
+    // Business / venue line
+    const venueTypeLabel = profile.venueType && typeof getVenueTypeLabel === 'function'
+        ? getVenueTypeLabel(profile.venueType)
+        : profile.venueType;
+    const venueMeta = [
+        venueTypeLabel,
+        profile.city,
+        profile.staffCount ? profile.staffCount + ' staff' : null,
+        profile.primaryAward
+    ].filter(Boolean).map(escapeHtml).join(' · ');
+
+    // Activity / churn signal
+    let inactiveBadge = '';
+    if (profile.lastActiveAt) {
+        const daysInactive = Math.floor((Date.now() - profile.lastActiveAt.getTime()) / (1000 * 60 * 60 * 24));
+        if (daysInactive >= 30) {
+            inactiveBadge = `<span class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded">Inactive ${daysInactive}d</span>`;
+        } else if (daysInactive >= 7) {
+            inactiveBadge = `<span class="text-xs bg-amber-500/20 text-amber-400 px-2 py-1 rounded">Quiet ${daysInactive}d</span>`;
+        }
+    }
+
+    // Free-tier prompt usage (upgrade-nudge signal when near the cap)
+    let promptsBadge = '';
+    if (profile.tier === 'free') {
+        const cap = CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS;
+        const nearCap = profile.monthlyPromptsUsed >= cap * 0.75;
+        promptsBadge = `<span class="text-xs ${nearCap ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-700/60 text-slate-400'} px-2 py-1 rounded">${profile.monthlyPromptsUsed}/${cap} prompts</span>`;
+    } else if (profile.reviewCredits) {
+        promptsBadge = `<span class="text-xs bg-slate-700/60 text-slate-400 px-2 py-1 rounded">${profile.reviewCreditsUsed}/${profile.reviewCredits} credits</span>`;
+    }
+
+    const legalStatus = profile.legalTermsAccepted
+        ? `<span class="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded" title="Accepted ${adminFormatDate(profile.legalTermsAcceptedAt)}">✓ Legal</span>`
+        : '<span class="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded">Legal pending</span>';
+
+    // Tool usage: lifetime counters (toolUsage) once they accrue, else recent tools
+    let toolsLine = '<span class="text-slate-600">No tools used yet</span>';
+    const usageEntries = Object.entries(profile.toolUsage)
+        .filter(([, n]) => typeof n === 'number' && n > 0)
+        .sort((a, b) => b[1] - a[1]);
+    if (usageEntries.length) {
+        toolsLine = '🛠️ ' + usageEntries.slice(0, 4).map(([toolId, n]) => {
+            const name = (typeof toolMetadata === 'object' && toolMetadata[toolId]?.name) || toolId;
+            return `${escapeHtml(name)} × ${n}`;
+        }).join(' · ');
+        if (usageEntries.length > 4) toolsLine += ` · +${usageEntries.length - 4} more`;
+    } else if (profile.recentTools.length) {
+        toolsLine = '🛠️ Recent: ' + profile.recentTools.map(t => escapeHtml(t.name || t.id)).join(', ');
+    }
+
+    const stripeLink = profile.stripeCustomerId
+        ? ` · <a href="https://dashboard.stripe.com/customers/${encodeURIComponent(profile.stripeCustomerId)}" target="_blank" rel="noopener" class="text-purple-400 hover:underline">Stripe ↗</a>`
+        : '';
+
+    return `
+        <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
+            <div class="flex items-start justify-between mb-2 gap-2">
+                <div class="min-w-0">
+                    <p class="text-purple-400 font-semibold truncate">${escapeHtml(profile.displayName)}
+                        <span class="text-xs ${tierClass} px-2 py-0.5 rounded ml-1 font-normal">${escapeHtml(tierLabel)}</span>
+                    </p>
+                    <p class="text-xs text-slate-500 truncate">${escapeHtml(profile.email)}</p>
+                    ${profile.businessName ? `<p class="text-sm text-amber-400 mt-1 truncate">🏢 ${escapeHtml(profile.businessName)}</p>` : '<p class="text-xs text-slate-600 mt-1">No business info</p>'}
+                    ${venueMeta ? `<p class="text-xs text-slate-400">${venueMeta}</p>` : ''}
+                </div>
+                <div class="flex flex-col items-end gap-1 flex-shrink-0">
+                    <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${profile.messageCount} chats</span>
+                    <span class="text-xs bg-slate-700/60 text-slate-300 px-2 py-1 rounded">${profile.toolTotal} tool uses</span>
+                    ${profile.documentCount ? `<span class="text-xs bg-slate-700/60 text-slate-300 px-2 py-1 rounded">${profile.documentCount} docs</span>` : ''}
+                    ${promptsBadge}
+                    ${legalStatus}
+                    ${inactiveBadge}
+                </div>
+            </div>
+            <div class="text-xs text-slate-400 mb-2">${toolsLine}</div>
+            <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-500 border-t border-slate-800 pt-2">
+                <span>Joined: <span class="text-slate-400">${adminFormatDate(profile.createdAt)}</span></span>
+                <span>Last login: <span class="text-slate-400">${adminFormatDate(profile.lastLoginAt)}</span></span>
+                <span>Last active: <span class="text-slate-400">${adminFormatDate(profile.lastActiveAt)}</span></span>
+            </div>
+            <div class="text-xs text-slate-600 mt-1">User ID: ${escapeHtml(profile.id.substring(0, 12))}...${stripeLink}</div>
+        </div>
+    `;
 }
 
 async function loadHighRisk() {
