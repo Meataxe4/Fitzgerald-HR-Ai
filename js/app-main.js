@@ -19634,8 +19634,9 @@ async function loadCharts() {
         for (const userDoc of usersSnapshot.docs) {
             const userData = userDoc.data();
             
-            // Subscription counts
-            const tier = (userData.subscriptionTier || 'free').toLowerCase();
+            // Subscription counts — credits.subscriptionTier is the
+            // Stripe-webhook source of truth, top-level is the signup default
+            const tier = String((userData.credits && userData.credits.subscriptionTier) || userData.subscriptionTier || 'free').toLowerCase();
             if (subscriptionCounts.hasOwnProperty(tier)) {
                 subscriptionCounts[tier]++;
             } else {
@@ -19654,14 +19655,19 @@ async function loadCharts() {
             
             conversationsSnapshot.forEach(convDoc => {
                 const conv = convDoc.data();
-                if (conv.timestamp) {
-                    const convDate = conv.timestamp.toDate ? conv.timestamp.toDate() : new Date(conv.timestamp);
-                    const dateKey = convDate.toISOString().split('T')[0];
-                    activityByDate[dateKey] = (activityByDate[dateKey] || 0) + 1;
-                    
-                    // Count messages
-                    const msgCount = conv.messages?.length || 1;
-                    messagesByDate[dateKey] = (messagesByDate[dateKey] || 0) + msgCount;
+                // Conversations carry ISO-string 'updated'/'created' fields (plus a
+                // server-timestamp 'updatedAt') — there is no 'timestamp' field
+                const when = conv.updated || conv.created || conv.updatedAt || conv.timestamp;
+                if (when) {
+                    const convDate = when.toDate ? when.toDate() : new Date(when);
+                    if (!isNaN(convDate.getTime())) {
+                        const dateKey = convDate.toISOString().split('T')[0];
+                        activityByDate[dateKey] = (activityByDate[dateKey] || 0) + 1;
+
+                        // Count messages
+                        const msgCount = conv.messages?.length || 1;
+                        messagesByDate[dateKey] = (messagesByDate[dateKey] || 0) + msgCount;
+                    }
                 }
             });
             
