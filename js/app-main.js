@@ -18666,11 +18666,16 @@ async function loadThemes() {
             
             conversationsSnapshot.forEach(convDoc => {
                 const conv = convDoc.data();
-                const title = conv.title || 'Other';
-                
-                // Categorize by keywords
+                const messages = conv.messages || [];
+                const firstUserMsg = messages.find(m => m.role === 'user');
+
+                // Skip welcome-only conversations — no user question, no theme
+                if (!firstUserMsg && (!conv.title || conv.title === 'New Chat')) return;
+
+                // Categorize on the title plus the first user message, not just
+                // the 50-char title
                 let theme = 'Other';
-                const titleLower = title.toLowerCase();
+                const titleLower = ((conv.title || '') + ' ' + (firstUserMsg?.content || '')).toLowerCase();
                 
                 if (titleLower.includes('award') || titleLower.includes('pay') || titleLower.includes('wage')) {
                     theme = 'Pay & Awards';
@@ -18976,45 +18981,59 @@ async function loadHighRisk() {
             { keyword: 'misconduct', severity: 'high' }
         ];
         
+        const severityOrder = { critical: 0, high: 1, medium: 2 };
         const usersSnapshot = await db.collection('users').get();
-        
+
         for (const userDoc of usersSnapshot.docs) {
             const userData = userDoc.data();
             const userName = userData.displayName || userData.email || userDoc.id.substring(0, 8);
             const userEmail = userData.email || 'N/A';
-            
+
             const conversationsSnapshot = await db.collection('users').doc(userDoc.id)
                 .collection('conversations')
                 .get();
-            
+
             conversationsSnapshot.forEach(convDoc => {
                 const conv = convDoc.data();
                 const title = (conv.title || '').toLowerCase();
                 const messages = conv.messages || [];
-                const fullText = title + ' ' + messages.map(m => m.content || '').join(' ').toLowerCase();
-                
-                // Check for high-risk keywords
+                // Scan only what the user wrote — assistant replies routinely
+                // mention terms like "fair work" and "termination", which
+                // flooded this tab with false positives
+                const userText = title + ' ' + messages
+                    .filter(m => m.role === 'user')
+                    .map(m => m.content || '')
+                    .join(' ').toLowerCase();
+
+                // Keep the highest-severity match (a first-match loop could tag
+                // a critical conversation as merely high)
+                let match = null;
                 for (const {keyword, severity} of highRiskKeywords) {
-                    if (fullText.includes(keyword)) {
-                        highRiskItems.push({
-                            id: convDoc.id,
-                            userName: userName,
-                            userEmail: userEmail,
-                            userId: userDoc.id,
-                            title: conv.title || 'Untitled Conversation',
-                            keyword: keyword,
-                            timestamp: conv.timestamp,
-                            severity: severity,
-                            messageCount: messages.length
-                        });
-                        break; // Only add once per conversation
+                    if (userText.includes(keyword)) {
+                        if (!match || severityOrder[severity] < severityOrder[match.severity]) {
+                            match = { keyword, severity };
+                        }
                     }
+                }
+
+                if (match) {
+                    highRiskItems.push({
+                        id: convDoc.id,
+                        userName: userName,
+                        userEmail: userEmail,
+                        userId: userDoc.id,
+                        title: conv.title || 'Untitled Conversation',
+                        keyword: match.keyword,
+                        // Conversations carry 'updated'/'created', not 'timestamp'
+                        timestamp: conv.updated || conv.created || conv.updatedAt || conv.timestamp,
+                        severity: match.severity,
+                        messageCount: messages.length
+                    });
                 }
             });
         }
-        
+
         // Sort by severity then timestamp
-        const severityOrder = { critical: 0, high: 1, medium: 2 };
         highRiskItems.sort((a, b) => {
             if (severityOrder[a.severity] !== severityOrder[b.severity]) {
                 return severityOrder[a.severity] - severityOrder[b.severity];
@@ -19053,7 +19072,8 @@ async function loadHighRisk() {
         `;
         
         highRiskItems.slice(0, 50).forEach(risk => {
-            const date = risk.timestamp?.toDate ? risk.timestamp.toDate().toLocaleString('en-AU') : 'Unknown';
+            const riskDate = adminTsToDate(risk.timestamp);
+            const date = riskDate ? riskDate.toLocaleString('en-AU') : 'Unknown';
             
             let borderClass, bgClass, textClass, badgeClass;
             if (risk.severity === 'critical') {
@@ -19077,14 +19097,14 @@ async function loadHighRisk() {
                 <div class="bg-slate-900 border-2 ${borderClass} rounded-lg p-4">
                     <div class="flex items-start justify-between mb-2 flex-wrap gap-2">
                         <div class="flex-1 min-w-0">
-                            <p class="${textClass} font-semibold truncate">${risk.title}</p>
+                            <p class="${textClass} font-semibold truncate">${escapeHtml(risk.title)}</p>
                             <p class="text-slate-500 text-xs">${date}</p>
                         </div>
                         <span class="text-xs ${badgeClass} px-2 py-1 rounded uppercase font-bold">${risk.severity}</span>
                     </div>
                     <div class="text-sm space-y-1">
-                        <p class="text-slate-400"><strong>User:</strong> ${risk.userName}</p>
-                        <p class="text-slate-500 text-xs">${risk.userEmail}</p>
+                        <p class="text-slate-400"><strong>User:</strong> ${escapeHtml(risk.userName)}</p>
+                        <p class="text-slate-500 text-xs">${escapeHtml(risk.userEmail)}</p>
                         <p class="text-slate-300 mt-2">Detected: <span class="${textClass} font-semibold">${risk.keyword}</span></p>
                         <p class="text-slate-500 text-xs">${risk.messageCount} messages in conversation</p>
                     </div>
