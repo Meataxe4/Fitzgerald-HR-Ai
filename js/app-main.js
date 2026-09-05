@@ -11316,6 +11316,12 @@ async function logDocumentGeneration() {
     const logs = JSON.parse(localStorage.getItem('documentLogs_' + userKey) || '[]');
     logs.push(log);
     localStorage.setItem('documentLogs_' + userKey, JSON.stringify(logs));
+
+    // Remember the local log id so logDocumentDownload can mark it downloaded
+    // even when Supabase is unavailable (the synced local log is what the
+    // admin dashboard aggregates)
+    documentBuilderState.lastLocalDocumentId = log.document_id;
+    if (typeof debouncedSync === 'function') debouncedSync();
     // Store in Supabase
     if (supabaseClient) {
         try {
@@ -11344,35 +11350,50 @@ async function logDocumentGeneration() {
  * @param {Object} metadata - Document metadata including format
  */
 async function logDocumentDownload(metadata) {
-    if (!supabaseClient) {
-        return;
-    }
-    
-    if (!documentBuilderState.lastGeneratedDocId) {
-        return;
-    }
-    
+    // Mark the matching local log entry downloaded first — the synced local log
+    // (documentLogs_* → appState.documentLogs) is what the admin dashboard
+    // aggregates, so this must not depend on Supabase being available
     try {
-        // ✅ Update with format information
-        const { data: updateData, error: updateError } = await supabaseClient
-            .from('generated_documents')
-            .update({ 
-                downloaded: true, 
-                downloaded_at: new Date().toISOString(),
-                format: metadata.format || 'pdf' // ✅ Track format (pdf or docx)
-            })
-            .eq('id', documentBuilderState.lastGeneratedDocId)
-            .select();
-        
-        if (updateError) {
-        } else {
-            // Clear the stored ID after successful update
-            documentBuilderState.lastGeneratedDocId = null;
+        const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
+        const logs = JSON.parse(localStorage.getItem('documentLogs_' + userKey) || '[]');
+        const localId = documentBuilderState.lastLocalDocumentId;
+        const entry = localId
+            ? logs.find(l => l.document_id === localId)
+            : logs[logs.length - 1];
+        if (entry) {
+            entry.downloaded = true;
+            entry.downloaded_at = new Date().toISOString();
+            entry.format = metadata.format || 'pdf';
+            localStorage.setItem('documentLogs_' + userKey, JSON.stringify(logs));
+            documentBuilderState.lastLocalDocumentId = null;
+            if (typeof debouncedSync === 'function') debouncedSync();
         }
-        
-    } catch (err) {
+    } catch (e) {
     }
-    
+
+    if (supabaseClient && documentBuilderState.lastGeneratedDocId) {
+        try {
+            // ✅ Update with format information
+            const { data: updateData, error: updateError } = await supabaseClient
+                .from('generated_documents')
+                .update({
+                    downloaded: true,
+                    downloaded_at: new Date().toISOString(),
+                    format: metadata.format || 'pdf' // ✅ Track format (pdf or docx)
+                })
+                .eq('id', documentBuilderState.lastGeneratedDocId)
+                .select();
+
+            if (updateError) {
+            } else {
+                // Clear the stored ID after successful update
+                documentBuilderState.lastGeneratedDocId = null;
+            }
+
+        } catch (err) {
+        }
+    }
+
     // Track event with format
     trackEvent('document_downloaded', {
         user: currentUser,
@@ -19044,35 +19065,42 @@ async function loadDocuments() {
     }
     
     try {
-        // Load documents from the global documents collection
-        const documentsSnapshot = await db.collection('generated_documents')
-            .orderBy('generated_at', 'desc')
-            .limit(100)
-            .get();
-        
+        // Documents are logged to localStorage (synced to users/{uid}.appState.documentLogs)
+        // and to Supabase — nothing writes a Firestore 'generated_documents' collection, so
+        // the synced per-user logs are the primary source here.
+        const usersSnapshot = await db.collection('users').get();
+
         let documents = [];
-        
-        if (documentsSnapshot.empty) {
-            // If no global collection, try to get from users
-            const usersSnapshot = await db.collection('users').get();
-            
-            for (const userDoc of usersSnapshot.docs) {
-                const userData = userDoc.data();
-                const userDocs = userData.generatedDocuments || [];
-                
-                userDocs.forEach(doc => {
-                    documents.push({
-                        ...doc,
-                        user_code: userData.displayName || userData.email || userDoc.id.substring(0, 8),
-                        user_email: userData.email || 'N/A'
-                    });
+        const seen = new Set();
+
+        usersSnapshot.forEach(userDoc => {
+            const userData = userDoc.data();
+            const logs = (userData.appState && Array.isArray(userData.appState.documentLogs) ? userData.appState.documentLogs : [])
+                .concat(Array.isArray(userData.generatedDocuments) ? userData.generatedDocuments : []);
+
+            logs.forEach(log => {
+                const key = log.document_id || (userDoc.id + '_' + (log.generated_at || ''));
+                if (seen.has(key)) return;
+                seen.add(key);
+                documents.push({
+                    ...log,
+                    user_code: userData.displayName || userData.email || userDoc.id.substring(0, 8),
+                    user_email: userData.email || 'N/A'
                 });
-            }
-        } else {
-            documentsSnapshot.forEach(doc => {
-                documents.push({ id: doc.id, ...doc.data() });
             });
-        }
+        });
+
+        // Merge anything that does exist in the Firestore collection (admin/manual entries)
+        try {
+            const documentsSnapshot = await db.collection('generated_documents').limit(500).get();
+            documentsSnapshot.forEach(doc => {
+                const data = doc.data();
+                const key = data.document_id || doc.id;
+                if (seen.has(key)) return;
+                seen.add(key);
+                documents.push({ id: doc.id, ...data });
+            });
+        } catch (e) { /* collection may not exist */ }
         
         if (documents.length === 0) {
             list.innerHTML = '<div class="bg-slate-900 rounded-lg p-6 text-center text-slate-400">No documents generated yet</div>';
@@ -19583,8 +19611,10 @@ async function loadCharts() {
                 }
             });
             
-            // Process generated documents
-            const userDocs = userData.generatedDocuments || [];
+            // Process generated documents — the synced per-user log
+            // (appState.documentLogs) is where document generation is recorded
+            const userDocs = (userData.appState && Array.isArray(userData.appState.documentLogs) ? userData.appState.documentLogs : [])
+                .concat(userData.generatedDocuments || []);
             userDocs.forEach(doc => {
                 const docType = doc.document_type || 'other';
                 if (documentTypes.hasOwnProperty(docType)) {
