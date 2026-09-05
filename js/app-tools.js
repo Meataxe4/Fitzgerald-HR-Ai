@@ -1196,9 +1196,11 @@ function exportTrainingPlanDOCXUnlocked() {
         const converted = htmlDocx.asBlob(html);
         const positionName = document.getElementById('trainingPosition').value.trim().replace(/\s+/g, '_');
         const filename = `Training_Plan_${positionName}_${Date.now()}.docx`;
-        
+
         saveAs(converted, filename);
-        
+
+        if (typeof logToolDocument === 'function') logToolDocument('trainingPlan', { format: 'docx' });
+
         if (typeof showNotification === 'function') {
             showNotification('✅ Training plan downloaded as DOCX', 'success');
         }
@@ -1217,9 +1219,11 @@ function exportTrainingPlanPDFUnlocked() {
         const docDefinition = buildTrainingPlanPDFDefinition();
         const positionName = document.getElementById('trainingPosition').value.trim().replace(/\s+/g, '_');
         const filename = `Training_Plan_${positionName}_${Date.now()}.pdf`;
-        
+
         pdfMake.createPdf(docDefinition).download(filename);
-        
+
+        if (typeof logToolDocument === 'function') logToolDocument('trainingPlan', { format: 'pdf' });
+
         if (typeof showNotification === 'function') {
             showNotification('✅ Training plan downloaded as PDF', 'success');
         }
@@ -2202,6 +2206,8 @@ async function downloadProbationDocumentUnlocked(format = 'pdf') {
             }
         }
         
+        if (typeof logToolDocument === 'function') logToolDocument('probationCheckIn', { format: format, employeeName: employeeName });
+
         if (typeof trackEvent === 'function') {
             trackEvent('probation_checkin_downloaded', {
                 user: currentUser,
@@ -2247,9 +2253,11 @@ function exportChecklistDOCXUnlocked() {
         const html = buildChecklistHTML();
         const converted = htmlDocx.asBlob(html);
         const filename = `Onboarding_Checklist_${onboardingState.position.replace(/\s+/g, '_')}_${Date.now()}.docx`;
-        
+
         saveAs(converted, filename);
-        
+
+        if (typeof logToolDocument === 'function') logToolDocument('onboardingChecklist', { format: 'docx' });
+
         if (typeof showNotification === 'function') {
             showNotification('✅ Checklist downloaded as DOCX', 'success');
         }
@@ -2277,7 +2285,9 @@ function exportChecklistPDFUnlocked() {
         const docDefinition = buildChecklistPDFDefinition();
         
         pdfMake.createPdf(docDefinition).download(filename);
-        
+
+        if (typeof logToolDocument === 'function') logToolDocument('onboardingChecklist', { format: 'pdf' });
+
         if (typeof showNotification === 'function') {
             showNotification('✅ Checklist downloaded as PDF', 'success');
         }
@@ -5795,7 +5805,11 @@ async function generateEmploymentContractUnlocked() {
             // Generate PDF
             await generateContractPDFDocument(contractHTML);
         }
-        
+
+        if (typeof logToolDocument === 'function') {
+            logToolDocument('employmentContract', { format: format });
+        }
+
         // Mark as saved
         contractBuilderState.unsavedChanges = false;
         
