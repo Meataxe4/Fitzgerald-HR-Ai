@@ -303,6 +303,13 @@
   .quote blockquote{font-size:clamp(1.2rem,2.4vw,1.6rem);font-weight:600;line-height:1.5;letter-spacing:-.01em;margin:28px 0 22px;text-wrap:balance}
   .quote blockquote .mark{color:var(--amber)}
   .quote cite{font-style:normal;font-size:.88rem;color:var(--muted)}
+  .quote-rotor{display:grid}
+  .quote-rotor .q-slide{grid-area:1/1;opacity:0;transition:opacity .6s ease;pointer-events:none}
+  .quote-rotor .q-slide.on{opacity:1;pointer-events:auto}
+  .q-dots{display:flex;justify-content:center;gap:8px;margin-top:18px}
+  .q-dot{width:8px;height:8px;border-radius:50%;border:0;padding:0;background:rgba(148,163,184,.35);cursor:pointer;transition:background .3s}
+  .q-dot.on{background:var(--amber)}
+  @media (prefers-reduced-motion:reduce){.quote-rotor .q-slide{transition:none}}
   .quote .moral{color:var(--muted);font-size:.95rem;max-width:56ch;margin:26px auto 0}
   .quote .moral b{color:var(--text)}
 
@@ -552,8 +559,20 @@
   <div class="wrap">
     <div class="quote rv">
       <span class="eyebrow" style="justify-content:center">Small businesses like yours, moments like these</span>
-      <blockquote><span class="mark">“</span>We had a kitchen hand walk out mid-Saturday service after an altercation. I was convinced we were going to get a claim lodged against us. Fitz walked me through exactly what to say, what to document, and what to avoid. We handled it correctly. No claim, no drama.<span class="mark">”</span></blockquote>
-      <cite>Business Owner · Inner West Sydney</cite>
+      <div class="quote-rotor" id="quoteRotor">
+        <div class="q-slide on">
+          <blockquote><span class="mark">“</span>We had a kitchen hand walk out mid-Saturday service after an altercation. I was convinced we were going to get a claim lodged against us. Fitz walked me through exactly what to say, what to document, and what to avoid. We handled it correctly. No claim, no drama.<span class="mark">”</span></blockquote>
+          <cite>Phil · Pub Owner and Operator, Alexandria NSW</cite>
+        </div>
+        <div class="q-slide">
+          <blockquote><span class="mark">“</span>We’ve worked with the team at Fitz HR for some time now and have found the platform and the team practical, responsive and easy to deal with. Fitz HR provides clear, commercially minded advice and support. I’d happily recommend Fitz HR to any business looking for reliable on demand HR support.<span class="mark">”</span></blockquote>
+          <cite>Jack · Workhorse Staffing</cite>
+        </div>
+      </div>
+      <div class="q-dots" aria-label="Testimonials">
+        <button class="q-dot on" type="button" aria-label="Show testimonial 1"></button>
+        <button class="q-dot" type="button" aria-label="Show testimonial 2"></button>
+      </div>
       <p class="moral">Same story in every sector — a support worker no-shows a 2am shift, a theft allegation on a Sunday, misconduct on night shift. <b>What decides the outcome is the call the manager makes in that moment.</b> Fitz makes sure it's the right one.</p>
     </div>
   </div>
@@ -704,6 +723,31 @@
     });
   }, {threshold:.15, rootMargin:'0px 0px -40px 0px'});
   document.querySelectorAll('.rv,.stagger').forEach(function(el){ io.observe(el); });
+
+  /* testimonial rotator — cycles every 8s, pauses on hover, dots for manual control */
+  var rotor = document.getElementById('quoteRotor');
+  if(rotor){
+    var qSlides = rotor.querySelectorAll('.q-slide');
+    var qDots = document.querySelectorAll('.q-dot');
+    var qi = 0, qTimer = null;
+    function qShow(n){
+      qi = n;
+      qSlides.forEach(function(s, i){ s.classList.toggle('on', i === n); });
+      qDots.forEach(function(d, i){ d.classList.toggle('on', i === n); });
+    }
+    function qStart(){
+      if(qTimer) clearInterval(qTimer);
+      qTimer = setInterval(function(){
+        if(!document.hidden) qShow((qi + 1) % qSlides.length);
+      }, 8000);
+    }
+    qDots.forEach(function(d, i){
+      d.addEventListener('click', function(){ qShow(i); qStart(); });
+    });
+    rotor.addEventListener('mouseenter', function(){ if(qTimer) clearInterval(qTimer); });
+    rotor.addEventListener('mouseleave', qStart);
+    qStart();
+  }
 
   /* counters */
   var cio = new IntersectionObserver(function(entries){
