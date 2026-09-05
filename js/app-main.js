@@ -11344,6 +11344,44 @@ async function logDocumentGeneration() {
     }
 }
 
+/**
+ * Logs a document produced by a tool outside the Document Builder — contracts,
+ * job descriptions, position descriptions, interview questions, reference
+ * checks, onboarding checklists, training plans, probation check-ins — into
+ * the same synced document log the admin dashboard aggregates, plus Supabase.
+ * Called at download time, so entries are marked downloaded immediately.
+ */
+async function logToolDocument(documentType, details = {}) {
+    const log = {
+        document_id: generateDocumentId(),
+        user_code: currentUser?.uid || currentUser,
+        document_type: documentType,
+        employee_name: details.employeeName || 'N/A',
+        generated_at: new Date().toISOString(),
+        downloaded: true,
+        downloaded_at: new Date().toISOString(),
+        format: details.format || null,
+        venue_name: venueProfile.venueName || null,
+        venue_location: venueProfile.location || null,
+        venue_city: venueProfile.city || null,
+        venue_type: venueProfile.venueType || null
+    };
+
+    try {
+        const userKey = currentUser && currentUser.uid ? currentUser.uid : currentUser;
+        const logs = JSON.parse(localStorage.getItem('documentLogs_' + userKey) || '[]');
+        logs.push(log);
+        localStorage.setItem('documentLogs_' + userKey, JSON.stringify(logs));
+        if (typeof debouncedSync === 'function') debouncedSync();
+    } catch (e) { }
+
+    if (supabaseClient) {
+        try {
+            await supabaseClient.from('generated_documents').insert([log]);
+        } catch (err) { }
+    }
+}
+
 // Log document download
 /**
  * Logs document download with format tracking
@@ -14963,6 +15001,7 @@ async function downloadJobDescriptionUnlocked(format) {
             
             showToast('✅ Job description downloaded as DOCX', 'success');
             trackEvent('job_description_downloaded', { format: 'docx', jobTitle: jdData.jobTitle });
+            logToolDocument('jobDescription', { format: 'docx' });
         } catch (error) {
             showToast('Error generating Word document. Please try PDF instead.', 'error');
         }
@@ -14976,6 +15015,7 @@ async function downloadJobDescriptionUnlocked(format) {
             });
             
             trackEvent('job_description_downloaded', { format: 'pdf', jobTitle: jdData.jobTitle });
+            logToolDocument('jobDescription', { format: 'pdf' });
         } catch (error) {
             showToast('Error generating PDF document', 'error');
         }
@@ -15438,6 +15478,7 @@ async function downloadPositionDescription(format = 'pdf') {
             
             showToast('✅ Position description downloaded as DOCX', 'success');
             trackEvent('position_description_downloaded', { format: 'docx', positionTitle: pdData.positionTitle });
+            logToolDocument('positionDescription', { format: 'docx' });
         } catch (error) {
             showToast('Error generating Word document. Please try PDF instead.', 'error');
         }
@@ -15451,6 +15492,7 @@ async function downloadPositionDescription(format = 'pdf') {
             });
             
             trackEvent('position_description_downloaded', { format: 'pdf', positionTitle: pdData.positionTitle });
+            logToolDocument('positionDescription', { format: 'pdf' });
         } catch (error) {
             showToast('Error generating PDF document', 'error');
         }
@@ -15777,6 +15819,7 @@ async function downloadInterviewQuestions(format) {
             
             showToast('✅ Interview questions downloaded as DOCX', 'success');
             trackEvent('interview_questions_downloaded', { format: 'docx', jobTitle: iqData.jobTitle });
+            logToolDocument('interviewQuestions', { format: 'docx' });
         } catch (error) {
             showToast('Error generating Word document. Please try PDF instead.', 'error');
         }
@@ -15790,6 +15833,7 @@ async function downloadInterviewQuestions(format) {
             });
             
             trackEvent('interview_questions_downloaded', { format: 'pdf', jobTitle: iqData.jobTitle });
+            logToolDocument('interviewQuestions', { format: 'pdf' });
         } catch (error) {
             showToast('Error generating PDF document', 'error');
         }
@@ -16068,6 +16112,7 @@ async function downloadReferenceCheckUnlocked(format) {
             
             showToast('✅ Reference check downloaded as DOCX', 'success');
             trackEvent('reference_check_downloaded', { format: 'docx', candidateName: candidateName });
+            logToolDocument('referenceCheck', { format: 'docx', employeeName: candidateName });
         } catch (error) {
             showToast('Error generating Word document. Please try PDF instead.', 'error');
         }
@@ -16082,6 +16127,7 @@ async function downloadReferenceCheckUnlocked(format) {
             });
             
             trackEvent('reference_check_downloaded', { format: 'pdf', candidateName: candidateName });
+            logToolDocument('referenceCheck', { format: 'pdf', employeeName: candidateName });
         } catch (error) {
             showToast('Error generating PDF document', 'error');
         }
@@ -19172,7 +19218,15 @@ async function loadDocuments() {
             formalWarning: { emoji: '⚠️', name: 'Formal Warning', borderClass: 'border-yellow-500', textClass: 'text-yellow-400' },
             recordOfDiscussion: { emoji: '📋', name: 'Record of Discussion', borderClass: 'border-green-500', textClass: 'text-green-400' },
             performanceImprovementPlan: { emoji: '📊', name: 'Performance Improvement Plan', borderClass: 'border-blue-500', textClass: 'text-blue-400' },
-            letterOfAllegation: { emoji: '🔍', name: 'Letter of Allegation', borderClass: 'border-red-500', textClass: 'text-red-400' }
+            letterOfAllegation: { emoji: '🔍', name: 'Letter of Allegation', borderClass: 'border-red-500', textClass: 'text-red-400' },
+            employmentContract: { emoji: '📑', name: 'Employment Contract', borderClass: 'border-emerald-500', textClass: 'text-emerald-400' },
+            jobDescription: { emoji: '📢', name: 'Job Description', borderClass: 'border-purple-500', textClass: 'text-purple-400' },
+            positionDescription: { emoji: '📋', name: 'Position Description', borderClass: 'border-purple-500', textClass: 'text-purple-400' },
+            interviewQuestions: { emoji: '🎤', name: 'Interview Questions', borderClass: 'border-purple-500', textClass: 'text-purple-400' },
+            referenceCheck: { emoji: '📞', name: 'Reference Check', borderClass: 'border-purple-500', textClass: 'text-purple-400' },
+            onboardingChecklist: { emoji: '✅', name: 'Onboarding Checklist', borderClass: 'border-emerald-500', textClass: 'text-emerald-400' },
+            trainingPlan: { emoji: '🎓', name: 'Training Plan', borderClass: 'border-emerald-500', textClass: 'text-emerald-400' },
+            probationCheckIn: { emoji: '🕒', name: 'Probation Check-In', borderClass: 'border-emerald-500', textClass: 'text-emerald-400' }
         };
         
         // Document list
