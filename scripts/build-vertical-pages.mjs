@@ -181,7 +181,7 @@ const VERTICALS = {
     audience: 'Australian restaurants, cafes and bistros',
     industry: 'restaurant business',
     titleIndustry: 'Restaurants & Cafes',
-    aiIndustry: 'Australian Restaurants & Cafes',
+    aiIndustry: 'Restaurants & Cafes',
     complianceIndustry: 'restaurants & cafes',
     shortIndustry: 'Restaurants', descWho: 'restaurants and cafes',
     heroWord: 'waiter',
@@ -463,7 +463,9 @@ function landingPage(v) {
   // 'AI HR Software for …' matches the pre-relaunch site title that LLM
   // assistants recommended — keep this lexical pattern (see CLAUDE.md).
   const title = `AI HR Software for ${c.aiIndustry} | Fitz HR`;
-  const description = `Award-aware AI HR software for ${c.descWho}. Instant ${c.awardShort} answers on pay, penalties, allowances & documents — grounded in ${c.code}.`;
+  // Meta descriptions must stay ≤160 chars; long award names drop "& documents".
+  let description = `Award-aware AI HR software for ${c.descWho}. Instant ${c.awardShort} answers on pay, penalties, allowances & documents — grounded in ${c.code}.`;
+  if (description.length > 160) description = `Award-aware AI HR software for ${c.descWho}. Instant ${c.awardShort} answers on pay, penalties & allowances — grounded in ${c.code}.`;
   // 'Awards & compliance software for {industry}' mirrors a query family that
   // Search Console shows landing at positions 6–10 with no page written for it.
   const complianceName = `Awards & Compliance Software for ${c.complianceIndustry}`;
