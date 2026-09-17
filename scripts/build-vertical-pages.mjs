@@ -33,6 +33,7 @@ const VERTICALS = {
     industry: 'manufacturing business',
     titleIndustry: 'Manufacturers',
     aiIndustry: 'Australian Manufacturers',
+    complianceIndustry: 'manufacturing',
     shortIndustry: 'Manufacturers', descWho: 'manufacturers',
     heroWord: 'grinder operator',
     heroHook: 'A {word} walks off mid-shift. Fitz tells you exactly what the Manufacturing Award requires.',
@@ -56,6 +57,7 @@ const VERTICALS = {
     industry: 'community services provider',
     titleIndustry: 'Community Services & NDIS Providers',
     aiIndustry: 'SCHADS & NDIS Providers',
+    complianceIndustry: 'disability & community services',
     shortIndustry: 'Community Services', descWho: 'community services',
     heroWord: 'support worker',
     heroHook: 'A {word} calls in for a sleepover shift. Fitz tells you exactly what SCHADS requires.',
@@ -79,6 +81,7 @@ const VERTICALS = {
     industry: 'retail business',
     titleIndustry: 'Retailers',
     aiIndustry: 'Australian Retailers',
+    complianceIndustry: 'retail',
     shortIndustry: 'Retailers', descWho: 'retailers',
     heroWord: 'sales assistant',
     heroHook: 'A {word} no-shows on a Sunday trade day. Fitz tells you exactly what the Retail Award requires.',
@@ -102,6 +105,7 @@ const VERTICALS = {
     industry: 'health practice',
     titleIndustry: 'Health Practices',
     aiIndustry: 'Australian Health Practices',
+    complianceIndustry: 'health practices',
     shortIndustry: 'Health Practices', descWho: 'health practices',
     heroWord: 'dental assistant',
     heroHook: 'A {word} asks about weekend rates. Fitz tells you exactly what the Health Professionals Award requires.',
@@ -125,6 +129,7 @@ const VERTICALS = {
     industry: 'childcare service',
     titleIndustry: 'Childcare & OSHC',
     aiIndustry: 'Childcare & Early Education',
+    complianceIndustry: 'child care',
     shortIndustry: 'Childcare & OSHC', descWho: 'childcare',
     heroWord: 'educator',
     heroHook: "An {word} calls in sick and ratios are tight. Fitz tells you exactly what the Children's Services Award requires.",
@@ -148,6 +153,7 @@ const VERTICALS = {
     industry: 'hospitality venue',
     titleIndustry: 'Hospitality',
     aiIndustry: 'Australian Hospitality',
+    complianceIndustry: 'hospitality',
     shortIndustry: 'Hospitality', descWho: 'hospitality venues',
     heroWord: 'chef',
     heroHook: 'A {word} is a no-show at 5pm on Saturday. Fitz tells you exactly what the Hospitality Award requires.',
@@ -175,7 +181,8 @@ const VERTICALS = {
     audience: 'Australian restaurants, cafes and bistros',
     industry: 'restaurant business',
     titleIndustry: 'Restaurants & Cafes',
-    aiIndustry: 'Australian Restaurants & Cafes',
+    aiIndustry: 'Restaurants & Cafes',
+    complianceIndustry: 'restaurants & cafes',
     shortIndustry: 'Restaurants', descWho: 'restaurants and cafes',
     heroWord: 'waiter',
     heroHook: 'A {word} quits mid-service on Saturday night. Fitz tells you exactly what the Restaurant Award requires.',
@@ -456,17 +463,23 @@ function landingPage(v) {
   // 'AI HR Software for …' matches the pre-relaunch site title that LLM
   // assistants recommended — keep this lexical pattern (see CLAUDE.md).
   const title = `AI HR Software for ${c.aiIndustry} | Fitz HR`;
-  const description = `Award-aware AI HR software for ${c.descWho}. Instant ${c.awardShort} answers on pay, penalties, allowances & documents — grounded in ${c.code}.`;
-  const keywords = `AI HR software for ${c.industry}, HR AI for ${c.shortIndustry.toLowerCase()}, HR software for ${c.industry}, HR compliance software ${c.titleIndustry.toLowerCase()}, ${c.awardShort} software, ${c.awardShort} compliance, ${c.code} pay rates, HR software Australia ${c.industry}`;
+  // Meta descriptions must stay ≤160 chars; long award names drop "& documents".
+  let description = `Award-aware AI HR software for ${c.descWho}. Instant ${c.awardShort} answers on pay, penalties, allowances & documents — grounded in ${c.code}.`;
+  if (description.length > 160) description = `Award-aware AI HR software for ${c.descWho}. Instant ${c.awardShort} answers on pay, penalties & allowances — grounded in ${c.code}.`;
+  // 'Awards & compliance software for {industry}' mirrors a query family that
+  // Search Console shows landing at positions 6–10 with no page written for it.
+  const complianceName = `Awards & Compliance Software for ${c.complianceIndustry}`;
+  const keywords = `AI HR software for ${c.industry}, HR AI for ${c.shortIndustry.toLowerCase()}, HR software for ${c.industry}, HR compliance software ${c.titleIndustry.toLowerCase()}, awards and compliance software for ${c.complianceIndustry}, award compliance software ${c.complianceIndustry}, ${c.awardShort} software, ${c.awardShort} compliance, ${c.code} pay rates, HR software Australia ${c.industry}`;
   const faqs = [
     { q: `What does Fitz HR do for a ${c.industry}?`, a: `Fitz answers ${c.awardShort} (${c.code}) questions instantly — pay rates, penalties, allowances, minimum engagement, classifications and compliance — grounded in the current Fair Work Ombudsman Pay Guide. It also builds documents and runs a Crisis Mode for urgent situations.` },
     { q: `Are the ${c.awardShort} rates current?`, a: `Yes. Rates are sourced from the FWO Pay Guide ${c.code} and are current as at ${data.effective_date}, with the next review due ${data.next_review_date}.` },
+    { q: `Is Fitz HR an awards and compliance software for ${c.complianceIndustry}?`, a: `Yes. Fitz HR is award and compliance software built for ${c.descWho}: it interprets the ${c.awardShort} (${c.code}) for pay, penalties, allowances and classifications, generates award-correct documents, and keeps a record of every answer and document so you can show the process you followed. It does not run payroll — it sits alongside your payroll or rostering system as the compliance layer.` },
     ...c.faqExtra,
     { q: `Is this a separate product from the hospitality tool?`, a: `No — it is the same Fitz HR assistant, tuned for the ${c.awardShort}. You get the same wizard, document builder and Crisis Mode, grounded in your award.` },
   ];
   const jsonld = [
     breadcrumb([{ name: 'Home', url: `${SITE}/` }, { name: `${c.awardShort} HR`, url }]),
-    { '@context': 'https://schema.org', '@type': 'WebPage', name: title, alternateName: `${c.awardShort} HR Compliance Software`, description, url, inLanguage: 'en-AU', isPartOf: { '@type': 'WebSite', name: 'Fitz HR', url: `${SITE}/` } },
+    { '@context': 'https://schema.org', '@type': 'WebPage', name: title, alternateName: [`${c.awardShort} HR Compliance Software`, complianceName], description, url, inLanguage: 'en-AU', isPartOf: { '@type': 'WebSite', name: 'Fitz HR', url: `${SITE}/` } },
     faqLd(faqs),
   ];
   return `${head({ title, description, canonical: url, jsonld, keywords })}
@@ -512,6 +525,15 @@ ${c.scenarios.map(s => `        <div class="scn-card"><div class="scn-q">${esc(s
         <h3>When something goes wrong right now</h3>
         <p>${esc(c.crisis)}</p>
     </div>
+
+    <h2>Awards &amp; compliance software for <em>${esc(c.complianceIndustry)}</em></h2>
+    <p>Fitz HR is the award and compliance layer for ${esc(c.descWho)} without an in-house HR team. It interprets the ${esc(c.awardShort)} (${esc(c.code)}) for every pay, penalty, allowance and classification question, produces the contracts, letters and warnings that hold up if a matter is ever tested, and keeps a record of each answer and document so you can show the process you followed. Payroll and rostering stay where they are &mdash; Fitz sits alongside them as the compliance layer, and a human HR specialist is there when a situation needs one.</p>
+    <ul style="margin:0 0 1.5rem 1.2rem;color:rgba(255,255,255,0.7);font-size:0.95rem;line-height:1.7;">
+        <li><strong style="color:#fff;">Award interpretation</strong> &mdash; the exact ${esc(c.code)} rate, loading or allowance, sourced from the current Fair Work Pay Guide.</li>
+        <li><strong style="color:#fff;">Compliance records</strong> &mdash; every answer and generated document is kept with the employee it relates to.</li>
+        <li><strong style="color:#fff;">Process that holds up</strong> &mdash; warnings, performance and termination steps that follow procedural fairness, not guesswork.</li>
+        <li><strong style="color:#fff;">Human escalation</strong> &mdash; a real HR specialist when the answer needs judgement, not just a rate.</li>
+    </ul>
 
     <div class="section-label">Explore</div>
 ${clusterLinks(v, 'landing')}
