@@ -405,6 +405,7 @@ function clusterLinks(v, current) {
     { key: 'best', href: `/compare/best-hr-software-${v}-australia`, label: 'Best software', title: `Best HR Software for ${VERTICALS[v].titleIndustry}`, blurb: `What to look for in HR & compliance software for ${pluralIndustry(VERTICALS[v].industry)} — and how Fitz compares.` },
   ].filter(l => l.key !== current);
   if (current === 'landing') links.push({ key: 'cheat', href: `/${v}-award-cheat-sheet`, label: 'Printable', title: `${VERTICALS[v].awardShort} Cheat Sheet`, blurb: 'Rates, penalties and allowances on one page — print or save as PDF.' });
+  if (current === 'landing') links.push({ key: 'classifications', href: `/${v}-award-classifications`, label: 'Classifications', title: `${VERTICALS[v].awardShort} Classifications`, blurb: 'Every classification level explained — who fits where, and what each level is paid.' });
   if (current === 'landing') links.push({ key: 'compliance', href: '/hr-compliance-software', label: 'Category', title: 'HR Compliance Software for Small Business', blurb: 'What HR compliance software has to do, what Fitz HR is and isn\'t, and how it compares.' });
   return `    <div class="hub-grid">
 ${links.map(l => `        <a href="${l.href}" class="hub-card"><div class="hub-label">${l.label}</div><h3>${esc(l.title)}</h3><p>${esc(l.blurb)}</p></a>`).join('\n')}
