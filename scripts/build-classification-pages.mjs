@@ -53,6 +53,11 @@ function page(v) {
   if (title.length > 60) title = `${c.short} Classifications & Pay | Fitz HR`;
   const description = `${c.short} (${code}) classification levels explained with 2026 full-time and casual pay rates for every level — sourced from the FWO Pay Guide.`;
   const groups = buildRows(data);
+  // Optional per-stream explainer (awards whose rates JSON carries a `streams`
+  // map, e.g. MA000027). Rendered before the tables; absent for other awards.
+  const streamsHtml = data.streams && typeof data.streams === 'object'
+    ? `    <h2>How the ${esc(c.short)} <em>Streams</em> Work</h2>\n    <ul>\n${Object.values(data.streams).map((t) => `        <li>${esc(String(t))}</li>`).join('\n')}\n    </ul>\n`
+    : '';
   const allRows = [...groups.values()].flat();
   const lo = Math.min(...allRows.map((r) => r.ft));
   const hi = Math.max(...allRows.map((r) => r.ft));
@@ -189,7 +194,7 @@ ${jsonld.map((j) => `    <script type="application/ld+json">\n    ${JSON.stringi
     </div>
 
     <h2>Every Classification &amp; <em>2026 Rate</em></h2>
-${tables}
+${streamsHtml}${tables}
     <p style="font-size:0.8rem;color:var(--w30);">*Casual rates include the 25% casual loading, as published in the FWO Pay Guide ${esc(code)}. Junior, apprentice and trainee rates differ — ask Fitz for those.</p>
 
     <h2>How to Read the <em>Levels</em></h2>

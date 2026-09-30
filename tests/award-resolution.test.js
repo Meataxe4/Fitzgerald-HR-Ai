@@ -224,7 +224,7 @@ eq('Retail casual min 3 hrs', retail.minimum_engagement.casual_hours_per_shift, 
 // ---- Health Professionals & Support Services data integrity (MA000027) ------
 const health = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'health-award-rates.json'), 'utf8'));
 eq('Health ma_number', health.ma_number, 'MA000027');
-eq('Health 80 rate rows (40 adult classifications x2)', health.rates.length, 80);
+eq('Health 90 rate rows (45 adult classifications x2: 13 support + 4 dental + 4 pathology + 24 health professional)', health.rates.length, 90);
 eq('Health four streams present', [...new Set(health.rates.map(r => r.stream))].sort().join(','),
    'dental_assistants,health_professionals,pathology_collectors,support_services');
 eq('Health Saturday FT/PT 1.5', health.penalty_rates.saturday_full_time_part_time, 1.5);
@@ -244,11 +244,43 @@ eq('Health Support L1 weekly $1024.70', hss1 && hss1.weekly_rate, 1024.70);
 // rate x multiplier reproduces the published penalty-dollar columns (Sat 150%, PH 250%).
 eq('Health Support L1 Saturday = $40.46 (PDF)', r2(hss1.rate * health.penalty_rates.saturday_full_time_part_time), 40.46);
 eq('Health Support L1 Public holiday = $67.43 (PDF)', r2(hss1.rate * health.penalty_rates.public_holiday_full_time_part_time), 67.43);
-// Health Professional top rate = $71.19 (weekly $2,705.10).
-const hp44 = health.rates.find(r => r.stream === 'health_professionals' && r.employment_type === 'full_time' && r.classification === 'Level 4 - pay point 4');
-eq('Health Professional L4pp4 rate $71.19', hp44 && hp44.rate, 71.19);
-eq('Health Professional L4pp4 casual rate $88.99',
-   (health.rates.find(r => r.stream === 'health_professionals' && r.employment_type === 'casual' && r.classification === 'Level 4 - pay point 4') || {}).rate, 88.99);
+// Health Professional stream from 1 October 2026 (PR814029 / FWO Pay Guide 26 Aug 2026):
+// Level 1 = AQF level x experience band (20 cells); Levels 2.1, 2.2, 3, 4 single rates. No pay points.
+const hpFT = health.rates.filter(r => r.stream === 'health_professionals' && r.employment_type === 'full_time');
+const hpCas = health.rates.filter(r => r.stream === 'health_professionals' && r.employment_type === 'casual');
+eq('Health Professional 24 full-time classifications', hpFT.length, 24);
+eq('Health Professional 24 casual classifications', hpCas.length, 24);
+eq('Health Professional has NO pay points after 1 Oct 2026', hpFT.some(r => /pay point/i.test(r.classification)), false);
+eq('Health Professional Level 1 = 5 AQF levels x 4 bands', hpFT.filter(r => r.hp_level === '1').length, 20);
+const hpAqf7y1 = hpFT.find(r => r.classification === 'Level 1 - AQF Level 7 - 1st year');
+eq('Health Professional L1 AQF7 1st year rate $34.44', hpAqf7y1 && hpAqf7y1.rate, 34.44);
+eq('Health Professional L1 AQF7 1st year weekly $1308.80 (= standard rate, cl.2)', hpAqf7y1 && hpAqf7y1.weekly_rate, 1308.80);
+eq('Health standard_rate weekly $1308.80', health.standard_rate && health.standard_rate.weekly, 1308.80);
+const hpAqf9top = hpFT.find(r => r.classification === 'Level 1 - AQF Level 9 - 7th year+');
+eq('Health Professional L1 AQF9 7th year+ rate $46.18', hpAqf9top && hpAqf9top.rate, 46.18);
+eq('Health Professional L1 AQF9 7th year+ casual $57.73',
+   (hpCas.find(r => r.classification === 'Level 1 - AQF Level 9 - 7th year+') || {}).rate, 57.73);
+const hp4 = hpFT.find(r => r.classification === 'Level 4');
+eq('Health Professional Level 4 rate $65.77', hp4 && hp4.rate, 65.77);
+eq('Health Professional Level 4 weekly $2499.10', hp4 && hp4.weekly_rate, 2499.10);
+eq('Health Professional Level 4 casual rate $82.21', (hpCas.find(r => r.classification === 'Level 4') || {}).rate, 82.21);
+eq('Health Professional Level 2.2 and Level 3 equal in stage 1 ($52.19)',
+   (hpFT.find(r => r.classification === 'Level 2.2') || {}).rate === 52.19 && (hpFT.find(r => r.classification === 'Level 3') || {}).rate === 52.19, true);
+// Every casual HP rate is the full-time rate + 25% loading (Pay Guide published figures).
+eq('Health Professional casual = FT x 1.25 for every classification',
+   hpCas.every(c => { const f = hpFT.find(x => x.classification === c.classification); return f && Math.abs(r2(f.rate * 1.25) - c.rate) <= 0.011; }), true);
+// Schedule B, translation and retained rates (Schedule J.4) are present and internally consistent.
+eq('Health Schedule B lists 47 professions', health.schedule_b && health.schedule_b.professions.length, 47);
+eq('Health Schedule B: Physiotherapist is AQF 7', (health.schedule_b.professions.find(p => p.profession === 'Physiotherapist') || {}).aqf_levels.join(','), '7');
+eq('Health Schedule B: Psychologist is AQF 9', (health.schedule_b.professions.find(p => p.profession === 'Psychologist') || {}).aqf_levels.join(','), '9');
+eq('Health J.4.1 has 14 translation tables', Object.values(health.translation.J_4_1_previous_levels_1_and_2.tables).reduce((n, t) => n + t.length, 0), 14);
+eq('Health J.4.3 retains 12 previous rates', health.retained_rates && health.retained_rates.rates.length, 12);
+const ret = Object.fromEntries(health.retained_rates.rates.map(r => [r.previous_classification, r.rate]));
+eq('Health retained L4 pp4 $71.19 > new Level 4 $65.77', ret['Level 4 - pay point 4'] === 71.19 && ret['Level 4 - pay point 4'] > hp4.rate, true);
+eq('Health retained L3 pp5 $52.19 > new Level 2.1 $51.19', ret['Level 3 - pay point 5'] > (hpFT.find(r => r.classification === 'Level 2.1') || {}).rate, true);
+eq('Health every Pay Guide retained-rate case has retained > translated',
+   health.pay_guide_retained_rate_cases.cases.every(c => { const t = hpFT.find(r => r.classification === c.translated_classification); return t && c.previously_classified_on_2026_09_30_as.every(p => ret[p] > t.rate); }), true);
+eq('Health effective date 2026-10-01', health.effective_date, '2026-10-01');
 // Minimum engagement + annualised wage sourced from award text.
 eq('Health casual min 3 hrs (clause 11.2)', health.minimum_engagement.casual_hours_per_shift, 3);
 eq('Health has NO fixed part-time per-shift minimum', health.minimum_engagement.part_time_hours_per_shift, undefined);
@@ -345,6 +377,92 @@ eq('Chat grounds retail cold-work allowance as $0.38 per hour',
    /Cold work allowance \(0°C and above\): \$0\.38 per hour \(while so employed\)/.test(retailFacts), true);
 eq('Chat allowance facts include a header for the award', /ALLOWANCES — General Retail Industry Award MA000004/.test(retailFacts), true);
 eq('buildAllowanceFacts fails closed with no allowances block', buildAllowanceFacts({ award_name: 'X' }, 'X'), '');
+
+// ---- Health Professionals wizard: steps + resolver (1 Oct 2026 restructure) ----
+// Extract the real _calcHealthSteps / _healthClassificationKey / resolveHealthRate
+// and run them against the shipped health-award-rates.json. Locks: (a) the
+// health-professional-only steps are hidden for support/dental/pathology users,
+// (b) the new AQF x years classification resolves to the Pay Guide figures,
+// (c) the clause J.4.3 retained-rate rule applies only when it is higher.
+{
+  const hsStart = src.indexOf('function _calcHealthSteps(');
+  const hsEnd = src.indexOf('function getAwardCalculatorConfig(');
+  if (hsStart === -1 || hsEnd === -1) throw new Error('health wizard markers not found');
+  const hsBlock = src.slice(hsStart, hsEnd);
+  const hsFactory = new Function('awardRates', hsBlock + '\nreturn { _calcHealthSteps, _healthClassificationKey, resolveHealthRate };');
+  const H = hsFactory(health);
+  const visibleKeys = (data) => H._calcHealthSteps().filter(st => typeof st.visibleWhen !== 'function' || st.visibleWhen(data)).map(st => st.key);
+  eq('Health wizard: support services user sees only stream/level/employment',
+     visibleKeys({ healthStream: 'support_services' }).join(','), 'healthStream,healthClass,employment');
+  eq('Health wizard: dental assistant user sees no health-professional steps',
+     visibleKeys({ healthStream: 'dental_assistants' }).join(','), 'healthStream,healthClass,employment');
+  eq('Health wizard: health professional Level 1 path',
+     visibleKeys({ healthStream: 'health_professionals', healthLevel: '1', healthOnAward30Sep: 'no' }).join(','),
+     'healthStream,healthLevel,healthProfession,healthAqf,healthYears,healthOnAward30Sep,employment');
+  eq('Health wizard: health professional Level 3 path skips profession/AQF/years',
+     visibleKeys({ healthStream: 'health_professionals', healthLevel: '3', healthOnAward30Sep: 'no' }).join(','),
+     'healthStream,healthLevel,healthOnAward30Sep,employment');
+  eq('Health wizard: employed on 30 Sep 2026 adds the previous-classification step',
+     visibleKeys({ healthStream: 'health_professionals', healthLevel: '2.1', healthOnAward30Sep: 'yes' }).indexOf('healthPrevClass') !== -1, true);
+  const steps = H._calcHealthSteps();
+  const profStep = steps.find(st => st.key === 'healthProfession');
+  eq('Health wizard: profession list = 47 Schedule B professions + Other', profStep.options({}).length, 48);
+  const aqfOpts = steps.find(st => st.key === 'healthAqf').options({ healthProfession: 'Physiotherapist' });
+  eq('Health wizard: AQF 7 flagged as listed for Physiotherapist', aqfOpts.find(o => o.value === '7').sublabel, 'Listed for this profession in Schedule B');
+  eq('Health wizard: classification key L1', H._healthClassificationKey({ healthStream: 'health_professionals', healthLevel: '1', healthAqf: '7', healthYears: '1st year' }), 'Level 1 - AQF Level 7 - 1st year');
+  eq('Health wizard: classification key L2.2', H._healthClassificationKey({ healthStream: 'health_professionals', healthLevel: '2.2' }), 'Level 2.2');
+  // Resolver — new starter, full-time physio AQF 7 first year.
+  const r1 = H.resolveHealthRate({ healthStream: 'health_professionals', healthLevel: '1', healthProfession: 'Physiotherapist', healthAqf: '7', healthYears: '1st year', healthOnAward30Sep: 'no', employment: 'full_time' });
+  eq('Health resolver: AQF7 1st year FT $34.44', r1.rate, 34.44);
+  eq('Health resolver: AQF7 1st year weekly $1308.80', r1.weeklyRate, 1308.80);
+  eq('Health resolver: AQF7 1st year Saturday $51.66 (Pay Guide)', r1.penalties.some(x => x.indexOf('Saturday (150%): $51.66/hr') !== -1), true);
+  eq('Health resolver: AQF7 1st year public holiday $86.10 (Pay Guide)', r1.penalties.some(x => x.indexOf('Public holiday (250%): $86.10/hr') !== -1), true);
+  // Resolver — casual AQF 9 7th year+.
+  const r2 = H.resolveHealthRate({ healthStream: 'health_professionals', healthLevel: '1', healthAqf: '9', healthYears: '7th year+', healthOnAward30Sep: 'no', employment: 'casual' });
+  eq('Health resolver: AQF9 7th year+ casual $57.73', r2.rate, 57.73);
+  eq('Health resolver: AQF9 7th year+ casual Saturday $80.82 (Pay Guide)', r2.penalties.some(x => x.indexOf('Saturday (175%): $80.82/hr') !== -1), true);
+  // Resolver — retained rate wins (old Level 4 pay point 4 $71.19 > new Level 4 $65.77).
+  const r3 = H.resolveHealthRate({ healthStream: 'health_professionals', healthLevel: '4', healthOnAward30Sep: 'yes', healthPrevClass: 'Level 4 - pay point 4', employment: 'full_time' });
+  eq('Health resolver: retained L4pp4 rate $71.19 applies over $65.77', r3.rate, 71.19);
+  eq('Health resolver: retained L4pp4 weekly $2705.10', r3.weeklyRate, 2705.10);
+  eq('Health resolver: retained rate labelled', /retained rate/.test(r3.level), true);
+  eq('Health resolver: retained rate drives penalties (Sat 150% = $106.79)', r3.penalties.some(x => x.indexOf('Saturday (150%): $106.79/hr') !== -1), true);
+  // Resolver — retained rate for a casual (old L3 pp5 $52.19 > new L2.1 $51.19; casual = x1.25).
+  const r4 = H.resolveHealthRate({ healthStream: 'health_professionals', healthLevel: '2.1', healthOnAward30Sep: 'yes', healthPrevClass: 'Level 3 - pay point 5', employment: 'casual' });
+  eq('Health resolver: retained L3pp5 casual $65.24', r4.rate, 65.24);
+  // Resolver — retained rate does NOT apply when translated is higher (old L1 pp1 $30.89 < AQF7 1st year $34.44).
+  const r5 = H.resolveHealthRate({ healthStream: 'health_professionals', healthLevel: '1', healthAqf: '7', healthYears: '1st year', healthOnAward30Sep: 'yes', healthPrevClass: 'Level 1 - pay point 1', employment: 'full_time' });
+  eq('Health resolver: no retained rate when translated is higher', r5.rate, 34.44);
+  eq('Health resolver: says no retained rate applies', r5.penalties[0].indexOf('No retained rate applies') === 0, true);
+  // Resolver — old L3 pp5 vs new Level 3 (equal $52.19): no retained rate.
+  const r6 = H.resolveHealthRate({ healthStream: 'health_professionals', healthLevel: '3', healthOnAward30Sep: 'yes', healthPrevClass: 'Level 3 - pay point 5', employment: 'full_time' });
+  eq('Health resolver: equal rates -> translated rate, no retained flag', r6.rate === 52.19 && !/retained rate/.test(r6.level), true);
+  // Resolver — support services path unchanged (no HP fields needed).
+  const r7 = H.resolveHealthRate({ healthStream: 'support_services', healthClass: 'Level 1', employment: 'full_time' });
+  eq('Health resolver: support services L1 still $26.97', r7.rate, 26.97);
+  eq('Health resolver: support services untouched by retained-rate logic', r7.penalties.some(x => /retained/i.test(x)), false);
+  const r8 = H.resolveHealthRate({ healthStream: 'pathology_collectors', healthClass: 'Level 7 - pathology collector (qualified)', employment: 'casual' });
+  eq('Health resolver: pathology collector L7 (qualified) casual $40.84', r8.rate, 40.84);
+}
+
+// ---- Chat prompt: CLASSIFICATION STRUCTURE section is health-only ----
+{
+  const chatSrc = fs.readFileSync(path.join(__dirname, '..', 'netlify', 'functions', 'chat.js'), 'utf8');
+  const hosp = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'hospitality-award-rates.json'), 'utf8'));
+  const cfStart = chatSrc.indexOf('function buildClassificationFacts(');
+  const cfEnd = chatSrc.indexOf('// Builds the MINIMUM ENGAGEMENT section');
+  if (cfStart === -1 || cfEnd === -1) throw new Error('buildClassificationFacts markers not found');
+  const buildClassificationFacts = new Function(chatSrc.slice(cfStart, cfEnd) + '\nreturn buildClassificationFacts;')();
+  eq('Chat classification facts: empty for Hospitality', buildClassificationFacts(hosp, 'Hospitality Industry (General) Award MA000009'), '');
+  eq('Chat classification facts: empty for Retail', buildClassificationFacts(retail, 'General Retail Industry Award MA000004'), '');
+  eq('Chat classification facts: empty for SCHADS', buildClassificationFacts(schads, 'SCHADS Award MA000100'), '');
+  const cf = buildClassificationFacts(health, 'Health Professionals and Support Services Award MA000027');
+  eq('Chat classification facts: present for Health', cf.indexOf('CLASSIFICATION STRUCTURE') === 0, true);
+  eq('Chat classification facts: explains AQF x years', /AQF Level 5, 6, 7, 8 or 9/.test(cf) && /7th year\+/.test(cf), true);
+  eq('Chat classification facts: explains retained rates (J.4.3)', /J\.4\.3/.test(cf), true);
+  eq('Chat classification facts: lists Physiotherapist AQF 7', /Physiotherapist AQF 7/.test(cf), true);
+  eq('Chat classification facts: never quotes a base rate', /\$\d/.test(cf), false);
+}
 
 console.log('\n' + pass + ' passed, ' + fail + ' failed');
 process.exit(fail ? 1 : 0);

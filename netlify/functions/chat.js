@@ -91,13 +91,40 @@ function buildPenaltyRateFacts(rates, awardLabel) {
   } else if (rates.ma_number === 'MA000004') {
     lines.push(`NOTE: General Retail penalties (clause 22) are, for full-time/part-time employees, Saturday 125%, Sunday 150% and public holiday 225% of the ordinary hourly rate; casual employees add the 25% casual loading (Saturday 150%, Sunday 175%, public holiday 250%). A separate evening loading of 25% applies to ordinary hours worked after 6:00pm Monday to Friday (150% for casuals, i.e. 125% + the 25% loading). Weekend and public holiday penalty rates apply instead of the evening loading on those days, not on top. Overtime (clause 21) is 150% for the first 3 hours and 200% thereafter, with all Sunday overtime at 200% and public holiday overtime at 250%. These figures are the adult classification rates; junior (age-scaled) and apprentice rates are a percentage of the adult rate — direct the user to the Pay Guide for those.`);
   } else if (rates.ma_number === 'MA000027') {
-    lines.push(`NOTE: Health Professionals & Support Services penalties (clause 26) are, for full-time/part-time employees, Saturday and Sunday 150% and public holiday 250% of the minimum hourly rate; casual employees add the 25% loading (Saturday/Sunday 175%, public holiday 275%). A Monday-to-Friday shiftwork loading of 15% applies to shiftworkers' ordinary hours (115% full-time/part-time, 140% casual). Overtime (clause 25) is 150% for the first 2 hours and 200% thereafter, with Sunday overtime 200%. For CASUALS, the overtime percentage is applied to the loaded casual rate (multiplicative), giving 187.5% for the first 2 hours, 250% thereafter, 250% Sunday overtime and 312.5% public holiday overtime — do not simply add the 25% loading to the overtime figure. A 'less than 10 hour break after overtime' rate of 200% also applies (clause 25). These figures are the adult classification rates across the four streams (Support Services, Dental assistants, Pathology collectors, Health Professionals); junior and apprentice rates are not listed here — direct the user to the Pay Guide.`);
+    lines.push(`NOTE: Health Professionals & Support Services penalties (clause 26) are, for full-time/part-time employees, Saturday and Sunday 150% and public holiday 250% of the minimum hourly rate; casual employees add the 25% loading (Saturday/Sunday 175%, public holiday 275%). A Monday-to-Friday shiftwork loading of 15% applies to shiftworkers' ordinary hours (115% full-time/part-time, 140% casual). Overtime (clause 25) is 150% for the first 2 hours and 200% thereafter, with Sunday overtime 200%. For CASUALS, the overtime percentage is applied to the loaded casual rate (multiplicative), giving 187.5% for the first 2 hours, 250% thereafter, 250% Sunday overtime and 312.5% public holiday overtime — do not simply add the 25% loading to the overtime figure. A 'less than 10 hour break after overtime' rate of 200% also applies (clause 25). These figures are the adult classification rates across the four streams (Support Services, Dental assistants, Pathology collectors, Health Professionals); junior and apprentice rates are not listed here — direct the user to the Pay Guide. See the CLASSIFICATION STRUCTURE section for how health professionals are classified from 1 October 2026.`);
   } else if (rates.ma_number === 'MA000120') {
     lines.push(`NOTE: Children's Services penalties (clause 23) are, for full-time/part-time employees, Sunday 200% and public holiday 250% of the ordinary hourly rate. Saturday is different: shiftworkers receive a 150% ordinary penalty, while day workers (non-shiftworkers) are paid OVERTIME for Saturday work (150% first 2 hours, 200% thereafter) — there is no ordinary weekday-equivalent Saturday penalty for day workers. Shiftwork loadings are early morning +10% (110%), afternoon +15% (115%), rotating night +17.5% (117.5%) and permanent night +30% (130%). Overtime is 150% for the first 2 hours and 200% thereafter (Monday-Saturday). Casual employees add the 25% casual loading to EVERY penalty, shift and overtime rate (additive): e.g. early morning 135%, permanent night 155%, Sunday 225%, public holiday 275%, overtime 175%/225%. These figures are the adult classification rates for the Support worker and Children's services employee (educator) streams; junior and apprentice rates are not listed here — direct the user to the Pay Guide.`);
   } else {
     lines.push(`NOTE: Weekend and public holiday rates supersede the late-night loadings.`);
   }
 
+  return lines.join('\n');
+}
+
+// Builds the CLASSIFICATION STRUCTURE section of the system prompt. Emitted only
+// for awards whose rates JSON carries a classification model — today only the
+// Health Professionals and Support Services Award (MA000027), whose health
+// professional stream was restructured from 1 October 2026 (FWC determination
+// PR814029). Every other award returns '' so its prompt is unchanged. Never
+// quotes base rates (the BASE RATE policy below still applies).
+function buildClassificationFacts(rates, awardLabel) {
+  if (!rates || rates.ma_number !== 'MA000027') return '';
+  const c = rates.health_professional_classification || {};
+  const l1 = c.level_1 || {};
+  const professions = (rates.schedule_b && rates.schedule_b.professions) || [];
+  const lines = [`CLASSIFICATION STRUCTURE — ${awardLabel} (health professional stream, from the first full pay period on or after 1 October 2026, FWC determination PR814029):`];
+  lines.push(`- Health Professional employee Level 1 has NO pay points. It is classified by (1) the AQF level of the profession's standard minimum qualification under Schedule B (AQF Level 5, 6, 7, 8 or 9) and (2) years of experience in the profession at Level 1 with ANY employer: ${(l1.experience_bands || []).join(', ')}. Experience is not tenure with the current employer, and the former 1,824-hour part-time progression rule no longer applies.`);
+  if (Array.isArray(l1.aqf_selection_rules_B2) && l1.aqf_selection_rules_B2.length) {
+    lines.push(`- Choosing the AQF level (clause B.2): ${l1.aqf_selection_rules_B2.join(' ')}`);
+  }
+  if (professions.length) {
+    lines.push(`- Schedule B standard minimum qualifications: ${professions.map(p => `${p.profession} AQF ${p.aqf_levels.join('/')}`).join('; ')}.`);
+  }
+  lines.push(`- Level 2 (Senior Clinician, Specialist, Supervisor or Educator): Level 2.1 = less than 5 years performing Level 2 role(s) and duties; Level 2.2 = 5 years or more. Level 3 = Advanced Clinician, Senior Specialist or Section Manager (appointed to the role). Level 4 = Manager with resource, budget and strategic accountability. Definitions are in Schedule A.2.`);
+  lines.push(`- Employees classified as health professionals on 30 September 2026 translate under Schedule J.4: old Levels 1-2 by the profession's AQF level and entry qualification pathway (J.4.1); old Level 3 by duties — Senior Clinician/Specialist/Supervisor/Educator becomes Level 2.1 (under 5 years) or 2.2 (5 years or more), Advanced Clinician/Senior Specialist/Section Manager becomes Level 3 (J.4.2); old Level 4 stays Level 4. They are paid the HIGHER of the translated rate and their 30 September 2026 rate (clause J.4.3). Always ask whether the employee was on this award before 1 October 2026 before classifying them. Annualised wage arrangements made with a former Level 2 employee continue (J.4.4).`);
+  lines.push(`- Support services (Levels 1-9), dental assistant (Levels 3, 5, 6, 7) and pathology collector (Levels 5, 6, 7) classifications are unchanged.`);
+  lines.push(`- These increases are stage 1 of 5; further stages are expected from 30 June 2027, 2028, 2029 and 2030 on top of Annual Wage Review rises.`);
+  lines.push(`- Do NOT quote base rates. For the dollar figure direct the user to the Award Wizard, which applies the AQF level, experience band and retained-rate rule.`);
   return lines.join('\n');
 }
 
@@ -340,6 +367,7 @@ exports.handler = async (event, context) => {
     const penaltyRateFacts = resolvedAward ? buildPenaltyRateFacts(ratesData, awardFullName) : '';
     const minimumEngagementFacts = resolvedAward ? buildMinimumEngagementFacts(ratesData, awardFullName) : '';
     const allowanceFacts = resolvedAward ? buildAllowanceFacts(ratesData, awardFullName) : '';
+    const classificationFacts = resolvedAward ? buildClassificationFacts(ratesData, awardFullName) : '';
 
     // System prompt for Fitz HR Assistant. When the award is resolved we use the
     // full award-aware prompt; when it is not, we fall back to a floor-only prompt
@@ -354,6 +382,7 @@ ${penaltyRateFacts}
 
 ${minimumEngagementFacts}
 ${allowanceFacts ? '\n' + allowanceFacts + '\n' : ''}
+${classificationFacts ? '\n' + classificationFacts + '\n' : ''}
 CRITICAL — MINIMUM ENGAGEMENT QUESTIONS:
 When a user asks about minimum shift length, minimum engagement, "shortest shift", "send someone home early", or "minimum hours per shift", you MUST quote the figures from the MINIMUM ENGAGEMENT section above for ${awardFullName}. Do NOT say "no minimum is specified" or "this depends on the contract" — the modern award sets explicit minimums and they always apply.
 

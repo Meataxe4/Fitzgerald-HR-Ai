@@ -758,6 +758,122 @@ ${h.penaltyTable(h.data)}` },
   // =====================================================================
   health: [
     {
+      slug: 'health-professionals-award-changes-1-october-2026',
+      tag: 'Award Changes · Classifications · 1 October 2026', cardTag: 'Award Changes · MA000027',
+      h1: 'Health Professionals Award Changes from 1 October 2026 — <em>New Levels, New Rates</em>',
+      cardTitle: 'Health Professionals Award Changes: 1 October 2026',
+      title: 'Health Professionals Award Changes 1 Oct 2026: New Rates',
+      metaDesc: 'What changed in the Health Professionals Award on 1 October 2026: Level 1 by AQF level and experience, Levels 2.1 to 4 by role, new rates and retained pay.',
+      keywords: 'health professionals award changes 1 october 2026, HPSS award changes 2026, health professionals award new classifications, MA000027 AQF level, health professionals award retained rates, PR814029, allied health award changes october 2026, physiotherapist award rate 2026',
+      blurb: 'Pay points are gone for health professionals. How Level 1 now works (AQF level x years of experience), the new Levels 2.1, 2.2, 3 and 4, the rates, and the retained-rate rule for staff employed on 30 September 2026.',
+      datePublished: '2026-09-30', dateModified: '2026-09-30', datePublishedLabel: '30 Sep 2026', dateModifiedLabel: '30 Sep 2026', readMin: 8,
+      intro: 'From the first full pay period on or after <strong>1 October 2026</strong>, the Fair Work Commission has rebuilt the health professional classification structure in the <strong>Health Professionals and Support Services Award MA000027</strong>. Pay points are gone. This guide sets out the new structure, the new rates, how existing staff translate across, and what a practice has to do.',
+      summary: 'From 1 October 2026 (FWC determination PR814029), Health Professional Level 1 is classified by the AQF level of the profession\'s standard minimum qualification (Schedule B: AQF 5 to 9) and years of experience in the profession (1st year, 2nd–3rd, 4th–6th, 7th+), with no pay points. Levels 2.1, 2.2, 3 and 4 are single rates defined by role. Full-time rates run from $32.44 to $65.77 an hour. Anyone employed as a health professional on 30 September 2026 is paid the higher of their translated rate and their previous rate (clause J.4.3). Support services, dental assistant and pathology collector rates are unchanged.',
+      quickRefLabel: 'Quick Reference — 1 October 2026 Changes',
+      quickRef: [
+        '<strong>Applies from:</strong> first full pay period on or after 1 October 2026',
+        '<strong>Who changes:</strong> health professional stream only',
+        '<strong>Level 1:</strong> AQF level (5–9) x years of experience in the profession — no pay points',
+        '<strong>Levels 2.1, 2.2, 3, 4:</strong> single rates by role ($51.19, $52.19, $52.19, $65.77/hr)',
+        '<strong>Existing staff:</strong> higher of translated rate and 30 September 2026 rate (cl. J.4.3)',
+        '<strong>Unchanged:</strong> support services, dental, pathology, penalties, allowances',
+      ],
+      sections: () => [
+        { h2: 'What Changed <em>and Why</em>', html:
+`    <p>The Fair Work Commission's <strong>Gender-based undervaluation – priority awards review</strong> found that the health professional minimum rates in MA000027 had not properly valued the qualifications, skill and responsibility of the work. Its determination <strong>PR814029</strong>, issued on 7 September 2026, replaces clause 17, the Schedule A.2 definitions and Schedule B, and adds translation rules in Schedule J.4. It applies from the first full pay period on or after <strong>1 October 2026</strong>.</p>
+    <p>Only the <strong>health professional stream</strong> is affected. Support services (Levels 1–9), dental assistants and pathology collectors keep the rates set on 1 July 2026 (the dental and pathology changes happened separately on 1 April 2026). The Fair Work Ombudsman published the new Pay Guide on 26 August 2026.</p>` },
+        { h2: 'Level 1: AQF Level <em>x Years of Experience</em>', html:
+`    <p>Level 1 is a practising health professional. Their minimum rate is now set by two things: the <strong>AQF level</strong> of the standard minimum qualification for their profession, listed in the award's new Schedule B, and their <strong>years of experience in the profession at Level 1 with any employer</strong>. Experience is not tenure with you. The old rule that a part-time employee needed 1,824 hours before moving up no longer applies.</p>
+    <table class="rate-table">
+        <thead><tr><th>Profession (Schedule B)</th><th>AQF level</th></tr></thead>
+        <tbody>
+            <tr><td>Physiotherapist, Occupational Therapist, Podiatrist, Pharmacist, Exercise Physiologist, Dental Hygienist, Oral Health Therapist, Medical Imaging Technologist</td><td>AQF 7</td></tr>
+            <tr><td>Sonographer, Medical Librarian, Biomedical Engineer</td><td>AQF 8</td></tr>
+            <tr><td>Psychologist, Chiropractor, Osteopath, Audiologist, Music Therapist, Clinical Perfusionist</td><td>AQF 9</td></tr>
+            <tr><td>Remedial Masseur, Aromatherapist, Reflexologist, Medical Laboratory Technician, Biomedical Technologist</td><td>AQF 5</td></tr>
+            <tr><td>Myotherapist</td><td>AQF 6</td></tr>
+            <tr><td>Counsellor, Social Worker, Dietitian, Speech Pathologist, Health Information Manager, Radiation Therapist</td><td>Range listed — see clause B.2</td></tr>
+        </tbody>
+    </table>
+    <p class="caption">Selected entries from the 47 professions in Schedule B. Where a range is listed, clause B.2 picks the level from the qualification held; a higher qualification required by the employer always wins.</p>
+    <table class="rate-table">
+        <thead><tr><th>Level 1</th><th>1st year</th><th>2nd–3rd year</th><th>4th–6th year</th><th>7th year+</th></tr></thead>
+        <tbody>
+            <tr><td>AQF Level 5</td><td>$1,232.70<br><span style="color:var(--w30)">$32.44/hr</span></td><td>$1,308.80<br><span style="color:var(--w30)">$34.44/hr</span></td><td>$1,426.00<br><span style="color:var(--w30)">$37.53/hr</span></td><td>$1,541.30<br><span style="color:var(--w30)">$40.56/hr</span></td></tr>
+            <tr><td>AQF Level 6</td><td>$1,232.70<br><span style="color:var(--w30)">$32.44/hr</span></td><td>$1,308.80<br><span style="color:var(--w30)">$34.44/hr</span></td><td>$1,483.30<br><span style="color:var(--w30)">$39.03/hr</span></td><td>$1,659.30<br><span style="color:var(--w30)">$43.67/hr</span></td></tr>
+            <tr><td>AQF Level 7</td><td>$1,308.80<br><span style="color:var(--w30)">$34.44/hr</span></td><td>$1,409.00<br><span style="color:var(--w30)">$37.08/hr</span></td><td>$1,565.30<br><span style="color:var(--w30)">$41.19/hr</span></td><td>$1,689.50<br><span style="color:var(--w30)">$44.46/hr</span></td></tr>
+            <tr><td>AQF Level 8</td><td>$1,337.10<br><span style="color:var(--w30)">$35.19/hr</span></td><td>$1,444.90<br><span style="color:var(--w30)">$38.02/hr</span></td><td>$1,584.90<br><span style="color:var(--w30)">$41.71/hr</span></td><td>$1,721.40<br><span style="color:var(--w30)">$45.30/hr</span></td></tr>
+            <tr><td>AQF Level 9</td><td>$1,444.90<br><span style="color:var(--w30)">$38.02/hr</span></td><td>$1,545.20<br><span style="color:var(--w30)">$40.66/hr</span></td><td>$1,659.30<br><span style="color:var(--w30)">$43.67/hr</span></td><td>$1,755.00<br><span style="color:var(--w30)">$46.18/hr</span></td></tr>
+        </tbody>
+    </table>
+    <p class="caption">Full-time weekly minimum (hourly below). Casual rates add 25%: $40.55 to $57.73 an hour across Level 1. Source: FWO Pay Guide MA000027 published 26 August 2026, clause 17.1.</p>` },
+        { h2: 'Levels 2.1, 2.2, 3 and 4: <em>By Role</em>', html:
+`    <p>Above Level 1 the structure is about the job, not the years. A <strong>Level 2</strong> employee is a Senior Clinician, Specialist, Supervisor or Educator as defined in Schedule A.2.2, split into 2.1 and 2.2 by time spent performing Level 2 duties. <strong>Level 3</strong> is an Advanced Clinician, Senior Specialist or Section Manager who has been appointed to that role. <strong>Level 4</strong> is a Manager.</p>
+    <table class="rate-table">
+        <thead><tr><th>Level</th><th>Who</th><th>Weekly</th><th>Hourly</th></tr></thead>
+        <tbody>
+            <tr><td>Level 2.1</td><td>Senior Clinician, Specialist, Supervisor or Educator — under 5 years performing Level 2 duties</td><td>$1,945.40</td><td class="rate-highlight">$51.19</td></tr>
+            <tr><td>Level 2.2</td><td>Senior Clinician, Specialist, Supervisor or Educator — 5 years or more performing Level 2 duties</td><td>$1,983.20</td><td class="rate-highlight">$52.19</td></tr>
+            <tr><td>Level 3</td><td>Advanced Clinician, Senior Specialist or Section Manager (appointed to the role)</td><td>$1,983.20</td><td class="rate-highlight">$52.19</td></tr>
+            <tr><td>Level 4</td><td>Manager with resource, budget and strategic accountability</td><td>$2,499.10</td><td class="rate-highlight">$65.77</td></tr>
+        </tbody>
+    </table>
+    <p class="caption">Level 2.2 and Level 3 are deliberately equal in this first stage. Casual: $63.99, $65.24, $65.24 and $82.21 an hour. Source: clause 17.2, Schedule A.2.</p>` },
+        { h2: 'Staff Employed on 30 September 2026: <em>Translation and Retained Rates</em>', html:
+`    <p>Anyone classified as a health professional under the award on 30 September 2026 is translated under <strong>Schedule J.4</strong>. Old Levels 1 and 2 translate by the profession's AQF level and its entry qualification pathway; the award's own tables cover UG2, three-year degree, four-year degree, masters and PhD entry. For example, a physiotherapist (AQF 7, four-year degree entry) on old pay point 3 becomes Level 1 – AQF Level 7 – 1st year, and on pay point 4 becomes 2nd–3rd year. Old Level 3 translates by duties: Senior Clinician, Specialist, Supervisor or Educator work becomes Level 2.1 or 2.2, and Advanced Clinician, Senior Specialist or Section Manager work stays Level 3. Old Level 4 stays Level 4.</p>
+    <p>Because some translations land below the old rate, <strong>clause J.4.3 retains the previous rate</strong>: the employee is paid the higher of their translated rate and their 30 September 2026 rate. The clearest case is old Level 4 pay point 4 at $71.19 an hour against the new Level 4 at $65.77.</p>
+    <table class="rate-table">
+        <thead><tr><th>Classification on 30 September 2026</th><th>Retained weekly</th><th>Retained hourly</th></tr></thead>
+        <tbody>
+            <tr><td>Level 1 pay points 1 to 6</td><td>$1,174.00 to $1,485.90</td><td>$30.89 to $39.10</td></tr>
+            <tr><td>Level 2 pay points 1 to 4</td><td>$1,493.90 to $1,671.40</td><td>$39.31 to $43.98</td></tr>
+            <tr><td>Level 3 pay point 5</td><td>$1,983.20</td><td>$52.19</td></tr>
+            <tr><td>Level 4 pay point 4</td><td>$2,705.10</td><td class="rate-highlight">$71.19</td></tr>
+        </tbody>
+    </table>
+    <p class="caption">Clause J.4.3. Level 3 pay points 1 to 4 and Level 4 pay points 1 to 3 are not retained because every translation for them pays more.</p>
+    <p>The Fair Work Ombudsman's Pay Guide lists thirteen translation cases where its tables must not be used for this reason. Fitz HR's Award Wizard asks whether the person was on the award on 30 September 2026 and applies the higher rate automatically.</p>` },
+        { h2: 'What Practice Owners <em>Must Do</em>', html:
+`    <ul>
+        <li>Identify your <strong>first full pay period</strong> on or after 1 October 2026.</li>
+        <li>For every health professional, record the <strong>profession, AQF level under Schedule B and years of experience in the profession</strong>, or the Level 2–4 role they are appointed to.</li>
+        <li>For staff employed on 30 September 2026, record their <strong>previous classification</strong> and compare the translated rate with the retained rate. Pay the higher.</li>
+        <li>Update <strong>base rates</strong> in payroll, then recalculate penalties, casual loading and overtime off the new base.</li>
+        <li>Issue a <strong>classification letter</strong> or contract variation so the basis of each rate is documented.</li>
+        <li>Check any <strong>annualised wage arrangement</strong> still covers what the award now requires (arrangements made with a Level 2 employee before 1 October continue under clause J.4.4).</li>
+    </ul>` },
+        { h2: 'What Has <em>Not</em> Changed', html:
+`    <p>Saturday and Sunday remain 150% (175% casual), public holidays 250% (275% casual), the Monday–Friday shift loading 15%, overtime 150% for the first two hours then 200%, casual loading 25% and the casual minimum engagement 3 hours. Every allowance keeps the same dollar value; the award's standard rate is simply re-based to the Level 1 – AQF Level 7 – 1st year weekly rate of $1,308.80. Support services, dental assistant and pathology collector rates are exactly as they were on 1 July 2026.</p>` },
+        { h2: 'What Comes <em>Next</em>', html:
+`    <p>This is the first of a staged correction. The Commission's May 2026 decision ([2026] FWCFB 123) provides for further increases to health professional minimum rates in stages, with the remaining stages operating from 30 June in 2027, 2028, 2029 and 2030, in addition to each Annual Wage Review. Retained rates under clause J.4.3 stay fixed at their 30 September 2026 values, so they will be overtaken as the translated rates rise.</p>` },
+      ],
+      mistakes: [
+        '<strong>Carrying old pay points into October.</strong> They no longer exist for health professionals. Reclassify by AQF level and years of experience, or by role.',
+        '<strong>Counting experience only with your practice.</strong> Years of experience in the profession count with any employer.',
+        '<strong>Dropping a long-serving employee to the new rate.</strong> If their 30 September 2026 rate is higher, it is retained under clause J.4.3.',
+        '<strong>Reading the Pay Guide table without checking translation.</strong> Thirteen translation cases must use the retained rate instead.',
+        '<strong>Applying the change to support staff.</strong> Support services, dental assistant and pathology collector rates did not change on 1 October.',
+      ],
+      faqs: [
+        { q: 'What changed in the Health Professionals Award on 1 October 2026?', a: '<strong>The health professional classification structure and minimum rates were replaced.</strong> Level 1 is now set by AQF level (5 to 9) and years of experience in the profession, with no pay points; Levels 2.1, 2.2, 3 and 4 are single rates by role. It applies from the first full pay period on or after 1 October 2026 under FWC determination PR814029.' },
+        { q: 'How do I work out a health professional\'s AQF level?', a: '<strong>Use Schedule B of the award.</strong> It lists the standard minimum qualification for 47 common professions by AQF level. Where a range is listed, clause B.2 uses the qualification the employee holds, or the closest listed level, and a higher qualification required by the employer always applies.' },
+        { q: 'Do existing health professionals get a pay cut if their new level is lower?', a: '<strong>No.</strong> Anyone classified as a health professional on 30 September 2026 is paid the higher of their translated rate and their previous rate (clause J.4.3). Old Level 4 pay point 4, for example, keeps $71.19 an hour rather than the new Level 4 rate of $65.77.' },
+        { q: 'What is the difference between Level 2.1 and Level 2.2?', a: '<strong>Time in the role.</strong> Both are a Senior Clinician, Specialist, Supervisor or Educator. Level 2.1 is under five years performing Level 2 duties ($51.19/hr); Level 2.2 is five years or more ($52.19/hr).' },
+        { q: 'Did dental assistant or pathology collector rates change on 1 October 2026?', a: '<strong>No.</strong> Their new levels took effect on 1 April 2026 and their rates are unchanged since 1 July 2026. Support services Levels 1 to 9 are also unchanged.' },
+        { q: 'Will there be more increases for health professionals?', a: '<strong>Yes.</strong> The Commission\'s decision provides for the increases to be phased in over several stages, with further stages from 30 June 2027 to 2030, on top of the annual wage review each 1 July.' },
+      ],
+      related: [
+        { href: '/blog/health-professionals-award-rates-2026', label: 'Health Professionals Award rates 2026 — full breakdown' },
+        { href: '/health-award-classifications', label: 'Health Professionals Award classifications — every level with rates' },
+        { href: '/blog/health-professionals-award-annualised-wage-arrangements', label: 'Annualised wage arrangements under clause 22' },
+        { href: '/blog/health-professionals-award-minimum-wage-increase-2026', label: 'The 1 July 2026 wage rise for the Health Professionals Award' },
+        { href: '/health-award-guide', label: 'Health Professionals Award guide (MA000027)' },
+        { href: '/health-award-pay-rates', label: 'Health Professionals Award pay rates — full table' },
+      ],
+      ctaH3: 'Reclassify Your Health Professionals — Correctly, in Minutes',
+      ctaP: 'Fitz HR\'s Award Wizard walks the new structure with you: profession, AQF level, years of experience, then the retained-rate check for anyone employed on 30 September 2026. Rates from the 26 August 2026 Pay Guide, verified to the cent.',
+    },
+    {
       slug: 'health-professionals-award-rates-2026',
       tag: 'Award Rates · Penalty Rates · 2026', cardTag: 'Pay Rates · MA000027',
       h1: 'Health Professionals Award Rates 2026 — Pay &amp; <em>Penalties</em>',
@@ -780,8 +896,8 @@ ${h.penaltyTable(h.data)}` },
       ],
       sections: (h) => [
         { h2: 'Rates by Stream <em>&amp; Level</em>', html:
-`    <p>MA000027 splits into streams — support services, dental assistants, pathology collectors and health professionals — each with its own levels and pay points. Health-professional streams reach much higher rates than support roles, so the stream and level both matter.</p>
-${h.payTable(h.data, 12)}` },
+`    <p>MA000027 splits into streams — support services, dental assistants, pathology collectors and health professionals — each with its own levels. <strong>From 1 October 2026 the health professional stream has no pay points:</strong> Level 1 is set by the AQF level of the profession's minimum qualification (Schedule B) and years of experience in the profession, and Levels 2.1, 2.2, 3 and 4 are defined by role. Staff employed on 30 September 2026 keep their previous rate where it is higher (clause J.4.3). See our <a href="/blog/health-professionals-award-changes-1-october-2026">guide to the 1 October 2026 changes</a>. Health-professional rates run well above support roles, so the stream and level both matter.</p>
+${h.payTable(h.data, 45)}` },
         { h2: 'Penalty Rates <em>&amp; Shift Loading</em>', html:
 `    <p>Weekend and public holiday penalties are a percentage of the minimum hourly rate; casual rates are all-inclusive of the 25% loading:</p>
 ${h.penaltyTable(h.data)}
@@ -791,18 +907,21 @@ ${h.penaltyTable(h.data)}
       ],
       mistakes: [
         '<strong>Using the wrong stream.</strong> A dental assistant, pathology collector and health professional sit in different streams with different rates.',
+        '<strong>Still using pay points for health professionals.</strong> They no longer exist from 1 October 2026 — classify Level 1 by AQF level and years of experience, and check the retained-rate rule for anyone employed on 30 September 2026.',
         '<strong>Treating a salary as covering everything.</strong> Annualised wages have strict conditions and a mandatory reconciliation — see our <a href="/blog/health-professionals-award-annualised-wage-arrangements">annualised wage guide</a>.',
         '<strong>Rostering casuals under 3 hours.</strong> The casual minimum engagement is 3 hours.',
         '<strong>Paying Sunday rates on public holidays.</strong> Public holidays are 250%/275%.',
       ],
       faqs: [
-        { q: 'What is the base rate for a health support worker in 2026?', a: '<strong>A Support Services Level 1 employee earns $26.97/hr full-time under MA000027.</strong> Health-professional streams (physiotherapy, etc.) reach much higher rates by level and pay point.' },
+        { q: 'What is the base rate for a health support worker in 2026?', a: '<strong>A Support Services Level 1 employee earns $26.97/hr full-time under MA000027.</strong> Health professionals (physiotherapy, etc.) are paid by AQF level and years of experience at Level 1, and by role at Levels 2.1, 2.2, 3 and 4 — from $32.44/hr to $65.77/hr full-time from 1 October 2026.' },
+        { q: 'Do health professionals still have pay points?', a: '<strong>No — pay points were removed from the health professional stream from the first full pay period on or after 1 October 2026</strong> (FWC determination PR814029). Level 1 is now AQF level x years of experience; Levels 2.1, 2.2, 3 and 4 are single rates by role. Support services, dental assistant and pathology collector levels are unchanged.' },
         { q: 'What are the weekend penalty rates under MA000027?', a: '<strong>Saturday and Sunday are both 150% (175% casual); public holidays are 250% (275% casual).</strong>' },
         { q: 'What is the casual minimum engagement under the Health Professionals Award?', a: '<strong>3 hours per shift.</strong> A casual must be paid for at least 3 hours each time they attend work.' },
         { q: 'Is there a shift loading under MA000027?', a: '<strong>Yes — a 15% loading applies to defined Monday–Friday shifts.</strong> Overtime is 150% for the first 2 hours and 200% after.' },
         { q: 'How do I calculate a Health Professionals Award rate?', a: '<strong>Fitz HR calculates the exact MA000027 rate by stream, level, day and shift.</strong> See the <a href="/health-award-pay-rates">pay rates page</a> or <a href="/app">ask Fitz free</a>.' },
       ],
       related: [
+        { href: '/blog/health-professionals-award-changes-1-october-2026', label: 'Health Professionals Award changes from 1 October 2026' },
         { href: '/blog/health-professionals-award-annualised-wage-arrangements', label: 'Health Professionals Award annualised wage arrangements' },
         { href: '/blog/health-professionals-award-weekend-penalty-rates', label: 'Health Professionals Award weekend penalty rates' },
         { href: '/blog/health-professionals-award-allowances-guide', label: 'Health Professionals Award allowances guide' },
@@ -826,7 +945,7 @@ ${h.penaltyTable(h.data)}
       summary: 'Under MA000027 clause 22, a full-time employee can be paid an annualised wage by written agreement that absorbs specified Award entitlements (such as penalties and overtime). The arrangement must set outer-limit hours, and the employer must reconcile the salary against what the Award would have paid at least every 12 months (and on termination), paying any shortfall within 14 days. Records of start, finish and unpaid-break times must be kept and signed.',
       quickRefLabel: 'Annualised Wages — Clause 22',
       quickRef: [
-        '<strong>Who:</strong> full-time employees, by written agreement',
+        '<strong>Who:</strong> full-time Support Services Level 8–9 or Health Professional Level 2 (2.1/2.2), 3 or 4 employees, by written agreement (clause 22.1(a))',
         '<strong>Outer-limit hours:</strong> must be specified; excess is paid separately',
         '<strong>Reconciliation:</strong> at least every 12 months and on termination',
         '<strong>Shortfall:</strong> paid within 14 days',
@@ -846,6 +965,7 @@ ${h.penaltyTable(h.data)}
         '<strong>Not keeping signed time records.</strong> Start, finish and unpaid-break records must be kept and signed — without them, the arrangement is not compliant.',
       ],
       faqs: [
+        { q: 'Does the 1 October 2026 restructure affect existing annualised wage arrangements?', a: '<strong>No — an arrangement made with a health professional who was Level 2 on or before 30 September 2026 continues to operate (clause J.4.4).</strong> Clause 22 itself was not amended; Level 2 now comprises Levels 2.1 and 2.2, and the reconciliation must still be done against the current award rates, including any retained rate under clause J.4.3.' },
         { q: 'Can a health professional be paid an annualised salary?', a: '<strong>Yes — under clause 22 of MA000027, by written agreement, for full-time employees.</strong> The salary can absorb specified Award entitlements but must meet strict conditions.' },
         { q: 'What is the annualised wage reconciliation?', a: '<strong>At least every 12 months (and on termination), the employer compares the salary to what the Award would have paid for the hours actually worked, and pays any shortfall within 14 days.</strong>' },
         { q: 'What records must be kept for an annualised wage?', a: '<strong>Start times, finish times and any unpaid breaks — recorded and signed by the employee each pay period or roster cycle.</strong> Without them the arrangement is non-compliant.' },
@@ -1283,6 +1403,7 @@ function mwPost(c) {
       { h2: 'Junior, Apprentice &amp; <em>Casual</em> Flow-On', html:
 `    <p>Junior and apprentice rates are set as percentages of the adult classification rate, so they rise automatically with the base. The 25% casual loading is unchanged as a percentage, but the dollar value of every casual hour rises because it is calculated on the higher base. Update the base first, then let the percentages flow through — do not freeze junior or casual rates at the old dollar figures.</p>` },
       { h2: 'Annual Wage Review Increases <em>Since 2024</em>', html: MWR_HISTORY },
+      ...(c.extraSections || []),
       { h2: `What ${c.industryTitle} Employers Must Do <em>Before 1 July</em>`, html:
 `    <ul>
         <li>Identify your <strong>first full pay period</strong> on or after 1 July 2026 — that is your cut-over date.</li>
@@ -1317,11 +1438,17 @@ function mwPost(c) {
   };
 }
 
+const HEALTH_MW_EXTRA = [
+  { h2: 'Health Professionals: A Second Change on <em>1 October 2026</em>', html:
+`    <p>The 1 July rise was not the last change for this award in 2026. From the first full pay period on or after <strong>1 October 2026</strong>, the Fair Work Commission's gender-based undervaluation review (determination PR814029) replaced the health professional classification structure: <strong>Level 1 no longer has pay points</strong> and is set by the AQF level of the profession's minimum qualification and years of experience in the profession, while <strong>Levels 2.1, 2.2, 3 and 4</strong> are single rates defined by role. Anyone employed as a health professional on 30 September 2026 is paid the higher of their translated rate and their previous rate.</p>
+    <p>Support services, dental assistant and pathology collector rates are unchanged from the 1 July figures. See our <a href="/blog/health-professionals-award-changes-1-october-2026">full guide to the 1 October 2026 changes</a> and the current <a href="/health-award-pay-rates">pay rates table</a>.</p>` },
+];
+
 const MW = [
   { key: 'retail', slug: 'retail-award-minimum-wage-increase-2026', short: 'Retail Award', full: 'General Retail Industry Award MA000004', code: 'MA000004', industry: 'retail', industryTitle: 'Retail', ratesSlug: 'retail-award-rates-2026', guide: '/retail-award-guide', payRates: '/retail-award-pay-rates', baseLine: 'a Retail Employee Level 1 is $27.81/hr', baseShort: 'Retail Employee Level 1 at $27.81/hr' },
   { key: 'manufacturing', slug: 'manufacturing-award-minimum-wage-increase-2026', short: 'Manufacturing Award', full: 'Manufacturing and Associated Industries and Occupations Award MA000010', code: 'MA000010', industry: 'manufacturing', industryTitle: 'Manufacturing', ratesSlug: 'manufacturing-award-rates-2026', guide: '/manufacturing-award-guide', payRates: '/manufacturing-award-pay-rates', baseLine: 'a C14 employee is $25.74/hr and every C-level rises 4.75%', baseShort: 'C14 at $25.74/hr' },
   { key: 'schads', slug: 'schads-award-minimum-wage-increase-2026', short: 'SCHADS Award', full: 'Social, Community, Home Care and Disability Services Industry Award MA000100', code: 'MA000100', industry: 'community services', industryTitle: 'Community Services', ratesSlug: 'schads-award-rates-2026', guide: '/schads-award-guide', payRates: '/schads-award-pay-rates', baseLine: 'a Social & Community Services Level 1 pay point 1 employee is $27.55/hr', baseShort: 'SACS Level 1 (pp1) at $27.55/hr' },
-  { key: 'health', slug: 'health-professionals-award-minimum-wage-increase-2026', short: 'Health Professionals Award', full: 'Health Professionals and Support Services Award MA000027', code: 'MA000027', industry: 'health practice', industryTitle: 'Health Practice', ratesSlug: 'health-professionals-award-rates-2026', guide: '/health-award-guide', payRates: '/health-award-pay-rates', baseLine: 'a Support Services Level 1 employee is $26.97/hr', baseShort: 'Support Services Level 1 at $26.97/hr' },
+  { key: 'health', extraSections: HEALTH_MW_EXTRA, slug: 'health-professionals-award-minimum-wage-increase-2026', short: 'Health Professionals Award', full: 'Health Professionals and Support Services Award MA000027', code: 'MA000027', industry: 'health practice', industryTitle: 'Health Practice', ratesSlug: 'health-professionals-award-rates-2026', guide: '/health-award-guide', payRates: '/health-award-pay-rates', baseLine: 'a Support Services Level 1 employee is $26.97/hr', baseShort: 'Support Services Level 1 at $26.97/hr' },
   { key: 'childrens', slug: 'childrens-services-award-minimum-wage-increase-2026', short: "Children's Services Award", full: "Children's Services Award MA000120", code: 'MA000120', industry: "children's services", industryTitle: "Children's Services", ratesSlug: 'childrens-services-award-rates-2026', guide: '/childrens-award-guide', payRates: '/childrens-award-pay-rates', baseLine: 'a Support Worker Level 1.1 is $26.44/hr — exactly the new lowest-ongoing floor', baseShort: 'Support Worker Level 1.1 at $26.44/hr' },
 ];
 for (const c of MW) POSTS[c.key].push(mwPost(c));

@@ -108,6 +108,7 @@ const VERTICALS = {
     complianceIndustry: 'health practices',
     shortIndustry: 'Health Practices', descWho: 'health practices',
     heroWord: 'dental assistant',
+    payTableLimit: 45,   // all four streams incl. the 24 health professional classifications (1 Oct 2026)
     heroHook: 'A {word} asks about weekend rates. Fitz tells you exactly what the Health Professionals Award requires.',
     coverage: 'private-sector health professionals and health support services — including allied health, dental assistants, pathology collectors and medical administration.',
     scenarios: [
@@ -119,6 +120,7 @@ const VERTICALS = {
     crisis: 'A patient-safety complaint or an urgent conduct issue — Crisis Mode gives you the immediate, award-grounded steps and the right documentation trail.',
     faqExtra: [
       { q: 'Who does the Health Professionals and Support Services Award cover?', a: 'MA000027 covers private-sector health professionals and support staff — allied health, dental assistants, pathology collectors and medical administration among them. Public-sector and nursing roles are typically covered by other awards.' },
+      { q: 'What changed for health professionals on 1 October 2026?', a: 'From the first full pay period on or after 1 October 2026, Health Professional Level 1 has no pay points: it is set by the AQF level of the profession\'s minimum qualification (Schedule B) and years of experience in the profession. Levels 2.1, 2.2, 3 and 4 are defined by role. Staff employed on 30 September 2026 are paid the higher of their translated rate and their previous rate (clause J.4.3). Support services, dental assistant and pathology collector rates are unchanged. Fitz applies all of this in the Award Wizard.' },
     ],
   },
   childrens: {
@@ -617,7 +619,7 @@ ${nav()}
 <div class="body">
     <h2>Classification <em>Hourly Rates</em></h2>
     <p>Full-time minimum rates by classification. Casual employees receive these rates plus the ${pct(data.casual_loading)} casual loading (or the all-inclusive casual rate where the award specifies one).</p>
-${payTable(data)}
+${payTable(data, c.payTableLimit || 24)}
 
     <p>Not sure which level a role belongs at? See <a href="/${v}-award-classifications">every ${esc(c.awardShort)} classification explained</a> with full-time and casual rates.</p>
 
