@@ -224,7 +224,7 @@ eq('Retail casual min 3 hrs', retail.minimum_engagement.casual_hours_per_shift, 
 // ---- Health Professionals & Support Services data integrity (MA000027) ------
 const health = JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'health-award-rates.json'), 'utf8'));
 eq('Health ma_number', health.ma_number, 'MA000027');
-eq('Health 80 rate rows (40 adult classifications x2)', health.rates.length, 80);
+eq('Health 90 rate rows (45 adult classifications x2: 13 support + 4 dental + 4 pathology + 24 health professional)', health.rates.length, 90);
 eq('Health four streams present', [...new Set(health.rates.map(r => r.stream))].sort().join(','),
    'dental_assistants,health_professionals,pathology_collectors,support_services');
 eq('Health Saturday FT/PT 1.5', health.penalty_rates.saturday_full_time_part_time, 1.5);
@@ -244,11 +244,43 @@ eq('Health Support L1 weekly $1024.70', hss1 && hss1.weekly_rate, 1024.70);
 // rate x multiplier reproduces the published penalty-dollar columns (Sat 150%, PH 250%).
 eq('Health Support L1 Saturday = $40.46 (PDF)', r2(hss1.rate * health.penalty_rates.saturday_full_time_part_time), 40.46);
 eq('Health Support L1 Public holiday = $67.43 (PDF)', r2(hss1.rate * health.penalty_rates.public_holiday_full_time_part_time), 67.43);
-// Health Professional top rate = $71.19 (weekly $2,705.10).
-const hp44 = health.rates.find(r => r.stream === 'health_professionals' && r.employment_type === 'full_time' && r.classification === 'Level 4 - pay point 4');
-eq('Health Professional L4pp4 rate $71.19', hp44 && hp44.rate, 71.19);
-eq('Health Professional L4pp4 casual rate $88.99',
-   (health.rates.find(r => r.stream === 'health_professionals' && r.employment_type === 'casual' && r.classification === 'Level 4 - pay point 4') || {}).rate, 88.99);
+// Health Professional stream from 1 October 2026 (PR814029 / FWO Pay Guide 26 Aug 2026):
+// Level 1 = AQF level x experience band (20 cells); Levels 2.1, 2.2, 3, 4 single rates. No pay points.
+const hpFT = health.rates.filter(r => r.stream === 'health_professionals' && r.employment_type === 'full_time');
+const hpCas = health.rates.filter(r => r.stream === 'health_professionals' && r.employment_type === 'casual');
+eq('Health Professional 24 full-time classifications', hpFT.length, 24);
+eq('Health Professional 24 casual classifications', hpCas.length, 24);
+eq('Health Professional has NO pay points after 1 Oct 2026', hpFT.some(r => /pay point/i.test(r.classification)), false);
+eq('Health Professional Level 1 = 5 AQF levels x 4 bands', hpFT.filter(r => r.level === '1').length, 20);
+const hpAqf7y1 = hpFT.find(r => r.classification === 'Level 1 - AQF Level 7 - 1st year');
+eq('Health Professional L1 AQF7 1st year rate $34.44', hpAqf7y1 && hpAqf7y1.rate, 34.44);
+eq('Health Professional L1 AQF7 1st year weekly $1308.80 (= standard rate, cl.2)', hpAqf7y1 && hpAqf7y1.weekly_rate, 1308.80);
+eq('Health standard_rate weekly $1308.80', health.standard_rate && health.standard_rate.weekly, 1308.80);
+const hpAqf9top = hpFT.find(r => r.classification === 'Level 1 - AQF Level 9 - 7th year+');
+eq('Health Professional L1 AQF9 7th year+ rate $46.18', hpAqf9top && hpAqf9top.rate, 46.18);
+eq('Health Professional L1 AQF9 7th year+ casual $57.73',
+   (hpCas.find(r => r.classification === 'Level 1 - AQF Level 9 - 7th year+') || {}).rate, 57.73);
+const hp4 = hpFT.find(r => r.classification === 'Level 4');
+eq('Health Professional Level 4 rate $65.77', hp4 && hp4.rate, 65.77);
+eq('Health Professional Level 4 weekly $2499.10', hp4 && hp4.weekly_rate, 2499.10);
+eq('Health Professional Level 4 casual rate $82.21', (hpCas.find(r => r.classification === 'Level 4') || {}).rate, 82.21);
+eq('Health Professional Level 2.2 and Level 3 equal in stage 1 ($52.19)',
+   (hpFT.find(r => r.classification === 'Level 2.2') || {}).rate === 52.19 && (hpFT.find(r => r.classification === 'Level 3') || {}).rate === 52.19, true);
+// Every casual HP rate is the full-time rate + 25% loading (Pay Guide published figures).
+eq('Health Professional casual = FT x 1.25 for every classification',
+   hpCas.every(c => { const f = hpFT.find(x => x.classification === c.classification); return f && Math.abs(r2(f.rate * 1.25) - c.rate) <= 0.011; }), true);
+// Schedule B, translation and retained rates (Schedule J.4) are present and internally consistent.
+eq('Health Schedule B lists 47 professions', health.schedule_b && health.schedule_b.professions.length, 47);
+eq('Health Schedule B: Physiotherapist is AQF 7', (health.schedule_b.professions.find(p => p.profession === 'Physiotherapist') || {}).aqf_levels.join(','), '7');
+eq('Health Schedule B: Psychologist is AQF 9', (health.schedule_b.professions.find(p => p.profession === 'Psychologist') || {}).aqf_levels.join(','), '9');
+eq('Health J.4.1 has 14 translation tables', Object.values(health.translation.J_4_1_previous_levels_1_and_2.tables).reduce((n, t) => n + t.length, 0), 14);
+eq('Health J.4.3 retains 12 previous rates', health.retained_rates && health.retained_rates.rates.length, 12);
+const ret = Object.fromEntries(health.retained_rates.rates.map(r => [r.previous_classification, r.rate]));
+eq('Health retained L4 pp4 $71.19 > new Level 4 $65.77', ret['Level 4 - pay point 4'] === 71.19 && ret['Level 4 - pay point 4'] > hp4.rate, true);
+eq('Health retained L3 pp5 $52.19 > new Level 2.1 $51.19', ret['Level 3 - pay point 5'] > (hpFT.find(r => r.classification === 'Level 2.1') || {}).rate, true);
+eq('Health every Pay Guide retained-rate case has retained > translated',
+   health.pay_guide_retained_rate_cases.cases.every(c => { const t = hpFT.find(r => r.classification === c.translated_classification); return t && c.previously_classified_on_2026_09_30_as.every(p => ret[p] > t.rate); }), true);
+eq('Health effective date 2026-10-01', health.effective_date, '2026-10-01');
 // Minimum engagement + annualised wage sourced from award text.
 eq('Health casual min 3 hrs (clause 11.2)', health.minimum_engagement.casual_hours_per_shift, 3);
 eq('Health has NO fixed part-time per-shift minimum', health.minimum_engagement.part_time_hours_per_shift, undefined);

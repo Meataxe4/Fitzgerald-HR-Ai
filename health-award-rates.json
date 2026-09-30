@@ -1,20 +1,409 @@
 {
   "award_name": "Health Professionals and Support Services Award MA000027",
   "ma_number": "MA000027",
-  "effective_date": "2026-07-01",
-  "next_review_date": "2027-07-01",
-  "version": "2026-2027",
-  "status": "PREVIEW — machine-validated from FWO Pay Guide (published 24 Jun 2026, effective 1 Jul 2026); gated behind health_preview flag, not GA — pending human/consultant sign-off",
-  "source": "Fair Work Ombudsman Pay Guide MA000027, published 24 June 2026",
+  "effective_date": "2026-10-01",
+  "next_review_date": "2027-06-30",
+  "version": "2026-27 v2 (1 October 2026 health professional restructure)",
+  "status": "LIVE — health professional stream restructured from the first full pay period on or after 1 October 2026 (FWC determination PR814029, 7 September 2026, Gender-based undervaluation – priority awards review AM2024/20). Support services, dental assistant and pathology collector rates, allowances and penalty multipliers are unchanged from the 1 July 2026 Pay Guide and were re-verified row by row against the 26 August 2026 Pay Guide. next_review_date is the stage-2 increase date (30 June 2027, per [2026] FWCFB 123); the 2027 Annual Wage Review follows on 1 July 2027.",
+  "source": "Fair Work Ombudsman Pay Guide MA000027, published 26 August 2026 (rates apply from the first full pay period on or after 1 October 2026); FWC determination PR814029 (7 September 2026) for clause 17, Schedule A.2, Schedule B, Schedule C and Schedule J.4.",
   "weekly_hours": 38,
   "coverage_note": "Private-sector health professionals and health support services (e.g. private hospitals, medical/dental/allied-health practices, diagnostic and pathology services, community and aged-care health). Does NOT cover employees excluded by the Fair Work Act, employees under a modern enterprise award or enterprise instrument, State reference public sector employees, or Medical Practitioners (clause 4.6). Where more than one award could apply, the most appropriate classification to the work performed applies (clause 4.7).",
   "casual_loading": 0.25,
   "superannuation_rate": 0.12,
+  "standard_rate": {
+    "weekly": 1308.8,
+    "hourly": 34.44,
+    "basis": "Health Professional employee—Level 1—AQF Level 7—1st year (clause 17.1(c))",
+    "clause": "2 (definitions) and D.1.1",
+    "effective": "2026-10-01",
+    "previous_basis": "Health Professional employee—Level 1 pay point 2 (to 30 September 2026)"
+  },
   "streams": {
     "support_services": "Support Services employees — Levels 1-9 (clerical, administrative, catering, cleaning, gardening, technical and support roles). Graded under clause 16.",
     "dental_assistants": "Support Services — Dental assistants (Levels 3, 5, 6, 7). Graded under clause 16.",
     "pathology_collectors": "Support Services — Pathology collectors (Levels 5, 6, 7 unqualified/qualified). Graded under clause 16.",
-    "health_professionals": "Health Professional employees — Levels 1-4 with pay points (clause 17). Level 1 = graduate/entry; Level 4 = senior/principal."
+    "health_professionals": "Health Professional employees (clause 17). Level 1 is classified by the AQF level of the profession's standard minimum qualification (Schedule B) and years of experience in the profession at Level 1 (1st year / 2nd-3rd year / 4th-6th year / 7th year+). Levels 2.1, 2.2, 3 and 4 are single rates defined by role (Schedule A.2.2-A.2.4). Pay points no longer exist for health professionals from 1 October 2026."
+  },
+  "health_professional_classification": {
+    "clause": "Schedule A.2 (as inserted by PR814029, operative 1 October 2026)",
+    "level_1": {
+      "definition": "An employee who meets the requirements to practice or work in their profession including, where applicable, under the National Registration and Accreditation Scheme, or as set by the relevant professional body for their profession, or who holds such qualification deemed acceptable by the employer (A.2.1).",
+      "classified_by": "The applicable AQF level in Schedule B and the employee's years of experience in the profession at Level 1.",
+      "aqf_levels": [
+        5,
+        6,
+        7,
+        8,
+        9
+      ],
+      "experience_bands": [
+        "1st year",
+        "2nd-3rd year",
+        "4th-6th year",
+        "7th year+"
+      ],
+      "experience_counts": "Years of experience in the profession at Level 1 with any employer (clause 17.1, A.2.1, B.2). Not tenure with the current employer.",
+      "aqf_selection_rules_B2": [
+        "(a) Where only one AQF level is listed for the profession in clause B.3, that AQF level.",
+        "(b) Where more than one AQF level is listed: (i) the AQF level of the qualification held by the employee and listed in the table; or (ii) if the employee's AQF level is not listed, the listed AQF level closest to the qualification held and required for entry into the profession.",
+        "(c) Where the profession is not listed in B.3: the AQF level of the standard minimum qualification required for entry into that profession, or where none exists, the AQF level of the qualification held by the employee.",
+        "(d) The AQF level of the qualification required by the employer, if higher than the level identified under (a), (b) or (c)."
+      ],
+      "aqf_reference": {
+        "5": "Diploma",
+        "6": "Advanced Diploma / Associate Degree",
+        "7": "Bachelor Degree",
+        "8": "Bachelor Honours / Graduate Certificate / Graduate Diploma",
+        "9": "Masters Degree",
+        "10": "Doctoral Degree (PhD entry translates within AQF 9 per J.4.1(n))"
+      }
+    },
+    "level_2": {
+      "title": "Senior Clinician, Specialist, Supervisor or Educator (A.2.2)",
+      "roles": {
+        "Senior Clinician": "Works directly with patients in a clinical area of their profession that requires specialist knowledge or depth of experience and/or provides clinical guidance and direction to less experienced employees as needed. May have a post-graduate qualification and/or perform advanced practice work and/or have completed training which may involve credentialing.",
+        "Specialist": "Performs duties within or across one or more areas of expertise, which may include research or quality assurance and control.",
+        "Supervisor": "Required to provide supervision on a day-to-day basis to other health professionals, other employees (such as allied health assistants), and/or students.",
+        "Educator": "Accountable for the assessment, planning, implementation and evaluation of education and staff development programs."
+      },
+      "level_2_1": "Less than 5 years experience in the profession performing the Level 2 role(s) and duties (A.2.2(b)).",
+      "level_2_2": "5 years or more experience in the profession performing the Level 2 role(s) and duties (A.2.2(c))."
+    },
+    "level_3": {
+      "title": "Advanced Clinician, Senior Specialist or Section Manager (A.2.3) — appointed to perform the role",
+      "roles": {
+        "Advanced Clinician": "A specialist in (a) clinical area(s) of their profession with extensive levels of specialist knowledge and/or a lead clinician/clinical lead with extensive levels of knowledge across their profession.",
+        "Senior Specialist": "Holds accountability for educational, research and/or quality assurance and control; may have responsibility for leading a team.",
+        "Section Manager": "Responsible for managing the activities of, and providing leadership, coordination and support to a specified group or team in an area, section or part of a department or service; may be accountable for ensuring budgets are met and/or the expenditure of set resources."
+      }
+    },
+    "level_4": {
+      "title": "Manager (A.2.4)",
+      "criteria": [
+        "Appointed as a manager",
+        "Has a proven record of achievement at a senior level",
+        "Has the capacity to allocate resources, set priorities and ensure budgets are met within a large and complex organisation",
+        "May be responsible to the executive for providing effective services and ensuring budget/strategic targets are met",
+        "Manages staff where required",
+        "Is expected to develop/implement and deliver strategic business plans which increase the level of care to customers within a budget framework"
+      ]
+    }
+  },
+  "schedule_b": {
+    "clause": "Schedule B—Common Health Professionals and Standard Minimum Qualifications (PR814029)",
+    "purpose": "Lists the standard minimum qualification(s) required for entry into common health professions according to AQF level; used with clause B.2 to classify a Level 1 employee on commencement.",
+    "professions": [
+      {
+        "profession": "Acupuncturist",
+        "aqf_levels": [
+          7
+        ]
+      },
+      {
+        "profession": "Aromatherapist",
+        "aqf_levels": [
+          5
+        ]
+      },
+      {
+        "profession": "Art Therapist",
+        "aqf_levels": [
+          9
+        ]
+      },
+      {
+        "profession": "Audiologist",
+        "aqf_levels": [
+          9
+        ]
+      },
+      {
+        "profession": "Biomedical Engineer",
+        "aqf_levels": [
+          8
+        ]
+      },
+      {
+        "profession": "Biomedical Technologist",
+        "aqf_levels": [
+          5
+        ]
+      },
+      {
+        "profession": "Cardiac Technologist (not performing echocardiography)",
+        "aqf_levels": [
+          7
+        ],
+        "note": "Where performing echocardiography, refer to the Sonographer standard minimum qualification (AQF 8)."
+      },
+      {
+        "profession": "Child Psychotherapist",
+        "aqf_levels": [
+          9
+        ]
+      },
+      {
+        "profession": "Chiropractor",
+        "aqf_levels": [
+          9
+        ]
+      },
+      {
+        "profession": "Client Advisor/Rehabilitation Consultant",
+        "aqf_levels": [
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "profession": "Clinical Perfusionist",
+        "aqf_levels": [
+          9
+        ]
+      },
+      {
+        "profession": "Community Development Worker",
+        "aqf_levels": [
+          5,
+          7
+        ]
+      },
+      {
+        "profession": "Counsellor",
+        "aqf_levels": [
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "profession": "Dental Hygienist",
+        "aqf_levels": [
+          7
+        ]
+      },
+      {
+        "profession": "Dental Prosthetist",
+        "aqf_levels": [
+          6,
+          7
+        ]
+      },
+      {
+        "profession": "Dental Therapist",
+        "aqf_levels": [
+          7
+        ]
+      },
+      {
+        "profession": "Dietitian",
+        "aqf_levels": [
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "profession": "Diversional Therapist/Recreation Therapist",
+        "aqf_levels": [
+          7
+        ]
+      },
+      {
+        "profession": "Exercise Physiologist",
+        "aqf_levels": [
+          7
+        ]
+      },
+      {
+        "profession": "Genetic Counsellor",
+        "aqf_levels": [
+          9
+        ]
+      },
+      {
+        "profession": "Health Information Manager",
+        "aqf_levels": [
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "profession": "Masseur, Remedial",
+        "aqf_levels": [
+          5
+        ]
+      },
+      {
+        "profession": "Medical Imaging Technologist (MIT) (including Medical Radiographer; Magnetic Resonance Imaging Technologist)",
+        "aqf_levels": [
+          7
+        ]
+      },
+      {
+        "profession": "Medical Laboratory Technician",
+        "aqf_levels": [
+          5
+        ]
+      },
+      {
+        "profession": "Medical Librarian",
+        "aqf_levels": [
+          8
+        ]
+      },
+      {
+        "profession": "Medical Scientist",
+        "aqf_levels": [
+          7
+        ]
+      },
+      {
+        "profession": "Music Therapist",
+        "aqf_levels": [
+          9
+        ]
+      },
+      {
+        "profession": "Myotherapist",
+        "aqf_levels": [
+          6
+        ],
+        "note": "May include health professionals previously known as Musculoskeletal Therapist."
+      },
+      {
+        "profession": "Naturopathist",
+        "aqf_levels": [
+          7
+        ]
+      },
+      {
+        "profession": "Nuclear Medicine Technologist",
+        "aqf_levels": [
+          7,
+          8
+        ]
+      },
+      {
+        "profession": "Occupational Therapist",
+        "aqf_levels": [
+          7
+        ]
+      },
+      {
+        "profession": "Oral Health Therapist",
+        "aqf_levels": [
+          7
+        ]
+      },
+      {
+        "profession": "Orthoptist",
+        "aqf_levels": [
+          8,
+          9
+        ]
+      },
+      {
+        "profession": "Osteopath",
+        "aqf_levels": [
+          9
+        ]
+      },
+      {
+        "profession": "Pharmacist",
+        "aqf_levels": [
+          7
+        ]
+      },
+      {
+        "profession": "Physiotherapist",
+        "aqf_levels": [
+          7
+        ],
+        "note": "May include health professionals previously known as Musculoskeletal Therapist."
+      },
+      {
+        "profession": "Podiatrist",
+        "aqf_levels": [
+          7
+        ]
+      },
+      {
+        "profession": "Prosthetist/Orthotist",
+        "aqf_levels": [
+          7,
+          8
+        ]
+      },
+      {
+        "profession": "Psychologist",
+        "aqf_levels": [
+          9
+        ]
+      },
+      {
+        "profession": "Radiation Therapist/Radiation Therapy Technologist",
+        "aqf_levels": [
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "profession": "Reflexologist",
+        "aqf_levels": [
+          5
+        ]
+      },
+      {
+        "profession": "Research Technologist",
+        "aqf_levels": [
+          7
+        ]
+      },
+      {
+        "profession": "Social Worker",
+        "aqf_levels": [
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "profession": "Sonographer",
+        "aqf_levels": [
+          8
+        ]
+      },
+      {
+        "profession": "Speech Pathologist",
+        "aqf_levels": [
+          7,
+          8,
+          9
+        ]
+      },
+      {
+        "profession": "Welfare Worker",
+        "aqf_levels": [
+          5,
+          6,
+          7
+        ]
+      },
+      {
+        "profession": "Youth Worker",
+        "aqf_levels": [
+          5,
+          6,
+          7
+        ]
+      }
+    ]
   },
   "minimum_engagement": {
     "casual_hours_per_shift": 3
@@ -32,7 +421,7 @@
     "overtime_after_2hrs": 2.0,
     "sunday_overtime": 2.0
   },
-  "penalty_rates_source": "Clause 26 — Saturday and Sunday 150% of the minimum hourly rate for full-time/part-time, 175% for casuals (150% + 25% loading); public holiday 250% (full-time/part-time) / 275% (casual). Monday-to-Friday shiftwork loading 115% (full-time/part-time) / 140% (casual). Clause 25 — overtime 150% for the first 2 hours and 200% thereafter (Monday-Saturday), Sunday overtime 200%. For casuals, the overtime percentage is applied to the loaded casual rate (multiplicative): 187.5% first 2 hours, 250% thereafter, 250% Sunday, 312.5% public holiday. A 'less than 10 hour break after overtime' rate of 200% (full-time/part-time) also applies per clause 25.",
+  "penalty_rates_source": "Clause 26 — Saturday and Sunday 150% of the minimum hourly rate for full-time/part-time, 175% for casuals (150% + 25% loading); public holiday 250% (full-time/part-time) / 275% (casual). Monday-to-Friday shiftwork loading 115% (full-time/part-time) / 140% (casual). Clause 25 — overtime 150% for the first 2 hours and 200% thereafter (Monday-Saturday), Sunday overtime 200%. For casuals, the overtime percentage is applied to the loaded casual rate (multiplicative): 187.5% first 2 hours, 250% thereafter, 250% Sunday, 312.5% public holiday. A 'less than 10 hour break after overtime' rate of 200% (full-time/part-time) also applies per clause 25. Shiftwork (clause 26.3) means any shift where ordinary hours commence between 6.00 pm and 6.00 am or finish between 6.00 pm and 8.00 am.",
   "annualised_wage": {
     "clause": "22",
     "eligibility": "Full-time employees only, and only in Support Services employee Level 8 or Level 9, or Health Professional employee Level 2, Level 3 or Level 4 (clause 22.1(a)).",
@@ -135,13 +524,428 @@
       "text": "reimbursement of training fees for prescribed courses and the cost of prescribed textbooks"
     }
   ],
-  "allowances_note": "Common allowances from the FWO Pay Guide MA000027 (effective 1 Jul 2026). Not every allowance is listed — consult the award and Pay Guide for others (e.g. telephone and apprentice-travel reimbursements).",
+  "allowances_note": "Common allowances from the FWO Pay Guide MA000027 (effective 1 Oct 2026; dollar amounts unchanged from 1 Jul 2026). Wage-related allowances are percentages of the standard rate, which from 1 October 2026 is the Health Professional employee—Level 1—AQF Level 7—1st year weekly rate of $1,308.80 (clause 2 and D.1.1). Not every allowance is listed — consult the award and Pay Guide for others (e.g. telephone and apprentice-travel reimbursements).",
+  "translation": {
+    "clause": "Schedule J.4—Health Professional employees (inserted by PR814029); applies to employees classified as Health Professional employees under this award on 30 September 2026",
+    "J_4_1_previous_levels_1_and_2": {
+      "rule": "Classified according to the applicable AQF level of the qualification for their profession in Schedule B, and their years of experience in that profession. The tables (J.4.1(a)-(n)) are the award's own examples, keyed by the profession's AQF level and the entry qualification pathway.",
+      "tables": {
+        "AQF Level 5": [
+          {
+            "entry_qualification": "UG2 qualification entry",
+            "previous_level_1": {
+              "pay point 1": "1st year",
+              "pay point 2": "2nd-3rd year",
+              "pay point 3": "2nd-3rd year",
+              "pay point 4": "4th-6th year",
+              "pay point 5": "4th-6th year",
+              "pay point 6": "4th-6th year"
+            },
+            "previous_level_2": {
+              "pay point 1": "7th year+",
+              "pay point 2": "7th year+",
+              "pay point 3": "7th year+",
+              "pay point 4": "7th year+"
+            }
+          }
+        ],
+        "AQF Level 6": [
+          {
+            "entry_qualification": "UG2 qualification entry",
+            "previous_level_1": {
+              "pay point 1": "1st year",
+              "pay point 2": "2nd-3rd year",
+              "pay point 3": "2nd-3rd year",
+              "pay point 4": "4th-6th year",
+              "pay point 5": "4th-6th year",
+              "pay point 6": "4th-6th year"
+            },
+            "previous_level_2": {
+              "pay point 1": "7th year+",
+              "pay point 2": "7th year+",
+              "pay point 3": "7th year+",
+              "pay point 4": "7th year+"
+            }
+          },
+          {
+            "entry_qualification": "3-year degree entry",
+            "previous_level_1": {
+              "pay point 2": "1st year",
+              "pay point 3": "2nd-3rd year",
+              "pay point 4": "2nd-3rd year",
+              "pay point 5": "4th-6th year",
+              "pay point 6": "4th-6th year"
+            },
+            "previous_level_2": {
+              "pay point 1": "4th-6th year",
+              "pay point 2": "7th year+",
+              "pay point 3": "7th year+",
+              "pay point 4": "7th year+"
+            }
+          }
+        ],
+        "AQF Level 7": [
+          {
+            "entry_qualification": "UG2 qualification entry",
+            "previous_level_1": {
+              "pay point 1": "1st year",
+              "pay point 2": "2nd-3rd year",
+              "pay point 3": "2nd-3rd year",
+              "pay point 4": "4th-6th year",
+              "pay point 5": "4th-6th year",
+              "pay point 6": "4th-6th year"
+            },
+            "previous_level_2": {
+              "pay point 1": "7th year+",
+              "pay point 2": "7th year+",
+              "pay point 3": "7th year+",
+              "pay point 4": "7th year+"
+            }
+          },
+          {
+            "entry_qualification": "3-year degree entry",
+            "previous_level_1": {
+              "pay point 2": "1st year",
+              "pay point 3": "2nd-3rd year",
+              "pay point 4": "2nd-3rd year",
+              "pay point 5": "4th-6th year",
+              "pay point 6": "4th-6th year"
+            },
+            "previous_level_2": {
+              "pay point 1": "4th-6th year",
+              "pay point 2": "7th year+",
+              "pay point 3": "7th year+",
+              "pay point 4": "7th year+"
+            }
+          },
+          {
+            "entry_qualification": "4-year degree entry",
+            "previous_level_1": {
+              "pay point 3": "1st year",
+              "pay point 4": "2nd-3rd year",
+              "pay point 5": "2nd-3rd year",
+              "pay point 6": "4th-6th year"
+            },
+            "previous_level_2": {
+              "pay point 1": "4th-6th year",
+              "pay point 2": "4th-6th year",
+              "pay point 3": "7th year+",
+              "pay point 4": "7th year+"
+            }
+          },
+          {
+            "entry_qualification": "Masters degree entry",
+            "previous_level_1": {
+              "pay point 4": "1st year",
+              "pay point 5": "2nd-3rd year",
+              "pay point 6": "2nd-3rd year"
+            },
+            "previous_level_2": {
+              "pay point 1": "4th-6th year",
+              "pay point 2": "4th-6th year",
+              "pay point 3": "4th-6th year",
+              "pay point 4": "7th year+"
+            }
+          }
+        ],
+        "AQF Level 8": [
+          {
+            "entry_qualification": "3-year degree entry",
+            "previous_level_1": {
+              "pay point 2": "1st year",
+              "pay point 3": "2nd-3rd year",
+              "pay point 4": "2nd-3rd year",
+              "pay point 5": "4th-6th year",
+              "pay point 6": "4th-6th year"
+            },
+            "previous_level_2": {
+              "pay point 1": "4th-6th year",
+              "pay point 2": "7th year+",
+              "pay point 3": "7th year+",
+              "pay point 4": "7th year+"
+            }
+          },
+          {
+            "entry_qualification": "4-year degree entry",
+            "previous_level_1": {
+              "pay point 3": "1st year",
+              "pay point 4": "2nd-3rd year",
+              "pay point 5": "2nd-3rd year",
+              "pay point 6": "4th-6th year"
+            },
+            "previous_level_2": {
+              "pay point 1": "4th-6th year",
+              "pay point 2": "4th-6th year",
+              "pay point 3": "7th year+",
+              "pay point 4": "7th year+"
+            }
+          },
+          {
+            "entry_qualification": "Masters degree entry",
+            "previous_level_1": {
+              "pay point 4": "1st year",
+              "pay point 5": "2nd-3rd year",
+              "pay point 6": "2nd-3rd year"
+            },
+            "previous_level_2": {
+              "pay point 1": "4th-6th year",
+              "pay point 2": "4th-6th year",
+              "pay point 3": "4th-6th year",
+              "pay point 4": "7th year+"
+            }
+          }
+        ],
+        "AQF Level 9": [
+          {
+            "entry_qualification": "3-year degree entry",
+            "previous_level_1": {
+              "pay point 2": "1st year",
+              "pay point 3": "2nd-3rd year",
+              "pay point 4": "2nd-3rd year",
+              "pay point 5": "4th-6th year",
+              "pay point 6": "4th-6th year"
+            },
+            "previous_level_2": {
+              "pay point 1": "4th-6th year",
+              "pay point 2": "7th year+",
+              "pay point 3": "7th year+",
+              "pay point 4": "7th year+"
+            }
+          },
+          {
+            "entry_qualification": "4-year degree entry",
+            "previous_level_1": {
+              "pay point 3": "1st year",
+              "pay point 4": "2nd-3rd year",
+              "pay point 5": "2nd-3rd year",
+              "pay point 6": "4th-6th year"
+            },
+            "previous_level_2": {
+              "pay point 1": "4th-6th year",
+              "pay point 2": "4th-6th year",
+              "pay point 3": "7th year+",
+              "pay point 4": "7th year+"
+            }
+          },
+          {
+            "entry_qualification": "Masters degree entry",
+            "previous_level_1": {
+              "pay point 4": "1st year",
+              "pay point 5": "2nd-3rd year",
+              "pay point 6": "2nd-3rd year"
+            },
+            "previous_level_2": {
+              "pay point 1": "4th-6th year",
+              "pay point 2": "4th-6th year",
+              "pay point 3": "4th-6th year",
+              "pay point 4": "7th year+"
+            }
+          },
+          {
+            "entry_qualification": "PhD entry",
+            "previous_level_1": {
+              "pay point 5": "1st year",
+              "pay point 6": "2nd-3rd year"
+            },
+            "previous_level_2": {
+              "pay point 1": "2nd-3rd year",
+              "pay point 2": "4th-6th year",
+              "pay point 3": "4th-6th year",
+              "pay point 4 (6th year)": "4th-6th year",
+              "pay point 4 (7th year+)": "7th year+"
+            }
+          }
+        ]
+      }
+    },
+    "J_4_2_previous_levels_3_and_4": [
+      {
+        "previous": "Level 3",
+        "condition": "performs Senior Clinician, Specialist, Supervisor or Educator role(s) and duties (as defined in A.2.2) and has less than 5 years experience performing them",
+        "translated": "Level 2.1"
+      },
+      {
+        "previous": "Level 3",
+        "condition": "performs Senior Clinician, Specialist, Supervisor or Educator role(s) and duties and has 5 years or more experience performing them",
+        "translated": "Level 2.2"
+      },
+      {
+        "previous": "Level 3",
+        "condition": "performs Advanced Clinician, Senior Specialist or Section Manager role(s) and duties (as defined in A.2.3)",
+        "translated": "Level 3"
+      },
+      {
+        "previous": "Level 4",
+        "condition": "—",
+        "translated": "Level 4"
+      }
+    ],
+    "J_4_4_annualised_wages": "An annualised wage arrangement entered into under clause 22 with a Health Professional employee classified at Level 2 on or before 30 September 2026 continues to operate."
+  },
+  "retained_rates": {
+    "clause": "J.4.3 Retained minimum rates of pay (PR814029)",
+    "rule": "The minimum rate of pay for a Health Professional employee who was classified under this award on 30 September 2026 is the HIGHER of (a) the minimum rate for the employee's translated classification under J.4.1 or J.4.2, and (b) the minimum rate previously applicable to the employee as at 30 September 2026, listed here. Only the previous classifications listed are retained; all other previous classifications translate to a rate that is at least as high.",
+    "as_at": "2026-09-30",
+    "casual_note": "Retained rates are minimum (full-time/part-time) rates; a casual is paid the retained rate plus the 25% casual loading, and penalties/overtime apply to whichever base rate is the higher.",
+    "rates": [
+      {
+        "previous_classification": "Level 1 - pay point 1",
+        "weekly_rate": 1174.0,
+        "rate": 30.89
+      },
+      {
+        "previous_classification": "Level 1 - pay point 2",
+        "weekly_rate": 1219.5,
+        "rate": 32.09
+      },
+      {
+        "previous_classification": "Level 1 - pay point 3",
+        "weekly_rate": 1273.4,
+        "rate": 33.51
+      },
+      {
+        "previous_classification": "Level 1 - pay point 4",
+        "weekly_rate": 1317.2,
+        "rate": 34.66
+      },
+      {
+        "previous_classification": "Level 1 - pay point 5",
+        "weekly_rate": 1435.0,
+        "rate": 37.76
+      },
+      {
+        "previous_classification": "Level 1 - pay point 6",
+        "weekly_rate": 1485.9,
+        "rate": 39.1
+      },
+      {
+        "previous_classification": "Level 2 - pay point 1",
+        "weekly_rate": 1493.9,
+        "rate": 39.31
+      },
+      {
+        "previous_classification": "Level 2 - pay point 2",
+        "weekly_rate": 1548.3,
+        "rate": 40.74
+      },
+      {
+        "previous_classification": "Level 2 - pay point 3",
+        "weekly_rate": 1607.4,
+        "rate": 42.3
+      },
+      {
+        "previous_classification": "Level 2 - pay point 4",
+        "weekly_rate": 1671.4,
+        "rate": 43.98
+      },
+      {
+        "previous_classification": "Level 3 - pay point 5",
+        "weekly_rate": 1983.2,
+        "rate": 52.19
+      },
+      {
+        "previous_classification": "Level 4 - pay point 4",
+        "weekly_rate": 2705.1,
+        "rate": 71.19
+      }
+    ]
+  },
+  "pay_guide_retained_rate_cases": {
+    "source": "FWO Pay Guide MA000027 published 26 August 2026: \"The pay rates in the tables should not be used for Health professional employees in the following classifications\" — because the employee's 30 September 2026 rate (retained under J.4.3) is higher than the translated rate.",
+    "cases": [
+      {
+        "translated_classification": "Level 1 - AQF Level 5 - 4th-6th year",
+        "previously_classified_on_2026_09_30_as": [
+          "Level 1 - pay point 5",
+          "Level 1 - pay point 6"
+        ]
+      },
+      {
+        "translated_classification": "Level 1 - AQF Level 5 - 7th year+",
+        "previously_classified_on_2026_09_30_as": [
+          "Level 2 - pay point 2",
+          "Level 2 - pay point 3",
+          "Level 2 - pay point 4"
+        ]
+      },
+      {
+        "translated_classification": "Level 1 - AQF Level 6 - 2nd-3rd year",
+        "previously_classified_on_2026_09_30_as": [
+          "Level 1 - pay point 4"
+        ]
+      },
+      {
+        "translated_classification": "Level 1 - AQF Level 6 - 4th-6th year",
+        "previously_classified_on_2026_09_30_as": [
+          "Level 1 - pay point 6",
+          "Level 2 - pay point 1"
+        ]
+      },
+      {
+        "translated_classification": "Level 1 - AQF Level 6 - 7th year+",
+        "previously_classified_on_2026_09_30_as": [
+          "Level 2 - pay point 4"
+        ]
+      },
+      {
+        "translated_classification": "Level 1 - AQF Level 7 - 1st year",
+        "previously_classified_on_2026_09_30_as": [
+          "Level 1 - pay point 4"
+        ]
+      },
+      {
+        "translated_classification": "Level 1 - AQF Level 7 - 2nd-3rd year",
+        "previously_classified_on_2026_09_30_as": [
+          "Level 1 - pay point 5",
+          "Level 1 - pay point 6"
+        ]
+      },
+      {
+        "translated_classification": "Level 1 - AQF Level 7 - 4th-6th year",
+        "previously_classified_on_2026_09_30_as": [
+          "Level 2 - pay point 3"
+        ]
+      },
+      {
+        "translated_classification": "Level 1 - AQF Level 8 - 2nd-3rd year",
+        "previously_classified_on_2026_09_30_as": [
+          "Level 1 - pay point 6"
+        ]
+      },
+      {
+        "translated_classification": "Level 1 - AQF Level 8 - 4th-6th year",
+        "previously_classified_on_2026_09_30_as": [
+          "Level 2 - pay point 3"
+        ]
+      },
+      {
+        "translated_classification": "Level 1 - AQF Level 9 - 4th-6th year",
+        "previously_classified_on_2026_09_30_as": [
+          "Level 2 - pay point 4"
+        ]
+      },
+      {
+        "translated_classification": "Level 2.1",
+        "previously_classified_on_2026_09_30_as": [
+          "Level 3 - pay point 5"
+        ]
+      },
+      {
+        "translated_classification": "Level 4",
+        "previously_classified_on_2026_09_30_as": [
+          "Level 4 - pay point 4"
+        ]
+      }
+    ]
+  },
   "notes": [
-    "MA000027 has four adult classification streams: Support Services (Levels 1-9), Dental assistants, Pathology collectors, and Health Professional employees (Levels 1-4 with pay points). Pick the stream and level that match the work performed and the employee's qualifications/experience.",
+    "MA000027 has four adult classification streams: Support Services (Levels 1-9), Dental assistants (Levels 3, 5, 6, 7), Pathology collectors (Levels 5, 6, 7) and Health Professional employees (Level 1 by AQF level and years of experience; Levels 2.1, 2.2, 3 and 4 by role). Pick the stream and level that match the work performed and the employee's qualifications/experience.",
+    "HEALTH PROFESSIONALS FROM 1 OCTOBER 2026: Level 1 has no pay points. Classify on commencement by (a) the AQF level listed for the profession in Schedule B (rules in clause B.2, including that a higher qualification required by the employer wins), and (b) years of experience in the profession at Level 1 with ANY employer — not tenure with the current employer. Level 2.1 vs 2.2 turns on whether the employee has less than 5 years, or 5 years or more, performing Level 2 role(s) and duties.",
+    "RETAINED RATES (clause J.4.3): an employee who was classified as a Health Professional employee under this award on 30 September 2026 is paid the HIGHER of (a) the minimum rate for their translated classification (clauses J.4.1 / J.4.2) and (b) the minimum rate for their previous classification as at 30 September 2026 (see retained_rates). The FWO Pay Guide lists the translation cases where its tables must not be used for this reason (see pay_guide_retained_rate_cases). Always ask whether the person was employed under this award on 30 September 2026 before quoting a health professional rate.",
     "Casual rates shown already include the 25% casual loading. Casual penalty rates add the 25% loading to the penalty (additive: Saturday/Sunday 175%, public holiday 275%, Mon-Fri shift 140%). Casual OVERTIME instead applies the overtime percentage to the loaded casual rate (multiplicative: 187.5% first 2 hours, 250% thereafter).",
-    "MA000027 HAS an annualised wage arrangement clause (clause 22) but it is restricted to full-time Support Services Level 8/9 or Health Professional Level 2/3/4 employees.",
-    "Junior (age-scaled) and apprentice rates are not modelled in this dataset — see the Pay Guide for those.",
-    "All 80 adult base-rate rows validated: FT hourly = round(weekly/38); casual = round(FT x 1.25). Penalty multipliers (shift 115%/140%, Sat/Sun 150%/175%, PH 250%/275%, overtime 150%/200% FT and 187.5%/250% casual) verified against the published penalty-dollar columns on a representative row of each stream."
+    "MA000027 HAS an annualised wage arrangement clause (clause 22) but it is restricted to full-time Support Services Level 8/9 or Health Professional Level 2/3/4 employees. Clause 22 was not amended by PR814029; Level 2 now comprises Levels 2.1 and 2.2. Clause J.4.4: an annualised wage arrangement entered into with an employee who was Health Professional Level 2 on or before 30 September 2026 continues to operate.",
+    "The health professional increases are stage 1 of 5 under the Gender-based undervaluation – priority awards review; the FWC has indicated further stages from 30 June in each of 2027, 2028, 2029 and 2030 ([2026] FWCFB 123), in addition to Annual Wage Review increases. Retained rates under J.4.3 are fixed at their 30 September 2026 values and will be overtaken as translated rates rise.",
+    "Junior (age-scaled) and apprentice rates are not modelled in this dataset — see the Pay Guide for those."
   ],
   "rates": [
     {
@@ -506,323 +1310,592 @@
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 1 - pay point 1",
-      "rate": 30.89,
-      "weekly_rate": 1174.0
+      "classification": "Level 1 - AQF Level 5 - 1st year",
+      "rate": 32.44,
+      "weekly_rate": 1232.7,
+      "level": "1",
+      "aqf_level": 5,
+      "experience_band": "1st year",
+      "clause": "17.1(a)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 1 - pay point 1",
-      "rate": 38.61
+      "classification": "Level 1 - AQF Level 5 - 1st year",
+      "rate": 40.55,
+      "level": "1",
+      "aqf_level": 5,
+      "experience_band": "1st year",
+      "clause": "17.1(a)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 1 - pay point 2",
-      "rate": 32.09,
-      "weekly_rate": 1219.5
+      "classification": "Level 1 - AQF Level 5 - 2nd-3rd year",
+      "rate": 34.44,
+      "weekly_rate": 1308.8,
+      "level": "1",
+      "aqf_level": 5,
+      "experience_band": "2nd-3rd year",
+      "clause": "17.1(a)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 1 - pay point 2",
-      "rate": 40.11
+      "classification": "Level 1 - AQF Level 5 - 2nd-3rd year",
+      "rate": 43.05,
+      "level": "1",
+      "aqf_level": 5,
+      "experience_band": "2nd-3rd year",
+      "clause": "17.1(a)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 1 - pay point 3",
-      "rate": 33.51,
-      "weekly_rate": 1273.4
+      "classification": "Level 1 - AQF Level 5 - 4th-6th year",
+      "rate": 37.53,
+      "weekly_rate": 1426.0,
+      "level": "1",
+      "aqf_level": 5,
+      "experience_band": "4th-6th year",
+      "clause": "17.1(a)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 1 - pay point 3",
-      "rate": 41.89
+      "classification": "Level 1 - AQF Level 5 - 4th-6th year",
+      "rate": 46.91,
+      "level": "1",
+      "aqf_level": 5,
+      "experience_band": "4th-6th year",
+      "clause": "17.1(a)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 1 - pay point 4",
-      "rate": 34.66,
-      "weekly_rate": 1317.2
+      "classification": "Level 1 - AQF Level 5 - 7th year+",
+      "rate": 40.56,
+      "weekly_rate": 1541.3,
+      "level": "1",
+      "aqf_level": 5,
+      "experience_band": "7th year+",
+      "clause": "17.1(a)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 1 - pay point 4",
-      "rate": 43.33
+      "classification": "Level 1 - AQF Level 5 - 7th year+",
+      "rate": 50.7,
+      "level": "1",
+      "aqf_level": 5,
+      "experience_band": "7th year+",
+      "clause": "17.1(a)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 1 - pay point 5",
-      "rate": 37.76,
-      "weekly_rate": 1435.0
+      "classification": "Level 1 - AQF Level 6 - 1st year",
+      "rate": 32.44,
+      "weekly_rate": 1232.7,
+      "level": "1",
+      "aqf_level": 6,
+      "experience_band": "1st year",
+      "clause": "17.1(b)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 1 - pay point 5",
-      "rate": 47.2
+      "classification": "Level 1 - AQF Level 6 - 1st year",
+      "rate": 40.55,
+      "level": "1",
+      "aqf_level": 6,
+      "experience_band": "1st year",
+      "clause": "17.1(b)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 1 - pay point 6",
-      "rate": 39.1,
-      "weekly_rate": 1485.9
+      "classification": "Level 1 - AQF Level 6 - 2nd-3rd year",
+      "rate": 34.44,
+      "weekly_rate": 1308.8,
+      "level": "1",
+      "aqf_level": 6,
+      "experience_band": "2nd-3rd year",
+      "clause": "17.1(b)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 1 - pay point 6",
-      "rate": 48.88
+      "classification": "Level 1 - AQF Level 6 - 2nd-3rd year",
+      "rate": 43.05,
+      "level": "1",
+      "aqf_level": 6,
+      "experience_band": "2nd-3rd year",
+      "clause": "17.1(b)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 2 - pay point 1",
-      "rate": 39.31,
-      "weekly_rate": 1493.9
+      "classification": "Level 1 - AQF Level 6 - 4th-6th year",
+      "rate": 39.03,
+      "weekly_rate": 1483.3,
+      "level": "1",
+      "aqf_level": 6,
+      "experience_band": "4th-6th year",
+      "clause": "17.1(b)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 2 - pay point 1",
-      "rate": 49.14
+      "classification": "Level 1 - AQF Level 6 - 4th-6th year",
+      "rate": 48.79,
+      "level": "1",
+      "aqf_level": 6,
+      "experience_band": "4th-6th year",
+      "clause": "17.1(b)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 2 - pay point 2",
-      "rate": 40.74,
-      "weekly_rate": 1548.3
+      "classification": "Level 1 - AQF Level 6 - 7th year+",
+      "rate": 43.67,
+      "weekly_rate": 1659.3,
+      "level": "1",
+      "aqf_level": 6,
+      "experience_band": "7th year+",
+      "clause": "17.1(b)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 2 - pay point 2",
-      "rate": 50.93
+      "classification": "Level 1 - AQF Level 6 - 7th year+",
+      "rate": 54.59,
+      "level": "1",
+      "aqf_level": 6,
+      "experience_band": "7th year+",
+      "clause": "17.1(b)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 2 - pay point 3",
-      "rate": 42.3,
-      "weekly_rate": 1607.4
+      "classification": "Level 1 - AQF Level 7 - 1st year",
+      "rate": 34.44,
+      "weekly_rate": 1308.8,
+      "level": "1",
+      "aqf_level": 7,
+      "experience_band": "1st year",
+      "clause": "17.1(c)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 2 - pay point 3",
-      "rate": 52.88
+      "classification": "Level 1 - AQF Level 7 - 1st year",
+      "rate": 43.05,
+      "level": "1",
+      "aqf_level": 7,
+      "experience_band": "1st year",
+      "clause": "17.1(c)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 2 - pay point 4",
-      "rate": 43.98,
-      "weekly_rate": 1671.4
+      "classification": "Level 1 - AQF Level 7 - 2nd-3rd year",
+      "rate": 37.08,
+      "weekly_rate": 1409.0,
+      "level": "1",
+      "aqf_level": 7,
+      "experience_band": "2nd-3rd year",
+      "clause": "17.1(c)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 2 - pay point 4",
-      "rate": 54.98
+      "classification": "Level 1 - AQF Level 7 - 2nd-3rd year",
+      "rate": 46.35,
+      "level": "1",
+      "aqf_level": 7,
+      "experience_band": "2nd-3rd year",
+      "clause": "17.1(c)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 3 - pay point 1",
-      "rate": 45.89,
-      "weekly_rate": 1743.9
+      "classification": "Level 1 - AQF Level 7 - 4th-6th year",
+      "rate": 41.19,
+      "weekly_rate": 1565.3,
+      "level": "1",
+      "aqf_level": 7,
+      "experience_band": "4th-6th year",
+      "clause": "17.1(c)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 3 - pay point 1",
-      "rate": 57.36
+      "classification": "Level 1 - AQF Level 7 - 4th-6th year",
+      "rate": 51.49,
+      "level": "1",
+      "aqf_level": 7,
+      "experience_band": "4th-6th year",
+      "clause": "17.1(c)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 3 - pay point 2",
-      "rate": 47.18,
-      "weekly_rate": 1792.8
+      "classification": "Level 1 - AQF Level 7 - 7th year+",
+      "rate": 44.46,
+      "weekly_rate": 1689.5,
+      "level": "1",
+      "aqf_level": 7,
+      "experience_band": "7th year+",
+      "clause": "17.1(c)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 3 - pay point 2",
-      "rate": 58.98
+      "classification": "Level 1 - AQF Level 7 - 7th year+",
+      "rate": 55.58,
+      "level": "1",
+      "aqf_level": 7,
+      "experience_band": "7th year+",
+      "clause": "17.1(c)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 3 - pay point 3",
-      "rate": 48.19,
-      "weekly_rate": 1831.3
+      "classification": "Level 1 - AQF Level 8 - 1st year",
+      "rate": 35.19,
+      "weekly_rate": 1337.1,
+      "level": "1",
+      "aqf_level": 8,
+      "experience_band": "1st year",
+      "clause": "17.1(d)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 3 - pay point 3",
-      "rate": 60.24
+      "classification": "Level 1 - AQF Level 8 - 1st year",
+      "rate": 43.99,
+      "level": "1",
+      "aqf_level": 8,
+      "experience_band": "1st year",
+      "clause": "17.1(d)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 3 - pay point 4",
-      "rate": 50.33,
-      "weekly_rate": 1912.6
+      "classification": "Level 1 - AQF Level 8 - 2nd-3rd year",
+      "rate": 38.02,
+      "weekly_rate": 1444.9,
+      "level": "1",
+      "aqf_level": 8,
+      "experience_band": "2nd-3rd year",
+      "clause": "17.1(d)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 3 - pay point 4",
-      "rate": 62.91
+      "classification": "Level 1 - AQF Level 8 - 2nd-3rd year",
+      "rate": 47.53,
+      "level": "1",
+      "aqf_level": 8,
+      "experience_band": "2nd-3rd year",
+      "clause": "17.1(d)"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 3 - pay point 5",
+      "classification": "Level 1 - AQF Level 8 - 4th-6th year",
+      "rate": 41.71,
+      "weekly_rate": 1584.9,
+      "level": "1",
+      "aqf_level": 8,
+      "experience_band": "4th-6th year",
+      "clause": "17.1(d)"
+    },
+    {
+      "category": "adult",
+      "stream": "health_professionals",
+      "employment_type": "casual",
+      "section": "Health professional employees - Casual",
+      "classification": "Level 1 - AQF Level 8 - 4th-6th year",
+      "rate": 52.14,
+      "level": "1",
+      "aqf_level": 8,
+      "experience_band": "4th-6th year",
+      "clause": "17.1(d)"
+    },
+    {
+      "category": "adult",
+      "stream": "health_professionals",
+      "employment_type": "full_time",
+      "section": "Health professional employees - Full-time & part-time",
+      "classification": "Level 1 - AQF Level 8 - 7th year+",
+      "rate": 45.3,
+      "weekly_rate": 1721.4,
+      "level": "1",
+      "aqf_level": 8,
+      "experience_band": "7th year+",
+      "clause": "17.1(d)"
+    },
+    {
+      "category": "adult",
+      "stream": "health_professionals",
+      "employment_type": "casual",
+      "section": "Health professional employees - Casual",
+      "classification": "Level 1 - AQF Level 8 - 7th year+",
+      "rate": 56.63,
+      "level": "1",
+      "aqf_level": 8,
+      "experience_band": "7th year+",
+      "clause": "17.1(d)"
+    },
+    {
+      "category": "adult",
+      "stream": "health_professionals",
+      "employment_type": "full_time",
+      "section": "Health professional employees - Full-time & part-time",
+      "classification": "Level 1 - AQF Level 9 - 1st year",
+      "rate": 38.02,
+      "weekly_rate": 1444.9,
+      "level": "1",
+      "aqf_level": 9,
+      "experience_band": "1st year",
+      "clause": "17.1(e)"
+    },
+    {
+      "category": "adult",
+      "stream": "health_professionals",
+      "employment_type": "casual",
+      "section": "Health professional employees - Casual",
+      "classification": "Level 1 - AQF Level 9 - 1st year",
+      "rate": 47.53,
+      "level": "1",
+      "aqf_level": 9,
+      "experience_band": "1st year",
+      "clause": "17.1(e)"
+    },
+    {
+      "category": "adult",
+      "stream": "health_professionals",
+      "employment_type": "full_time",
+      "section": "Health professional employees - Full-time & part-time",
+      "classification": "Level 1 - AQF Level 9 - 2nd-3rd year",
+      "rate": 40.66,
+      "weekly_rate": 1545.2,
+      "level": "1",
+      "aqf_level": 9,
+      "experience_band": "2nd-3rd year",
+      "clause": "17.1(e)"
+    },
+    {
+      "category": "adult",
+      "stream": "health_professionals",
+      "employment_type": "casual",
+      "section": "Health professional employees - Casual",
+      "classification": "Level 1 - AQF Level 9 - 2nd-3rd year",
+      "rate": 50.83,
+      "level": "1",
+      "aqf_level": 9,
+      "experience_band": "2nd-3rd year",
+      "clause": "17.1(e)"
+    },
+    {
+      "category": "adult",
+      "stream": "health_professionals",
+      "employment_type": "full_time",
+      "section": "Health professional employees - Full-time & part-time",
+      "classification": "Level 1 - AQF Level 9 - 4th-6th year",
+      "rate": 43.67,
+      "weekly_rate": 1659.3,
+      "level": "1",
+      "aqf_level": 9,
+      "experience_band": "4th-6th year",
+      "clause": "17.1(e)"
+    },
+    {
+      "category": "adult",
+      "stream": "health_professionals",
+      "employment_type": "casual",
+      "section": "Health professional employees - Casual",
+      "classification": "Level 1 - AQF Level 9 - 4th-6th year",
+      "rate": 54.59,
+      "level": "1",
+      "aqf_level": 9,
+      "experience_band": "4th-6th year",
+      "clause": "17.1(e)"
+    },
+    {
+      "category": "adult",
+      "stream": "health_professionals",
+      "employment_type": "full_time",
+      "section": "Health professional employees - Full-time & part-time",
+      "classification": "Level 1 - AQF Level 9 - 7th year+",
+      "rate": 46.18,
+      "weekly_rate": 1755.0,
+      "level": "1",
+      "aqf_level": 9,
+      "experience_band": "7th year+",
+      "clause": "17.1(e)"
+    },
+    {
+      "category": "adult",
+      "stream": "health_professionals",
+      "employment_type": "casual",
+      "section": "Health professional employees - Casual",
+      "classification": "Level 1 - AQF Level 9 - 7th year+",
+      "rate": 57.73,
+      "level": "1",
+      "aqf_level": 9,
+      "experience_band": "7th year+",
+      "clause": "17.1(e)"
+    },
+    {
+      "category": "adult",
+      "stream": "health_professionals",
+      "employment_type": "full_time",
+      "section": "Health professional employees - Full-time & part-time",
+      "classification": "Level 2.1",
+      "rate": 51.19,
+      "weekly_rate": 1945.4,
+      "level": "2.1",
+      "role_basis": "Senior Clinician, Specialist, Supervisor or Educator with less than 5 years experience in the profession performing Level 2 role(s) and duties (clause A.2.2(b))",
+      "clause": "17.2"
+    },
+    {
+      "category": "adult",
+      "stream": "health_professionals",
+      "employment_type": "casual",
+      "section": "Health professional employees - Casual",
+      "classification": "Level 2.1",
+      "rate": 63.99,
+      "level": "2.1",
+      "role_basis": "Senior Clinician, Specialist, Supervisor or Educator with less than 5 years experience in the profession performing Level 2 role(s) and duties (clause A.2.2(b))",
+      "clause": "17.2"
+    },
+    {
+      "category": "adult",
+      "stream": "health_professionals",
+      "employment_type": "full_time",
+      "section": "Health professional employees - Full-time & part-time",
+      "classification": "Level 2.2",
       "rate": 52.19,
-      "weekly_rate": 1983.2
+      "weekly_rate": 1983.2,
+      "level": "2.2",
+      "role_basis": "Senior Clinician, Specialist, Supervisor or Educator with 5 years or more experience in the profession performing Level 2 role(s) and duties (clause A.2.2(c))",
+      "clause": "17.2"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 3 - pay point 5",
-      "rate": 65.24
+      "classification": "Level 2.2",
+      "rate": 65.24,
+      "level": "2.2",
+      "role_basis": "Senior Clinician, Specialist, Supervisor or Educator with 5 years or more experience in the profession performing Level 2 role(s) and duties (clause A.2.2(c))",
+      "clause": "17.2"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 4 - pay point 1",
-      "rate": 55.57,
-      "weekly_rate": 2111.6
+      "classification": "Level 3",
+      "rate": 52.19,
+      "weekly_rate": 1983.2,
+      "level": "3",
+      "role_basis": "Advanced Clinician, Senior Specialist or Section Manager (clause A.2.3)",
+      "clause": "17.2"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 4 - pay point 1",
-      "rate": 69.46
+      "classification": "Level 3",
+      "rate": 65.24,
+      "level": "3",
+      "role_basis": "Advanced Clinician, Senior Specialist or Section Manager (clause A.2.3)",
+      "clause": "17.2"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "full_time",
       "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 4 - pay point 2",
-      "rate": 59.3,
-      "weekly_rate": 2253.3
+      "classification": "Level 4",
+      "rate": 65.77,
+      "weekly_rate": 2499.1,
+      "level": "4",
+      "role_basis": "Manager (clause A.2.4)",
+      "clause": "17.2"
     },
     {
       "category": "adult",
       "stream": "health_professionals",
       "employment_type": "casual",
       "section": "Health professional employees - Casual",
-      "classification": "Level 4 - pay point 2",
-      "rate": 74.13
-    },
-    {
-      "category": "adult",
-      "stream": "health_professionals",
-      "employment_type": "full_time",
-      "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 4 - pay point 3",
-      "rate": 64.48,
-      "weekly_rate": 2450.4
-    },
-    {
-      "category": "adult",
-      "stream": "health_professionals",
-      "employment_type": "casual",
-      "section": "Health professional employees - Casual",
-      "classification": "Level 4 - pay point 3",
-      "rate": 80.6
-    },
-    {
-      "category": "adult",
-      "stream": "health_professionals",
-      "employment_type": "full_time",
-      "section": "Health professional employees - Full-time & part-time",
-      "classification": "Level 4 - pay point 4",
-      "rate": 71.19,
-      "weekly_rate": 2705.1
-    },
-    {
-      "category": "adult",
-      "stream": "health_professionals",
-      "employment_type": "casual",
-      "section": "Health professional employees - Casual",
-      "classification": "Level 4 - pay point 4",
-      "rate": 88.99
+      "classification": "Level 4",
+      "rate": 82.21,
+      "level": "4",
+      "role_basis": "Manager (clause A.2.4)",
+      "clause": "17.2"
     }
   ]
 }
