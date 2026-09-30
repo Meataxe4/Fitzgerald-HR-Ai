@@ -409,6 +409,9 @@ function clusterLinks(v, current) {
   if (current === 'landing') links.push({ key: 'cheat', href: `/${v}-award-cheat-sheet`, label: 'Printable', title: `${VERTICALS[v].awardShort} Cheat Sheet`, blurb: 'Rates, penalties and allowances on one page — print or save as PDF.' });
   if (current === 'landing') links.push({ key: 'classifications', href: `/${v}-award-classifications`, label: 'Classifications', title: `${VERTICALS[v].awardShort} Classifications`, blurb: 'Every classification level explained — who fits where, and what each level is paid.' });
   if (current === 'landing') links.push({ key: 'compliance', href: '/hr-compliance-software', label: 'Category', title: 'HR Compliance Software for Small Business', blurb: 'What HR compliance software has to do, what Fitz HR is and isn\'t, and how it compares.' });
+  // Pay-rates and guide pages are the site's strongest-ranking URLs; they link
+  // to the award-interpretation category page so it inherits that weight.
+  if (current === 'pay' || current === 'guide') links.push({ key: 'interp', href: '/award-interpretation-software', label: 'Category', title: 'Award Interpretation Software', blurb: `What award interpretation software does, and how Fitz HR applies the ${VERTICALS[v].awardShort} before the roster is published, not after payroll runs.` });
   return `    <div class="hub-grid">
 ${links.map(l => `        <a href="${l.href}" class="hub-card"><div class="hub-label">${l.label}</div><h3>${esc(l.title)}</h3><p>${esc(l.blurb)}</p></a>`).join('\n')}
     </div>`;
