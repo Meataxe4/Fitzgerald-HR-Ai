@@ -31,7 +31,8 @@ def main():
     layers = [(render(p["wordmark"]), 0.10, 26),
               (render(p["title"]),    0.28, 40),
               (render(p["barbody"]),  0.60, 34),
-              (render(p["date"]),     0.90, 30)]
+              (render(p["date"]),     0.90, 30),
+              (render(p["save"]),     1.15, 28)]
     # headshots slide up from below
     heads_img = None; heads_y = 0; heads_delay = 0.5; heads_dur = 0.9; heads_rise = 0
     if HEADS and os.path.exists(HEADS):
@@ -41,7 +42,7 @@ def main():
         heads_img = canvas
         heads_rise = h.height + 8  # start fully below frame
 
-    intro_end = max(0.90 + DUR, heads_delay + heads_dur)
+    intro_end = max(1.15 + DUR, heads_delay + heads_dur)
     length = intro_end + HOLD
 
     def compose(t):

@@ -56,20 +56,21 @@ def parts():
     bar_bottom = date_y + 150
     wordmark = (f'<text x="{MX}" y="316" class="ti" font-size="52" font-weight="800">'
                 f'<tspan fill="{AMBER}">F</tspan><tspan fill="{W}">ITZ</tspan><tspan fill="{AMBER}">HR</tspan></text>')
-    title = (f'<g class="ti" font-weight="800" font-size="{tsize}" paint-order="stroke" stroke="{CREAM}" '
-             f'stroke-width="9" stroke-linejoin="round" fill="{AMBER}">'
+    title = (f'<g class="ti" font-weight="800" font-size="{tsize}" fill="{AMBER}">'
              f'<text x="{MX}" y="{ty1}">{t1}</text><text x="{MX}" y="{ty2}">{t2}</text></g>')
     barbody = f'<rect x="{MX}" y="{ty2+70}" width="10" height="{bar_bottom-(ty2+70)}" rx="5" fill="{AMBER}"/>' + body_svg
     date = (f'<text x="164" y="{date_y}" class="ti" font-size="52" font-weight="800">'
             f'<tspan fill="{AMBER}">Wednesday 7 October</tspan><tspan fill="{W}">  |  11am AEDT</tspan></text>'
             f'<text x="164" y="{date_y+66}" class="ti" font-size="50" font-weight="800" fill="{W}">Online via Zoom</text>')
-    return {"wordmark": wordmark, "title": title, "barbody": barbody, "date": date}
+    save = (f'<text x="164" y="{date_y+156}" class="ti" font-size="54" font-weight="800">'
+            f'<tspan fill="{W}">Save your spot</tspan><tspan fill="{AMBER}">  →</tspan></text>')
+    return {"wordmark": wordmark, "title": title, "barbody": barbody, "date": date, "save": save}
 
 def svg(inner): return f'<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">{DEFS}{inner}</svg>'
 
 def build_svg():
     p = parts()
-    return svg(f'<rect width="1080" height="1920" fill="url(#bg)"/>' + p["wordmark"] + p["title"] + p["barbody"] + p["date"])
+    return svg(f'<rect width="1080" height="1920" fill="url(#bg)"/>' + p["wordmark"] + p["title"] + p["barbody"] + p["date"] + p["save"])
 
 def main():
     os.makedirs(OUTDIR, exist_ok=True)
