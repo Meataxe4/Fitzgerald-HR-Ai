@@ -44,9 +44,28 @@ GLOW = ('<linearGradient id="glow" x1="0" y1="0" x2="0" y2="1"><stop offset="0%"
         '<radialGradient id="ag" cx="80%" cy="26%" r="72%"><stop offset="0%" stop-color="#f59e0b" stop-opacity="0.16"/>'
         '<stop offset="100%" stop-color="#f59e0b" stop-opacity="0"/></radialGradient>')
 
+# themed line glyphs (drawn around origin, ~±45); used as large faint watermarks
+_ICONS = {
+    "pulse": '<path d="M -46 0 H -16 L -6 -26 L 6 24 L 16 0 H 46"/>',
+    "cap":   ('<path d="M 0 -22 L 46 -4 L 0 14 L -46 -4 Z"/>'
+              '<path d="M -24 3 V 18 Q 0 33 24 18 V 3"/>'
+              '<path d="M 46 -4 V 22"/><circle cx="46" cy="26" r="4"/>'),
+    "trend": ('<path d="M -40 26 L -12 -6 L 6 14 L 40 -24"/>'
+              '<path d="M 22 -24 H 40 V -6"/>'),
+    "calendar": ('<rect x="-34" y="-26" width="68" height="58" rx="8"/>'
+                 '<path d="M -34 -8 H 34"/><path d="M -18 -26 V -38"/><path d="M 18 -26 V -38"/>'
+                 '<rect x="6" y="6" width="16" height="14" rx="3"/>'),
+    "shield": ('<path d="M 0 -30 L 28 -19 V 5 Q 28 26 0 32 Q -28 26 -28 5 V -19 Z"/>'
+               '<path d="M -11 2 L -2 13 L 15 -9"/>'),
+}
+def gicon(name, cx, cy, scale, stroke, opacity=0.08, sw=6):
+    return (f'<g transform="translate({cx},{cy}) scale({scale})" fill="none" stroke="{stroke}" '
+            f'stroke-width="{sw/scale:.2f}" stroke-linecap="round" stroke-linejoin="round" '
+            f'opacity="{opacity}">{_ICONS[name]}</g>')
+
 def hook():
     base = render('<rect width="1080" height="1920" fill="url(#glow)"/><rect width="1080" height="1920" fill="url(#ag)"/>'
-                  '<text x="1030" y="1210" class="ti" font-size="760" font-weight="800" fill="#f59e0b" opacity="0.07" text-anchor="end">+</text>'
+                  + gicon("pulse", 780, 1230, 8.2, AMBER, 0.08)
                   + wm(), GLOW)
     title = (f'<text x="{MX}" y="640" class="ti" font-size="36" font-weight="800" fill="{AMBER}" letter-spacing="6">HEALTH AWARD · MA000027</text>'
              f'<text x="{MX}" y="800" class="ti" font-size="118" font-weight="800" fill="{W}">Big changes</text>'
@@ -55,9 +74,10 @@ def hook():
                   for i, l in enumerate(wrap("What clinics, practices & allied health need to know.", 46, 860)))
     return base, [(title, 0.15, 40), (sub, 0.5, 32)]
 
-def card(cnt, eyebrow, t_lines, kicker):
+def card(cnt, eyebrow, t_lines, kicker, icon="pulse"):
     base = render(f'<rect width="1080" height="1920" fill="{NAVY}"/>'
-                  f'<rect x="60" y="300" width="10" height="1300" rx="5" fill="{AMBER}" opacity="0.9"/>'
+                  + gicon(icon, 800, 1300, 7.2, AMBER, 0.08)
+                  + f'<rect x="60" y="300" width="10" height="1300" rx="5" fill="{AMBER}" opacity="0.9"/>'
                   + wm() + f'<text x="{MR}" y="300" class="ti" font-size="38" font-weight="800" fill="{AMBER}" text-anchor="end" letter-spacing="2">{cnt}</text>')
     tsvg = (f'<text x="{MX}" y="500" class="ti" font-size="36" font-weight="800" fill="{AMBER}" letter-spacing="6">{esc(eyebrow)}</text>'
             + "".join(f'<text x="{MX}" y="{640+i*110}" class="ti" font-size="96" font-weight="800" fill="{c}">{esc(t)}</text>'
@@ -70,7 +90,8 @@ def card(cnt, eyebrow, t_lines, kicker):
 
 def cta():
     base = render(f'<rect width="1080" height="1920" fill="{AMBER}"/>'
-                  f'<rect x="{MX}" y="246" width="190" height="78" rx="16" fill="{NAVY}"/>' + wm(x=MX+24, ink=W))
+                  + gicon("shield", 800, 1250, 7.0, NAVY, 0.10)
+                  + f'<rect x="{MX}" y="246" width="190" height="78" rx="16" fill="{NAVY}"/>' + wm(x=MX+24, ink=W))
     title = (f'<text x="{MX}" y="700" class="ti" font-size="104" font-weight="800" fill="{NAVY}">Check your</text>'
              f'<text x="{MX}" y="814" class="ti" font-size="104" font-weight="800" fill="{NAVY}">Health Award rate.</text>')
     sub = "".join(f'<text x="{MX}" y="{940+i*54}" class="bd" font-size="44" fill="{N72}">{esc(l)}</text>'
@@ -84,11 +105,11 @@ def build():
     return [
         hook(),
         card("01", "NEW STRUCTURE", [("Pay now follows", W), ("AQF levels.", AMBER)],
-             "Levels 5, 6 & 7 by years of experience — the old pay-point levels are replaced."),
+             "Levels 5, 6 & 7 by years of experience — the old pay-point levels are replaced.", icon="cap"),
         card("02", "WHY IT CHANGED", [("Minimum rates", W), ("move up.", AMBER)],
-             "Part of Fair Work's gender-based undervaluation priority review."),
+             "Part of Fair Work's gender-based undervaluation priority review.", icon="trend"),
         card("03", "WHEN & WHO", [("First full pay period", W), ("on/after 1 Oct 2026.", AMBER)],
-             "Existing staff are protected by transitional rates — no one goes backwards."),
+             "Existing staff are protected by transitional rates — no one goes backwards.", icon="calendar"),
         cta(),
     ]
 
