@@ -14057,24 +14057,80 @@ function resolveRetailRate(data) {
 
 // Health Professionals and Support Services (MA000027) classification picker —
 // graded by STREAM (Support services, Dental assistants, Pathology collectors,
-// Health professionals) then level/pay point. Reads from the loaded
-// health-award-rates.json (awardRates).
+// Health professionals) then level. Health professionals (from 1 Oct 2026):
+// level by role, Level 1 by AQF level + years of experience, plus the clause
+// J.4.3 retained-rate check. Reads from the loaded health-award-rates.json.
 function _calcHealthSteps() {
     const streamLabels = {
         support_services: 'Support services (clerical, admin, catering, cleaning, technical)',
         dental_assistants: 'Support services — Dental assistant',
         pathology_collectors: 'Support services — Pathology collector',
-        health_professionals: 'Health professional (allied health, Levels 1-4)'
+        health_professionals: 'Health professional (allied health and other Schedule B professions)'
     };
     const empLabels = { full_time: 'Full-time / Part-time', casual: 'Casual' };
+    // From 1 October 2026 (PR814029) the health professional stream has no pay
+    // points: Level 1 is AQF level x years of experience, Levels 2.1/2.2/3/4 are
+    // role-based. The other three streams are unchanged and keep the plain
+    // level picker. Every health-professional-only step is gated with
+    // visibleWhen so support/dental/pathology users never see it.
+    const isHP = d => d.healthStream === 'health_professionals';
+    const isHPL1 = d => isHP(d) && d.healthLevel === '1';
+    const hpc = () => (awardRates.health_professional_classification || {});
+    const professions = () => ((awardRates.schedule_b || {}).professions || []);
+    const BANDS = ((hpc().level_1 || {}).experience_bands) || ['1st year', '2nd-3rd year', '4th-6th year', '7th year+'];
     return [
         { key: 'healthStream', title: 'Which classification stream?', options: function () {
             return [...new Set(awardRates.rates.map(r => r.stream))]
                 .map(s => ({ value: s, label: streamLabels[s] || s }));
         }},
-        { key: 'healthClass', title: 'Which level / pay point?', options: function (data) {
+        { key: 'healthLevel', title: 'Which health professional level?', visibleWhen: isHP, options: function () {
+            return [
+                { value: '1', label: 'Level 1 — practising health professional', sublabel: 'Classified by the AQF level of the profession\'s minimum qualification (Schedule B) and years of experience in the profession' },
+                { value: '2.1', label: 'Level 2.1 — Senior Clinician, Specialist, Supervisor or Educator', sublabel: 'Less than 5 years performing Level 2 role(s) and duties' },
+                { value: '2.2', label: 'Level 2.2 — Senior Clinician, Specialist, Supervisor or Educator', sublabel: '5 years or more performing Level 2 role(s) and duties' },
+                { value: '3', label: 'Level 3 — Advanced Clinician, Senior Specialist or Section Manager', sublabel: 'Appointed to the role (Schedule A.2.3)' },
+                { value: '4', label: 'Level 4 — Manager', sublabel: 'Appointed as a manager with resource, budget and strategic accountability (Schedule A.2.4)' }
+            ];
+        }},
+        { key: 'healthProfession', title: 'Which profession? (Schedule B — Common Health Professionals)', visibleWhen: isHPL1, options: function () {
+            const list = professions().map(p => ({ value: p.profession, label: p.profession + ' — AQF Level ' + p.aqf_levels.join(' / ') }));
+            list.push({ value: 'Other profession', label: 'Other profession not listed in Schedule B' });
+            return list;
+        }},
+        { key: 'healthAqf', title: 'Which AQF level applies? (clause B.2)', visibleWhen: isHPL1, options: function (data) {
+            const prof = professions().find(p => p.profession === data.healthProfession);
+            const listed = prof ? prof.aqf_levels : [];
+            const names = ((hpc().level_1 || {}).aqf_reference) || {};
+            return [5, 6, 7, 8, 9].map(l => ({
+                value: String(l),
+                label: 'AQF Level ' + l + (names[String(l)] ? ' — ' + names[String(l)] : ''),
+                sublabel: listed.indexOf(l) !== -1
+                    ? 'Listed for this profession in Schedule B'
+                    : (listed.length
+                        ? 'Only if the employer requires this higher qualification (B.2(d)) or it is the closest listed level to the qualification held (B.2(b))'
+                        : 'The standard minimum qualification for entry to the profession, or the qualification held (B.2(c))')
+            }));
+        }},
+        { key: 'healthYears', title: 'Years of experience in the profession at Level 1 (with any employer)', visibleWhen: isHPL1, options: function () {
+            return BANDS.map(b => ({ value: b, label: b }));
+        }},
+        { key: 'healthClass', title: 'Which level?', visibleWhen: d => !!d.healthStream && !isHP(d), options: function (data) {
             return [...new Set(awardRates.rates.filter(r => r.stream === data.healthStream).map(r => r.classification))]
                 .map(c => ({ value: c, label: c }));
+        }},
+        { key: 'healthOnAward30Sep', title: 'Was this person employed as a health professional under this award on 30 September 2026?', visibleWhen: isHP, options: function () {
+            return [
+                { value: 'no', label: 'No — started on or after 1 October 2026', sublabel: 'The new classification structure applies directly' },
+                { value: 'yes', label: 'Yes — employed before 1 October 2026', sublabel: 'Translated under Schedule J.4; their 30 September 2026 rate is retained if it is higher (clause J.4.3)' }
+            ];
+        }},
+        { key: 'healthPrevClass', title: 'Their classification on 30 September 2026', visibleWhen: d => isHP(d) && d.healthOnAward30Sep === 'yes', options: function () {
+            const prev = [];
+            for (let i = 1; i <= 6; i++) prev.push('Level 1 - pay point ' + i);
+            for (let i = 1; i <= 4; i++) prev.push('Level 2 - pay point ' + i);
+            for (let i = 1; i <= 5; i++) prev.push('Level 3 - pay point ' + i);
+            for (let i = 1; i <= 4; i++) prev.push('Level 4 - pay point ' + i);
+            return prev.map(c => ({ value: c, label: c }));
         }},
         { key: 'employment', title: 'What type of employment?', options: function (data) {
             const emps = [...new Set(awardRates.rates.filter(r => r.stream === data.healthStream).map(r => r.employment_type))];
@@ -14083,39 +14139,61 @@ function _calcHealthSteps() {
     ];
 }
 
+function _healthClassificationKey(data) {
+    if (data.healthStream !== 'health_professionals') return data.healthClass;
+    if (data.healthLevel === '1') return 'Level 1 - AQF Level ' + data.healthAqf + ' - ' + data.healthYears;
+    return 'Level ' + data.healthLevel;
+}
+
 // Health resolver — returns the shared result-card shape. Casual rates already
 // include the 25% loading, so penalties are computed on the (unloaded) base
 // rate: penalties add the 25% loading (additive) while overtime applies the
 // overtime % to the loaded casual rate (multiplicative), reproducing the Pay
-// Guide's casual columns. See docs/guardrails-award-resolution.md.
+// Guide's casual columns. For health professionals employed on 30 September
+// 2026 the retained-rate rule (clause J.4.3) applies: the higher of the
+// translated rate and the previous rate. See docs/guardrails-award-resolution.md.
 function resolveHealthRate(data) {
-    const entry = awardRates.rates.find(r => r.stream === data.healthStream && r.classification === data.healthClass && r.employment_type === data.employment);
+    const cls = _healthClassificationKey(data);
+    const entry = awardRates.rates.find(r => r.stream === data.healthStream && r.classification === cls && r.employment_type === data.employment);
     if (!entry) {
         return { award: awardRates.award_name, level: 'Rate not found', rate: 0,
             penalties: ['No rate found for that combination.'], nextSteps: ['Contact Fitz HR support'] };
     }
-    const rate = entry.rate;
     const p = awardRates.penalty_rates || {};
     const cl = awardRates.casual_loading || 0.25;
     const isCasual = data.employment === 'casual';
     const ftSibling = isCasual
-        ? awardRates.rates.find(r => r.stream === data.healthStream && r.classification === data.healthClass && r.employment_type === 'full_time')
+        ? awardRates.rates.find(r => r.stream === data.healthStream && r.classification === cls && r.employment_type === 'full_time')
         : null;
-    const base = isCasual ? (ftSibling ? ftSibling.rate : rate / (1 + cl)) : rate;
     // Round half-up to cents (the FWO Pay Guide convention).
-    const money = n => '$' + (Math.round((n + 1e-9) * 100) / 100).toFixed(2);
-    const penalties = [];
-    // Penalty rates: casual adds the 25% loading to the penalty (additive).
-    const pen = (label, mult) => {
-        if (typeof mult !== 'number') return;
-        const m = isCasual ? mult + cl : mult;
-        penalties.push(`${label} (${Math.round(m * 100)}%): ${money(base * m)}/hr`);
-    };
+    const round2 = n => Math.round((n + 1e-9) * 100) / 100;
+    const money = n => '$' + round2(n).toFixed(2);
+    let rate = entry.rate;
+    let weeklyRate = entry.weekly_rate || null;
+    let base = isCasual ? (ftSibling ? ftSibling.rate : rate / (1 + cl)) : rate;
+    let levelLabel = entry.classification;
+    const isHP = data.healthStream === 'health_professionals';
+    const leadNotes = [];
+    // Retained minimum rate (clause J.4.3) — health professionals only.
+    if (isHP && data.healthOnAward30Sep === 'yes') {
+        const retained = ((awardRates.retained_rates || {}).rates || []).find(r => r.previous_classification === data.healthPrevClass);
+        const translatedBase = base;
+        if (retained && retained.rate > translatedBase) {
+            base = retained.rate;
+            rate = isCasual ? round2(retained.rate * (1 + cl)) : retained.rate;
+            weeklyRate = isCasual ? null : retained.weekly_rate;
+            levelLabel = entry.classification + ' — retained rate (previously ' + data.healthPrevClass + ')';
+            leadNotes.push(`Retained rate applies (clause J.4.3): the 30 September 2026 minimum for ${data.healthPrevClass} (${money(retained.rate)}/hr) is higher than the translated ${entry.classification} rate (${money(translatedBase)}/hr). The rate and penalties shown use the retained rate.`);
+        } else if (data.healthPrevClass) {
+            leadNotes.push(`No retained rate applies: the translated ${entry.classification} rate is at least the 30 September 2026 minimum for ${data.healthPrevClass} (clause J.4.3).`);
+        }
+    }
+    const penalties = leadNotes.slice();
     const shift = (p.shift_loading_mon_fri != null) ? p.shift_loading_mon_fri : 0.15;
     const shiftMult = 1 + shift + (isCasual ? cl : 0);
     penalties.push(`Shiftwork Mon-Fri (${Math.round(shiftMult * 100)}%): ${money(base * shiftMult)}/hr`);
-    pen('Saturday', isCasual ? undefined : p.saturday_full_time_part_time);
     if (isCasual) penalties.push(`Saturday (${Math.round((p.saturday_casual || 1.75) * 100)}%): ${money(base * (p.saturday_casual || 1.75))}/hr`);
+    else penalties.push(`Saturday (${Math.round((p.saturday_full_time_part_time || 1.5) * 100)}%): ${money(base * (p.saturday_full_time_part_time || 1.5))}/hr`);
     if (isCasual) penalties.push(`Sunday (${Math.round((p.sunday_casual || 1.75) * 100)}%): ${money(base * (p.sunday_casual || 1.75))}/hr`);
     else penalties.push(`Sunday (${Math.round((p.sunday_full_time_part_time || 1.5) * 100)}%): ${money(base * (p.sunday_full_time_part_time || 1.5))}/hr`);
     if (isCasual) penalties.push(`Public holiday (${Math.round((p.public_holiday_casual || 2.75) * 100)}%): ${money(base * (p.public_holiday_casual || 2.75))}/hr`);
@@ -14131,13 +14209,25 @@ function resolveHealthRate(data) {
     if (isCasual) {
         penalties.push('Casual rates include the 25% loading; penalty rates above add the loading, and overtime applies the overtime % to the loaded casual rate.');
     }
-    return { award: awardRates.award_name, level: entry.classification, rate: rate, weeklyRate: entry.weekly_rate || null,
-        rateLabel: isCasual ? 'Casual Rate (per hour)' : 'Base Rate (per hour)',
-        penalties: penalties, nextSteps: [
-            'Confirm the stream and level against Schedule A/B of MA000027',
+    const nextSteps = isHP
+        ? [
+            data.healthLevel === '1'
+                ? 'Confirm the AQF level under Schedule B and clause B.2 of MA000027, and count years of experience in the profession with any employer'
+                : 'Confirm the role(s) and duties against Schedule A.2 of MA000027' + (data.healthLevel === '2.1' || data.healthLevel === '2.2' ? ', and the years spent performing Level 2 duties' : ''),
+            data.healthOnAward30Sep === 'yes'
+                ? 'Check the translation table in Schedule J.4 for the profession\'s entry qualification — it sets the experience band for staff employed on 30 September 2026'
+                : 'Record the classification basis in the employment contract',
+            'Set up payroll with these exact rates — further stage increases are expected from 30 June 2027',
+            'Keep employment records for 7 years'
+        ]
+        : [
+            'Confirm the stream and level against Schedule A of MA000027',
             'Set up payroll with these exact rates',
             'Keep employment records for 7 years'
-        ]};
+        ];
+    return { award: awardRates.award_name, level: levelLabel, rate: rate, weeklyRate: weeklyRate,
+        rateLabel: isCasual ? 'Casual Rate (per hour)' : 'Base Rate (per hour)',
+        penalties: penalties, nextSteps: nextSteps };
 }
 
 // Children's Services (MA000120) classification picker — graded by STREAM
@@ -14234,7 +14324,7 @@ function getAwardCalculatorConfig(code) {
         }
         if (code === 'MA000027') {
             return {
-                disclaimer: '⚠️ Preview — Health Professionals & Support Services rates effective 01/07/2026, adult classifications only (junior/apprentice rates not modelled). Pick the stream that matches the work performed. Verify against the award before relying on these figures.',
+                disclaimer: '⚠️ Health Professionals & Support Services rates effective 01/10/2026 — the health professional stream was restructured by FWC determination PR814029 (Level 1 by AQF level and years of experience; Levels 2.1, 2.2, 3 and 4 by role). Support services, dental assistant and pathology collector rates are unchanged since 01/07/2026. Adult classifications only (junior/apprentice rates not modelled). Verify against the award before relying on these figures.',
                 steps: _calcHealthSteps(),
                 resolve: resolveHealthRate,
                 juniorRedirect: false
@@ -24572,13 +24662,14 @@ function _fwDocClassificationOptions(awardCode) {
     const ma004 = ['Retail Employee Level 1', 'Retail Employee Level 2', 'Retail Employee Level 3',
                    'Retail Employee Level 4', 'Retail Employee Level 5', 'Retail Employee Level 6',
                    'Retail Employee Level 7', 'Retail Employee Level 8', 'Other'];
-    // Health Professionals and Support Services Award MA000027 — streams then levels/pay points.
+    // Health Professionals and Support Services Award MA000027 — streams then levels (health professional levels per PR814029, 1 Oct 2026).
     const ma027 = ['Support Services - Level 1', 'Support Services - Level 2', 'Support Services - Level 3',
                    'Support Services - Level 4', 'Support Services - Level 5', 'Support Services - Level 6',
                    'Support Services - Level 7', 'Support Services - Level 8', 'Support Services - Level 9',
                    'Dental assistant - Level 3', 'Dental assistant - Level 5', 'Dental assistant - Level 6',
                    'Dental assistant - Level 7', 'Pathology collector - Level 5', 'Pathology collector - Level 6',
-                   'Pathology collector - Level 7', 'Health Professional - Level 1', 'Health Professional - Level 2',
+                   'Pathology collector - Level 7', 'Health Professional - Level 1 (AQF level + years of experience)',
+                   'Health Professional - Level 2.1', 'Health Professional - Level 2.2',
                    'Health Professional - Level 3', 'Health Professional - Level 4', 'Other'];
     // Children's Services Award MA000120 — two streams: Support worker + educator levels.
     const ma120 = ['Support worker level 1.1', 'Support worker level 2.1', 'Support worker level 2.2',

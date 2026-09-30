@@ -24,7 +24,7 @@ const VERTICALS = {
   manufacturing: { code: 'MA000010', file: 'manufacturing-award-rates.json', label: 'Manufacturing and Associated Industries and Occupations Award', flag: 'manufacturing_preview' },
   schads:        { code: 'MA000100', file: 'schads-award-rates.json',       label: 'Social, Community, Home Care and Disability Services Industry Award', flag: 'schads_preview' },
   retail:        { code: 'MA000004', file: 'retail-award-rates.json',       label: 'General Retail Industry Award',                              flag: 'retail_preview' },
-  health:        { code: 'MA000027', file: 'health-award-rates.json',       label: 'Health Professionals and Support Services Award',            flag: 'health_preview' },
+  health:        { code: 'MA000027', file: 'health-award-rates.json',       label: 'Health Professionals and Support Services Award',            flag: null },
   childrens:     { code: 'MA000120', file: 'childrens-award-rates.json',    label: "Children's Services Award",                                  flag: 'childrens_preview' },
 };
 
