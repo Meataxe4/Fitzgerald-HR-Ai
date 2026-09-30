@@ -34,6 +34,7 @@ const VERTICALS = {
     titleIndustry: 'Manufacturers',
     aiIndustry: 'Australian Manufacturers',
     complianceIndustry: 'manufacturing',
+    qa: { name: 'Manufacturing and Associated Industries Award' },
     shortIndustry: 'Manufacturers', descWho: 'manufacturers',
     heroWord: 'grinder operator',
     heroHook: 'A {word} walks off mid-shift. Fitz tells you exactly what the Manufacturing Award requires.',
@@ -58,6 +59,7 @@ const VERTICALS = {
     titleIndustry: 'Community Services & NDIS Providers',
     aiIndustry: 'SCHADS & NDIS Providers',
     complianceIndustry: 'disability & community services',
+    qa: { name: 'SCHADS Award' },
     shortIndustry: 'Community Services', descWho: 'community services',
     heroWord: 'support worker',
     heroHook: 'A {word} calls in for a sleepover shift. Fitz tells you exactly what SCHADS requires.',
@@ -82,6 +84,7 @@ const VERTICALS = {
     titleIndustry: 'Retailers',
     aiIndustry: 'Australian Retailers',
     complianceIndustry: 'retail',
+    qa: { name: 'General Retail Industry Award' },
     shortIndustry: 'Retailers', descWho: 'retailers',
     heroWord: 'sales assistant',
     heroHook: 'A {word} no-shows on a Sunday trade day. Fitz tells you exactly what the Retail Award requires.',
@@ -106,6 +109,7 @@ const VERTICALS = {
     titleIndustry: 'Health Practices',
     aiIndustry: 'Australian Health Practices',
     complianceIndustry: 'health practices',
+    qa: { name: 'Health Professionals Award', note: 'From 1 October 2026 health professionals are classified by AQF level and years of experience (Level 1) or by role (Levels 2.1, 2.2, 3 and 4), with no pay points; staff employed on 30 September 2026 keep their previous rate where it is higher.' },
     shortIndustry: 'Health Practices', descWho: 'health practices',
     heroWord: 'dental assistant',
     payTableLimit: 45,   // all four streams incl. the 24 health professional classifications (1 Oct 2026)
@@ -132,6 +136,7 @@ const VERTICALS = {
     titleIndustry: 'Childcare & OSHC',
     aiIndustry: 'Childcare & Early Education',
     complianceIndustry: 'child care',
+    qa: { name: "Children's Services Award" },
     shortIndustry: 'Childcare & OSHC', descWho: 'childcare',
     heroWord: 'educator',
     heroHook: "An {word} calls in sick and ratios are tight. Fitz tells you exactly what the Children's Services Award requires.",
@@ -156,6 +161,7 @@ const VERTICALS = {
     titleIndustry: 'Hospitality',
     aiIndustry: 'Australian Hospitality',
     complianceIndustry: 'hospitality',
+    qa: { name: 'Hospitality Industry (General) Award', level: 'Level 1, e.g. food & beverage or kitchen attendant grade 1', also: [{ match: /^introductory$/i, label: 'the introductory rate' }] },
     shortIndustry: 'Hospitality', descWho: 'hospitality venues',
     heroWord: 'chef',
     heroHook: 'A {word} is a no-show at 5pm on Saturday. Fitz tells you exactly what the Hospitality Award requires.',
@@ -185,6 +191,7 @@ const VERTICALS = {
     titleIndustry: 'Restaurants & Cafes',
     aiIndustry: 'Restaurants & Cafes',
     complianceIndustry: 'restaurants & cafes',
+    qa: { name: 'Restaurant Industry Award', level: 'Level 1, e.g. food & beverage or kitchen attendant grade 1', also: [{ match: /^introductory$/i, label: 'the introductory rate' }, { match: /^level_6\.cook_grade5_chef_de_partie$/i, label: 'a chef de partie (Level 6)' }] },
     shortIndustry: 'Restaurants', descWho: 'restaurants and cafes',
     heroWord: 'waiter',
     heroHook: 'A {word} quits mid-service on Saturday night. Fitz tells you exactly what the Restaurant Award requires.',
@@ -409,6 +416,9 @@ function clusterLinks(v, current) {
   if (current === 'landing') links.push({ key: 'cheat', href: `/${v}-award-cheat-sheet`, label: 'Printable', title: `${VERTICALS[v].awardShort} Cheat Sheet`, blurb: 'Rates, penalties and allowances on one page — print or save as PDF.' });
   if (current === 'landing') links.push({ key: 'classifications', href: `/${v}-award-classifications`, label: 'Classifications', title: `${VERTICALS[v].awardShort} Classifications`, blurb: 'Every classification level explained — who fits where, and what each level is paid.' });
   if (current === 'landing') links.push({ key: 'compliance', href: '/hr-compliance-software', label: 'Category', title: 'HR Compliance Software for Small Business', blurb: 'What HR compliance software has to do, what Fitz HR is and isn\'t, and how it compares.' });
+  // Pay-rates and guide pages are the site's strongest-ranking URLs; they link
+  // to the award-interpretation category page so it inherits that weight.
+  if (current === 'pay' || current === 'guide') links.push({ key: 'interp', href: '/award-interpretation-software', label: 'Category', title: 'Award Interpretation Software', blurb: `What award interpretation software does, and how Fitz HR applies the ${VERTICALS[v].awardShort} before the roster is published, not after payroll runs.` });
   return `    <div class="hub-grid">
 ${links.map(l => `        <a href="${l.href}" class="hub-card"><div class="hub-label">${l.label}</div><h3>${esc(l.title)}</h3><p>${esc(l.blurb)}</p></a>`).join('\n')}
     </div>`;
@@ -576,6 +586,45 @@ function ratesAlertBlock(c) {
 }
 
 
+// "Quick answer" box for AEO/GEO: the page's own headline figures in one
+// paragraph, computed from the rates JSON so it tracks each Annual Wage
+// Review. Paired with a speakable WebPage schema (see speakableLd) so
+// assistants can lift it verbatim. Per-vertical wording lives in `qa`.
+const fmtDate = (iso) => {
+  const d = new Date(`${iso}T00:00:00Z`);
+  return Number.isNaN(d.getTime()) ? iso : `${d.getUTCDate()} ${d.toLocaleString('en-AU', { month: 'long', timeZone: 'UTC' })} ${d.getUTCFullYear()}`;
+};
+function quickAnswer(c, data, mode) {
+  const qa = c.qa || {};
+  const ft = (data.rates || []).filter(r => r.employment_type === 'full_time' && typeof r.rate === 'number');
+  const start = ft.find(r => !/^introductory$/i.test(r.classification) && !/^introductory$/i.test(r.level || '')) || ft[0];
+  if (!start) return '';
+  const levelLabel = qa.level || `${start.classification}${start.stream ? ` (${String(start.stream).replace(/_/g, ' ')})` : ''}`;
+  const also = (qa.also || [])
+    .map(({ match, label }) => { const r = ft.find(x => match.test(x.classification)); return r ? `${label} at ${money(r.rate)}/hour` : null; })
+    .filter(Boolean);
+  const alsoText = also.length ? `, with ${also.join(' and ')}` : '';
+  const p = pen(data);
+  const hasCasual = typeof p.sat_cas === 'number';
+  const day = (name, ftpt, cas) => typeof ftpt === 'number'
+    ? `${name} ${pct(ftpt)} (full/part-time)${hasCasual && typeof cas === 'number' ? ` or ${pct(cas)} (casual)` : ''}` : null;
+  const penalties = [day('Saturdays pay', p.sat_ftpt, p.sat_cas), day('Sundays', p.sun_ftpt, p.sun_cas), day('public holidays', p.ph_ftpt, p.ph_cas)].filter(Boolean).join('; ');
+  const casual = hasCasual
+    ? `Casual percentages already include the ${pct(data.casual_loading)} casual loading.`
+    : `Casuals receive these rates plus the ${pct(data.casual_loading)} casual loading.`;
+  const opener = mode === 'guide'
+    ? `The ${esc(qa.name || c.awardShort)} (${esc(c.code)}) sets minimum pay by classification, starting at <strong>${money(start.rate)}/hour</strong> full-time (${esc(levelLabel)})${esc(alsoText)}.`
+    : `Under the ${esc(qa.name || c.awardShort)} (${esc(c.code)}), the minimum full-time adult rate starts at <strong>${money(start.rate)}/hour</strong> (${esc(levelLabel)})${esc(alsoText)}.`;
+  const note = qa.note ? ` ${esc(qa.note)}` : '';
+  return `
+<div class="quick-answer" style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.35);border-left:4px solid #f59e0b;border-radius:12px;padding:20px 22px;margin:28px 0;">
+    <strong style="display:block;font-size:0.72rem;letter-spacing:0.14em;text-transform:uppercase;color:#f59e0b;margin-bottom:8px;">Quick answer</strong>
+    <p style="margin:0;line-height:1.65;">${opener} ${penalties}. ${casual} Figures current as at ${fmtDate(data.effective_date)}, sourced from the Fair Work Ombudsman Pay Guide — full tables below, or ask Fitz for the exact rate for your classification and shift.${note}</p>
+</div>
+`;
+}
+const speakableLd = (url) => ({ '@context': 'https://schema.org', '@type': 'WebPage', url, speakable: { '@type': 'SpeakableSpecification', cssSelector: ['.quick-answer'] } });
+
 // Distinguishable cheat-sheet callout used on guide + pay-rates pages.
 function cheatSheetCallout(v, c) {
   return `<div class="cheat-callout" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;background:rgba(245,158,11,0.08);border:1px dashed rgba(245,158,11,0.55);border-radius:12px;padding:1.1rem 1.4rem;margin:2rem 0;">
@@ -601,6 +650,7 @@ function payRatesPage(v) {
     breadcrumb([{ name: 'Home', url: `${SITE}/` }, { name: `${c.awardShort} Pay Rates`, url }]),
     { '@context': 'https://schema.org', '@type': 'WebPage', name: title, description, url, inLanguage: 'en-AU' },
     faqLd(faqs),
+    speakableLd(url),
   ];
   return `${head({ title, description, canonical: url, jsonld })}
 ${nav()}
@@ -617,6 +667,7 @@ ${nav()}
     <div class="badge"><div class="k">Next review</div><div class="v">${data.next_review_date}</div></div>
 </div>
 <div class="body">
+${quickAnswer(c, data, 'pay')}
     <h2>Classification <em>Hourly Rates</em></h2>
     <p>Full-time minimum rates by classification. Casual employees receive these rates plus the ${pct(data.casual_loading)} casual loading (or the all-inclusive casual rate where the award specifies one).</p>
 ${payTable(data, c.payTableLimit || 24)}
@@ -665,6 +716,7 @@ function guidePage(v) {
     breadcrumb([{ name: 'Home', url: `${SITE}/` }, { name: `${c.awardShort} Guide`, url }]),
     { '@context': 'https://schema.org', '@type': 'Article', headline: `${c.awardShort} Guide — ${c.code} Complete Reference (2026)`, description, author: { '@type': 'Organization', name: 'Fitz HR', url: `${SITE}/` }, publisher: { '@type': 'Organization', name: 'Fitz HR', logo: { '@type': 'ImageObject', url: `${SITE}/assets/og-image.png` } }, mainEntityOfPage: { '@type': 'WebPage', '@id': url }, datePublished: '2026-07-01', dateModified: data.effective_date, inLanguage: 'en-AU' },
     faqLd(faqs),
+    speakableLd(url),
   ];
   return `${head({ title, description, canonical: url, jsonld })}
 ${nav()}
@@ -674,6 +726,7 @@ ${nav()}
     <p class="intro">The complete reference to the ${esc(c.awardFull)} for ${esc(c.audience)} — coverage, classifications, penalty rates, allowances, minimum engagement and Fair Work compliance.</p>
 </header>
 <div class="body">
+${quickAnswer(c, data, 'guide')}
     <h2>What the ${esc(c.awardShort)} <em>Covers</em></h2>
     <p>The ${esc(c.awardFull)} covers ${esc(c.coverage)} Getting coverage right matters — it drives the classification structure, penalty rates, and allowances that apply to every shift. Applying the wrong award creates systematic underpayment exposure.</p>
 
