@@ -257,7 +257,7 @@ ${HEAD_STYLE}
 
     <p><strong>${summary}</strong></p>
 
-    <p style="font-size:0.82rem;color:rgba(255,255,255,0.4);margin-top:-0.5rem;margin-bottom:1.5rem;">Rates current as at ${data.effective_date} (Annual Wage Review), sourced from the Fair Work Ombudsman Pay Guide ${award.code}. Next review ${data.next_review_date}.</p>
+    <p style="font-size:0.82rem;color:rgba(255,255,255,0.4);margin-top:-0.5rem;margin-bottom:1.5rem;">Rates current as at ${data.effective_date} (${data.effective_basis || 'Annual Wage Review'}), sourced from the Fair Work Ombudsman Pay Guide ${award.code}. Next review ${data.next_review_date}.</p>
 
 ${quickRefHtml}
 ${sectionsHtml}

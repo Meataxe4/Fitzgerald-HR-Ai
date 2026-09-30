@@ -251,7 +251,7 @@ const hpCas = health.rates.filter(r => r.stream === 'health_professionals' && r.
 eq('Health Professional 24 full-time classifications', hpFT.length, 24);
 eq('Health Professional 24 casual classifications', hpCas.length, 24);
 eq('Health Professional has NO pay points after 1 Oct 2026', hpFT.some(r => /pay point/i.test(r.classification)), false);
-eq('Health Professional Level 1 = 5 AQF levels x 4 bands', hpFT.filter(r => r.level === '1').length, 20);
+eq('Health Professional Level 1 = 5 AQF levels x 4 bands', hpFT.filter(r => r.hp_level === '1').length, 20);
 const hpAqf7y1 = hpFT.find(r => r.classification === 'Level 1 - AQF Level 7 - 1st year');
 eq('Health Professional L1 AQF7 1st year rate $34.44', hpAqf7y1 && hpAqf7y1.rate, 34.44);
 eq('Health Professional L1 AQF7 1st year weekly $1308.80 (= standard rate, cl.2)', hpAqf7y1 && hpAqf7y1.weekly_rate, 1308.80);
