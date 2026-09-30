@@ -15,6 +15,7 @@ FONTDIR = "/usr/share/fonts/truetype/reel"
 NAVY, NAVY2, AMBER, CREAM = "#0f172a", "#0b1220", "#f59e0b", "#fdf6e8"
 W, W80 = "#ffffff", "rgba(255,255,255,0.86)"
 MX = 96
+BANNER_TOP = 1748          # amber banner spans 1748..1920 (Instagram bottom exclusion zone)
 FONTS = "@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&amp;display=swap');"
 
 _ot, _of = {}, {}
@@ -64,13 +65,22 @@ def parts():
             f'<text x="164" y="{date_y+66}" class="ti" font-size="50" font-weight="800" fill="{W}">Online via Zoom</text>')
     save = (f'<text x="164" y="{date_y+156}" class="ti" font-size="54" font-weight="800">'
             f'<tspan fill="{W}">Save your spot</tspan><tspan fill="{AMBER}">  →</tspan></text>')
-    return {"wordmark": wordmark, "title": title, "barbody": barbody, "date": date, "save": save}
+    # bottom banner sits in Instagram's exclusion zone; presenters tuck behind it
+    banner = (f'<rect x="0" y="{BANNER_TOP}" width="1080" height="{1920-BANNER_TOP}" fill="{AMBER}"/>'
+              f'<text x="540" y="{BANNER_TOP+66}" class="ti" font-size="28" font-weight="800" fill="rgba(15,23,42,0.72)" '
+              f'text-anchor="middle" letter-spacing="4">IN PARTNERSHIP WITH PAYSAUCE</text>'
+              f'<text x="540" y="{BANNER_TOP+128}" class="ti" font-size="54" font-weight="800" fill="{NAVY}" '
+              f'text-anchor="middle">fitzhr.com</text>')
+    return {"wordmark": wordmark, "title": title, "barbody": barbody, "date": date, "save": save, "banner": banner}
 
 def svg(inner): return f'<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920">{DEFS}{inner}</svg>'
 
 def build_svg():
     p = parts()
-    return svg(f'<rect width="1080" height="1920" fill="url(#bg)"/>' + p["wordmark"] + p["title"] + p["barbody"] + p["date"] + p["save"])
+    return svg('<rect width="1080" height="1920" fill="url(#bg)"/>' + p["wordmark"] + p["title"] + p["barbody"] + p["date"] + p["save"])
+
+def banner_svg():
+    return svg(parts()["banner"])
 
 def main():
     os.makedirs(OUTDIR, exist_ok=True)
@@ -79,7 +89,9 @@ def main():
     base = Image.open(io.BytesIO(cairosvg.svg2png(bytestring=s.encode(), output_width=1080, output_height=1920))).convert("RGBA")
     if HEADS and os.path.exists(HEADS):
         heads = Image.open(HEADS).convert("RGBA")
-        base.alpha_composite(heads, (0, 1920 - heads.height + 8))
+        base.alpha_composite(heads, (0, BANNER_TOP + 72 - heads.height))   # tuck behind banner
+    banner = Image.open(io.BytesIO(cairosvg.svg2png(bytestring=banner_svg().encode(), output_width=1080, output_height=1920))).convert("RGBA")
+    base.alpha_composite(banner)                                            # banner on top
     base.convert("RGB").save(os.path.join(OUTDIR, "fitz-hr-underpayments-webinar.png"))
     print("wrote", os.path.join(OUTDIR, "fitz-hr-underpayments-webinar.png"))
 

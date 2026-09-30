@@ -33,14 +33,15 @@ def main():
               (render(p["barbody"]),  0.60, 34),
               (render(p["date"]),     0.90, 30),
               (render(p["save"]),     1.15, 28)]
-    # headshots slide up from below
+    # headshots slide up from below (they rise from behind the bottom banner)
     heads_img = None; heads_y = 0; heads_delay = 0.5; heads_dur = 0.9; heads_rise = 0
     if HEADS and os.path.exists(HEADS):
         h = Image.open(HEADS).convert("RGBA")
-        heads_y = 1920 - h.height + 8
+        heads_y = B.BANNER_TOP + 72 - h.height
         canvas = Image.new("RGBA", SIZE, (0, 0, 0, 0)); canvas.alpha_composite(h, (0, heads_y))
         heads_img = canvas
-        heads_rise = h.height + 8  # start fully below frame
+        heads_rise = 1920 - heads_y  # start fully below the frame
+    banner_layer = render(p["banner"])   # amber footer, always on top
 
     intro_end = max(1.15 + DUR, heads_delay + heads_dur)
     length = intro_end + HOLD
@@ -65,6 +66,7 @@ def main():
                 frame.alpha_composite(scale_alpha(cv, e) if pr < 1 else cv)
             else:
                 frame.alpha_composite(img)
+        frame.alpha_composite(banner_layer)   # banner on top so heads tuck behind it
         return frame.convert("RGB")
 
     w = imageio.get_writer(OUT, fps=FPS, codec="libx264", quality=8, macro_block_size=8,
