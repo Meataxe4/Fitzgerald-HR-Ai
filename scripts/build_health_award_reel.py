@@ -14,7 +14,7 @@ NAVY, NAVY2, AMBER, W = "#0f172a", "#0b1220", "#f59e0b", "#ffffff"
 W72 = "rgba(255,255,255,0.72)"; N72 = "rgba(15,23,42,0.72)"
 MX, MR = 96, 984
 FONTS = "@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&amp;display=swap');"
-FPS, DUR, HOLD, XF, SIZE = 30, 0.55, 0.9, 0.4, (1080, 1920)
+FPS, DUR, HOLD, XF, SIZE = 30, 0.6, 1.7, 0.6, (1080, 1920)
 
 _ot = {}
 def ot(s): _ot.setdefault(s, ImageFont.truetype(os.path.join(FONTDIR, "OutfitText-500.ttf"), s)); return _ot[s]
