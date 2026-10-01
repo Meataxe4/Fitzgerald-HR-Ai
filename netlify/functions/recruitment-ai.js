@@ -88,13 +88,32 @@ Questions should:
     // Adjust max_tokens based on task type - keep it lower for faster response
     const maxTokens = taskType === 'interviewQuestions' ? 1500 : 2000;
 
+    // Model migration (1 Oct 2026): claude-sonnet-4-20250514 was retired by
+    // Anthropic on 15 June 2026 and every request to it now fails with
+    // not_found_error (12 failed calls on 29 Sep 2026 per Anthropic's notice).
+    // Moved to Claude Sonnet 5.5, the current Sonnet. Changes from the old
+    // request shape, each required by the newer API:
+    //   - temperature removed: non-default sampling parameters return a 400 on
+    //     Sonnet 5 and later. Tone/variety is steered by the system prompts.
+    //   - thinking 'between_tools' at effort 'low': Sonnet 5.5 thinks by
+    //     default, and 'disabled' is a 400. 'between_tools' is the lowest
+    //     setting - with no tools declared it does no thinking at all - which
+    //     keeps latency close to the old non-thinking Sonnet 4 behind Netlify's
+    //     function timeout (the cause of the earlier 504s on Sonnet 4.6). If
+    //     quality needs a lift, try adaptive thinking (omit `thinking`) at
+    //     effort 'low' and measure p95 latency before raising effort.
+    //   - max_tokens unchanged: nothing is spent on thinking, and the outputs
+    //     are short lists; Sonnet 5's tokenizer uses ~30% more tokens than
+    //     Sonnet 4 for the same text, still well inside these limits.
+    //   - response read by block type, not position: a response can begin with
+    //     a thinking block, so content[0].text is no longer safe.
+    //   - stop_reason 'refusal' handled: Sonnet 5.5's safety classifiers return
+    //     HTTP 200 with no usable text; surface it as a failed generation.
     const message = await anthropic.messages.create({
-      // Reverted from claude-sonnet-4-6 to the dated Sonnet 4 ID after a 504
-      // on the unversioned alias. Re-attempt when we have a confirmed-valid
-      // latest-Sonnet API model ID.
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-5-5',
       max_tokens: maxTokens,
-      temperature: 0.7,
+      thinking: { type: 'between_tools' },
+      output_config: { effort: 'low' },
       system: systemPrompt,
       messages: [{
         role: 'user',
@@ -102,7 +121,31 @@ Questions should:
       }]
     });
 
-    const responseText = message.content[0].text;
+    if (message.stop_reason === 'refusal') {
+      const category = message.stop_details && message.stop_details.category;
+      console.error('recruitment-ai: request declined by safety classifier', { taskType, category });
+      return {
+        statusCode: 200,
+        headers: {
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          success: false,
+          error: 'The AI declined this request. Try rephrasing the role or prompt.',
+          taskType: taskType
+        })
+      };
+    }
+
+    const responseText = message.content
+      .filter(block => block.type === 'text')
+      .map(block => block.text)
+      .join('\n')
+      .trim();
+    if (!responseText) {
+      throw new Error(`Empty response from model (stop_reason: ${message.stop_reason})`);
+    }
     
     // Return the text response directly
     return {
@@ -120,9 +163,14 @@ Questions should:
 
   } catch (error) {
     console.error('Error in recruitment-ai function:', error);
-    
+
+    // Anthropic SDK errors carry the upstream HTTP status (401 bad key, 404
+    // unknown model, 429 rate limit, 5xx outage); pass it through so the
+    // failure mode is visible in Netlify logs and the client, instead of a
+    // blanket 500.
+    const upstreamStatus = (error instanceof Anthropic.APIError && typeof error.status === 'number') ? error.status : 500;
     return {
-      statusCode: 500,
+      statusCode: upstreamStatus,
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Content-Type': 'application/json'
