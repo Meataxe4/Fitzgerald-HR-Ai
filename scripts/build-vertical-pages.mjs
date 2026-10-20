@@ -7,7 +7,7 @@
 //   <slug>.html                                     landing page
 //   <slug>-award-pay-rates.html                     [Award] Pay Rates (SEO)
 //   <slug>-award-guide.html                         [Award] Guide (SEO)
-//   compare/fitz-hr-vs-employment-hero-<slug>.html  vs Employment Hero (SEO)
+//   (per-award vs-Employment-Hero pages were folded into compare/fitz-hr-vs-employment-hero.html in Oct 2026)
 //
 // Content facts (rates, penalties, allowances, dates) are pulled live from the
 // SME-verified *-award-rates.json grounding data, so the marketing pages cannot
@@ -109,6 +109,7 @@ const VERTICALS = {
     titleIndustry: 'Health Practices',
     aiIndustry: 'Australian Health Practices',
     complianceIndustry: 'health practices',
+    recentChange: { date: '1 October 2026', summary: 'Health professionals are now classified by AQF level and years of experience (Level 1) or by role (Levels 2.1, 2.2, 3 and 4), with no pay points. Staff employed on 30 September 2026 keep their previous rate where it is higher.', href: '/blog/health-professionals-award-changes-1-october-2026', label: 'the full 1 October 2026 change guide' },
     qa: { name: 'Health Professionals Award', note: 'From 1 October 2026 health professionals are classified by AQF level and years of experience (Level 1) or by role (Levels 2.1, 2.2, 3 and 4), with no pay points; staff employed on 30 September 2026 keep their previous rate where it is higher.' },
     shortIndustry: 'Health Practices', descWho: 'health practices',
     heroWord: 'dental assistant',
@@ -410,7 +411,7 @@ function clusterLinks(v, current) {
     { key: 'landing', href: `/${v}`, label: 'Overview', title: `${VERTICALS[v].awardShort} for your business`, blurb: 'The live scenarios, wizard, document builder and Crisis Mode, built for your vertical.' },
     { key: 'pay', href: `/${v}-award-pay-rates`, label: 'Pay Rates', title: `${VERTICALS[v].awardShort} Pay Rates 2026`, blurb: 'Current classification rates, penalties and allowances from the FWO Pay Guide.' },
     { key: 'guide', href: `/${v}-award-guide`, label: 'Guide', title: `${VERTICALS[v].awardShort} Guide (${VERTICALS[v].code})`, blurb: 'The complete reference — coverage, classifications, penalties, allowances and compliance.' },
-    { key: 'vs', href: VERTICALS[v].vsHref || `/compare/fitz-hr-vs-employment-hero-${v}`, label: 'Compare', title: `Fitz HR vs Employment Hero`, blurb: `How Fitz compares for ${pluralIndustry(VERTICALS[v].industry)} on the ${VERTICALS[v].awardShort}.` },
+    { key: 'vs', href: '/compare/fitz-hr-vs-employment-hero', label: 'Compare', title: `Fitz HR vs Employment Hero`, blurb: `How Fitz compares for ${pluralIndustry(VERTICALS[v].industry)} on the ${VERTICALS[v].awardShort}.` },
     { key: 'best', href: `/compare/best-hr-software-${v}-australia`, label: 'Best software', title: `Best HR Software for ${VERTICALS[v].titleIndustry}`, blurb: `What to look for in HR & compliance software for ${pluralIndustry(VERTICALS[v].industry)} — and how Fitz compares.` },
   ].filter(l => l.key !== current);
   if (current === 'landing') links.push({ key: 'cheat', href: `/${v}-award-cheat-sheet`, label: 'Printable', title: `${VERTICALS[v].awardShort} Cheat Sheet`, blurb: 'Rates, penalties and allowances on one page — print or save as PDF.' });
@@ -625,6 +626,66 @@ function quickAnswer(c, data, mode) {
 }
 const speakableLd = (url) => ({ '@context': 'https://schema.org', '@type': 'WebPage', url, speakable: { '@type': 'SpeakableSpecification', cssSelector: ['.quick-answer'] } });
 
+// Date of the last substantive content pass over the generated pay-rates and
+// guide pages. Bump it only when the generated content genuinely changes.
+const PAGE_UPDATED = '2026-10-21';
+// Gazetted national public holidays in the 2026–27 summer period. State and
+// territory lists add their own; the pages say so.
+const SUMMER_HOLIDAYS = [
+  ['Christmas Day', 'Friday 25 December 2026'],
+  ['Boxing Day', 'Saturday 26 December 2026 (most states and territories gazette an additional public holiday on Monday 28 December)'],
+  ["New Year's Day", 'Friday 1 January 2027'],
+  ['Australia Day', 'Tuesday 26 January 2027'],
+];
+function seasonBlock(c, data) {
+  const ft = (data.rates || []).filter(r => r.employment_type === 'full_time' && typeof r.rate === 'number');
+  const start = ft.find(r => !/^introductory$/i.test(r.classification) && !/^introductory$/i.test(r.level || '')) || ft[0];
+  if (!start) return '';
+  const p = pen(data);
+  const label = (c.qa && c.qa.level) ? c.qa.level.split(',')[0] : `${start.classification}${start.stream ? ` (${String(start.stream).replace(/_/g, ' ')})` : ''}`;
+  const money = (n) => '$' + (Math.round(n * 100 + 1e-6) / 100).toFixed(2);
+  const phFt = typeof p.ph_ftpt === 'number' ? money(start.rate * p.ph_ftpt) : null;
+  const phCas = typeof p.ph_cas === 'number' ? money(start.rate * p.ph_cas) : null;
+  const rows = [
+    `            <tr><td>Ordinary Monday&ndash;Friday hour</td><td class="highlight">${money(start.rate)}</td><td>${typeof data.casual_loading === 'number' ? money(start.rate * (1 + data.casual_loading)) : '&mdash;'}</td></tr>`,
+    phFt ? `            <tr><td>Public holiday hour (${pct(p.ph_ftpt)}${phCas ? ` / ${pct(p.ph_cas)} casual` : ''})</td><td class="highlight">${phFt}</td><td>${phCas || 'Ask Fitz'}</td></tr>` : '',
+  ].filter(Boolean).join('\n');
+  const change = c.recentChange ? `
+    <h3>What changed on ${esc(c.recentChange.date)}</h3>
+    <p>${esc(c.recentChange.summary)} See <a href="${c.recentChange.href}">${esc(c.recentChange.label)}</a>.</p>` : '';
+  return `
+    <h2>Christmas, New Year &amp; Public Holiday Rates <em>(2026&ndash;27)</em></h2>
+    <p>The summer public holidays are where ${esc(c.awardShort)} payroll errors cluster, because the public holiday penalty is the largest multiplier in the award and Boxing Day falls on a Saturday this year, which brings substitute-day rules into play. For a ${esc(label)} employee on the current minimum of ${money(start.rate)} an hour:</p>
+    <table class="rate-table">
+        <thead><tr><th>Hour worked</th><th>Full-time / part-time</th><th>Casual</th></tr></thead>
+        <tbody>
+${rows}
+        </tbody>
+    </table>
+    <p>The same multiplier applies at every classification level, so take the level&rsquo;s ordinary rate from the table above and multiply. ${typeof p.ph_cas === 'number' ? 'The casual public holiday percentage already includes the 25% casual loading; do not add it again.' : 'Casual public holiday rates under this award depend on the shift and loading; ask Fitz for the exact figure.'} The national public holidays in the period are:</p>
+    <ul>
+${SUMMER_HOLIDAYS.map(([n, d]) => `        <li><strong>${n}</strong> &mdash; ${d}</li>`).join('\n')}
+    </ul>
+    <p>Each state and territory gazettes its own list, including part-day holidays such as Christmas Eve and New Year&rsquo;s Eve in some jurisdictions, so check your state&rsquo;s list before the roster is published. The penalty applies to hours worked on the gazetted day; where a substitute day is declared, the award sets out which day attracts the penalty, and that is a question worth asking Fitz before the pay run rather than after.</p>
+
+    <h2>What Changed in 2026, and <em>What Changes Next</em></h2>
+    <p>The rates on this page took effect from the first full pay period on or after 1 July 2026, following the Fair Work Commission&rsquo;s <a href="/blog/minimum-wage-increase-2026">4.75% Annual Wage Review increase</a>, and apply for the 2026&ndash;27 financial year. The next Annual Wage Review decision is expected in June 2027 and takes effect from the first full pay period on or after 1 July 2027. Superannuation guarantee is ${pct(data.superannuation_rate)}. Nothing else is scheduled to change the ${esc(c.awardShort)} minimum rates before then; if the Commission varies the award mid-year, the rates alert below will tell you.</p>${change}
+`;
+}
+function seasonFaqs(c, data) {
+  const ft = (data.rates || []).filter(r => r.employment_type === 'full_time' && typeof r.rate === 'number');
+  const start = ft.find(r => !/^introductory$/i.test(r.classification) && !/^introductory$/i.test(r.level || '')) || ft[0];
+  if (!start) return [];
+  const p = pen(data);
+  const money = (n) => '$' + (Math.round(n * 100 + 1e-6) / 100).toFixed(2);
+  const faqs = [
+    { q: `How much did the ${c.awardShort} rates increase in 2026?`, a: `By 4.75% from the first full pay period on or after 1 July 2026, in line with the Fair Work Commission's Annual Wage Review decision. The rates on this page are the post-increase minimums and apply until the next review takes effect on 1 July 2027.` },
+    { q: `What is the ${c.awardShort} pay rate for 2026-27?`, a: `The 2026–27 minimum full-time adult rate starts at ${money(start.rate)} an hour, with higher classifications listed in the table on this page. The figures apply from 1 July 2026 to 30 June 2027 unless the Fair Work Commission varies the award.` },
+  ];
+  if (typeof p.ph_ftpt === 'number') faqs.push({ q: `What is the ${c.awardShort} public holiday rate on Christmas Day 2026?`, a: `${pct(p.ph_ftpt)} of the ordinary rate for full-time and part-time employees${typeof p.ph_cas === 'number' ? `, and ${pct(p.ph_cas)} for casuals, inclusive of the casual loading` : ''}. For the lowest adult classification that is ${money(start.rate * p.ph_ftpt)} an hour${typeof p.ph_cas === 'number' ? ` (casual ${money(start.rate * p.ph_cas)})` : ''}. Christmas Day falls on Friday 25 December 2026.` });
+  return faqs;
+}
+
 // Distinguishable cheat-sheet callout used on guide + pay-rates pages.
 function cheatSheetCallout(v, c) {
   return `<div class="cheat-callout" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;background:rgba(245,158,11,0.08);border:1px dashed rgba(245,158,11,0.55);border-radius:12px;padding:1.1rem 1.4rem;margin:2rem 0;">
@@ -644,11 +705,12 @@ function payRatesPage(v) {
   const faqs = [
     { q: `What are the ${c.awardShort} pay rates in 2026?`, a: `The ${c.awardFull} minimum rates are current as at ${data.effective_date} (next review ${data.next_review_date}). Full-time classification rates, penalty rates and allowances are listed above; casual employees receive a ${pct(data.casual_loading)} loading.` },
     { q: `What penalty rates apply under ${c.code}?`, a: `Weekend and public holiday penalties are shown in the penalties table above, expressed as a percentage of the ordinary hourly rate. Casual penalty percentages are all-inclusive of the ${pct(data.casual_loading)} casual loading.` },
+    ...seasonFaqs(c, data),
     { q: `How current is this data?`, a: `These figures are extracted from the Fair Work Ombudsman Pay Guide ${c.code} and are current as at ${data.effective_date}. Fitz HR re-checks them against the Pay Guide and flags when an award is past its review date of ${data.next_review_date}.` },
   ];
   const jsonld = [
     breadcrumb([{ name: 'Home', url: `${SITE}/` }, { name: `${c.awardShort} Pay Rates`, url }]),
-    { '@context': 'https://schema.org', '@type': 'WebPage', name: title, description, url, inLanguage: 'en-AU' },
+    { '@context': 'https://schema.org', '@type': 'WebPage', name: title, description, url, inLanguage: 'en-AU', dateModified: PAGE_UPDATED },
     faqLd(faqs),
     speakableLd(url),
   ];
@@ -668,6 +730,7 @@ ${nav()}
 </div>
 <div class="body">
 ${quickAnswer(c, data, 'pay')}
+    <p style="font-size:0.78rem;color:var(--w30);margin:-0.5rem 0 1.5rem;">Page updated ${fmtDate(PAGE_UPDATED)}: added Christmas and New Year public holiday rates and the 2026&ndash;27 change timeline. Rates current as at ${fmtDate(data.effective_date)}.</p>
     <h2>Classification <em>Hourly Rates</em></h2>
     <p>Full-time minimum rates by classification. Casual employees receive these rates plus the ${pct(data.casual_loading)} casual loading (or the all-inclusive casual rate where the award specifies one).</p>
 ${payTable(data, c.payTableLimit || 24)}
@@ -685,6 +748,7 @@ ${allowanceTable(data)}
     <div class="section-label">Explore</div>
 ${clusterLinks(v, 'pay')}
 
+${seasonBlock(c, data)}
 ${cheatSheetCallout(v, c)}
 
     ${ratesAlertBlock(c)}${faqBlock(faqs)}
@@ -710,11 +774,12 @@ function guidePage(v) {
     { q: `What is the ${c.awardFull}?`, a: `<strong>It is a modern award under the Fair Work Act 2009 (Cth) that sets minimum pay rates, penalty rates, allowances and conditions.</strong> It covers ${c.coverage}` },
     { q: `What are the penalty rates under ${c.code} in 2026?`, a: `Saturday ${pct(pen(data).sat_ftpt)} and Sunday ${pct(pen(data).sun_ftpt)} for full-time and part-time employees, with a public holiday rate of ${pct(pen(data).ph_ftpt)}. Casual rates are all-inclusive of the ${pct(data.casual_loading)} loading. See the <a href="/${v}-award-pay-rates">full pay rates page</a>.` },
     ...c.faqExtra,
+    ...seasonFaqs(c, data),
     { q: `How current are these ${c.awardShort} figures?`, a: `They are extracted from the Fair Work Ombudsman Pay Guide ${c.code}, current as at ${data.effective_date}, with the next review due ${data.next_review_date}.` },
   ];
   const jsonld = [
     breadcrumb([{ name: 'Home', url: `${SITE}/` }, { name: `${c.awardShort} Guide`, url }]),
-    { '@context': 'https://schema.org', '@type': 'Article', headline: `${c.awardShort} Guide — ${c.code} Complete Reference (2026)`, description, author: { '@type': 'Organization', name: 'Fitz HR', url: `${SITE}/` }, publisher: { '@type': 'Organization', name: 'Fitz HR', logo: { '@type': 'ImageObject', url: `${SITE}/assets/og-image.png` } }, mainEntityOfPage: { '@type': 'WebPage', '@id': url }, datePublished: '2026-07-01', dateModified: data.effective_date, inLanguage: 'en-AU' },
+    { '@context': 'https://schema.org', '@type': 'Article', headline: `${c.awardShort} Guide — ${c.code} Complete Reference (2026)`, description, author: { '@type': 'Organization', name: 'Fitz HR', url: `${SITE}/` }, publisher: { '@type': 'Organization', name: 'Fitz HR', logo: { '@type': 'ImageObject', url: `${SITE}/assets/og-image.png` } }, mainEntityOfPage: { '@type': 'WebPage', '@id': url }, datePublished: '2026-07-01', dateModified: PAGE_UPDATED > data.effective_date ? PAGE_UPDATED : data.effective_date, inLanguage: 'en-AU' },
     faqLd(faqs),
     speakableLd(url),
   ];
@@ -727,6 +792,7 @@ ${nav()}
 </header>
 <div class="body">
 ${quickAnswer(c, data, 'guide')}
+    <p style="font-size:0.78rem;color:var(--w30);margin:-0.5rem 0 1.5rem;">Page updated ${fmtDate(PAGE_UPDATED)}: added Christmas and New Year public holiday rates and the 2026&ndash;27 change timeline. Rates current as at ${fmtDate(data.effective_date)}.</p>
     <h2>What the ${esc(c.awardShort)} <em>Covers</em></h2>
     <p>The ${esc(c.awardFull)} covers ${esc(c.coverage)} Getting coverage right matters — it drives the classification structure, penalty rates, and allowances that apply to every shift. Applying the wrong award creates systematic underpayment exposure.</p>
 
@@ -758,8 +824,9 @@ ${allowanceTable(data, 8)}
         <li><strong>Casual Employment Information Statement:</strong> provide at commencement and at the relevant conversion milestone.</li>
         <li><strong>Superannuation:</strong> currently ${pct(data.superannuation_rate)} on ordinary time earnings.</li>
     </ul>
-    <p>See the <a href="/fair-work-compliance-hospitality">Fair Work compliance pillar guide</a> and <a href="/compare/fitz-hr-vs-employment-hero-${v}">how Fitz HR compares for ${esc(c.industry)}s</a>.</p>
+    <p>See the <a href="/fair-work-compliance-hospitality">Fair Work compliance pillar guide</a> and <a href="/compare/fitz-hr-vs-employment-hero">how Fitz HR compares with Employment Hero</a>.</p>
 
+${seasonBlock(c, data)}
 ${cheatSheetCallout(v, c)}
 
     ${ratesAlertBlock(c)}${faqBlock(faqs)}
@@ -922,7 +989,7 @@ const onlyPages = pagesArg ? pagesArg.slice('--pages='.length).split(',') : null
 const only = argv.filter(a => !a.startsWith('--'));
 for (const v of Object.keys(VERTICALS)) {
   if (only.length && !only.includes(v)) continue;
-  let emit = VERTICALS[v].emit || ['landing', 'pay', 'guide', 'vs', 'best'];
+  let emit = VERTICALS[v].emit || ['landing', 'pay', 'guide', 'best'];
   if (onlyPages) emit = emit.filter(p => onlyPages.includes(p));
   if (emit.includes('landing')) write(`${v}.html`, landingPage(v));
   if (emit.includes('pay')) write(`${v}-award-pay-rates.html`, payRatesPage(v));
