@@ -14308,7 +14308,7 @@ function getAwardCalculatorConfig(code) {
     if (getAwardContext().calculatorType === 'classification') {
         if (code === 'MA000100') {
             return {
-                disclaimer: '⚠️ Preview — SCHADS rates effective 01/07/2026. Pick the stream that matches the work performed. Verify against the award before relying on these figures.',
+                disclaimer: '⚠️ Preview — SCHADS rates effective 01/07/2026. Home care (disability) rates rise by about 15% from the first full pay period on or after 01/12/2026 and are not yet updated here. Pick the stream that matches the work performed. Verify against the award before relying on these figures.',
                 steps: _calcSchadsSteps(),
                 resolve: resolveSchadsRate,
                 juniorRedirect: false
@@ -14316,7 +14316,7 @@ function getAwardCalculatorConfig(code) {
         }
         if (code === 'MA000004') {
             return {
-                disclaimer: '⚠️ Preview — General Retail rates effective 01/07/2026, adult classifications only (junior/apprentice rates not modelled). Verify against the award before relying on these figures.',
+                disclaimer: '⚠️ Preview — General Retail rates effective 01/07/2026, adult classifications only (junior/apprentice rates not modelled; junior rates for 18–20 year olds with more than 6 months\' service change from 01/12/2026). Verify against the award before relying on these figures.',
                 steps: _calcRetailSteps(),
                 resolve: resolveRetailRate,
                 juniorRedirect: false
