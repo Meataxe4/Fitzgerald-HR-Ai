@@ -60,6 +60,7 @@ const VERTICALS = {
     aiIndustry: 'SCHADS & NDIS Providers',
     complianceIndustry: 'disability & community services',
     qa: { name: 'SCHADS Award' },
+    midYear: ' Exception: home care (disability) employees under Schedule E receive an interim increase of about 15% from the first full pay period on or after 1 December 2026; the home care rates on this page are the 1 July 2026 rates until they are updated.',
     shortIndustry: 'Community Services', descWho: 'community services',
     heroWord: 'support worker',
     heroHook: 'A {word} calls in for a sleepover shift. Fitz tells you exactly what SCHADS requires.',
@@ -679,8 +680,8 @@ function seasonFaqs(c, data) {
   const p = pen(data);
   const money = (n) => '$' + (Math.round(n * 100 + 1e-6) / 100).toFixed(2);
   const faqs = [
-    { q: `How much did the ${c.awardShort} rates increase in 2026?`, a: `By 4.75% from the first full pay period on or after 1 July 2026, in line with the Fair Work Commission's Annual Wage Review decision. The rates on this page are the post-increase minimums and apply until the next review takes effect on 1 July 2027.` },
-    { q: `What is the ${c.awardShort} pay rate for 2026-27?`, a: `The 2026–27 minimum full-time adult rate starts at ${money(start.rate)} an hour, with higher classifications listed in the table on this page. The figures apply from 1 July 2026 to 30 June 2027 unless the Fair Work Commission varies the award.` },
+    { q: `How much did the ${c.awardShort} rates increase in 2026?`, a: `By 4.75% from the first full pay period on or after 1 July 2026, in line with the Fair Work Commission's Annual Wage Review decision. The rates on this page are the post-increase minimums and apply until the next review takes effect on 1 July 2027.${c.midYear || ''}` },
+    { q: `What is the ${c.awardShort} pay rate for 2026-27?`, a: `The 2026–27 minimum full-time adult rate starts at ${money(start.rate)} an hour, with higher classifications listed in the table on this page. The figures apply from 1 July 2026 to 30 June 2027 unless the Fair Work Commission varies the award.${c.midYear || ''}` },
   ];
   if (typeof p.ph_ftpt === 'number') faqs.push({ q: `What is the ${c.awardShort} public holiday rate on Christmas Day 2026?`, a: `${pct(p.ph_ftpt)} of the ordinary rate for full-time and part-time employees${typeof p.ph_cas === 'number' ? `, and ${pct(p.ph_cas)} for casuals, inclusive of the casual loading` : ''}. For the lowest adult classification that is ${money(start.rate * p.ph_ftpt)} an hour${typeof p.ph_cas === 'number' ? ` (casual ${money(start.rate * p.ph_cas)})` : ''}. Christmas Day falls on Friday 25 December 2026.` });
   return faqs;
