@@ -14,7 +14,7 @@ NAVY, NAVY2, AMBER, W = "#0f172a", "#0b1220", "#f59e0b", "#ffffff"
 W72 = "rgba(255,255,255,0.72)"; N72 = "rgba(15,23,42,0.72)"
 MX, MR = 96, 984
 FONTS = "@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@500;700;800&amp;display=swap');"
-FPS, DUR, HOLD, XF, SIZE = 30, 0.6, 1.7, 0.6, (1080, 1920)
+FPS, DUR, HOLD, XF, SIZE = 30, 0.6, 2.4, 0.6, (1080, 1920)
 
 _ot = {}
 def ot(s): _ot.setdefault(s, ImageFont.truetype(os.path.join(FONTDIR, "OutfitText-500.ttf"), s)); return _ot[s]
@@ -84,7 +84,7 @@ def card(cnt, eyebrow, t_lines, kicker, icon):
 
 def cta():
     base = render(f'<rect width="1080" height="1920" fill="{AMBER}"/>'
-                  + gicon("people", 800, 1250, 7.2, NAVY, 0.11)
+                  + gicon("people", 820, 1700, 6.0, NAVY, 0.12)
                   + f'<rect x="{MX}" y="246" width="190" height="78" rx="16" fill="{NAVY}"/>' + wm(x=MX+24, ink=W))
     title = (f'<text x="{MX}" y="660" class="ti" font-size="100" font-weight="800" fill="{NAVY}">AI for speed.</text>'
              f'<text x="{MX}" y="772" class="ti" font-size="100" font-weight="800" fill="{NAVY}">Humans for</text>'
