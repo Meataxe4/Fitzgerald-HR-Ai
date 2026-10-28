@@ -28,7 +28,8 @@
 
 ## Infrastructure notes
 
-- Netlify hosting behind Cloudflare. Clean URLs need explicit redirects in netlify.toml (no catch-all). New pages: add redirect + sitemap entry.
+- Netlify hosting (no Cloudflare in front of it). Clean URLs need explicit redirects in netlify.toml (no catch-all). New pages: add redirect + sitemap entry.
+- `scripts/indexnow-ping.mjs` submits only pages changed in the deploy (git diff CACHED_COMMIT_REF..COMMIT_REF) plus sitemap entries with a lastmod in the last 3 days — keep sitemap lastmod honest, it drives Bing recrawl.
 - `npm run build` regenerates feed.xml (scripts/generate-rss.mjs) — new blog posts are picked up automatically.
 - fairwork.gov.au / fwc.gov.au return 403 to ALL crawlers — external-link flags for those domains in audits are noise.
 - Award guide + pay-rates pages have "Quick answer" boxes and speakable schema. For the seven generated pay-rates pages and five generated guides they come from `quickAnswer()` in scripts/build-vertical-pages.mjs (per-vertical wording in each vertical's `qa` config), so regenerate after every rates-JSON change. hospitality-award-guide.html and restaurant-award-guide.html are hand-built — update their boxes by hand at each Annual Wage Review.
