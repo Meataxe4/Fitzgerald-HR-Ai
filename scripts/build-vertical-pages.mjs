@@ -60,7 +60,7 @@ const VERTICALS = {
     aiIndustry: 'SCHADS & NDIS Providers',
     complianceIndustry: 'disability & community services',
     qa: { name: 'SCHADS Award' },
-    midYear: ' Exception: home care (disability) employees under Schedule E receive an interim increase of about 15% from the first full pay period on or after 1 December 2026; the home care rates on this page are the 1 July 2026 rates until they are updated.',
+    midYear: ' Exception: home care (disability) employees under Schedule E receive an interim increase of about 15% from the first full pay period on or after 1 December 2026; the home care rates on this page are the 1 July 2026 rates until they are updated. Full details and the new figures: fitzhr.com/blog/schads-award-changes-1-december-2026.',
     shortIndustry: 'Community Services', descWho: 'community services',
     heroWord: 'support worker',
     heroHook: 'A {word} calls in for a sleepover shift. Fitz tells you exactly what SCHADS requires.',
@@ -670,7 +670,7 @@ ${SUMMER_HOLIDAYS.map(([n, d]) => `        <li><strong>${n}</strong> &mdash; ${d
     <p>Each state and territory gazettes its own list, including part-day holidays such as Christmas Eve and New Year&rsquo;s Eve in some jurisdictions, so check your state&rsquo;s list before the roster is published. The penalty applies to hours worked on the gazetted day; where a substitute day is declared, the award sets out which day attracts the penalty, and that is a question worth asking Fitz before the pay run rather than after.</p>
 
     <h2>What Changed in 2026, and <em>What Changes Next</em></h2>
-    <p>The rates on this page took effect from the first full pay period on or after 1 July 2026, following the Fair Work Commission&rsquo;s <a href="/blog/minimum-wage-increase-2026">4.75% Annual Wage Review increase</a>, and apply for the 2026&ndash;27 financial year. The next Annual Wage Review decision is expected in June 2027 and takes effect from the first full pay period on or after 1 July 2027. Superannuation guarantee is ${pct(data.superannuation_rate)}. Nothing else is scheduled to change the ${esc(c.awardShort)} minimum rates before then; if the Commission varies the award mid-year, the rates alert below will tell you.</p>${change}
+    <p>The rates on this page took effect from the first full pay period on or after 1 July 2026, following the Fair Work Commission&rsquo;s <a href="/blog/minimum-wage-increase-2026">4.75% Annual Wage Review increase</a>, and apply for the 2026&ndash;27 financial year. The next Annual Wage Review decision is expected in June 2027 and takes effect from the first full pay period on or after 1 July 2027. Superannuation guarantee is ${pct(data.superannuation_rate)}. ${c.midYear ? esc(c.midYear.trim()) + ' The rates alert below will tell you when the updated figures are published.' : `Nothing else is scheduled to change the ${esc(c.awardShort)} minimum rates before then; if the Commission varies the award mid-year, the rates alert below will tell you.`}</p>${change}
 `;
 }
 function seasonFaqs(c, data) {
