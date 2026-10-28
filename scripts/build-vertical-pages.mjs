@@ -60,7 +60,7 @@ const VERTICALS = {
     aiIndustry: 'SCHADS & NDIS Providers',
     complianceIndustry: 'disability & community services',
     qa: { name: 'SCHADS Award' },
-    midYear: ' Exception: home care (disability) employees under Schedule E receive an interim increase of about 15% from the first full pay period on or after 1 December 2026; the home care rates on this page are the 1 July 2026 rates until they are updated.',
+    midYear: ' Exception: home care (disability) employees under Schedule E receive an interim increase of about 15% from the first full pay period on or after 1 December 2026; the home care rates on this page are the 1 July 2026 rates until they are updated. Full details and the new figures: fitzhr.com/blog/schads-award-changes-1-december-2026.',
     shortIndustry: 'Community Services', descWho: 'community services',
     heroWord: 'support worker',
     heroHook: 'A {word} calls in for a sleepover shift. Fitz tells you exactly what SCHADS requires.',
