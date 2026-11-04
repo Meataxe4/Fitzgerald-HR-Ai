@@ -29,6 +29,7 @@
 ## Infrastructure notes
 
 - Netlify hosting (no Cloudflare in front of it). Clean URLs need explicit redirects in netlify.toml (no catch-all). New pages: add redirect + sitemap entry.
+- Netlify publishes the repo root (`publish = "."`), so every committed file is web-reachable unless blocked. netlify.toml returns 404 for internal paths (CLAUDE.md, marketing/, scripts/, regression/, tests/, docs/, templates/, src/, netlify/, reports/, package files, config). Any new non-website folder or root file must be added to that block. The *-award-rates.json files and regulatory-changes.json stay public: the app fetches them.
 - `scripts/indexnow-ping.mjs` submits only pages changed in the deploy (git diff CACHED_COMMIT_REF..COMMIT_REF) plus sitemap entries with a lastmod in the last 3 days — keep sitemap lastmod honest, it drives Bing recrawl.
 - `npm run build` regenerates feed.xml (scripts/generate-rss.mjs) — new blog posts are picked up automatically.
 - fairwork.gov.au / fwc.gov.au return 403 to ALL crawlers — external-link flags for those domains in audits are noise.

@@ -26,6 +26,7 @@ const SITE = 'https://fitzhr.com';
 // --------------------------------------------------------------------------
 const VERTICALS = {
   manufacturing: {
+    wagePost: 'manufacturing-award-minimum-wage-increase-2026',
     code: 'MA000010', file: 'manufacturing-award-rates.json',
     awardShort: 'Manufacturing Award',
     awardFull: 'Manufacturing and Associated Industries and Occupations Award MA000010',
@@ -51,6 +52,7 @@ const VERTICALS = {
     ],
   },
   schads: {
+    wagePost: 'schads-award-minimum-wage-increase-2026',
     code: 'MA000100', file: 'schads-award-rates.json',
     awardShort: 'SCHADS Award',
     awardFull: 'Social, Community, Home Care and Disability Services Industry Award MA000100',
@@ -95,6 +97,7 @@ const VERTICALS = {
     ],
   },
   retail: {
+    wagePost: 'retail-award-minimum-wage-increase-2026',
     code: 'MA000004', file: 'retail-award-rates.json',
     awardShort: 'Retail Award',
     awardFull: 'General Retail Industry Award MA000004',
@@ -120,6 +123,7 @@ const VERTICALS = {
     ],
   },
   health: {
+    wagePost: 'health-professionals-award-minimum-wage-increase-2026',
     code: 'MA000027', file: 'health-award-rates.json',
     awardShort: 'Health Professionals Award',
     awardFull: 'Health Professionals and Support Services Award MA000027',
@@ -148,6 +152,7 @@ const VERTICALS = {
     ],
   },
   childrens: {
+    wagePost: 'childrens-services-award-minimum-wage-increase-2026',
     code: 'MA000120', file: 'childrens-award-rates.json',
     awardShort: "Children's Services Award",
     awardFull: "Children's Services Award MA000120",
@@ -756,7 +761,7 @@ ${SUMMER_HOLIDAYS.map(([n, d]) => `        <li><strong>${n}</strong> &mdash; ${d
     <p>Each state and territory gazettes its own list, including part-day holidays such as Christmas Eve and New Year&rsquo;s Eve in some jurisdictions, so check your state&rsquo;s list before the roster is published. The penalty applies to hours worked on the gazetted day; where a substitute day is declared, the award sets out which day attracts the penalty, and that is a question worth asking Fitz before the pay run rather than after.</p>
 
     <h2>What Changed in 2026, and <em>What Changes Next</em></h2>
-    <p>The rates on this page took effect from the first full pay period on or after 1 July 2026, following the Fair Work Commission&rsquo;s <a href="/blog/minimum-wage-increase-2026">4.75% Annual Wage Review increase</a>, and apply for the 2026&ndash;27 financial year. The next Annual Wage Review decision is expected in June 2027 and takes effect from the first full pay period on or after 1 July 2027. Superannuation guarantee is ${pct(data.superannuation_rate)}. ${c.midYear ? esc(c.midYear.trim()).replace(/Full details and the new figures: fitzhr\.com(\/blog\/[\w-]+)\./, 'Full details and the new figures: <a href="$1">the 1 December 2026 changes</a>.') + ' The rates alert below will tell you when the updated figures are published.' : `Nothing else is scheduled to change the ${esc(c.awardShort)} minimum rates before then; if the Commission varies the award mid-year, the rates alert below will tell you.`}</p>${change}
+    <p>The rates on this page took effect from the first full pay period on or after 1 July 2026, following the Fair Work Commission&rsquo;s <a href="/blog/minimum-wage-increase-2026">4.75% Annual Wage Review increase</a>${c.wagePost ? ` (see <a href="/blog/${c.wagePost}">what the 2026 increase means for the ${esc(c.awardShort)}</a>)` : ''}, and apply for the 2026&ndash;27 financial year. The next Annual Wage Review decision is expected in June 2027 and takes effect from the first full pay period on or after 1 July 2027. Superannuation guarantee is ${pct(data.superannuation_rate)}. ${c.midYear ? esc(c.midYear.trim()).replace(/Full details and the new figures: fitzhr\.com(\/blog\/[\w-]+)\./, 'Full details and the new figures: <a href="$1">the 1 December 2026 changes</a>.') + ' The rates alert below will tell you when the updated figures are published.' : `Nothing else is scheduled to change the ${esc(c.awardShort)} minimum rates before then; if the Commission varies the award mid-year, the rates alert below will tell you.`}</p>${change}
 `;
 }
 function seasonFaqs(c, data) {
