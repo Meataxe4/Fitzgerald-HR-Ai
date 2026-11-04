@@ -39,3 +39,4 @@
 
 - Bing data shows a click cliff below position 5 for award queries — prioritise position lift (links, freshness) over CTR tweaks.
 - Backlink profile is almost entirely AI-tool directories — the active priority is relevant Australian links (see marketing/link-building-playbook.md). No paid links, no more AI directories.
+- Weekly search data: `npm run seo:report` (scripts/seo-report.mjs) pulls Search Console, GA4 and Bing via API using the `GOOGLE_SERVICE_ACCOUNT_JSON` and `BING_WEBMASTER_API_KEY` environment variables (optional `GA4_PROPERTY_ID`, `GSC_SITE_URL`, `BING_SITE_URL`); `npm run seo:check` tests access only. Output goes to reports/ (gitignored, never commit it). Bing AI citations are not in the API and stay a manual export.
