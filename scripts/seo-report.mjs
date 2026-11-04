@@ -34,6 +34,7 @@ const DOMAIN = 'fitzhr.com';
 // Queries the weekly review tracks by name (substring match, case-insensitive).
 const TRACKED = [
   'fitz hr',
+  'fitzhr',
   'hospitality award rates',
   'hospitality award guide',
   'restaurant award',
@@ -69,11 +70,11 @@ const fmt = (n, dp = 0) => n == null || Number.isNaN(n) ? '–' : Number(n).toLo
 const pct = (a, b) => (b ? ((a - b) / b) * 100 : null);
 function delta(cur, prev, dp = 0, lowerIsBetter = false) {
   if (cur == null || prev == null) return '–';
-  const d = cur - prev;
+  const d = Math.abs(cur - prev) < 0.5 * 10 ** -dp ? 0 : cur - prev;
   const sign = d > 0 ? '+' : d < 0 ? '−' : '±';
   const p = pct(cur, prev);
   const arrow = d === 0 ? '' : (d > 0) !== lowerIsBetter ? ' ▲' : ' ▼';
-  return `${sign}${fmt(Math.abs(d), dp)}${p != null && !lowerIsBetter ? ` (${p > 0 ? '+' : ''}${fmt(p, 0)}%)` : ''}${arrow}`;
+  return `${sign}${fmt(Math.abs(d), dp)}${p != null && d !== 0 && !lowerIsBetter ? ` (${p > 0 ? '+' : ''}${fmt(p, 0)}%)` : ''}${arrow}`;
 }
 const table = (head, rows) => [
   `| ${head.join(' | ')} |`,
@@ -180,8 +181,9 @@ async function gscSection(token) {
     const p = prevQ.get(r.keys[0]);
     return [r.keys[0], fmt(r.clicks), fmt(r.impressions), delta(r.impressions, p?.impressions ?? 0), fmt(r.position, 1), p ? delta(r.position, p.position, 1, true) : 'new'];
   };
+  const isBrand = q => /fitz/i.test(q);
   const tracked = qW.filter(r => TRACKED.some(t => r.keys[0].toLowerCase().includes(t)))
-    .sort((a, b) => b.impressions - a.impressions).slice(0, 40);
+    .sort((a, b) => (isBrand(b.keys[0]) - isBrand(a.keys[0])) || b.impressions - a.impressions).slice(0, 40);
   out.push('### Tracked queries (Australia)\n\n' + (tracked.length ? table(['Query', 'Clicks', 'Impr.', 'Δ impr.', 'Pos.', 'Δ pos.'], tracked.map(qRow)) : '_No tracked queries with impressions this week._'));
   out.push('### Top queries by impressions (Australia)\n\n' + table(['Query', 'Clicks', 'Impr.', 'Δ impr.', 'Pos.', 'Δ pos.'],
     [...qW].sort((a, b) => b.impressions - a.impressions).slice(0, 25).map(qRow)));
