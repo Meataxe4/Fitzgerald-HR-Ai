@@ -34,6 +34,7 @@
 - fairwork.gov.au / fwc.gov.au return 403 to ALL crawlers — external-link flags for those domains in audits are noise.
 - Award guide + pay-rates pages have "Quick answer" boxes and speakable schema. For the seven generated pay-rates pages and five generated guides they come from `quickAnswer()` in scripts/build-vertical-pages.mjs (per-vertical wording in each vertical's `qa` config), so regenerate after every rates-JSON change. hospitality-award-guide.html and restaurant-award-guide.html are hand-built — update their boxes by hand at each Annual Wage Review.
 - llms.txt: bump the "Last updated" date whenever rates or pricing change.
+- /schads-award-pay-rates is the single target page for "SCHADS award 2026", "SCHADS pay guide" and "SCHADS level N" queries (Nov 2026): per-level sections come from `levelSections()` via the `pay` override in the schads config of scripts/build-vertical-pages.mjs. Other SCHADS pages link to it with the anchor "SCHADS Award 2026 pay rates by level". The award blog posts (scripts/build-award-blog-posts.mjs) have been hand-edited since generation; do not re-run that generator, edit the post HTML by hand.
 
 ## SEO watchpoints
 

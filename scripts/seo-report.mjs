@@ -207,7 +207,32 @@ async function gscSection(token) {
 
   const cW = await gscQuery(token, site, WEEK, ['country'], { rowLimit: 8 });
   out.push('### Countries (week)\n\n' + table(['Country', 'Clicks', 'Impr.', 'Pos.'], cW.map(r => [r.keys[0].toUpperCase(), fmt(r.clicks), fmt(r.impressions), fmt(r.position, 1)])));
+  out.push(await indexSection(token, site));
   return { md: out.join('\n\n') };
+}
+
+// Pillar pages whose index status is checked weekly with the URL Inspection API.
+const INSPECT = [
+  '/', '/hospitality-award-guide', '/restaurant-award-guide', '/retail-award-guide',
+  '/manufacturing-award-guide', '/health-award-guide', '/schads-award-guide', '/childrens-award-guide',
+  '/hospitality-award-pay-rates', '/retail-award-pay-rates', '/schads-award-pay-rates',
+  '/blog/hospitality-award-rates-2026', '/blog/restaurant-award-rates-2026', '/award-interpretation-software',
+];
+async function indexSection(token, site) {
+  const base = site.startsWith('sc-domain:') ? `https://${site.slice(10)}` : site.replace(/\/$/, '');
+  const today = sydneyToday();
+  const rows = [];
+  for (const p of INSPECT) {
+    try {
+      const r = await gpost(token, 'https://searchconsole.googleapis.com/v1/urlInspection/index:inspect', { inspectionUrl: base + p, siteUrl: site });
+      const x = r.inspectionResult?.indexStatusResult || {};
+      const crawl = x.lastCrawlTime ? x.lastCrawlTime.slice(0, 10) : '–';
+      const age = x.lastCrawlTime ? Math.round((Date.parse(today) - Date.parse(crawl)) / 864e5) : null;
+      const canon = x.googleCanonical && x.userCanonical && x.googleCanonical !== x.userCanonical ? `**Google chose ${shortUrl(x.googleCanonical)}**` : 'OK';
+      rows.push([p, `${x.verdict === 'PASS' ? '' : '**'}${x.coverageState || x.verdict || '–'}${x.verdict === 'PASS' ? '' : '**'}`, crawl + (age != null && age > 21 ? ` (**${age} days**)` : ''), canon]);
+    } catch (e) { rows.push([p, `error: ${e.message.slice(0, 80)}`, '–', '–']); }
+  }
+  return '### Index status of pillar pages (URL Inspection)\n\nFlags: not indexed, last crawl over 21 days ago, or Google choosing a different canonical.\n\n' + table(['Page', 'Coverage', 'Last crawl', 'Canonical'], rows);
 }
 
 // ---------- GA4 ----------

@@ -16,7 +16,7 @@ const AWARDS = {
   restaurant: { file: 'restaurant-award-rates.json', short: 'Restaurant Award', levelWord: 'Levels', example: 'a waiter, cook or barista' },
   retail: { file: 'retail-award-rates.json', short: 'Retail Award', levelWord: 'Levels', example: 'a shop assistant, keyholder or department manager' },
   manufacturing: { file: 'manufacturing-award-rates.json', short: 'Manufacturing Award', levelWord: 'C Levels', example: 'a process worker, tradesperson or leading hand' },
-  schads: { file: 'schads-award-rates.json', short: 'SCHADS Award', levelWord: 'Levels & Pay Points', example: 'a support worker or coordinator' },
+  schads: { file: 'schads-award-rates.json', short: 'SCHADS Award', levelWord: 'Levels & Pay Points', example: 'a support worker or coordinator', payAnchor: 'SCHADS Award 2026 pay rates by level' },
   health: { file: 'health-award-rates.json', short: 'Health Professionals Award', levelWord: 'Levels', example: 'a receptionist, dental assistant or allied health professional' },
   childrens: { file: 'childrens-award-rates.json', short: "Children's Services Award", levelWord: 'Levels', example: 'an educator, cook or director' },
 };
@@ -183,7 +183,7 @@ ${jsonld.map((j) => `    <script type="application/ld+json">\n    ${JSON.stringi
 <header class="hero">
     <div class="post-tag">${esc(code)} &middot; Classifications 2026</div>
     <h1>${esc(c.short)} <em>${esc(c.levelWord)} Explained</em></h1>
-    <p class="intro">Every adult classification under the ${esc(c.short)} (${esc(code)}) with current full-time and casual rates — and how to tell which level a role belongs at. Rates current as at ${esc(data.effective_date)}, sourced from the FWO Pay Guide.</p>
+    <p class="intro">Every adult classification under the ${esc(c.short)} (${esc(code)}) with current full-time and casual rates — and how to tell which level a role belongs at. Rates current as at ${esc(data.effective_date)}, sourced from the FWO Pay Guide.${c.payAnchor ? ` Every rate in one table: <a href="/${v}-award-pay-rates" style="color:var(--amber)">${esc(c.payAnchor)}</a>.` : ''}</p>
 </header>
 
 <div class="body">
@@ -199,7 +199,7 @@ ${streamsHtml}${tables}
 
     <h2>How to Read the <em>Levels</em></h2>
     <p><strong>The award classifies the work, not the title.</strong> Whether ${esc(c.example)} sits at one level or the next depends on the duties actually performed, the skills and qualifications the role requires, and the responsibility it carries — each defined in the award's classification schedule. Misclassifying downward creates an underpayment that compounds every pay run; misclassifying upward is money you didn't need to spend.</p>
-    <p>If you're unsure, describe the role to <a href="/app">Fitz</a> — the classification wizard walks the ${esc(c.short)} structure with you and returns the level and current rate. Or start from the <a href="/${v}-award-pay-rates">full pay-rates tables</a> and the <a href="/${v}-award-guide">complete award guide</a>.</p>
+    <p>If you're unsure, describe the role to <a href="/app">Fitz</a> — the classification wizard walks the ${esc(c.short)} structure with you and returns the level and current rate. Or start from the <a href="/${v}-award-pay-rates">${c.payAnchor ? esc(c.payAnchor) : 'full pay-rates tables'}</a> and the <a href="/${v}-award-guide">complete award guide</a>.</p>
 
     <p>Classification is the first thing <a href="/award-interpretation-software">award interpretation software</a> has to get right, because every rate, penalty and allowance flows from the level. Fitz HR applies the ${esc(c.short)} from the classification through to the pay figure and the documents.</p>
 

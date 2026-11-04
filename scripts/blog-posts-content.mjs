@@ -542,6 +542,7 @@ ${h.allowanceTable(h.data, 10)}` },
       sections: (h) => [
         { h2: 'Rates by Stream <em>&amp; Level</em>', html:
 `    <p>SCHADS runs across streams — social &amp; community services, home care, family day care and crisis accommodation — each with its own levels and pay points. Getting the stream and pay point right is essential.</p>
+    <p>The table below is a sample. For every level and pay point in every stream, with full-time, weekly and casual rates, see <a href="/schads-award-pay-rates">SCHADS Award 2026 pay rates by level</a>.</p>
 ${h.payTable(h.data, 12)}` },
         { h2: 'Penalty Rates — Weekends <em>&amp; Public Holidays</em>', html:
 `    <p>Penalties are a percentage of the minimum hourly rate; casual percentages already include the 25% loading:</p>

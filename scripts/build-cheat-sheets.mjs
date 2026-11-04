@@ -16,7 +16,7 @@ const AWARDS = {
   restaurant: { file: 'restaurant-award-rates.json', short: 'Restaurant Award', industry: 'restaurants, cafes & bistros' },
   retail: { file: 'retail-award-rates.json', short: 'Retail Award', industry: 'shops & retail chains' },
   manufacturing: { file: 'manufacturing-award-rates.json', short: 'Manufacturing Award', industry: 'manufacturers & workshops' },
-  schads: { file: 'schads-award-rates.json', short: 'SCHADS Award', industry: 'community services & NDIS' },
+  schads: { file: 'schads-award-rates.json', short: 'SCHADS Award', industry: 'community services & NDIS', payAnchor: 'SCHADS Award 2026 pay rates by level' },
   health: { file: 'health-award-rates.json', short: 'Health Professionals Award', industry: 'practices, clinics & allied health' },
   childrens: { file: 'childrens-award-rates.json', short: "Children's Services Award", industry: 'childcare, preschool & OSHC' },
 };
@@ -215,7 +215,7 @@ ${allow.map((a) => `                <tr><td>${esc(a.name)}</td><td>$${a.amount.t
 </div>
 
 <div class="below no-print">
-    <p>This is the condensed reference — the full classification tables live at <a href="/${v}-award-pay-rates">${esc(c.short)} pay rates</a> and the complete rules at the <a href="/${v}-award-guide">${esc(c.short)} guide</a>. For the exact rate for any classification, employment type or shift, <a href="/app">ask Fitz</a> — free, no card required.</p>
+    <p>This is the condensed reference — the full classification tables live at <a href="/${v}-award-pay-rates">${c.payAnchor ? esc(c.payAnchor) : `${esc(c.short)} pay rates`}</a> and the complete rules at the <a href="/${v}-award-guide">${esc(c.short)} guide</a>. For the exact rate for any classification, employment type or shift, <a href="/app">ask Fitz</a> — free, no card required.</p>
 </div>
 
 </body>
