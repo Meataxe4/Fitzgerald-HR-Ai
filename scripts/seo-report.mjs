@@ -308,7 +308,7 @@ async function bingSection() {
     site = s.Url;
   }
   if (CHECK_ONLY) return { ok: `Bing OK (${site})` };
-  const out = [`## Bing Webmaster Tools\n\nSite \`${site}\`. Bing reports its own date buckets; the windows below are the same calendar weeks where daily data allows.`];
+  const out = [`## Bing Webmaster Tools\n\nSite \`${site}\`. Totals use the same calendar weeks as Google; query and page stats use Bing's weekly buckets.`];
 
   const traffic = (await bing('GetRankAndTrafficStats', { siteUrl: site })).map(r => ({ date: bingDate(r.Date), clicks: r.Clicks, impressions: r.Impressions }));
   const sum = (rng) => traffic.filter(r => r.date >= rng.start && r.date <= rng.end).reduce((a, r) => ({ clicks: a.clicks + r.clicks, impressions: a.impressions + r.impressions }), { clicks: 0, impressions: 0 });
@@ -318,36 +318,56 @@ async function bingSection() {
     ['Impressions', fmt(tw.impressions), fmt(tp.impressions), delta(tw.impressions, tp.impressions)],
   ]) + `\n\nLatest Bing traffic date: ${traffic.map(r => r.date).sort().pop() || '–'}.`);
 
-  // Query and page stats come back as rows per query per period bucket.
-  const bucketed = async (method, keyField) => {
+  // Query and page stats come back as one row per query (or page) per weekly bucket.
+  // Bing lists only ~80 queries a week and the list churns, so queries compare the last
+  // 4 buckets with the 4 before; pages are stable enough to compare week on week.
+  const fetchBuckets = async method => {
     const rows = (await bing(method, { siteUrl: site })).map(r => ({ ...r, date: bingDate(r.Date) }));
-    const dates = [...new Set(rows.map(r => r.date))].sort();
-    const [prevD, curD] = dates.slice(-2);
-    const by = d => new Map(rows.filter(r => r.date === d).map(r => [r[keyField], r]));
-    return { cur: by(curD), prev: by(prevD), curD, prevD };
+    return { rows, dates: [...new Set(rows.map(r => r.date))].sort() };
   };
-  const q = await bucketed('GetQueryStats', 'Query');
-  const qRows = [...q.cur.values()].sort((a, b) => b.Impressions - a.Impressions);
-  const qLine = r => {
-    const p = q.prev.get(r.Query);
-    return [r.Query, fmt(r.Clicks), fmt(r.Impressions), delta(r.Impressions, p?.Impressions ?? 0), fmt(r.AvgImpressionPosition, 1), p ? delta(r.AvgImpressionPosition, p.AvgImpressionPosition, 1, true) : 'new'];
+  const aggregate = (rows, dates, keyField) => {
+    const m = new Map();
+    for (const r of rows.filter(x => dates.includes(x.date))) {
+      const a = m.get(r[keyField]) || { key: r[keyField], clicks: 0, impressions: 0, posW: 0 };
+      a.clicks += r.Clicks; a.impressions += r.Impressions; a.posW += r.AvgImpressionPosition * r.Impressions;
+      m.set(r[keyField], a);
+    }
+    for (const a of m.values()) a.position = a.impressions ? a.posW / a.impressions : null;
+    return m;
+  };
+
+  const qb = await fetchBuckets('GetQueryStats');
+  const cur4 = qb.dates.slice(-4), prev4 = qb.dates.slice(-8, -4);
+  const qCur = aggregate(qb.rows, cur4, 'Query'), qPrev = aggregate(qb.rows, prev4, 'Query');
+  const qSorted = [...qCur.values()].sort((a, b) => b.impressions - a.impressions);
+  const qLine = a => {
+    const p = qPrev.get(a.key);
+    return [a.key.length > 90 ? a.key.slice(0, 87) + '…' : a.key, fmt(a.clicks), fmt(a.impressions), delta(a.impressions, p?.impressions ?? 0), fmt(a.position, 1), p ? delta(a.position, p.position, 1, true) : 'new'];
   };
   const head = ['Query', 'Clicks', 'Impr.', 'Δ impr.', 'Avg pos.', 'Δ pos.'];
-  out.push(`### Queries (bucket ${q.curD} vs ${q.prevD})\n\n` + table(head, qRows.slice(0, 25).map(qLine)));
-  const tq = qRows.filter(r => TRACKED.some(t => r.Query.toLowerCase().includes(t)));
-  if (tq.length) out.push('### Tracked queries\n\n' + table(head, tq.slice(0, 30).map(qLine)));
+  out.push(`### Queries, 4 weeks (buckets ${cur4[0]} to ${cur4.at(-1)}) vs previous 4
 
-  const pg = await bucketed('GetPageStats', 'Query');
-  out.push(`### Pages (bucket ${pg.curD} vs ${pg.prevD})\n\n` + table(['Page', 'Clicks', 'Impr.', 'Δ impr.', 'Avg pos.'],
-    [...pg.cur.values()].sort((a, b) => b.Impressions - a.Impressions).slice(0, 25).map(r => {
-      const p = pg.prev.get(r.Query);
-      return [shortUrl(r.Query), fmt(r.Clicks), fmt(r.Impressions), delta(r.Impressions, p?.Impressions ?? 0), fmt(r.AvgImpressionPosition, 1)];
+Bing only reports a sample of queries (about 80 a week) and rounds positions to whole numbers.
+
+` + table(head, qSorted.slice(0, 25).map(qLine)));
+  const tq = qSorted.filter(a => TRACKED.some(t => a.key.toLowerCase().includes(t)) && a.key.split(' ').length <= 8);
+  if (tq.length) out.push('### Tracked queries (4 weeks)\n\n' + table(head, tq.slice(0, 30).map(qLine)));
+
+  const pb = await fetchBuckets('GetPageStats');
+  const [pPrevD, pCurD] = pb.dates.slice(-2);
+  const pCur = aggregate(pb.rows, [pCurD], 'Query'), pPrev = aggregate(pb.rows, [pPrevD], 'Query');
+  out.push(`### Pages (week bucket ${pCurD} vs ${pPrevD})\n\n` + table(['Page', 'Clicks', 'Impr.', 'Δ impr.', 'Avg pos.', 'Δ pos.'],
+    [...pCur.values()].sort((a, b) => b.impressions - a.impressions).slice(0, 25).map(a => {
+      const p = pPrev.get(a.key);
+      return [shortUrl(a.key), fmt(a.clicks), fmt(a.impressions), delta(a.impressions, p?.impressions ?? 0), fmt(a.position, 1), p ? delta(a.position, p.position, 1, true) : 'new'];
     })));
 
   try {
     const links = await bing('GetLinkCounts', { siteUrl: site, page: '0' });
-    const list = links?.Links || links || [];
-    out.push('### Inbound links by page\n\n' + table(['Page', 'Links'], list.slice(0, 15).map(l => [shortUrl(l.Url), fmt(l.Count)])));
+    const list = links?.Links || [];
+    out.push('### Inbound links by page\n\n' + (list.length
+      ? table(['Page', 'Links'], list.slice(0, 15).map(l => [shortUrl(l.Url), fmt(l.Count)]))
+      : '_The Bing API returned no link data; check Backlinks in the Bing Webmaster UI._'));
   } catch (e) { out.push(`_Inbound links unavailable: ${e.message}_`); }
 
   out.push('_Bing AI citations (AI Performance) are not exposed by the Webmaster API; that file stays a manual export._');
