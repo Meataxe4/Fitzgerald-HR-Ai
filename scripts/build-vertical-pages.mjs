@@ -59,7 +59,25 @@ const VERTICALS = {
     titleIndustry: 'Community Services & NDIS Providers',
     aiIndustry: 'SCHADS & NDIS Providers',
     complianceIndustry: 'disability & community services',
-    qa: { name: 'SCHADS Award' },
+    qa: {
+      name: 'SCHADS Award',
+      level: 'social and community services Level 1, pay point 1',
+      also: [
+        { match: /^Social and community services - Level 2 - pay point 1$/, label: 'Level 2 pay point 1' },
+        { match: /^Social and community services - Level 3 - pay point 1$/, label: 'Level 3 pay point 1' },
+      ],
+    },
+    // Pay-rates page is the single target for "SCHADS award 2026", "SCHADS pay
+    // guide" and "SCHADS level N" queries (Nov 2026 consolidation).
+    pay: {
+      title: 'SCHADS Award 2026 Pay Rates by Level (MA000100)',
+      h1: 'SCHADS Award 2026 <em>Pay Rates</em>',
+      description: 'SCHADS Award 2026 pay rates (MA000100) for every level and pay point: SACS Levels 1–8, home care, crisis accommodation and family day care.',
+      anchor: 'SCHADS Award 2026 pay rates by level',
+      byLevel: true,
+      updated: '2026-11-04',
+      updatedNote: 'pay rates for every SCHADS level and pay point by stream, with casual rates',
+    },
     midYear: ' Exception: home care (disability) employees under Schedule E receive an interim increase of about 15% from the first full pay period on or after 1 December 2026; the home care rates on this page are the 1 July 2026 rates until they are updated. Full details and the new figures: fitzhr.com/blog/schads-award-changes-1-december-2026.',
     shortIndustry: 'Community Services', descWho: 'community services',
     heroWord: 'support worker',
@@ -185,6 +203,8 @@ const VERTICALS = {
     ],
   },
   restaurant: {
+    // The hand-built /blog/restaurant-award-rates-2026 already uses the MA-code title.
+    pay: { title: 'Restaurant Award Pay Rates 2026 | Fitz HR' },
     code: 'MA000119', file: 'restaurant-award-rates.json',
     awardShort: 'Restaurant Award',
     awardFull: 'Restaurant Industry Award MA000119',
@@ -410,7 +430,7 @@ ${faqs.map((f, i) => `        <details class="faq-item"${i === 0 ? ' open' : ''}
 function clusterLinks(v, current) {
   const links = [
     { key: 'landing', href: `/${v}`, label: 'Overview', title: `${VERTICALS[v].awardShort} for your business`, blurb: 'The live scenarios, wizard, document builder and Crisis Mode, built for your vertical.' },
-    { key: 'pay', href: `/${v}-award-pay-rates`, label: 'Pay Rates', title: `${VERTICALS[v].awardShort} Pay Rates 2026`, blurb: 'Current classification rates, penalties and allowances from the FWO Pay Guide.' },
+    { key: 'pay', href: `/${v}-award-pay-rates`, label: 'Pay Rates', title: (VERTICALS[v].pay && VERTICALS[v].pay.anchor) ? VERTICALS[v].pay.anchor.replace(/^./, ch => ch.toUpperCase()) : `${VERTICALS[v].awardShort} Pay Rates 2026`, blurb: 'Current classification rates, penalties and allowances from the FWO Pay Guide.' },
     { key: 'guide', href: `/${v}-award-guide`, label: 'Guide', title: `${VERTICALS[v].awardShort} Guide (${VERTICALS[v].code})`, blurb: 'The complete reference — coverage, classifications, penalties, allowances and compliance.' },
     { key: 'vs', href: '/compare/fitz-hr-vs-employment-hero', label: 'Compare', title: `Fitz HR vs Employment Hero`, blurb: `How Fitz compares for ${pluralIndustry(VERTICALS[v].industry)} on the ${VERTICALS[v].awardShort}.` },
     { key: 'best', href: `/compare/best-hr-software-${v}-australia`, label: 'Best software', title: `Best HR Software for ${VERTICALS[v].titleIndustry}`, blurb: `What to look for in HR & compliance software for ${pluralIndustry(VERTICALS[v].industry)} — and how Fitz compares.` },
@@ -467,6 +487,72 @@ function allowanceTable(data, limit = 10) {
 ${rows}
         </tbody>
     </table>`;
+}
+
+const STREAM_LABELS = {
+  social_community_services: ['Social and community services (SACS)', 'sacs'],
+  home_care: ['Home care', 'home-care'],
+  crisis_accommodation: ['Crisis accommodation', 'crisis-accommodation'],
+  family_day_care: ['Family day care', 'family-day-care'],
+};
+const levelNum = (cls) => { const m = /Level (\d+)/.exec(cls); return m ? Number(m[1]) : null; };
+const ppLabel = (cls) => cls.split(' - ').slice(1).join(' – ');
+function casualFor(data, r) {
+  const m = (data.rates || []).find(x => x.employment_type === 'casual' && x.stream === r.stream && x.classification === r.classification);
+  return m && typeof m.rate === 'number' ? m.rate : null;
+}
+const range = (vals) => { const v = vals.filter(n => typeof n === 'number'); if (!v.length) return null; const lo = Math.min(...v), hi = Math.max(...v); return lo === hi ? money(lo) : `${money(lo)} to ${money(hi)}`; };
+function levelRows(data, rows) {
+  return rows.map(r => `            <tr><td>${esc(ppLabel(r.classification))}</td><td class="highlight">${money(r.rate)}</td><td>${r.weekly_rate ? money(r.weekly_rate) : '&mdash;'}</td><td>${casualFor(data, r) != null ? money(casualFor(data, r)) : '&mdash;'}</td></tr>`).join('\n');
+}
+const levelTableHtml = (data, rows) => `    <table class="rate-table">
+        <thead><tr><th>Level / pay point</th><th>Full-time hourly</th><th>Full-time weekly</th><th>Casual hourly</th></tr></thead>
+        <tbody>
+${levelRows(data, rows)}
+        </tbody>
+    </table>`;
+// Per-level pay sections (SACS stream split by level; other streams one table each).
+// Every figure comes straight from the rates JSON (full-time and casual rows).
+function levelSections(c, data) {
+  const ft = (data.rates || []).filter(r => r.employment_type === 'full_time' && typeof r.rate === 'number');
+  const from = `the first full pay period on or after ${fmtDate(data.effective_date)}`;
+  const streams = Object.keys(STREAM_LABELS).filter(s => ft.some(r => r.stream === s));
+  const sacs = ft.filter(r => r.stream === 'social_community_services');
+  const sacsLevels = [...new Set(sacs.map(r => levelNum(r.classification)).filter(Boolean))].sort((a, b) => a - b);
+  const jump = [
+    ...sacsLevels.map(n => `<a href="#sacs-level-${n}">Level ${n}</a>`),
+    ...streams.filter(s => s !== 'social_community_services').map(s => `<a href="#${STREAM_LABELS[s][1]}">${STREAM_LABELS[s][0]}</a>`),
+  ].join(' &middot; ');
+  const out = [`    <h2>${esc(c.awardShort)} 2026 Pay Rates <em>by Level</em></h2>
+    <p>Every minimum rate in the ${esc(c.awardShort)} (${esc(c.code)}) from ${from}, taken from the Fair Work Ombudsman pay guide. Casual rates already include the ${pct(data.casual_loading)} casual loading.</p>
+    <p style="line-height:2;"><strong>Jump to:</strong> ${jump}</p>`];
+  for (const n of sacsLevels) {
+    const rows = sacs.filter(r => levelNum(r.classification) === n);
+    out.push(`    <h3 id="sacs-level-${n}">SCHADS Level ${n} pay rate <em>(social and community services)</em></h3>
+    <p>From ${from}, a SCHADS social and community services Level ${n} employee is paid <strong>${range(rows.map(r => r.rate))} an hour</strong> full-time${rows.length > 1 ? ', depending on pay point' : ''}, or ${range(rows.map(r => casualFor(data, r)))} an hour as a casual.</p>
+${levelTableHtml(data, rows)}`);
+  }
+  for (const s of streams.filter(x => x !== 'social_community_services')) {
+    const rows = ft.filter(r => r.stream === s);
+    const note = s === 'home_care' && c.midYear
+      ? ' Home care (disability) rates rise from the first full pay period on or after 1 December 2026; the figures below are the 1 July 2026 rates until then. See <a href="/blog/schads-award-changes-1-december-2026">the 1 December 2026 changes</a>.'
+      : '';
+    out.push(`    <h3 id="${STREAM_LABELS[s][1]}">${STREAM_LABELS[s][0]} <em>pay rates</em></h3>
+    <p>From ${from}, ${STREAM_LABELS[s][0].toLowerCase()} employees under the ${esc(c.awardShort)} are paid <strong>${range(rows.map(r => r.rate))} an hour</strong> full-time, or ${range(rows.map(r => casualFor(data, r)))} an hour as a casual, depending on level and pay point.${note}</p>
+${levelTableHtml(data, rows)}`);
+  }
+  return out.join('\n\n');
+}
+function levelFaqs(c, data) {
+  const ft = (data.rates || []).filter(r => r.employment_type === 'full_time' && typeof r.rate === 'number' && r.stream === 'social_community_services');
+  const from = `the first full pay period on or after ${fmtDate(data.effective_date)}`;
+  const faqs = [2, 3, 4].map(n => {
+    const rows = ft.filter(r => levelNum(r.classification) === n);
+    if (!rows.length) return null;
+    return { q: `What is the ${c.awardShort} Level ${n} pay rate in 2026?`, a: `Social and community services Level ${n} pays ${range(rows.map(r => r.rate))} an hour full-time, depending on pay point, and ${range(rows.map(r => casualFor(data, r)))} an hour casual, from ${from}. Home care, crisis accommodation and family day care have their own Level ${n} rates; see <a href="#sacs-level-${n}">the Level ${n} table</a> and the stream tables on this page.` };
+  }).filter(Boolean);
+  faqs.push({ q: `What is the ${c.awardShort} pay guide?`, a: `The Fair Work Ombudsman publishes a pay guide for the ${esc(c.awardFull)} that lists every minimum hourly and weekly rate, penalty and allowance. This page reproduces the 2026&ndash;27 rates from that pay guide by stream, level and pay point, including casual rates.` });
+  return faqs;
 }
 
 // --------------------------------------------------------------------------
@@ -670,7 +756,7 @@ ${SUMMER_HOLIDAYS.map(([n, d]) => `        <li><strong>${n}</strong> &mdash; ${d
     <p>Each state and territory gazettes its own list, including part-day holidays such as Christmas Eve and New Year&rsquo;s Eve in some jurisdictions, so check your state&rsquo;s list before the roster is published. The penalty applies to hours worked on the gazetted day; where a substitute day is declared, the award sets out which day attracts the penalty, and that is a question worth asking Fitz before the pay run rather than after.</p>
 
     <h2>What Changed in 2026, and <em>What Changes Next</em></h2>
-    <p>The rates on this page took effect from the first full pay period on or after 1 July 2026, following the Fair Work Commission&rsquo;s <a href="/blog/minimum-wage-increase-2026">4.75% Annual Wage Review increase</a>, and apply for the 2026&ndash;27 financial year. The next Annual Wage Review decision is expected in June 2027 and takes effect from the first full pay period on or after 1 July 2027. Superannuation guarantee is ${pct(data.superannuation_rate)}. ${c.midYear ? esc(c.midYear.trim()) + ' The rates alert below will tell you when the updated figures are published.' : `Nothing else is scheduled to change the ${esc(c.awardShort)} minimum rates before then; if the Commission varies the award mid-year, the rates alert below will tell you.`}</p>${change}
+    <p>The rates on this page took effect from the first full pay period on or after 1 July 2026, following the Fair Work Commission&rsquo;s <a href="/blog/minimum-wage-increase-2026">4.75% Annual Wage Review increase</a>, and apply for the 2026&ndash;27 financial year. The next Annual Wage Review decision is expected in June 2027 and takes effect from the first full pay period on or after 1 July 2027. Superannuation guarantee is ${pct(data.superannuation_rate)}. ${c.midYear ? esc(c.midYear.trim()).replace(/Full details and the new figures: fitzhr\.com(\/blog\/[\w-]+)\./, 'Full details and the new figures: <a href="$1">the 1 December 2026 changes</a>.') + ' The rates alert below will tell you when the updated figures are published.' : `Nothing else is scheduled to change the ${esc(c.awardShort)} minimum rates before then; if the Commission varies the award mid-year, the rates alert below will tell you.`}</p>${change}
 `;
 }
 function seasonFaqs(c, data) {
@@ -701,9 +787,16 @@ function cheatSheetCallout(v, c) {
 function payRatesPage(v) {
   const c = VERTICALS[v]; const data = load(c.file);
   const url = `${SITE}/${v}-award-pay-rates`;
-  const title = `${c.awardShort} Pay Rates 2026 | Fitz HR`;
-  const description = `${c.awardShort} (${c.code}) pay rates — hourly and weekly rates, weekend and public holiday penalties, casual loading and allowances.`;
+  const pc = c.pay || {};
+  // Award code in the title (people search by MA number); drop the brand suffix
+  // where it would push the title past 60 characters.
+  const defTitle = `${c.awardShort} Pay Rates 2026 (${c.code}) | Fitz HR`;
+  const title = pc.title || (defTitle.length <= 60 ? defTitle : `${c.awardShort} Pay Rates 2026 (${c.code})`);
+  const description = pc.description || `${c.awardShort} (${c.code}) pay rates — hourly and weekly rates, weekend and public holiday penalties, casual loading and allowances.`;
+  const updated = pc.updated || PAGE_UPDATED;
+  const updatedNote = pc.updatedNote || 'added Christmas and New Year public holiday rates and the 2026&ndash;27 change timeline';
   const faqs = [
+    ...(pc.byLevel ? levelFaqs(c, data) : []),
     { q: `What are the ${c.awardShort} pay rates in 2026?`, a: `The ${c.awardFull} minimum rates are current as at ${data.effective_date} (next review ${data.next_review_date}). Full-time classification rates, penalty rates and allowances are listed above; casual employees receive a ${pct(data.casual_loading)} loading.` },
     { q: `What penalty rates apply under ${c.code}?`, a: `Weekend and public holiday penalties are shown in the penalties table above, expressed as a percentage of the ordinary hourly rate. Casual penalty percentages are all-inclusive of the ${pct(data.casual_loading)} casual loading.` },
     ...seasonFaqs(c, data),
@@ -711,7 +804,7 @@ function payRatesPage(v) {
   ];
   const jsonld = [
     breadcrumb([{ name: 'Home', url: `${SITE}/` }, { name: `${c.awardShort} Pay Rates`, url }]),
-    { '@context': 'https://schema.org', '@type': 'WebPage', name: title, description, url, inLanguage: 'en-AU', dateModified: PAGE_UPDATED },
+    { '@context': 'https://schema.org', '@type': 'WebPage', name: title, description, url, inLanguage: 'en-AU', dateModified: updated },
     faqLd(faqs),
     speakableLd(url),
   ];
@@ -719,7 +812,7 @@ function payRatesPage(v) {
 ${nav()}
 <header class="hero">
     <div class="post-tag">${esc(c.code)} &middot; Pay Rates 2026</div>
-    <h1>${esc(c.awardShort)} <em>Pay Rates</em></h1>
+    <h1>${pc.h1 || `${esc(c.awardShort)} <em>Pay Rates</em>`}</h1>
     <p class="intro">Minimum rates under the ${esc(c.awardFull)}, current as at <strong style="color:#fff">${data.effective_date}</strong>. Sourced from the Fair Work Ombudsman Pay Guide ${esc(c.code)}.</p>
     <div class="hero-ctas"><a href="/app" class="btn-primary">Ask Fitz for any rate &rarr;</a><a href="/${v}" class="btn-ghost">${esc(c.awardShort)} overview</a></div>
 </header>
@@ -731,10 +824,10 @@ ${nav()}
 </div>
 <div class="body">
 ${quickAnswer(c, data, 'pay')}
-    <p style="font-size:0.78rem;color:var(--w30);margin:-0.5rem 0 1.5rem;">Page updated ${fmtDate(PAGE_UPDATED)}: added Christmas and New Year public holiday rates and the 2026&ndash;27 change timeline. Rates current as at ${fmtDate(data.effective_date)}.</p>
-    <h2>Classification <em>Hourly Rates</em></h2>
+    <p style="font-size:0.78rem;color:var(--w30);margin:-0.5rem 0 1.5rem;">Page updated ${fmtDate(updated)}: ${updatedNote}. Rates current as at ${fmtDate(data.effective_date)}.</p>
+${pc.byLevel ? levelSections(c, data) : `    <h2>Classification <em>Hourly Rates</em></h2>
     <p>Full-time minimum rates by classification. Casual employees receive these rates plus the ${pct(data.casual_loading)} casual loading (or the all-inclusive casual rate where the award specifies one).</p>
-${payTable(data, c.payTableLimit || 24)}
+${payTable(data, c.payTableLimit || 24)}`}
 
     <p>Not sure which level a role belongs at? See <a href="/${v}-award-classifications">every ${esc(c.awardShort)} classification explained</a> with full-time and casual rates.</p>
 
@@ -773,7 +866,7 @@ function guidePage(v) {
     .map(([k, x]) => `<li><strong>${esc(k.replace(/_/g, ' '))}:</strong> ${x} hours minimum per shift</li>`).join('');
   const faqs = [
     { q: `What is the ${c.awardFull}?`, a: `<strong>It is a modern award under the Fair Work Act 2009 (Cth) that sets minimum pay rates, penalty rates, allowances and conditions.</strong> It covers ${c.coverage}` },
-    { q: `What are the penalty rates under ${c.code} in 2026?`, a: `Saturday ${pct(pen(data).sat_ftpt)} and Sunday ${pct(pen(data).sun_ftpt)} for full-time and part-time employees, with a public holiday rate of ${pct(pen(data).ph_ftpt)}. Casual rates are all-inclusive of the ${pct(data.casual_loading)} loading. See the <a href="/${v}-award-pay-rates">full pay rates page</a>.` },
+    { q: `What are the penalty rates under ${c.code} in 2026?`, a: `Saturday ${pct(pen(data).sat_ftpt)} and Sunday ${pct(pen(data).sun_ftpt)} for full-time and part-time employees, with a public holiday rate of ${pct(pen(data).ph_ftpt)}. Casual rates are all-inclusive of the ${pct(data.casual_loading)} loading. See the <a href="/${v}-award-pay-rates">${c.pay && c.pay.anchor ? esc(c.pay.anchor) : 'full pay rates page'}</a>.` },
     ...c.faqExtra,
     ...seasonFaqs(c, data),
     { q: `How current are these ${c.awardShort} figures?`, a: `They are extracted from the Fair Work Ombudsman Pay Guide ${c.code}, current as at ${data.effective_date}, with the next review due ${data.next_review_date}.` },
@@ -807,7 +900,7 @@ ${penaltyTable(data)}
       : `Casual employees receive a ${pct(data.casual_loading)} loading in addition to the ordinary rate. Ask Fitz for the exact casual and overtime rates under ${esc(c.code)}.`}</p>
 
     <h2>Classification <em>Rates</em></h2>
-    <p>A sample of the full-time minimum rates. See the <a href="/${v}-award-pay-rates">${esc(c.awardShort)} pay rates page</a> for the full table, streams and casual rates.</p>
+    <p>A sample of the full-time minimum rates. See the <a href="/${v}-award-pay-rates">${c.pay && c.pay.anchor ? esc(c.pay.anchor) : `${esc(c.awardShort)} pay rates page`}</a> for the full table, streams and casual rates.</p>
 ${payTable(data, 12)}
 
     <h2>Minimum <em>Engagement</em></h2>
