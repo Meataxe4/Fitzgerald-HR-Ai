@@ -882,12 +882,13 @@
   status = 200
 
 # ============================================
-# SPA fallback - MUST be last
+# Unknown URLs: real 404 (was an SPA fallback serving the homepage with 200).
+# Must stay last. The app only uses /app, /?payment=..., and the /auth/* callbacks above.
 # ============================================
 [[redirects]]
   from = "/*"
-  to = "/index.html"
-  status = 200
+  to = "/404.html"
+  status = 404
 
 # Functions configuration
 [functions]
