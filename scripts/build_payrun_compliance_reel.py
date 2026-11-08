@@ -93,9 +93,9 @@ def stat_card():
     big = (f'<text x="{MX}" y="500" class="ti" font-size="36" font-weight="800" fill="{AMBER}" letter-spacing="6">THE COST</text>'
            f'<text x="{MX-6}" y="780" class="ti" font-size="236" font-weight="800" fill="{AMBER}">$2.5M</text>'
            f'<text x="{MX}" y="900" class="ti" font-size="70" font-weight="800" fill="{W}">in back-pay</text>'
-           f'<text x="{MX}" y="984" class="ti" font-size="70" font-weight="800" fill="{AMBER}">in just 6 days.</text>')
+           f'<text x="{MX}" y="984" class="ti" font-size="70" font-weight="800" fill="{AMBER}">over 6 years.</text>')
     kick = "".join(f'<text x="{MX}" y="{1110+i*56}" class="bd" font-size="44" fill="{W72}">{esc(l)}</text>'
-                   for i, l in enumerate(wrap("Recovered by the Fair Work Ombudsman — from pay runs that looked fine.", 44, 850)))
+                   for i, l in enumerate(wrap("Back-pay owed over six years — from pay runs that looked fine. Fair Work Ombudsman.", 44, 850)))
     return base, [(big, 0.12, 40), (kick, 0.45, 30)]
 
 def fix_card():
