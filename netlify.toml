@@ -18,6 +18,28 @@
   status = 301
   force = true
 
+# Stray URLs Google has stored: send them to the real page.
+# Doubled domain in the path (fitzhr.com/fitzhr.com/...).
+[[redirects]]
+  from = "/fitzhr.com/*"
+  to = "/:splat"
+  status = 301
+  force = true
+
+# Session parameter glued onto the path without a "?".
+[[redirects]]
+  from = "/manufacturing-award-guide&gsessionid=*"
+  to = "/manufacturing-award-guide"
+  status = 301
+  force = true
+
+# Old slug of the 2026 wage increase post.
+[[redirects]]
+  from = "/blog/minimum-wage-increase-2026-4.75-pay-rise"
+  to = "/blog/minimum-wage-increase-2026"
+  status = 301
+  force = true
+
 # Internal files: the site publishes the repo root, so block everything that is
 # not part of the website (docs, marketing drafts, scripts, tests, config).
 [[redirects]]
