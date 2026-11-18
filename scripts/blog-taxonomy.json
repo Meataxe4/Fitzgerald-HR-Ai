@@ -1,0 +1,801 @@
+{
+ "_note": "Blog taxonomy. Every post has exactly one topic, one or more awards (\"all\" = applies to any award) and one type. Titles and blurbs are HTML (entities allowed). After editing run: node scripts/build-blog-hubs.mjs",
+ "topics": {
+  "pay-rates-penalty-rates": {
+   "name": "Pay Rates & Penalty Rates",
+   "short": "Pay & penalty rates",
+   "intro": "Minimum hourly rates by classification, weekend and public holiday penalty rates, overtime and annualised wage arrangements under each modern award. Every figure comes from the current Fair Work Ombudsman pay guide for that award.",
+   "desc": "Minimum hourly rates by classification, weekend and public holiday penalty rates, overtime and annualised wages under each modern award."
+  },
+  "allowances-loadings": {
+   "name": "Allowances & Loadings",
+   "short": "Allowances & loadings",
+   "intro": "The allowances and loadings that sit on top of the ordinary rate: sleepovers, shift and evening loadings, the educational leader allowance, leave loading and the award-specific allowances that are easy to miss in a pay run.",
+   "desc": "Allowances and loadings under each modern award: sleepovers, shift and evening loadings, the educational leader allowance and leave loading."
+  },
+  "rostering-hours-breaks": {
+   "name": "Rostering, Hours & Breaks",
+   "short": "Rostering, hours & breaks",
+   "intro": "How each award regulates the roster: meal and rest breaks by shift length, split and broken shifts, minimum engagement periods, and how much notice a roster change needs.",
+   "desc": "How each award regulates the roster: meal and rest breaks, split and broken shifts, minimum engagement and notice of roster changes."
+  },
+  "hiring-contracts": {
+   "name": "Hiring, Contracts & HR Setup",
+   "short": "Hiring & contracts",
+   "intro": "What to put in place when you employ someone: the employment contract, the probation period, and the HR basics a small team needs from day one."
+  },
+  "casual-employment": {
+   "name": "Casual Employment",
+   "short": "Casual employment",
+   "intro": "Casual conversion under each award, and what the Fair Work Act requires before you stop rostering or end the employment of a casual."
+  },
+  "performance-warnings": {
+   "name": "Performance & Warnings",
+   "short": "Performance & warnings",
+   "intro": "Managing underperformance step by step: verbal and written warnings, how many are needed and how long they last, performance improvement plans, and no-shows."
+  },
+  "ending-employment": {
+   "name": "Ending Employment",
+   "short": "Ending employment",
+   "intro": "Dismissal done properly: summary dismissal, dismissal during probation, procedural fairness, stand-down, and what an unfair dismissal claim costs."
+  },
+  "complaints-conduct": {
+   "name": "Complaints & Conduct",
+   "short": "Complaints & conduct",
+   "intro": "Handling staff complaints, workplace bullying allegations and serious misconduct, and what to do when an employee raises Fair Work."
+  },
+  "fair-work-compliance": {
+   "name": "Fair Work Compliance & Underpayments",
+   "short": "Compliance & underpayments",
+   "intro": "Staying compliant with the Fair Work Act and your award: which award covers you, the compliance checklist, penalties, and how to find and fix an underpayment."
+  },
+  "award-changes-news": {
+   "name": "Award Changes & News",
+   "short": "Award changes",
+   "intro": "What has changed and what is about to: the Annual Wage Review increase for each award and the mid-year award variations, with the dates they take effect."
+  }
+ },
+ "awards": {
+  "hospitality": {
+   "name": "Hospitality Award",
+   "code": "MA000009"
+  },
+  "restaurant": {
+   "name": "Restaurant Award",
+   "code": "MA000119"
+  },
+  "retail": {
+   "name": "Retail Award",
+   "code": "MA000004"
+  },
+  "manufacturing": {
+   "name": "Manufacturing Award",
+   "code": "MA000010"
+  },
+  "schads": {
+   "name": "SCHADS Award",
+   "code": "MA000100"
+  },
+  "health": {
+   "name": "Health Professionals Award",
+   "code": "MA000027"
+  },
+  "childrens": {
+   "name": "Children's Services Award",
+   "code": "MA000120"
+  }
+ },
+ "featured": [
+  "restaurant-award-rates-2026",
+  "hospitality-award-rates-2026",
+  "schads-award-changes-1-december-2026",
+  "how-long-does-a-warning-last-australia",
+  "probation-periods-hospitality-australia",
+  "health-professionals-award-rates-2026"
+ ],
+ "startHere": [
+  [
+   "Firing or terminating a staff member",
+   "can-i-fire-someone-on-the-spot-australia"
+  ],
+  [
+   "A staff complaint has just landed",
+   "how-to-handle-staff-complaint-hospitality"
+  ],
+  [
+   "An employee has mentioned Fair Work",
+   "what-happens-when-employee-threatens-fair-work"
+  ],
+  [
+   "Staff didn’t show up",
+   "what-to-do-when-employee-no-shows-hospitality"
+  ],
+  [
+   "Removing a casual from the roster",
+   "can-i-stop-rostering-casual-employee-australia"
+  ],
+  [
+   "Am I compliant right now?",
+   "fair-work-compliance-checklist-hospitality"
+  ]
+ ],
+ "posts": {
+  "annual-leave-loading-cashing-out-hospitality-restaurant-award": {
+   "topic": "allowances-loadings",
+   "awards": [
+    "hospitality",
+    "restaurant"
+   ],
+   "type": "Guide",
+   "title": "Annual Leave Loading &amp; Cashing Out &mdash; MA000009 vs MA000119",
+   "blurb": "The 17.5% leave loading under both Awards, NES cashing-out rules, the 4-week balance requirement, and termination payment treatment."
+  },
+  "annualised-wage-arrangements-restaurant-award-australia": {
+   "topic": "pay-rates-penalty-rates",
+   "awards": [
+    "restaurant"
+   ],
+   "type": "Guide",
+   "title": "Annualised Wage Arrangements Under MA000119 (Clause 20)",
+   "blurb": "The 25% loading, outer limits of 18 penalty hours and 12 OT hours per week, the 12-month reconciliation, and the signed weekly time-record requirement."
+  },
+  "can-i-change-staff-roster-last-minute-hospitality": {
+   "topic": "rostering-hours-breaks",
+   "awards": [
+    "hospitality"
+   ],
+   "type": "Guide",
+   "title": "Can I Change a Staff Roster at the Last Minute?",
+   "blurb": "What the Award says about roster changes and how much notice you actually need to give in hospitality."
+  },
+  "can-i-change-staff-roster-last-minute-restaurant": {
+   "topic": "rostering-hours-breaks",
+   "awards": [
+    "restaurant"
+   ],
+   "type": "Guide",
+   "title": "Can I Change a Restaurant Roster at the Last Minute?",
+   "blurb": "The 7-day notice rule, 2-week RDO notice, and the consultation obligation under clauses 15 and 33."
+  },
+  "can-i-fire-someone-on-the-spot-australia": {
+   "topic": "ending-employment",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "Can I Fire Someone on the Spot?",
+   "blurb": "Where most employers get it wrong: misapplying serious misconduct rules and triggering unfair dismissal claims even when the conduct was real."
+  },
+  "can-i-stop-rostering-casual-employee-australia": {
+   "topic": "casual-employment",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "Can I Just Stop Rostering a Casual Employee?",
+   "blurb": "If they&rsquo;ve worked regular shifts for 6+ months, you&rsquo;re not &ldquo;just changing the roster&rdquo; &mdash; you&rsquo;re terminating their employment."
+  },
+  "casual-conversion-rules-hospitality-award-australia": {
+   "topic": "casual-employment",
+   "awards": [
+    "hospitality"
+   ],
+   "type": "Guide",
+   "title": "Casual Conversion Rules Under the Hospitality Award",
+   "blurb": "The 12-month threshold, notification requirements, and the specific penalties for getting it wrong."
+  },
+  "casual-conversion-rules-restaurant-award-australia": {
+   "topic": "casual-employment",
+   "awards": [
+    "restaurant"
+   ],
+   "type": "Guide",
+   "title": "Casual Conversion Rules Under the Restaurant Award",
+   "blurb": "The post-Feb 2025 employee-initiated framework, 6-month threshold, 21-day employer response, and CEIS obligations."
+  },
+  "childrens-services-award-broken-shift-allowance": {
+   "topic": "rostering-hours-breaks",
+   "awards": [
+    "childrens"
+   ],
+   "type": "Guide",
+   "title": "Children's Services Broken Shift Allowance",
+   "blurb": "The $21.38 per day broken shift allowance — common in outside-school-hours care — and how the minimum engagement applies to each portion of the day."
+  },
+  "childrens-services-award-casual-conversion-rules-australia": {
+   "topic": "casual-employment",
+   "awards": [
+    "childrens"
+   ],
+   "type": "Guide",
+   "title": "Casual Conversion Under the Children's Services Award",
+   "blurb": "The employee-initiated casual conversion rules under MA000120 — eligibility, the 21-day response and what changes on conversion."
+  },
+  "childrens-services-award-educational-leader-allowance": {
+   "topic": "allowances-loadings",
+   "awards": [
+    "childrens"
+   ],
+   "type": "Guide",
+   "title": "Educational Leader Allowance Explained",
+   "blurb": "The educational leader allowance ($4,784.28/year for 5+ days), how it is pro-rated, and how it fits with the National Quality Framework requirement."
+  },
+  "childrens-services-award-minimum-wage-increase-2026": {
+   "topic": "award-changes-news",
+   "awards": [
+    "childrens"
+   ],
+   "type": "Award change",
+   "title": "Children's Services Award Minimum Wage Increase 2026 — 4.75% Rise",
+   "blurb": "What the Fair Work 4.75% Annual Wage Review increase from 1 July 2026 means for children's services employers — new MA000120 base rates and a pre-1-July checklist."
+  },
+  "childrens-services-award-penalty-rates": {
+   "topic": "pay-rates-penalty-rates",
+   "awards": [
+    "childrens"
+   ],
+   "type": "Guide",
+   "title": "Children's Services Penalty Rates",
+   "blurb": "Saturday, Sunday and public holiday penalties for early childhood and OSHC staff, the early-morning/afternoon/night shift loadings, and worked examples."
+  },
+  "childrens-services-award-rates-2026": {
+   "topic": "pay-rates-penalty-rates",
+   "awards": [
+    "childrens"
+   ],
+   "type": "Rates",
+   "title": "Children's Services Award Rates 2026",
+   "blurb": "Educator and director level rates, weekend penalties, shift loadings, the educational leader allowance and casual loading under MA000120."
+  },
+  "do-i-have-to-give-warning-before-firing-australia": {
+   "topic": "performance-warnings",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "Do I Have to Give a Warning Before Firing Someone?",
+   "blurb": "Usually yes &mdash; here&rsquo;s what the Commission actually looks for and the narrow exceptions that exist."
+  },
+  "employment-contract-restaurant-staff-australia": {
+   "topic": "hiring-contracts",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "How to Write an Employment Contract for Restaurant Staff",
+   "blurb": "Required elements, hospitality-specific clauses, and the common mistakes that make contracts unenforceable."
+  },
+  "fair-work-compliance-checklist-hospitality": {
+   "topic": "fair-work-compliance",
+   "awards": [
+    "all"
+   ],
+   "type": "Checklist",
+   "title": "Fair Work Compliance Checklist for Hospitality",
+   "blurb": "Pay, records, documentation, leave, termination, and safety &mdash; the complete compliance checklist."
+  },
+  "fair-work-fines-hospitality-australia": {
+   "topic": "fair-work-compliance",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "Fair Work Fines for Hospitality &mdash; Real Penalty Figures (2026)",
+   "blurb": "$93,900 per contravention. What the Ombudsman targets, the contravention multiplier, and three real hospitality cases."
+  },
+  "firing-during-probation-australia": {
+   "topic": "ending-employment",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "Can I Fire Someone During Probation?",
+   "blurb": "Unfair dismissal during the probation period, the minimum employment period, notice, and what you can&rsquo;t do even on day one."
+  },
+  "health-professionals-award-allowances-guide": {
+   "topic": "allowances-loadings",
+   "awards": [
+    "health"
+   ],
+   "type": "Guide",
+   "title": "Health Professionals Award Allowances Guide",
+   "blurb": "The uniform allowance, tool allowance and other frequently-applied allowances under MA000027 — what triggers each and the current figures."
+  },
+  "health-professionals-award-annualised-wage-arrangements": {
+   "topic": "pay-rates-penalty-rates",
+   "awards": [
+    "health"
+   ],
+   "type": "Guide",
+   "title": "Health Professionals Award Annualised Wages",
+   "blurb": "How annualised wages work under MA000027 (clause 22) — eligibility, outer-limit hours, and the mandatory annual reconciliation that catches out most salaried arrangements."
+  },
+  "health-professionals-award-casual-conversion-rules-australia": {
+   "topic": "casual-employment",
+   "awards": [
+    "health"
+   ],
+   "type": "Guide",
+   "title": "Casual Conversion Under the Health Professionals Award",
+   "blurb": "The employee-initiated casual conversion rules under MA000027 — eligibility, the 21-day response and what changes on conversion."
+  },
+  "health-professionals-award-changes-1-october-2026": {
+   "topic": "award-changes-news",
+   "awards": [
+    "health"
+   ],
+   "type": "Award change",
+   "title": "Health Professionals Award Changes: 1 October 2026",
+   "blurb": "Pay points are gone for health professionals. How Level 1 now works (AQF level x years of experience), the new Levels 2.1, 2.2, 3 and 4, the rates, and the retained-rate rule for staff employed on 30 September 2026."
+  },
+  "health-professionals-award-minimum-wage-increase-2026": {
+   "topic": "award-changes-news",
+   "awards": [
+    "health"
+   ],
+   "type": "Award change",
+   "title": "Health Professionals Award Minimum Wage Increase 2026 — 4.75% Rise",
+   "blurb": "What the Fair Work 4.75% Annual Wage Review increase from 1 July 2026 means for health practice employers — new MA000027 base rates and a pre-1-July checklist."
+  },
+  "health-professionals-award-rates-2026": {
+   "topic": "pay-rates-penalty-rates",
+   "awards": [
+    "health"
+   ],
+   "type": "Rates",
+   "title": "Health Professionals Award Rates 2026",
+   "blurb": "Stream and level rates for allied health, dental, pathology and support staff, weekend penalties, the Monday–Friday shift loading and casual loading under MA000027."
+  },
+  "health-professionals-award-weekend-penalty-rates": {
+   "topic": "pay-rates-penalty-rates",
+   "awards": [
+    "health"
+   ],
+   "type": "Guide",
+   "title": "Health Professionals Award Weekend Penalty Rates",
+   "blurb": "Saturday, Sunday and public holiday penalties for health professionals and support staff, the 15% Monday–Friday shift loading, and worked examples."
+  },
+  "hospitality-award-break-entitlements-shift-length": {
+   "topic": "rostering-hours-breaks",
+   "awards": [
+    "hospitality"
+   ],
+   "type": "Guide",
+   "title": "Break Entitlements Under the Hospitality Award by Shift Length",
+   "blurb": "Paid vs unpaid breaks, break timing, and the penalties that apply when breaks are missed or delayed."
+  },
+  "hospitality-award-rates-2026": {
+   "topic": "pay-rates-penalty-rates",
+   "awards": [
+    "hospitality"
+   ],
+   "type": "Rates",
+   "title": "Hospitality Award Rates 2026 &mdash; By Classification",
+   "blurb": "Base rates, weekend penalties, evening loadings, overtime, and casual loading under MA000009."
+  },
+  "hospitality-award-vs-restaurant-award-difference": {
+   "topic": "fair-work-compliance",
+   "awards": [
+    "hospitality",
+    "restaurant"
+   ],
+   "type": "Guide",
+   "title": "Hospitality Award vs Restaurant Award &mdash; What&rsquo;s the Difference?",
+   "blurb": "Coverage, penalty rates, minimum engagements, and how to work out which Award applies to your venue."
+  },
+  "how-long-does-a-warning-last-australia": {
+   "topic": "performance-warnings",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "How Long Does a Written Warning Last in Australia?",
+   "blurb": "No fixed expiry &mdash; but relevance degrades. What the Commission actually looks at when assessing old warnings."
+  },
+  "how-many-warnings-before-dismissal-australia": {
+   "topic": "performance-warnings",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "How Many Warnings Before Dismissal in Australia?",
+   "blurb": "There is no fixed number. What the Fair Work Act and the Small Business Fair Dismissal Code actually require, and a sequence that holds up."
+  },
+  "how-to-calculate-back-pay-underpaid-staff-australia": {
+   "topic": "fair-work-compliance",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "How to Calculate Back-Pay for Underpaid Staff",
+   "blurb": "Step-by-step Award gap analysis, the 6-year limitation, interest, super, and Fair Work Ombudsman remediation."
+  },
+  "how-to-handle-staff-complaint-hospitality": {
+   "topic": "complaints-conduct",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "How to Handle a Staff Complaint",
+   "blurb": "The first few hours determine whether a complaint stays manageable or escalates into a Fair Work matter. What to do before anything else."
+  },
+  "how-to-handle-workplace-bullying-complaint-hospitality": {
+   "topic": "complaints-conduct",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "How to Handle a Workplace Bullying Complaint",
+   "blurb": "Legal obligations under the Fair Work Act and WHS laws, investigation steps, and documentation required."
+  },
+  "how-to-terminate-casual-employee-australia": {
+   "topic": "casual-employment",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "How to Terminate a Casual Employee in Australia",
+   "blurb": "Notice requirements, unfair dismissal protections, and the documentation needed to terminate correctly."
+  },
+  "how-to-write-formal-warning-letter-hospitality-australia": {
+   "topic": "performance-warnings",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "How to Write a Formal Warning Letter in Australia",
+   "blurb": "The formal warning process step by step, the 8 required elements, a template, and the mistakes that make a warning useless at the Fair Work Commission."
+  },
+  "hr-software-cost-small-business-australia": {
+   "topic": "hiring-contracts",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "What HR Software Really Costs a 15-Person Team in Australia",
+   "blurb": "Flat fee vs per-employee pricing compared with published 2026 prices — and the casual-headcount trap."
+  },
+  "managing-underperformance-hospitality": {
+   "topic": "performance-warnings",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "How to Handle Underperformance in Hospitality",
+   "blurb": "The 5-step process: informal conversations, formal warnings, PIPs, and termination &mdash; with hospitality examples."
+  },
+  "manufacturing-award-allowances-guide": {
+   "topic": "allowances-loadings",
+   "awards": [
+    "manufacturing"
+   ],
+   "type": "Guide",
+   "title": "Manufacturing Award Allowances Guide",
+   "blurb": "The tool allowance, meal allowance and other frequently-applied allowances under MA000010 — what triggers each and the current figures."
+  },
+  "manufacturing-award-casual-conversion-rules-australia": {
+   "topic": "casual-employment",
+   "awards": [
+    "manufacturing"
+   ],
+   "type": "Guide",
+   "title": "Casual Conversion Under the Manufacturing Award",
+   "blurb": "The employee-initiated casual conversion rules under MA000010 — eligibility, the 21-day response and what changes on conversion."
+  },
+  "manufacturing-award-minimum-wage-increase-2026": {
+   "topic": "award-changes-news",
+   "awards": [
+    "manufacturing"
+   ],
+   "type": "Award change",
+   "title": "Manufacturing Award Minimum Wage Increase 2026 — 4.75% Rise",
+   "blurb": "What the Fair Work 4.75% Annual Wage Review increase from 1 July 2026 means for manufacturing employers — new MA000010 base rates and a pre-1-July checklist."
+  },
+  "manufacturing-award-overtime-rules": {
+   "topic": "pay-rates-penalty-rates",
+   "awards": [
+    "manufacturing"
+   ],
+   "type": "Guide",
+   "title": "Manufacturing Award Overtime Rules",
+   "blurb": "When overtime applies under MA000010, the 150%/200% rates, Sunday overtime and the rest-break-after-overtime rule."
+  },
+  "manufacturing-award-rates-2026": {
+   "topic": "pay-rates-penalty-rates",
+   "awards": [
+    "manufacturing"
+   ],
+   "type": "Rates",
+   "title": "Manufacturing Award Rates 2026 — By C-Level",
+   "blurb": "The C14–C-level classification rates, weekend penalties, afternoon and night shift loadings, overtime and casual loading under MA000010."
+  },
+  "manufacturing-award-shift-loadings-afternoon-night": {
+   "topic": "allowances-loadings",
+   "awards": [
+    "manufacturing"
+   ],
+   "type": "Guide",
+   "title": "Manufacturing Shift Loadings — Afternoon &amp; Night",
+   "blurb": "The 15% afternoon and night shift loading, the 30% permanent night rate, and how shift loadings interact with weekend penalties and overtime."
+  },
+  "minimum-wage-increase-2026": {
+   "topic": "award-changes-news",
+   "awards": [
+    "all"
+   ],
+   "type": "Award change",
+   "title": "Minimum Wage Increase 2026 &mdash; 4.75% Award Rate Rise",
+   "blurb": "What Fair Work&rsquo;s 4.75% increase from 1 July 2026 means for hospitality and restaurant employers &mdash; indicative rates and a pre-1-July checklist."
+  },
+  "performance-improvement-plan-template-australia-hospitality": {
+   "topic": "performance-warnings",
+   "awards": [
+    "all"
+   ],
+   "type": "Template",
+   "title": "Performance Improvement Plan Template for Australian Hospitality",
+   "blurb": "Most PIPs fail at Fair Work &mdash; not because they don&rsquo;t exist, but because they weren&rsquo;t done properly."
+  },
+  "probation-periods-hospitality-australia": {
+   "topic": "hiring-contracts",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "Probation Periods in Australia &mdash; What Employers Can &amp; Can&rsquo;t Do",
+   "blurb": "The 6 and 12 month minimum employment period, what a probation clause must say, what happens at the end of probation, and the protections that apply from day one."
+  },
+  "procedural-fairness-australian-employment-law-hospitality": {
+   "topic": "ending-employment",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "Procedural Fairness in Dismissal: What Employers Must Do",
+   "blurb": "The six steps, the Commission&rsquo;s test, a pre-dismissal checklist and the small business rules &mdash; the standard that decides most unfair dismissal outcomes."
+  },
+  "public-holiday-pay-rules-hospitality-award-australia": {
+   "topic": "pay-rates-penalty-rates",
+   "awards": [
+    "hospitality"
+   ],
+   "type": "Guide",
+   "title": "Public Holiday Penalty Rates &mdash; Hospitality Award",
+   "blurb": "225% and 250% rates, the substitute day option, the right-to-refuse rule, and penalty calculations for pubs and hotels."
+  },
+  "public-holiday-pay-rules-restaurant-award-australia": {
+   "topic": "pay-rates-penalty-rates",
+   "awards": [
+    "restaurant"
+   ],
+   "type": "Guide",
+   "title": "Public Holiday Penalty Rates &mdash; Restaurant Award",
+   "blurb": "225% and 250% rates, the substitute day option, Christmas-on-a-weekend rule, and the 4-hour minimum engagement under MA000119."
+  },
+  "restaurant-award-break-entitlements-shift-length": {
+   "topic": "rostering-hours-breaks",
+   "awards": [
+    "restaurant"
+   ],
+   "type": "Guide",
+   "title": "Restaurant Award Break Entitlements by Shift Length",
+   "blurb": "Meal breaks, rest breaks, and the 50% delayed meal break penalty under MA000119 clause 16."
+  },
+  "restaurant-award-rates-2026": {
+   "topic": "pay-rates-penalty-rates",
+   "awards": [
+    "restaurant"
+   ],
+   "type": "Rates",
+   "title": "Restaurant Award Rates 2026 &mdash; MA000119 by Classification",
+   "blurb": "Adult, casual, junior, and apprentice rates by classification level. Penalty rates, evening loadings, and overtime included."
+  },
+  "retail-award-casual-conversion-rules-australia": {
+   "topic": "casual-employment",
+   "awards": [
+    "retail"
+   ],
+   "type": "Guide",
+   "title": "Casual Conversion Under the Retail Award",
+   "blurb": "The employee-initiated casual conversion rules under MA000004 — eligibility, the 21-day response, and what changes on conversion."
+  },
+  "retail-award-evening-loading-explained": {
+   "topic": "allowances-loadings",
+   "awards": [
+    "retail"
+   ],
+   "type": "Guide",
+   "title": "Retail Award Evening Loading Explained",
+   "blurb": "The 25% loading on ordinary hours worked after 6pm Monday to Friday — when it applies, when it does not, and how it interacts with penalties and overtime."
+  },
+  "retail-award-minimum-engagement-rules": {
+   "topic": "rostering-hours-breaks",
+   "awards": [
+    "retail"
+   ],
+   "type": "Guide",
+   "title": "Retail Award Minimum Engagement &amp; Rostering",
+   "blurb": "Part-time and casual retail employees must be paid for at least 3 hours per shift — how the minimum engagement works and how it interacts with rostering."
+  },
+  "retail-award-minimum-wage-increase-2026": {
+   "topic": "award-changes-news",
+   "awards": [
+    "retail"
+   ],
+   "type": "Award change",
+   "title": "Retail Award Minimum Wage Increase 2026 — 4.75% Rise",
+   "blurb": "What the Fair Work 4.75% Annual Wage Review increase from 1 July 2026 means for retail employers — new MA000004 base rates and a pre-1-July checklist."
+  },
+  "retail-award-penalty-rates-sunday-public-holiday": {
+   "topic": "pay-rates-penalty-rates",
+   "awards": [
+    "retail"
+   ],
+   "type": "Guide",
+   "title": "Retail Award Penalty Rates — Sunday &amp; Public Holidays",
+   "blurb": "Saturday, Sunday and public holiday penalty rates for retail staff — the exact percentages, casual all-inclusive rates and the substitute-day rule."
+  },
+  "retail-award-rates-2026": {
+   "topic": "pay-rates-penalty-rates",
+   "awards": [
+    "retail"
+   ],
+   "type": "Rates",
+   "title": "Retail Award Rates 2026 — By Classification",
+   "blurb": "Retail Employee Level 1–8 base rates, weekend and public holiday penalties, casual loading and the evening loading under MA000004."
+  },
+  "schads-award-broken-shift-rules": {
+   "topic": "rostering-hours-breaks",
+   "awards": [
+    "schads"
+   ],
+   "type": "Guide",
+   "title": "SCHADS Broken Shift Rules",
+   "blurb": "The broken shift allowance ($21.81 / $28.87), the maximum number of unpaid breaks, and how minimum engagement applies to each portion."
+  },
+  "schads-award-casual-conversion-rules-australia": {
+   "topic": "casual-employment",
+   "awards": [
+    "schads"
+   ],
+   "type": "Guide",
+   "title": "Casual Conversion Under the SCHADS Award",
+   "blurb": "The employee-initiated casual conversion rules under MA000100 — eligibility, the 21-day response and what changes on conversion."
+  },
+  "schads-award-changes-1-december-2026": {
+   "topic": "award-changes-news",
+   "awards": [
+    "schads"
+   ],
+   "type": "Award change",
+   "title": "SCHADS Award Changes 1 December 2026: Home Care Rates Rise",
+   "blurb": "Schedule E disability home care rates rise about 15% from the first full pay period on or after 1 December. New figures against current, who is covered, what does not change, and the pre-December checklist."
+  },
+  "schads-award-minimum-wage-increase-2026": {
+   "topic": "award-changes-news",
+   "awards": [
+    "schads"
+   ],
+   "type": "Award change",
+   "title": "SCHADS Award Minimum Wage Increase 2026 — 4.75% Rise",
+   "blurb": "What the Fair Work 4.75% Annual Wage Review increase from 1 July 2026 means for community services employers — new MA000100 base rates and a pre-1-July checklist."
+  },
+  "schads-award-penalty-rates-weekend-public-holiday": {
+   "topic": "pay-rates-penalty-rates",
+   "awards": [
+    "schads"
+   ],
+   "type": "Guide",
+   "title": "SCHADS Penalty Rates — Weekend &amp; Public Holidays",
+   "blurb": "Saturday, Sunday and public holiday penalties for social, community, home care and disability staff — with casual all-inclusive rates and worked examples."
+  },
+  "schads-award-rates-2026": {
+   "topic": "pay-rates-penalty-rates",
+   "awards": [
+    "schads"
+   ],
+   "type": "Rates",
+   "title": "SCHADS Award Rates 2026 — By Level",
+   "blurb": "Social &amp; community services and home care level rates, weekend and public holiday penalties, casual loading and shift loadings under MA000100."
+  },
+  "schads-award-sleepover-allowance-explained": {
+   "topic": "allowances-loadings",
+   "awards": [
+    "schads"
+   ],
+   "type": "Guide",
+   "title": "SCHADS Sleepover Allowance Explained",
+   "blurb": "The $62.87 per night sleepover allowance, what qualifies as a sleepover, and how active duty during the night is paid on top."
+  },
+  "serious-misconduct-hospitality-australia": {
+   "topic": "complaints-conduct",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "What Counts as Serious Misconduct?",
+   "blurb": "Most employers apply this label too broadly. Getting it wrong turns a justified dismissal into an expensive unfair dismissal finding."
+  },
+  "so-youve-hired-someone-now-what": {
+   "topic": "hiring-contracts",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "So, You&rsquo;ve Hired Someone. Now What?",
+   "blurb": "The HR questions that start the day you employ someone, where Fitz HR fits, and where PaySauce takes over at payday."
+  },
+  "split-shift-rules-hospitality-award-australia": {
+   "topic": "rostering-hours-breaks",
+   "awards": [
+    "hospitality"
+   ],
+   "type": "Guide",
+   "title": "Split Shift Rules Under the Hospitality Award",
+   "blurb": "Allowances, maximum spread of hours, minimum engagements, and when split shifts can lawfully be rostered."
+  },
+  "split-shift-rules-restaurant-award-australia": {
+   "topic": "rostering-hours-breaks",
+   "awards": [
+    "restaurant"
+   ],
+   "type": "Guide",
+   "title": "Split Shifts &amp; Minimum Engagement Under MA000119",
+   "blurb": "The $5.60 split shift allowance, 12-hour spread cap, and the 2-hour casual minimum that&rsquo;s often confused with the 3-hour part-time daily minimum."
+  },
+  "stand-down-vs-termination-hospitality-australia": {
+   "topic": "ending-employment",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "Stand-Down vs Termination &mdash; When s524 Applies",
+   "blurb": "The 3 lawful grounds for stand-down under the Fair Work Act, why a downturn isn&rsquo;t enough, and how it differs from suspension and redundancy."
+  },
+  "unfair-dismissal-cost-australia-hospitality": {
+   "topic": "ending-employment",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "How Much Does an Unfair Dismissal Claim Actually Cost?",
+   "blurb": "The 2026 compensation cap ($95,050), how the Commission calculates a figure, conciliation costs, legal fees, and who can actually claim."
+  },
+  "what-happens-if-you-underpay-staff-australia": {
+   "topic": "fair-work-compliance",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "What Happens If You Underpay Staff in Australia?",
+   "blurb": "Back-pay obligations, Fair Work Ombudsman penalties, and how accidental underpayment becomes compounding liability."
+  },
+  "what-happens-if-you-underpay-staff-restaurant-australia": {
+   "topic": "fair-work-compliance",
+   "awards": [
+    "restaurant"
+   ],
+   "type": "Guide",
+   "title": "What Happens If You Underpay Restaurant Staff?",
+   "blurb": "Civil penalties up to $4.95M, criminal wage theft up to 10 years prison, and the small business safe harbour under the Voluntary Code."
+  },
+  "what-happens-when-employee-threatens-fair-work": {
+   "topic": "complaints-conduct",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "An Employee Has Mentioned Fair Work: What Now?",
+   "blurb": "What they can actually claim, what to say next, and how procedural fairness affects every decision from this point forward."
+  },
+  "what-to-do-when-employee-no-shows-hospitality": {
+   "topic": "performance-warnings",
+   "awards": [
+    "all"
+   ],
+   "type": "Guide",
+   "title": "What to Do When an Employee No-Shows",
+   "blurb": "The 5-step process, abandonment of employment rules, and when you can legally stop rostering them."
+  }
+ }
+}
