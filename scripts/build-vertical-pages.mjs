@@ -16,6 +16,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { awardArticlesBlock } from './blog-taxonomy-lib.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '..');
@@ -927,6 +928,8 @@ ${allowanceTable(data, 8)}
 
 ${seasonBlock(c, data)}
 ${cheatSheetCallout(v, c)}
+
+    ${awardArticlesBlock(v)}
 
     ${ratesAlertBlock(c)}${faqBlock(faqs)}
 
