@@ -12,9 +12,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const SITE = 'https://fitzhr.com';
 
 const AWARDS = {
-  hospitality: { file: 'hospitality-award-rates.json', short: 'Hospitality Award', industry: 'pubs, hotels, bars & venues' },
-  restaurant: { file: 'restaurant-award-rates.json', short: 'Restaurant Award', industry: 'restaurants, cafes & bistros' },
-  retail: { file: 'retail-award-rates.json', short: 'Retail Award', industry: 'shops & retail chains' },
+  hospitality: { file: 'hospitality-award-rates.json', short: 'Hospitality Award', industry: 'pubs, hotels, bars & venues', target: ['/hospitality-award-guide', 'Hospitality Award 2026 rates and guide'] },
+  restaurant: { file: 'restaurant-award-rates.json', short: 'Restaurant Award', industry: 'restaurants, cafes & bistros', target: ['/blog/restaurant-award-rates-2026', 'Restaurant Award pay guide 2026'] },
+  retail: { file: 'retail-award-rates.json', short: 'Retail Award', industry: 'shops & retail chains', payAnchor: 'Retail Award 2026 pay rates by level' },
   manufacturing: { file: 'manufacturing-award-rates.json', short: 'Manufacturing Award', industry: 'manufacturers & workshops' },
   schads: { file: 'schads-award-rates.json', short: 'SCHADS Award', industry: 'community services & NDIS', payAnchor: 'SCHADS Award 2026 pay rates by level' },
   health: { file: 'health-award-rates.json', short: 'Health Professionals Award', industry: 'practices, clinics & allied health' },
@@ -64,9 +64,11 @@ function page(v) {
   const data = JSON.parse(readFileSync(join(root, c.file), 'utf8'));
   const code = data.ma_number;
   const url = `${SITE}/${v}-award-cheat-sheet`;
-  let title = `${c.short} Cheat Sheet 2026 (${code}) | Fitz HR`;
-  if (title.length > 60) title = `${c.short} Cheat Sheet 2026 | Fitz HR`;
-  const description = `${c.short} cheat sheet: 2026 pay rates, penalties, loadings & allowances on one printable page. Sourced from FWO Pay Guide ${code}.`;
+  let title = `${c.short} Cheat Sheet: Printable One-Pager (${code})`;
+  if (title.length > 60) title = `${c.short} Cheat Sheet: Printable One-Pager`;
+  const [targetHref, targetAnchor] = c.target || [`/${v}-award-pay-rates`, c.payAnchor || `${c.short} pay rates 2026`];
+  let description = `Printable one-page ${c.short} summary (${code}): base rates, penalties, loadings and allowances to pin up or save as PDF. From the FWO pay guide.`;
+  if (description.length > 160) description = `Printable one-page ${c.short} summary: base rates, penalties, loadings and allowances to pin up or save as PDF.`;
   const { rows, shown, total } = condenseRates(data);
   const pens = Object.entries(data.penalty_rates);
   const allow = (data.allowances || []).filter((a) => typeof a.amount === 'number').slice(0, 6);
@@ -147,6 +149,9 @@ ${jsonld.map((j) => `    <script type="application/ld+json">\n    ${JSON.stringi
     .below{max-width:860px;margin:0 auto 3rem;padding:0 0.5rem;}
     .below a{color:var(--amber);text-decoration:none;}
     .below p{color:var(--w60);font-size:0.9rem;}
+    .above{max-width:860px;margin:1.25rem auto 0;padding:0.85rem 1.1rem;border:1px solid rgba(245,158,11,0.35);border-radius:10px;background:rgba(245,158,11,0.06);}
+    .above a{color:var(--amber);font-weight:700;text-decoration:none;}
+    .above p{color:var(--w60);font-size:0.9rem;margin:0;}
     @media print{
         body{background:#fff;color:#111;}
         .nav,.no-print{display:none !important;}
@@ -169,6 +174,10 @@ ${jsonld.map((j) => `    <script type="application/ld+json">\n    ${JSON.stringi
         <a class="btn-app" href="/app">Ask Fitz Free</a>
     </div>
 </nav>
+
+<div class="above no-print">
+    <p>This is the printable one-page summary. For every classification rate, casual rate and the full rules, see <a href="${targetHref}">${esc(targetAnchor)}</a>.</p>
+</div>
 
 <div class="sheet">
     <div class="sheet-head">

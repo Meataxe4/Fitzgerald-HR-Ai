@@ -107,7 +107,22 @@ const VERTICALS = {
     titleIndustry: 'Retailers',
     aiIndustry: 'Australian Retailers',
     complianceIndustry: 'retail',
-    qa: { name: 'General Retail Industry Award' },
+    qa: {
+      name: 'General Retail Industry Award',
+      level: 'Retail Employee Level 1',
+      also: [2, 3, 4, 5, 6, 7, 8].map((n) => ({ match: new RegExp(`^Retail Employee Level ${n}$`), label: `Level ${n}` })),
+    },
+    // Pay-rates page is the single target for "retail award pay rates", "retail
+    // award pay rates 2026" and "retail award level N" (Nov 2026 refresh).
+    pay: {
+      title: 'Retail Award 2026 Pay Rates by Level (MA000004)',
+      h1: 'Retail Award 2026 <em>Pay Rates</em>',
+      description: 'Retail Award 2026 pay rates (MA000004) for every level, Level 1 to Level 8: full-time hourly and weekly rates, casual rates and penalty rates.',
+      anchor: 'Retail Award 2026 pay rates by level',
+      byLevel: 'simple',
+      updated: '2026-11-23',
+      updatedNote: 'pay rates for every Retail Award level, with weekly and casual rates',
+    },
     shortIndustry: 'Retailers', descWho: 'retailers',
     heroWord: 'sales assistant',
     heroHook: 'A {word} no-shows on a Sunday trade day. Fitz tells you exactly what the Retail Award requires.',
@@ -549,6 +564,42 @@ ${levelTableHtml(data, rows)}`);
   }
   return out.join('\n\n');
 }
+// Single-stream awards with one rate per level (e.g. Retail Levels 1-8): one
+// summary table, then a short quotable section per level. Figures straight
+// from the rates JSON (full-time and casual rows).
+function simpleLevelRows(data) {
+  return (data.rates || []).filter(r => r.employment_type === 'full_time' && typeof r.rate === 'number' && levelNum(r.classification));
+}
+const weeklyMoney = (r) => r.weekly_rate ? '$' + Number(r.weekly_rate).toLocaleString('en-AU', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : null;
+function simpleLevelSections(v, c, data) {
+  const rows = simpleLevelRows(data);
+  const from = `the first full pay period on or after ${fmtDate(data.effective_date)}`;
+  const out = [`    <h2>${esc(c.awardShort)} 2026 Pay Rates <em>by Level</em></h2>
+    <p>Every adult minimum rate in the ${esc(c.awardShort)} (${esc(c.code)}) from ${from}, taken from the Fair Work Ombudsman pay guide. Casual rates already include the ${pct(data.casual_loading)} casual loading.</p>
+    <p style="line-height:2;"><strong>Jump to:</strong> ${rows.map(r => `<a href="#level-${levelNum(r.classification)}">Level ${levelNum(r.classification)}</a>`).join(' &middot; ')}</p>
+    <table class="rate-table">
+        <thead><tr><th>Level</th><th>Full-time hourly</th><th>Full-time weekly</th><th>Casual hourly</th></tr></thead>
+        <tbody>
+${rows.map(r => `            <tr><td>Level ${levelNum(r.classification)}</td><td class="highlight">${money(r.rate)}</td><td>${weeklyMoney(r) || '&mdash;'}</td><td>${casualFor(data, r) != null ? money(casualFor(data, r)) : '&mdash;'}</td></tr>`).join('\n')}
+        </tbody>
+    </table>`];
+  for (const r of rows) {
+    const n = levelNum(r.classification), cas = casualFor(data, r), w = weeklyMoney(r);
+    out.push(`    <h3 id="level-${n}">${esc(c.awardShort)} Level ${n} pay rate</h3>
+    <p>From ${from}, a ${esc(r.classification)} under the ${esc(c.awardShort)} is paid <strong>${money(r.rate)} an hour</strong> full-time or part-time${w ? ` (${w} for a full-time week)` : ''}${cas != null ? `, or ${money(cas)} an hour as a casual` : ''}.</p>`);
+  }
+  return out.join('\n\n');
+}
+function simpleLevelFaqs(c, data) {
+  const rows = simpleLevelRows(data);
+  const from = `the first full pay period on or after ${fmtDate(data.effective_date)}`;
+  const faqs = rows.filter(r => [1, 2, 3].includes(levelNum(r.classification))).map(r => {
+    const n = levelNum(r.classification), cas = casualFor(data, r);
+    return { q: `What is the ${c.awardShort} Level ${n} pay rate in 2026?`, a: `${money(r.rate)} an hour for full-time and part-time employees${cas != null ? ` and ${money(cas)} an hour for casuals` : ''}, from ${from}. See <a href="#level-${n}">the Level ${n} rate</a> and the full table on this page.` };
+  });
+  faqs.push({ q: `What is the ${c.awardShort} pay guide?`, a: `The Fair Work Ombudsman publishes a pay guide for the ${esc(c.awardFull)} that lists every minimum hourly and weekly rate, penalty and allowance. This page reproduces the 2026&ndash;27 adult rates from that pay guide for every level, including casual rates.` });
+  return faqs;
+}
 function levelFaqs(c, data) {
   const ft = (data.rates || []).filter(r => r.employment_type === 'full_time' && typeof r.rate === 'number' && r.stream === 'social_community_services');
   const from = `the first full pay period on or after ${fmtDate(data.effective_date)}`;
@@ -697,7 +748,7 @@ function quickAnswer(c, data, mode) {
   const also = (qa.also || [])
     .map(({ match, label }) => { const r = ft.find(x => match.test(x.classification)); return r ? `${label} at ${money(r.rate)}/hour` : null; })
     .filter(Boolean);
-  const alsoText = also.length ? `, with ${also.join(' and ')}` : '';
+  const alsoText = also.length ? `, with ${also.length > 2 ? `${also.slice(0, -1).join(', ')} and ${also[also.length - 1]}` : also.join(' and ')}` : '';
   const p = pen(data);
   const hasCasual = typeof p.sat_cas === 'number';
   const day = (name, ftpt, cas) => typeof ftpt === 'number'
@@ -802,7 +853,7 @@ function payRatesPage(v) {
   const updated = pc.updated || PAGE_UPDATED;
   const updatedNote = pc.updatedNote || 'added Christmas and New Year public holiday rates and the 2026&ndash;27 change timeline';
   const faqs = [
-    ...(pc.byLevel ? levelFaqs(c, data) : []),
+    ...(pc.byLevel === 'simple' ? simpleLevelFaqs(c, data) : pc.byLevel ? levelFaqs(c, data) : []),
     { q: `What are the ${c.awardShort} pay rates in 2026?`, a: `The ${c.awardFull} minimum rates are current as at ${data.effective_date} (next review ${data.next_review_date}). Full-time classification rates, penalty rates and allowances are listed above; casual employees receive a ${pct(data.casual_loading)} loading.` },
     { q: `What penalty rates apply under ${c.code}?`, a: `Weekend and public holiday penalties are shown in the penalties table above, expressed as a percentage of the ordinary hourly rate. Casual penalty percentages are all-inclusive of the ${pct(data.casual_loading)} casual loading.` },
     ...seasonFaqs(c, data),
@@ -831,7 +882,7 @@ ${nav()}
 <div class="body">
 ${quickAnswer(c, data, 'pay')}
     <p style="font-size:0.78rem;color:var(--w30);margin:-0.5rem 0 1.5rem;">Page updated ${fmtDate(updated)}: ${updatedNote}. Rates current as at ${fmtDate(data.effective_date)}.</p>
-${pc.byLevel ? levelSections(c, data) : `    <h2>Classification <em>Hourly Rates</em></h2>
+${pc.byLevel === 'simple' ? simpleLevelSections(v, c, data) : pc.byLevel ? levelSections(c, data) : `    <h2>Classification <em>Hourly Rates</em></h2>
     <p>Full-time minimum rates by classification. Casual employees receive these rates plus the ${pct(data.casual_loading)} casual loading (or the all-inclusive casual rate where the award specifies one).</p>
 ${payTable(data, c.payTableLimit || 24)}`}
 

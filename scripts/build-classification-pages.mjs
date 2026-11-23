@@ -14,7 +14,7 @@ const SITE = 'https://fitzhr.com';
 const AWARDS = {
   hospitality: { file: 'hospitality-award-rates.json', short: 'Hospitality Award', levelWord: 'Levels', example: 'a food & beverage attendant, cook or kitchen hand' },
   restaurant: { file: 'restaurant-award-rates.json', short: 'Restaurant Award', levelWord: 'Levels', example: 'a waiter, cook or barista' },
-  retail: { file: 'retail-award-rates.json', short: 'Retail Award', levelWord: 'Levels', example: 'a shop assistant, keyholder or department manager' },
+  retail: { file: 'retail-award-rates.json', short: 'Retail Award', levelWord: 'Levels', example: 'a shop assistant, keyholder or department manager', payAnchor: 'Retail Award 2026 pay rates by level' },
   manufacturing: { file: 'manufacturing-award-rates.json', short: 'Manufacturing Award', levelWord: 'C Levels', example: 'a process worker, tradesperson or leading hand' },
   schads: { file: 'schads-award-rates.json', short: 'SCHADS Award', levelWord: 'Levels & Pay Points', example: 'a support worker or coordinator', payAnchor: 'SCHADS Award 2026 pay rates by level' },
   health: { file: 'health-award-rates.json', short: 'Health Professionals Award', levelWord: 'Levels', example: 'a receptionist, dental assistant or allied health professional' },
