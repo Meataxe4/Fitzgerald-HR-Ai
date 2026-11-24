@@ -101,7 +101,7 @@ function head({ title, description, canonical, jsonld }) {
     <meta name="theme-color" content="#f59e0b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
 ${jsonld.map(ld).join('\n')}
     <style>
 ${CSS}
@@ -124,33 +124,43 @@ ${CSS}
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+</svg>
 <nav class="nav">
-    <a href="/" class="nav-logo"><span style="display:inline-flex;gap:0;letter-spacing:-1px;"><span class="wm-f">F</span><span class="wm-itz">ITZ</span></span><span class="wm-hr" style="margin-left:0.18em;">HR</span></a>
-    <div style="display:flex;align-items:center;gap:1.25rem;">
+  <div class="nav-in">
+    <a href="/" class="logo"><em>F</em>ITZ<em>HR</em></a>
+    <div class="nav-right">
         <a href="/" class="nav-home">Home</a>
         <a href="/blog/" class="nav-home">Blog</a>
         <a href="/pricing" class="nav-home">Pricing</a>
-        <a href="/app" class="nav-cta">Start Free</a>
+        <a href="/app" class="btn small">Start Free</a>
     </div>
+  </div>
 </nav>
 `;
 }
 const footer = () => `
-<a href="/app" class="sticky-pill">Start Free &mdash; No Card Required &rarr;</a>
 <footer>
     <p>&copy; Fitzgerald HR Pty Ltd (ABN 87 693 882 709), trading as Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog/">Blog</a> &middot; <a href="/pricing">Pricing</a> &middot; <a href="/app">Start Free</a></p>
 </footer>`;
 const cta = () => `    <div class="inline-cta">
-        <h2>Need the answer for your award, right now?</h2>
-        <p>Ask Fitz any pay, roster or Fair Work question and get an answer grounded in your award.</p>
-        <a href="/app">Start Free &mdash; No Card Required</a>
+        <div>
+            <h2>Need the answer for your award?</h2>
+            <p>Ask Fitz any pay, roster or Fair Work question and get an answer grounded in your award.</p>
+        </div>
+        <a href="/app" class="btn">Start Free &mdash; No Card Required</a>
     </div>`;
 
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const card = (p, { tag } = {}) => `        <a href="/blog/${p.slug}" class="post-card">
             <div class="post-card-tag">${esc(tag || `${TAX.topics[p.topic].short} · ${awardText(p)}`)}</div>
             <h3>${p.title}</h3>
             <p>${p.blurb}</p>
-            <div class="post-card-meta">${esc(p.type)}${p.date ? ` &middot; Updated ${fmtDate(p.date)}` : ''}</div>
+            <div class="post-card-meta">${esc(cap(p.type))}${p.date ? ` &middot; Updated ${fmtDate(p.date)}` : ''}</div>
         </a>`;
 
 // ---------------------------------------------------------------------------
@@ -160,7 +170,7 @@ function indexPage() {
   const url = `${SITE}/blog/`;
   const title = 'HR & Award Compliance Blog | Fitz HR';
   const description = 'Award-aware HR guides for Australian employers, organised by topic and by award: pay rates, rostering, warnings, dismissal and Fair Work compliance.';
-  const latest = [...POSTS].filter((p) => p.date).sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug)).slice(0, 6);
+  const latest = [...POSTS].filter((p) => p.date && !TAX.featured.includes(p.slug)).sort((a, b) => b.date.localeCompare(a.date) || a.slug.localeCompare(b.slug)).slice(0, 6);
   const jsonld = [
     crumbLd([['Home', `${SITE}/`], ['Blog', url]]),
     { '@context': 'https://schema.org', '@type': 'Blog', name: 'Fitz HR — HR & Award Compliance Blog', description, url, inLanguage: 'en-AU',
@@ -173,33 +183,30 @@ function indexPage() {
             <p>${esc(TAX.topics[t].intro.split('. ')[0].replace(/\.$/, ''))}.</p>
             <div class="post-card-meta">${inTopic(t).length} articles</div>
         </a>`).join('\n');
-  const awardCards = AWARD_ORDER.map((a) => `        <div class="post-card award-card">
-            <h3><a href="${guideUrl(a)}#articles">${esc(TAX.awards[a].name)}</a></h3>
-            <div class="post-card-tag">${TAX.awards[a].code} &middot; ${inAward(a).length} articles</div>
+  const awardCards = AWARD_ORDER.map((a) => `        <div class="award-row">
+            <span class="code">${TAX.awards[a].code}</span>
+            <h3><a href="${guideUrl(a)}#articles">${esc(TAX.awards[a].name)}</a><span>${inAward(a).length} articles</span></h3>
             <p class="award-links"><a href="${guideUrl(a)}">Guide</a> &middot; <a href="/${a}-award-pay-rates">Pay rates</a> &middot; <a href="/${a}-award-classifications">Classifications</a> &middot; <a href="/${a}-award-cheat-sheet">Cheat sheet</a> &middot; <a href="${guideUrl(a)}#articles">All articles</a></p>
         </div>`).join('\n');
   const allList = TOPIC_ORDER.map((t) => `    <details class="all-group">
-        <summary><h3>${esc(TAX.topics[t].name)}</h3><span>${inTopic(t).length} articles</span></summary>
+        <summary><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><h3>${esc(TAX.topics[t].name)}</h3><span>${inTopic(t).length} articles</span></summary>
         <ul>
 ${inTopic(t).map((p) => `            <li><a href="/blog/${p.slug}">${p.title}</a> <span>${esc(awardText(p))}</span></li>`).join('\n')}
-            <li class="hub-link"><a href="${topicUrl(t)}">Open the ${esc(TAX.topics[t].name)} hub &rarr;</a></li>
+            <li class="hub-link"><a href="${topicUrl(t)}">Open the ${esc(TAX.topics[t].name)} hub</a></li>
         </ul>
     </details>`).join('\n');
   return `${head({ title, description, canonical: url, jsonld })}
 <div class="hero">
-    <div class="hero-tag">Australian HR &amp; Award Compliance</div>
-    <h1>Real HR Answers, <em>Grounded in Your Award</em></h1>
-    <p>Practical guides for Australian employers, organised two ways: by <a href="#topics">topic</a> and by <a href="#awards">award</a>. ${POSTS.length} articles across the Hospitality, Restaurant, Retail, Manufacturing, SCHADS, Health Professionals and Children&rsquo;s Services Awards.</p>
-    <div style="margin-top:1.5rem;margin-bottom:1.25rem;">
-        <a href="/app" class="hero-cta">Start Free &mdash; No Card Required</a>
-    </div>
+    <div class="hero-tag">HR &amp; award compliance blog</div>
+    <h1>HR guides for Australian employers, by topic and by award</h1>
+    <p>${POSTS.length} practical articles across the Hospitality, Restaurant, Retail, Manufacturing, SCHADS, Health Professionals and Children&rsquo;s Services Awards. Browse by <a href="#topics">topic</a> or by <a href="#awards">award</a>, or search.</p>
     <div class="blog-search" id="blog-search">
         <div class="blog-search-inner">
-            <span class="blog-search-icon" aria-hidden="true">&#9906;</span>
+            <span class="blog-search-icon" aria-hidden="true"><svg class="icon"><use href="#i-search"/></svg></span>
             <label for="blog-search-input" class="sr-only">Search the blog</label>
-            <input id="blog-search-input" type="search" autocomplete="off" placeholder="Search ${POSTS.length} articles: public holiday rates, casual conversion, warnings">
-            <span class="blog-search-kbd" aria-hidden="true">/ to focus</span>
-            <button type="button" class="blog-search-clear" id="blog-search-clear" aria-label="Clear search">&times;</button>
+            <input id="blog-search-input" type="search" autocomplete="off" placeholder="Search ${POSTS.length} articles">
+            <span class="blog-search-kbd" aria-hidden="true">/</span>
+            <button type="button" class="blog-search-clear" id="blog-search-clear" aria-label="Clear search"><svg class="icon"><use href="#i-x"/></svg></button>
         </div>
         <div class="blog-search-status" id="blog-search-status" aria-live="polite"></div>
     </div>
@@ -210,7 +217,7 @@ ${inTopic(t).map((p) => `            <li><a href="/blog/${p.slug}">${p.title}</a
     <div class="decision-block">
         <h2>Something happening right now?</h2>
         <div class="decision-links">
-${TAX.startHere.map(([label, slug]) => { if (!bySlug[slug]) throw new Error(`startHere: ${slug}`); return `            <a href="/blog/${slug}">${esc(label)}</a>`; }).join('\n')}
+${TAX.startHere.map(([label, slug]) => { if (!bySlug[slug]) throw new Error(`startHere: ${slug}`); return `            <a href="/blog/${slug}">${esc(label)}<svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></a>`; }).join('\n')}
         </div>
     </div>
 
@@ -220,7 +227,7 @@ ${topicCards}
     </div>
 
     <h2 class="section-label" id="awards">Browse by award</h2>
-    <div class="post-grid">
+    <div class="award-index">
 ${awardCards}
     </div>
 
@@ -307,9 +314,6 @@ function topicPage(t) {
     <div class="hero-tag">Topic &middot; ${list.length} articles</div>
     <h1>${esc(T.name)}</h1>
     <p>${esc(T.intro)}</p>
-    <div style="margin-top:1.5rem;">
-        <a href="/app" class="hero-cta">Start Free &mdash; No Card Required</a>
-    </div>
 </div>
 
 <main class="posts">
@@ -358,8 +362,9 @@ function updatePost(p) {
   if (!sawArticle) warnings.push(`${p.slug}: no Article schema found`);
   if (!sawCrumb) html = html.replace('</head>', `${ld(crumbLd([['Home', `${SITE}/`], ['Blog', `${SITE}/blog/`], [T.name, `${SITE}${topicUrl(p.topic)}`], [plain(p.title), url]]))}\n</head>`);
   // Visible trail under the top nav
-  const awardLinks = p.awards[0] === 'all' ? '' : ` <span style="opacity:0.5;">&middot;</span> ${p.awards.map((a) => `<a href="${guideUrl(a)}#articles" style="color:#f59e0b;text-decoration:none;">${esc(TAX.awards[a].name)}</a>`).join(' &amp; ')}`;
-  const crumb = `\n<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:900px;margin:0 auto;padding:1.1rem 1.5rem 0;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.45);line-height:1.8;"><a href="/blog/" style="color:rgba(255,255,255,0.6);text-decoration:none;">Blog</a> <span style="opacity:0.5;">&rsaquo;</span> <a href="${topicUrl(p.topic)}" style="color:#f59e0b;text-decoration:none;">${esc(T.name)}</a>${awardLinks}</nav><!-- blog-crumb:end -->`;
+  const cl = 'color:rgba(232,237,245,0.72);text-decoration:none;';
+  const awardLinks = p.awards[0] === 'all' ? '' : ` <span style="margin:0 4px;">&middot;</span> ${p.awards.map((a) => `<a href="${guideUrl(a)}#articles" style="${cl}">${esc(TAX.awards[a].name)}</a>`).join(' &amp; ')}`;
+  const crumb = `\n<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:900px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="${cl}">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="${topicUrl(p.topic)}" style="${cl}">${esc(T.name)}</a>${awardLinks}</nav><!-- blog-crumb:end -->`;
   html = html.replace(CRUMB_RE, '');
   const navEnd = html.indexOf('</nav>');
   if (navEnd === -1) { warnings.push(`${p.slug}: no top nav, visible breadcrumb not added`); }
