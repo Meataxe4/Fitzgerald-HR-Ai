@@ -107,7 +107,7 @@ not product launches.
 
 Hi [NAME],
 
-One for your compliance coverage. Fair Work penalties for award breaches run to $93,900
+One for your compliance coverage. Fair Work penalties for award breaches run to $109,200
 per contravention for companies — yet the thing that actually decides most disputes isn't
 the breach, it's whether anything was documented. Warning letters, incident notes,
 employee records. Most venues have none of it, because the decisions get made mid-service

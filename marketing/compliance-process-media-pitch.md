@@ -13,7 +13,7 @@ editors — stagger sends a week apart, vary the angle per masthead, never send 
 copy to two titles.
 
 **Figures policy:** every number below is already published on fitzhr.com (unfair
-dismissal $10,000–$50,000+; Fair Work penalties up to $93,900 per contravention for
+dismissal $10,000–$50,000+; Fair Work penalties up to $109,200 per contravention for
 companies). The record-keeping obligations (employee records kept for 7 years; pay slips
 within one working day of payment) are Fair Work Ombudsman requirements — **Blake to
 verify current FWO wording before send.** No other statistics may be added.
@@ -41,7 +41,7 @@ good reason — repeated no-shows, misconduct on the floor — and still loses t
 dismissal claim. Not because the decision was wrong, but because there was no written
 warning, no documented process, no evidence of procedural fairness. A typical claim runs
 $10,000–$50,000+ once legal fees land, and Fair Work penalties for non-compliance reach
-$93,900 per contravention for companies.
+$109,200 per contravention for companies.
 
 The uncomfortable truth for hospitality: these decisions don't happen at 10am with HR in
 the room. They happen mid-service, late at night, five minutes before open — made by an
@@ -104,7 +104,7 @@ editor per title; never the generic inbox.
 
 ### The Shout (industry news)
 - Subject: "Fair Work exposure in venues: the risk isn't the decision, it's the paperwork"
-- Skew: news angle — with penalties at up to $93,900 per contravention and claims at
+- Skew: news angle — with penalties at up to $109,200 per contravention and claims at
   $10k–$50k+, the cheapest risk control in the industry is documentation and process,
   and most venues still run on none
 - Offer: short expert comment, fast turnaround
@@ -133,7 +133,7 @@ editor per title; never the generic inbox.
 ## Data / assets to offer on reply (all already published on fitzhr.com)
 
 - Cost exposure: unfair dismissal claims typically $10,000–$50,000+; Fair Work penalties
-  up to $93,900 per contravention for companies
+  up to $109,200 per contravention for companies
 - The venue-owner reality: one published customer account of a kitchen-hand walkout
   handled with Fitz support (Business Owner · Inner West Sydney) — quote only with the
   published wording
