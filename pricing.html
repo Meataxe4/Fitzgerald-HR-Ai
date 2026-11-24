@@ -45,10 +45,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <!-- Tailwind CSS (compiled, see tailwind.config.js) -->
-    <link rel="stylesheet" href="/tailwind.css?v=179006516670">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
 
     <!-- Structured Data for Pricing -->
     <script type="application/ld+json">
@@ -98,36 +95,155 @@
     </script>
 
     <style>
-        * {
-            font-family: 'Outfit', sans-serif;
-        }
-        .gradient-text {
-            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3);
-        }
-        .card-hover {
-            transition: all 0.3s ease;
-        }
-        .card-hover:hover {
-            transform: translateY(-4px);
-        }
-        .toggle-btn {
-            transition: all 0.3s ease;
-        }
-        .toggle-btn.active {
-            background: #f59e0b;
-            color: #0f172a;
-        }
+      /* Pricing design pass (Nov 2026), following unslop by Damir Sokolovsky (@heydamir), CC BY 4.0. Same tokens as the homepage. */
+      :root{
+        --bg:#0b1220; --bg2:#0e1626; --surface:#121a2b; --raised:#18223a;
+        --line:rgba(232,237,245,.08); --line2:rgba(232,237,245,.12);
+        --text:#e8edf5; --text2:#a7b1c2; --muted:#7f8aa0;
+        --amber:#f59e0b; --amber-hover:#fbb024; --amber-ink:#1a1204; --amber-line:rgba(245,158,11,.32);
+        --sans:'Outfit',"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+        --ease:cubic-bezier(.22,1,.36,1);
+        --fitz:url("/assets/fitz-bot.webp");
+      }
+      *,*::before,*::after{box-sizing:border-box}
+      html{scroll-behavior:smooth}
+      body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.6;margin:0;-webkit-font-smoothing:antialiased;overflow-x:hidden;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+      h1,h2,h3,h4{margin:0;font-weight:500;text-wrap:balance}
+      p{margin:0}
+      a{color:inherit}
+      a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:2px;border-radius:4px}
+      .icon{width:16px;height:16px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+      .wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+      section{padding:96px 0}
+      .alt{background:var(--bg2);border-block:1px solid var(--line)}
+
+      /* nav (same as homepage) */
+      nav{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:1px solid transparent;transition:border-color 160ms var(--ease)}
+      nav.scrolled{border-bottom-color:var(--line)}
+      .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
+      .logo{font-weight:600;font-size:18px;letter-spacing:.02em;color:var(--text);text-decoration:none;line-height:1}
+      .logo em{font-style:normal;color:var(--amber)}
+      .nav-right{display:flex;align-items:center;gap:24px}
+      .nav-links{display:flex;gap:24px;align-items:center;font-size:15px}
+      .nav-links a{color:var(--text2);text-decoration:none;transition:color 150ms var(--ease)}
+      .nav-links a:hover,.nav-links a[aria-current]{color:var(--text)}
+      .menu-btn{display:none;width:36px;height:36px;align-items:center;justify-content:center;background:transparent;border:1px solid var(--line2);border-radius:8px;color:var(--text2);cursor:pointer}
+      .menu-btn .icon{width:18px;height:18px}
+      .menu-panel{position:absolute;top:64px;left:16px;right:16px;background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:8px;display:flex;flex-direction:column}
+      .menu-panel[hidden]{display:none}
+      .menu-panel a{display:flex;align-items:center;height:40px;padding:0 12px;border-radius:4px;color:var(--text);text-decoration:none;font-size:15px}
+      .menu-panel a:hover{background:var(--raised)}
+
+      /* buttons */
+      .btn{display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 20px;border-radius:10px;background:var(--amber);color:var(--amber-ink);font-family:var(--sans);font-size:15px;font-weight:600;text-decoration:none;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:background-color 150ms var(--ease),transform 120ms var(--ease)}
+      .btn:hover{background:var(--amber-hover)}
+      .btn:active{transform:scale(.98)}
+      .btn.small{height:36px;padding:0 16px;font-size:14px;border-radius:8px}
+      .btn-2{display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 20px;border-radius:10px;border:1px solid var(--line2);color:var(--text);font-size:15px;font-weight:500;text-decoration:none;transition:background-color 150ms var(--ease),transform 120ms var(--ease)}
+      .btn-2:hover{background:var(--raised)}
+      .btn-2:active{transform:scale(.98)}
+
+      /* header */
+      .page-head{padding:96px 0 40px}
+      .label{display:block;font-size:15px;font-weight:500;color:var(--muted);margin-bottom:12px}
+      .page-head h1{font-size:clamp(2.25rem,4.4vw,3.25rem);line-height:1.08;letter-spacing:-.02em;max-width:18ch}
+      .page-head .sub{color:var(--text2);font-size:18px;line-height:30px;margin-top:20px;max-width:36rem}
+      .head-row{display:flex;align-items:flex-end;justify-content:space-between;gap:32px;flex-wrap:wrap}
+
+      /* billing toggle */
+      .billing{display:flex;align-items:center;gap:12px}
+      .seg{display:inline-flex;padding:4px;background:var(--surface);border:1px solid var(--line2);border-radius:10px}
+      .seg button{height:36px;padding:0 16px;border:0;border-radius:6px;background:transparent;color:var(--text2);font-family:var(--sans);font-size:14px;font-weight:500;cursor:pointer;transition:background-color 150ms var(--ease),color 150ms var(--ease)}
+      .seg button:hover{color:var(--text)}
+      .seg button[aria-pressed="true"]{background:var(--raised);color:var(--text);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+      .save{font-size:14px;color:var(--amber)}
+
+      /* plans (same card as the homepage pricing section, with actions) */
+      .plans-sec{padding:0 0 96px}
+      .plans{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;align-items:stretch}
+      .plan{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px;display:flex;flex-direction:column}
+      .plan.pop{background:var(--raised);border-color:var(--amber-line)}
+      .plan .top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
+      .plan h2{font-size:18px;line-height:24px}
+      .plan .pop-tag{font-size:13px;color:var(--amber)}
+      .plan .who{font-size:14px;line-height:20px;color:var(--muted);margin-top:4px;min-height:40px}
+      .plan .price{font-size:32px;line-height:1;font-weight:500;font-variant-numeric:tabular-nums;margin-top:16px}
+      .plan .price small{font-size:14px;font-weight:400;color:var(--text2);margin-left:2px}
+      .plan .per{font-size:14px;color:var(--text2);margin-top:8px;min-height:20px;font-variant-numeric:tabular-nums}
+      .plan ul{list-style:none;margin:20px 0 24px;padding:20px 0 0;border-top:1px solid var(--line);font-size:14px;color:var(--text2);display:flex;flex-direction:column;gap:12px}
+      .plan li{display:flex;align-items:flex-start;gap:8px;line-height:20px;font-variant-numeric:tabular-nums}
+      .plan li .icon{color:var(--muted);margin-top:2px}
+      .plan li b{color:var(--text);font-weight:500}
+      .plan li.no{color:var(--muted)}
+      .plan li .note{display:block;font-size:13px;color:var(--muted)}
+      .plan .btn,.plan .btn-2{margin-top:auto;width:100%}
+
+      /* credits */
+      .credits{margin-top:48px;padding-top:32px;border-top:1px solid var(--line)}
+      .credits h2{font-size:20px;line-height:28px}
+      .credits .sub{font-size:15px;line-height:24px;color:var(--text2);margin-top:8px;max-width:40rem}
+      .credit-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px}
+      .credit{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px}
+      .credit .icon{width:18px;height:18px;color:var(--text2);margin-bottom:16px}
+      .credit h3{font-size:17px;line-height:24px;margin-bottom:8px}
+      .credit p{font-size:15px;line-height:24px;color:var(--text2)}
+      .guarantee{color:var(--text2);font-size:15px;margin-top:32px}
+      .guarantee b{color:var(--text);font-weight:500}
+
+      /* FAQ (same as homepage) */
+      .sec-head{max-width:720px;margin-bottom:48px}
+      .sec-head h2{font-size:clamp(1.75rem,3vw,2.25rem);line-height:1.15;letter-spacing:-.015em}
+      .sec-head.center{margin-inline:auto;text-align:center}
+      .faq{max-width:760px;margin:0 auto;border-top:1px solid var(--line)}
+      .faq details{border-bottom:1px solid var(--line)}
+      .faq summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;font-size:17px;font-weight:500;color:var(--text)}
+      .faq summary::-webkit-details-marker{display:none}
+      .faq summary .icon{color:var(--muted);transition:transform 150ms var(--ease)}
+      .faq details[open] summary .icon{transform:rotate(45deg)}
+      .faq .ans{color:var(--text2);font-size:15px;line-height:26px;padding:0 0 20px;max-width:65ch}
+      .faq .ans b{color:var(--text);font-weight:500}
+
+      /* closing (same as homepage) */
+      .closing{text-align:center}
+      .closing .fitz-bot{background:var(--fitz) center/contain no-repeat;display:block;width:112px;height:92px;margin:0 auto 24px}
+      .closing h2{font-size:clamp(2rem,3.6vw,2.5rem);line-height:1.15;letter-spacing:-.015em}
+      .closing p{color:var(--text2);font-size:17px;line-height:28px;max-width:34rem;margin:16px auto 32px}
+      .closing .note{font-size:14px;color:var(--muted);margin:16px auto 0}
+
+      /* footer (same as homepage) */
+      footer{border-top:1px solid var(--line);padding:64px 0 32px;color:var(--muted);font-size:14px}
+      .foot-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1.1fr 1fr;gap:32px;margin-bottom:48px}
+      .foot-grid h4{font-size:14px;color:var(--text2);margin:0 0 12px}
+      .foot-grid h4.next{margin-top:24px}
+      .foot-grid ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+      .foot-grid a{color:var(--muted);text-decoration:none;font-size:14px;transition:color 150ms var(--ease)}
+      .foot-grid a:hover{color:var(--text)}
+      .foot-brand p{margin-top:12px;max-width:34ch;line-height:1.6}
+      .foot-in{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;align-items:center;border-top:1px solid var(--line);padding-top:24px;font-size:13px}
+      footer .logo{font-size:16px}
+
+      @media (prefers-reduced-motion:reduce){
+        *,*::before,*::after{animation-duration:.01ms !important;transition-duration:.01ms !important}
+        html{scroll-behavior:auto}
+      }
+      @media (max-width:900px){
+        section{padding:64px 0}
+        .page-head{padding:48px 0 32px}
+        .plans-sec{padding:0 0 64px}
+        .nav-links{display:none}
+        .menu-btn{display:inline-flex}
+        .nav-right{gap:12px}
+        .plans{grid-template-columns:repeat(2,1fr)}
+        .credit-grid{grid-template-columns:1fr}
+        .foot-grid{grid-template-columns:1fr 1fr}
+      }
+      @media (max-width:560px){
+        .plans{grid-template-columns:1fr}
+        .plan .who{min-height:0}
+        .page-head .sub{font-size:17px;line-height:28px}
+        .closing .btn{width:100%}
+        .foot-grid{grid-template-columns:1fr}
+      }
     </style>
     <!-- Meta Pixel Code -->
     <script>
@@ -146,462 +262,272 @@
     <noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2162481364528579&ev=PageView&noscript=1"/></noscript>
     <!-- End Meta Pixel Code -->
 </head>
-<body class="bg-slate-900 text-white antialiased">
+<body>
 
-    <!-- Navigation -->
-    <nav class="fixed top-0 left-0 right-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800">
-        <div class="max-w-6xl mx-auto px-6 py-4">
-            <div class="flex items-center justify-between">
-                <!-- Logo -->
-                <a href="/" class="flex items-center text-3xl font-extrabold tracking-tight" style="letter-spacing: -1px;">
-                    <span class="text-amber-500">F</span><span class="text-white">ITZ</span><span class="text-white">&nbsp;</span><span class="text-amber-500">HR</span>
-                </a>
-                
-                <!-- Desktop Nav -->
-                <div class="hidden md:flex items-center gap-8">
-                    <a href="/#features" class="text-slate-300 hover:text-white transition-colors">Features</a>
-                    <a href="/#how-it-works" class="text-slate-300 hover:text-white transition-colors">How It Works</a>
-                    <a href="/pricing" class="text-white font-medium">Pricing</a>
-                    <a href="/blog/" class="text-slate-300 hover:text-white transition-colors">Blog</a>
-                </div>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16"/><path d="M4 12h16"/><path d="M4 18h16"/></symbol>
+  <symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 13H8"/><path d="M16 17H8"/><path d="M16 13h-2"/></symbol>
+  <symbol id="i-file-check" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m9 15 2 2 4-4"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+</svg>
 
-                <!-- CTA -->
-                <div class="flex items-center gap-4">
-                    <a href="/app" class="hidden sm:inline-block text-slate-300 hover:text-white transition-colors">Log In</a>
-                    <a href="/app" class="btn-primary px-5 py-2.5 rounded-lg font-semibold text-slate-900">
-                        Get Started Free
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
+<nav id="nav">
+  <div class="wrap nav-in">
+    <a class="logo" href="/"><em>F</em>ITZ<em>HR</em></a>
+    <div class="nav-right">
+      <div class="nav-links">
+        <a href="/#how">How it works</a>
+        <a href="/pricing" aria-current="page">Pricing</a>
+        <a href="/blog/">Blog</a>
+        <a href="/about">About</a>
+        <a href="/partnerships">Partnerships</a>
+        <a href="/app">Log in</a>
+      </div>
+      <a class="btn small" href="/app">Start Free</a>
+      <button class="menu-btn" id="menu-btn" type="button" aria-label="Menu" aria-expanded="false" aria-controls="menu"><svg class="icon"><use href="#i-menu"/></svg></button>
+    </div>
+  </div>
+  <div class="menu-panel" id="menu" hidden>
+    <a href="/#how">How it works</a>
+    <a href="/pricing" aria-current="page">Pricing</a>
+    <a href="/blog/">Blog</a>
+    <a href="/about">About</a>
+    <a href="/partnerships">Partnerships</a>
+    <a href="/app">Log in</a>
+  </div>
+</nav>
 
-    <!-- Header -->
-    <header class="pt-32 pb-12 px-6">
-        <div class="max-w-4xl mx-auto text-center">
-            <h1 class="text-4xl sm:text-5xl font-extrabold mb-6">
-                Simple, <span class="gradient-text">Transparent</span> Pricing
-            </h1>
-            <p class="text-xl text-slate-300 max-w-2xl mx-auto">
-                Full template access + expert-reviewed documents. Choose the plan that fits your business.
-            </p>
-        </div>
-    </header>
+<header class="page-head">
+  <div class="wrap head-row">
+    <div>
+      <span class="label">Pricing</span>
+      <h1>Start free. Upgrade when your HR gets busier</h1>
+      <p class="sub">Every plan answers from your modern award. Paid plans add unlimited AI chat, every HR template and credits for expert-reviewed documents.</p>
+    </div>
+    <div class="billing">
+      <div class="seg" role="group" aria-label="Billing period">
+        <button type="button" id="monthlyBtn" aria-pressed="false" onclick="toggleBilling('monthly')">Monthly</button>
+        <button type="button" id="yearlyBtn" aria-pressed="true" onclick="toggleBilling('yearly')">Yearly</button>
+      </div>
+      <span class="save">Save over 20% yearly</span>
+    </div>
+  </div>
+</header>
 
-    <!-- Billing Toggle -->
-    <section class="px-6 mb-12">
-        <div class="max-w-6xl mx-auto flex justify-center">
-            <div class="inline-flex items-center bg-slate-800 rounded-xl p-1">
-                <button id="monthlyBtn" onclick="toggleBilling('monthly')" class="toggle-btn px-6 py-3 rounded-lg font-medium text-slate-300">
-                    Monthly
-                </button>
-                <button id="yearlyBtn" onclick="toggleBilling('yearly')" class="toggle-btn active px-6 py-3 rounded-lg font-medium">
-                    Yearly
-                </button>
-                <span class="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full ml-2">
-                    Save 20%+
-                </span>
-            </div>
-        </div>
-    </section>
+<section class="plans-sec">
+  <div class="wrap">
+    <div class="plans">
 
-    <!-- Pricing Cards -->
-    <section class="px-6 pb-20">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                
-                <!-- Free Plan -->
-                <div class="card-hover bg-slate-800 border border-green-500/50 rounded-2xl p-6 relative">
-                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-green-500 text-white text-sm font-bold px-4 py-1 rounded-full">
-                        FREE FOREVER
-                    </div>
-                    
-                    <div class="mb-6 mt-2">
-                        <h2 class="text-2xl font-bold mb-2 text-green-400">Free</h2>
-                        <p class="text-slate-400 text-sm">Try Fitz with no commitment</p>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-5xl font-bold">$0</span>
-                            <span class="text-slate-400">/forever</span>
-                        </div>
-                        <p class="text-green-500 text-sm mt-1">No credit card required</p>
-                    </div>
+      <div class="plan">
+        <div class="top"><h2>Free</h2></div>
+        <p class="who">Try Fitz with no commitment</p>
+        <p class="price">$0<small>/forever</small></p>
+        <p class="per">No credit card required</p>
+        <ul>
+          <li><svg class="icon"><use href="#i-check"/></svg><span><b>20</b> AI chats/month</span></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><span><b>1</b> free template download</span></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><span>Unlimited HR tools</span></li>
+          <li class="no"><svg class="icon"><use href="#i-x"/></svg><span>Expert-reviewed documents</span></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><span>Crisis support <b>$320</b><span class="note">Per consultation</span></span></li>
+        </ul>
+        <a class="btn-2" href="/app">Start free</a>
+      </div>
 
-                    <ul class="space-y-4 mb-8">
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span><strong>20</strong> AI chats/month</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span><strong>1</strong> free template download</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span><strong>Unlimited</strong> HR Tools</span>
-                        </li>
-                        <li class="flex items-start gap-3 text-slate-500">
-                            <svg class="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
-                            </svg>
-                            <span>Expert-reviewed docs</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <span class="text-red-400 mt-0.5 flex-shrink-0">🚨</span>
-                            <span>Crisis Support <span class="text-slate-500">$320</span></span>
-                        </li>
-                    </ul>
+      <div class="plan">
+        <div class="top"><h2>Starter</h2></div>
+        <p class="who">For small businesses with occasional HR needs</p>
+        <p class="price"><span id="starterPrice">$249</span><small id="starterPeriod">/year</small></p>
+        <p class="per" id="starterMonthly">$21/month, billed yearly</p>
+        <ul>
+          <li><svg class="icon"><use href="#i-check"/></svg><span>Unlimited AI chat</span></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><span>All HR templates</span></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><span><b id="starterDocs">96</b> <span id="starterDocsPeriod">credits/year</span></span></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><span>Unlimited HR tools</span></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><span>Crisis support <b>$288</b><span class="note">Per consultation, 10% off</span></span></li>
+        </ul>
+        <a class="btn-2" href="/app">Choose Starter</a>
+      </div>
 
-                    <a href="/app" class="block w-full text-center py-4 bg-green-600 hover:bg-green-500 rounded-xl font-semibold text-white transition-colors">
-                        Start Free
-                    </a>
-                </div>
+      <div class="plan pop">
+        <div class="top"><h2>Pro</h2><span class="pop-tag">Most popular</span></div>
+        <p class="who">For busy businesses with regular HR needs</p>
+        <p class="price"><span id="proPrice">$449</span><small id="proPeriod">/year</small></p>
+        <p class="per" id="proMonthly">$37/month, billed yearly</p>
+        <ul>
+          <li><svg class="icon"><use href="#i-check"/></svg><span>Unlimited AI chat</span></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><span>All HR templates</span></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><span><b id="proDocs">240</b> <span id="proDocsPeriod">credits/year</span></span></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><span>Unlimited HR tools</span></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><span>Crisis support <b>$240</b><span class="note">Per consultation, 25% off</span></span></li>
+        </ul>
+        <a class="btn" href="/app">Choose Pro</a>
+      </div>
 
-                <!-- Starter Plan -->
-                <div class="card-hover bg-slate-800 border border-slate-700 rounded-2xl p-6">
-                    <div class="mb-6">
-                        <h2 class="text-2xl font-bold mb-2">Starter</h2>
-                        <p class="text-slate-400 text-sm">For small businesses with occasional HR needs</p>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-5xl font-bold" id="starterPrice">$249</span>
-                            <span class="text-slate-400" id="starterPeriod">/year</span>
-                        </div>
-                        <p class="text-green-500 text-sm mt-1" id="starterMonthly">Just $21/month</p>
-                    </div>
+      <div class="plan">
+        <div class="top"><h2>Business</h2></div>
+        <p class="who">For multi-site or high-turnover operations</p>
+        <p class="price"><span id="businessPrice">$899</span><small id="businessPeriod">/year</small></p>
+        <p class="per" id="businessMonthly">$75/month, billed yearly</p>
+        <ul>
+          <li><svg class="icon"><use href="#i-check"/></svg><span>Unlimited AI chat</span></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><span>All HR templates</span></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><span><b id="businessDocs">600</b> <span id="businessDocsPeriod">credits/year</span></span></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><span>Unlimited HR tools</span></li>
+          <li><svg class="icon"><use href="#i-check"/></svg><span>Crisis support <b>$160</b><span class="note">Per consultation, 50% off</span></span></li>
+        </ul>
+        <a class="btn-2" href="/app">Choose Business</a>
+      </div>
+    </div>
 
-                    <ul class="space-y-4 mb-8">
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span><strong>Unlimited</strong> AI chat</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span><strong>All</strong> HR templates</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span><strong id="starterDocs">96</strong> <span id="starterDocsPeriod">credits/year</span></span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span><strong>Unlimited</strong> HR Tools</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <span class="text-red-400 mt-0.5 flex-shrink-0">🚨</span>
-                            <span>Crisis Support <span class="text-green-500 font-semibold">10% off</span></span>
-                        </li>
-                    </ul>
+    <p class="guarantee">All paid plans include a <b>14-day money-back guarantee</b>. Cancel anytime.</p>
 
-                    <a href="/app" class="block w-full text-center py-4 border border-slate-600 rounded-xl font-semibold hover:border-amber-500 transition-colors">
-                        Choose Starter
-                    </a>
-                </div>
+    <div class="credits">
+      <h2>What credits are for</h2>
+      <p class="sub">Different services use different amounts of credits. Extra credits are $29 each, or 5 for $119, and never expire.</p>
+      <div class="credit-grid">
+        <div class="credit"><svg class="icon"><use href="#i-file"/></svg><h3>Generate documents</h3><p>Employment contracts, position descriptions, onboarding documents and policies</p></div>
+        <div class="credit"><svg class="icon"><use href="#i-file-check"/></svg><h3>Expert-reviewed documents</h3><p>Warnings, PIPs and terminations, reviewed by qualified HR consultants</p></div>
+        <div class="credit"><svg class="icon"><use href="#i-user"/></svg><h3>HR consultations</h3><p>Book time with HR professionals for any workplace matter</p></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-                <!-- Pro Plan (Featured) -->
-                <div class="card-hover bg-slate-800 border-2 border-amber-500 rounded-2xl p-6 relative">
-                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-amber-500 text-slate-900 text-sm font-bold px-4 py-1 rounded-full">
-                        MOST POPULAR
-                    </div>
-                    
-                    <div class="mb-6 mt-2">
-                        <h2 class="text-2xl font-bold mb-2 text-amber-500">Pro</h2>
-                        <p class="text-slate-400 text-sm">For busy businesses with regular HR needs</p>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-5xl font-bold" id="proPrice">$449</span>
-                            <span class="text-slate-400" id="proPeriod">/year</span>
-                        </div>
-                        <p class="text-green-500 text-sm mt-1" id="proMonthly">Just $37/month</p>
-                    </div>
+<section class="alt">
+  <div class="wrap">
+    <div class="sec-head center">
+      <span class="label">FAQ</span>
+      <h2>Frequently asked questions</h2>
+    </div>
+    <div class="faq">
+      <details><summary>What are credits used for?<svg class="icon"><use href="#i-plus"/></svg></summary><p class="ans">Credits are your currency for Fitz services. Use them for <b>document generation</b> (contracts, position descriptions, onboarding docs), <b>expert-reviewed documents</b> (warnings, PIPs, terminations reviewed by qualified HR consultants before you use them), and <b>HR consultations</b> (book time with professionals for any workplace matter). Different services use different amounts of credits.</p></details>
+      <details><summary>Can I upgrade or downgrade my plan?<svg class="icon"><use href="#i-plus"/></svg></summary><p class="ans">Yes, you can change your plan at any time. If you upgrade, you'll be charged the prorated difference. If you downgrade, the change takes effect at your next billing date.</p></details>
+      <details><summary>What if I need more credits?<svg class="icon"><use href="#i-plus"/></svg></summary><p class="ans">You can purchase additional credits at any time. Extra credits are $29 each, or 5 for $119. They never expire and roll over year to year.</p></details>
+      <details><summary>Is there a free trial?<svg class="icon"><use href="#i-plus"/></svg></summary><p class="ans">We offer a free tier with limited access so you can try Fitz before committing. Plus, all paid plans come with a 14-day money-back guarantee. If it's not right for you, we'll refund your payment.</p></details>
+      <details><summary>Is my data secure?<svg class="icon"><use href="#i-plus"/></svg></summary><p class="ans">Yes. We use industry-standard encryption, secure Australian servers, and never share your data with third parties. Your HR conversations and documents are private and protected.</p></details>
+    </div>
+  </div>
+</section>
 
-                    <ul class="space-y-4 mb-8">
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span><strong>Unlimited</strong> AI chat</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span><strong>All</strong> HR templates</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span><strong id="proDocs">240</strong> <span id="proDocsPeriod">credits/year</span></span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span><strong>Unlimited</strong> HR Tools</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <span class="text-red-400 mt-0.5 flex-shrink-0">🚨</span>
-                            <span>Crisis Support <span class="text-green-500 font-semibold">25% off</span></span>
-                        </li>
-                    </ul>
+<section class="closing">
+  <div class="wrap">
+    <div class="fitz-bot" aria-hidden="true"></div>
+    <span class="label">We know your award cold</span>
+    <h2>Start with the free plan today</h2>
+    <p>Ask Fitz about your award tonight and upgrade only when you need more.</p>
+    <a class="btn" href="/app">Start Free — No Card Required</a>
+    <p class="note">14-day money-back guarantee on all paid plans · Cancel anytime</p>
+  </div>
+</section>
 
-                    <a href="/app" class="btn-primary block w-full text-center py-4 rounded-xl font-semibold text-slate-900">
-                        Choose Pro
-                    </a>
-                </div>
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <a class="logo" href="/"><em>F</em>ITZ<em>HR</em></a>
+        <p>HR compliance software for small business in Australia. Fair Work compliance, award pay rates, and employment documents, grounded in your modern award, not a generic template. Not payroll or rostering: Fitz sits alongside them as the compliance layer.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <ul>
+          <li><a href="/#how">How it works</a></li>
+          <li><a href="/pricing">Pricing</a></li>
+          <li><a href="/blog/">Blog</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/partnerships">Partnerships</a></li>
+          <li><a href="/app">Log in</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Industries</h4>
+        <ul>
+          <li><a href="/hospitality">AI HR for Hospitality</a></li>
+          <li><a href="/restaurant">AI HR for Restaurants</a></li>
+          <li><a href="/retail">AI HR for Retail</a></li>
+          <li><a href="/manufacturing">AI HR for Manufacturing</a></li>
+          <li><a href="/schads">AI HR for SCHADS &amp; NDIS</a></li>
+          <li><a href="/health">AI HR for Health Practices</a></li>
+          <li><a href="/childrens">AI HR for Childcare</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Award guides</h4>
+        <ul>
+          <li><a href="/hospitality-award-guide">Hospitality Award (MA000009)</a></li>
+          <li><a href="/restaurant-award-guide">Restaurant Award (MA000119)</a></li>
+          <li><a href="/retail-award-guide">Retail Award (MA000004)</a></li>
+          <li><a href="/manufacturing-award-guide">Manufacturing Award (MA000010)</a></li>
+          <li><a href="/schads-award-guide">SCHADS Award (MA000100)</a></li>
+          <li><a href="/health-award-guide">Health Professionals Award (MA000027)</a></li>
+          <li><a href="/childrens-award-guide">Children's Services Award (MA000120)</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Resources</h4>
+        <ul>
+          <li><a href="/blog/">HR &amp; Award Blog</a></li>
+          <li><a href="/hr-compliance-software">HR Compliance Software</a></li>
+          <li><a href="/award-interpretation-software">Award Interpretation Software</a></li>
+          <li><a href="/compare/">Compare Fitz HR</a></li>
+        </ul>
+        <h4 class="next">Legal</h4>
+        <ul>
+          <li><a href="/privacy">Privacy Policy</a></li>
+          <li><a href="/terms">Terms of Service</a></li>
+          <li><a href="mailto:support@fitzhr.com">support@fitzhr.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-in">
+      <span>© 2026 Fitzgerald HR Pty Ltd (ABN 87 693 882 709), trading as Fitz HR. All rights reserved.</span>
+      <span>Grounded in 7 modern awards · Built in Australia</span>
+    </div>
+  </div>
+</footer>
 
-                <!-- Business Plan -->
-                <div class="card-hover bg-slate-800 border border-slate-700 rounded-2xl p-6">
-                    <div class="mb-6">
-                        <h2 class="text-2xl font-bold mb-2">Business</h2>
-                        <p class="text-slate-400 text-sm">For multi-site or high-turnover operations</p>
-                    </div>
-                    
-                    <div class="mb-6">
-                        <div class="flex items-baseline gap-1">
-                            <span class="text-5xl font-bold" id="businessPrice">$899</span>
-                            <span class="text-slate-400" id="businessPeriod">/year</span>
-                        </div>
-                        <p class="text-green-500 text-sm mt-1" id="businessMonthly">Just $75/month</p>
-                    </div>
+<script>
+  (function(){
+    var nav = document.getElementById('nav');
+    function onScroll(){ nav.classList.toggle('scrolled', window.scrollY > 8); }
+    addEventListener('scroll', onScroll, {passive:true});
+    onScroll();
+    var menuBtn = document.getElementById('menu-btn'), menu = document.getElementById('menu');
+    menuBtn.addEventListener('click', function(){
+      var open = menu.hidden;
+      menu.hidden = !open;
+      menuBtn.setAttribute('aria-expanded', String(open));
+    });
+  })();
 
-                    <ul class="space-y-4 mb-8">
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span><strong>Unlimited</strong> AI chat</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span><strong>All</strong> HR templates</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span><strong id="businessDocs">600</strong> <span id="businessDocsPeriod">credits/year</span></span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <svg class="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                            </svg>
-                            <span><strong>Unlimited</strong> HR Tools</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <span class="text-red-400 mt-0.5 flex-shrink-0">🚨</span>
-                            <span>Crisis Support <span class="text-green-500 font-semibold">50% off</span></span>
-                        </li>
-                    </ul>
+  const pricing = {
+    yearly: {
+      starter: { price: '$249', period: '/year', monthly: '$21/month, billed yearly', docs: '96', docsPeriod: 'credits/year' },
+      pro: { price: '$449', period: '/year', monthly: '$37/month, billed yearly', docs: '240', docsPeriod: 'credits/year' },
+      business: { price: '$899', period: '/year', monthly: '$75/month, billed yearly', docs: '600', docsPeriod: 'credits/year' }
+    },
+    monthly: {
+      starter: { price: '$29', period: '/month', monthly: 'Billed monthly', docs: '8', docsPeriod: 'credits/month' },
+      pro: { price: '$49', period: '/month', monthly: 'Billed monthly', docs: '20', docsPeriod: 'credits/month' },
+      business: { price: '$99', period: '/month', monthly: 'Billed monthly', docs: '50', docsPeriod: 'credits/month' }
+    }
+  };
 
-                    <a href="/app" class="block w-full text-center py-4 border border-slate-600 rounded-xl font-semibold hover:border-amber-500 transition-colors">
-                        Choose Business
-                    </a>
-                </div>
-            </div>
-
-            <!-- What are credits? -->
-            <div class="max-w-4xl mx-auto mt-12 bg-slate-800 border border-slate-700 rounded-2xl p-6">
-                <p class="text-amber-500 font-bold text-lg text-center mb-4">💡 What can you do with credits?</p>
-                <div class="grid md:grid-cols-3 gap-6 text-center">
-                    <div>
-                        <span class="text-3xl">📄</span>
-                        <h4 class="text-white font-semibold mt-2">Generate Documents</h4>
-                        <p class="text-slate-400 text-sm">Employment contracts, position descriptions, onboarding docs, policies</p>
-                    </div>
-                    <div>
-                        <span class="text-3xl">⚠️</span>
-                        <h4 class="text-white font-semibold mt-2">Expert-Reviewed Docs</h4>
-                        <p class="text-slate-400 text-sm">Warnings, PIPs, terminations — reviewed by qualified HR consultants</p>
-                    </div>
-                    <div>
-                        <span class="text-3xl">👤</span>
-                        <h4 class="text-white font-semibold mt-2">HR Consultations</h4>
-                        <p class="text-slate-400 text-sm">Book time with HR professionals for any workplace matter</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Guarantee -->
-            <p class="text-center text-slate-400 mt-8">
-                All plans include a <strong>14-day money-back guarantee</strong>. Cancel anytime.
-            </p>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section class="py-20 px-6 bg-slate-800/50">
-        <div class="max-w-3xl mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
-            
-            <div class="space-y-6">
-                <!-- FAQ 1 -->
-                <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold mb-2">What are credits used for?</h3>
-                    <p class="text-slate-400">Credits are your currency for Fitz services. Use them for: <strong>Document Generation</strong> (contracts, position descriptions, onboarding docs), <strong>Expert-Reviewed Documents</strong> (warnings, PIPs, terminations reviewed by qualified HR consultants before you use them), and <strong>HR Consultations</strong> (book time with professionals for any workplace matter). Different services use different amounts of credits.</p>
-                </div>
-
-                <!-- FAQ 2 -->
-                <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold mb-2">Can I upgrade or downgrade my plan?</h3>
-                    <p class="text-slate-400">Yes, you can change your plan at any time. If you upgrade, you'll be charged the prorated difference. If you downgrade, the change takes effect at your next billing date.</p>
-                </div>
-
-                <!-- FAQ 3 -->
-                <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold mb-2">What if I need more credits?</h3>
-                    <p class="text-slate-400">You can purchase additional credits at any time. Extra credits are $29 each, or 5 for $119. They never expire and roll over year to year.</p>
-                </div>
-
-                <!-- FAQ 4 -->
-                <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold mb-2">Is there a free trial?</h3>
-                    <p class="text-slate-400">We offer a free tier with limited access so you can try Fitz before committing. Plus, all paid plans come with a 14-day money-back guarantee — if it's not right for you, we'll refund your payment.</p>
-                </div>
-
-                <!-- FAQ 5 -->
-                <div class="bg-slate-800 border border-slate-700 rounded-xl p-6">
-                    <h3 class="text-lg font-semibold mb-2">Is my data secure?</h3>
-                    <p class="text-slate-400">Yes. We use industry-standard encryption, secure Australian servers, and never share your data with third parties. Your HR conversations and documents are private and protected.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Final CTA -->
-    <section class="py-24 px-6">
-        <div class="max-w-4xl mx-auto text-center">
-            <h2 class="text-3xl sm:text-4xl font-bold mb-6">Ready to Simplify Your HR?</h2>
-            <p class="text-xl text-slate-300 mb-10">
-                Start free today. No credit card required.
-            </p>
-            <a href="/app" class="btn-primary inline-block px-10 py-5 rounded-xl font-bold text-xl text-slate-900">
-                Get Started Free →
-            </a>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="bg-slate-800 border-t border-slate-700 py-12 px-6">
-        <div class="max-w-6xl mx-auto">
-            <div class="grid md:grid-cols-4 gap-8 mb-8">
-                <!-- Brand -->
-                <div>
-                    <a href="/" class="flex items-center text-3xl font-extrabold tracking-tight mb-4" style="letter-spacing: -1px;">
-                        <span class="text-amber-500">F</span><span class="text-white">ITZ</span><span class="text-white">&nbsp;</span><span class="text-amber-500">HR</span>
-                    </a>
-                    <p class="text-slate-400 text-sm">AI-powered award compliance software for Australian small businesses. Seven modern awards, from hospitality to SCHADS.</p>
-                </div>
-
-                <!-- Product -->
-                <div>
-                    <h4 class="font-semibold mb-4">Product</h4>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><a href="/#features" class="hover:text-white transition-colors">Features</a></li>
-                        <li><a href="/pricing" class="hover:text-white transition-colors">Pricing</a></li>
-                        <li><a href="/blog/" class="hover:text-white transition-colors">Blog</a></li>
-                        <li><a href="/app" class="hover:text-white transition-colors">Log In</a></li>
-                    </ul>
-                </div>
-
-                <!-- Legal -->
-                <div>
-                    <h4 class="font-semibold mb-4">Legal</h4>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><a href="/privacy" class="hover:text-white transition-colors">Privacy Policy</a></li>
-                        <li><a href="/terms" class="hover:text-white transition-colors">Terms of Service</a></li>
-                    </ul>
-                </div>
-
-                <!-- Contact -->
-                <div>
-                    <h4 class="font-semibold mb-4">Contact</h4>
-                    <ul class="space-y-2 text-slate-400">
-                        <li><a href="mailto:support@fitzhr.com" class="hover:text-white transition-colors">support@fitzhr.com</a></li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="border-t border-slate-700 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-                <p class="text-slate-400 text-sm">
-                    © 2026 Fitzgerald HR Pty Ltd (ABN 87 693 882 709), trading as Fitz HR. All rights reserved.
-                </p>
-                <p class="text-slate-500 text-sm">
-                    Made with ❤️ in Australia
-                </p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Billing Toggle Script -->
-    <script>
-        const pricing = {
-            yearly: {
-                starter: { price: '$249', period: '/year', monthly: 'Just $21/month', docs: '96', docsPeriod: 'credits/year' },
-                pro: { price: '$449', period: '/year', monthly: 'Just $37/month', docs: '240', docsPeriod: 'credits/year' },
-                business: { price: '$899', period: '/year', monthly: 'Just $75/month', docs: '600', docsPeriod: 'credits/year' }
-            },
-            monthly: {
-                starter: { price: '$29', period: '/month', monthly: '', docs: '8', docsPeriod: 'credits/month' },
-                pro: { price: '$49', period: '/month', monthly: '', docs: '20', docsPeriod: 'credits/month' },
-                business: { price: '$99', period: '/month', monthly: '', docs: '50', docsPeriod: 'credits/month' }
-            }
-        };
-
-        function toggleBilling(type) {
-            const p = pricing[type];
-            
-            // Update buttons
-            document.getElementById('monthlyBtn').classList.toggle('active', type === 'monthly');
-            document.getElementById('yearlyBtn').classList.toggle('active', type === 'yearly');
-            
-            // Update Starter prices and docs
-            document.getElementById('starterPrice').textContent = p.starter.price;
-            document.getElementById('starterPeriod').textContent = p.starter.period;
-            document.getElementById('starterMonthly').textContent = p.starter.monthly;
-            document.getElementById('starterDocs').textContent = p.starter.docs;
-            document.getElementById('starterDocsPeriod').textContent = p.starter.docsPeriod;
-            
-            // Update Pro prices and docs
-            document.getElementById('proPrice').textContent = p.pro.price;
-            document.getElementById('proPeriod').textContent = p.pro.period;
-            document.getElementById('proMonthly').textContent = p.pro.monthly;
-            document.getElementById('proDocs').textContent = p.pro.docs;
-            document.getElementById('proDocsPeriod').textContent = p.pro.docsPeriod;
-            
-            // Update Business prices and docs
-            document.getElementById('businessPrice').textContent = p.business.price;
-            document.getElementById('businessPeriod').textContent = p.business.period;
-            document.getElementById('businessMonthly').textContent = p.business.monthly;
-            document.getElementById('businessDocs').textContent = p.business.docs;
-            document.getElementById('businessDocsPeriod').textContent = p.business.docsPeriod;
-        }
-    </script>
+  function toggleBilling(type) {
+    const p = pricing[type];
+    document.getElementById('monthlyBtn').setAttribute('aria-pressed', String(type === 'monthly'));
+    document.getElementById('yearlyBtn').setAttribute('aria-pressed', String(type === 'yearly'));
+    ['starter', 'pro', 'business'].forEach(function(k){
+      document.getElementById(k + 'Price').textContent = p[k].price;
+      document.getElementById(k + 'Period').textContent = p[k].period;
+      document.getElementById(k + 'Monthly').textContent = p[k].monthly;
+      document.getElementById(k + 'Docs').textContent = p[k].docs;
+      document.getElementById(k + 'DocsPeriod').textContent = p[k].docsPeriod;
+    });
+  }
+</script>
 
 </body>
 </html>
-
-            
