@@ -36,7 +36,7 @@
     <meta name="theme-color" content="#f59e0b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&amp;display=swap" rel="stylesheet">
 
     <!-- BreadcrumbList -->
     <script type="application/ld+json">
@@ -143,72 +143,21 @@
     </script>
 
     <style>
-        :root { --navy:#0f172a; --navy2:#141f35; --amber:#f59e0b; --w60:rgba(255,255,255,0.6); --w30:rgba(255,255,255,0.3); --rule:rgba(245,158,11,0.18); --rw:rgba(255,255,255,0.08); }
+        /* One-off components for this post. Shared post styles: /assets/blog-post.css */
+        :root{--navy:#0f172a; --navy2:#141f35; --amber:#f59e0b; --w60:rgba(255,255,255,0.6); --w30:rgba(255,255,255,0.3); --rule:rgba(245,158,11,0.18); --rw:rgba(255,255,255,0.08);}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-        html{font-size:16px;scroll-behavior:smooth;}
-        body{background:var(--navy);color:#fff;font-family:'Outfit',sans-serif;line-height:1.7;}
-        .nav{background:rgba(15,23,42,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--rule);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-        .nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-1px;text-decoration:none;display:flex;align-items:center;gap:0.4rem;} .nav-logo .wm-f,.nav-logo .wm-itz,.nav-logo .wm-hr{display:inline;}
-        .wm-f,.wm-hr{color:var(--amber);} .wm-itz{color:#fff;}
-        .nav-back{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--w60);text-decoration:none;transition:color 0.2s;}
-        .nav-back:hover{color:var(--amber);}
-        .post-hero{padding:3.5rem 1.5rem 2.5rem;max-width:780px;margin:0 auto;}
-        .post-tag{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;display:flex;align-items:center;gap:0.6rem;}
-        .post-tag::before{content:'';width:24px;height:2px;background:var(--amber);display:inline-block;}
-        .post-h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2rem,5vw,2.8rem);line-height:1.1;letter-spacing:-0.02em;margin-bottom:1.25rem;}
-        .post-h1 em{font-style:italic;color:var(--amber);}
-        .post-meta{display:flex;align-items:center;gap:1rem;font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--w30);margin-bottom:2rem;flex-wrap:wrap;}
-        .meta-dot{width:3px;height:3px;border-radius:50%;background:var(--w30);}
-        .post-intro{font-size:1.1rem;line-height:1.7;color:var(--w60);border-left:3px solid var(--amber);padding-left:1.25rem;margin-bottom:2.5rem;}
-        .post-body{max-width:780px;margin:0 auto;padding:0 1.5rem 5rem;}
-        .post-body h2{font-family:'Playfair Display',serif;font-weight:700;font-size:1.6rem;line-height:1.2;color:#fff;margin:2.5rem 0 1rem;}
-        .post-body h2 em{font-style:italic;color:var(--amber);}
-        .post-body h3{font-size:1.05rem;font-weight:700;color:var(--amber);margin:1.75rem 0 0.6rem;}
-        .post-body p{font-size:0.98rem;line-height:1.75;color:var(--w60);margin-bottom:1.1rem;}
-        .post-body strong{color:#fff;}
-        .post-body a{color:var(--amber);text-decoration:none;}
-        .post-body a:hover{text-decoration:underline;}
-        .post-body ol,.post-body ul{margin:1rem 0 1.4rem 1.25rem;padding-left:0.5rem;color:var(--w60);}
-        .post-body ol li,.post-body ul li{font-size:0.98rem;line-height:1.7;margin-bottom:0.55rem;padding-left:0.35rem;}
-        .post-body ol li::marker{color:var(--amber);font-family:'DM Mono',monospace;font-weight:600;}
-        .post-body ul li::marker{color:var(--amber);}
         .example-box{background:var(--navy2);border:1px solid var(--rule);border-radius:12px;padding:1.5rem;margin:2rem 0;}
-        .example-box-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);margin-bottom:0.6rem;}
-        .example-box p{font-size:0.95rem;color:rgba(255,255,255,0.85);margin-bottom:0.8rem;line-height:1.7;}
+        .example-box-label{font-size:13px;color:var(--text);margin-bottom:0.6rem;}
+        .example-box p{font-size:0.95rem;color:var(--text);margin-bottom:0.8rem;line-height:1.7;}
         .example-box p:last-child{margin-bottom:0;}
-        .example-box em{color:var(--amber);font-style:normal;font-weight:600;}
-        .verdict{background:var(--navy2);border:1px solid var(--rw);border-left:4px solid var(--amber);border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;}
-        .verdict-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);margin-bottom:0.6rem;}
-        .verdict p{margin:0;font-size:0.95rem;color:#fff;}
-        .warning-box{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-left:4px solid #ef4444;border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;}
-        .warning-box p{margin:0;font-size:0.95rem;color:rgba(255,255,255,0.8);}
+        .example-box em{color:var(--text);font-style:normal;font-weight:600;}
         .rules-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.88rem;}
-        .rules-table th{background:var(--navy2);color:var(--amber);padding:0.75rem 1rem;text-align:left;font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;border-bottom:1px solid var(--rule);}
+        .rules-table th{background:var(--navy2);color:var(--text);padding:0.75rem 1rem;text-align:left;font-size:13px;border-bottom:1px solid var(--rule);}
         .rules-table td{padding:0.85rem 1rem;border-bottom:1px solid var(--rw);color:var(--w60);vertical-align:top;}
         .rules-table tr:last-child td{border-bottom:none;}
-        .rules-table td:first-child{color:#fff;font-weight:600;}
-        .faq-list{display:flex;flex-direction:column;gap:0.5rem;margin:1.5rem 0;}
-        .faq-item{background:var(--navy2);border:1px solid var(--rw);border-radius:10px;overflow:hidden;}
-        .faq-item summary{padding:1rem 1.25rem;cursor:pointer;font-weight:600;font-size:0.95rem;color:#fff;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
-        .faq-item summary::-webkit-details-marker{display:none;}
-        .faq-item summary::after{content:'+';color:var(--amber);font-size:1.2rem;flex-shrink:0;transition:transform 0.3s;}
-        .faq-item[open] summary::after{transform:rotate(45deg);}
-        .faq-item[open]{border-color:var(--rule);}
-        .faq-answer{padding:0 1.25rem 1rem;font-size:0.88rem;color:var(--w60);line-height:1.65;}
-        .post-cta{background:var(--amber);padding:2.5rem 1.5rem;border-radius:12px;text-align:center;margin:2.5rem 0;}
-        .post-cta h3{font-family:'Playfair Display',serif;font-weight:900;font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem;}
-        .post-cta p{font-size:0.9rem;color:rgba(15,23,42,0.7);margin-bottom:1.25rem;}
-        .post-cta a{display:inline-block;background:var(--navy);color:var(--amber);font-weight:800;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.85rem 2rem;text-decoration:none;transition:background 0.3s;}
-        .post-cta a:hover{background:#1e293b;}
-        .dont-list{display:flex;flex-direction:column;gap:1px;margin:1.5rem 0;}
-        .dont-item{background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;padding:0.9rem 1.25rem;display:flex;align-items:flex-start;gap:0.75rem;}
-        .dont-item-x{color:#ef4444;font-size:1rem;flex-shrink:0;margin-top:0.1rem;}
-        .dont-item-text{font-size:0.9rem;color:rgba(255,255,255,0.8);line-height:1.55;}
-        .dont-item-text strong{color:#fff;}
-        footer{background:var(--navy2);border-top:1px solid var(--rule);padding:2rem 1.5rem;text-align:center;}
-        footer p{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.1em;color:var(--w30);}
-        footer a{color:var(--amber);text-decoration:none;}
+        .rules-table td:first-child{color:var(--text);font-weight:600;}
     </style>
+    <link rel="stylesheet" href="/assets/blog-post.css?v=1">
     <!-- Meta Pixel Code -->
     <script>
     !function(f,b,e,v,n,t,s)
@@ -227,10 +176,17 @@
 </head>
 <body>
 <nav class="nav">
-    <a href="/" class="nav-logo"><span style="display:inline-flex;gap:0;letter-spacing:-1px;"><span class="wm-f">F</span><span class="wm-itz">ITZ</span></span><span class="wm-hr" style="margin-left:0.18em;">HR</span></a>
-    <a href="/blog/" class="nav-back">← Back to Blog</a>
+  <div class="nav-in">
+    <a href="/" class="logo"><em>F</em>ITZ<em>HR</em></a>
+    <div class="nav-right">
+        <a href="/" class="nav-home">Home</a>
+        <a href="/blog/" class="nav-home">Blog</a>
+        <a href="/pricing" class="nav-home">Pricing</a>
+        <a href="/app" class="btn small">Start Free</a>
+    </div>
+  </div>
 </nav>
-<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:900px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="color:rgba(232,237,245,0.72);text-decoration:none;">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="/blog/topics/fair-work-compliance" style="color:rgba(232,237,245,0.72);text-decoration:none;">Fair Work Compliance &amp; Underpayments</a> <span style="margin:0 4px;">&middot;</span> <a href="/hospitality-award-guide#articles" style="color:rgba(232,237,245,0.72);text-decoration:none;">Hospitality Award</a> &amp; <a href="/restaurant-award-guide#articles" style="color:rgba(232,237,245,0.72);text-decoration:none;">Restaurant Award</a></nav><!-- blog-crumb:end -->
+<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:780px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="color:rgba(232,237,245,0.72);text-decoration:none;">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="/blog/topics/fair-work-compliance" style="color:rgba(232,237,245,0.72);text-decoration:none;">Fair Work Compliance &amp; Underpayments</a> <span style="margin:0 4px;">&middot;</span> <a href="/hospitality-award-guide#articles" style="color:rgba(232,237,245,0.72);text-decoration:none;">Hospitality Award</a> &amp; <a href="/restaurant-award-guide#articles" style="color:rgba(232,237,245,0.72);text-decoration:none;">Restaurant Award</a></nav><!-- blog-crumb:end -->
 
 <header class="post-hero">
     <div class="post-tag">Award Coverage · Hospitality vs Restaurant</div>
@@ -248,7 +204,7 @@
     <div class="verdict">
         <div class="verdict-label">Quick Answer</div>
         <p>The <strong>Hospitality Industry (General) Award (MA000009)</strong> applies to pubs, hotels, motels, resorts and venues where the principal business is accommodation or licensed hospitality. The <strong>Restaurant Industry Award (MA000119)</strong> applies to standalone restaurants, cafés and food-service venues where the primary activity is serving food to the public. The correct Award is determined by the employer's principal business — not the employee's role. For a deeper breakdown of MA000009 obligations, see the <a href="/hospitality-award-guide">Fitz HR Hospitality Award guide</a>.</p>
-        <p style="margin-top:0.85rem;"><strong>In simple terms:</strong> pubs and hotels = Hospitality Award. Standalone restaurants and cafés = Restaurant Award.</p>
+        <p style="margin-top:0.85rem"><strong>In simple terms:</strong> pubs and hotels = Hospitality Award. Standalone restaurants and cafés = Restaurant Award.</p>
     </div>
 
     <h2>Hospitality Award vs Restaurant Award — Key Differences</h2>
@@ -455,11 +411,11 @@
     <h2>What <em>Not</em> to Do With Award Coverage</h2>
     <p>These are the mistakes that turn an honest oversight into a six-figure back-pay claim:</p>
     <div class="dont-list">
-        <div class="dont-item"><div class="dont-item-x">✗</div><div class="dont-item-text"><strong>Don't assume your café is under the Restaurant Award without checking the venue type.</strong> A café inside a motel or hotel is HIGA. A standalone café on the high street is the Restaurant Award. The address matters — what's around the kitchen matters.</div></div>
-        <div class="dont-item"><div class="dont-item-x">✗</div><div class="dont-item-text"><strong>Don't apply HIGA's evening and night loadings as percentages.</strong> They are flat dollar amounts. Every shift you process this way compounds the underpayment for lower-classification staff.</div></div>
-        <div class="dont-item"><div class="dont-item-x">✗</div><div class="dont-item-text"><strong>Don't classify the same role under two different Awards inside one business.</strong> Front-of-house and kitchen staff in a pub bistro are both covered by HIGA. There is no split-Award arrangement available to a single employer with one principal business.</div></div>
-        <div class="dont-item"><div class="dont-item-x">✗</div><div class="dont-item-text"><strong>Don't copy allowance amounts from one Award to the other.</strong> Split shift, meal and laundry allowances differ between MA000009 and MA000119 in both dollar amount and trigger conditions.</div></div>
-        <div class="dont-item"><div class="dont-item-x">✗</div><div class="dont-item-text"><strong>Don't assume a 4-hour shift is fine for a full-time restaurant employee.</strong> The Restaurant Award has a 6-hour daily minimum for full-time staff. HIGA does not. If you switched Awards mid-business and didn't update rostering rules, this is where you'll get caught.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Don't assume your café is under the Restaurant Award without checking the venue type.</strong> A café inside a motel or hotel is HIGA. A standalone café on the high street is the Restaurant Award. The address matters — what's around the kitchen matters.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Don't apply HIGA's evening and night loadings as percentages.</strong> They are flat dollar amounts. Every shift you process this way compounds the underpayment for lower-classification staff.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Don't classify the same role under two different Awards inside one business.</strong> Front-of-house and kitchen staff in a pub bistro are both covered by HIGA. There is no split-Award arrangement available to a single employer with one principal business.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Don't copy allowance amounts from one Award to the other.</strong> Split shift, meal and laundry allowances differ between MA000009 and MA000119 in both dollar amount and trigger conditions.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Don't assume a 4-hour shift is fine for a full-time restaurant employee.</strong> The Restaurant Award has a 6-hour daily minimum for full-time staff. HIGA does not. If you switched Awards mid-business and didn't update rostering rules, this is where you'll get caught.</div></div>
     </div>
 
     <h2>Best Practice for Award Coverage</h2>
@@ -507,9 +463,9 @@
         </details>
     </div>
 
-    <p style="font-size:1rem;line-height:1.7;color:rgba(255,255,255,0.7);font-style:italic;border-top:1px solid rgba(255,255,255,0.08);padding-top:1.5rem;margin-top:2rem;">Award coverage is the foundation of every other compliance decision. If the foundation is wrong, every payroll cycle compounds the problem. The good news is that working it out takes minutes — and only needs to be done once for most venues.</p>
+    <p style="font-size:1rem;line-height:1.7;color:var(--text2);border-top:1px solid rgba(255,255,255,0.08);padding-top:1.5rem;margin-top:2rem">Award coverage is the foundation of every other compliance decision. If the foundation is wrong, every payroll cycle compounds the problem. The good news is that working it out takes minutes — and only needs to be done once for most venues.</p>
 
-    <p style="font-size:1.02rem;line-height:1.7;color:#fff;text-align:center;margin:1.75rem 0 0;"><strong>Most venues only need to get this right once.</strong> Once your Award coverage is confirmed, everything else — pay rates, penalties, allowances — flows from that decision.</p>
+    <p style="font-size:1.02rem;line-height:1.7;color:var(--text);text-align:center;margin:1.75rem 0 0"><strong>Most venues only need to get this right once.</strong> Once your Award coverage is confirmed, everything else — pay rates, penalties, allowances — flows from that decision.</p>
 
     <div class="post-cta">
         <h3>Not Sure Which Award Covers Your Venue?</h3>
@@ -520,7 +476,7 @@
 </div>
 
 <footer>
-    <p>© 2026 Fitz HR · <a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/app">Try Free</a></p>
+    <p>&copy; Fitzgerald HR Pty Ltd (ABN 87 693 882 709), trading as Fitz HR · <a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/app">Try Free</a></p>
 </footer>
 </body>
 </html>

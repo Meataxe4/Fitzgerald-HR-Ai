@@ -39,7 +39,7 @@
     <meta name="theme-color" content="#f59e0b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&amp;display=swap" rel="stylesheet">
 
     <!-- FIXED: BreadcrumbList with proper @type/@id on item objects -->
     <script type="application/ld+json">
@@ -122,74 +122,13 @@
     </script>
 
     <style>
+        /* One-off components for this post. Shared post styles: /assets/blog-post.css */
         :root{--navy:#0f172a;--navy2:#141f35;--amber:#f59e0b;--w60:rgba(255,255,255,0.6);--w30:rgba(255,255,255,0.3);--rule:rgba(245,158,11,0.18);--rw:rgba(255,255,255,0.08);}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-        html{font-size:16px;scroll-behavior:smooth;}
-        body{background:var(--navy);color:#fff;font-family:'Outfit',sans-serif;line-height:1.7;}
-        .nav{background:rgba(15,23,42,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--rule);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-        .nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-1px;text-decoration:none;display:flex;align-items:center;}
-        .wm-f,.wm-hr{color:var(--amber);}.wm-itz{color:#fff;}
-        .nav-back{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--w60);text-decoration:none;}
-        .nav-back:hover{color:var(--amber);}
-        .post-hero{padding:3.5rem 1.5rem 2.5rem;max-width:780px;margin:0 auto;}
-        .post-tag{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;display:flex;align-items:center;gap:0.6rem;}
-        .post-tag::before{content:'';width:24px;height:2px;background:var(--amber);display:inline-block;}
-        .post-h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2rem,5vw,2.8rem);line-height:1.1;letter-spacing:-0.02em;margin-bottom:1.25rem;}
-        .post-h1 em{font-style:italic;color:var(--amber);}
-        .post-meta{display:flex;align-items:center;gap:1rem;font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--w30);margin-bottom:2rem;flex-wrap:wrap;}
-        .meta-dot{width:3px;height:3px;border-radius:50%;background:var(--w30);}
-        .post-meta span:last-child{color:var(--amber);}
-        .post-intro{font-size:1.1rem;line-height:1.7;color:var(--w60);border-left:3px solid var(--amber);padding-left:1.25rem;margin-bottom:2.5rem;}
-        .post-body{max-width:780px;margin:0 auto;padding:0 1.5rem 5rem;}
-        .post-body h2{font-family:'Playfair Display',serif;font-weight:700;font-size:1.6rem;line-height:1.2;color:#fff;margin:2.5rem 0 1rem;border-top:1px solid rgba(255,255,255,0.06);padding-top:1.5rem;}
-        .post-body h2 em{font-style:italic;color:var(--amber);}
-        .post-body p{font-size:0.98rem;line-height:1.75;color:var(--w60);margin-bottom:1.1rem;}
-        .post-body strong{color:#fff;}
-        .post-body a{color:var(--amber);text-decoration:none;}
-        .post-body a:hover{text-decoration:underline;}
-        .post-body ul{margin:0 0 1.1rem 1.25rem;}
-        .post-body li{font-size:0.95rem;color:var(--w60);line-height:1.65;margin-bottom:0.4rem;}
-        .verdict{background:var(--navy2);border:1px solid var(--rw);border-left:4px solid var(--amber);border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;}
-        .verdict-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);margin-bottom:0.6rem;}
-        .verdict p{margin:0;font-size:0.95rem;color:#fff;}
-        .verdict p br{display:block;margin-top:0.3rem;}
-        .warning-box{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-left:4px solid #ef4444;border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;}
-        .warning-box p{margin:0;font-size:0.95rem;color:rgba(255,255,255,0.8);}
-        .rate-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.88rem;}
-        .rate-table th{background:var(--navy2);color:var(--amber);padding:0.75rem 1rem;text-align:left;font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;border-bottom:1px solid var(--rule);}
-        .rate-table td{padding:0.85rem 1rem;border-bottom:1px solid var(--rw);color:var(--w60);vertical-align:middle;}
-        .rate-table tr:last-child td{border-bottom:none;}
-        .rate-table td:first-child{color:#fff;font-weight:600;}
-        .rate-table tr:hover td{background:rgba(245,158,11,0.04);}
-        .rate-table tr:nth-child(even) td{background:rgba(255,255,255,0.02);}
-        .rate-table th{position:sticky;top:60px;}
-        .ok{color:#22c55e;font-weight:600;}
-        .no{color:#ef4444;font-weight:600;}
-        .dont-list{display:flex;flex-direction:column;gap:1px;margin:1.5rem 0;}
-        .dont-item{background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;padding:0.9rem 1.25rem;display:flex;align-items:flex-start;gap:0.75rem;}
-        .dont-item-x{color:#ef4444;font-size:1rem;flex-shrink:0;margin-top:0.1rem;}
-        .dont-item-text{font-size:0.9rem;color:rgba(255,255,255,0.8);line-height:1.55;}
-        .dont-item-text strong{color:#fff;}
-        .faq-list{display:flex;flex-direction:column;gap:0.5rem;margin:1.5rem 0;}
-        .faq-item{background:var(--navy2);border:1px solid var(--rw);border-radius:10px;overflow:hidden;}
-        .faq-item summary{padding:1rem 1.25rem;cursor:pointer;font-weight:600;font-size:0.95rem;color:#fff;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
-        .faq-item summary::-webkit-details-marker{display:none;}
-        .faq-item summary::after{content:'+';color:var(--amber);font-size:1.2rem;flex-shrink:0;transition:transform 0.3s;}
-        .faq-item[open] summary::after{transform:rotate(45deg);}
-        .faq-item[open]{border-color:var(--rule);}
-        .faq-answer{padding:0 1.25rem 1rem;font-size:0.88rem;color:var(--w60);line-height:1.65;}
-        .post-cta{background:var(--amber);padding:2.5rem 1.5rem;border-radius:12px;text-align:center;margin:2.5rem 0;}
-        .post-cta h3{font-family:'Playfair Display',serif;font-weight:900;font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem;}
-        .post-cta p{font-size:0.9rem;color:rgba(15,23,42,0.7);margin-bottom:1.25rem;}
-        .post-cta a{display:inline-block;background:var(--navy);color:var(--amber);font-weight:800;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.85rem 2rem;text-decoration:none;transition:background 0.3s;}
-        .post-cta a:hover{background:#1e293b;}
-        footer{background:var(--navy2);border-top:1px solid var(--rule);padding:2rem 1.5rem;text-align:center;}
-        footer p{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.1em;color:var(--w30);}
-        footer a{color:var(--amber);text-decoration:none;}
-        .sticky-pill{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--amber);color:var(--navy);padding:0.75rem 1.75rem;border-radius:999px;font-weight:800;font-size:0.8rem;text-decoration:none;z-index:999;white-space:nowrap;box-shadow:0 4px 24px rgba(245,158,11,0.35);letter-spacing:0.04em;}
-        .sticky-pill:hover{background:#fbbf24;}
-        @media(max-width:600px){.rate-table{font-size:0.78rem;}.rate-table th,.rate-table td{padding:0.6rem 0.6rem;}.sticky-pill{font-size:0.74rem;padding:0.65rem 1.25rem;}}
+        .ok{color:var(--pos);font-weight:600;}
+        .no{color:var(--neg);font-weight:600;}
     </style>
+    <link rel="stylesheet" href="/assets/blog-post.css?v=1">
     <!-- Meta Pixel Code -->
     <script>
     !function(f,b,e,v,n,t,s)
@@ -208,10 +147,17 @@
 </head>
 <body>
 <nav class="nav">
-    <a href="/" class="nav-logo"><span style="display:inline-flex;gap:0;letter-spacing:-1px;"><span class="wm-f">F</span><span class="wm-itz">ITZ</span></span><span class="wm-hr" style="margin-left:0.18em;">HR</span></a>
-    <a href="/blog/" class="nav-back">&larr; Back to Blog</a>
+  <div class="nav-in">
+    <a href="/" class="logo"><em>F</em>ITZ<em>HR</em></a>
+    <div class="nav-right">
+        <a href="/" class="nav-home">Home</a>
+        <a href="/blog/" class="nav-home">Blog</a>
+        <a href="/pricing" class="nav-home">Pricing</a>
+        <a href="/app" class="btn small">Start Free</a>
+    </div>
+  </div>
 </nav>
-<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:900px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="color:rgba(232,237,245,0.72);text-decoration:none;">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="/blog/topics/rostering-hours-breaks" style="color:rgba(232,237,245,0.72);text-decoration:none;">Rostering, Hours &amp; Breaks</a> <span style="margin:0 4px;">&middot;</span> <a href="/hospitality-award-guide#articles" style="color:rgba(232,237,245,0.72);text-decoration:none;">Hospitality Award</a></nav><!-- blog-crumb:end -->
+<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:780px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="color:rgba(232,237,245,0.72);text-decoration:none;">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="/blog/topics/rostering-hours-breaks" style="color:rgba(232,237,245,0.72);text-decoration:none;">Rostering, Hours &amp; Breaks</a> <span style="margin:0 4px;">&middot;</span> <a href="/hospitality-award-guide#articles" style="color:rgba(232,237,245,0.72);text-decoration:none;">Hospitality Award</a></nav><!-- blog-crumb:end -->
 
 <header class="post-hero">
     <div class="post-tag">Split Shifts &middot; Hospitality Award &middot; Compliance</div>
@@ -230,7 +176,7 @@
 
     <p><strong>Under the Hospitality Industry (General) Award MA000009:</strong> a split shift is two separate periods of work in a single day with an unpaid break of more than one hour between them. Full-time and part-time employees must be paid a split shift allowance on top of ordinary pay for every day a split shift is worked. Casual employees are not entitled to the allowance. The maximum spread of hours is 12 hours for most employees, and each period must be at least 2 hours.</p>
 
-    <p style="font-size:0.82rem;color:rgba(255,255,255,0.4);margin-top:-0.5rem;margin-bottom:1.5rem;">Last reviewed against Fair Work Ombudsman guidance &mdash; April 2026</p>
+    <p style="font-size:0.82rem;color:var(--muted);margin-top:-0.5rem;margin-bottom:1.5rem">Last reviewed against Fair Work Ombudsman guidance &mdash; April 2026</p>
 
     <div class="warning-box">
         <p><strong>Risk:</strong> Missing the split shift allowance creates back-pay liabilities across every affected employee, every week &mdash; often unnoticed for years. The allowance is small per occurrence. The compounded liability isn&rsquo;t.</p>
@@ -276,9 +222,9 @@
         </tbody>
     </table>
 
-    <div style="background:rgba(245,158,11,0.08);border:1px solid var(--rule);border-radius:12px;padding:1.25rem;margin:2rem 0;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
-        <p style="margin:0;font-size:0.92rem;color:#fff;">Not sure if your split shift rosters are compliant? Ask Fitz &mdash; get a clear answer based on the Hospitality Award.</p>
-        <a href="/app" style="background:var(--amber);color:var(--navy);font-weight:800;font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.65rem 1.25rem;text-decoration:none;white-space:nowrap;flex-shrink:0;">Check Your Setup &rarr;</a>
+    <div style="background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:1.25rem;margin:2rem 0;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+        <p style="margin:0;font-size:0.92rem;color:var(--text)">Not sure if your split shift rosters are compliant? Ask Fitz &mdash; get a clear answer based on the Hospitality Award.</p>
+        <a href="/app" style="background:var(--amber);color:var(--amber-ink);font-weight:600;font-size:13px;padding:0.65rem 1.25rem;text-decoration:none;white-space:nowrap;flex-shrink:0">Check Your Setup &rarr;</a>
     </div>
 
     <div class="warning-box">
@@ -306,12 +252,12 @@
     <h2>Common Mistakes That <em>Trigger Back-Pay</em></h2>
 
     <div class="dont-list">
-        <div class="dont-item"><div class="dont-item-x">&times;</div><div class="dont-item-text"><strong>Not paying the split shift allowance at all.</strong> By far the most common error. Many venues operate split shifts for years without knowing the allowance exists. It applies on every split shift day for every permanent employee &mdash; there is no minimum frequency threshold before it kicks in.</div></div>
-        <div class="dont-item"><div class="dont-item-x">&times;</div><div class="dont-item-text"><strong>Applying the allowance to casuals.</strong> Casuals are not entitled to the split shift allowance. But their 25% loading must still be applied correctly to every hour worked across both periods.</div></div>
-        <div class="dont-item"><div class="dont-item-x">&times;</div><div class="dont-item-text"><strong>Exceeding the 12-hour spread of hours.</strong> A roster from 9am to 11pm with a gap in the middle gives a 14-hour spread &mdash; exceeding the Award limit for most employee types. Work outside the spread may attract additional payments.</div></div>
-        <div class="dont-item"><div class="dont-item-x">&times;</div><div class="dont-item-text"><strong>Rostering shift periods below the 2-hour minimum engagement.</strong> A 90-minute lunch shift followed by a 5-hour dinner shift creates an underpayment on the first period. The employee is entitled to 2 hours&rsquo; pay for that period regardless of actual time worked.</div></div>
-        <div class="dont-item"><div class="dont-item-x">&times;</div><div class="dont-item-text"><strong>Recording total hours only, not start and finish times per period.</strong> Time records must show the start and finish time of each separate period &mdash; not just total daily hours. Incomplete records are a separate breach of the <strong>Fair Work Act 2009 (Cth)</strong>. See the <a href="/blog/fair-work-compliance-checklist-hospitality">Fair Work compliance checklist for hospitality</a>.</div></div>
-        <div class="dont-item"><div class="dont-item-x">&times;</div><div class="dont-item-text"><strong>Confusing the unpaid gap with a paid break.</strong> The gap between split shift periods is unpaid time &mdash; not a paid meal break or rest break. Separate break entitlement rules still apply <em>within</em> each shift period. See our guide on <a href="/blog/hospitality-award-break-entitlements-shift-length">break entitlements under the Hospitality Award</a>.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Not paying the split shift allowance at all.</strong> By far the most common error. Many venues operate split shifts for years without knowing the allowance exists. It applies on every split shift day for every permanent employee &mdash; there is no minimum frequency threshold before it kicks in.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Applying the allowance to casuals.</strong> Casuals are not entitled to the split shift allowance. But their 25% loading must still be applied correctly to every hour worked across both periods.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Exceeding the 12-hour spread of hours.</strong> A roster from 9am to 11pm with a gap in the middle gives a 14-hour spread &mdash; exceeding the Award limit for most employee types. Work outside the spread may attract additional payments.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Rostering shift periods below the 2-hour minimum engagement.</strong> A 90-minute lunch shift followed by a 5-hour dinner shift creates an underpayment on the first period. The employee is entitled to 2 hours&rsquo; pay for that period regardless of actual time worked.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Recording total hours only, not start and finish times per period.</strong> Time records must show the start and finish time of each separate period &mdash; not just total daily hours. Incomplete records are a separate breach of the <strong>Fair Work Act 2009 (Cth)</strong>. See the <a href="/blog/fair-work-compliance-checklist-hospitality">Fair Work compliance checklist for hospitality</a>.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Confusing the unpaid gap with a paid break.</strong> The gap between split shift periods is unpaid time &mdash; not a paid meal break or rest break. Separate break entitlement rules still apply <em>within</em> each shift period. See our guide on <a href="/blog/hospitality-award-break-entitlements-shift-length">break entitlements under the Hospitality Award</a>.</div></div>
     </div>
 
     <h2>Frequently Asked Questions</h2>
@@ -345,7 +291,7 @@
 
     <p>Related guides: <a href="/blog/split-shift-rules-restaurant-award-australia">split shift rules under the Restaurant Award (MA000119)</a>, <a href="/blog/hospitality-award-break-entitlements-shift-length">break entitlements by shift length</a>, and <a href="/blog/hospitality-award-rates-2026">2026 Hospitality Award rates and loadings</a>.</p>
 
-    <p style="font-size:1rem;line-height:1.7;color:rgba(255,255,255,0.7);font-style:italic;border-top:1px solid rgba(255,255,255,0.08);padding-top:1.5rem;margin-top:2rem;">Split shift back-pay is almost always discovered late &mdash; after months or years of missed allowances have compounded across every affected employee. The allowance is small per day. Across a team and a year, the liability isn&rsquo;t.</p>
+    <p style="font-size:1rem;line-height:1.7;color:var(--text2);border-top:1px solid rgba(255,255,255,0.08);padding-top:1.5rem;margin-top:2rem">Split shift back-pay is almost always discovered late &mdash; after months or years of missed allowances have compounded across every affected employee. The allowance is small per day. Across a team and a year, the liability isn&rsquo;t.</p>
 
     <div class="post-cta">
         <h3>Get Split Shift Rules Right</h3>
@@ -355,10 +301,8 @@
 
 </div>
 
-<a href="/app" class="sticky-pill">Ask Fitz HR &mdash; Split Shift Rules &rarr;</a>
-
 <footer>
-    <p>&copy; 2026 Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog/">Blog</a> &middot; <a href="/app">Try Free</a></p>
+    <p>&copy; Fitzgerald HR Pty Ltd (ABN 87 693 882 709), trading as Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog/">Blog</a> &middot; <a href="/app">Try Free</a></p>
 </footer>
 </body>
 </html>

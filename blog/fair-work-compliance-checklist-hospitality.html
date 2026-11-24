@@ -40,7 +40,7 @@
     <meta name="theme-color" content="#f59e0b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&amp;display=swap" rel="stylesheet">
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://fitzhr.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://fitzhr.com/blog/"},{"@type":"ListItem","position":3,"name":"Fair Work Compliance & Underpayments","item":"https://fitzhr.com/blog/topics/fair-work-compliance"},{"@type":"ListItem","position":4,"name":"Fair Work Compliance Checklist for Hospitality","item":"https://fitzhr.com/blog/fair-work-compliance-checklist-hospitality"}]}
     </script>
@@ -51,67 +51,20 @@
     {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What are the most common Fair Work violations in hospitality?","acceptedAnswer":{"@type":"Answer","text":"The most common violations are: underpayment of penalty rates (especially weekend and public holiday rates), failure to keep accurate time and pay records, not paying casual loading correctly, not providing payslips or providing inaccurate payslips, and failing to pay superannuation on time. The Fair Work Ombudsman specifically targets hospitality for these issues — it is a priority enforcement sector every year."}},{"@type":"Question","name":"How long must I keep employee records in hospitality?","acceptedAnswer":{"@type":"Answer","text":"Under the Fair Work Act 2009 (Cth), employers must keep employee records for 7 years. This includes time and wages records, leave records, superannuation contribution records, and any individual flexibility agreements. Records must be legible, in English, and readily accessible. Incomplete records can attract penalties even if you have been paying correctly."}},{"@type":"Question","name":"What happens if my restaurant fails a Fair Work audit?","acceptedAnswer":{"@type":"Answer","text":"Penalties for non-compliance can be severe. Company penalties can reach $93,900 per contravention. For serious or deliberate underpayment (wage theft), criminal penalties can apply including fines up to $7.825 million for companies under the Protecting Worker Entitlements Act 2023 (Cth). The Fair Work Ombudsman can also issue compliance notices, enforceable undertakings, and pursue court action."}},{"@type":"Question","name":"Do I need to give employees a Fair Work Information Statement?","acceptedAnswer":{"@type":"Answer","text":"Yes. Before or as soon as practicable after an employee starts, you must provide the Fair Work Information Statement (FWIS). For casual employees, you must also provide the Casual Employment Information Statement (CEIS). Failing to provide either is itself a breach of the Fair Work Act 2009 (Cth). Both are available free from fairwork.gov.au."}}]}
     </script>
     <style>
-        :root { --navy:#0f172a; --navy2:#141f35; --amber:#f59e0b; --w60:rgba(255,255,255,0.6); --w30:rgba(255,255,255,0.3); --rule:rgba(245,158,11,0.18); --rw:rgba(255,255,255,0.08); }
+        /* One-off components for this post. Shared post styles: /assets/blog-post.css */
+        :root{--navy:#0f172a; --navy2:#141f35; --amber:#f59e0b; --w60:rgba(255,255,255,0.6); --w30:rgba(255,255,255,0.3); --rule:rgba(245,158,11,0.18); --rw:rgba(255,255,255,0.08);}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-        html{font-size:16px;scroll-behavior:smooth;}
-        body{background:var(--navy);color:#fff;font-family:'Outfit',sans-serif;line-height:1.7;}
-        .nav{background:rgba(15,23,42,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--rule);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-        .nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-1px;text-decoration:none;display:flex;align-items:center;gap:0.4rem;}
-        .wm-f,.wm-hr{color:var(--amber);} .wm-itz{color:#fff;}
-        .nav-back{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--w60);text-decoration:none;transition:color 0.2s;}
-        .nav-back:hover{color:var(--amber);}
-        .post-hero{padding:3.5rem 1.5rem 2.5rem;max-width:780px;margin:0 auto;}
-        .post-tag{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;display:flex;align-items:center;gap:0.6rem;}
-        .post-tag::before{content:'';width:24px;height:2px;background:var(--amber);display:inline-block;}
-        .post-h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2rem,5vw,2.8rem);line-height:1.1;letter-spacing:-0.02em;margin-bottom:1.25rem;}
-        .post-h1 em{font-style:italic;color:var(--amber);}
-        .post-meta{display:flex;align-items:center;gap:1rem;font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--w30);margin-bottom:2rem;flex-wrap:wrap;}
-        .meta-dot{width:3px;height:3px;border-radius:50%;background:var(--w30);}
-        .post-intro{font-size:1.1rem;line-height:1.7;color:var(--w60);border-left:3px solid var(--amber);padding-left:1.25rem;margin-bottom:2.5rem;}
-        .post-body{max-width:780px;margin:0 auto;padding:0 1.5rem 5rem;}
-        .post-body h2{font-family:'Playfair Display',serif;font-weight:700;font-size:1.6rem;line-height:1.2;color:#fff;margin:2.5rem 0 1rem;}
-        .post-body h2 em{font-style:italic;color:var(--amber);}
-        .post-body h3{font-size:1.05rem;font-weight:700;color:var(--amber);margin:1.75rem 0 0.6rem;}
-        .post-body p{font-size:0.98rem;line-height:1.75;color:var(--w60);margin-bottom:1.1rem;}
-        .post-body strong{color:#fff;}
-        .post-body a{color:var(--amber);text-decoration:none;}
-        .post-body a:hover{text-decoration:underline;}
-        .post-body ul,.post-body ol{margin:0 0 1.1rem 1.25rem;}
-        .post-body li{font-size:0.95rem;color:var(--w60);line-height:1.65;margin-bottom:0.4rem;}
-        .verdict{background:var(--navy2);border:1px solid var(--rw);border-left:4px solid var(--amber);border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;}
-        .verdict-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);margin-bottom:0.6rem;}
-        .verdict p{margin:0;font-size:0.95rem;color:#fff;}
-        .warning-box{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-left:4px solid #ef4444;border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;}
-        .warning-box p{margin:0;font-size:0.95rem;color:rgba(255,255,255,0.8);}
-        /* CHECKLIST SECTIONS */
         .check-section{background:var(--navy2);border:1px solid var(--rw);border-radius:12px;overflow:hidden;margin:1.5rem 0;}
-        .check-section-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);padding:0.75rem 1.25rem;border-bottom:1px solid var(--rw);background:rgba(245,158,11,0.05);}
+        .check-section-label{font-size:13px;color:var(--text);padding:0.75rem 1.25rem;border-bottom:1px solid var(--rw);background:var(--surface);}
         .check-items{display:flex;flex-direction:column;}
         .check-item{display:flex;align-items:flex-start;gap:0.85rem;padding:0.85rem 1.25rem;border-bottom:1px solid var(--rw);transition:background 0.2s;}
         .check-item:last-child{border-bottom:none;}
-        .check-item:hover{background:rgba(245,158,11,0.04);}
-        .check-box{width:16px;height:16px;border:2px solid rgba(245,158,11,0.4);border-radius:3px;flex-shrink:0;margin-top:3px;}
+        .check-item:hover{background:var(--surface);}
+        .check-box{width:16px;height:16px;border:2px solid var(--line2);border-radius:3px;flex-shrink:0;margin-top:3px;}
         .check-text{flex:1;font-size:0.88rem;color:var(--w60);line-height:1.5;}
-        .check-text strong{color:#fff;}
-        /* FAQ */
-        .faq-list{display:flex;flex-direction:column;gap:0.5rem;margin:1.5rem 0;}
-        .faq-item{background:var(--navy2);border:1px solid var(--rw);border-radius:10px;overflow:hidden;}
-        .faq-item summary{padding:1rem 1.25rem;cursor:pointer;font-weight:600;font-size:0.95rem;color:#fff;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
-        .faq-item summary::-webkit-details-marker{display:none;}
-        .faq-item summary::after{content:'+';color:var(--amber);font-size:1.2rem;flex-shrink:0;transition:transform 0.3s;}
-        .faq-item[open] summary::after{transform:rotate(45deg);}
-        .faq-item[open]{border-color:var(--rule);}
-        .faq-answer{padding:0 1.25rem 1rem;font-size:0.88rem;color:var(--w60);line-height:1.65;}
-        /* CTA */
-        .post-cta{background:var(--amber);padding:2.5rem 1.5rem;border-radius:12px;text-align:center;margin:2.5rem 0;}
-        .post-cta h3{font-family:'Playfair Display',serif;font-weight:900;font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem;}
-        .post-cta p{font-size:0.9rem;color:rgba(15,23,42,0.7);margin-bottom:1.25rem;}
-        .post-cta a{display:inline-block;background:var(--navy);color:var(--amber);font-weight:800;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.85rem 2rem;text-decoration:none;transition:background 0.3s;}
-        .post-cta a:hover{background:#1e293b;}
-        footer{background:var(--navy2);border-top:1px solid var(--rule);padding:2rem 1.5rem;text-align:center;}
-        footer p{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.1em;color:var(--w30);}
-        footer a{color:var(--amber);text-decoration:none;}
+        .check-text strong{color:var(--text);}
     </style>
+    <link rel="stylesheet" href="/assets/blog-post.css?v=1">
     <!-- Meta Pixel Code -->
     <script>
     !function(f,b,e,v,n,t,s)
@@ -130,10 +83,17 @@
 </head>
 <body>
 <nav class="nav">
-    <a href="/" class="nav-logo"><span style="display:inline-flex;gap:0;letter-spacing:-1px;"><span class="wm-f">F</span><span class="wm-itz">ITZ</span></span><span class="wm-hr" style="margin-left:0.18em;">HR</span></a>
-    <a href="/blog/" class="nav-back">← Back to Blog</a>
+  <div class="nav-in">
+    <a href="/" class="logo"><em>F</em>ITZ<em>HR</em></a>
+    <div class="nav-right">
+        <a href="/" class="nav-home">Home</a>
+        <a href="/blog/" class="nav-home">Blog</a>
+        <a href="/pricing" class="nav-home">Pricing</a>
+        <a href="/app" class="btn small">Start Free</a>
+    </div>
+  </div>
 </nav>
-<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:900px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="color:rgba(232,237,245,0.72);text-decoration:none;">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="/blog/topics/fair-work-compliance" style="color:rgba(232,237,245,0.72);text-decoration:none;">Fair Work Compliance &amp; Underpayments</a></nav><!-- blog-crumb:end -->
+<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:780px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="color:rgba(232,237,245,0.72);text-decoration:none;">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="/blog/topics/fair-work-compliance" style="color:rgba(232,237,245,0.72);text-decoration:none;">Fair Work Compliance &amp; Underpayments</a></nav><!-- blog-crumb:end -->
 
 <header class="post-hero">
     <div class="post-tag">Fair Work · Compliance · 2026</div>
@@ -146,7 +106,7 @@
         <span>Legally reviewed — 2026</span>
     </div>
     <p class="post-intro">The <strong>Fair Work Ombudsman</strong> has made hospitality a priority enforcement sector — every year. Underpayment cases involving restaurant groups have led to increased scrutiny across the entire industry, from large chains to single-venue operations. Most venues that fail an audit don't fail because they're dishonest. They fail because they didn't know the rules. This checklist fixes that.</p>
-    <p class="post-intro" style="margin-top:-1rem;"><strong>If you're unsure about any item below, you are exposed to potential Fair Work liability.</strong></p>
+    <p class="post-intro" style="margin-top:-1rem"><strong>If you're unsure about any item below, you are exposed to potential Fair Work liability.</strong></p>
 </header>
 
 <div class="post-body">
@@ -159,7 +119,7 @@
     <h2>1. Pay &amp; <em>Award Compliance</em></h2>
     <p>This is where the <strong>Fair Work Ombudsman</strong> finds the most contraventions in hospitality — and the most expensive ones. Get this section right first.</p>
 
-    <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin-bottom:0.75rem;">Tick each item as you review your current setup — any unchecked item is a compliance gap.</p>
+    <p style="font-size:0.82rem;color:var(--text2);margin-bottom:0.75rem">Tick each item as you review your current setup — any unchecked item is a compliance gap.</p>
     <div class="check-section">
         <div class="check-section-label">Pay &amp; Award Compliance</div>
         <div class="check-items">
@@ -196,7 +156,7 @@
 
     <div class="verdict">
         <div class="verdict-label">Need a quick answer?</div>
-        <p>Ask Fitz HR anything about pay rates, records, or compliance — and get an instant, Award-aligned answer before it becomes a problem. <a href="/app" style="color:var(--amber);">Ask Fitz free →</a></p>
+        <p>Ask Fitz HR anything about pay rates, records, or compliance — and get an instant, Award-aligned answer before it becomes a problem. <a href="/app" style="color:var(--text)">Ask Fitz free →</a></p>
     </div>
 
     <h2>3. <em>Employment Documentation</em></h2>
@@ -289,7 +249,7 @@
 
     <p><strong>A single mistake in any section above can trigger back-pay across every employee and every pay period.</strong></p>
 
-    <p style="font-size:1rem;line-height:1.7;color:rgba(255,255,255,0.7);font-style:italic;border-top:1px solid rgba(255,255,255,0.08);padding-top:1.5rem;margin-top:2rem;">Most venues that fail a Fair Work audit weren't trying to cut corners — they just didn't have the right information at the right time. This checklist is the starting point. Fitz HR is what you use when you have a specific question.</p>
+    <p style="font-size:1rem;line-height:1.7;color:var(--text2);border-top:1px solid rgba(255,255,255,0.08);padding-top:1.5rem;margin-top:2rem">Most venues that fail a Fair Work audit weren't trying to cut corners — they just didn't have the right information at the right time. This checklist is the starting point. Fitz HR is what you use when you have a specific question.</p>
 
     <p>If you&rsquo;re evaluating tools to handle these obligations day-to-day, see our comparison of the <a href="/compare/best-hr-software-hospitality-australia">best HR software for hospitality in Australia</a> &mdash; what each option actually does for Award interpretation, casual conversion tracking, and payslip compliance.</p>
 
@@ -302,7 +262,7 @@
 </div>
 
 <footer>
-    <p>© 2026 Fitz HR · <a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/app">Try Free</a></p>
+    <p>&copy; Fitzgerald HR Pty Ltd (ABN 87 693 882 709), trading as Fitz HR · <a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/app">Try Free</a></p>
 </footer>
 </body>
 </html>

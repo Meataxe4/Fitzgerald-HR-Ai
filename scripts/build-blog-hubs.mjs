@@ -364,7 +364,7 @@ function updatePost(p) {
   // Visible trail under the top nav
   const cl = 'color:rgba(232,237,245,0.72);text-decoration:none;';
   const awardLinks = p.awards[0] === 'all' ? '' : ` <span style="margin:0 4px;">&middot;</span> ${p.awards.map((a) => `<a href="${guideUrl(a)}#articles" style="${cl}">${esc(TAX.awards[a].name)}</a>`).join(' &amp; ')}`;
-  const crumb = `\n<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:900px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="${cl}">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="${topicUrl(p.topic)}" style="${cl}">${esc(T.name)}</a>${awardLinks}</nav><!-- blog-crumb:end -->`;
+  const crumb = `\n<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:780px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="${cl}">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="${topicUrl(p.topic)}" style="${cl}">${esc(T.name)}</a>${awardLinks}</nav><!-- blog-crumb:end -->`;
   html = html.replace(CRUMB_RE, '');
   const navEnd = html.indexOf('</nav>');
   if (navEnd === -1) { warnings.push(`${p.slug}: no top nav, visible breadcrumb not added`); }
