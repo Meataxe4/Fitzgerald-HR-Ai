@@ -1,10 +1,65 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 # Fitz HR — Project Context for Claude
+
+## Commands
+
+Node 18 (`engines`, and what CI uses). There is no linter and no bundler for the front end.
+
+- `npm run dev`: run the site plus Netlify Functions locally (`netlify dev`).
+- `npm run build:css`: rebuild `tailwind.css` from `src/tailwind-input.css`. `tailwind.css` is gitignored and only built at deploy time.
+- `npm run build`: the Netlify deploy build (CSS, then `stamp-assets.mjs`, RSS, IndexNow). **Don't run it locally just to check something.** `stamp-assets.mjs` rewrites the `?v=` asset query strings in every HTML file in place, which leaves a large diff. IndexNow skips itself unless `CONTEXT=production`.
+- `npm run test:ci`: everything CI runs (`.github/workflows/regression.yml`). It covers:
+  - `npm test`: `tests/award-resolution.test.js`, the guardrail tests for `resolveAward()`.
+  - `npm run test:gate`: proves the accuracy gate fails closed.
+  - `npm run validate:rates`: structural check of every `*-award-rates.json`.
+  - `npm run test:regression`: the frozen question suite in `regression/questions/<vertical>.json`, with the launch gate (`ACCURACY_THRESHOLD`, default 0.95).
+- Run a single test file directly, e.g. `node tests/award-resolution.test.js`. These are plain Node scripts with hand-rolled asserts, not a test framework, so there's no per-test filter. `js/fitz-watch-rules.test.js` is not wired into npm or CI. It runs from the browser devtools console via `runFitzWatchTests()`.
+- `npm run check:staleness`: warns when an award's `next_review_date` is near or past. Use `--strict` to make it fail, and `STALENESS_TODAY=YYYY-MM-DD` to pin the date.
+- Page generators (rerun after any rates-JSON change):
+  - `npm run build:vertical-pages`
+  - `node scripts/build-cheat-sheets.mjs`
+  - `node scripts/build-classification-pages.mjs`
+  - `npm run build:blog`
+
+  Never hand-edit their output.
+
+## Architecture (big picture)
+
+Static HTML + vanilla JS on Netlify, with no SPA framework. Netlify Functions in `netlify/functions/` are the backend, bundled with esbuild. Firebase Auth and Firestore hold identity and per-user data. Claude powers the chat.
+
+- **The product app** is `app.html` plus global scripts:
+  - `js/app-main.js` (~26k lines): almost all app logic.
+  - `js/app-firebase.js`: auth, Firestore, the admin gate.
+  - `js/app-tools.js`
+- **Marketing site:** every other root `*.html`, plus `blog/` and `compare/`. Many pages are generated (see Commands).
+- **The rates JSON files are the single source of truth.** Each award has a `<vertical>-award-rates.json` at the repo root, with FWO Pay Guide figures, `effective_date` and `next_review_date`. They feed:
+  - the browser, which fetches them;
+  - `chat.js`, which `require()`s them and esbuild bundles them in;
+  - the regression suite and the page generators.
+
+  The annual 1 July wage review is a data-only change. The procedure is in `docs/maintenance-pipeline.md`: edit the JSON, run `validate:rates`, run `build:regression`, regenerate the pages, run `test:ci`, then commit the JSON and `regression/questions/*.json` together.
+- **Award resolution fails closed.** `AWARD_REGISTRY` and `resolveAward()` in `js/app-main.js` map a stored `venueProfile.primaryAward` string to an MA code by code or alias.
+  - Anything unrecognised resolves to `UNRESOLVED_AWARD`. Never add a default or fallback award.
+  - `status: 'preview'` awards resolve only when `hasFeature(flag)` is true. Flags live in the Firestore user doc and clients can't write them (`firestore.rules`).
+  - `netlify/functions/chat.js` keeps its own mirror, `SERVER_AWARDS`, which must be kept in sync. When no award resolves, chat answers only at the NES / Fair Work Act level.
+  - The tests and the regression runner pull the registry out of `app-main.js` by text markers: the start marker `const AWARD_REGISTRY = {` and the end comment `// Returns the resolved award context`. Don't rename or move those lines.
+  - Spec: `docs/guardrails-award-resolution.md`.
+- **Chat grounding is fact injection, not RAG.** `chat.js` builds fact blocks from the rates JSON (e.g. `buildPenaltyRateFacts`) and puts them into an award-scoped system prompt. The prompt deliberately bans quoting specific dollar base rates in chat. Per-award branches are keyed on `rates.ma_number` so that existing awards' output stays unchanged.
+- **Documents:**
+  - Client-side `_fwDoc*` builders in `app-main.js` produce HTML.
+  - `netlify/functions/generate-word.js` converts that HTML to `.docx` and knows nothing about awards.
+- **Other functions:** Stripe (checkout, portal, webhook), Deputy (OAuth, roster sync), Twilio/Telegram crisis notifications.
+- **Adding a new award:** follow `docs/add-new-award-blueprint.md`, which has the full update map across the rates file, registry, pickers, calculators, docs, chat grounding, gating, tests and pages. A vertical moves from `preview` to `supported` only once the regression suite clears the gate (`docs/regression-suite.md`).
+- `docs/architecture-current.md` is a June 2026 snapshot taken before the award registry existed. Its line numbers and "binary award" findings are out of date.
 
 ## Hard constraints (do not suggest otherwise)
 
 - **No LinkedIn.** Blake (founder) has a conflict of interest with his current employer and CANNOT create a LinkedIn personal profile or company page for Fitz HR. Do not recommend LinkedIn in any plan, playbook, or schema. Work around it with other entity signals (Instagram @fitz.hr, X @FitzHR, Crunchbase, Google Business Profile, Bing Places, software directories, the /about page).
 - **Founder name stays out of visible page text.** Blake's name must not appear in rendered/visible HTML content (it would surface when someone Googles his name). JSON-LD schema (`founder`/`creator`) is explicitly OK. llms.txt currently names him — flagged as a judgement call, Blake's to make. Press pitches naming him are his per-send decision.
-- **Never invent statistics, testimonials, or award rates.** All figures must come from the site's own published pages (sourced from FWO Pay Guides) or from Blake directly. The one testimonial is "Business Owner · Inner West Sydney" (kitchen-hand walkout story).
+- **Never invent statistics, testimonials, or award rates.** All figures must come from the site's own published pages (sourced from FWO Pay Guides) or from Blake directly. The real testimonials are: "Phil · Pub Owner and Operator, Alexandria NSW" and "Jack · Workhorse Staffing" (both on the homepage), and "Business Owner · Inner West Sydney" (kitchen-hand walkout story, on /about). Use only these.
 - **One primary CTA** across the marketing site: "Start Free — No Card Required" → /app.
 
 ## Legal entity
