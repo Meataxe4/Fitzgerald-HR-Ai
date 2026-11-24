@@ -35,7 +35,7 @@
     <meta name="theme-color" content="#f59e0b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&amp;display=swap" rel="stylesheet">
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://fitzhr.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://fitzhr.com/blog/"},{"@type":"ListItem","position":3,"name":"Hiring, Contracts & HR Setup","item":"https://fitzhr.com/blog/topics/hiring-contracts"},{"@type":"ListItem","position":4,"name":"Probation Periods","item":"https://fitzhr.com/blog/probation-periods-hospitality-australia"}]}
     </script>
@@ -46,73 +46,13 @@
     {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is a probation period in Australia?","acceptedAnswer":{"@type":"Answer","text":"A probation period is a contractual period at the start of employment during which the employer assesses the employee's suitability for the role. It is a creature of the employment contract — there is no statutory probation period in Australian law. The employment contract sets the duration (typically 3 to 6 months) and the conditions during the probation. Probation does not change the employee's entitlements under the National Employment Standards or the applicable modern award."}},{"@type":"Question","name":"How long can a probation period be in Australia?","acceptedAnswer":{"@type":"Answer","text":"There is no statutory limit on the contractual probation period in Australia — the employer can specify any duration in the employment contract. However, the practical relevance of probation is closely linked to the Minimum Employment Period under section 383 of the Fair Work Act 2009 (Cth): 6 months for employees of non-small business employers, or 12 months for employees of small business employers (fewer than 15 employees). After the Minimum Employment Period, the employee can access unfair dismissal jurisdiction regardless of contractual probation status."}},{"@type":"Question","name":"What is the difference between probation and the Minimum Employment Period?","acceptedAnswer":{"@type":"Answer","text":"Probation is a contractual concept — the employer specifies it in the employment contract for the purpose of assessing the employee's suitability. The Minimum Employment Period (MEP) is statutory under section 383 of the Fair Work Act 2009 (Cth) — it sets the minimum service required before an employee can claim unfair dismissal under section 385. The MEP is 6 months for non-small business employers and 12 months for small business employers. Contractual probation does not extend or override the MEP. An employee can be on a 3-month probation but be protected from unfair dismissal after 6 months service if the employer is non-small business."}},{"@type":"Question","name":"Can an employer dismiss an employee during probation without notice?","acceptedAnswer":{"@type":"Answer","text":"No. Even during a probation period, the employer must give the notice of termination required under section 117 of the Fair Work Act 2009 (Cth) and the applicable modern award (clause 35 of MA000119 or clause 41 of MA000009). The minimum notice is 1 week for employees with up to 1 year of service. The employer can pay in lieu of notice. Probation does not override the notice requirement — it primarily affects access to unfair dismissal jurisdiction, not basic termination obligations."}},{"@type":"Question","name":"Do general protections apply during probation?","acceptedAnswer":{"@type":"Answer","text":"Yes. The general protections under Part 3-1 of the Fair Work Act 2009 (Cth) apply from day one of employment, with no Minimum Employment Period or probation period restriction. An employee dismissed during probation can bring a general protections claim under section 365 if the dismissal was for a prohibited reason (such as exercising a workplace right, taking sick leave, raising a complaint, or any of the protected attributes under section 351). The 21-day filing limit applies from the date of dismissal."}},{"@type":"Question","name":"Can I extend an employee’s probation?","acceptedAnswer":{"@type":"Answer","text":"Yes, if the contract permits it — most modern contracts include a probation extension provision (typically up to 3 additional months). The extension must be in writing, must be communicated to the employee before the original probation period expires, and should state the reason and the new end date. An extension does not change the statutory MEP — it only extends the contractual review milestone."}},{"@type":"Question","name":"Is a 6 month probation period standard in Australia?","acceptedAnswer":{"@type":"Answer","text":"Six months is the most common probation length because it matches the minimum employment period for employers with 15 or more staff. Small business employers often use twelve months for the same reason. Three months is also common for junior roles. The Fair Work Act does not set a probation period at all; it sets the minimum employment period, which is what actually controls unfair dismissal access."}},{"@type":"Question","name":"Can an employee be terminated after the probation period ends?","acceptedAnswer":{"@type":"Answer","text":"Yes, but once the minimum employment period has passed the full unfair dismissal framework applies: a valid reason, a warning and a genuine chance to improve for performance matters, notice of the reason, an opportunity to respond, a support person, and notice or payment in lieu. Passing probation does not give the employee a job for life, and it does not mean the employer has lost the ability to dismiss. It means the process has to hold up."}},{"@type":"Question","name":"Does probation apply to casual employees?","acceptedAnswer":{"@type":"Answer","text":"A casual contract can include a review period, but the concept matters less because a casual engagement can end without notice under most awards. What does matter is the minimum employment period: a casual who has worked on a regular and systematic basis with a reasonable expectation of ongoing work accumulates service towards it, and once past it can bring an unfair dismissal claim if the roster simply stops."}}]}
     </script>
     <style>
+        /* One-off components for this post. Shared post styles: /assets/blog-post.css */
         :root{--navy:#0f172a;--navy2:#141f35;--amber:#f59e0b;--w60:rgba(255,255,255,0.6);--w30:rgba(255,255,255,0.3);--rule:rgba(245,158,11,0.18);--rw:rgba(255,255,255,0.08);--green:#22c55e;}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-        body{background:var(--navy);color:#fff;font-family:'Outfit',sans-serif;line-height:1.7;}
-        html{scroll-behavior:smooth;scroll-padding-top:80px;}
-        .nav{background:rgba(15,23,42,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--rule);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-        .nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-1px;text-decoration:none;display:inline-flex;}
-        .wm-f,.wm-hr{color:var(--amber);}.wm-itz{color:#fff;}
-        .nav-back{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--w60);text-decoration:none;}
-        .nav-back:hover{color:var(--amber);}
-        .hero{padding:4rem 1.5rem 2rem;max-width:900px;margin:0 auto;}
-        .post-tag{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;display:flex;align-items:center;gap:0.6rem;}
-        .post-tag::before{content:'';width:24px;height:2px;background:var(--amber);display:inline-block;}
-        h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2rem,4.5vw,2.8rem);line-height:1.1;letter-spacing:-0.02em;margin-bottom:1.25rem;}
-        h1 em{font-style:italic;color:var(--amber);}
-        .intro{font-size:1.05rem;line-height:1.7;color:var(--w60);border-left:3px solid var(--amber);padding-left:1.25rem;margin-bottom:2rem;}
-        .body{max-width:900px;margin:0 auto;padding:0 1.5rem 5rem;}
-        .body h2{font-family:'Playfair Display',serif;font-weight:700;font-size:1.5rem;color:#fff;margin:2.5rem 0 1rem;border-top:1px solid var(--rw);padding-top:1.5rem;}
-        .body h2 em{font-style:italic;color:var(--amber);}
-        .body h3{font-family:'Outfit',sans-serif;font-weight:700;font-size:1.05rem;color:#fff;margin:1.5rem 0 0.5rem;}
-        .body p{font-size:0.97rem;line-height:1.75;color:var(--w60);margin-bottom:1rem;}
-        .body strong{color:#fff;}
-        .body a{color:var(--amber);text-decoration:none;}
-        .body a:hover{text-decoration:underline;}
-        .body ul{margin:0 0 1rem 1.25rem;}
-        .body li{font-size:0.95rem;color:var(--w60);line-height:1.65;margin-bottom:0.4rem;}
-        .body ol{margin:0 0 1rem 1.25rem;}
-        .body ol li{font-size:0.95rem;color:var(--w60);line-height:1.65;margin-bottom:0.5rem;}
-        .hub-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin:1.5rem 0;}
-        @media(max-width:600px){.hub-grid{grid-template-columns:1fr;}}
-        .hub-card{background:var(--navy2);padding:1.5rem;text-decoration:none;display:block;border:1px solid transparent;transition:background 0.2s,border-color 0.2s;}
-        .hub-card:hover{background:#1a2847;border-color:var(--rule);}
-        .hub-label{font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);margin-bottom:0.5rem;}
-        .hub-card h3{font-size:0.95rem;font-weight:700;color:#fff;line-height:1.4;margin-bottom:0.4rem;}
-        .hub-card p{font-size:0.82rem;color:var(--w60);line-height:1.55;margin:0;}
-        .rate-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.86rem;}
-        .rate-table th{background:var(--navy2);color:var(--amber);padding:0.75rem 1rem;text-align:left;font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;border-bottom:1px solid var(--rule);}
-        .rate-table td{padding:0.8rem 1rem;border-bottom:1px solid var(--rw);color:var(--w60);vertical-align:middle;}
-        .rate-table tr:last-child td{border-bottom:none;}
-        .rate-table td:first-child{color:#fff;font-weight:600;}
-        .rate-table tr:hover td{background:rgba(245,158,11,0.02);}
-        .highlight{color:var(--amber);font-weight:700;}
-        .verdict{background:var(--navy2);border:1px solid var(--rw);border-left:4px solid var(--amber);border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;}
-        .verdict-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);margin-bottom:0.6rem;}
-        .verdict p{margin:0;font-size:0.95rem;color:#fff;}
-        .callout{background:#1a2847;border-left:3px solid var(--amber);padding:1.25rem 1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0;}
-        .callout strong{color:#fff;font-size:0.95rem;display:block;margin-bottom:0.4rem;}
-        .callout p{font-size:0.88rem;color:var(--w60);margin:0;line-height:1.65;}
-        .faq-list{display:flex;flex-direction:column;gap:0.5rem;margin:1.5rem 0;}
-        .faq-item{background:var(--navy2);border:1px solid var(--rw);border-radius:10px;overflow:hidden;}
-        .faq-item summary{padding:1rem 1.25rem;cursor:pointer;font-weight:600;font-size:0.95rem;color:#fff;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
-        .faq-item summary::-webkit-details-marker{display:none;}
-        .faq-item summary::after{content:'+';color:var(--amber);font-size:1.2rem;flex-shrink:0;transition:transform 0.3s;}
-        .faq-item[open] summary::after{transform:rotate(45deg);}
-        .faq-item[open]{border-color:var(--rule);}
-        .faq-answer{padding:0 1.25rem 1rem;font-size:0.88rem;color:var(--w60);line-height:1.65;}
-        .post-cta{background:var(--amber);padding:2.5rem 1.5rem;border-radius:12px;text-align:center;margin:2.5rem 0;}
-        .post-cta h3{font-family:'Playfair Display',serif;font-weight:900;font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem;}
-        .post-cta p{font-size:0.9rem;color:rgba(15,23,42,0.7);margin-bottom:1.25rem;}
-        .post-cta a{display:inline-block;background:var(--navy);color:var(--amber);font-weight:800;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.85rem 2rem;text-decoration:none;}
-        .post-cta a:hover{background:#1e293b;}
-        .sticky-pill{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--amber);color:var(--navy);padding:0.75rem 1.75rem;border-radius:999px;font-weight:800;font-size:0.8rem;text-decoration:none;z-index:999;white-space:nowrap;box-shadow:0 4px 24px rgba(245,158,11,0.35);}
-        .sticky-pill:hover{background:#fbbf24;}
-        footer{background:var(--navy2);border-top:1px solid var(--rule);padding:2rem 1.5rem;text-align:center;}
-        footer p{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.1em;color:var(--w30);}
-        footer a{color:var(--amber);text-decoration:none;}
-        @media(max-width:600px){.sticky-pill{font-size:0.74rem;padding:0.65rem 1.25rem;}.rate-table{font-size:0.78rem;}.rate-table th,.rate-table td{padding:0.6rem 0.6rem;}}
+        h1{font-weight:600;font-size:clamp(2rem,4.5vw,2.8rem);line-height:1.1;margin-bottom:1.25rem;}
+        h1 em{color:var(--text);}
     </style>
+    <link rel="stylesheet" href="/assets/blog-post.css?v=1">
     <!-- Meta Pixel Code -->
     <script>
     !function(f,b,e,v,n,t,s)
@@ -131,29 +71,36 @@
 </head>
 <body>
 <nav class="nav">
-    <a href="/" class="nav-logo" aria-label="Fitz HR home"><span class="wm-f">F</span><span class="wm-itz">ITZ</span><span class="wm-hr" style="margin-left:0.18em;">HR</span></a>
-    <a href="/blog/" class="nav-back">&larr; Blog</a>
+  <div class="nav-in">
+    <a href="/" class="logo"><em>F</em>ITZ<em>HR</em></a>
+    <div class="nav-right">
+        <a href="/" class="nav-home">Home</a>
+        <a href="/blog/" class="nav-home">Blog</a>
+        <a href="/pricing" class="nav-home">Pricing</a>
+        <a href="/app" class="btn small">Start Free</a>
+    </div>
+  </div>
 </nav>
-<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:900px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="color:rgba(232,237,245,0.72);text-decoration:none;">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="/blog/topics/hiring-contracts" style="color:rgba(232,237,245,0.72);text-decoration:none;">Hiring, Contracts &amp; HR Setup</a></nav><!-- blog-crumb:end -->
+<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:780px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="color:rgba(232,237,245,0.72);text-decoration:none;">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="/blog/topics/hiring-contracts" style="color:rgba(232,237,245,0.72);text-decoration:none;">Hiring, Contracts &amp; HR Setup</a></nav><!-- blog-crumb:end -->
 
 <header class="hero">
     <div class="post-tag">Probation &middot; Any Award &middot; Fair Work Act 2009 (Cth) s383</div>
     <h1>Probation Periods in <em>Australia</em> — What Employers Can and Can&rsquo;t Do</h1>
-    <div style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--w30);margin-bottom:2rem;">Updated 14 Oct 2026 &middot; Fair Work Act 2009 (Cth) sections 117, 351, 383, 385 &middot; Applies under every modern award</div>
+    <div style="font-size:13px;color:var(--w30);margin-bottom:2rem">Updated 14 Oct 2026 &middot; Fair Work Act 2009 (Cth) sections 117, 351, 383, 385 &middot; Applies under every modern award</div>
     <p class="intro">Employers often ask what a <strong>probation period in Australia</strong> actually allows them to do &mdash; but the legal position is frequently misunderstood. Probation is one of the most misunderstood terms in Australian employment law. It&rsquo;s commonly described as a period during which an employer can &ldquo;easily&rdquo; let an employee go &mdash; but probation isn&rsquo;t a statutory concept, it doesn&rsquo;t override notice obligations, and it doesn&rsquo;t insulate the employer from general protections claims or discrimination claims. The relevant statutory protection is the <em>Minimum Employment Period</em> under section 383 of the Fair Work Act &mdash; the threshold for <strong>probation vs unfair dismissal in Australia</strong> &mdash; which is separate from the contractual probation in the offer letter. Here&rsquo;s how the two actually work, and what employers can and can&rsquo;t do during the early months of employment, whether the new hire is a chef, a retail assistant, a support worker, a machinist or an educator.</p>
 </header>
 
 <div class="body">
 
-    <div class="verdict" style="margin-bottom:2rem;">
+    <div class="verdict" style="margin-bottom:2rem">
         <div class="verdict-label">Quick Answer</div>
         <p><strong>Probation is contractual; the Minimum Employment Period is statutory.</strong> The MEP under FW Act s383 is <strong>6 months</strong> for non-small business employers and <strong>12 months</strong> for small business employers (fewer than 15 employees). Within the MEP, the employee cannot bring an unfair dismissal claim. They <em>can</em> still bring a general protections claim, a discrimination claim, or a Fair Work claim about workplace rights. Notice of termination under s117 still applies during probation. Contractual probation duration is not capped, but it cannot extend or reduce the MEP.</p>
     </div>
 
-    <p style="font-size:1rem;color:#fff;font-weight:600;line-height:1.6;border-left:3px solid var(--amber);padding:0.25rem 0 0.25rem 1.25rem;margin:0 0 2rem;"><span style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:0.5rem;">In Simple Terms</span>You can dismiss a new hire more easily in their first 6 months (or 12 months for small businesses with fewer than 15 employees) because they can&rsquo;t bring an unfair dismissal claim &mdash; but you still have to give them notice, you can&rsquo;t dismiss for a discriminatory or unlawful reason, and the &ldquo;probation&rdquo; in the contract isn&rsquo;t doing the legal work people think it is.</p>
+    <p style="font-size:1rem;color:var(--text);font-weight:600;line-height:1.6;border-left:3px solid var(--line2);padding:0.25rem 0 0.25rem 1.25rem;margin:0 0 2rem"><span style="font-size:13px;color:var(--text);display:block;margin-bottom:0.5rem">In Simple Terms</span>You can dismiss a new hire more easily in their first 6 months (or 12 months for small businesses with fewer than 15 employees) because they can&rsquo;t bring an unfair dismissal claim &mdash; but you still have to give them notice, you can&rsquo;t dismiss for a discriminatory or unlawful reason, and the &ldquo;probation&rdquo; in the contract isn&rsquo;t doing the legal work people think it is.</p>
 
     <h2>What Is a <em>Probation Period in Australia?</em></h2>
-    <p style="font-size:1.05rem;color:#fff;font-weight:600;line-height:1.6;background:var(--navy2);border:1px solid var(--rule);border-radius:8px;padding:1.5rem;margin:1rem 0 1.5rem;">There is no legal probation period under Australian law. Probation periods in Australia are <strong>contractual only</strong>. The legal protection threshold is the <strong>Minimum Employment Period</strong> under section 383 of the Fair Work Act 2009 (Cth), which determines when an employee can bring an unfair dismissal claim under section 385.</p>
+    <p style="font-size:1.05rem;color:var(--text);font-weight:600;line-height:1.6;background:var(--navy2);border:1px solid var(--rule);border-radius:8px;padding:1.5rem;margin:1rem 0 1.5rem">There is no legal probation period under Australian law. Probation periods in Australia are <strong>contractual only</strong>. The legal protection threshold is the <strong>Minimum Employment Period</strong> under section 383 of the Fair Work Act 2009 (Cth), which determines when an employee can bring an unfair dismissal claim under section 385.</p>
     <p>This single distinction explains most of the confusion around probation. The contract sets a probation period to define a contractual review milestone. The Fair Work Act sets a separate Minimum Employment Period to determine access to unfair dismissal jurisdiction. The two often coincide in length, but they are different concepts with different effects.</p>
 
     <h2>Probation vs the <em>Minimum Employment Period</em></h2>
@@ -377,7 +324,7 @@
         </details>
     </div>
 
-    <p style="text-align:center;font-size:1rem;color:#fff;font-weight:600;line-height:1.6;margin:2.5rem auto 1rem;max-width:640px;">Probation isn&rsquo;t the legal shield people think it is. Get the contract right, follow notice rules, document the process &mdash; and the early months of employment work as intended.</p>
+    <p style="text-align:center;font-size:1rem;color:var(--text);font-weight:600;line-height:1.6;margin:2.5rem auto 1rem;max-width:640px">Probation isn&rsquo;t the legal shield people think it is. Get the contract right, follow notice rules, document the process &mdash; and the early months of employment work as intended.</p>
 
     <div class="post-cta">
         <h3>Probation Decision &mdash; Ask Fitz</h3>
@@ -386,10 +333,8 @@
     </div>
 </div>
 
-<a href="/app" class="sticky-pill">Probation question? Ask Fitz &rarr;</a>
-
 <footer>
-    <p>&copy; 2026 Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog/">Blog</a> &middot; <a href="/restaurant-award-guide">Restaurant Award</a> &middot; <a href="/hospitality-award-guide">Hospitality Award</a> &middot; <a href="/app">Try Free</a></p>
+    <p>&copy; Fitzgerald HR Pty Ltd (ABN 87 693 882 709), trading as Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog/">Blog</a> &middot; <a href="/restaurant-award-guide">Restaurant Award</a> &middot; <a href="/hospitality-award-guide">Hospitality Award</a> &middot; <a href="/app">Try Free</a></p>
 </footer>
 </body>
 </html>

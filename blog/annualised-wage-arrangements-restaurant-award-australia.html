@@ -35,7 +35,7 @@
     <meta name="theme-color" content="#f59e0b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&amp;display=swap" rel="stylesheet">
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://fitzhr.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://fitzhr.com/blog/"},{"@type":"ListItem","position":3,"name":"Pay Rates & Penalty Rates","item":"https://fitzhr.com/blog/topics/pay-rates-penalty-rates"},{"@type":"ListItem","position":4,"name":"Annualised Wage Arrangements","item":"https://fitzhr.com/blog/annualised-wage-arrangements-restaurant-award-australia"}]}
     </script>
@@ -46,73 +46,13 @@
     {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is an annualised wage arrangement under the Restaurant Award MA000119?","acceptedAnswer":{"@type":"Answer","text":"An annualised wage arrangement under clause 20 of the Restaurant Industry Award MA000119 is a written agreement between an employer and a full-time employee where the employee is paid an annualised wage of at least 25% above the minimum weekly rate prescribed in clause 18, multiplied by 52, in satisfaction of certain Award entitlements. The annualised wage can satisfy obligations under clause 18 (minimum rates), clause 21.3 (split shift allowance), clause 23 (overtime), clause 24 (penalty rates), and clause 25.3 (annual leave payment). Casual and part-time employees cannot be placed on an annualised wage arrangement under clause 20."}},{"@type":"Question","name":"What are the outer limits for an annualised wage under MA000119?","acceptedAnswer":{"@type":"Answer","text":"Under clause 20.1(b) of the Restaurant Industry Award MA000119, an employee on an annualised wage cannot be required to work more than: (i) an average of 18 ordinary hours per week that would attract a penalty rate under clause 24.2(a), excluding any hours worked from 10pm to midnight; or (ii) an average of 12 overtime hours per week. Any hours worked in excess of either outer limit are not covered by the annualised wage and must be separately paid at the applicable Award rates under clause 20.1(c)."}},{"@type":"Question","name":"How often must an employer reconcile an annualised wage under the Restaurant Award?","acceptedAnswer":{"@type":"Answer","text":"Under clause 20.2(b) of the Restaurant Industry Award MA000119, the employer must reconcile the annualised wage every 12 months from the commencement of the arrangement, or earlier if the employment ends or the agreement terminates. The employer compares the annualised wage paid against the amount the employee would have received under the Award for the work performed. Where the annualised wage is less than the Award amount, the employer must pay the shortfall within 14 days."}},{"@type":"Question","name":"Do employees on an annualised wage need to keep timesheets under MA000119?","acceptedAnswer":{"@type":"Answer","text":"Yes. Under clause 20.2(c) of the Restaurant Industry Award MA000119, the employer must keep a record of the starting and finishing times of work, and any unpaid breaks taken, for each employee on an annualised wage arrangement. The record must be signed by the employee, or acknowledged as correct in writing (including by electronic means), each pay period or roster cycle. This record is required so that the 12-month reconciliation under clause 20.2(b) can be performed."}},{"@type":"Question","name":"Can a casual or part-time employee be on an annualised wage under MA000119?","acceptedAnswer":{"@type":"Answer","text":"No. Clause 20.1(a) of the Restaurant Industry Award MA000119 specifies that an annualised wage arrangement may only be entered into between an employer and a full-time employee. Casual and part-time employees cannot be placed on an annualised wage under clause 20. Casual employees are paid the 25% casual loading on top of the ordinary hourly rate under clause 11.1, while part-time employees are paid the minimum hourly rate plus applicable penalties for hours worked within their guaranteed hours."}}]}
     </script>
     <style>
+        /* One-off components for this post. Shared post styles: /assets/blog-post.css */
         :root{--navy:#0f172a;--navy2:#141f35;--amber:#f59e0b;--w60:rgba(255,255,255,0.6);--w30:rgba(255,255,255,0.3);--rule:rgba(245,158,11,0.18);--rw:rgba(255,255,255,0.08);--green:#22c55e;}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-        body{background:var(--navy);color:#fff;font-family:'Outfit',sans-serif;line-height:1.7;}
-        html{scroll-behavior:smooth;scroll-padding-top:80px;}
-        .nav{background:rgba(15,23,42,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--rule);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-        .nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-1px;text-decoration:none;display:inline-flex;}
-        .wm-f,.wm-hr{color:var(--amber);}.wm-itz{color:#fff;}
-        .nav-back{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--w60);text-decoration:none;}
-        .nav-back:hover{color:var(--amber);}
-        .hero{padding:4rem 1.5rem 2rem;max-width:900px;margin:0 auto;}
-        .post-tag{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;display:flex;align-items:center;gap:0.6rem;}
-        .post-tag::before{content:'';width:24px;height:2px;background:var(--amber);display:inline-block;}
-        h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2rem,4.5vw,2.8rem);line-height:1.1;letter-spacing:-0.02em;margin-bottom:1.25rem;}
-        h1 em{font-style:italic;color:var(--amber);}
-        .intro{font-size:1.05rem;line-height:1.7;color:var(--w60);border-left:3px solid var(--amber);padding-left:1.25rem;margin-bottom:2rem;}
-        .body{max-width:900px;margin:0 auto;padding:0 1.5rem 5rem;}
-        .body h2{font-family:'Playfair Display',serif;font-weight:700;font-size:1.5rem;color:#fff;margin:2.5rem 0 1rem;border-top:1px solid var(--rw);padding-top:1.5rem;}
-        .body h2 em{font-style:italic;color:var(--amber);}
-        .body h3{font-family:'Outfit',sans-serif;font-weight:700;font-size:1.05rem;color:#fff;margin:1.5rem 0 0.5rem;}
-        .body p{font-size:0.97rem;line-height:1.75;color:var(--w60);margin-bottom:1rem;}
-        .body strong{color:#fff;}
-        .body a{color:var(--amber);text-decoration:none;}
-        .body a:hover{text-decoration:underline;}
-        .body ul{margin:0 0 1rem 1.25rem;}
-        .body li{font-size:0.95rem;color:var(--w60);line-height:1.65;margin-bottom:0.4rem;}
-        .body ol{margin:0 0 1rem 1.25rem;}
-        .body ol li{font-size:0.95rem;color:var(--w60);line-height:1.65;margin-bottom:0.5rem;}
-        .hub-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin:1.5rem 0;}
-        @media(max-width:600px){.hub-grid{grid-template-columns:1fr;}}
-        .hub-card{background:var(--navy2);padding:1.5rem;text-decoration:none;display:block;border:1px solid transparent;transition:background 0.2s,border-color 0.2s;}
-        .hub-card:hover{background:#1a2847;border-color:var(--rule);}
-        .hub-label{font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);margin-bottom:0.5rem;}
-        .hub-card h3{font-size:0.95rem;font-weight:700;color:#fff;line-height:1.4;margin-bottom:0.4rem;}
-        .hub-card p{font-size:0.82rem;color:var(--w60);line-height:1.55;margin:0;}
-        .rate-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.86rem;}
-        .rate-table th{background:var(--navy2);color:var(--amber);padding:0.75rem 1rem;text-align:left;font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;border-bottom:1px solid var(--rule);}
-        .rate-table td{padding:0.8rem 1rem;border-bottom:1px solid var(--rw);color:var(--w60);vertical-align:middle;}
-        .rate-table tr:last-child td{border-bottom:none;}
-        .rate-table td:first-child{color:#fff;font-weight:600;}
-        .rate-table tr:hover td{background:rgba(245,158,11,0.02);}
-        .highlight{color:var(--amber);font-weight:700;}
-        .verdict{background:var(--navy2);border:1px solid var(--rw);border-left:4px solid var(--amber);border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;}
-        .verdict-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);margin-bottom:0.6rem;}
-        .verdict p{margin:0;font-size:0.95rem;color:#fff;}
-        .callout{background:#1a2847;border-left:3px solid var(--amber);padding:1.25rem 1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0;}
-        .callout strong{color:#fff;font-size:0.95rem;display:block;margin-bottom:0.4rem;}
-        .callout p{font-size:0.88rem;color:var(--w60);margin:0;line-height:1.65;}
-        .faq-list{display:flex;flex-direction:column;gap:0.5rem;margin:1.5rem 0;}
-        .faq-item{background:var(--navy2);border:1px solid var(--rw);border-radius:10px;overflow:hidden;}
-        .faq-item summary{padding:1rem 1.25rem;cursor:pointer;font-weight:600;font-size:0.95rem;color:#fff;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
-        .faq-item summary::-webkit-details-marker{display:none;}
-        .faq-item summary::after{content:'+';color:var(--amber);font-size:1.2rem;flex-shrink:0;transition:transform 0.3s;}
-        .faq-item[open] summary::after{transform:rotate(45deg);}
-        .faq-item[open]{border-color:var(--rule);}
-        .faq-answer{padding:0 1.25rem 1rem;font-size:0.88rem;color:var(--w60);line-height:1.65;}
-        .post-cta{background:var(--amber);padding:2.5rem 1.5rem;border-radius:12px;text-align:center;margin:2.5rem 0;}
-        .post-cta h3{font-family:'Playfair Display',serif;font-weight:900;font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem;}
-        .post-cta p{font-size:0.9rem;color:rgba(15,23,42,0.7);margin-bottom:1.25rem;}
-        .post-cta a{display:inline-block;background:var(--navy);color:var(--amber);font-weight:800;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.85rem 2rem;text-decoration:none;}
-        .post-cta a:hover{background:#1e293b;}
-        .sticky-pill{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--amber);color:var(--navy);padding:0.75rem 1.75rem;border-radius:999px;font-weight:800;font-size:0.8rem;text-decoration:none;z-index:999;white-space:nowrap;box-shadow:0 4px 24px rgba(245,158,11,0.35);}
-        .sticky-pill:hover{background:#fbbf24;}
-        footer{background:var(--navy2);border-top:1px solid var(--rule);padding:2rem 1.5rem;text-align:center;}
-        footer p{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.1em;color:var(--w30);}
-        footer a{color:var(--amber);text-decoration:none;}
-        @media(max-width:600px){.sticky-pill{font-size:0.74rem;padding:0.65rem 1.25rem;}.rate-table{font-size:0.78rem;}.rate-table th,.rate-table td{padding:0.6rem 0.6rem;}}
+        h1{font-weight:600;font-size:clamp(2rem,4.5vw,2.8rem);line-height:1.1;margin-bottom:1.25rem;}
+        h1 em{color:var(--text);}
     </style>
+    <link rel="stylesheet" href="/assets/blog-post.css?v=1">
     <!-- Meta Pixel Code -->
     <script>
     !function(f,b,e,v,n,t,s)
@@ -131,26 +71,33 @@
 </head>
 <body>
 <nav class="nav">
-    <a href="/" class="nav-logo" aria-label="Fitz HR home"><span class="wm-f">F</span><span class="wm-itz">ITZ</span><span class="wm-hr" style="margin-left:0.18em;">HR</span></a>
-    <a href="/restaurant-award-guide" class="nav-back">&larr; Restaurant Award Guide</a>
+  <div class="nav-in">
+    <a href="/" class="logo"><em>F</em>ITZ<em>HR</em></a>
+    <div class="nav-right">
+        <a href="/" class="nav-home">Home</a>
+        <a href="/blog/" class="nav-home">Blog</a>
+        <a href="/pricing" class="nav-home">Pricing</a>
+        <a href="/app" class="btn small">Start Free</a>
+    </div>
+  </div>
 </nav>
-<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:900px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="color:rgba(232,237,245,0.72);text-decoration:none;">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="/blog/topics/pay-rates-penalty-rates" style="color:rgba(232,237,245,0.72);text-decoration:none;">Pay Rates &amp; Penalty Rates</a> <span style="margin:0 4px;">&middot;</span> <a href="/restaurant-award-guide#articles" style="color:rgba(232,237,245,0.72);text-decoration:none;">Restaurant Award</a></nav><!-- blog-crumb:end -->
+<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:780px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="color:rgba(232,237,245,0.72);text-decoration:none;">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="/blog/topics/pay-rates-penalty-rates" style="color:rgba(232,237,245,0.72);text-decoration:none;">Pay Rates &amp; Penalty Rates</a> <span style="margin:0 4px;">&middot;</span> <a href="/restaurant-award-guide#articles" style="color:rgba(232,237,245,0.72);text-decoration:none;">Restaurant Award</a></nav><!-- blog-crumb:end -->
 
 <header class="hero">
     <div class="post-tag">Restaurant Award &middot; Annualised Wage &middot; MA000119 Clause 20</div>
     <h1>Annualised Wage <em>Arrangements</em> — Restaurant Award (MA000119)</h1>
-    <div style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--w30);margin-bottom:2rem;">Updated May 2026 &middot; Sourced from MA000119 Clause 20 &middot; Fair Work Act 2009 (Cth)</div>
+    <div style="font-size:13px;color:var(--w30);margin-bottom:2rem">Updated May 2026 &middot; Sourced from MA000119 Clause 20 &middot; Fair Work Act 2009 (Cth)</div>
     <p class="intro">An annualised wage looks like a clean way to pay a salaried chef or restaurant manager — one fixed number, no penalty rate calculations, no Saturday loading maths. Under clause 20 of the Restaurant Industry Award MA000119, that simplicity comes with strict guardrails: a minimum 25% loading, hard outer limits of 18 ordinary penalty hours and 12 overtime hours per week, signed weekly time records, and a 12-month reconciliation with shortfalls payable within 14 days. Get any one of those wrong and the &ldquo;simple&rdquo; salary becomes a multi-year underpayment claim.</p>
 </header>
 
 <div class="body">
 
-    <div class="verdict" style="margin-bottom:2rem;">
+    <div class="verdict" style="margin-bottom:2rem">
         <div class="verdict-label">Quick Answer</div>
         <p><strong>Under clause 20.1 of MA000119,</strong> an annualised wage is a written agreement between an employer and a <strong>full-time employee only</strong> (no casuals, no part-timers) for an annual salary of at least <strong>25% above the minimum weekly rate</strong> (clause 18) &times; 52. The wage can absorb obligations under clauses 18, 21.3, 23, 24, and 25.3. Outer limits cap the &ldquo;included&rdquo; hours: an average of <strong>18 ordinary penalty hours/week</strong> (excluding 10pm&ndash;midnight) and an average of <strong>12 overtime hours/week</strong>. Hours beyond either limit must be paid separately. Reconciliation is required <strong>every 12 months</strong> with any shortfall paid within 14 days, and the employer must keep <strong>signed weekly time records</strong>.</p>
     </div>
 
-    <p style="font-size:1rem;color:#fff;font-weight:600;line-height:1.6;border-left:3px solid var(--amber);padding:0.25rem 0 0.25rem 1.25rem;margin:0 0 2rem;"><span style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:0.5rem;">In Simple Terms</span>An annualised wage under the Restaurant Award (also called an annualised salary) is a fixed yearly figure that must be at least 25% above the Award minimum and can only cover up to <strong>18 penalty hours and 12 overtime hours per week on average</strong> &mdash; anything beyond that must be paid separately at Award rates.</p>
+    <p style="font-size:1rem;color:var(--text);font-weight:600;line-height:1.6;border-left:3px solid var(--line2);padding:0.25rem 0 0.25rem 1.25rem;margin:0 0 2rem"><span style="font-size:13px;color:var(--text);display:block;margin-bottom:0.5rem">In Simple Terms</span>An annualised wage under the Restaurant Award (also called an annualised salary) is a fixed yearly figure that must be at least 25% above the Award minimum and can only cover up to <strong>18 penalty hours and 12 overtime hours per week on average</strong> &mdash; anything beyond that must be paid separately at Award rates.</p>
 
     <h2>What an Annualised Wage Arrangement <em>Actually Is</em></h2>
     <p>Clause 20 of the Restaurant Industry Award MA000119 was substantially rewritten in 2022 (PR740708, ppc 1 September 2022). The old version &mdash; titled &ldquo;Annualised salary arrangements&rdquo; &mdash; let an employer roll an annual salary into the Award and rely on a year-end better-off comparison. The current version &mdash; <strong>&ldquo;Annualised wage arrangements&rdquo; (still commonly called annualised salary arrangements in practice)</strong> &mdash; keeps the salary structure but adds outer limits on the hours covered, mandatory weekly time-record signing, and a precise list of which Award provisions the wage can absorb.</p>
@@ -363,7 +310,7 @@
         </details>
     </div>
 
-    <p style="text-align:center;font-size:1rem;color:#fff;font-weight:600;line-height:1.6;margin:2.5rem auto 1rem;max-width:640px;">You don&rsquo;t need a payroll consultant on retainer to get clause 20 right &mdash; you need to know whether your current annualised wage agreement, your weekly time records, and your last reconciliation actually satisfy the Award. That check takes a few questions.</p>
+    <p style="text-align:center;font-size:1rem;color:var(--text);font-weight:600;line-height:1.6;margin:2.5rem auto 1rem;max-width:640px">You don&rsquo;t need a payroll consultant on retainer to get clause 20 right &mdash; you need to know whether your current annualised wage agreement, your weekly time records, and your last reconciliation actually satisfy the Award. That check takes a few questions.</p>
 
     <div class="post-cta">
         <h3>Get Annualised Wage Compliance Right — Ask Fitz</h3>
@@ -372,10 +319,8 @@
     </div>
 </div>
 
-<a href="/app" class="sticky-pill">Annualised wage question? Ask Fitz &rarr;</a>
-
 <footer>
-    <p>&copy; 2026 Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog/">Blog</a> &middot; <a href="/restaurant-award-guide">Restaurant Award</a> &middot; <a href="/hospitality-award-guide">Hospitality Award</a> &middot; <a href="/app">Try Free</a></p>
+    <p>&copy; Fitzgerald HR Pty Ltd (ABN 87 693 882 709), trading as Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog/">Blog</a> &middot; <a href="/restaurant-award-guide">Restaurant Award</a> &middot; <a href="/hospitality-award-guide">Hospitality Award</a> &middot; <a href="/app">Try Free</a></p>
 </footer>
 </body>
 </html>
