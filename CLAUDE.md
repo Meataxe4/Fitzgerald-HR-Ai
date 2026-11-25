@@ -16,6 +16,10 @@ Node 18 (`engines`, and what CI uses). There is no linter and no bundler for the
   - `npm run test:gate`: proves the accuracy gate fails closed.
   - `npm run validate:rates`: structural check of every `*-award-rates.json`.
   - `npm run test:regression`: the frozen question suite in `regression/questions/<vertical>.json`, with the launch gate (`ACCURACY_THRESHOLD`, default 0.95).
+- Site quality checks run in a separate workflow, `.github/workflows/site-quality.yml`, not in `test:ci`. Config is in `tests/site-quality/`:
+  - Vale (`vale.ini`, `vale-styles/FitzHR/`): fails on "Fitz HR Pty Ltd", the founder's name in visible text, and LinkedIn mentions. A separate step fails on any `linkedin.com` URL.
+  - lychee: internal links, canonicals and sitemap entries, checked offline against the repo files. External links run weekly only.
+  - pa11y-ci with axe over every sitemap page. `pa11y-gate.mjs` fails on any axe rule not listed in `known-a11y-debt.json` (currently `color-contrast` and `link-in-text-block`, which are reported only). Remove a rule from that list once its count reaches zero.
 - Run a single test file directly, e.g. `node tests/award-resolution.test.js`. These are plain Node scripts with hand-rolled asserts, not a test framework, so there's no per-test filter. `js/fitz-watch-rules.test.js` is not wired into npm or CI. It runs from the browser devtools console via `runFitzWatchTests()`.
 - `npm run check:staleness`: warns when an award's `next_review_date` is near or past. Use `--strict` to make it fail, and `STALENESS_TODAY=YYYY-MM-DD` to pin the date.
 - Page generators (rerun after any rates-JSON change):

@@ -1,0 +1,152 @@
+name: Site quality (content rules, links, accessibility)
+
+# Three independent checks on the published HTML. Config lives in
+# tests/site-quality/ (already blocked from the web by netlify.toml).
+#
+#   content        Vale enforces the hard content rules in CLAUDE.md (legal entity
+#                  name, founder name out of visible text, no LinkedIn).
+#   links          lychee checks every internal link, canonical URL and sitemap
+#                  entry against the files in the repo. Offline, so never flaky.
+#   accessibility  pa11y-ci (axe, WCAG 2 AA) tests every page in sitemap.xml.
+#                  Rules in known-a11y-debt.json are reported but do not block;
+#                  any other rule fails the build.
+#   external-links lychee against third-party sites. Weekly and on demand only,
+#                  because other people's servers should not block a deploy.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: ['**']
+  schedule:
+    - cron: '23 19 * * 0' # Monday ~05:23 AEST
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  VALE_VERSION: '3.9.5'
+  LYCHEE_VERSION: '0.18.1'
+
+jobs:
+  content:
+    name: Content rules (Vale)
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Vale
+        run: |
+          curl -sSfL "https://github.com/errata-ai/vale/releases/download/v${VALE_VERSION}/vale_${VALE_VERSION}_Linux_64-bit.tar.gz" \
+            | tar xz -C /usr/local/bin vale
+          vale --version
+
+      # Visible text only: Vale skips <script>, so JSON-LD founder/creator is fine.
+      - name: Vale content rules
+        run: vale --config tests/site-quality/vale.ini --output line .
+
+      # Vale cannot see href values or JSON-LD, so catch LinkedIn URLs directly
+      # (links, sameAs schema, llms.txt, feeds).
+      - name: No LinkedIn URLs
+        run: |
+          if grep -rniE 'linkedin\.com' --include='*.html' --include='*.xml' --include='*.txt' \
+               --exclude-dir=node_modules --exclude-dir=.git .; then
+            echo "::error::LinkedIn URL found. Fitz HR must not link to or list LinkedIn."
+            exit 1
+          fi
+
+  links:
+    name: Internal links (lychee)
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # tailwind.css is gitignored and built at deploy time; pages link to it.
+      - name: Build CSS
+        run: npm ci && npm run build:css
+
+      - name: Install lychee
+        run: |
+          curl -sSfL "https://github.com/lycheeverse/lychee/releases/download/lychee-v${LYCHEE_VERSION}/lychee-x86_64-unknown-linux-gnu.tar.gz" \
+            | tar xz -C /usr/local/bin lychee
+          lychee --version
+
+      # --fallback-extensions html mirrors Netlify's clean URLs (/about -> about.html).
+      # --remap checks absolute https://fitzhr.com/... URLs (canonicals, sitemap)
+      # against the local files instead of the live site.
+      - name: Check internal links, canonicals and sitemap
+        run: |
+          lychee --offline --no-progress --format compact \
+            --root-dir "$PWD" --fallback-extensions html \
+            --remap "^https://fitzhr\.com/ file://$PWD/" \
+            './*.html' './blog/**/*.html' './compare/**/*.html' sitemap.xml
+
+  accessibility:
+    name: Accessibility (pa11y-ci)
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build CSS
+        run: npm ci && npm run build:css
+
+      # -e html serves clean URLs the way Netlify does.
+      - name: Serve the site locally
+        run: |
+          npx --yes http-server@14.1.1 . -p 8080 -e html -s &
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:8080/ > /dev/null && exit 0
+            sleep 1
+          done
+          echo "::error::Local server did not start"; exit 1
+
+      # pa11y-ci exits non-zero on any issue; the gate script decides pass/fail.
+      - name: Run pa11y-ci over every sitemap page
+        run: |
+          npx --yes pa11y-ci@4.1.1 --config tests/site-quality/pa11yci.json \
+            --sitemap http://127.0.0.1:8080/sitemap.xml \
+            --sitemap-find 'https://fitzhr.com' \
+            --sitemap-replace 'http://127.0.0.1:8080' \
+            --json > pa11y-report.json || true
+
+      - name: Accessibility gate
+        run: node tests/site-quality/pa11y-gate.mjs pa11y-report.json
+
+      - name: Upload pa11y report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pa11y-report
+          path: pa11y-report.json
+
+  external-links:
+    name: External links (lychee, weekly)
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install lychee
+        run: |
+          curl -sSfL "https://github.com/lycheeverse/lychee/releases/download/lychee-v${LYCHEE_VERSION}/lychee-x86_64-unknown-linux-gnu.tar.gz" \
+            | tar xz -C /usr/local/bin lychee
+
+      # fairwork.gov.au and fwc.gov.au return 403 to all crawlers, so they are
+      # excluded. fitzhr.com and root-relative links are covered by the internal job.
+      - name: Check external links
+        run: |
+          lychee --no-progress --format compact \
+            --max-concurrency 8 --timeout 30 --max-retries 2 \
+            --accept '200..=299,403,429' \
+            --exclude 'fairwork\.gov\.au' --exclude 'fwc\.gov\.au' \
+            --exclude '^https://fitzhr\.com' --exclude '^file://' \
+            './*.html' './blog/**/*.html' './compare/**/*.html'
