@@ -10,6 +10,8 @@ name: Site quality (content rules, links, accessibility)
 #   accessibility  pa11y-ci (axe, WCAG 2 AA) tests every page in sitemap.xml.
 #                  Rules in known-a11y-debt.json are reported but do not block;
 #                  any other rule fails the build.
+#   app-output-safety  browser test that untrusted content (user text, model
+#                  output, Deputy data) is never executed by the app.
 #   external-links lychee against third-party sites. Weekly and on demand only,
 #                  because other people's servers should not block a deploy.
 on:
@@ -144,6 +146,28 @@ jobs:
         with:
           name: pa11y-report
           path: pa11y-report.json
+
+  app-output-safety:
+    name: App output safety (XSS browser test)
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Not a project dependency: Netlify builds should not download a browser.
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --no-save playwright@1.63.0
+          npx playwright install --with-deps chromium
+
+      # Pushes script payloads through chat, the review viewer, the admin
+      # lists, the Deputy roster and the AI tool panels, and fails if any run.
+      # The test blocks every non-local request, so no analytics are touched.
+      - name: Untrusted content must not execute
+        run: node tests/xss-rendering.test.js
 
   external-links:
     name: External links (lychee, weekly)
