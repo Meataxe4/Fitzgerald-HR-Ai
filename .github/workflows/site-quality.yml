@@ -109,6 +109,23 @@ jobs:
           done
           echo "::error::Local server did not start"; exit 1
 
+      # Every page carries the Google Analytics tag and the Meta pixel. Without
+      # this, each run reports ~143 fake US visitors (the runner) to both. Block
+      # the tracker hosts on the runner, and fail if the tag is still reachable.
+      # tests/site-quality/pa11yci.json blocks the same hosts inside Chrome.
+      - name: Block analytics and ad trackers
+        run: |
+          for host in www.googletagmanager.com www.google-analytics.com \
+              region1.google-analytics.com analytics.google.com \
+              stats.g.doubleclick.net connect.facebook.net www.facebook.com; do
+            echo "0.0.0.0 $host" | sudo tee -a /etc/hosts > /dev/null
+          done
+          if curl -s -m 10 -o /dev/null https://www.googletagmanager.com/gtag/js; then
+            echo "::error::Analytics tag is still reachable; refusing to load pages."
+            exit 1
+          fi
+          echo "Trackers blocked."
+
       # pa11y-ci exits non-zero on any issue; the gate script decides pass/fail.
       - name: Run pa11y-ci over every sitemap page
         run: |

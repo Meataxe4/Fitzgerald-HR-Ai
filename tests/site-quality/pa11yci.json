@@ -1,9 +1,16 @@
 {
   "defaults": {
     "standard": "WCAG2AA",
-    "runners": ["axe"],
+    "runners": [
+      "axe"
+    ],
     "timeout": 60000,
-    "chromeLaunchConfig": { "args": ["--no-sandbox"] }
+    "chromeLaunchConfig": {
+      "args": [
+        "--no-sandbox",
+        "--host-resolver-rules=MAP www.googletagmanager.com ~NOTFOUND, MAP *.google-analytics.com ~NOTFOUND, MAP *.analytics.google.com ~NOTFOUND, MAP *.doubleclick.net ~NOTFOUND, MAP connect.facebook.net ~NOTFOUND, MAP www.facebook.com ~NOTFOUND"
+      ]
+    }
   },
   "concurrency": 4
 }
