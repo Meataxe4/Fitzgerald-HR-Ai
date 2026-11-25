@@ -1,0 +1,40 @@
+name: FWC rates check
+
+# Daily cross-check of every *-award-rates.json against the Fair Work Commission
+# Modern Awards Pay Database API. Read-only: it never edits the rates files.
+# Fails (and so emails the repo owner) when a figure in our files is no longer
+# published by the FWC for that award, or when the FWC schedules a change whose
+# date is not yet listed in scripts/fwc-known-gaps.json.
+#
+# Needs the repository secret FWC_API_KEY (Settings > Secrets and variables >
+# Actions). Key from https://developer.fwc.gov.au.
+on:
+  schedule:
+    - cron: '41 20 * * *' # ~06:41 AEST daily
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify rates against the FWC database
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check rates files against the FWC
+        env:
+          FWC_API_KEY: ${{ secrets.FWC_API_KEY }}
+        run: node scripts/verify-rates-fwc.mjs --strict --json fwc-rates-report.json
+
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fwc-rates-report
+          path: fwc-rates-report.json
+          if-no-files-found: ignore
