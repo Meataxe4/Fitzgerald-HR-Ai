@@ -1,0 +1,32 @@
+{
+  "comment": "Used by scripts/verify-rates-fwc.mjs. 'base' and 'allowances' list figures in our rates files that the FWC Modern Awards Pay Database does not hold, or holds in another form, so the script cannot check them: they still need checking against the FWO Pay Guide by hand. Match on a name substring ('match') and/or a rates 'category'. 'acknowledged_upcoming' lists dates of scheduled FWC changes that are already planned for; remove a date once the change is in the rates file.",
+  "awards": {
+    "MA000009": {
+      "allowances": [
+        { "match": "Split/broken shift allowance (loaded-rate employees", "reason": "derived: the difference between the two FWC split shift amounts ($5.60 - $3.69)" }
+      ]
+    },
+    "MA000004": {
+      "allowances": [
+        { "match": "Cold work allowance (below 0", "reason": "derived: the sum of the two FWC cold work amounts ($0.38 + $0.59)" }
+      ],
+      "acknowledged_upcoming": ["2026-12-01"]
+    },
+    "MA000010": {
+      "base": [
+        { "category": "junior", "reason": "junior rates for this award are not in the MAPD" },
+        { "category": "trainee", "reason": "the MAPD holds National Training Wage rates in a different form" },
+        { "category": "cadet", "reason": "cadet rates for this award are not in the MAPD" },
+        { "category": "apprentice", "match": "Higher engineering", "reason": "not in the MAPD" },
+        { "category": "apprentice", "match": "Advanced engineering", "reason": "not in the MAPD" },
+        { "category": "adult", "match": "Advanced Certificate or National Diploma", "reason": "technical-field rates are not in the MAPD" },
+        { "category": "adult", "match": "Associate Diploma or National Advanced Diploma", "reason": "technical-field rates are not in the MAPD" },
+        { "category": "adult", "match": "Technical field - No qualification", "reason": "technical-field rates are not in the MAPD" },
+        { "category": "adult", "match": "Completed Diploma of Engineering", "reason": "technical-field rates are not in the MAPD" }
+      ]
+    },
+    "MA000100": {
+      "acknowledged_upcoming": ["2026-12-01"]
+    }
+  }
+}

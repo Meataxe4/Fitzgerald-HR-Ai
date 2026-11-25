@@ -18,6 +18,7 @@
     "build:blog": "node scripts/build-blog-hubs.mjs",
     "validate:rates": "node scripts/validate-rates.mjs",
     "check:staleness": "node scripts/check-staleness.mjs",
+    "verify:fwc": "node --use-env-proxy --disable-warning=UNDICI-EHPA scripts/verify-rates-fwc.mjs",
     "flag:to-regression": "node scripts/flag-to-regression.mjs",
     "seo:report": "node --use-env-proxy --disable-warning=UNDICI-EHPA scripts/seo-report.mjs",
     "seo:check": "node --use-env-proxy --disable-warning=UNDICI-EHPA scripts/seo-report.mjs --check"
