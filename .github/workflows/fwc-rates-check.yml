@@ -9,6 +9,14 @@ name: FWC rates check
 # Needs the repository secret FWC_API_KEY (Settings > Secrets and variables >
 # Actions). Key from https://developer.fwc.gov.au.
 on:
+  # Also run whenever the rates data or the check itself changes, so a rates
+  # edit is verified against the FWC before it is merged.
+  push:
+    paths:
+      - '*-award-rates.json'
+      - 'scripts/verify-rates-fwc.mjs'
+      - 'scripts/fwc-known-gaps.json'
+      - '.github/workflows/fwc-rates-check.yml'
   schedule:
     - cron: '41 20 * * *' # ~06:41 AEST daily
   workflow_dispatch:
