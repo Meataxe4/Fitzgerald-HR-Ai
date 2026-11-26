@@ -85,7 +85,7 @@ Everything else (profiles, chamber, bookkeepers, podcasts) is either one-time se
 >
 > Hi [name],
 >
-> Loved your piece on [recent article]. With the 2026 Annual Wage Review rates now in effect (1 July), we're seeing the same mistakes repeat across [sector] — and they're the expensive kind, since Fair Work penalties for award non-compliance run to $93,900 per contravention for companies.
+> Loved your piece on [recent article]. With the 2026 Annual Wage Review rates now in effect (1 July), we're seeing the same mistakes repeat across [sector] — and they're the expensive kind, since Fair Work penalties for award non-compliance run to $109,200 per contravention for companies.
 >
 > Three I can walk your readers through, with current figures:
 > 1. Applying the new base rate but forgetting flat-dollar loadings changed too (e.g. hospitality evening loading)

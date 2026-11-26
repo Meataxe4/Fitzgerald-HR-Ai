@@ -35,7 +35,7 @@
     <meta name="theme-color" content="#f59e0b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&amp;display=swap" rel="stylesheet">
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://fitzhr.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://fitzhr.com/blog/"},{"@type":"ListItem","position":3,"name":"Pay Rates & Penalty Rates","item":"https://fitzhr.com/blog/topics/pay-rates-penalty-rates"},{"@type":"ListItem","position":4,"name":"Public Holiday Pay Rules","item":"https://fitzhr.com/blog/public-holiday-pay-rules-restaurant-award-australia"}]}
     </script>
@@ -46,73 +46,13 @@
     {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is the public holiday pay rate under the Restaurant Award MA000119?","acceptedAnswer":{"@type":"Answer","text":"Under clause 24.2(c) of the Restaurant Industry Award MA000119, full-time and part-time employees who work on a public holiday are paid 225% of the minimum hourly rate. Casual employees who work on a public holiday are paid 250% of the minimum hourly rate (this rate already includes the 25% casual loading). Permanent employees who work a public holiday also receive the National Employment Standards entitlement to a paid day off."}},{"@type":"Question","name":"What is the minimum engagement on a public holiday under MA000119?","acceptedAnswer":{"@type":"Answer","text":"Under clause 24.4 of the Restaurant Industry Award MA000119, a full-time or part-time employee who works on a public holiday must be paid for a minimum of 4 hours, even if they actually work less. The 2-hour casual minimum engagement under clause 11.3 continues to apply for casual employees on public holidays."}},{"@type":"Question","name":"Can a restaurant employee agree to a lower public holiday rate under MA000119?","acceptedAnswer":{"@type":"Answer","text":"Yes. Under clause 24.4 of the Restaurant Industry Award MA000119, an employer and employee may agree in writing to substitute the 225% public holiday rate with: 125% of the minimum hourly rate for hours worked on the public holiday, plus equivalent paid time added to the employee's annual leave, OR a paid day off taken within 28 days of the public holiday. The substitute arrangement is voluntary and must be agreed in writing."}},{"@type":"Question","name":"What happens when Christmas Day falls on a weekend under MA000119?","acceptedAnswer":{"@type":"Answer","text":"Under clause 24.4 of the Restaurant Industry Award MA000119, when Christmas Day falls on a Saturday or Sunday and the public holiday is observed on a different day, an employee other than a casual who works on the actual Christmas Day is paid an additional loading of 50% of their ordinary time rate for hours worked on that day, in addition to the weekend penalty rate. The employee is also entitled to the benefit of the substitute public holiday."}},{"@type":"Question","name":"Does a casual employee get a paid public holiday under the Restaurant Award?","acceptedAnswer":{"@type":"Answer","text":"No. Under the National Employment Standards (sections 114-116 of the Fair Work Act 2009 (Cth)), only permanent (full-time and part-time) employees are entitled to a paid day off for public holidays not worked. Casual employees are not entitled to be paid if they do not work on a public holiday. If a casual does work on a public holiday, they receive the 250% public holiday rate under clause 24.2(c) of MA000119."}}]}
     </script>
     <style>
+        /* One-off components for this post. Shared post styles: /assets/blog-post.css */
         :root{--navy:#0f172a;--navy2:#141f35;--amber:#f59e0b;--w60:rgba(255,255,255,0.6);--w30:rgba(255,255,255,0.3);--rule:rgba(245,158,11,0.18);--rw:rgba(255,255,255,0.08);--green:#22c55e;}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-        body{background:var(--navy);color:#fff;font-family:'Outfit',sans-serif;line-height:1.7;}
-        html{scroll-behavior:smooth;scroll-padding-top:80px;}
-        .nav{background:rgba(15,23,42,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--rule);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-        .nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-1px;text-decoration:none;display:inline-flex;}
-        .wm-f,.wm-hr{color:var(--amber);}.wm-itz{color:#fff;}
-        .nav-back{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--w60);text-decoration:none;}
-        .nav-back:hover{color:var(--amber);}
-        .hero{padding:4rem 1.5rem 2rem;max-width:900px;margin:0 auto;}
-        .post-tag{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;display:flex;align-items:center;gap:0.6rem;}
-        .post-tag::before{content:'';width:24px;height:2px;background:var(--amber);display:inline-block;}
-        h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2rem,4.5vw,2.8rem);line-height:1.1;letter-spacing:-0.02em;margin-bottom:1.25rem;}
-        h1 em{font-style:italic;color:var(--amber);}
-        .intro{font-size:1.05rem;line-height:1.7;color:var(--w60);border-left:3px solid var(--amber);padding-left:1.25rem;margin-bottom:2rem;}
-        .body{max-width:900px;margin:0 auto;padding:0 1.5rem 5rem;}
-        .body h2{font-family:'Playfair Display',serif;font-weight:700;font-size:1.5rem;color:#fff;margin:2.5rem 0 1rem;border-top:1px solid var(--rw);padding-top:1.5rem;}
-        .body h2 em{font-style:italic;color:var(--amber);}
-        .body h3{font-family:'Outfit',sans-serif;font-weight:700;font-size:1.05rem;color:#fff;margin:1.5rem 0 0.5rem;}
-        .body p{font-size:0.97rem;line-height:1.75;color:var(--w60);margin-bottom:1rem;}
-        .body strong{color:#fff;}
-        .body a{color:var(--amber);text-decoration:none;}
-        .body a:hover{text-decoration:underline;}
-        .body ul{margin:0 0 1rem 1.25rem;}
-        .body li{font-size:0.95rem;color:var(--w60);line-height:1.65;margin-bottom:0.4rem;}
-        .body ol{margin:0 0 1rem 1.25rem;}
-        .body ol li{font-size:0.95rem;color:var(--w60);line-height:1.65;margin-bottom:0.5rem;}
-        .hub-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin:1.5rem 0;}
-        @media(max-width:600px){.hub-grid{grid-template-columns:1fr;}}
-        .hub-card{background:var(--navy2);padding:1.5rem;text-decoration:none;display:block;border:1px solid transparent;transition:background 0.2s,border-color 0.2s;}
-        .hub-card:hover{background:#1a2847;border-color:var(--rule);}
-        .hub-label{font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);margin-bottom:0.5rem;}
-        .hub-card h3{font-size:0.95rem;font-weight:700;color:#fff;line-height:1.4;margin-bottom:0.4rem;}
-        .hub-card p{font-size:0.82rem;color:var(--w60);line-height:1.55;margin:0;}
-        .rate-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.86rem;}
-        .rate-table th{background:var(--navy2);color:var(--amber);padding:0.75rem 1rem;text-align:left;font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;border-bottom:1px solid var(--rule);}
-        .rate-table td{padding:0.8rem 1rem;border-bottom:1px solid var(--rw);color:var(--w60);vertical-align:middle;}
-        .rate-table tr:last-child td{border-bottom:none;}
-        .rate-table td:first-child{color:#fff;font-weight:600;}
-        .rate-table tr:hover td{background:rgba(245,158,11,0.02);}
-        .highlight{color:var(--amber);font-weight:700;}
-        .verdict{background:var(--navy2);border:1px solid var(--rw);border-left:4px solid var(--amber);border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;}
-        .verdict-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);margin-bottom:0.6rem;}
-        .verdict p{margin:0;font-size:0.95rem;color:#fff;}
-        .callout{background:#1a2847;border-left:3px solid var(--amber);padding:1.25rem 1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0;}
-        .callout strong{color:#fff;font-size:0.95rem;display:block;margin-bottom:0.4rem;}
-        .callout p{font-size:0.88rem;color:var(--w60);margin:0;line-height:1.65;}
-        .faq-list{display:flex;flex-direction:column;gap:0.5rem;margin:1.5rem 0;}
-        .faq-item{background:var(--navy2);border:1px solid var(--rw);border-radius:10px;overflow:hidden;}
-        .faq-item summary{padding:1rem 1.25rem;cursor:pointer;font-weight:600;font-size:0.95rem;color:#fff;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
-        .faq-item summary::-webkit-details-marker{display:none;}
-        .faq-item summary::after{content:'+';color:var(--amber);font-size:1.2rem;flex-shrink:0;transition:transform 0.3s;}
-        .faq-item[open] summary::after{transform:rotate(45deg);}
-        .faq-item[open]{border-color:var(--rule);}
-        .faq-answer{padding:0 1.25rem 1rem;font-size:0.88rem;color:var(--w60);line-height:1.65;}
-        .post-cta{background:var(--amber);padding:2.5rem 1.5rem;border-radius:12px;text-align:center;margin:2.5rem 0;}
-        .post-cta h3{font-family:'Playfair Display',serif;font-weight:900;font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem;}
-        .post-cta p{font-size:0.9rem;color:rgba(15,23,42,0.7);margin-bottom:1.25rem;}
-        .post-cta a{display:inline-block;background:var(--navy);color:var(--amber);font-weight:800;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.85rem 2rem;text-decoration:none;}
-        .post-cta a:hover{background:#1e293b;}
-        .sticky-pill{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--amber);color:var(--navy);padding:0.75rem 1.75rem;border-radius:999px;font-weight:800;font-size:0.8rem;text-decoration:none;z-index:999;white-space:nowrap;box-shadow:0 4px 24px rgba(245,158,11,0.35);}
-        .sticky-pill:hover{background:#fbbf24;}
-        footer{background:var(--navy2);border-top:1px solid var(--rule);padding:2rem 1.5rem;text-align:center;}
-        footer p{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.1em;color:var(--w30);}
-        footer a{color:var(--amber);text-decoration:none;}
-        @media(max-width:600px){.sticky-pill{font-size:0.74rem;padding:0.65rem 1.25rem;}.rate-table{font-size:0.78rem;}.rate-table th,.rate-table td{padding:0.6rem 0.6rem;}}
+        h1{font-weight:600;font-size:clamp(2rem,4.5vw,2.8rem);line-height:1.1;margin-bottom:1.25rem;}
+        h1 em{color:var(--text);}
     </style>
+    <link rel="stylesheet" href="/assets/blog-post.css?v=1">
     <!-- Meta Pixel Code -->
     <script>
     !function(f,b,e,v,n,t,s)
@@ -131,26 +71,33 @@
 </head>
 <body>
 <nav class="nav">
-    <a href="/" class="nav-logo" aria-label="Fitz HR home"><span class="wm-f">F</span><span class="wm-itz">ITZ</span><span class="wm-hr" style="margin-left:0.18em;">HR</span></a>
-    <a href="/restaurant-award-guide" class="nav-back">&larr; Restaurant Award Guide</a>
+  <div class="nav-in">
+    <a href="/" class="logo"><em>F</em>ITZ<em>HR</em></a>
+    <div class="nav-right">
+        <a href="/" class="nav-home">Home</a>
+        <a href="/blog/" class="nav-home">Blog</a>
+        <a href="/pricing" class="nav-home">Pricing</a>
+        <a href="/app" class="btn small">Start Free</a>
+    </div>
+  </div>
 </nav>
-<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:900px;margin:0 auto;padding:1.1rem 1.5rem 0;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.45);line-height:1.8;"><a href="/blog/" style="color:rgba(255,255,255,0.6);text-decoration:none;">Blog</a> <span style="opacity:0.5;">&rsaquo;</span> <a href="/blog/topics/pay-rates-penalty-rates" style="color:#f59e0b;text-decoration:none;">Pay Rates &amp; Penalty Rates</a> <span style="opacity:0.5;">&middot;</span> <a href="/restaurant-award-guide#articles" style="color:#f59e0b;text-decoration:none;">Restaurant Award</a></nav><!-- blog-crumb:end -->
+<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:780px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="color:rgba(232,237,245,0.72);text-decoration:none;">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="/blog/topics/pay-rates-penalty-rates" style="color:rgba(232,237,245,0.72);text-decoration:none;">Pay Rates &amp; Penalty Rates</a> <span style="margin:0 4px;">&middot;</span> <a href="/restaurant-award-guide#articles" style="color:rgba(232,237,245,0.72);text-decoration:none;">Restaurant Award</a></nav><!-- blog-crumb:end -->
 
 <header class="hero">
     <div class="post-tag">Restaurant Award &middot; Public Holidays &middot; MA000119 Clauses 24.2 &amp; 24.4</div>
     <h1>Public Holiday <em>Pay Rules</em> — Restaurant Award (MA000119)</h1>
-    <div style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--w30);margin-bottom:2rem;">Updated May 2026 &middot; Sourced from MA000119 &middot; Fair Work Act 2009 (Cth) sections 114-116</div>
+    <div style="font-size:13px;color:var(--w30);margin-bottom:2rem">Updated May 2026 &middot; Sourced from MA000119 &middot; Fair Work Act 2009 (Cth) sections 114-116</div>
     <p class="intro"><strong>Public holiday penalty rates in Australia&rsquo;s Restaurant Award (MA000119)</strong> are the highest-cost rates in the standard restaurant week. Working a public holiday triggers a 225% rate for permanent staff (250% for casuals), a 4-hour minimum engagement, the National Employment Standards paid-day-off entitlement for staff not required to work, and a special rule for when Christmas Day lands on a weekend. There&rsquo;s also a substitute-day option that lets venues halve the public holiday rate &mdash; but only with a written agreement. Here&rsquo;s every rule, with worked examples for the 2026 calendar.</p>
 </header>
 
 <div class="body">
 
-    <div class="verdict" style="margin-bottom:2rem;">
+    <div class="verdict" style="margin-bottom:2rem">
         <div class="verdict-label">Quick Answer</div>
         <p><strong>Under clause 24.2(c) of MA000119,</strong> hours worked on a public holiday are paid at <strong>225% (full-time/part-time)</strong> or <strong>250% (casual, loading included)</strong> of the minimum hourly rate. Minimum engagement is <strong>4 hours</strong> for permanent employees (clause 24.4) and <strong>2 hours</strong> for casuals (clause 11.3). The Award&rsquo;s clause 24.4 also allows a written substitute-day arrangement (125% pay + paid day off within 28 days), and a Christmas-on-weekend additional 50% loading for permanents.</p>
     </div>
 
-    <p style="font-size:1rem;color:#fff;font-weight:600;line-height:1.6;border-left:3px solid var(--amber);padding:0.25rem 0 0.25rem 1.25rem;margin:0 0 2rem;"><span style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:0.5rem;">In Simple Terms</span>Under the Restaurant Award (MA000119), public holiday work must be paid at <strong>225% for permanent employees and 250% for casuals</strong>, with a <strong>4-hour minimum engagement for permanents and 2 hours for casuals</strong>. A substitute arrangement can reduce the rate to 125% plus a paid day off &mdash; but only if agreed in writing before the work is performed.</p>
+    <p style="font-size:1rem;color:var(--text);font-weight:600;line-height:1.6;border-left:3px solid var(--line2);padding:0.25rem 0 0.25rem 1.25rem;margin:0 0 2rem"><span style="font-size:13px;color:var(--text);display:block;margin-bottom:0.5rem">In Simple Terms</span>Under the Restaurant Award (MA000119), public holiday work must be paid at <strong>225% for permanent employees and 250% for casuals</strong>, with a <strong>4-hour minimum engagement for permanents and 2 hours for casuals</strong>. A substitute arrangement can reduce the rate to 125% plus a paid day off &mdash; but only if agreed in writing before the work is performed.</p>
 
     <h2>Restaurant Award Public Holiday <em>Penalty Rates 2026</em></h2>
     <p>Clause 24.2(c) of MA000119 (Table 8 &mdash; Penalty rates) sets the public holiday rate. The casual rate is all-inclusive &mdash; the 25% casual loading is built into the 250% figure, not stacked on top.</p>
@@ -245,9 +192,9 @@
         <li><strong>Stacking the public holiday rate on top of overtime</strong> &mdash; if a permanent works overtime hours on a public holiday, clause 23.4 Table 7 sets the applicable overtime rate for that work (typically 250% for public holiday overtime). The 225% public holiday penalty rate and the overtime rate do not stack; the applicable overtime rate under Table 7 governs the overtime hours. Always check the Table 7 figure for the precise overtime time-and-day combination</li>
     </ul>
 
-    <p style="text-align:center;font-size:1rem;color:#fff;font-weight:600;line-height:1.6;margin:2rem auto 1rem;max-width:640px;"><strong>One incorrectly paid public holiday across a 10-person roster, repeated across 7 national public holidays a year, can become thousands of dollars of back-pay over a single year.</strong> The cost compounds before anyone notices.</p>
+    <p style="text-align:center;font-size:1rem;color:var(--text);font-weight:600;line-height:1.6;margin:2rem auto 1rem;max-width:640px"><strong>One incorrectly paid public holiday across a 10-person roster, repeated across 7 national public holidays a year, can become thousands of dollars of back-pay over a single year.</strong> The cost compounds before anyone notices.</p>
 
-    <div class="post-cta" style="margin-top:1rem;margin-bottom:3rem;">
+    <div class="post-cta" style="margin-top:1rem;margin-bottom:3rem">
         <h3>Check Your Public Holiday Setup Against MA000119</h3>
         <p>Run your last public holiday roster past Fitz to confirm the rates, minimum engagements, and substitute arrangements satisfy clause 24.</p>
         <a href="/app">Check Your Setup &rarr;</a>
@@ -305,7 +252,7 @@
         </details>
     </div>
 
-    <p style="text-align:center;font-size:1rem;color:#fff;font-weight:600;line-height:1.6;margin:2.5rem auto 1rem;max-width:640px;">Public holiday rosters are where small mistakes become large invoices. Confirm your rates, your minimum engagements, and your substitute-day arrangements <em>before</em> the long weekend &mdash; not after.</p>
+    <p style="text-align:center;font-size:1rem;color:var(--text);font-weight:600;line-height:1.6;margin:2.5rem auto 1rem;max-width:640px">Public holiday rosters are where small mistakes become large invoices. Confirm your rates, your minimum engagements, and your substitute-day arrangements <em>before</em> the long weekend &mdash; not after.</p>
 
     <div class="post-cta">
         <h3>Get Public Holiday Pay Right — Ask Fitz</h3>
@@ -314,10 +261,8 @@
     </div>
 </div>
 
-<a href="/app" class="sticky-pill">Public holiday question? Ask Fitz &rarr;</a>
-
 <footer>
-    <p>&copy; 2026 Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog/">Blog</a> &middot; <a href="/restaurant-award-guide">Restaurant Award</a> &middot; <a href="/hospitality-award-guide">Hospitality Award</a> &middot; <a href="/app">Try Free</a></p>
+    <p>&copy; Fitzgerald HR Pty Ltd (ABN 87 693 882 709), trading as Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog/">Blog</a> &middot; <a href="/restaurant-award-guide">Restaurant Award</a> &middot; <a href="/hospitality-award-guide">Hospitality Award</a> &middot; <a href="/app">Try Free</a></p>
 </footer>
 </body>
 </html>

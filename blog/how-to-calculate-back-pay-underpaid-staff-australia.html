@@ -35,7 +35,7 @@
     <meta name="theme-color" content="#f59e0b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&amp;display=swap" rel="stylesheet">
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://fitzhr.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://fitzhr.com/blog/"},{"@type":"ListItem","position":3,"name":"Fair Work Compliance & Underpayments","item":"https://fitzhr.com/blog/topics/fair-work-compliance"},{"@type":"ListItem","position":4,"name":"How to Calculate Back-Pay","item":"https://fitzhr.com/blog/how-to-calculate-back-pay-underpaid-staff-australia"}]}
     </script>
@@ -46,73 +46,13 @@
     {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How do I calculate back-pay for an underpaid employee in Australia?","acceptedAnswer":{"@type":"Answer","text":"Calculate back-pay by determining the correct Award entitlement for each pay period using contemporaneous time records and roster data, comparing it to what was actually paid, and identifying the shortfall for each period. The calculation must include base rates, applicable penalty rates, overtime, allowances, and leave loading. The total back-pay is the sum of all per-period shortfalls. Superannuation contributions on the back-pay must also be calculated and paid. The Fair Work Ombudsman provides a Pay and Conditions Tool (PACT) for verifying minimum rates."}},{"@type":"Question","name":"How far back can an employee claim underpayment in Australia?","acceptedAnswer":{"@type":"Answer","text":"Under section 544 of the Fair Work Act 2009 (Cth), an employee or the Fair Work Ombudsman can recover unpaid amounts for up to 6 years from the date the contravention occurred. Underpayments older than 6 years are generally not enforceable through Federal Circuit and Family Court of Australia or Federal Court proceedings. Employers should still calculate back-pay back to the start of the underpayment for the affected period to support voluntary remediation under the Fair Work Ombudsman's Voluntary Small Business Wage Compliance Code."}},{"@type":"Question","name":"Do I need to pay interest on back-pay in Australia?","acceptedAnswer":{"@type":"Answer","text":"Interest is not automatically required for voluntary back-pay remediation, but the Fair Work Ombudsman expects pre-judgment interest to be considered. Where the Fair Work Ombudsman or a court orders back-pay, interest may be added under section 547 of the Fair Work Act 2009 (Cth) or under court rules. Many employers voluntarily include simple interest at the Reserve Bank cash rate or the rate prescribed in court rules to demonstrate good faith and meet the Voluntary Small Business Wage Compliance Code expectations."}},{"@type":"Question","name":"Do I need to pay superannuation on back-pay in Australia?","acceptedAnswer":{"@type":"Answer","text":"Yes. Superannuation contributions are payable on back-pay where the back-pay relates to ordinary time earnings under the Superannuation Guarantee (Administration) Act 1992 (Cth). The Superannuation Guarantee rate from 1 July 2025 is 12% of ordinary time earnings. Failing to pay superannuation on back-pay may trigger the Superannuation Guarantee Charge with additional administrative components and interest payable to the Australian Taxation Office."}},{"@type":"Question","name":"Should I tell the Fair Work Ombudsman if I find an underpayment?","acceptedAnswer":{"@type":"Answer","text":"Voluntary disclosure of an underpayment may protect against criminal prosecution under section 327A of the Fair Work Act 2009 (Cth), which has been a federal criminal offence since 1 January 2025. Under section 327E, an employer who voluntarily discloses a potential underpayment may apply for a cooperation agreement with the Fair Work Ombudsman that prevents criminal referral. Small business employers (fewer than 15 employees) compliant with the Voluntary Small Business Wage Compliance Code also have a safe harbour from criminal prosecution."}}]}
     </script>
     <style>
+        /* One-off components for this post. Shared post styles: /assets/blog-post.css */
         :root{--navy:#0f172a;--navy2:#141f35;--amber:#f59e0b;--w60:rgba(255,255,255,0.6);--w30:rgba(255,255,255,0.3);--rule:rgba(245,158,11,0.18);--rw:rgba(255,255,255,0.08);--green:#22c55e;}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-        body{background:var(--navy);color:#fff;font-family:'Outfit',sans-serif;line-height:1.7;}
-        html{scroll-behavior:smooth;scroll-padding-top:80px;}
-        .nav{background:rgba(15,23,42,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--rule);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-        .nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-1px;text-decoration:none;display:inline-flex;}
-        .wm-f,.wm-hr{color:var(--amber);}.wm-itz{color:#fff;}
-        .nav-back{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--w60);text-decoration:none;}
-        .nav-back:hover{color:var(--amber);}
-        .hero{padding:4rem 1.5rem 2rem;max-width:900px;margin:0 auto;}
-        .post-tag{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;display:flex;align-items:center;gap:0.6rem;}
-        .post-tag::before{content:'';width:24px;height:2px;background:var(--amber);display:inline-block;}
-        h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2rem,4.5vw,2.8rem);line-height:1.1;letter-spacing:-0.02em;margin-bottom:1.25rem;}
-        h1 em{font-style:italic;color:var(--amber);}
-        .intro{font-size:1.05rem;line-height:1.7;color:var(--w60);border-left:3px solid var(--amber);padding-left:1.25rem;margin-bottom:2rem;}
-        .body{max-width:900px;margin:0 auto;padding:0 1.5rem 5rem;}
-        .body h2{font-family:'Playfair Display',serif;font-weight:700;font-size:1.5rem;color:#fff;margin:2.5rem 0 1rem;border-top:1px solid var(--rw);padding-top:1.5rem;}
-        .body h2 em{font-style:italic;color:var(--amber);}
-        .body h3{font-family:'Outfit',sans-serif;font-weight:700;font-size:1.05rem;color:#fff;margin:1.5rem 0 0.5rem;}
-        .body p{font-size:0.97rem;line-height:1.75;color:var(--w60);margin-bottom:1rem;}
-        .body strong{color:#fff;}
-        .body a{color:var(--amber);text-decoration:none;}
-        .body a:hover{text-decoration:underline;}
-        .body ul{margin:0 0 1rem 1.25rem;}
-        .body li{font-size:0.95rem;color:var(--w60);line-height:1.65;margin-bottom:0.4rem;}
-        .body ol{margin:0 0 1rem 1.25rem;}
-        .body ol li{font-size:0.95rem;color:var(--w60);line-height:1.65;margin-bottom:0.5rem;}
-        .hub-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin:1.5rem 0;}
-        @media(max-width:600px){.hub-grid{grid-template-columns:1fr;}}
-        .hub-card{background:var(--navy2);padding:1.5rem;text-decoration:none;display:block;border:1px solid transparent;transition:background 0.2s,border-color 0.2s;}
-        .hub-card:hover{background:#1a2847;border-color:var(--rule);}
-        .hub-label{font-family:'DM Mono',monospace;font-size:0.5rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);margin-bottom:0.5rem;}
-        .hub-card h3{font-size:0.95rem;font-weight:700;color:#fff;line-height:1.4;margin-bottom:0.4rem;}
-        .hub-card p{font-size:0.82rem;color:var(--w60);line-height:1.55;margin:0;}
-        .rate-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.86rem;}
-        .rate-table th{background:var(--navy2);color:var(--amber);padding:0.75rem 1rem;text-align:left;font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.12em;text-transform:uppercase;border-bottom:1px solid var(--rule);}
-        .rate-table td{padding:0.8rem 1rem;border-bottom:1px solid var(--rw);color:var(--w60);vertical-align:middle;}
-        .rate-table tr:last-child td{border-bottom:none;}
-        .rate-table td:first-child{color:#fff;font-weight:600;}
-        .rate-table tr:hover td{background:rgba(245,158,11,0.02);}
-        .highlight{color:var(--amber);font-weight:700;}
-        .verdict{background:var(--navy2);border:1px solid var(--rw);border-left:4px solid var(--amber);border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;}
-        .verdict-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);margin-bottom:0.6rem;}
-        .verdict p{margin:0;font-size:0.95rem;color:#fff;}
-        .callout{background:#1a2847;border-left:3px solid var(--amber);padding:1.25rem 1.5rem;margin:1.5rem 0;border-radius:0 8px 8px 0;}
-        .callout strong{color:#fff;font-size:0.95rem;display:block;margin-bottom:0.4rem;}
-        .callout p{font-size:0.88rem;color:var(--w60);margin:0;line-height:1.65;}
-        .faq-list{display:flex;flex-direction:column;gap:0.5rem;margin:1.5rem 0;}
-        .faq-item{background:var(--navy2);border:1px solid var(--rw);border-radius:10px;overflow:hidden;}
-        .faq-item summary{padding:1rem 1.25rem;cursor:pointer;font-weight:600;font-size:0.95rem;color:#fff;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
-        .faq-item summary::-webkit-details-marker{display:none;}
-        .faq-item summary::after{content:'+';color:var(--amber);font-size:1.2rem;flex-shrink:0;transition:transform 0.3s;}
-        .faq-item[open] summary::after{transform:rotate(45deg);}
-        .faq-item[open]{border-color:var(--rule);}
-        .faq-answer{padding:0 1.25rem 1rem;font-size:0.88rem;color:var(--w60);line-height:1.65;}
-        .post-cta{background:var(--amber);padding:2.5rem 1.5rem;border-radius:12px;text-align:center;margin:2.5rem 0;}
-        .post-cta h3{font-family:'Playfair Display',serif;font-weight:900;font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem;}
-        .post-cta p{font-size:0.9rem;color:rgba(15,23,42,0.7);margin-bottom:1.25rem;}
-        .post-cta a{display:inline-block;background:var(--navy);color:var(--amber);font-weight:800;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.85rem 2rem;text-decoration:none;}
-        .post-cta a:hover{background:#1e293b;}
-        .sticky-pill{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--amber);color:var(--navy);padding:0.75rem 1.75rem;border-radius:999px;font-weight:800;font-size:0.8rem;text-decoration:none;z-index:999;white-space:nowrap;box-shadow:0 4px 24px rgba(245,158,11,0.35);}
-        .sticky-pill:hover{background:#fbbf24;}
-        footer{background:var(--navy2);border-top:1px solid var(--rule);padding:2rem 1.5rem;text-align:center;}
-        footer p{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.1em;color:var(--w30);}
-        footer a{color:var(--amber);text-decoration:none;}
-        @media(max-width:600px){.sticky-pill{font-size:0.74rem;padding:0.65rem 1.25rem;}.rate-table{font-size:0.78rem;}.rate-table th,.rate-table td{padding:0.6rem 0.6rem;}}
+        h1{font-weight:600;font-size:clamp(2rem,4.5vw,2.8rem);line-height:1.1;margin-bottom:1.25rem;}
+        h1 em{color:var(--text);}
     </style>
+    <link rel="stylesheet" href="/assets/blog-post.css?v=1">
     <!-- Meta Pixel Code -->
     <script>
     !function(f,b,e,v,n,t,s)
@@ -131,31 +71,38 @@
 </head>
 <body>
 <nav class="nav">
-    <a href="/" class="nav-logo" aria-label="Fitz HR home"><span class="wm-f">F</span><span class="wm-itz">ITZ</span><span class="wm-hr" style="margin-left:0.18em;">HR</span></a>
-    <a href="/blog/" class="nav-back">&larr; Blog</a>
+  <div class="nav-in">
+    <a href="/" class="logo"><em>F</em>ITZ<em>HR</em></a>
+    <div class="nav-right">
+        <a href="/" class="nav-home">Home</a>
+        <a href="/blog/" class="nav-home">Blog</a>
+        <a href="/pricing" class="nav-home">Pricing</a>
+        <a href="/app" class="btn small">Start Free</a>
+    </div>
+  </div>
 </nav>
-<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:900px;margin:0 auto;padding:1.1rem 1.5rem 0;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.45);line-height:1.8;"><a href="/blog/" style="color:rgba(255,255,255,0.6);text-decoration:none;">Blog</a> <span style="opacity:0.5;">&rsaquo;</span> <a href="/blog/topics/fair-work-compliance" style="color:#f59e0b;text-decoration:none;">Fair Work Compliance &amp; Underpayments</a></nav><!-- blog-crumb:end -->
+<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:780px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="color:rgba(232,237,245,0.72);text-decoration:none;">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="/blog/topics/fair-work-compliance" style="color:rgba(232,237,245,0.72);text-decoration:none;">Fair Work Compliance &amp; Underpayments</a></nav><!-- blog-crumb:end -->
 
 <header class="hero">
     <div class="post-tag">Underpayment Remediation &middot; Fair Work Act 2009 (Cth) &middot; FWO Compliance Code</div>
     <h1>How to Calculate <em>Back-Pay</em> for Underpaid Staff in Australia</h1>
-    <div style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--w30);margin-bottom:2rem;">Updated May 2026 &middot; Reflects post-1 January 2025 wage theft regime &middot; Voluntary Small Business Wage Compliance Code</div>
+    <div style="font-size:13px;color:var(--w30);margin-bottom:2rem">Updated May 2026 &middot; Reflects post-1 January 2025 wage theft regime &middot; Voluntary Small Business Wage Compliance Code</div>
     <p class="intro">An underpayment discovered in your venue is not just a financial problem &mdash; since 1 January 2025, the Fair Work Act&rsquo;s section 327A has made <em>intentional</em> underpayment a federal criminal offence carrying up to 10 years&rsquo; imprisonment for individuals (the offence requires deliberate conduct, not honest mistakes). But underpayments are often unintentional: a missed Award rate increase, a misclassified employee, an evening loading that wasn&rsquo;t flagged. This is the practical, step-by-step methodology for calculating back-pay correctly, including the 6-year limitation, the superannuation top-up, and the Fair Work Ombudsman&rsquo;s expectations for voluntary remediation under the Voluntary Small Business Wage Compliance Code.</p>
 </header>
 
 <div class="body">
 
-    <div class="verdict" style="margin-bottom:2rem;">
+    <div class="verdict" style="margin-bottom:2rem">
         <div class="verdict-label">Quick Answer</div>
         <p><strong>To calculate back-pay correctly:</strong> (1) identify the affected period (max <strong>6 years</strong> back under FW Act s544); (2) for each pay period, work out what the employee should have been paid under the Award (base + penalties + overtime + allowances + leave loading); (3) compare to actual gross pay; (4) add up the per-period shortfalls; (5) calculate <strong>12% Superannuation Guarantee on ordinary time earnings</strong> in the back-pay; (6) consider interest. Document everything. If the underpayment is material, voluntarily disclose to the Fair Work Ombudsman under section 327E to access the criminal safe harbour.</p>
     </div>
 
-    <p style="font-size:0.95rem;color:var(--w60);font-style:italic;margin:0 0 2rem;">Many employers search for a <strong>back pay calculator in Australia</strong>, but accurate back-pay calculations require per-period Award analysis &mdash; not a single-formula calculator. The methodology below shows the per-period structure that any defensible calculation must follow.</p>
+    <p style="font-size:0.95rem;color:var(--w60);margin:0 0 2rem">Many employers search for a <strong>back pay calculator in Australia</strong>, but accurate back-pay calculations require per-period Award analysis &mdash; not a single-formula calculator. The methodology below shows the per-period structure that any defensible calculation must follow.</p>
 
-    <p style="font-size:1rem;color:#fff;font-weight:600;line-height:1.6;border-left:3px solid var(--amber);padding:0.25rem 0 0.25rem 1.25rem;margin:0 0 2rem;"><span style="font-family:'DM Mono',monospace;font-size:0.6rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);display:block;margin-bottom:0.5rem;">In Simple Terms</span>Back-pay is calculated <strong>per pay period</strong>, not as a yearly average. You need the actual hours worked, the correct Award rate, and what was actually paid &mdash; for each pay period across the affected window. The total is the sum of every per-period shortfall, plus 12% super on the ordinary time earnings, plus any interest you choose to add.</p>
+    <p style="font-size:1rem;color:var(--text);font-weight:600;line-height:1.6;border-left:3px solid var(--line2);padding:0.25rem 0 0.25rem 1.25rem;margin:0 0 2rem"><span style="font-size:13px;color:var(--text);display:block;margin-bottom:0.5rem">In Simple Terms</span>Back-pay is calculated <strong>per pay period</strong>, not as a yearly average. You need the actual hours worked, the correct Award rate, and what was actually paid &mdash; for each pay period across the affected window. The total is the sum of every per-period shortfall, plus 12% super on the ordinary time earnings, plus any interest you choose to add.</p>
 
     <h2>Back-Pay Formula <em>(Australia)</em></h2>
-    <p style="font-size:1.05rem;color:#fff;font-weight:600;line-height:1.6;background:var(--navy2);border:1px solid var(--rule);border-radius:8px;padding:1.5rem;margin:1rem 0 1.5rem;text-align:center;font-family:'DM Mono',monospace;">Back-pay = &Sigma; (Correct pay per period &minus; Actual pay per period) + Super (12% of OTE) + Interest (if applied)</p>
+    <p style="font-size:1.05rem;color:var(--text);font-weight:600;line-height:1.6;background:var(--navy2);border:1px solid var(--rule);border-radius:8px;padding:1.5rem;margin:1rem 0 1.5rem;text-align:center">Back-pay = &Sigma; (Correct pay per period &minus; Actual pay per period) + Super (12% of OTE) + Interest (if applied)</p>
     <p>Read in plain English: for every pay period in the affected window, calculate what the employee should have been paid under the Award, subtract what they actually received, and add up all the shortfalls. To that total, add the 12% Superannuation Guarantee on the ordinary time earnings component (overtime is generally not OTE), and add any interest you elect to include for voluntary remediation. The result is the total back-pay owed for that employee.</p>
 
     <h2>Before You Start — <em>What You&rsquo;ll Need</em></h2>
@@ -356,7 +303,7 @@
         </details>
     </div>
 
-    <p style="text-align:center;font-size:1rem;color:#fff;font-weight:600;line-height:1.6;margin:2.5rem auto 1rem;max-width:640px;">A back-pay calculation done well takes effort but produces a defensible outcome. Done badly, it creates a second underpayment claim sitting on top of the first one. Get it right the first time.</p>
+    <p style="text-align:center;font-size:1rem;color:var(--text);font-weight:600;line-height:1.6;margin:2.5rem auto 1rem;max-width:640px">A back-pay calculation done well takes effort but produces a defensible outcome. Done badly, it creates a second underpayment claim sitting on top of the first one. Get it right the first time.</p>
 
     <div class="post-cta">
         <h3>Calculate Back-Pay Without Guessing — Ask Fitz</h3>
@@ -365,10 +312,8 @@
     </div>
 </div>
 
-<a href="/app" class="sticky-pill">Back-pay calculation? Ask Fitz &rarr;</a>
-
 <footer>
-    <p>&copy; 2026 Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog/">Blog</a> &middot; <a href="/restaurant-award-guide">Restaurant Award</a> &middot; <a href="/hospitality-award-guide">Hospitality Award</a> &middot; <a href="/app">Try Free</a></p>
+    <p>&copy; Fitzgerald HR Pty Ltd (ABN 87 693 882 709), trading as Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog/">Blog</a> &middot; <a href="/restaurant-award-guide">Restaurant Award</a> &middot; <a href="/hospitality-award-guide">Hospitality Award</a> &middot; <a href="/app">Try Free</a></p>
 </footer>
 </body>
 </html>

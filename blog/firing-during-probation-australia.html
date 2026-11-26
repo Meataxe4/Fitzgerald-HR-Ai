@@ -32,7 +32,7 @@
     <meta name="theme-color" content="#f59e0b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&amp;display=swap" rel="stylesheet">
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://fitzhr.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://fitzhr.com/blog/"},{"@type":"ListItem","position":3,"name":"Ending Employment","item":"https://fitzhr.com/blog/topics/ending-employment"},{"@type":"ListItem","position":4,"name":"Can I Fire Someone During Probation in Australia","item":"https://fitzhr.com/blog/firing-during-probation-australia"}]}
     </script>
@@ -43,81 +43,29 @@
     {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Can I fire someone during probation in Australia?","acceptedAnswer":{"@type":"Answer","text":"Yes — but with important limits. Employees in their minimum employment period (typically the first 6 months, or 12 months for small businesses) do not have access to unfair dismissal protections. However, they can still make general protections claims if terminated for unlawful reasons. And probation must be in writing to be enforceable — a verbal probation period offers no protection."}},{"@type":"Question","name":"What is the minimum employment period in Australia?","acceptedAnswer":{"@type":"Answer","text":"The minimum employment period under the Fair Work Act 2009 (Cth) is 6 months for businesses with 15 or more employees, and 12 months for small businesses with fewer than 15 employees. During this period, employees do not have access to unfair dismissal protections — but they can still bring general protections claims for adverse action."}},{"@type":"Question","name":"Does probation need to be in writing in Australia?","acceptedAnswer":{"@type":"Answer","text":"Yes — to be enforceable. A verbal probation period is effectively unenforceable. If the employment contract does not include a probation clause, the minimum employment period still applies under the Fair Work Act 2009 (Cth), but you cannot rely on a stated probation period for management purposes. Always include probation terms in writing before the employee starts."}},{"@type":"Question","name":"Can an employee on probation make a Fair Work claim?","acceptedAnswer":{"@type":"Answer","text":"Yes — a general protections (adverse action) claim can be made from day one of employment, regardless of probation status or the minimum employment period. If an employee believes they were dismissed because they exercised a workplace right, made a complaint, or were discriminated against, they can bring a general protections claim even during probation. General protections claims have no minimum employment period."}},{"@type":"Question","name":"What is the difference between probation and the minimum employment period?","acceptedAnswer":{"@type":"Answer","text":"The minimum employment period is a legal threshold set by the Fair Work Act 2009 (Cth) — 6 months for most businesses, 12 months for small businesses. Probation is a contractual term between the employer and employee. They often overlap but are not the same thing. A 3-month probation does not reduce the minimum employment period — the employee still cannot bring an unfair dismissal claim until the 6-month mark, regardless of what the contract says about probation."}},{"@type":"Question","name":"Can an employee on probation claim unfair dismissal in Australia?","acceptedAnswer":{"@type":"Answer","text":"Not while they are inside the minimum employment period: six months, or twelve months if the employer has fewer than 15 employees. The probation clause itself is irrelevant to this; the Fair Work Act counts service, not the contract. Once the minimum period has passed, an employee can claim unfair dismissal even if the contract says probation is still running. Inside the period, general protections, discrimination and breach-of-contract claims remain available."}},{"@type":"Question","name":"Does the minimum employment period include the notice period?","acceptedAnswer":{"@type":"Answer","text":"No. The period is measured to the earlier of when the employee is told they are dismissed and when the dismissal takes effect. An employer who gives notice on the last day before the six-month mark has dismissed inside the period, even if the employee works out a week of notice afterwards. Leaving the decision until after the anniversary moves the employee into unfair dismissal protection."}},{"@type":"Question","name":"What notice do I have to give when dismissing during probation?","acceptedAnswer":{"@type":"Answer","text":"At least the National Employment Standards minimum, which is one week for an employee with up to one year of continuous service, or payment in lieu. The contract or award may require more, and a probation clause cannot reduce it below the NES minimum. Serious misconduct is the only basis for dismissal without notice."}}]}
     </script>
     <style>
+        /* One-off components for this post. Shared post styles: /assets/blog-post.css */
         :root{--navy:#0f172a;--navy2:#141f35;--amber:#f59e0b;--w60:rgba(255,255,255,0.6);--w30:rgba(255,255,255,0.3);--rule:rgba(245,158,11,0.18);--rw:rgba(255,255,255,0.08);--green:#22c55e;--red:#ef4444;}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-        html{font-size:16px;scroll-behavior:smooth;}
-        body{background:var(--navy);color:#fff;font-family:'Outfit',sans-serif;line-height:1.7;}
-        .nav{background:rgba(15,23,42,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--rule);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-        .nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-1px;text-decoration:none;display:flex;align-items:center;}
-        .wm-f,.wm-hr{color:var(--amber);}.wm-itz{color:#fff;}
-        .nav-back{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--w60);text-decoration:none;}
-        .nav-back:hover{color:var(--amber);}
-        .post-hero{padding:3.5rem 1.5rem 2.5rem;max-width:780px;margin:0 auto;}
-        .post-tag{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;display:flex;align-items:center;gap:0.6rem;}
-        .post-tag::before{content:'';width:24px;height:2px;background:var(--amber);display:inline-block;}
-        .post-h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2rem,5vw,2.8rem);line-height:1.1;letter-spacing:-0.02em;margin-bottom:1.25rem;}
-        .post-h1 em{font-style:italic;color:var(--amber);}
-        .post-meta{display:flex;align-items:center;gap:1rem;font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--w30);margin-bottom:2rem;flex-wrap:wrap;}
-        .post-meta span:last-child{color:var(--amber);}
-        .meta-dot{width:3px;height:3px;border-radius:50%;background:var(--w30);}
-        .post-intro{font-size:1.1rem;line-height:1.7;color:var(--w60);border-left:3px solid var(--amber);padding-left:1.25rem;margin-bottom:2.5rem;}
-        .post-body{max-width:780px;margin:0 auto;padding:0 1.5rem 5rem;}
-        .post-body h2{font-family:'Playfair Display',serif;font-weight:700;font-size:1.6rem;line-height:1.2;color:#fff;margin:2.5rem 0 1rem;border-top:1px solid rgba(255,255,255,0.06);padding-top:1.5rem;}
-        .post-body h2 em{font-style:italic;color:var(--amber);}
-        .post-body p{font-size:0.98rem;line-height:1.75;color:var(--w60);margin-bottom:1.1rem;}
-        .post-body strong{color:#fff;}
-        .post-body a{color:var(--amber);text-decoration:none;}
-        .post-body a:hover{text-decoration:underline;}
-        .post-body ul{margin:0 0 1.1rem 1.25rem;}
-        .post-body li{font-size:0.95rem;color:var(--w60);line-height:1.65;margin-bottom:0.4rem;}
         .comp-table{width:100%;border-collapse:collapse;margin:1.5rem 0;font-size:0.86rem;}
-        .comp-table th{background:var(--navy2);color:var(--amber);padding:0.75rem 1rem;text-align:left;font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.14em;text-transform:uppercase;border-bottom:1px solid var(--rule);}
+        .comp-table th{background:var(--navy2);color:var(--text);padding:0.75rem 1rem;text-align:left;font-size:13px;border-bottom:1px solid var(--rule);}
         .comp-table td{padding:0.8rem 1rem;border-bottom:1px solid var(--rw);vertical-align:top;color:var(--w60);}
-        .comp-table td:first-child{color:#fff;font-weight:600;}
-        @media(max-width:600px){.comp-table{font-size:0.76rem;}.comp-table th,.comp-table td{padding:0.6rem 0.5rem;}}
-        .verdict{background:var(--navy2);border:1px solid var(--rw);border-left:4px solid var(--amber);border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;}
-        .verdict-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);margin-bottom:0.6rem;}
-        .verdict p{margin:0;font-size:0.95rem;color:#fff;}
-        .verdict p br{display:block;margin-top:0.3rem;}
-        .warning-box{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-left:4px solid var(--red);border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;}
-        .warning-box p{margin:0;font-size:0.95rem;color:rgba(255,255,255,0.85);}
+        .comp-table td:first-child{color:var(--text);font-weight:600;}
+        @media(max-width:600px){.comp-table{font-size:13px;}
+        .comp-table th,.comp-table td{padding:0.6rem 0.5rem;}}
         .two-col{display:grid;grid-template-columns:1fr 1fr;gap:1px;margin:1.5rem 0;}
         @media(max-width:600px){.two-col{grid-template-columns:1fr;}}
         .col-card{background:var(--navy2);padding:1.25rem;}
         .col-card.yes{border-top:3px solid var(--green);}
         .col-card.no{border-top:3px solid var(--red);}
-        .col-label{font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.16em;text-transform:uppercase;margin-bottom:0.6rem;}
+        .col-label{font-size:13px;margin-bottom:0.6rem;}
         .col-card.yes .col-label{color:var(--green);}
         .col-card.no .col-label{color:var(--red);}
         .col-card ul{list-style:none;padding:0;margin:0;}
         .col-card li{font-size:0.85rem;color:var(--w60);line-height:1.55;margin-bottom:0.4rem;padding-left:1.1rem;position:relative;}
         .col-card.yes li::before{content:'\2713';color:var(--green);position:absolute;left:0;}
         .col-card.no li::before{content:'\2717';color:var(--red);position:absolute;left:0;}
-        .dont-list{display:flex;flex-direction:column;gap:1px;margin:1.5rem 0;}
-        .dont-item{background:rgba(239,68,68,0.05);border-left:3px solid var(--red);padding:0.9rem 1.25rem;display:flex;align-items:flex-start;gap:0.75rem;}
-        .dont-item-x{color:var(--red);font-size:1rem;flex-shrink:0;margin-top:0.1rem;}
-        .dont-item-text{font-size:0.9rem;color:rgba(255,255,255,0.8);line-height:1.55;}
-        .dont-item-text strong{color:#fff;}
-        .faq-list{display:flex;flex-direction:column;gap:0.5rem;margin:1.5rem 0;}
-        .faq-item{background:var(--navy2);border:1px solid var(--rw);border-radius:10px;overflow:hidden;}
-        .faq-item summary{padding:1rem 1.25rem;cursor:pointer;font-weight:600;font-size:0.95rem;color:#fff;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
-        .faq-item summary::-webkit-details-marker{display:none;}
-        .faq-item summary::after{content:'+';color:var(--amber);font-size:1.2rem;flex-shrink:0;transition:transform 0.3s;}
-        .faq-item[open] summary::after{transform:rotate(45deg);}
-        .faq-item[open]{border-color:var(--rule);}
-        .faq-answer{padding:0 1.25rem 1rem;font-size:0.88rem;color:var(--w60);line-height:1.65;}
-        .sticky-pill{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--amber);color:var(--navy);padding:0.75rem 1.75rem;border-radius:999px;font-weight:800;font-size:0.8rem;text-decoration:none;z-index:999;white-space:nowrap;box-shadow:0 4px 24px rgba(245,158,11,0.35);letter-spacing:0.04em;}
-        .sticky-pill:hover{background:#fbbf24;}
-        .post-cta{background:var(--amber);padding:2.5rem 1.5rem;border-radius:12px;text-align:center;margin:2.5rem 0;}
-        .post-cta h3{font-family:'Playfair Display',serif;font-weight:900;font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem;}
-        .post-cta p{font-size:0.9rem;color:rgba(15,23,42,0.7);margin-bottom:1.25rem;}
-        .post-cta a{display:inline-block;background:var(--navy);color:var(--amber);font-weight:800;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.85rem 2rem;text-decoration:none;transition:background 0.3s;}
-        .post-cta a:hover{background:#1e293b;}
-        footer{background:var(--navy2);border-top:1px solid var(--rule);padding:2rem 1.5rem;text-align:center;}
-        footer p{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.1em;color:var(--w30);}
-        footer a{color:var(--amber);text-decoration:none;}
-        @media(max-width:600px){.sticky-pill{font-size:0.74rem;padding:0.65rem 1.25rem;}}
     </style>
+    <link rel="stylesheet" href="/assets/blog-post.css?v=1">
     <!-- Meta Pixel Code -->
     <script>
     !function(f,b,e,v,n,t,s)
@@ -136,10 +84,17 @@
 </head>
 <body>
 <nav class="nav">
-    <a href="/" class="nav-logo"><span style="display:inline-flex;gap:0;letter-spacing:-1px;"><span class="wm-f">F</span><span class="wm-itz">ITZ</span></span><span class="wm-hr" style="margin-left:0.18em;">HR</span></a>
-    <a href="/blog/" class="nav-back">&larr; Back to Blog</a>
+  <div class="nav-in">
+    <a href="/" class="logo"><em>F</em>ITZ<em>HR</em></a>
+    <div class="nav-right">
+        <a href="/" class="nav-home">Home</a>
+        <a href="/blog/" class="nav-home">Blog</a>
+        <a href="/pricing" class="nav-home">Pricing</a>
+        <a href="/app" class="btn small">Start Free</a>
+    </div>
+  </div>
 </nav>
-<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:900px;margin:0 auto;padding:1.1rem 1.5rem 0;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.45);line-height:1.8;"><a href="/blog/" style="color:rgba(255,255,255,0.6);text-decoration:none;">Blog</a> <span style="opacity:0.5;">&rsaquo;</span> <a href="/blog/topics/ending-employment" style="color:#f59e0b;text-decoration:none;">Ending Employment</a></nav><!-- blog-crumb:end -->
+<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:780px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="color:rgba(232,237,245,0.72);text-decoration:none;">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="/blog/topics/ending-employment" style="color:rgba(232,237,245,0.72);text-decoration:none;">Ending Employment</a></nav><!-- blog-crumb:end -->
 <header class="post-hero">
     <div class="post-tag">Probation &middot; Termination &middot; Fair Work</div>
     <h1 class="post-h1">Can I Fire Someone <em>During Probation</em> in Australia?</h1>
@@ -154,17 +109,17 @@
 </header>
 <div class="post-body">
 
-    <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-left:4px solid #ef4444;border-radius:0 12px 12px 0;padding:1.25rem;margin:1.5rem 0;">
-        <div style="font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:#ef4444;margin-bottom:0.6rem;">Use this guide if&hellip;</div>
-        <ul style="list-style:none;padding:0;margin:0;">
-            <li style="font-size:0.88rem;color:rgba(255,255,255,0.8);padding-left:1.1rem;position:relative;margin-bottom:0.4rem;"><span style="position:absolute;left:0;color:#ef4444;">&bull;</span> You&rsquo;re about to terminate someone who is still in their probation period</li>
-            <li style="font-size:0.88rem;color:rgba(255,255,255,0.8);padding-left:1.1rem;position:relative;margin-bottom:0.4rem;"><span style="position:absolute;left:0;color:#ef4444;">&bull;</span> An employee has recently made a complaint or taken sick leave</li>
-            <li style="font-size:0.88rem;color:rgba(255,255,255,0.8);padding-left:1.1rem;position:relative;"><span style="position:absolute;left:0;color:#ef4444;">&bull;</span> You&rsquo;re unsure whether your probation clause is legally enforceable</li>
+    <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-left:4px solid var(--neg);border-radius:0 12px 12px 0;padding:1.25rem;margin:1.5rem 0">
+        <div style="font-size:13px;color:var(--neg);margin-bottom:0.6rem">Use this guide if&hellip;</div>
+        <ul style="list-style:none;padding:0;margin:0">
+            <li style="font-size:0.88rem;color:var(--text);padding-left:1.1rem;position:relative;margin-bottom:0.4rem"><span style="position:absolute;left:0;color:var(--neg)">&bull;</span> You&rsquo;re about to terminate someone who is still in their probation period</li>
+            <li style="font-size:0.88rem;color:var(--text);padding-left:1.1rem;position:relative;margin-bottom:0.4rem"><span style="position:absolute;left:0;color:var(--neg)">&bull;</span> An employee has recently made a complaint or taken sick leave</li>
+            <li style="font-size:0.88rem;color:var(--text);padding-left:1.1rem;position:relative"><span style="position:absolute;left:0;color:var(--neg)">&bull;</span> You&rsquo;re unsure whether your probation clause is legally enforceable</li>
         </ul>
     </div>
 
     <p><strong>Yes &mdash; you can terminate during probation in Australia, but there are critical limits.</strong> Employees in their minimum employment period (6 months for most businesses, 12 months for small businesses) cannot bring unfair dismissal claims. But they can bring general protections claims from day one &mdash; and those have no minimum employment period. A termination that looks like it&rsquo;s about performance can become a claim if the employee can show it was actually about exercising a workplace right.</p>
-    <p style="font-size:0.82rem;color:rgba(255,255,255,0.4);margin-top:-0.5rem;margin-bottom:1.5rem;">Last reviewed against Fair Work Ombudsman guidance &mdash; October 2026</p>
+    <p style="font-size:0.82rem;color:var(--muted);margin-top:-0.5rem;margin-bottom:1.5rem">Last reviewed against Fair Work Ombudsman guidance &mdash; October 2026</p>
 
     <div class="verdict">
         <div class="verdict-label">Quick Answer</div>
@@ -185,30 +140,30 @@
 
     <h2>What You <em>Can</em> and <em>Cannot</em> Do During Probation</h2>
     <p>The decision tree below covers the two most common situations an employer faces during a probation termination:</p>
-    <div style="display:flex;flex-direction:column;gap:1px;margin:1.5rem 0;">
-        <div style="background:var(--navy2);border-left:3px solid var(--amber);padding:1.25rem;">
-            <div style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--amber);margin-bottom:0.75rem;">Step 1 &mdash; Have they been employed for 6+ months?</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;">
-                <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);padding:1rem;border-radius:6px;">
-                    <div style="font-size:0.78rem;font-weight:700;color:#22c55e;margin-bottom:0.4rem;">No &mdash; Under 6 Months</div>
-                    <div style="font-size:0.82rem;color:var(--w60);line-height:1.5;">No unfair dismissal access yet. Lower risk &mdash; but general protections still apply from day one.</div>
+    <div style="display:flex;flex-direction:column;gap:1px;margin:1.5rem 0">
+        <div style="background:var(--navy2);border-left:3px solid var(--line2);padding:1.25rem">
+            <div style="font-size:13px;color:var(--text);margin-bottom:0.75rem">Step 1 &mdash; Have they been employed for 6+ months?</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px">
+                <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);padding:1rem;border-radius:6px">
+                    <div style="font-size:13px;font-weight:600;color:var(--pos);margin-bottom:0.4rem">No &mdash; Under 6 Months</div>
+                    <div style="font-size:0.82rem;color:var(--w60);line-height:1.5">No unfair dismissal access yet. Lower risk &mdash; but general protections still apply from day one.</div>
                 </div>
-                <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);padding:1rem;border-radius:6px;">
-                    <div style="font-size:0.78rem;font-weight:700;color:#ef4444;margin-bottom:0.4rem;">Yes &mdash; 6+ Months</div>
-                    <div style="font-size:0.82rem;color:var(--w60);line-height:1.5;">Unfair dismissal protections apply. Must follow full fair process regardless of probation clause.</div>
+                <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);padding:1rem;border-radius:6px">
+                    <div style="font-size:13px;font-weight:600;color:var(--neg);margin-bottom:0.4rem">Yes &mdash; 6+ Months</div>
+                    <div style="font-size:0.82rem;color:var(--w60);line-height:1.5">Unfair dismissal protections apply. Must follow full fair process regardless of probation clause.</div>
                 </div>
             </div>
         </div>
-        <div style="background:var(--navy2);border-left:3px solid #ef4444;padding:1.25rem;">
-            <div style="font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.14em;text-transform:uppercase;color:#ef4444;margin-bottom:0.75rem;">Step 2 &mdash; Have they recently made a complaint or exercised a workplace right?</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;">
-                <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);padding:1rem;border-radius:6px;">
-                    <div style="font-size:0.78rem;font-weight:700;color:#22c55e;margin-bottom:0.4rem;">No</div>
-                    <div style="font-size:0.82rem;color:var(--w60);line-height:1.5;">Lower risk. Ensure the reason is documented and not discriminatory.</div>
+        <div style="background:var(--navy2);border-left:3px solid var(--neg);padding:1.25rem">
+            <div style="font-size:13px;color:var(--neg);margin-bottom:0.75rem">Step 2 &mdash; Have they recently made a complaint or exercised a workplace right?</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px">
+                <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);padding:1rem;border-radius:6px">
+                    <div style="font-size:13px;font-weight:600;color:var(--pos);margin-bottom:0.4rem">No</div>
+                    <div style="font-size:0.82rem;color:var(--w60);line-height:1.5">Lower risk. Ensure the reason is documented and not discriminatory.</div>
                 </div>
-                <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);padding:1rem;border-radius:6px;">
-                    <div style="font-size:0.78rem;font-weight:700;color:#ef4444;margin-bottom:0.4rem;">Yes &mdash; HIGH RISK</div>
-                    <div style="font-size:0.82rem;color:var(--w60);line-height:1.5;">General protections claim likely. The timing creates an inference of adverse action &mdash; regardless of probation status.</div>
+                <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);padding:1rem;border-radius:6px">
+                    <div style="font-size:13px;font-weight:600;color:var(--neg);margin-bottom:0.4rem">Yes &mdash; HIGH RISK</div>
+                    <div style="font-size:0.82rem;color:var(--w60);line-height:1.5">General protections claim likely. The timing creates an inference of adverse action &mdash; regardless of probation status.</div>
                 </div>
             </div>
         </div>
@@ -219,9 +174,9 @@
     </div>
 
 
-    <div style="background:rgba(245,158,11,0.08);border:1px solid var(--rule);border-radius:12px;padding:1.25rem;margin:2rem 0;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
-        <p style="margin:0;font-size:0.92rem;color:#fff;">&#9889; Not sure if your probation clause holds up &mdash; or whether this termination is safe to proceed?</p>
-        <a href="/app" style="background:var(--amber);color:var(--navy);font-weight:800;font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.65rem 1.25rem;text-decoration:none;white-space:nowrap;flex-shrink:0;">Get a Clear Answer Free &rarr;</a>
+    <div style="background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:1.25rem;margin:2rem 0;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+        <p style="margin:0;font-size:0.92rem;color:var(--text)">&#9889; Not sure if your probation clause holds up &mdash; or whether this termination is safe to proceed?</p>
+        <a href="/app" style="background:var(--amber);color:var(--amber-ink);font-weight:600;font-size:13px;padding:0.65rem 1.25rem;text-decoration:none;white-space:nowrap;flex-shrink:0">Get a Clear Answer Free &rarr;</a>
     </div>
 
     <h2>Unfair Dismissal During the <em>Probation Period</em>: What Actually Applies</h2>
@@ -254,9 +209,9 @@
     <p>This process takes 15 minutes and eliminates the general protections risk that exists even during probation.</p>
 
     <div class="dont-list">
-        <div class="dont-item"><div class="dont-item-x">&times;</div><div class="dont-item-text"><strong>Don&rsquo;t terminate for a discriminatory or retaliatory reason and assume probation protects you.</strong> General protections claims apply from day one. A termination that coincides with a sick day, a workplace complaint, or a pregnancy announcement creates immediate risk regardless of probation status.</div></div>
-        <div class="dont-item"><div class="dont-item-x">&times;</div><div class="dont-item-text"><strong>Don&rsquo;t rely on a verbal probation period.</strong> If it&rsquo;s not in the signed employment contract before the employee starts, you cannot enforce it. See our guide on <a href="/blog/employment-contract-restaurant-staff-australia">compliant employment contracts for hospitality</a>.</div></div>
-        <div class="dont-item"><div class="dont-item-x">&times;</div><div class="dont-item-text"><strong>Don&rsquo;t assume a 3-month probation means 3 months of protection.</strong> The minimum employment period is 6 months (or 12 months for small businesses) regardless of what your probation clause says. A 3-month probation does not create a 3-month unfair dismissal protection period.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Don&rsquo;t terminate for a discriminatory or retaliatory reason and assume probation protects you.</strong> General protections claims apply from day one. A termination that coincides with a sick day, a workplace complaint, or a pregnancy announcement creates immediate risk regardless of probation status.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Don&rsquo;t rely on a verbal probation period.</strong> If it&rsquo;s not in the signed employment contract before the employee starts, you cannot enforce it. See our guide on <a href="/blog/employment-contract-restaurant-staff-australia">compliant employment contracts for hospitality</a>.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Don&rsquo;t assume a 3-month probation means 3 months of protection.</strong> The minimum employment period is 6 months (or 12 months for small businesses) regardless of what your probation clause says. A 3-month probation does not create a 3-month unfair dismissal protection period.</div></div>
     </div>
 
     <h2>Frequently Asked Questions</h2>
@@ -295,16 +250,15 @@
         </details>
     </div>
     <p>Related guides: <a href="/blog/probation-periods-hospitality-australia">how probation periods actually work in hospitality</a>, <a href="/blog/procedural-fairness-australian-employment-law-hospitality">procedural fairness in Australian employment law</a>, and <a href="/blog/do-i-have-to-give-warning-before-firing-australia">whether you have to give a warning before firing</a>.</p>
-    <p style="font-size:1rem;line-height:1.7;color:rgba(255,255,255,0.7);font-style:italic;border-top:1px solid rgba(255,255,255,0.08);padding-top:1.5rem;margin-top:2rem;">Probation reduces unfair dismissal risk. It does not eliminate all legal risk. The general protections provisions apply from the first day of employment &mdash; and they are the provisions most commonly triggered by terminations that look routine from the outside.</p>
+    <p style="font-size:1rem;line-height:1.7;color:var(--text2);border-top:1px solid rgba(255,255,255,0.08);padding-top:1.5rem;margin-top:2rem">Probation reduces unfair dismissal risk. It does not eliminate all legal risk. The general protections provisions apply from the first day of employment &mdash; and they are the provisions most commonly triggered by terminations that look routine from the outside.</p>
     <div class="post-cta">
         <h3>Protect This Termination Before It Becomes a Claim</h3>
         <p>Fitz HR walks you through the correct process, identifies the risk level specific to your situation, and generates the documentation you need &mdash; in under 60 seconds.</p>
         <a href="/app">Avoid a $15,000+ Mistake &mdash; It&rsquo;s Free &rarr;</a>
     </div>
 </div>
-<a href="/app" class="sticky-pill">Is this termination safe to proceed? Ask Fitz &rarr;</a>
 <footer>
-    <p>&copy; 2026 Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog/">Blog</a> &middot; <a href="/app">Try Free</a></p>
+    <p>&copy; Fitzgerald HR Pty Ltd (ABN 87 693 882 709), trading as Fitz HR &middot; <a href="/">Home</a> &middot; <a href="/blog/">Blog</a> &middot; <a href="/app">Try Free</a></p>
 </footer>
 </body>
 </html>

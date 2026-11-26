@@ -11,6 +11,7 @@
     "build": "npm run build:css && npm run stamp && node scripts/generate-rss.mjs && node scripts/indexnow-ping.mjs",
     "test": "node tests/award-resolution.test.js",
     "test:gate": "node tests/regression-gate.test.js",
+    "test:xss": "node tests/xss-rendering.test.js",
     "test:regression": "node scripts/run-regression.mjs",
     "test:ci": "npm test && npm run test:gate && npm run validate:rates && npm run test:regression",
     "build:regression": "node scripts/build-regression-questions.mjs",
@@ -18,6 +19,7 @@
     "build:blog": "node scripts/build-blog-hubs.mjs",
     "validate:rates": "node scripts/validate-rates.mjs",
     "check:staleness": "node scripts/check-staleness.mjs",
+    "verify:fwc": "node --use-env-proxy --disable-warning=UNDICI-EHPA scripts/verify-rates-fwc.mjs",
     "flag:to-regression": "node scripts/flag-to-regression.mjs",
     "seo:report": "node --use-env-proxy --disable-warning=UNDICI-EHPA scripts/seo-report.mjs",
     "seo:check": "node --use-env-proxy --disable-warning=UNDICI-EHPA scripts/seo-report.mjs --check"

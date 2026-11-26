@@ -39,7 +39,7 @@
     <meta name="theme-color" content="#f59e0b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&amp;display=swap" rel="stylesheet">
 
     <!-- FIXED: BreadcrumbList with proper @type/@id on item objects -->
     <script type="application/ld+json">
@@ -146,80 +146,23 @@
     </script>
 
     <style>
-        :root { --navy:#0f172a; --navy2:#141f35; --amber:#f59e0b; --w60:rgba(255,255,255,0.6); --w30:rgba(255,255,255,0.3); --rule:rgba(245,158,11,0.18); --rw:rgba(255,255,255,0.08); }
+        /* One-off components for this post. Shared post styles: /assets/blog-post.css */
+        :root{--navy:#0f172a; --navy2:#141f35; --amber:#f59e0b; --w60:rgba(255,255,255,0.6); --w30:rgba(255,255,255,0.3); --rule:rgba(245,158,11,0.18); --rw:rgba(255,255,255,0.08);}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-        html{font-size:16px;scroll-behavior:smooth;}
-        body{background:var(--navy);color:#fff;font-family:'Outfit',sans-serif;line-height:1.7;}
-        .nav{background:rgba(15,23,42,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--rule);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-        .nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-1px;text-decoration:none;display:flex;align-items:center;gap:0.4rem;}
-        .wm-f,.wm-hr{color:var(--amber);} .wm-itz{color:#fff;}
-        .nav-back{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--w60);text-decoration:none;transition:color 0.2s;}
-        .nav-back:hover{color:var(--amber);}
-        .post-hero{padding:3.5rem 1.5rem 2.5rem;max-width:780px;margin:0 auto;}
-        .post-tag{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;display:flex;align-items:center;gap:0.6rem;}
-        .post-tag::before{content:'';width:24px;height:2px;background:var(--amber);display:inline-block;}
-        .post-h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2rem,5vw,2.8rem);line-height:1.1;letter-spacing:-0.02em;margin-bottom:1.25rem;}
-        .post-h1 em{font-style:italic;color:var(--amber);}
-        .post-meta{display:flex;align-items:center;gap:1rem;font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--w30);margin-bottom:2rem;flex-wrap:wrap;}
-        .meta-dot{width:3px;height:3px;border-radius:50%;background:var(--w30);}
-        .post-intro{font-size:1.1rem;line-height:1.7;color:var(--w60);border-left:3px solid var(--amber);padding-left:1.25rem;margin-bottom:2.5rem;}
-        .post-body{max-width:780px;margin:0 auto;padding:0 1.5rem 5rem;}
-        .post-body h2{font-family:'Playfair Display',serif;font-weight:700;font-size:1.6rem;line-height:1.2;color:#fff;margin:2.5rem 0 1rem;}
-        .post-body h2 em{font-style:italic;color:var(--amber);}
-        .post-body h3{font-size:1.05rem;font-weight:700;color:var(--amber);margin:1.75rem 0 0.6rem;}
-        .post-body p{font-size:0.98rem;line-height:1.75;color:var(--w60);margin-bottom:1.1rem;}
-        .post-body strong{color:#fff;}
-        .post-body a{color:var(--amber);text-decoration:none;}
-        .post-body a:hover{text-decoration:underline;}
-        .post-body ul{margin:0 0 1.1rem 1.25rem;}
-        .post-body li{font-size:0.95rem;color:var(--w60);line-height:1.65;margin-bottom:0.4rem;}
-        .verdict{background:var(--navy2);border:1px solid var(--rw);border-left:4px solid var(--amber);border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;}
-        .verdict-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);margin-bottom:0.6rem;}
-        .verdict p{margin:0;font-size:0.95rem;color:#fff;}
-        .warning-box{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-left:4px solid #ef4444;border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;}
-        .warning-box p{margin:0;font-size:0.95rem;color:rgba(255,255,255,0.8);}
-        .review-box{background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.3);border-left:4px solid #22c55e;border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;display:flex;gap:1.25rem;align-items:flex-start;flex-wrap:wrap;}
+        .review-box{background:rgba(34,197,94,0.07);border:1px solid rgba(34,197,94,0.3);border-left:4px solid var(--pos);border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;display:flex;gap:1.25rem;align-items:flex-start;flex-wrap:wrap;}
         .review-box .rb-body{flex:1 1 320px;}
-        .review-box .rb-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:#22c55e;margin-bottom:0.5rem;}
-        .review-box h3{margin:0 0 0.4rem;color:#fff;font-size:1.05rem;}
-        .review-box p{margin:0;font-size:0.93rem;color:rgba(255,255,255,0.75);}
-        .review-box a.rb-cta{display:inline-block;background:#22c55e;color:var(--navy);font-weight:800;font-size:0.82rem;letter-spacing:0.04em;padding:0.75rem 1.4rem;border-radius:8px;text-decoration:none;white-space:nowrap;align-self:center;}
+        .review-box .rb-label{font-size:13px;color:var(--pos);margin-bottom:0.5rem;}
+        .review-box h3{margin:0 0 0.4rem;color:var(--text);font-size:1.05rem;}
+        .review-box p{margin:0;font-size:0.93rem;color:var(--text2);}
+        .review-box a.rb-cta{display:inline-block;background:#22c55e;color:var(--amber-ink);font-weight:600;font-size:0.82rem;padding:0.75rem 1.4rem;border-radius:8px;text-decoration:none;white-space:nowrap;align-self:center;}
         .review-box a.rb-cta:hover{background:#4ade80;text-decoration:none;}
-        .checklist{background:rgba(34,197,94,0.05);border:1px solid rgba(34,197,94,0.15);border-radius:12px;padding:1.5rem 1.5rem 1.5rem 1.25rem;margin:1.5rem 0;}
-        .checklist-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:#22c55e;margin-bottom:0.85rem;}
-        .checklist ul{margin:0;padding:0;list-style:none;}
-        .checklist li{font-size:0.9rem;color:var(--w60);line-height:1.6;margin-bottom:0.5rem;padding-left:1.5rem;position:relative;}
-        .checklist li::before{content:'✓';position:absolute;left:0;color:#22c55e;font-weight:700;}
-        .dont-list{display:flex;flex-direction:column;gap:1px;margin:1.5rem 0;}
-        .dont-item{background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;padding:0.9rem 1.25rem;display:flex;align-items:flex-start;gap:0.75rem;}
-        .dont-item-x{color:#ef4444;font-size:1rem;flex-shrink:0;margin-top:0.1rem;}
-        .dont-item-text{font-size:0.9rem;color:rgba(255,255,255,0.8);line-height:1.55;}
-        .dont-item-text strong{color:#fff;}
         .template-block{background:var(--navy2);border:1px solid var(--rule);border-radius:12px;overflow:hidden;margin:1.5rem 0;}
-        .template-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);padding:0.75rem 1.25rem;border-bottom:1px solid var(--rw);background:rgba(245,158,11,0.05);}
+        .template-label{font-size:13px;color:var(--text);padding:0.75rem 1.25rem;border-bottom:1px solid var(--rw);background:var(--surface);}
         .template-body{padding:1.25rem;font-size:0.85rem;color:var(--w60);line-height:1.8;}
-        .template-body strong{color:var(--amber);}
-        .template-body .placeholder{color:rgba(245,158,11,0.6);font-style:italic;}
-        .sticky-pill{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--amber);color:var(--navy);padding:0.75rem 1.75rem;border-radius:999px;font-weight:800;font-size:0.8rem;text-decoration:none;z-index:999;white-space:nowrap;box-shadow:0 4px 24px rgba(245,158,11,0.35);letter-spacing:0.04em;}
-        .sticky-pill:hover{background:#fbbf24;}
-        .faq-list{display:flex;flex-direction:column;gap:0.5rem;margin:1.5rem 0;}
-        .faq-item{background:var(--navy2);border:1px solid var(--rw);border-radius:10px;overflow:hidden;}
-        .faq-item summary{padding:1rem 1.25rem;cursor:pointer;font-weight:600;font-size:0.95rem;color:#fff;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
-        .faq-item summary::-webkit-details-marker{display:none;}
-        .faq-item summary::after{content:'+';color:var(--amber);font-size:1.2rem;flex-shrink:0;transition:transform 0.3s;}
-        .faq-item[open] summary::after{transform:rotate(45deg);}
-        .faq-item[open]{border-color:var(--rule);}
-        .faq-answer{padding:0 1.25rem 1rem;font-size:0.88rem;color:var(--w60);line-height:1.65;}
-        .post-cta{background:var(--amber);padding:2.5rem 1.5rem;border-radius:12px;text-align:center;margin:2.5rem 0;}
-        .post-cta h3{font-family:'Playfair Display',serif;font-weight:900;font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem;}
-        .post-cta p{font-size:0.9rem;color:rgba(15,23,42,0.7);margin-bottom:1.25rem;}
-        .post-cta a{display:inline-block;background:var(--navy);color:var(--amber);font-weight:800;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.85rem 2rem;text-decoration:none;transition:background 0.3s;}
-        .post-cta a:hover{background:#1e293b;}
-        footer{background:var(--navy2);border-top:1px solid var(--rule);padding:2rem 1.5rem;text-align:center;}
-        footer p{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.1em;color:var(--w30);}
-        footer a{color:var(--amber);text-decoration:none;}
-        @media(max-width:600px){.sticky-pill{font-size:0.74rem;padding:0.65rem 1.25rem;}}
+        .template-body strong{color:var(--text);}
+        .template-body .placeholder{color:var(--text);}
     </style>
+    <link rel="stylesheet" href="/assets/blog-post.css?v=1">
     <!-- Meta Pixel Code -->
     <script>
     !function(f,b,e,v,n,t,s)
@@ -238,10 +181,17 @@
 </head>
 <body>
 <nav class="nav">
-    <a href="/" class="nav-logo"><span style="display:inline-flex;gap:0;letter-spacing:-1px;"><span class="wm-f">F</span><span class="wm-itz">ITZ</span></span><span class="wm-hr" style="margin-left:0.18em;">HR</span></a>
-    <a href="/blog/" class="nav-back">← Back to Blog</a>
+  <div class="nav-in">
+    <a href="/" class="logo"><em>F</em>ITZ<em>HR</em></a>
+    <div class="nav-right">
+        <a href="/" class="nav-home">Home</a>
+        <a href="/blog/" class="nav-home">Blog</a>
+        <a href="/pricing" class="nav-home">Pricing</a>
+        <a href="/app" class="btn small">Start Free</a>
+    </div>
+  </div>
 </nav>
-<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:900px;margin:0 auto;padding:1.1rem 1.5rem 0;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.45);line-height:1.8;"><a href="/blog/" style="color:rgba(255,255,255,0.6);text-decoration:none;">Blog</a> <span style="opacity:0.5;">&rsaquo;</span> <a href="/blog/topics/performance-warnings" style="color:#f59e0b;text-decoration:none;">Performance &amp; Warnings</a></nav><!-- blog-crumb:end -->
+<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:780px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="color:rgba(232,237,245,0.72);text-decoration:none;">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="/blog/topics/performance-warnings" style="color:rgba(232,237,245,0.72);text-decoration:none;">Performance &amp; Warnings</a></nav><!-- blog-crumb:end -->
 
 <header class="post-hero">
     <div class="post-tag">Warnings · Any Award · Reviewed by HR Professionals</div>
@@ -260,7 +210,7 @@
 
     <p><strong>To write a compliant warning letter in Australia:</strong> include the specific conduct or performance issue with dates and examples, reference any previous discussions, state the expected standard going forward, offer support, specify the improvement timeframe, state consequences of further breaches, and give the employee an opportunity to respond. Vague warnings do not satisfy procedural fairness — and an unfair dismissal built on a vague warning is still an unfair dismissal.</p>
 
-    <p style="font-size:0.82rem;color:rgba(255,255,255,0.4);margin-top:-0.5rem;margin-bottom:1.5rem;">Last reviewed against Fair Work Ombudsman guidance — September 2026</p>
+    <p style="font-size:0.82rem;color:var(--muted);margin-top:-0.5rem;margin-bottom:1.5rem">Last reviewed against Fair Work Ombudsman guidance — September 2026</p>
 
     <div class="verdict">
         <div class="verdict-label">Quick Answer — What Must Be In Every Warning Letter</div>
@@ -365,12 +315,12 @@
     <p>A warning that doesn't hold up at Fair Work is worse than no warning — it suggests you tried to follow a process and failed. These are the errors that most commonly invalidate warnings, and they are exactly what an HR consultant's review is designed to catch.</p>
 
     <div class="dont-list">
-        <div class="dont-item"><div class="dont-item-x">✗</div><div class="dont-item-text"><strong>Being vague.</strong> "Your attitude needs to improve" is not a warning. Neither is "your performance has been unsatisfactory." You must specify exactly what happened, when, and what the expected standard is. The employee must clearly understand what they need to change.</div></div>
-        <div class="dont-item"><div class="dont-item-x">✗</div><div class="dont-item-text"><strong>Not allowing a response.</strong> Issuing a warning letter and asking for an immediate signature — before the employee has had a chance to respond to the allegations — is a procedural failure. They must have a genuine opportunity to respond. Issue the letter, give them 5 business days, consider their response, then finalise.</div></div>
-        <div class="dont-item"><div class="dont-item-x">✗</div><div class="dont-item-text"><strong>Issuing the warning verbally only.</strong> "I told them verbally" is not a warning for Fair Work purposes. If it is not written and signed, it did not happen as far as the Commission is concerned. Always follow up any verbal discussion with a written record.</div></div>
-        <div class="dont-item"><div class="dont-item-x">✗</div><div class="dont-item-text"><strong>Setting an unreasonably short improvement period.</strong> Giving someone 3 days to improve a performance issue that has been developing for months is not a genuine opportunity to improve. The Commission will scrutinise the timeframe. 2–4 weeks for conduct; 4–8 weeks for performance is the expected range.</div></div>
-        <div class="dont-item"><div class="dont-item-x">✗</div><div class="dont-item-text"><strong>Issuing a warning after the decision to terminate has already been made.</strong> This is sometimes called a "sham warning" — going through the motions of a process when the outcome is already decided. The Fair Work Commission identifies this pattern and it significantly undermines your case. A warning must be genuine: the employee must have a real opportunity to improve before any decision is made.</div></div>
-        <div class="dont-item"><div class="dont-item-x">✗</div><div class="dont-item-text"><strong>Not keeping a copy.</strong> Store the signed warning letter — or the unsigned letter with a note that the employee declined to sign — securely. You may need it months or years later if a claim is lodged. Not having a copy is almost as bad as not having issued one.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Being vague.</strong> "Your attitude needs to improve" is not a warning. Neither is "your performance has been unsatisfactory." You must specify exactly what happened, when, and what the expected standard is. The employee must clearly understand what they need to change.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Not allowing a response.</strong> Issuing a warning letter and asking for an immediate signature — before the employee has had a chance to respond to the allegations — is a procedural failure. They must have a genuine opportunity to respond. Issue the letter, give them 5 business days, consider their response, then finalise.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Issuing the warning verbally only.</strong> "I told them verbally" is not a warning for Fair Work purposes. If it is not written and signed, it did not happen as far as the Commission is concerned. Always follow up any verbal discussion with a written record.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Setting an unreasonably short improvement period.</strong> Giving someone 3 days to improve a performance issue that has been developing for months is not a genuine opportunity to improve. The Commission will scrutinise the timeframe. 2–4 weeks for conduct; 4–8 weeks for performance is the expected range.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Issuing a warning after the decision to terminate has already been made.</strong> This is sometimes called a "sham warning" — going through the motions of a process when the outcome is already decided. The Fair Work Commission identifies this pattern and it significantly undermines your case. A warning must be genuine: the employee must have a real opportunity to improve before any decision is made.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Not keeping a copy.</strong> Store the signed warning letter — or the unsigned letter with a note that the employee declined to sign — securely. You may need it months or years later if a claim is lodged. Not having a copy is almost as bad as not having issued one.</div></div>
     </div>
 
     <p>For context on when warnings are required and how many, see our guides on <a href="/blog/how-many-warnings-before-dismissal-australia">how many warnings before dismissal</a>, <a href="/blog/do-i-have-to-give-warning-before-firing-australia">warnings before firing in Australia</a>, <a href="/blog/how-long-does-a-warning-last-australia">how long a written warning lasts</a>, <a href="/blog/can-i-fire-someone-on-the-spot-australia">firing someone on the spot</a>, and <a href="/blog/how-to-terminate-casual-employee-australia">terminating a casual employee</a>.</p>
@@ -411,7 +361,7 @@
         </details>
     </div>
 
-    <p style="font-size:1rem;line-height:1.7;color:rgba(255,255,255,0.7);font-style:italic;border-top:1px solid rgba(255,255,255,0.08);padding-top:1.5rem;margin-top:2rem;">A warning letter done correctly is 10 minutes of work. An unfair dismissal claim based on a missing or defective warning is months of stress and thousands of dollars. The documentation is the protection.</p>
+    <p style="font-size:1rem;line-height:1.7;color:var(--text2);border-top:1px solid rgba(255,255,255,0.08);padding-top:1.5rem;margin-top:2rem">A warning letter done correctly is 10 minutes of work. An unfair dismissal claim based on a missing or defective warning is months of stress and thousands of dollars. The documentation is the protection.</p>
 
     <div class="post-cta">
         <h3>Generate It in Minutes. Have a Real HR Professional Check It.</h3>
@@ -421,10 +371,8 @@
 
 </div>
 
-<a href="/app" class="sticky-pill">Generate a warning letter — reviewed by a real HR professional →</a>
-
 <footer>
-    <p>© 2026 Fitz HR · <a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/app">Try Free</a></p>
+    <p>&copy; Fitzgerald HR Pty Ltd (ABN 87 693 882 709), trading as Fitz HR · <a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/app">Try Free</a></p>
 </footer>
 </body>
 </html>

@@ -151,7 +151,7 @@ function displayAIInsights(insights) {
     const insightsBox = document.getElementById('aiInsightsBox');
     const content = document.getElementById('aiInsightsContent');
     
-    content.innerHTML = insights.replace(/\n/g, '<br>');
+    content.innerHTML = sanitizeHTML(insights).replace(/\n/g, '<br>');
     insightsBox.classList.remove('hidden');
 }
 
@@ -159,7 +159,7 @@ function showAIThinking(message) {
     const insightsBox = document.getElementById('aiInsightsBox');
     const content = document.getElementById('aiInsightsContent');
     
-    content.innerHTML = `<div class="ai-thinking">${message}</div>`;
+    content.innerHTML = `<div class="ai-thinking">${escapeHtml(message)}</div>`;
     insightsBox.classList.remove('hidden');
 }
 
@@ -522,7 +522,7 @@ async function askAIAssistant() {
         const prompt = `As an Australian HR expert, answer this onboarding question:\n\nContext: ${context}\n\nQuestion: ${question}\n\nProvide a clear, actionable answer focused on Australian ${_awardSector()}workplace compliance.`;
         
         const answer = await callClaudeAPI(prompt);
-        responseContent.innerHTML = answer.replace(/\n/g, '<br>');
+        responseContent.innerHTML = sanitizeHTML(answer).replace(/\n/g, '<br>');
         
         // Clear input
         document.getElementById('aiQuestionInput').value = '';
@@ -818,7 +818,7 @@ function getFallbackInsights() {
 
 function displayTrainingInsights(insights) {
     const content = document.getElementById('trainingAIContent');
-    content.innerHTML = insights.replace(/\n/g, '<br>');
+    content.innerHTML = sanitizeHTML(insights).replace(/\n/g, '<br>');
 }
 
 // Build Training Plan
@@ -1128,7 +1128,7 @@ async function askTrainingCoach() {
         const prompt = `As an Australian hospitality training expert, answer this question:\n\nContext: ${context}\n\nQuestion: ${question}\n\nProvide practical, specific advice.`;
         
         const answer = await callClaudeAPI(prompt);
-        responseContent.innerHTML = answer.replace(/\n/g, '<br>');
+        responseContent.innerHTML = sanitizeHTML(answer).replace(/\n/g, '<br>');
         
         document.getElementById('trainingCoachInput').value = '';
     } catch (error) {

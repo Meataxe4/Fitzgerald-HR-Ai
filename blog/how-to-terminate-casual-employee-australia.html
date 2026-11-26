@@ -39,7 +39,7 @@
     <meta name="theme-color" content="#f59e0b">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&amp;display=swap" rel="stylesheet">
     <script type="application/ld+json">
     {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://fitzhr.com/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://fitzhr.com/blog/"},{"@type":"ListItem","position":3,"name":"Casual Employment","item":"https://fitzhr.com/blog/topics/casual-employment"},{"@type":"ListItem","position":4,"name":"How to Terminate a Casual Employee in Australia","item":"https://fitzhr.com/blog/how-to-terminate-casual-employee-australia"}]}
     </script>
@@ -50,70 +50,17 @@
     {"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Can I terminate a casual employee at any time in Australia?","acceptedAnswer":{"@type":"Answer","text":"Not always. Casual employees employed on a regular and systematic basis for at least 6 months (12 months for small businesses) have unfair dismissal protections under the Fair Work Act 2009 (Cth). Simply ceasing to roster a long-term casual is effectively a dismissal and can be challenged at the Fair Work Commission."}},{"@type":"Question","name":"Do casual employees get notice of termination in Australia?","acceptedAnswer":{"@type":"Answer","text":"Under the Fair Work Act 2009 (Cth), casual employees are generally not entitled to notice of termination or payment in lieu. However, some enterprise agreements or individual contracts may include notice provisions. Always check the specific employment terms before acting."}},{"@type":"Question","name":"What is regular and systematic casual employment in Australia?","acceptedAnswer":{"@type":"Answer","text":"Regular and systematic employment means the casual employee works consistent shifts, is rostered in advance, and has a reasonable expectation of ongoing work. In hospitality, most casuals employed for more than a few months meet this threshold — even if their exact hours vary week to week."}},{"@type":"Question","name":"Can a casual employee make an unfair dismissal claim in Australia?","acceptedAnswer":{"@type":"Answer","text":"Yes — once a casual employee has been employed on a regular and systematic basis for 6 months (or 12 months for small businesses with fewer than 15 employees), they have access to unfair dismissal protections under the Fair Work Act 2009 (Cth). This applies even if their engagement has been purely casual and they have never had a formal contract."}},{"@type":"Question","name":"Can I make a casual employee redundant in Australia?","acceptedAnswer":{"@type":"Answer","text":"Yes, but genuine redundancy requires that the position no longer exists, that you have complied with any applicable consultation obligations, and that you have explored reasonable redeployment options first. Simply not needing someone as much is not a genuine redundancy — and a casual employee in regular and systematic employment has the same redundancy protections as a permanent employee."}}]}
     </script>
     <style>
-        :root { --navy:#0f172a; --navy2:#141f35; --amber:#f59e0b; --w60:rgba(255,255,255,0.6); --w30:rgba(255,255,255,0.3); --rule:rgba(245,158,11,0.18); --rw:rgba(255,255,255,0.08); }
+        /* One-off components for this post. Shared post styles: /assets/blog-post.css */
+        :root{--navy:#0f172a; --navy2:#141f35; --amber:#f59e0b; --w60:rgba(255,255,255,0.6); --w30:rgba(255,255,255,0.3); --rule:rgba(245,158,11,0.18); --rw:rgba(255,255,255,0.08);}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-        html{font-size:16px;scroll-behavior:smooth;}
-        body{background:var(--navy);color:#fff;font-family:'Outfit',sans-serif;line-height:1.7;}
-        .nav{background:rgba(15,23,42,0.95);backdrop-filter:blur(16px);border-bottom:1px solid var(--rule);padding:1rem 1.5rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-        .nav-logo{font-weight:800;font-size:1.1rem;letter-spacing:-1px;text-decoration:none;display:flex;align-items:center;gap:0.4rem;}
-        .wm-f,.wm-hr{color:var(--amber);} .wm-itz{color:#fff;}
-        .nav-back{font-family:'DM Mono',monospace;font-size:0.58rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--w60);text-decoration:none;transition:color 0.2s;}
-        .nav-back:hover{color:var(--amber);}
-        .post-hero{padding:3.5rem 1.5rem 2.5rem;max-width:780px;margin:0 auto;}
-        .post-tag{font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;display:flex;align-items:center;gap:0.6rem;}
-        .post-tag::before{content:'';width:24px;height:2px;background:var(--amber);display:inline-block;}
-        .post-h1{font-family:'Playfair Display',serif;font-weight:900;font-size:clamp(2rem,5vw,2.8rem);line-height:1.1;letter-spacing:-0.02em;margin-bottom:1.25rem;}
-        .post-h1 em{font-style:italic;color:var(--amber);}
-        .post-meta{display:flex;align-items:center;gap:1rem;font-family:'DM Mono',monospace;font-size:0.56rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--w30);margin-bottom:2rem;flex-wrap:wrap;}
-        .meta-dot{width:3px;height:3px;border-radius:50%;background:var(--w30);}
-        .post-intro{font-size:1.1rem;line-height:1.7;color:var(--w60);border-left:3px solid var(--amber);padding-left:1.25rem;margin-bottom:2.5rem;}
-        .post-body{max-width:780px;margin:0 auto;padding:0 1.5rem 5rem;}
-        .post-body h2{font-family:'Playfair Display',serif;font-weight:700;font-size:1.6rem;line-height:1.2;color:#fff;margin:2.5rem 0 1rem;}
-        .post-body h2 em{font-style:italic;color:var(--amber);}
-        .post-body h3{font-size:1.05rem;font-weight:700;color:var(--amber);margin:1.75rem 0 0.6rem;}
-        .post-body p{font-size:0.98rem;line-height:1.75;color:var(--w60);margin-bottom:1.1rem;}
-        .post-body strong{color:#fff;}
-        .post-body a{color:var(--amber);text-decoration:none;}
-        .post-body a:hover{text-decoration:underline;}
-        .post-body ul{margin:0 0 1.1rem 1.25rem;}
-        .post-body li{font-size:0.95rem;color:var(--w60);line-height:1.65;margin-bottom:0.4rem;}
-        .verdict{background:var(--navy2);border:1px solid var(--rw);border-left:4px solid var(--amber);border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;}
-        .verdict-label{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);margin-bottom:0.6rem;}
-        .verdict p{margin:0;font-size:0.95rem;color:#fff;}
-        .warning-box{background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-left:4px solid #ef4444;border-radius:0 12px 12px 0;padding:1.5rem;margin:2rem 0;}
-        .warning-box p{margin:0;font-size:0.95rem;color:rgba(255,255,255,0.8);}
         .step-list{display:flex;flex-direction:column;gap:1px;margin:1.5rem 0;}
-        .step-item{display:flex;gap:1.25rem;background:var(--navy2);padding:1.1rem 1.25rem;align-items:flex-start;border-left:3px solid var(--amber);}
-        .step-num{font-family:'Playfair Display',serif;font-weight:900;font-size:1.4rem;color:var(--amber);line-height:1;min-width:1.5rem;opacity:0.5;}
+        .step-item{display:flex;gap:1.25rem;background:var(--navy2);padding:1.1rem 1.25rem;align-items:flex-start;border-left:3px solid var(--line2);}
+        .step-num{font-weight:600;font-size:1.4rem;color:var(--text);line-height:1;min-width:1.5rem;opacity:0.5;}
         .step-content{flex:1;}
-        .step-title{font-weight:700;font-size:0.95rem;color:#fff;margin-bottom:0.25rem;}
+        .step-title{font-weight:600;font-size:0.95rem;color:var(--text);margin-bottom:0.25rem;}
         .step-desc{font-size:0.88rem;color:var(--w60);line-height:1.55;margin:0;}
-        .dont-list{display:flex;flex-direction:column;gap:1px;margin:1.5rem 0;}
-        .dont-item{background:rgba(239,68,68,0.05);border-left:3px solid #ef4444;padding:0.9rem 1.25rem;display:flex;align-items:flex-start;gap:0.75rem;}
-        .dont-item-x{color:#ef4444;font-size:1rem;flex-shrink:0;margin-top:0.1rem;}
-        .dont-item-text{font-size:0.9rem;color:rgba(255,255,255,0.8);line-height:1.55;}
-        .dont-item-text strong{color:#fff;}
-        .faq-list{display:flex;flex-direction:column;gap:0.5rem;margin:1.5rem 0;}
-        .faq-item{background:var(--navy2);border:1px solid var(--rw);border-radius:10px;overflow:hidden;}
-        .faq-item summary{padding:1rem 1.25rem;cursor:pointer;font-weight:600;font-size:0.95rem;color:#fff;list-style:none;display:flex;align-items:center;justify-content:space-between;gap:1rem;}
-        .faq-item summary::-webkit-details-marker{display:none;}
-        .faq-item summary::after{content:'+';color:var(--amber);font-size:1.2rem;flex-shrink:0;transition:transform 0.3s;}
-        .faq-item[open] summary::after{transform:rotate(45deg);}
-        .faq-item[open]{border-color:var(--rule);}
-        .faq-answer{padding:0 1.25rem 1rem;font-size:0.88rem;color:var(--w60);line-height:1.65;}
-        .post-cta{background:var(--amber);padding:2.5rem 1.5rem;border-radius:12px;text-align:center;margin:2.5rem 0;}
-        .post-cta h3{font-family:'Playfair Display',serif;font-weight:900;font-size:1.5rem;color:var(--navy);margin-bottom:0.5rem;}
-        .post-cta p{font-size:0.9rem;color:rgba(15,23,42,0.7);margin-bottom:1.25rem;}
-        .post-cta a{display:inline-block;background:var(--navy);color:var(--amber);font-weight:800;font-size:0.85rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.85rem 2rem;text-decoration:none;transition:background 0.3s;}
-        .post-cta a:hover{background:#1e293b;}
-        /* STICKY CTA */
-                .sticky-pill{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--amber);color:var(--navy);padding:0.75rem 1.75rem;border-radius:999px;font-weight:800;font-size:0.8rem;text-decoration:none;z-index:999;white-space:nowrap;box-shadow:0 4px 24px rgba(245,158,11,0.35);letter-spacing:0.04em;}
-        .sticky-pill:hover{background:#fbbf24;}
-        @media(max-width:600px){.sticky-pill{font-size:0.74rem;padding:0.65rem 1.25rem;}}
-        footer{background:var(--navy2);border-top:1px solid var(--rule);padding:2rem 1.5rem;text-align:center;}
-        footer p{font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.1em;color:var(--w30);}
-        footer a{color:var(--amber);text-decoration:none;}
     </style>
+    <link rel="stylesheet" href="/assets/blog-post.css?v=1">
     <!-- Meta Pixel Code -->
     <script>
     !function(f,b,e,v,n,t,s)
@@ -132,10 +79,17 @@
 </head>
 <body>
 <nav class="nav">
-    <a href="/" class="nav-logo"><span style="display:inline-flex;gap:0;letter-spacing:-1px;"><span class="wm-f">F</span><span class="wm-itz">ITZ</span></span><span class="wm-hr" style="margin-left:0.18em;">HR</span></a>
-    <a href="/blog/" class="nav-back">← Back to Blog</a>
+  <div class="nav-in">
+    <a href="/" class="logo"><em>F</em>ITZ<em>HR</em></a>
+    <div class="nav-right">
+        <a href="/" class="nav-home">Home</a>
+        <a href="/blog/" class="nav-home">Blog</a>
+        <a href="/pricing" class="nav-home">Pricing</a>
+        <a href="/app" class="btn small">Start Free</a>
+    </div>
+  </div>
 </nav>
-<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:900px;margin:0 auto;padding:1.1rem 1.5rem 0;font-family:'DM Mono',monospace;font-size:0.62rem;letter-spacing:0.1em;text-transform:uppercase;color:rgba(255,255,255,0.45);line-height:1.8;"><a href="/blog/" style="color:rgba(255,255,255,0.6);text-decoration:none;">Blog</a> <span style="opacity:0.5;">&rsaquo;</span> <a href="/blog/topics/casual-employment" style="color:#f59e0b;text-decoration:none;">Casual Employment</a></nav><!-- blog-crumb:end -->
+<!-- blog-crumb:start --><nav aria-label="Breadcrumb" style="max-width:780px;margin:0 auto;padding:16px 24px 0;font-family:'Outfit',sans-serif;font-size:14px;color:rgba(232,237,245,0.5);line-height:1.6;"><a href="/blog/" style="color:rgba(232,237,245,0.72);text-decoration:none;">Blog</a> <span style="margin:0 4px;">&rsaquo;</span> <a href="/blog/topics/casual-employment" style="color:rgba(232,237,245,0.72);text-decoration:none;">Casual Employment</a></nav><!-- blog-crumb:end -->
 
 <header class="post-hero">
     <div class="post-tag">Termination · Casual Employment · Fair Work</div>
@@ -147,7 +101,7 @@
         <span>6 min read — could save a $12,000+ unfair dismissal claim</span><span class="meta-dot"></span>
         <span>Legally reviewed — 2026</span>
     </div>
-    <p class="post-intro" style="background:rgba(239,68,68,0.06);border-left:3px solid #ef4444;padding-left:1.25rem;margin-bottom:1rem;color:rgba(255,255,255,0.75);">It's Friday night. You've decided not to roster someone next week. If they've been working for you for 6 months or more, you may have just dismissed them — and you don't know it yet.</p>
+    <p class="post-intro" style="background:rgba(239,68,68,0.06);border-left:3px solid var(--neg);padding-left:1.25rem;margin-bottom:1rem;color:var(--text2)">It's Friday night. You've decided not to roster someone next week. If they've been working for you for 6 months or more, you may have just dismissed them — and you don't know it yet.</p>
     <p class="post-intro">Most hospitality venue owners believe casual employees can be terminated at any time without consequence. This misconception is one of the most common reasons casual employment ends in an unfair dismissal claim. The rules are more nuanced — and the risk is higher — than most operators realise.</p>
 </header>
 
@@ -155,7 +109,7 @@
 
     <p><strong>To terminate a casual employee in Australia:</strong> first determine whether they have unfair dismissal protections (6 months regular and systematic employment, or 12 months for small businesses). If they do, follow the same fair process as a permanent employee — valid reason, prior warnings, opportunity to respond, support person present, and written documentation. Simply ceasing to roster a protected casual is a dismissal.</p>
 
-    <p style="font-size:0.82rem;color:rgba(255,255,255,0.4);margin-top:-0.5rem;margin-bottom:1.5rem;">Last reviewed against Fair Work Ombudsman guidance — April 2026</p>
+    <p style="font-size:0.82rem;color:var(--muted);margin-top:-0.5rem;margin-bottom:1.5rem">Last reviewed against Fair Work Ombudsman guidance — April 2026</p>
 
     <div class="verdict">
         <div class="verdict-label">Quick Answer</div>
@@ -167,24 +121,24 @@
     </div>
 
 
-    <div style="background:var(--navy2);border:1px solid var(--rw);border-radius:12px;padding:1.5rem;margin:1.5rem 0;">
-        <div style="font-family:'DM Mono',monospace;font-size:0.54rem;letter-spacing:0.18em;text-transform:uppercase;color:var(--amber);margin-bottom:1rem;">Quick Check — Am I At Risk?</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-bottom:1rem;">
-            <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);padding:1rem;border-radius:8px 0 0 8px;">
-                <div style="font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.14em;text-transform:uppercase;color:#22c55e;margin-bottom:0.6rem;">Lower Risk</div>
-                <div style="font-size:0.85rem;color:var(--w60);line-height:1.6;">☐ Employed less than 6 months<br>☐ Not on a regular consistent roster<br>☐ Genuinely irregular hours</div>
+    <div style="background:var(--navy2);border:1px solid var(--rw);border-radius:12px;padding:1.5rem;margin:1.5rem 0">
+        <div style="font-size:13px;color:var(--text);margin-bottom:1rem">Quick Check — Am I At Risk?</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;margin-bottom:1rem">
+            <div style="background:rgba(34,197,94,0.06);border:1px solid rgba(34,197,94,0.15);padding:1rem;border-radius:8px 0 0 8px">
+                <div style="font-size:13px;color:var(--pos);margin-bottom:0.6rem">Lower Risk</div>
+                <div style="font-size:0.85rem;color:var(--w60);line-height:1.6">☐ Employed less than 6 months<br>☐ Not on a regular consistent roster<br>☐ Genuinely irregular hours</div>
             </div>
-            <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);padding:1rem;border-radius:0 8px 8px 0;">
-                <div style="font-family:'DM Mono',monospace;font-size:0.52rem;letter-spacing:0.14em;text-transform:uppercase;color:#ef4444;margin-bottom:0.6rem;">High Risk — Follow Full Process</div>
-                <div style="font-size:0.85rem;color:var(--w60);line-height:1.6;">☐ 6+ months employed<br>☐ Regular weekly or weekly-ish shifts<br>☐ Rostered in advance consistently</div>
+            <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.15);padding:1rem;border-radius:0 8px 8px 0">
+                <div style="font-size:13px;color:var(--neg);margin-bottom:0.6rem">High Risk — Follow Full Process</div>
+                <div style="font-size:0.85rem;color:var(--w60);line-height:1.6">☐ 6+ months employed<br>☐ Regular weekly or weekly-ish shifts<br>☐ Rostered in advance consistently</div>
             </div>
         </div>
-        <p style="font-size:0.82rem;color:rgba(255,255,255,0.5);margin:0;text-align:center;">If two or more high-risk boxes apply → assume unfair dismissal protections and follow the full process.</p>
+        <p style="font-size:0.82rem;color:var(--text2);margin:0;text-align:center">If two or more high-risk boxes apply → assume unfair dismissal protections and follow the full process.</p>
     </div>
 
-    <div style="background:rgba(245,158,11,0.08);border:1px solid var(--rule);border-radius:12px;padding:1.25rem;margin:1.5rem 0;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;">
-        <p style="margin:0;font-size:0.92rem;color:#fff;">⚡ Not sure if your casual is protected? Ask Fitz — get a clear answer in 30 seconds before you act.</p>
-        <a href="/app" style="background:var(--amber);color:var(--navy);font-weight:800;font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.65rem 1.25rem;text-decoration:none;white-space:nowrap;flex-shrink:0;">Check Now — Free</a>
+    <div style="background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:1.25rem;margin:1.5rem 0;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap">
+        <p style="margin:0;font-size:0.92rem;color:var(--text)"> Not sure if your casual is protected? Ask Fitz — get a clear answer in 30 seconds before you act.</p>
+        <a href="/app" style="background:var(--amber);color:var(--amber-ink);font-weight:600;font-size:13px;padding:0.65rem 1.25rem;text-decoration:none;white-space:nowrap;flex-shrink:0">Check Now — Free</a>
     </div>
 
     <h2>Can You Just <em>Stop Rostering</em> a Casual?</h2>
@@ -262,11 +216,11 @@
     <h2>What <em>Not</em> to Do</h2>
     <p>These are the mistakes that turn a casual termination into an unfair dismissal claim.</p>
     <div class="dont-list">
-        <div class="dont-item"><div class="dont-item-x">✗</div><div class="dont-item-text"><strong>Don't just stop rostering them without any communication.</strong> If they're regular and systematic, this is a dismissal without a valid reason or fair process — the worst possible outcome at Fair Work. See <a href="/blog/can-i-stop-rostering-casual-employee-australia">can I stop rostering a casual employee?</a> for the full breakdown of when this becomes a dismissal.</div></div>
-        <div class="dont-item"><div class="dont-item-x">✗</div><div class="dont-item-text"><strong>Don't assume short tenure means no protections.</strong> Six months arrives faster than most venue owners expect — and from that point, the casual has the same unfair dismissal access as a permanent employee.</div></div>
-        <div class="dont-item"><div class="dont-item-x">✗</div><div class="dont-item-text"><strong>Don't use "we don't need you as much" as the reason.</strong> If the role still exists, this isn't redundancy — it's a termination without a valid reason. You need a specific, genuine reason that can be documented.</div></div>
-        <div class="dont-item"><div class="dont-item-x">✗</div><div class="dont-item-text"><strong>Don't confuse no-notice with no-process.</strong> Casuals generally aren't entitled to notice of termination — but that doesn't mean no process is required. The fair process obligations are separate from notice obligations.</div></div>
-        <div class="dont-item"><div class="dont-item-x">✗</div><div class="dont-item-text"><strong>Don't retaliate against a casual who raised a complaint.</strong> If the casual has exercised a workplace right — complained about pay, raised a safety issue, or mentioned Fair Work — adverse action including termination is separately actionable regardless of employment type. See our guide on <a href="/blog/what-happens-when-employee-threatens-fair-work">responding to Fair Work threats</a>.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Don't just stop rostering them without any communication.</strong> If they're regular and systematic, this is a dismissal without a valid reason or fair process — the worst possible outcome at Fair Work. See <a href="/blog/can-i-stop-rostering-casual-employee-australia">can I stop rostering a casual employee?</a> for the full breakdown of when this becomes a dismissal.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Don't assume short tenure means no protections.</strong> Six months arrives faster than most venue owners expect — and from that point, the casual has the same unfair dismissal access as a permanent employee.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Don't use "we don't need you as much" as the reason.</strong> If the role still exists, this isn't redundancy — it's a termination without a valid reason. You need a specific, genuine reason that can be documented.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Don't confuse no-notice with no-process.</strong> Casuals generally aren't entitled to notice of termination — but that doesn't mean no process is required. The fair process obligations are separate from notice obligations.</div></div>
+        <div class="dont-item"><div class="dont-item-x"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg></div><div class="dont-item-text"><strong>Don't retaliate against a casual who raised a complaint.</strong> If the casual has exercised a workplace right — complained about pay, raised a safety issue, or mentioned Fair Work — adverse action including termination is separately actionable regardless of employment type. See our guide on <a href="/blog/what-happens-when-employee-threatens-fair-work">responding to Fair Work threats</a>.</div></div>
     </div>
 
     <h2>Genuine Redundancy for <em>Casual Employees</em></h2>
@@ -299,7 +253,7 @@
         </details>
     </div>
 
-    <p style="font-size:1rem;line-height:1.7;color:rgba(255,255,255,0.7);font-style:italic;border-top:1px solid rgba(255,255,255,0.08);padding-top:1.5rem;margin-top:2rem;">Most unfair dismissal claims involving casuals don't come from venue owners acting in bad faith — they come from venue owners who didn't know the 6-month rule existed until it was too late.</p>
+    <p style="font-size:1rem;line-height:1.7;color:var(--text2);border-top:1px solid rgba(255,255,255,0.08);padding-top:1.5rem;margin-top:2rem">Most unfair dismissal claims involving casuals don't come from venue owners acting in bad faith — they come from venue owners who didn't know the 6-month rule existed until it was too late.</p>
 
     <div class="post-cta">
         <h3>Terminate Correctly — Before It Becomes a Claim</h3>
@@ -309,10 +263,8 @@
 
 </div>
 
-<a href="/app" class="sticky-pill">Ask Fitz — get an instant answer →</a>
-
 <!-- Hidden FAQ for AI and search engine full-text indexing -->
-<div style="display:none;">
+<div style="display:none">
 <h2>Casual Employee Termination FAQ Australia</h2>
 <p>Can you fire a casual employee at any time in Australia? No — not once they have been employed on a regular and systematic basis for 6 months or more. At that point they have unfair dismissal protections under the Fair Work Act 2009 (Cth).</p>
 <p>Do casual employees get notice of termination in Australia? Generally no — casual employees are not entitled to notice of termination or payment in lieu under the Fair Work Act 2009. However some contracts or enterprise agreements may include notice provisions.</p>
@@ -324,7 +276,7 @@
 
 
 <footer>
-    <p>© 2026 Fitz HR · <a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/app">Try Free</a></p>
+    <p>&copy; Fitzgerald HR Pty Ltd (ABN 87 693 882 709), trading as Fitz HR · <a href="/">Home</a> · <a href="/blog/">Blog</a> · <a href="/app">Try Free</a></p>
 </footer>
 </body>
 </html>

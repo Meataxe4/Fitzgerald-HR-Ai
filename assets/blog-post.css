@@ -1,0 +1,146 @@
+/* Blog posts: shared styles. Design pass Nov 2026 (unslop by Damir Sokolovsky, @heydamir, CC BY 4.0).
+   Same tokens as the homepage and blog hubs. Linked after each post's own <style>, which now only
+   holds that post's one-off components. The legacy variable names (--navy, --w60, ...) are mapped
+   onto the new tokens so the inline styles inside posts keep working. */
+:root{
+  --bg:#0b1220;--bg2:#0e1626;--surface:#121a2b;--raised:#18223a;
+  --line:rgba(232,237,245,.08);--line2:rgba(232,237,245,.12);
+  --text:#e8edf5;--text2:#a7b1c2;--muted:#7f8aa0;
+  --amber:#f59e0b;--amber-hover:#fbb024;--amber-ink:#1a1204;--amber-line:rgba(245,158,11,.32);
+  --pos:#4cc38a;--neg:#e5484d;
+  --ease:cubic-bezier(.22,1,.36,1);
+  --navy:#0b1220;--navy2:#121a2b;--w60:#a7b1c2;--w30:#7f8aa0;--rule:rgba(232,237,245,.08);--rw:rgba(232,237,245,.08);
+  --red:#e5484d;--green:#4cc38a;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Outfit',"Segoe UI",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased}
+a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--amber);outline-offset:2px;border-radius:4px}
+.icon{width:16px;height:16px;flex-shrink:0;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+h1 em,h2 em,h3 em{font-style:normal;color:inherit}
+
+/* nav (same as the blog hubs) */
+.nav{position:sticky;top:0;z-index:100;background:var(--bg);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1120px;margin:0 auto;padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-weight:600;font-size:18px;letter-spacing:.02em;color:var(--text);text-decoration:none;line-height:1}
+.logo em{font-style:normal;color:var(--amber)}
+.nav-right{display:flex;align-items:center;gap:24px}
+.nav-home{font-size:15px;color:var(--text2);text-decoration:none;transition:color 150ms var(--ease)}
+.nav-home:hover{color:var(--text)}
+.btn{display:inline-flex;align-items:center;justify-content:center;height:48px;padding:0 20px;border-radius:10px;background:var(--amber);color:var(--amber-ink);font-size:15px;font-weight:600;text-decoration:none;white-space:nowrap;box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:background-color 150ms var(--ease),transform 120ms var(--ease)}
+.btn:hover{background:var(--amber-hover)}
+.btn:active{transform:scale(.98)}
+.btn.small{height:36px;padding:0 16px;font-size:14px;border-radius:8px}
+
+/* header */
+.post-hero,.hero{max-width:780px;margin:0 auto;padding:48px 24px 32px}
+.post-tag{font-size:15px;font-weight:500;color:var(--text2);margin-bottom:16px}
+.post-h1,.hero h1{font-weight:500;font-size:clamp(2rem,4.6vw,2.75rem);line-height:1.12;letter-spacing:-.02em;color:var(--text);margin-bottom:20px;text-wrap:balance}
+.post-meta{display:flex;align-items:center;flex-wrap:wrap;gap:8px 12px;font-size:14px;color:var(--muted);margin-bottom:32px;font-variant-numeric:tabular-nums}
+.meta-dot{width:3px;height:3px;border-radius:50%;background:var(--muted);opacity:.6}
+.post-intro,.intro{font-size:18px;line-height:30px;color:var(--text2)}
+.post-intro strong,.intro strong{color:var(--text);font-weight:500}
+
+/* article body */
+.post-body,.body{max-width:780px;margin:0 auto;padding:0 24px 96px}
+.post-body h2,.body h2{font-size:26px;line-height:34px;font-weight:500;letter-spacing:-.01em;color:var(--text);margin:56px 0 16px;text-wrap:balance}
+.post-body h3,.body h3{font-size:18px;line-height:26px;font-weight:500;color:var(--text);margin:32px 0 8px}
+.post-body p,.body p{font-size:17px;line-height:30px;color:var(--text2);margin-bottom:20px}
+.post-body strong,.body strong{color:var(--text);font-weight:600}
+.post-body a,.body a{color:var(--text);text-decoration:underline;text-decoration-color:var(--amber-line);text-underline-offset:3px;transition:text-decoration-color 150ms var(--ease)}
+.post-body a:hover,.body a:hover{text-decoration-color:var(--amber)}
+.post-body ul,.post-body ol,.body ul,.body ol{margin:0 0 20px 24px}
+.post-body li,.body li{font-size:17px;line-height:28px;color:var(--text2);margin-bottom:8px}
+.post-body li::marker,.body li::marker{color:var(--muted)}
+
+/* summary card */
+.verdict{background:var(--surface);border:1px solid var(--line2);border-radius:12px;padding:24px;margin:32px 0}
+.verdict-label{font-size:14px;font-weight:500;color:var(--text2);margin-bottom:8px}
+.verdict p{margin:0;font-size:16px;line-height:28px;color:var(--text)}
+.verdict strong{color:var(--text);font-weight:600}
+
+/* quick answer: the one accented block on a post */
+.quick-answer{background:var(--surface);border:1px solid var(--amber-line);border-radius:12px;padding:24px;margin:32px 0}
+.quick-answer>strong:first-child{display:block;font-size:14px;font-weight:500;color:var(--amber);margin-bottom:8px}
+.quick-answer p{margin:0;font-size:16px;line-height:28px;color:var(--text)}
+
+.warning-box{background:rgba(229,72,77,.06);border:1px solid rgba(229,72,77,.24);border-radius:12px;padding:24px;margin:32px 0}
+.warning-box p{margin:0;font-size:16px;line-height:28px;color:var(--text)}
+.callout{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 24px;margin:24px 0}
+.callout strong{display:block;color:var(--text);font-size:16px;font-weight:500;margin-bottom:4px}
+.callout p{margin:0;font-size:15px;line-height:26px;color:var(--text2)}
+.caption{font-size:14px;line-height:22px;color:var(--muted);margin:8px 0 24px}
+.caption a{color:var(--text2)}
+.highlight,.rate-highlight,.rate-green{color:var(--text);font-weight:600}
+
+/* tables */
+.rate-table{width:100%;border-collapse:collapse;margin:24px 0;font-size:15px;font-variant-numeric:tabular-nums}
+.rate-table th{text-align:left;font-size:14px;font-weight:500;color:var(--text2);padding:12px 16px;border-bottom:1px solid var(--line2);background:var(--surface)}
+.rate-table td{padding:12px 16px;border-bottom:1px solid var(--line);color:var(--text2);vertical-align:top}
+.rate-table td:first-child{color:var(--text);font-weight:500}
+.rate-table tr:last-child td{border-bottom:none}
+
+/* don't list */
+.dont-list{display:flex;flex-direction:column;margin:24px 0;border-top:1px solid var(--line)}
+.dont-item{display:flex;align-items:flex-start;gap:12px;padding:16px 0;border-bottom:1px solid var(--line)}
+.dont-item-x{display:inline-flex;color:var(--neg);margin-top:5px;flex-shrink:0}
+.dont-item-text{font-size:16px;line-height:26px;color:var(--text2)}
+.dont-item-text strong{color:var(--text);font-weight:600}
+
+/* checklist */
+.checklist{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:24px;margin:24px 0}
+.checklist-label{font-size:14px;font-weight:500;color:var(--text2);margin-bottom:12px}
+.checklist ul{margin:0;padding:0;list-style:none}
+.checklist li{position:relative;padding-left:24px;margin-bottom:8px;font-size:16px;line-height:26px;color:var(--text2)}
+.checklist li::before{content:'✓';position:absolute;left:0;color:var(--pos)}
+.checklist ol{margin:0 0 0 20px}
+.checklist ol li{padding-left:0}
+.checklist ol li::before{content:none}
+
+/* related guides */
+.hub-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:24px 0}
+.hub-card{display:block;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;text-decoration:none!important;transition:background-color 150ms var(--ease),border-color 150ms var(--ease)}
+.hub-card:hover{background:var(--raised);border-color:var(--line2)}
+.hub-label{font-size:13px;color:var(--muted);margin-bottom:8px}
+.hub-card h3{font-size:16px;line-height:24px;font-weight:500;color:var(--text);margin:0 0 4px}
+.hub-card p{font-size:14px;line-height:22px;color:var(--text2);margin:0}
+
+/* FAQ */
+.faq-list{margin:24px 0;border-top:1px solid var(--line)}
+.faq-item{border-bottom:1px solid var(--line)}
+.faq-item summary{cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px;padding:20px 0;font-size:17px;font-weight:500;color:var(--text)}
+.faq-item summary::-webkit-details-marker{display:none}
+.faq-item summary::after{content:'+';font-size:20px;font-weight:400;line-height:1;color:var(--muted);flex-shrink:0;transition:transform 150ms var(--ease)}
+.faq-item[open] summary::after{transform:rotate(45deg)}
+.faq-answer{font-size:16px;line-height:28px;color:var(--text2);padding:0 0 20px;max-width:65ch}
+.faq-answer strong{color:var(--text);font-weight:600}
+.faq-answer a{color:var(--text);text-decoration:underline;text-decoration-color:var(--amber-line);text-underline-offset:3px}
+
+/* CTA: one quiet block, same as the hubs */
+.post-cta{background:var(--surface);border:1px solid var(--line2);border-radius:16px;padding:32px;margin:48px 0;display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.post-cta h3{font-size:20px;line-height:28px;font-weight:500;color:var(--text);margin:0}
+.post-cta p{font-size:15px;line-height:24px;color:var(--text2);margin:0 0 12px;max-width:40rem}
+.post-cta a{display:inline-flex;align-items:center;height:48px;padding:0 20px;border-radius:10px;background:var(--amber);color:var(--amber-ink)!important;font-size:15px;font-weight:600;text-decoration:none!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.25);transition:background-color 150ms var(--ease),transform 120ms var(--ease)}
+.post-cta a:hover{background:var(--amber-hover)}
+.post-cta a:active{transform:scale(.98)}
+
+/* footer */
+footer{border-top:1px solid var(--line);padding:32px 24px;text-align:center;background:var(--bg)}
+footer p{font-size:13px;line-height:22px;color:var(--muted)}
+footer a{color:var(--text2);text-decoration:none}
+footer a:hover{color:var(--text)}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}html{scroll-behavior:auto}}
+@media(max-width:600px){
+  .nav-right{gap:16px}
+  .nav .nav-home[href="/"]{display:none}
+  .post-hero,.hero{padding-top:32px}
+  .post-intro,.intro{font-size:17px;line-height:28px}
+  .post-body h2,.body h2{font-size:22px;line-height:30px;margin-top:48px}
+  .post-body p,.body p,.post-body li,.body li{font-size:16px;line-height:28px}
+  .rate-table{display:block;overflow-x:auto;font-size:14px}
+  .rate-table th,.rate-table td{padding:10px 12px}
+  .hub-grid{grid-template-columns:1fr}
+  .post-cta{padding:24px}
+  .post-cta a{width:100%;justify-content:center}
+}

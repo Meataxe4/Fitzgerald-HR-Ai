@@ -2404,15 +2404,65 @@ loadAwardRates();
 // UTILITY FUNCTIONS
 // ========================================
 
+// ---- Output safety ---------------------------------------------------------
+// Anything that did not come from this file's own string literals is
+// untrusted: text a user typed, Firestore fields, model output, Deputy data,
+// file names, error messages. Before it goes into innerHTML it must pass
+// through exactly one of these three:
+//
+//   escapeHtml(x)    plain text shown as text (names, messages, IDs)
+//   escapeJsArg(x)   a value inside a quoted string in an inline handler,
+//                    e.g. onclick="open('${escapeJsArg(id)}')"
+//   sanitizeHTML(x)  content that is meant to keep formatting (model output,
+//                    generated documents). Scripts and handlers are removed.
+
 /**
- * Sanitizes HTML to prevent XSS attacks
- * @param {string} html - Raw HTML string
- * @returns {string} Sanitized HTML safe for innerHTML
+ * Escapes text for use in HTML content or a quoted attribute value.
+ * @param {*} text
+ * @returns {string}
+ */
+function escapeHtml(text) {
+    return String(text == null ? '' : text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+/**
+ * Escapes a value for a quoted JavaScript string inside an inline event
+ * handler attribute. JS-escape first, then HTML-escape, because the browser
+ * decodes the attribute before it runs the script.
+ * @param {*} value
+ * @returns {string}
+ */
+function escapeJsArg(value) {
+    const js = String(value == null ? '' : value)
+        .replace(/\\/g, '\\\\')
+        .replace(/'/g, "\\'")
+        .replace(/"/g, '\\"')
+        .replace(/\r/g, '\\r')
+        .replace(/\n/g, '\\n');
+    return escapeHtml(js);
+}
+
+/**
+ * Removes scripts, event handlers and form controls from untrusted HTML while
+ * keeping its formatting. Fails closed: if DOMPurify did not load, the content
+ * is shown as plain text instead of being trusted.
+ * @param {*} html
+ * @returns {string} HTML safe for innerHTML
  */
 function sanitizeHTML(html) {
-    const temp = document.createElement('div');
-    temp.textContent = html;
-    return temp.innerHTML;
+    const raw = String(html == null ? '' : html);
+    if (typeof DOMPurify === 'undefined' || typeof DOMPurify.sanitize !== 'function') {
+        return escapeHtml(raw);
+    }
+    return DOMPurify.sanitize(raw, {
+        FORBID_TAGS: ['style', 'form', 'input', 'button', 'textarea', 'select', 'option'],
+        FORBID_ATTR: ['srcset', 'formaction']
+    });
 }
 
 /**
@@ -6474,7 +6524,7 @@ function showDocumentPreview(generatedDoc) {
     // Convert the AI-generated content to proper HTML
     const formattedHTML = convertAIContentToHTML(generatedDoc);
     
-    document.getElementById('documentPreviewContent').innerHTML = formattedHTML;
+    document.getElementById('documentPreviewContent').innerHTML = sanitizeHTML(formattedHTML);
     document.getElementById('documentPreviewModal').classList.remove('hidden');
 }
 
@@ -7623,7 +7673,7 @@ function restorePendingDocument() {
         const previewModal = document.getElementById('documentPreviewModal');
         
         if (previewContent && previewModal) {
-            previewContent.innerHTML = pendingDoc.content;
+            previewContent.innerHTML = sanitizeHTML(pendingDoc.content);
             previewModal.dataset.docType = pendingDoc.docType;
             previewModal.dataset.docName = pendingDoc.docName;
             previewModal.classList.remove('hidden');
@@ -9645,8 +9695,8 @@ function showReviewViewerModal(data) {
                 <div class="flex items-center gap-3">
                     <span class="text-4xl">📋</span>
                     <div>
-                        <h2 class="text-2xl font-bold text-white">${data.docName || 'Document Review'}</h2>
-                        <p class="text-amber-200">Reference: ${data.refNumber}</p>
+                        <h2 class="text-2xl font-bold text-white">${escapeHtml(data.docName || 'Document Review')}</h2>
+                        <p class="text-amber-200">Reference: ${escapeHtml(data.refNumber)}</p>
                     </div>
                 </div>
             </div>
@@ -9655,20 +9705,20 @@ function showReviewViewerModal(data) {
                 <!-- Quick Info Bar -->
                 <div class="flex flex-wrap items-center gap-4 text-sm">
                     <span class="bg-amber-500/20 text-amber-400 px-3 py-1 rounded-full font-semibold">
-                        ⏳ ${data.status === 'pending' ? 'Pending Review' : data.status}
+                        ⏳ ${escapeHtml(data.status === 'pending' ? 'Pending Review' : data.status)}
                     </span>
                     <span class="text-slate-400">📅 ${createdDate}</span>
-                    <span class="text-slate-400">👤 ${data.employeeName || 'N/A'} (${data.employeeRole || 'N/A'})</span>
+                    <span class="text-slate-400">👤 ${escapeHtml(data.employeeName || 'N/A')} (${escapeHtml(data.employeeRole || 'N/A')})</span>
                 </div>
                 
                 <!-- Venue & Contact - Compact -->
                 <div class="bg-slate-700/50 rounded-lg p-3 text-sm">
                     <div class="flex flex-wrap gap-4">
-                        <span><span class="text-slate-400">Venue:</span> <span class="text-white">${data.venueName || 'N/A'}</span></span>
-                        <span><span class="text-slate-400">Contact:</span> <span class="text-white">${data.userName || 'N/A'}</span></span>
-                        <span><span class="text-slate-400">Email:</span> <a href="mailto:${data.userEmail}" class="text-blue-400 hover:underline">${data.userEmail || 'N/A'}</a></span>
-                        ${data.signInEmail && data.signInEmail !== data.userEmail ? `<span><span class="text-slate-500">(Sign-in:</span> <span class="text-slate-400">${data.signInEmail})</span></span>` : ''}
-                        <span><span class="text-slate-400">Phone:</span> <a href="tel:${data.phoneNumber}" class="text-blue-400 hover:underline">${data.phoneNumber || 'N/A'}</a></span>
+                        <span><span class="text-slate-400">Venue:</span> <span class="text-white">${escapeHtml(data.venueName || 'N/A')}</span></span>
+                        <span><span class="text-slate-400">Contact:</span> <span class="text-white">${escapeHtml(data.userName || 'N/A')}</span></span>
+                        <span><span class="text-slate-400">Email:</span> <a href="mailto:${escapeHtml(data.userEmail)}" class="text-blue-400 hover:underline">${escapeHtml(data.userEmail || 'N/A')}</a></span>
+                        ${data.signInEmail && data.signInEmail !== data.userEmail ? `<span><span class="text-slate-500">(Sign-in:</span> <span class="text-slate-400">${escapeHtml(data.signInEmail)})</span></span>` : ''}
+                        <span><span class="text-slate-400">Phone:</span> <a href="tel:${escapeHtml(data.phoneNumber)}" class="text-blue-400 hover:underline">${escapeHtml(data.phoneNumber || 'N/A')}</a></span>
                     </div>
                 </div>
                 
@@ -9676,7 +9726,7 @@ function showReviewViewerModal(data) {
                 ${data.issueDescription ? `
                 <div class="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
                     <h3 class="text-red-400 font-semibold mb-2">📝 Issue Description</h3>
-                    <p class="text-slate-300 text-sm whitespace-pre-wrap">${data.issueDescription}</p>
+                    <p class="text-slate-300 text-sm whitespace-pre-wrap">${escapeHtml(data.issueDescription)}</p>
                 </div>
                 ` : ''}
                 
@@ -9684,7 +9734,7 @@ function showReviewViewerModal(data) {
                 ${data.previousWarnings ? `
                 <div class="bg-orange-900/20 border border-orange-500/30 rounded-lg p-4">
                     <h3 class="text-orange-400 font-semibold mb-2">⚠️ Previous Warnings</h3>
-                    <p class="text-slate-300 text-sm whitespace-pre-wrap">${data.previousWarnings}</p>
+                    <p class="text-slate-300 text-sm whitespace-pre-wrap">${escapeHtml(data.previousWarnings)}</p>
                 </div>
                 ` : ''}
                 
@@ -9692,7 +9742,7 @@ function showReviewViewerModal(data) {
                 ${data.employeeResponse ? `
                 <div class="bg-blue-900/20 border border-blue-500/30 rounded-lg p-4">
                     <h3 class="text-blue-400 font-semibold mb-2">💬 Employee Response</h3>
-                    <p class="text-slate-300 text-sm whitespace-pre-wrap">${data.employeeResponse}</p>
+                    <p class="text-slate-300 text-sm whitespace-pre-wrap">${escapeHtml(data.employeeResponse)}</p>
                 </div>
                 ` : ''}
                 
@@ -9715,7 +9765,7 @@ function showReviewViewerModal(data) {
                         class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition-all">
                     📋 Copy Document
                 </button>
-                <button onclick="downloadReviewDocument('${data.refNumber}', '${data.docName || 'Document'}')" 
+                <button onclick="downloadReviewDocument('${escapeJsArg(data.refNumber)}', '${escapeJsArg(data.docName || 'Document')}')" 
                         class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-lg transition-all">
                     📥 Download Word
                 </button>
@@ -11829,7 +11879,7 @@ async function sendMessage() {
         
         // Show redirect message without using a prompt
         const redirectMessage = createDocumentRedirectMessage(documentRequest);
-        addMessage('assistant', redirectMessage);
+        addMessage('assistant', redirectMessage, { trusted: true });
         return;
     }
     
@@ -11856,7 +11906,7 @@ async function sendMessage() {
         removeThinkingIndicator(thinkingDiv);
         
         // Build final response with injections
-        let finalResponse = response;
+        let finalResponse = sanitizeHTML(response); // model output is untrusted; the injected boxes below are ours
         
         // ✅ INJECT TOOL SUGGESTIONS SECOND (max 2 tools)
         if (toolNeeds && toolNeeds.length > 0) {
@@ -11877,7 +11927,7 @@ async function sendMessage() {
             finalResponse = warningBox + finalResponse;
         }
         
-        addMessage('assistant', finalResponse);
+        addMessage('assistant', finalResponse, { trusted: true });
         trackConversation(message, response);
         conversationHistory.push({ role: 'assistant', content: response });
         
@@ -11930,7 +11980,18 @@ function removeThinkingIndicator(thinkingDiv) {
     }
 }
 
-function addMessage(role, content) {
+// `content` is untrusted by default: a user's message is shown as plain text,
+// and assistant content (model output, restored history) is sanitised. Pass
+// { trusted: true } only for HTML assembled in this file whose untrusted
+// parts were already sanitised, e.g. our own tool-suggestion buttons.
+function addMessage(role, content, options) {
+    content = String(content == null ? '' : content);
+    if (role === 'user') {
+        content = escapeHtml(content);
+    } else if (!(options && options.trusted === true)) {
+        content = sanitizeHTML(content);
+    }
+
     let container = DOM.messagesContainer.querySelector('.space-y-6');
     
     // If container doesn't exist, create it
@@ -13030,13 +13091,6 @@ function formatRelativeDate(date) {
     return date.toLocaleDateString();
 }
 
-// Escape HTML
-function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-}
-
 // Initialize conversation system
 function initConversationSystem() {
     loadConversations();
@@ -13460,7 +13514,7 @@ function performSidebarSearch() {
             <div class="text-xs text-slate-300 py-2 px-2 hover:bg-slate-700 rounded cursor-pointer border-b border-slate-700/50" 
                  onclick="openSearchResult('${r.conversationId}')">
                 <div class="text-slate-400 text-xs mb-1">${escapeHtml(r.conversationTitle)}</div>
-                <div>${highlighted}</div>
+                <div>${sanitizeHTML(highlighted)}</div>
             </div>
         `;
     }).join('');
@@ -16694,7 +16748,7 @@ function performSidebarSearch() {
     
     resultsDiv.innerHTML = results.slice(0, 5).map(conv => {
         const preview = conv.content.substring(0, 60) + '...';
-        return `<div class="text-xs text-slate-300 py-2 px-2 hover:bg-slate-700 rounded cursor-pointer">${preview}</div>`;
+        return `<div class="text-xs text-slate-300 py-2 px-2 hover:bg-slate-700 rounded cursor-pointer">${escapeHtml(preview)}</div>`;
     }).join('');
 }
 
@@ -16770,7 +16824,7 @@ function performSearch() {
                     <span class="text-xs text-slate-500">${conv.role === 'user' ? '👤 You' : '<span class="fitz-thinking-wrap"><span class="fitz-bot fitz-xs" style="vertical-align: middle;"></span> Fitz</span>'}</span>
                     <span class="text-xs text-slate-500">${conv.timestamp || 'Recent'}</span>
                 </div>
-                <div class="text-sm text-slate-300">${highlighted}</div>
+                <div class="text-sm text-slate-300">${sanitizeHTML(highlighted)}</div>
             </div>
         `;
     }).join('');
@@ -18715,14 +18769,14 @@ async function loadConversationsAdmin() {
                 <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 hover:border-purple-500 transition-all">
                     <div class="flex items-start justify-between mb-2">
                         <div>
-                            <span class="text-purple-400 font-semibold">${conv.userName}</span>
+                            <span class="text-purple-400 font-semibold">${escapeHtml(conv.userName)}</span>
                             <span class="text-slate-500 text-xs ml-2">${dateStr}</span>
                         </div>
-                        <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${conv.title}</span>
+                        <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${escapeHtml(conv.title)}</span>
                     </div>
                     <div class="text-sm">
-                        <p class="text-slate-300 mb-2"><strong>User:</strong> ${conv.userMessage}...</p>
-                        <p class="text-slate-400 text-xs"><strong>Response:</strong> ${conv.assistantResponse}...</p>
+                        <p class="text-slate-300 mb-2"><strong>User:</strong> ${escapeHtml(conv.userMessage)}...</p>
+                        <p class="text-slate-400 text-xs"><strong>Response:</strong> ${escapeHtml(conv.assistantResponse)}...</p>
                     </div>
                 </div>
             `;
@@ -18730,7 +18784,7 @@ async function loadConversationsAdmin() {
         
         list.innerHTML = html;
     } catch (error) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error: ' + error.message + '</div>';
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error: ' + escapeHtml(error.message) + '</div>';
     }
 }
 
@@ -18804,7 +18858,7 @@ async function loadThemes() {
             html += `
                 <div class="bg-slate-900 border border-slate-700 rounded-lg p-4">
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-purple-400 font-semibold">${themeData.theme}</span>
+                        <span class="text-purple-400 font-semibold">${escapeHtml(themeData.theme)}</span>
                         <span class="text-2xl font-bold text-purple-400">${themeData.count}</span>
                     </div>
                     <div class="h-2 bg-slate-700 rounded-full overflow-hidden">
@@ -18904,7 +18958,7 @@ async function loadUsers() {
 
         renderAdminUsers();
     } catch (error) {
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + escapeHtml(error.message) + '</div>';
     }
 }
 
@@ -18982,9 +19036,9 @@ function buildAdminUserCard(profile) {
     if (profile.tier === 'free') {
         const cap = CONFIG.CREDITS.FREE_TIER.MONTHLY_PROMPTS;
         const nearCap = profile.monthlyPromptsUsed >= cap * 0.75;
-        promptsBadge = `<span class="text-xs ${nearCap ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-700/60 text-slate-400'} px-2 py-1 rounded">${profile.monthlyPromptsUsed}/${cap} prompts</span>`;
+        promptsBadge = `<span class="text-xs ${nearCap ? 'bg-amber-500/20 text-amber-400' : 'bg-slate-700/60 text-slate-400'} px-2 py-1 rounded">${escapeHtml(profile.monthlyPromptsUsed)}/${escapeHtml(cap)} prompts</span>`;
     } else if (profile.reviewCredits) {
-        promptsBadge = `<span class="text-xs bg-slate-700/60 text-slate-400 px-2 py-1 rounded">${profile.reviewCreditsUsed}/${profile.reviewCredits} credits</span>`;
+        promptsBadge = `<span class="text-xs bg-slate-700/60 text-slate-400 px-2 py-1 rounded">${escapeHtml(profile.reviewCreditsUsed)}/${escapeHtml(profile.reviewCredits)} credits</span>`;
     }
 
     const legalStatus = profile.legalTermsAccepted
@@ -19022,9 +19076,9 @@ function buildAdminUserCard(profile) {
                     ${venueMeta ? `<p class="text-xs text-slate-400">${venueMeta}</p>` : ''}
                 </div>
                 <div class="flex flex-col items-end gap-1 flex-shrink-0">
-                    <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${profile.messageCount} chats</span>
-                    <span class="text-xs bg-slate-700/60 text-slate-300 px-2 py-1 rounded">${profile.toolTotal} tool uses</span>
-                    ${profile.documentCount ? `<span class="text-xs bg-slate-700/60 text-slate-300 px-2 py-1 rounded">${profile.documentCount} docs</span>` : ''}
+                    <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${escapeHtml(profile.messageCount)} chats</span>
+                    <span class="text-xs bg-slate-700/60 text-slate-300 px-2 py-1 rounded">${escapeHtml(profile.toolTotal)} tool uses</span>
+                    ${profile.documentCount ? `<span class="text-xs bg-slate-700/60 text-slate-300 px-2 py-1 rounded">${escapeHtml(profile.documentCount)} docs</span>` : ''}
                     ${promptsBadge}
                     ${legalStatus}
                     ${inactiveBadge}
@@ -19190,13 +19244,13 @@ async function loadHighRisk() {
                             <p class="${textClass} font-semibold truncate">${escapeHtml(risk.title)}</p>
                             <p class="text-slate-500 text-xs">${date}</p>
                         </div>
-                        <span class="text-xs ${badgeClass} px-2 py-1 rounded uppercase font-bold">${risk.severity}</span>
+                        <span class="text-xs ${badgeClass} px-2 py-1 rounded uppercase font-bold">${escapeHtml(risk.severity)}</span>
                     </div>
                     <div class="text-sm space-y-1">
                         <p class="text-slate-400"><strong>User:</strong> ${escapeHtml(risk.userName)}</p>
                         <p class="text-slate-500 text-xs">${escapeHtml(risk.userEmail)}</p>
-                        <p class="text-slate-300 mt-2">Detected: <span class="${textClass} font-semibold">${risk.keyword}</span></p>
-                        <p class="text-slate-500 text-xs">${risk.messageCount} messages in conversation</p>
+                        <p class="text-slate-300 mt-2">Detected: <span class="${textClass} font-semibold">${escapeHtml(risk.keyword)}</span></p>
+                        <p class="text-slate-500 text-xs">${escapeHtml(risk.messageCount)} messages in conversation</p>
                     </div>
                 </div>
             `;
@@ -19206,7 +19260,7 @@ async function loadHighRisk() {
         list.innerHTML = html;
     } catch (error) {
         console.error('High risk load error:', error);
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + escapeHtml(error.message) + '</div>';
     }
 }
 
@@ -19363,11 +19417,11 @@ async function loadDocuments() {
             let actionButtons = '';
             if (doc.download_url) {
                 actionButtons = `
-                    <button onclick="viewAdminDocument('${docId}')" class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded hover:bg-purple-500/30 transition-colors">👁️ View</button>
-                    <button onclick="deleteAdminDocument('${docId}')" class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded hover:bg-red-500/30 transition-colors">🗑️</button>
+                    <button onclick="viewAdminDocument('${escapeJsArg(docId)}')" class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded hover:bg-purple-500/30 transition-colors">👁️ View</button>
+                    <button onclick="deleteAdminDocument('${escapeJsArg(docId)}')" class="text-xs bg-red-500/20 text-red-400 px-2 py-1 rounded hover:bg-red-500/30 transition-colors">🗑️</button>
                 `;
             } else if (doc.content || doc.document_url) {
-                actionButtons = `<button onclick="viewAdminDocument('${docId}')" class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded hover:bg-purple-500/30 transition-colors">👁️ View</button>`;
+                actionButtons = `<button onclick="viewAdminDocument('${escapeJsArg(docId)}')" class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded hover:bg-purple-500/30 transition-colors">👁️ View</button>`;
             }
             
             html += `
@@ -19376,22 +19430,22 @@ async function loadDocuments() {
                         <div class="flex items-center gap-3 min-w-0 flex-1">
                             <span class="text-2xl flex-shrink-0">${config.emoji}</span>
                             <div class="min-w-0">
-                                <p class="${config.textClass} font-semibold truncate">${config.name}</p>
+                                <p class="${config.textClass} font-semibold truncate">${escapeHtml(config.name)}</p>
                                 <p class="text-slate-500 text-xs">${date}</p>
                             </div>
                         </div>
                         <div class="flex flex-wrap items-center gap-2">
-                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${doc.user_code || 'Unknown'}</span>
+                            <span class="text-xs bg-purple-500/20 text-purple-400 px-2 py-1 rounded">${escapeHtml(doc.user_code || 'Unknown')}</span>
                             ${formatBadge}
                             ${actionButtons}
                         </div>
                     </div>
                     <div class="text-sm space-y-1 mt-3 pt-3 border-t border-slate-700/50">
-                        <p class="text-slate-300"><strong>Employee:</strong> ${doc.employee_name || 'N/A'}</p>
-                        ${doc.venue_name ? `<p class="text-slate-400 text-xs">Venue: ${doc.venue_name}</p>` : ''}
-                        ${doc.user_email ? `<p class="text-slate-500 text-xs">User: ${doc.user_email}</p>` : ''}
+                        <p class="text-slate-300"><strong>Employee:</strong> ${escapeHtml(doc.employee_name || 'N/A')}</p>
+                        ${doc.venue_name ? `<p class="text-slate-400 text-xs">Venue: ${escapeHtml(doc.venue_name)}</p>` : ''}
+                        ${doc.user_email ? `<p class="text-slate-500 text-xs">User: ${escapeHtml(doc.user_email)}</p>` : ''}
                         ${doc.file_size ? `<p class="text-slate-600 text-xs">Size: ${(doc.file_size / 1024).toFixed(1)} KB</p>` : ''}
-                        <p class="text-slate-600 text-xs mt-2">ID: ${docId}</p>
+                        <p class="text-slate-600 text-xs mt-2">ID: ${escapeHtml(docId)}</p>
                     </div>
                 </div>
             `;
@@ -19403,7 +19457,7 @@ async function loadDocuments() {
         list.innerHTML = html;
     } catch (error) {
         console.error('Documents load error:', error);
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + escapeHtml(error.message) + '</div>';
     }
 }
 
@@ -19510,16 +19564,16 @@ async function loadSubscriptions() {
                     <div class="bg-slate-900 border ${tierBorder} rounded-lg p-3">
                         <div class="flex items-center justify-between flex-wrap gap-2">
                             <div class="min-w-0 flex-1">
-                                <p class="text-white font-semibold truncate">${user.name}</p>
-                                <p class="text-slate-500 text-xs truncate">${user.email}</p>
+                                <p class="text-white font-semibold truncate">${escapeHtml(user.name)}</p>
+                                <p class="text-slate-500 text-xs truncate">${escapeHtml(user.email)}</p>
                             </div>
                             <div class="flex items-center gap-2">
-                                <span class="text-xs ${tierBadge} px-2 py-1 rounded font-bold uppercase">${user.tier}</span>
-                                <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">${user.billing}</span>
+                                <span class="text-xs ${tierBadge} px-2 py-1 rounded font-bold uppercase">${escapeHtml(user.tier)}</span>
+                                <span class="text-xs bg-slate-700 text-slate-300 px-2 py-1 rounded">${escapeHtml(user.billing)}</span>
                             </div>
                         </div>
                         <div class="mt-2 text-xs text-slate-400">
-                            Credits: ${user.creditsUsed}/${user.creditsTotal} used
+                            Credits: ${escapeHtml(user.creditsUsed)}/${escapeHtml(user.creditsTotal)} used
                             ${user.stripeCustomerId ? ' • <span class="text-green-400">Stripe ✓</span>' : ''}
                         </div>
                     </div>
@@ -19540,7 +19594,7 @@ async function loadSubscriptions() {
         list.innerHTML = html;
     } catch (error) {
         console.error('Subscriptions load error:', error);
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + escapeHtml(error.message) + '</div>';
     }
 }
 
@@ -19635,35 +19689,35 @@ async function loadExpertReviews() {
                 <div class="bg-slate-900 border ${borderClass} rounded-lg p-3">
                     <div class="flex items-start justify-between flex-wrap gap-2 mb-2">
                         <div class="min-w-0 flex-1">
-                            <p class="text-white font-semibold truncate">${docName}</p>
+                            <p class="text-white font-semibold truncate">${escapeHtml(docName)}</p>
                             <p class="text-slate-500 text-xs">${date}</p>
-                            <p class="text-purple-400 text-xs font-mono">${refNumber}</p>
+                            <p class="text-purple-400 text-xs font-mono">${escapeHtml(refNumber)}</p>
                         </div>
-                        <span class="text-xs ${statusBadge} px-2 py-1 rounded font-bold uppercase">${status.replace('_', ' ')}</span>
+                        <span class="text-xs ${statusBadge} px-2 py-1 rounded font-bold uppercase">${escapeHtml(status.replace('_', ' '))}</span>
                     </div>
                     <div class="text-sm space-y-1">
-                        <p class="text-slate-400"><strong>Employee:</strong> ${review.employeeName || 'N/A'} (${review.employeeRole || 'N/A'})</p>
-                        <p class="text-slate-400"><strong>Venue:</strong> ${review.venueName || 'N/A'}</p>
-                        <p class="text-slate-500 text-xs">${review.userEmail || ''}</p>
+                        <p class="text-slate-400"><strong>Employee:</strong> ${escapeHtml(review.employeeName || 'N/A')} (${escapeHtml(review.employeeRole || 'N/A')})</p>
+                        <p class="text-slate-400"><strong>Venue:</strong> ${escapeHtml(review.venueName || 'N/A')}</p>
+                        <p class="text-slate-500 text-xs">${escapeHtml(review.userEmail || '')}</p>
                     </div>
                     <div class="mt-3 flex flex-wrap gap-2">
-                        <button onclick="openReviewFromAdmin('${refNumber}')" 
+                        <button onclick="openReviewFromAdmin('${escapeJsArg(refNumber)}')" 
                                 class="text-xs bg-purple-500 hover:bg-purple-600 text-white px-3 py-1.5 rounded transition-colors">
                             👁️ View Document
                         </button>
                         ${status === 'pending' ? `
-                            <button onclick="updateReviewStatus('${refNumber}', 'in_progress')" 
+                            <button onclick="updateReviewStatus('${escapeJsArg(refNumber)}', 'in_progress')" 
                                     class="text-xs bg-blue-500 hover:bg-blue-600 text-white px-3 py-1.5 rounded transition-colors">
                                 Start Review
                             </button>
                         ` : ''}
                         ${status === 'in_progress' ? `
-                            <button onclick="updateReviewStatus('${refNumber}', 'completed')" 
+                            <button onclick="updateReviewStatus('${escapeJsArg(refNumber)}', 'completed')" 
                                     class="text-xs bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded transition-colors">
                                 Mark Complete
                             </button>
                         ` : ''}
-                        <button onclick="emailReviewUser('${review.userEmail}')" 
+                        <button onclick="emailReviewUser('${escapeJsArg(review.userEmail)}')" 
                                 class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded transition-colors">
                             ✉️ Email
                         </button>
@@ -19676,7 +19730,7 @@ async function loadExpertReviews() {
         list.innerHTML = html;
     } catch (error) {
         console.error('Reviews load error:', error);
-        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + error.message + '</div>';
+        list.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading data: ' + escapeHtml(error.message) + '</div>';
     }
 }
 
@@ -19994,7 +20048,7 @@ async function loadCharts() {
         
     } catch (error) {
         console.error('Charts load error:', error);
-        container.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading charts: ' + error.message + '</div>';
+        container.innerHTML = '<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center text-red-400">Error loading charts: ' + escapeHtml(error.message) + '</div>';
     }
 }
 
@@ -20064,15 +20118,15 @@ function filterConversations() {
             <div class="bg-slate-900 border border-slate-700 rounded-lg p-4 hover:border-purple-500 transition-all">
                 <div class="flex items-start justify-between mb-2">
                     <div>
-                        <span class="text-purple-400 font-semibold">${conv.user}</span>
+                        <span class="text-purple-400 font-semibold">${escapeHtml(conv.user)}</span>
                         <span class="text-slate-500 text-xs ml-2">${date}</span>
                         ${riskBadge}
                     </div>
-                    <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${conv.theme}</span>
+                    <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-1 rounded">${escapeHtml(conv.theme)}</span>
                 </div>
                 <div class="text-sm">
-                    <p class="text-slate-300 mb-2"><strong>User:</strong> ${conv.userMessage}</p>
-                    <p class="text-slate-400 text-xs"><strong>Response:</strong> ${conv.assistantResponse.substring(0, 150)}...</p>
+                    <p class="text-slate-300 mb-2"><strong>User:</strong> ${escapeHtml(conv.userMessage)}</p>
+                    <p class="text-slate-400 text-xs"><strong>Response:</strong> ${escapeHtml(conv.assistantResponse.substring(0, 150))}...</p>
                 </div>
             </div>
         `;
@@ -20863,7 +20917,7 @@ async function analyzeRosterDescription() {
         document.getElementById('rosterStressResults').innerHTML = `
             <div class="bg-slate-900 border-2 border-red-500 rounded-lg p-6">
                 <h3 class="text-red-400 font-bold mb-4">🔍 Analysis Results</h3>
-                <div class="text-slate-200 text-sm">${response.replace(/\n/g, '<br>')}</div>
+                <div class="text-slate-200 text-sm">${sanitizeHTML(response).replace(/\n/g, '<br>')}</div>
             </div>
         `;
         
@@ -20997,7 +21051,7 @@ async function analyzeScenario() {
         document.getElementById('scenarioResults').innerHTML = `
             <div class="bg-slate-900 border border-green-500 rounded-lg p-6">
                 <h3 class="text-green-500 font-bold mb-4">✅ Analysis</h3>
-                <div class="text-slate-200 text-sm">${response.replace(/\n/g, '<br>')}</div>
+                <div class="text-slate-200 text-sm">${sanitizeHTML(response).replace(/\n/g, '<br>')}</div>
             </div>
         `;
 
@@ -22844,7 +22898,7 @@ function updateRosterDashboard(rosters) {
     document.getElementById('compliantShifts').textContent = compliant;
     document.getElementById('issueShifts').textContent = total - compliant;
     document.getElementById('totalCost').textContent = `$${cost.toFixed(2)}`;
-    document.getElementById('rosterList').innerHTML = rosters.map(r => `<div class="bg-slate-700 rounded-lg p-4 ${r.compliance.warnings.length ? 'border-2 border-red-500' : 'border border-slate-600'}"><div class="flex justify-between mb-3"><div class="flex gap-3"><div class="w-12 h-12 bg-slate-600 rounded-full flex items-center justify-center text-white font-bold">${r.employee.name[0]}</div><div><div class="font-semibold text-white">${r.employee.name}</div><div class="text-sm text-slate-400">${r.position}</div></div></div><div class="text-right"><div class="font-semibold text-white">${r.date}</div><div class="text-sm text-slate-400">${r.startTime}-${r.endTime}</div></div></div>${r.compliance.warnings.length ? `<div class="bg-red-900/30 border border-red-500/30 rounded p-3"><div class="font-semibold text-red-400">⚠️ ${r.compliance.warnings.length} Issue(s)</div>${r.compliance.warnings.map(w => `<div class="text-sm text-red-300 mt-1">${w.type}: ${w.message}</div>`).join('')}</div>` : '<div class="bg-green-900/30 border border-green-500/30 rounded p-3 text-green-400">✅ Compliant</div>'}</div>`).join('');
+    document.getElementById('rosterList').innerHTML = rosters.map(r => `<div class="bg-slate-700 rounded-lg p-4 ${r.compliance.warnings.length ? 'border-2 border-red-500' : 'border border-slate-600'}"><div class="flex justify-between mb-3"><div class="flex gap-3"><div class="w-12 h-12 bg-slate-600 rounded-full flex items-center justify-center text-white font-bold">${escapeHtml(String(r.employee.name || '')[0] || '')}</div><div><div class="font-semibold text-white">${escapeHtml(r.employee.name)}</div><div class="text-sm text-slate-400">${escapeHtml(r.position)}</div></div></div><div class="text-right"><div class="font-semibold text-white">${escapeHtml(r.date)}</div><div class="text-sm text-slate-400">${escapeHtml(r.startTime)}-${escapeHtml(r.endTime)}</div></div></div>${r.compliance.warnings.length ? `<div class="bg-red-900/30 border border-red-500/30 rounded p-3"><div class="font-semibold text-red-400">⚠️ ${r.compliance.warnings.length} Issue(s)</div>${r.compliance.warnings.map(w => `<div class="text-sm text-red-300 mt-1">${escapeHtml(w.type)}: ${escapeHtml(w.message)}</div>`).join('')}</div>` : '<div class="bg-green-900/30 border border-green-500/30 rounded p-3 text-green-400">✅ Compliant</div>'}</div>`).join('');
 }
 
 function openRosterCompliance() {

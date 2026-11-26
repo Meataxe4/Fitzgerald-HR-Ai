@@ -30,7 +30,7 @@ Hi [first name],
 
 The 2026 Annual Wage Review rates took effect 1 July — a 4.75% rise across the modern
 awards — and the errors employers make in the first payroll cycles are the expensive kind:
-Fair Work penalties for award non-compliance run up to $93,900 per contravention for
+Fair Work penalties for award non-compliance run up to $109,200 per contravention for
 companies, and a typical unfair dismissal claim costs $10,000–$50,000+ once legal fees land.
 
 Three mistakes I can walk your readers through, with current figures:
@@ -109,7 +109,7 @@ Swap the bracketed first line and, where marked, the sector skew of point 3.
   SCHADS $27.55 · Health (support services L1) $26.97 · Manufacturing C14 $25.74
 - Hospitality penalty schedule: Sat 125%/150% · Sun 150%/175% · PH 225%/250% (casual
   figures include the 25% loading) · evening +$2.95/hr · night +$4.42/hr
-- Fair Work exposure: up to $93,900 per contravention (companies); unfair dismissal
+- Fair Work exposure: up to $109,200 per contravention (companies); unfair dismissal
   claims typically $10,000–$50,000+
 - Per-award guides for linking: fitzhr.com/hospitality-award-guide, /schads-award-guide,
   /retail-award-guide, /manufacturing-award-guide, /health-award-guide,
